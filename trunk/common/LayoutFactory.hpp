@@ -17,8 +17,8 @@ namespace Damaris {
 			int d = layout->getDimensions();
 			for(int i = 0; i < d; i++)
 			{
-				buffer[2*i+2] = (int64_t)(layout->getStartIndex(i));
-				buffer[2*i+1+2] = (int64_t)(layout->getEndIndex(i));
+				buffer[2*i+2] = layout->getStartIndex(i);
+				buffer[2*i+1+2] = layout->getEndIndex(i);
 			}
 			return 0;
 		}
@@ -30,9 +30,11 @@ namespace Damaris {
 			int32_t dimensions = (int32_t)(buffer[1]);
 			
 			std::vector<int64_t> extents(2*dimensions,0);
-			
-			for(int i = 0; i < dimensions; i++)
+			for(int i = 0; i < dimensions*2; i++) 
+			{
 				extents[i] = buffer[i+2];
+			}
+			printf("\n");
 			
 			layout = new Layout(type,dimensions,extents);
 			return layout;

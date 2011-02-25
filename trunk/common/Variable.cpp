@@ -32,6 +32,11 @@ namespace Damaris {
 	{
 		return layout;
 	}
+
+	void* Variable::getDataAddress() const
+	{
+		return data;
+	}
 	
 	bool Variable::compare(const Variable &v) const
 	{

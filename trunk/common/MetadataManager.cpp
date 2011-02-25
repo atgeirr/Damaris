@@ -6,6 +6,16 @@ namespace Damaris {
 	
 	Variable* MetadataManager::get(std::string* name, int32_t iteration, int32_t sourceID)
 	{
+		std::list<Variable*>::iterator i;
+		// TODO : this function bug
+		for(i=vars.begin(); i != vars.end(); i++)
+		{
+			bool c = true;
+			c =  (*i)->getName()->compare(*name) == 0;
+			c = c && (*i)->getIteration() == iteration;
+			c = c && (*i)->getSource() == sourceID;
+			if(c) return (*i);
+		}
 		return NULL;
 	}
 	
@@ -23,6 +33,11 @@ namespace Damaris {
 	void MetadataManager::remove(std::string* name, int32_t iteration, int32_t sourceID)
 	{
 		Variable* v = get(name,iteration,sourceID);
+		vars.remove(v);
+	}
+
+	void MetadataManager::remove(Variable* v)
+	{
 		vars.remove(v);
 	}
 	

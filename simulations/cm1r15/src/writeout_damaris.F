@@ -990,7 +990,7 @@ subroutine writeout_mult_damaris(model_time,qname,sigma,sigmaf,xh,xf,uf,yh,yf,vf
                       qvarname='                    '
                       write(qvarname(1:3),156) qname(n)
 156                   Format(a3)
-                      call damaris_write_3d_float(varname,int_time,ds,x0,x1,y0,y1,0,nk-1)
+                      call damaris_write_3d_float(qvarname,int_time,ds,x0,x1,y0,y1,0,nk-1)
                   endif
               enddo
           endif !output_q .eq.1
@@ -1320,7 +1320,6 @@ subroutine writeout_mult_damaris(model_time,qname,sigma,sigmaf,xh,xf,uf,yh,yf,vf
       character(LEN=20) :: varname
       real, dimension(numis:numie,numjs:numje,numks:numke) :: fl_array_3d
       integer*8 :: layout
-
       call dc_define_a3d_layout(layout,4,numis,numie,numjs,numje,numks,numke)
       call dc_write(varname,step,fl_array_3d,layout,ierr)      
       call dc_free_layout(layout)

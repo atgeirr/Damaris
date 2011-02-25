@@ -20,6 +20,7 @@ namespace Damaris {
 		void put(Variable* v);
 		void put(std::string *name, int32_t iteration, int32_t sourceID, Layout* l, void* data);
 		void remove(std::string* name, int32_t iteration, int32_t sourceID);	
+		void remove(Variable* v);
 		MetadataManager(managed_shared_memory* s);
 		std::list<Variable*>* getAllVariables();
 		~MetadataManager();

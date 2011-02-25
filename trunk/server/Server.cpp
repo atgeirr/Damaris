@@ -26,13 +26,13 @@ namespace Damaris {
 			shared_memory_object::remove(config->getSegmentName()->c_str());	
 			
 			msgQueue = new message_queue(create_only,
-										 config->getMsgQueueName()->c_str(),
-										 config->getMsgQueueSize(),
-										 sizeof(Message));
+							config->getMsgQueueName()->c_str(),
+							config->getMsgQueueSize(),
+							sizeof(Message));
 			
 			segment = new managed_shared_memory(create_only,
-												config->getSegmentName()->c_str(),
-												config->getSegmentSize());
+								config->getSegmentName()->c_str(),
+								config->getSegmentSize());
 			
 			metadataManager = new MetadataManager(segment);
 			behaviorManager = new BehaviorManager(metadataManager);
@@ -68,9 +68,7 @@ namespace Damaris {
 		bool c;
 		
 		while(!needStop) {
-			c = msgQueue->try_receive(msg,sizeof(Message),
-									  recvSize,
-									  priority);
+			c = msgQueue->try_receive(msg,sizeof(Message), recvSize, priority);
 			if(c) {
 				processMessage(msg);
 			}

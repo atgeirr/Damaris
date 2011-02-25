@@ -21,6 +21,7 @@ namespace Damaris {
 		int32_t getIteration() const;
 		int32_t getSource() const;
 		Layout* getLayout() const;
+		void* getDataAddress() const;
 		bool compare(const Variable &v) const;
 		void print() const; 
 	};

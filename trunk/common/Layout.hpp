@@ -38,6 +38,7 @@ namespace Damaris {
 		int32_t getDimensions() const;
 		int64_t getStartIndex(int dim) const;
 		int64_t getEndIndex(int dim) const;
+		int64_t getExtentAlongDimension(int dim) const;
 		
 	}; // class Layout
 	

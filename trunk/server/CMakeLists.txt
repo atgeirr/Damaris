@@ -9,4 +9,4 @@ set(DAMARIS_SERVER_SRC ${DAMARIS_SOURCE_DIR}/server/main.cpp
 
 add_executable (server ${DAMARIS_SERVER_SRC})
 
-target_link_libraries (server ${BOOST_LIBRARIES} rt)
+target_link_libraries (server ${BOOST_LIBRARIES} hdf5_cpp hdf5 z rt)

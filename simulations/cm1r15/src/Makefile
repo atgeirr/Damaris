@@ -20,13 +20,13 @@
 #              (NOTE: Don't change lines 3 and 4!)
 # Note: You may need to remove -lsz.
 #
-#OUTPUTINC = -I/usr/local/hdf5/include
-#OUTPUTLIB = -L/usr/local/hdf5/lib -L/usr/local/szip/lib
+#OUTPUTINC = -I/home/matthieu/deploy/include
+#OUTPUTLIB = -L/home/matthieu/deploy/lib -L/home/matthieu/deploy/szip/lib
 #OUTPUTOPT = -DHDFOUT
 #LINKOPTS  = -lhdf5hl_fortran -lhdf5_hl -lhdf5_fortran -lhdf5 -lsz -lz -lm
 #-----------------------------------------------------------------------------
 OUTPUTINC =
-OUTPUTLIB = -L/home/matthieu/Work/damaris/client
+OUTPUTLIB = -L/home/matthieu/Work/damaris/trunk/client
 OUTPUTOPT = -DDAMARIS
 LINKOPTS  = -ldamaris  -lstdc++
 

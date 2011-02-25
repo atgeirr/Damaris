@@ -39,7 +39,6 @@ namespace Damaris {
 			{
 				startIndex[i] = extents[2*i];
 				endIndex[i] = extents[2*i+1];
-				printf("%d,%d - ",(int)startIndex[i],(int)endIndex[i]);
 			}
 		} else {
 			startIndex = NULL;
@@ -92,5 +91,12 @@ namespace Damaris {
 	{
 		return endIndex[dim];
 	}
-	
+
+	int64_t Layout::getExtentAlongDimension(int dim) const
+	{
+		if(dim < dimensions)
+			return (endIndex[dim]-startIndex[dim]+1);
+		else
+			return 0;
+	}	
 }

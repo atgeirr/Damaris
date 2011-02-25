@@ -18,14 +18,11 @@ set(ZLIB_LIBRARY_DIR "${EXTERNAL_ROOT}/lib")
 set(ZLIB_INCLUDE_DIR "${EXTERNAL_ROOT}/include")
 
 find_package(Boost REQUIRED)
-#find_package(HDF5 REQUIRED)
-#find_package(ZLIB REQUIRED)
 
 include_directories(${Boost_INCLUDE_DIR})
 include_directories(${HDF5_INCLUDE_DIR})
 include_directories(${ZLIB_INCLUDE_DIR})
 include_directories(${DAMARIS_SOURCE_DIR})
-#include_directories(${DAMARIS_SOURCE_DIR}/client)
 
 link_directories(${HDF5_LIBRARY_DIR})
 link_directories(${ZLIB_LIBRARY_DIR})
