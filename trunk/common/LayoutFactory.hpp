@@ -34,7 +34,6 @@ namespace Damaris {
 			{
 				extents[i] = buffer[i+2];
 			}
-			printf("\n");
 			
 			layout = new Layout(type,dimensions,extents);
 			return layout;
