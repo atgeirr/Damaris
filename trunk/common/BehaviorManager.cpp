@@ -45,8 +45,6 @@ void hdf5(const std::string* event, int32_t step, int32_t src, Damaris::Metadata
 
 	if(waiting == 1) {
 	
-	herr_t status;
-	
         hid_t dataset_id, dataspace_id, chunk_id;
         hid_t file_id, group_id;
         
@@ -72,20 +70,27 @@ void hdf5(const std::string* event, int32_t step, int32_t src, Damaris::Metadata
 	std::list<Damaris::Variable*> *lv = db->getAllVariables();
         std::list<Damaris::Variable*>::iterator i;
         
-	for(i = lv->begin();i != lv->end(); i++)
+	for(i = lv->begin();i != lv->end();)
         {
                 v = (*i);
 		Damaris::Layout* ly = v->getLayout();
                 
 	// for each variable v
 	if(v != NULL){
-	if(v->getIteration() == step)
+	//if(v->getIteration() == step)
 	switch(ly->getDimensions()){
 	case 0:
 		break;
 	case 1:
 		break;
 	case 2:
+		chunkdims[0] = dims[0] = ly->getExtentAlongDimension(0);
+                chunkdims[1] = dims[1] = ly->getExtentAlongDimension(1);
+                dataspace_id = H5Screate_simple(ly->getDimensions(), dims, NULL);
+                sprintf(dsetname,"%s",v->getName()->c_str());
+                dataset_id = H5Dcreate(group_id, dsetname,H5T_NATIVE_FLOAT, dataspace_id, H5P_DEFAULT,H5P_DEFAULT,H5P_DEFAULT);
+                H5Dwrite(dataset_id, H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, H5P_DEFAULT,v->getDataAddress());
+                H5Dclose(dataset_id);
 		break;
 	case 3:
 		chunkdims[0] = dims[0] = ly->getExtentAlongDimension(0);
@@ -96,13 +101,13 @@ void hdf5(const std::string* event, int32_t step, int32_t src, Damaris::Metadata
 		H5Pset_filter(chunk_id,1,0,1,gzip_filter_values);
 		dataspace_id = H5Screate_simple(ly->getDimensions(), dims, NULL);
 		sprintf(dsetname,"%s",v->getName()->c_str());
-		printf(" ---------- writing %s -- dim are %d,%d,%d\n",v->getName()->c_str(),(int)dims[0],(int)dims[1],(int)dims[2]);
-		dataset_id = H5Dcreate(group_id, dsetname,H5T_NATIVE_FLOAT, dataspace_id, chunk_id, H5P_DEFAULT, H5P_DEFAULT);
+		dataset_id = H5Dcreate1(group_id, dsetname,H5T_NATIVE_FLOAT, dataspace_id, chunk_id);
 		H5Dwrite(dataset_id, H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, H5P_DEFAULT,v->getDataAddress());
 		H5Dclose(dataset_id);
 		break;
 	}
-	//db->remove(v);
+	i++;
+	db->remove(v);
 	// end for each
 	} // if
 	} // for 

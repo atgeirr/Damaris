@@ -16,7 +16,7 @@ namespace Damaris {
 	
 	class Server {
 	public:
-		Server(std::string *config);
+		Server(std::string *config, int id);
 		~Server();
 		void run();
 		void stop();

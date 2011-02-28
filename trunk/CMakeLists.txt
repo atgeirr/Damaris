@@ -3,6 +3,9 @@ project (DAMARIS)
 
 enable_language (Fortran)
 
+#include(CMakeForceCompiler)
+#CMAKE_FORCE_CXX_COMPILER(mpicxx "MPI C++ Compiler")
+
 set(EXTERNAL_ROOT ~/deploy)
 
 add_definitions (-O2 -Wall -D__INFO)

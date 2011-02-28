@@ -15,9 +15,9 @@ using namespace boost::interprocess;
 
 namespace Damaris {
 	
-	Server::Server(std::string* configfile) 
+	Server::Server(std::string* configfile, int id) 
 	{
-		config = new Configuration();
+		config = new Configuration(configfile,id);
 		needStop = false;
 		
 		try {
@@ -72,7 +72,6 @@ namespace Damaris {
 			if(c) {
 				processMessage(msg);
 			}
-			
 		}
 		
 		delete msg;

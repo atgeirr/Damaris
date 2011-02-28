@@ -1,20 +1,25 @@
 #ifndef __DAMARIS_CONFIG_H
 #define __DAMARIS_CONFIG_H
 
+#include <string>
+
 namespace Damaris {
-	
+
 	class Configuration {
+		
+	private:
+		std::string* configFile;
+		int id;
+	
 	public:
-		int    getCoresPerNode() const 
-			{ return 1; }
-		std::string*  getSegmentName() const 
-		{ return new std::string("my shared segment");}
-		size_t getSegmentSize() const 
-			{ return 67108864; }
-		std::string*  getMsgQueueName() const
-		{ return new std::string("my poke queue"); }
-		size_t getMsgQueueSize() const
-			{ return 100;}
+		Configuration(std::string* conf, int i);
+		
+		int getCoresPerNode() const; 
+		int getNodeID() const;
+		std::string*  getSegmentName() const; 
+		size_t getSegmentSize() const;
+		std::string*  getMsgQueueName() const;
+		size_t getMsgQueueSize() const;
 	};
 	
 }

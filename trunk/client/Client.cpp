@@ -18,7 +18,7 @@ namespace Damaris {
 	
 	Client::Client(std::string* configfile, int32_t coreID)
 	{
-		config = new Configuration();
+		config = new Configuration(configfile,coreID);
 		try {
 			msgQueue = new message_queue(open_only, config->getMsgQueueName()->c_str());
 			segment = new managed_shared_memory(open_only, config->getSegmentName()->c_str());
@@ -128,6 +128,8 @@ namespace Damaris {
 	{
 		delete msgQueue;
 		delete segment;
+		
+		delete config;
 		
 		LOG("Client destroyed successfuly\n")
 	}
