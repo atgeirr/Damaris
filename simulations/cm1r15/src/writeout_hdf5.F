@@ -136,6 +136,7 @@ subroutine writeout_mult_hdf5(model_time,qname,sigma,sigmaf,xh,xf,uf,yh,yf,vf,mh
       integer itime,lt,flag
       integer x0,x1,y0,y1; ! bounding box for each MPI rank within total domain
 
+      double precision t_start,t_end
       if (len_trim(output_path) .eq. 0) then
             write(outfile,*) 'empty output_path'
             write(outfile,*) 'defaulting to current working directory'
@@ -150,6 +151,7 @@ subroutine writeout_mult_hdf5(model_time,qname,sigma,sigmaf,xh,xf,uf,yh,yf,vf,mh
       if (myid.eq.0) call system(dircmd)
 #ifdef MPI
       call MPI_BARRIER (MPI_COMM_WORLD,ierr) ! TODO: create directory structure ahead of time
+      call t_start = MPI_WTIME()
 #endif
       filename = trim(filedir)//trim(output_basename)//'.'//ctime//'_'//cid//'.cm1hdf5'
       write(outfile,*) 'myid,filename=',myid,'   ',trim(filename)
@@ -1674,6 +1676,7 @@ subroutine writeout_mult_hdf5(model_time,qname,sigma,sigmaf,xh,xf,uf,yh,yf,vf,mh
       call h5close_f(ierror)
 
 #ifdef MPI
+      t_end = MPI_WTIME()
 !     call MPI_BARRIER (MPI_COMM_WORLD,ierr)
 #endif
 
