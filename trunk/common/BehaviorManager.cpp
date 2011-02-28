@@ -5,6 +5,7 @@
 
 #include <hdf5.h>
 
+#include "common/Debug.hpp"
 #include "common/Configuration.hpp"
 #include "common/Util.hpp"
 #include "common/MetadataManager.hpp"
@@ -44,7 +45,7 @@ void hdf5(const std::string* event, int32_t step, int32_t src, Damaris::Metadata
 	waiting++;
 
 	if(waiting == 1) {
-	
+	TIMER_START(write_time)	
         hid_t dataset_id, dataspace_id, chunk_id;
         hid_t file_id, group_id;
         
@@ -114,6 +115,7 @@ void hdf5(const std::string* event, int32_t step, int32_t src, Damaris::Metadata
 
 	H5Fclose(file_id);
 	waiting = 0;
+	TIMER_STOP(write_time,"end writing")
 	}
 }
 
