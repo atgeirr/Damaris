@@ -1,3 +1,5 @@
+#include "common/FCMangle.h"
+
 #include <string.h>
 #include <string>
 #include <stdlib.h>
@@ -185,26 +187,30 @@ extern "C" {
 	 Fortran Binding
 	 ====================================================================== */
 	
-	void dc_initialize_(char* config_file_name_f, int32_t* core_id_f, int32_t* ierr_f, int config_file_name_size)
+	void FC_FUNC_GLOBAL(dc_initialize,DC_INITIALIZE)
+		(char* config_file_name_f, int32_t* core_id_f, int32_t* ierr_f, int config_file_name_size)
 	{
 		std::string config_file_name(config_file_name_f, config_file_name_size);
 		client = new Damaris::Client(&config_file_name,*core_id_f);
 		*ierr_f = 0;
 	}
 	
-	void dc_write_(char* var_name_f, int32_t* iteration_f, void* data_f, int64_t* layout_handle_f, int32_t* ierr_f, int var_name_size)
+	void FC_FUNC_GLOBAL(dc_write,DC_WRITE)
+		(char* var_name_f, int32_t* iteration_f, void* data_f, int64_t* layout_handle_f, int32_t* ierr_f, int var_name_size)
 	{
 		std::string var_name(var_name_f,var_name_size);
 		*ierr_f = client->write(&var_name,*iteration_f,data_f,(Damaris::Layout*)(*layout_handle_f));
 	}
 	
-	void dc_poke_(char* event_name_f, int32_t* iteration_f, int* ierr_f, int event_name_size)
+	void FC_FUNC_GLOBAL(dc_poke,DC_POKE)
+		(char* event_name_f, int32_t* iteration_f, int* ierr_f, int event_name_size)
 	{
 		std::string event_name(event_name_f,event_name_size);
 		*ierr_f = client->poke(&event_name,*iteration_f);
 	}
 	
-	void dc_finalize_(int* ierr_f)
+	void FC_FUNC_GLOBAL(dc_finalize,DC_FINALIZE)
+		(int* ierr_f)
 	{
 		delete client;
 		*ierr_f = 0;

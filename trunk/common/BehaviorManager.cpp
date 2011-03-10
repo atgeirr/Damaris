@@ -2,8 +2,7 @@
 #include <string>
 #include <list>
 #include <iostream>
-
-#include <hdf5.h>
+#include "hdf5.h"
 
 #include "common/Debug.hpp"
 #include "common/Configuration.hpp"

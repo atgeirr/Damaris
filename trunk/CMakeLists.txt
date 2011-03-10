@@ -30,6 +30,11 @@ include_directories(${DAMARIS_SOURCE_DIR})
 link_directories(${HDF5_LIBRARY_DIR})
 link_directories(${ZLIB_LIBRARY_DIR})
 
+include(FortranCInterface)
+FortranCInterface_HEADER(${DAMARIS_SOURCE_DIR}/common/FCMangle.h
+			 MACRO_NAMESPACE "FC_FUNC_"
+                         SYMBOL_NAMESPACE "FC_SYM_")
+
 add_subdirectory (client)
 add_subdirectory (server)
 add_subdirectory (test)
