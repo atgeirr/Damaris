@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <iostream>
 
+#include "common/Debug.hpp"
 #include "common/Configuration.hpp"
 #include "common/Util.hpp"
 #include "common/Layout.hpp"
@@ -29,7 +30,7 @@ namespace Damaris {
 		catch(interprocess_exception &ex) {
 			std::cout << ex.what() << std::endl;
 		}
-		LOGF("Client initialized successfully for core %d with configuration %s\n",coreID,configfile->c_str())
+		INFO("Client initialized successfully for core " << id << " with configuration " << *configfile);
 	}
 	/**
 	 *
@@ -40,7 +41,7 @@ namespace Damaris {
 		if(datalayout == (Layout*)NULL) {
 			// try retrieving layout from configuration
 			// TODO
-			LOG("Alloc: current version of Damaris cannot make this function work without a layout\n")
+			ERROR("The current version of Damaris cannot make this function work without a layout");
 			return NULL;
 		} else {
 			size = datalayout->getRequiredMemoryLength();
@@ -48,7 +49,7 @@ namespace Damaris {
 		// buffer allocation
 		char* buffer = static_cast<char*>(segment->allocate(size));
 		
-		LOG("Warning: this function is not fully implemented yet!!!\n")
+		INFO("Warning: this function is not fully implemented yet!!!");
 		// TODO put the (varname,step,layout,ptr) in a hash table to it can be retrieved from the commit function
 		return (void*)buffer;
 	}
@@ -56,7 +57,7 @@ namespace Damaris {
 	int Client::commit(std::string* varname, int32_t iteration)
 	{
 		// TODO
-		LOG("Call to commit, but this function is not implemented\n")
+		ERROR("This function is not implemented");
 		return 0;
 	}
 	
@@ -66,7 +67,7 @@ namespace Damaris {
         	size_t size = 0;
         	if(datalayout == (Layout*)NULL) {
 			layout = NULL;// TODO should retrieve the layout from configuration
-			LOG("Write: current version of Damaris cannot make this function work without a layout\n")
+			ERROR("Current version of Damaris cannot make this function work without a layout");
 			return -1;
         	} else {
         		layout = datalayout;
@@ -82,7 +83,7 @@ namespace Damaris {
 		message->sourceID = id;
 		
 		if(varname->length() > 63) {
-			LOG("Warning, variable name length bigger than 63, will be truncated\n")
+			ERROR("Warning: variable name length bigger than 63, will be truncated");
 			memcpy(message->content,varname->c_str(),63);
 			message->content[63] = '\0';
 		} else {
@@ -110,7 +111,7 @@ namespace Damaris {
 		poke->handle = 0;
 		
 		if(poke_name->length() > 63) {
-			LOG("Warning, poke tag length bigger than 63, will be truncated\n")
+			ERROR("Warning: poke tag length bigger than 63, will be truncated");
 			memcpy(poke->content,poke_name->c_str(),63);
 			poke->content[63] = '\0';
 		} else {
@@ -121,7 +122,7 @@ namespace Damaris {
 			msgQueue->send(poke,sizeof(Message),0);
 			return 0;
 		} catch(interprocess_exception &e) {
-			LOGF("Error while poking \"%s\", %s\n",poke_name->c_str(),e.what())
+			ERROR("Error while poking " << *poke_name << ", " << e.what());
 			return 1;
 		}
 	}
@@ -133,7 +134,7 @@ namespace Damaris {
 		
 		delete config;
 		
-		LOG("Client destroyed successfuly\n")
+		INFO("Client destroyed successfuly");
 	}
 	
 }
