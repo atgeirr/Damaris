@@ -8,12 +8,15 @@ namespace Damaris {
 	class Configuration {
 		
 	private:
+		static Configuration* config;
 		std::string* configFile;
 		int id;
-	
 	public:
 		Configuration(std::string* conf, int i);
 		
+		static int getID() {
+			return config->getNodeID();
+		}
 		int getCoresPerNode() const; 
 		int getNodeID() const;
 		std::string*  getSegmentName() const; 
@@ -21,7 +24,7 @@ namespace Damaris {
 		std::string*  getMsgQueueName() const;
 		size_t getMsgQueueSize() const;
 	};
-	
+
 }
 
 #endif

@@ -1,13 +1,15 @@
 #include <string>
-
 #include "common/Configuration.hpp"
 
 namespace Damaris {
+	
+	Configuration* Configuration::config = NULL;	
 
-	Configuration::Configuration(std::string *config, int i)
+	Configuration::Configuration(std::string *cfgFile, int i)
 	{
 		id = i;
-		configFile = new std::string(*config);
+		configFile = new std::string(*cfgFile);
+		Damaris::Configuration::config = this;
 	}
 
 	int Configuration::getCoresPerNode() const 

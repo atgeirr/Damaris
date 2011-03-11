@@ -55,8 +55,9 @@ void hdf5(const std::string* event, int32_t step, int32_t src, Damaris::Metadata
 	unsigned int gzip_filter_values[1];
 	gzip_filter_values[0] = 4;
 	
+	int serverID = Damaris::Configuration::getID();
 	// create the file
-        sprintf(filename,"cm1out%d.h5",(int)step);
+        sprintf(filename,"cm1out.%d.%d.h5",(int)step,serverID);
 	file_id = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
 	// create group
@@ -98,7 +99,9 @@ void hdf5(const std::string* event, int32_t step, int32_t src, Damaris::Metadata
 		chunkdims[2] = dims[2] = ly->getExtentAlongDimension(2);
 		chunk_id = H5Pcreate(H5P_DATASET_CREATE);
 		H5Pset_chunk(chunk_id,ly->getDimensions(),chunkdims);
+#ifdef __ENABLE_COMPRESSION
 		H5Pset_filter(chunk_id,1,0,1,gzip_filter_values);
+#endif
 		dataspace_id = H5Screate_simple(ly->getDimensions(), dims, NULL);
 		sprintf(dsetname,"%s",v->getName()->c_str());
 		dataset_id = H5Dcreate1(group_id, dsetname,H5T_NATIVE_FLOAT, dataspace_id, chunk_id);

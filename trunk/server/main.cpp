@@ -30,6 +30,8 @@ int main(int argc, char** argv)
 		("daemon,D","start the server as daemon process")
 		("stdout",po::value<std::string>(),"redirect stdout to a given file")
 		("stderr",po::value<std::string>(),"redirect stderr to a given file")
+		("basename,B",po::value<std::string>(),"base name for output files")
+		("extension,E",po::value<std::string>(),"extension for output files")
 	;
 	
 	po::variables_map vm;
