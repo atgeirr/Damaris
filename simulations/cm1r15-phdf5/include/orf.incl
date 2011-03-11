@@ -1,0 +1,27 @@
+integer &
+	niv,njv,nkv,ibv,iev,jbv,jev,kbv,kev,                            &
+	myroot,mygroupcomm,mcmrootcomm,myxgroupcomm,myygroupcomm,       &
+	cores_per_mcm,corex,corey,mymcmi,mymcmj,mymcmid,nmcm,           &
+	mygroup,mcmrootgroup,myxgroup,myygroup,                         &
+	mcmxtype,mcmytype,mcmxytype,mcmxyztype,                         &
+	mcmxyzutype,mcmxyzvtype,mcmxyzwtype,                            &
+	ioid,iocomm,iorank,                                             &
+	iomyi,iomyj,ionumi,ionumj,ionodex,ionodey,                      &
+	iox0,iox1,ioy0,ioy1
+
+common /paramiorf/                                                    &
+	niv,njv,nkv,ibv,iev,jbv,jev,kbv,kev,                            &
+	myroot,mygroupcomm,mcmrootcomm,myxgroupcomm,myygroupcomm,       &
+	cores_per_mcm,corex,corey,mymcmi,mymcmj,mymcmid,nmcm,           &
+	mygroup,mcmrootgroup,myxgroup,myygroup,                         &
+	mcmxtype,mcmytype,mcmxytype,mcmxyztype,                         &
+	mcmxyzutype,mcmxyzvtype,mcmxyzwtype,                            &
+	ioid,iocomm,iorank,                                             &
+	iomyi,iomyj,ionumi,ionumj,ionodex,ionodey,                      &
+	iox0,iox1,ioy0,ioy1
+
+real  slcfrq
+real, dimension (:,:), allocatable :: twodmcm
+real, dimension (:,:,:), allocatable :: threedmcm
+
+common /paramrorf/ slcfrq,twodmcm,threedmcm
