@@ -1,10 +1,10 @@
 
  &param0
- nx           =     240,
- ny           =     240,
- nz           =     32,
- nodex        =       4,
- nodey        =       4,
+ nx           =      60,
+ ny           =      60,
+ nz           =      40,
+ nodex        =       1,
+ nodey        =       1,
  timeformat   =       1,
  timestats    =       1,
  terrain_flag = .false.,
@@ -180,7 +180,7 @@
  &param9
  output_path      = '.',
  output_basename  = 'test',
- output_format    = 5, !1 is grads 2 is netcdf 3-5 hdf
+ output_format    = 6, !1 is grads 2 is netcdf 3-5 hdf 6 damaris
  output_filetype  = 2,
  output_interp    = 0, !ignore
  output_rain      = 1, !done

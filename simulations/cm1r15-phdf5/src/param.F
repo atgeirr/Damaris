@@ -387,7 +387,7 @@
               print *
               call stopcm1
             ENDIF
-            IF( (output_format.le.0) .or. (output_format.ge.6) )THEN
+            IF( (output_format.le.0) .or. (output_format.ge.7) )THEN
               print *
               print *,'  output_format = ',output_format
               print *
@@ -2523,9 +2523,9 @@
 
 ! Like myid, myi, myj etc, these variables are all global (in orfiomod module ) 
 
-      cores_per_mcm = 16
-      corex = 4
-      corey = 4
+      cores_per_mcm = 1
+      corex = 1
+      corey = 1
       if (myid.eq.0) then
             if ( mod(numprocs,cores_per_mcm).ne.0 )   then
                   print *, "Exiting, numprocs/cores_per_mcm not evenly divisible"

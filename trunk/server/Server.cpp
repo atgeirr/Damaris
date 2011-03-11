@@ -3,7 +3,7 @@
 
 //#include <boost/interprocess/ipc/message_queue.hpp>
 //#include <boost/interprocess/managed_shared_memory.hpp>
-
+#include "common/Debug.hpp"
 #include "common/Util.hpp"
 #include "common/Configuration.hpp"
 #include "common/Message.hpp"
@@ -41,7 +41,7 @@ namespace Damaris {
 			LOGF("Error when initializing the server: %s\n",ex.what())
 			exit(-1);
 		}
-		LOGF("Server successfully started with configuration %s\n",configfile->c_str())
+		INFO("Server successfully started with configuration " << *configfile);
 	}
 	
 	Server::~Server()
@@ -60,7 +60,7 @@ namespace Damaris {
 	
 	void Server::run()
 	{
-		LOG("Successfully entered in \"run\" mode\n")
+		INFO("Successfully entered in \"run\" mode");
 		
 		Message *msg = new Message();
 		unsigned int priority;

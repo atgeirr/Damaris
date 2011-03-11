@@ -1,17 +1,15 @@
 
 #SHELL = /bin/sh
 
-HDFINC=/usr/include
-HDFLIB=/usr/lib
-OUTPUTINC = -I${HDFINC}
-OUTPUTLIB = -L${HDFLIB}
-OUTPUTOPT = -DHDFOUT
-LINKOPTS  = -lhdf5hl_fortran -lhdf5_hl -lhdf5_fortran -lhdf5  -lm -lz
+OUTPUTINC = -I/home/matthieu/deploy/include
+OUTPUTLIB = -L/home/matthieu/Work/damaris/trunk/client -L/home/matthieu/deploy/lib
+OUTPUTOPT = -DDAMARIS
+LINKOPTS  = -ldamaris -lstdc++
 
 FC   = mpif90
 OPTS = -O2 -ffree-line-length-200 -I../include -I/usr/include
 CPP  = cpp -C -P -traditional
-DM = -DMPI -DFFLUSH=flush -DMPIO=H5FD_MPIO_COLLECTIVE_F
+DM = -DMPI -DFFLUSH=flush
 #-DORFSWATHS
 #-----------------------------------------------------------------------------
 #                     HARDWARE SECTION
@@ -146,6 +144,7 @@ SRC   = adv5.F \
 	writeout.F \
 	writeout_nc.F \
 	writeout_hdf5.F \
+	writeout_damaris.F \
 	raddata3d.F \
 	radlib3d.F \
 	irrad3d.F \

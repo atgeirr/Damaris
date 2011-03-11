@@ -1,5 +1,7 @@
 !<arch>
-adv5.F/         1298670057  19071 8000  100644  49064     `
+//                                              20        `
+writeout_damaris.F/
+adv5.F/         1299847442  1000  1000  100644  49064     `
 
 
       subroutine adv5s(bflag,bsq,xh,rxh,uh,ruh,xf,vh,rvh,gz,mh,rmh,          &
@@ -1662,7 +1664,7 @@ adv5.F/         1298670057  19071 8000  100644  49064     `
       end
 
 
-adv6.F/         1298670057  19071 8000  100644  71641     `
+adv6.F/         1299847441  1000  1000  100644  71641     `
 
 
       subroutine adv6s(bflag,bsq,xh,rxh,uh,ruh,xf,vh,rvh,gz,mh,rmh,      &
@@ -4473,7 +4475,7 @@ adv6.F/         1298670057  19071 8000  100644  71641     `
 
 
 
-anelp.F/        1298670057  19071 8000  100644  7295      `
+anelp.F/        1299847441  1000  1000  100644  7295      `
 
 
       subroutine anelp(xh,uh,xf,uf,yh,vh,yf,vf,                     &
@@ -4723,7 +4725,7 @@ anelp.F/        1298670057  19071 8000  100644  7295      `
 
 
 
-base.F/         1298670057  19071 8000  100644  66271     `
+base.F/         1299847438  1000  1000  100644  66271     `
 
 
       subroutine base(zh,mh,zf,mf,rho0s,pi0s,prs0s,rth0s,pi0,prs0,rho0,thv0,th0,t0,qv0,u0,v0,rh0,    &
@@ -6970,7 +6972,7 @@ endif
     end subroutine revthe2
 
 
-bc.F/           1298670057  19071 8000  100644  70073     `
+bc.F/           1299847440  1000  1000  100644  70073     `
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -10021,7 +10023,7 @@ bc.F/           1298670057  19071 8000  100644  70073     `
 
 
 
-cm1.F/          1299680022  19071 8000  100644  63107     `
+cm1.F/          1299853356  1000  1000  100644  64311     `
       program cm1
 
 #ifdef ORFSWATHS
@@ -10216,6 +10218,17 @@ cm1.F/          1299680022  19071 8000  100644  63107     `
       call MPI_COMM_RANK( MPI_COMM_WORLD, myid, ierr )
       call MPI_COMM_SIZE( MPI_COMM_WORLD, numprocs, ierr )
 #endif
+
+!----------------------------------------------------------------------
+!  Initialize Damaris
+#ifdef DAMARIS
+      call dc_initialize("config.xml",myid,ierr)
+      IF(ierr.ne.0)THEN
+        print *,"Error while initializing Damaris."
+        call stopcm1
+      ENDIF
+#endif
+
 
 !----------------------------------------------------------------------
 !  Get domain dimensions, allocate some arrays, then call PARAM
@@ -10903,6 +10916,18 @@ cm1.F/          1299680022  19071 8000  100644  63107     `
                       radsw,rnflx,radswnet,radlwin,u10,v10,t2,q2,znt,ust,hpbl,zol,mol,br,   &
                       dissten,thpten,qvpten,qcpten,qipten,upten,vpten,swten,lwten)
 #endif
+#ifdef DAMARIS
+      ELSEIF(output_format.eq.6) THEN
+       sten = 0.0
+        call writeout_mult_damaris(0.0,qname,sigma,sigmaf,xh,xf,uf,yh,yf,vf,mh,zh,mf,zf, &
+                      pi0,prs0,rho0,th0,qv0,u0,v0,                     &
+                      zs,rain,sws,svs,sps,srs,sgs,sus,shs,thflux,qvflux,cdu,cdv,ce,dum1,dum2,dum3,dum4,  &
+                      rho,prs,sten,ua,uten,va,vten,wa,wten,ppi,tha,    &
+                      qa,kmh,kmv,khh,khv,tkea,pta,num_soil_layers,   &
+                      lu_index,xland,mavail,tsk,tmn,tml,hml,huml,hvml,hfx,qfx,gsw,glw,tslb,   &
+                      radsw,rnflx,radswnet,radlwin,u10,v10,t2,q2,znt,ust,hpbl,zol,mol,br,   &
+                      dissten,thpten,qvpten,qcpten,qipten,upten,vpten,swten,lwten)
+#endif
       ENDIF
     endif
 
@@ -11162,7 +11187,10 @@ cm1.F/          1299680022  19071 8000  100644  63107     `
 ! ARGH... we don't need the timings file to be accessed in parallel;
 ! however, in order to use the existing h5_write_1d_float routine, we
 ! make it parallel, and pass rootonlyrank to it.
+      allocate ( timbuf(numprocs) )
+      allocate (time_solve_full(numprocs) )
 
+#ifdef HDFOUT
       filename = trim(output_basename)//'_timings.hdf5'
       call h5open_f (ierr)
 
@@ -11173,9 +11201,6 @@ cm1.F/          1299680022  19071 8000  100644  63107     `
       CALL h5pclose_f(plist_id, ierr)
 
       dims(1)=numprocs; hcount(1)=numprocs; offset(1)=0
-
-      allocate ( timbuf(numprocs) )
-      allocate ( time_solve_full(numprocs) )
 
       call MPI_GATHER(time_solve,1,MPI_REAL,time_solve_full,1,MPI_REAL,0,MPI_COMM_WORLD,ierr)
       varname='time_solve'; description='Time to solve'; units='seconds'
@@ -11355,7 +11380,7 @@ cm1.F/          1299680022  19071 8000  100644  63107     `
 
       if(myid.eq.0) call h5fclose_f(timings_file_id,ierr)
       call h5close_f(ierr)
-
+#endif
 ! ORF We output averaged values of all timings to the procfile
 
       time_solve_avg = 0.01 * time_solve_avg ! for percent, not fraction
@@ -11508,6 +11533,13 @@ cm1.F/          1299680022  19071 8000  100644  63107     `
 !  End time loop
 !----------------------------------------------------------------------
 
+!----------------------------------------------------------------------
+! Finalize Damaris
+
+#ifdef DAMARIS
+      call dc_finalize(ierr)
+#endif
+
       close(unit=51)
       close(unit=52)
       close(unit=53)
@@ -11528,7 +11560,7 @@ cm1.F/          1299680022  19071 8000  100644  63107     `
 
 
 
-comm.F/         1298670057  19071 8000  100644  122915    `
+comm.F/         1299847438  1000  1000  100644  122915    `
 !-----------------------------------------------------------------------
 !  message passing routines
 !-----------------------------------------------------------------------
@@ -16906,7 +16938,7 @@ comm.F/         1298670057  19071 8000  100644  122915    `
 
 
 
-diff2.F/        1298670057  19071 8000  100644  21122     `
+diff2.F/        1299847439  1000  1000  100644  21122     `
 
 
       subroutine diff2u(flag,rxh,uh,xf,uf,vh,vf,mh,mf,dumx,dumy,diffx,diffy,epsd,ua,uten)
@@ -17838,7 +17870,7 @@ diff2.F/        1298670057  19071 8000  100644  21122     `
       end
 
 
-diff6.F/        1298670057  19071 8000  100644  17322     `
+diff6.F/        1299847441  1000  1000  100644  17322     `
 
 
       subroutine diff6s(dt,s0,dumx,dumy,p,s,sten)
@@ -18631,7 +18663,7 @@ diff6.F/        1298670057  19071 8000  100644  17322     `
       end
 
 
-goddard.F/      1298670057  19071 8000  100644  62215     `
+goddard.F/      1299847438  1000  1000  100644  62215     `
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -20015,7 +20047,7 @@ goddard.F/      1298670057  19071 8000  100644  62215     `
       END
 
 
-init3d.F/       1298670057  19071 8000  100644  52064     `
+init3d.F/       1299847439  1000  1000  100644  52064     `
 
 
       subroutine init3d(num_soil_layers,qbudget,asq,bsq,                  &
@@ -21823,7 +21855,7 @@ init3d.F/       1298670057  19071 8000  100644  52064     `
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-init_physics.F/ 1298670057  19071 8000  100644  10072     `
+init_physics.F/ 1299847439  1000  1000  100644  10072     `
       subroutine init_physics(prs0,rf0,cdu,cdv,ce,dum1,dum2,dum3,u0,ua,v0,va,o30,   &
                              lu_index,xland,emiss,thc,albd,znt,mavail,f2d,tsk,u1,v1,w1)
       use module_sf_slab
@@ -22156,7 +22188,7 @@ init_physics.F/ 1298670057  19071 8000  100644  10072     `
       print *
       call stopcm1
       end subroutine getlanduse
-init_surface.F/ 1298670057  19071 8000  100644  7949      `
+init_surface.F/ 1299847440  1000  1000  100644  7949      `
       subroutine init_surface(num_soil_layers,   &
            dodrag,dosfcflx,xh,ruh,xf,yh,rvh,yf,   &
            lu_index,xland,tsk,slab_zs,slab_dzs,tslb, &
@@ -22427,7 +22459,7 @@ init_surface.F/ 1298670057  19071 8000  100644  7949      `
 
       end subroutine init_surface
 
-init_terrain.F/ 1298670057  19071 8000  100644  9350      `
+init_terrain.F/ 1299847440  1000  1000  100644  9350      `
       subroutine init_terrain(xh,xf,yh,yf,sigma,sigmaf,   &
                               zh,mh,rmh,zf,mf,rmf,zs,gz,dzdx,dzdy,gx,gy)
       implicit none
@@ -22761,7 +22793,7 @@ init_terrain.F/ 1298670057  19071 8000  100644  9350      `
 !-----------------------------------------------------------------------
 
       end subroutine init_terrain
-kessler.F/      1298670057  19071 8000  100644  19561     `
+kessler.F/      1299847440  1000  1000  100644  19561     `
 
 
       subroutine kessler(dt,tauto,taccr,tevar,ruh,rvh,rmh,pi0,th0,tmp,   &
@@ -23482,7 +23514,7 @@ kessler.F/      1298670057  19071 8000  100644  19561     `
 
 
 
-lfoice.F/       1298670057  19071 8000  100644  67165     `
+lfoice.F/       1299847440  1000  1000  100644  67165     `
 !-------------------------------------------------------------------------------
 !   lfo_ice_drive
 !
@@ -25420,7 +25452,7 @@ lfoice.F/       1298670057  19071 8000  100644  67165     `
 
 !--------------------------------------------------------------------------
 
-maxmin.F/       1298670057  19071 8000  100644  8829      `
+maxmin.F/       1299847440  1000  1000  100644  8829      `
       subroutine maxmin_orf(izz,jzz,kzz,f,fmax,fmin,comm)
       use orfiomod
       implicit none
@@ -25751,7 +25783,7 @@ maxmin.F/       1298670057  19071 8000  100644  8829      `
 
 
 
-misclibs.F/     1298670057  19071 8000  100644  63430     `
+misclibs.F/     1299847439  1000  1000  100644  63430     `
 
 
       subroutine getqli(ip,q,ql,qi)
@@ -28072,7 +28104,7 @@ misclibs.F/     1298670057  19071 8000  100644  63430     `
       end
 
 
-morrison.F/     1298670057  19071 8000  100644  178096    `
+morrison.F/     1299847441  1000  1000  100644  178096    `
 !WRF:MODEL_LAYER:PHYSICS
 !
 
@@ -33162,7 +33194,7 @@ END SUBROUTINE MP_MORR_TWO_MOMENT
       end subroutine calc_refl10cm
 
 END MODULE module_mp_morr_two_moment
-param.F/        1298670057  19071 8000  100644  145723    `
+param.F/        1299852986  1000  1000  100644  145722    `
 
 
       subroutine param(dt,dtlast,stattim,taptim,rsttim,radtim,          &
@@ -33552,7 +33584,7 @@ param.F/        1298670057  19071 8000  100644  145723    `
               print *
               call stopcm1
             ENDIF
-            IF( (output_format.le.0) .or. (output_format.ge.6) )THEN
+            IF( (output_format.le.0) .or. (output_format.ge.7) )THEN
               print *
               print *,'  output_format = ',output_format
               print *
@@ -35688,9 +35720,9 @@ param.F/        1298670057  19071 8000  100644  145723    `
 
 ! Like myid, myi, myj etc, these variables are all global (in orfiomod module ) 
 
-      cores_per_mcm = 16
-      corex = 4
-      corey = 4
+      cores_per_mcm = 1
+      corex = 1
+      corey = 1
       if (myid.eq.0) then
             if ( mod(numprocs,cores_per_mcm).ne.0 )   then
                   print *, "Exiting, numprocs/cores_per_mcm not evenly divisible"
@@ -37114,8 +37146,7 @@ param.F/        1298670057  19071 8000  100644  145723    `
       end
 
 
-
-parcel.F/       1298670057  19071 8000  100644  15705     `
+parcel.F/       1299847439  1000  1000  100644  15705     `
 
 
       subroutine parcel_driver(prec,dt,xh,uh,ruh,yh,vh,rvh,zh,mh,rmh,mf,   &
@@ -37714,7 +37745,7 @@ parcel.F/       1298670057  19071 8000  100644  15705     `
 
 
 
-poiss.F/        1298670057  19071 8000  100644  4838      `
+poiss.F/        1299847442  1000  1000  100644  4838      `
 
 
       subroutine poiss(uh,vh,mh,rmh,mf,rmf,pi0,thv0,rho0,rf0,   &
@@ -37912,7 +37943,7 @@ poiss.F/        1298670057  19071 8000  100644  4838      `
       end
 
 
-sfcphys.F/      1298670057  19071 8000  100644  16715     `
+sfcphys.F/      1299847440  1000  1000  100644  16715     `
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -38476,7 +38507,7 @@ sfcphys.F/      1298670057  19071 8000  100644  16715     `
 
 
 
-singleton.F/    1298670057  19071 8000  100644  38594     `
+singleton.F/    1299847441  1000  1000  100644  38594     `
 MODULE singleton
   !-----------------------------------------------------------------------------
   ! Multivariate Fast Fourier Transform
@@ -39548,7 +39579,7 @@ CONTAINS
   END SUBROUTINE fftradix
 
 END MODULE singleton
-solve.F/        1298670206  19071 8000  100644  143434    `
+solve.F/        1299851995  1000  1000  100644  144184    `
 
 !-----------------------------------------------------------------------
 !  CM1 Numerical Model, Release 15  (cm1r15)
@@ -43759,6 +43790,17 @@ endif
 !      enddo
 
 #endif
+#ifdef DAMARIS
+       ELSEIF(output_format.eq.6)THEN
+        call writeout_mult_damaris(rtime,qname,sigma,sigmaf,xh,xf,uf,yh,yf,vf,mh,zh,mf,zf, &
+                      pi0,prs0,rho0,th0,qv0,u0,v0,                     &
+                      zs,rain,sws,svs,sps,srs,sgs,sus,shs,thflux,qvflux,cdu,cdv,ce,dum1,dum2,dum3,dum4,  &
+                      rho,prs,sten,ua,uten,va,vten,wa,wten,ppi,tha,    &
+                      qa,kmh,kmv,khh,khv,tkea,pta,num_soil_layers,   &
+                      lu_index,xland,mavail,tsk,tmn,tml,hml,huml,hvml,hfx,qfx,gsw,glw,tslb,   &
+                      radsw,rnflx,radswnet,radlwin,u10,v10,t2,q2,znt,ust,hpbl,zol,mol,br,   &
+                      dissten,thpten,qvpten,qcpten,qipten,upten,vpten,swten,lwten)
+#endif
       ENDIF
 !ORF keep regular hist file dumps on schedule
       if (ctrldrophist.eq.0.and.ctrldropslice.eq.0)taptim=taptim+tapfrq
@@ -43818,7 +43860,7 @@ endif
       end
 
 
-sounde.F/       1298670057  19071 8000  100644  17926     `
+sounde.F/       1299847440  1000  1000  100644  17926     `
 
 
       subroutine sounde(dt,xh,rxh,uh,ruh,xf,uf,yh,vh,rvh,yf,vf,zh,mh,rmh,mf,rmf,    &
@@ -44491,7 +44533,7 @@ sounde.F/       1298670057  19071 8000  100644  17926     `
       end
 
 
-sound.F/        1298670057  19071 8000  100644  25617     `
+sound.F/        1299847440  1000  1000  100644  25617     `
 
 
       subroutine sound(dt,xh,rxh,uh,ruh,xf,uf,yh,vh,rvh,yf,vf,zh,mh,rmh,mf,rmf,  &
@@ -45410,7 +45452,7 @@ sound.F/        1298670057  19071 8000  100644  25617     `
 
 
 
-soundns.F/      1298670057  19071 8000  100644  8878      `
+soundns.F/      1299847438  1000  1000  100644  8878      `
 
 
       subroutine soundns(xh,rxh,uh,xf,uf,yh,vh,yf,vf,zh,mh,mf,pi0,thv0,       &
@@ -45715,7 +45757,7 @@ soundns.F/      1298670057  19071 8000  100644  8878      `
       end
 
 
-statpack.F/     1298670057  19071 8000  100644  14169     `
+statpack.F/     1299847439  1000  1000  100644  14169     `
 
 
       subroutine statpack(nrec,ndt,dt,rtime,adt,acfl,cloudvar,qname,budname,qbudget,asq,bsq, &
@@ -46204,7 +46246,7 @@ statpack.F/     1298670057  19071 8000  100644  14169     `
 
 
 
-thompson.F/     1298670057  19071 8000  100644  168833    `
+thompson.F/     1299847439  1000  1000  100644  168833    `
 !+---+-----------------------------------------------------------------+
 !.. This subroutine computes the moisture tendencies of water vapor,
 !.. cloud droplets, rain, cloud ice (pristine), snow, and graupel.
@@ -50611,7 +50653,7 @@ thompson.F/     1298670057  19071 8000  100644  168833    `
 !+---+-----------------------------------------------------------------+
 END MODULE module_mp_thompson
 
-turbtke.F/      1298670057  19071 8000  100644  100173    `
+turbtke.F/      1299847440  1000  1000  100644  100173    `
 
 
       subroutine turbtke(dt,dodrag,dosfcflx,ruh,rvh,rmh,mf,rmf,th0,thflux,qvflux,rth0s,    &
@@ -54408,7 +54450,7 @@ turbtke.F/      1298670057  19071 8000  100644  100173    `
       end
 
 
-weno.F/         1298670057  19071 8000  100644  7977      `
+weno.F/         1299847440  1000  1000  100644  7977      `
 
 
       subroutine wenos(bflag,bsq,xh,rxh,uh,ruh,xf,vh,rvh,gz,mh,rmh,      &
@@ -54720,7 +54762,7 @@ weno.F/         1298670057  19071 8000  100644  7977      `
 
 
 
-writeout.F/     1298670057  19071 8000  100644  81164     `
+writeout.F/     1299847441  1000  1000  100644  81164     `
 
 
       subroutine setup_output(tdef,qname,budname,xh,xf,yh,yf,xfref,yfref,zh,zf)
@@ -57096,7 +57138,7 @@ endif
       end
 
 
-writeout_nc.F/  1298670057  19071 8000  100644  116498    `
+writeout_nc.F/  1299847438  1000  1000  100644  116498    `
 
 !-------------------------------------------------------------
 !
@@ -60022,7 +60064,7 @@ endif
       return
       end subroutine writepdata_nc
 #endif
-writeout_hdf5.F/1298670057  19071 8000  100644  180167    `
+writeout_hdf5.F/1299847442  1000  1000  100644  180167    `
 ! parallel HDF5 output written by Leigh Orf <leigh.orf@cmich.edu>
 !
 ! In namelist.input, you can choose which of the 2D and 3D variables are written.
@@ -64545,7 +64587,1400 @@ subroutine writestat_hdf5(nrec,rtime,nstat,rstat,qname,budname)
 !--------------------------------------------------------------------------------------------MARK
 
 
-raddata3d.F/    1298670057  19071 8000  100644  206056    `
+/0              1299851452  1000  1000  100644  37516     `
+
+
+subroutine writeout_mult_damaris(model_time,qname,sigma,sigmaf,xh,xf,uf,yh,yf,vf,mh,zh,mf,zf,    &
+                pi0,prs0,rho0,th0,qv0,u0,v0,                        &
+                zs,rain,sws,svs,sps,srs,sgs,sus,shs,thflux,qvflux,cdu,cdv,ce,dum1,dum2,dum3,dum4, &
+                rho,prs,dbz,ua,dumu,va,dumv,wa,dumw,ppi,tha,        &
+                qa,kmh,kmv,khh,khv,tkea,pta,num_soil_layers,   &
+                lu_index,xland,mavail,tsk,tmn,tml,hml,huml,hvml,hfx,qfx,gsw,glw,tslb,   &
+                radsw,rnflx,radswnet,radlwin,u10,v10,t2,q2,znt,ust,hpbl,zol,mol,br,  &
+                dissten,thpten,qvpten,qcpten,qipten,upten,vpten,swten,lwten)
+      implicit none
+
+      include 'input.incl'
+      include 'constants.incl'
+#ifdef MPI
+      include 'mpif.h'
+#endif
+
+      real :: model_time
+      integer :: int_time
+      character*3, dimension(maxq) :: qname
+      real, dimension(kb:ke) :: sigma
+      real, dimension(kb:ke+1) :: sigmaf
+      real, dimension(ib:ie)   :: xh
+      real, dimension(ib:ie+1) :: xf,uf
+      real, dimension(jb:je)   :: yh
+      real, dimension(jb:je+1) :: yf,vf
+      real, dimension(ib:ie,jb:je,kb:ke) :: mh,zh,pi0,prs0,rho0,th0,qv0
+      real, dimension(ib:ie,jb:je,kb:ke+1) :: mf,zf
+      real, dimension(itb:ite,jtb:jte) :: zs
+      real, dimension(ib:ie,jb:je,nrain) :: rain,sws,svs,sps,srs,sgs,sus,shs
+      real, dimension(ib:ie,jb:je) :: thflux,qvflux,cdu,cdv,ce
+      real, dimension(ib:ie,jb:je,kb:ke) :: dum1,dum2,dum3,dum4,rho,prs,dbz
+      real, dimension(ib:ie+1,jb:je,kb:ke) :: u0,ua,dumu
+      real, dimension(ib:ie,jb:je+1,kb:ke) :: v0,va,dumv
+      real, dimension(ib:ie,jb:je,kb:ke+1) :: wa,dumw
+      real, dimension(ib:ie,jb:je,kb:ke) :: ppi,tha
+      real, dimension(ibm:iem,jbm:jem,kbm:kem,numq) :: qa
+      real, dimension(ibc:iec,jbc:jec,kbc:kec) :: kmh,kmv,khh,khv
+      real, dimension(ibt:iet,jbt:jet,kbt:ket) :: tkea
+      real, dimension(ibp:iep,jbp:jep,kbp:kep,npt) :: pta
+      integer, intent(in) :: num_soil_layers
+      integer, dimension(ibl:iel,jbl:jel), intent(in) :: lu_index
+      real, dimension(ib:ie,jb:je), intent(in) :: tsk
+      real, dimension(ibl:iel,jbl:jel), intent(in) :: xland,mavail,tmn,tml,hml,huml,hvml,hfx,qfx,gsw,glw
+      real, dimension(ibl:iel,jbl:jel,num_soil_layers), intent(in) :: tslb
+      real, dimension(ni,nj), intent(in) :: radsw,rnflx,radswnet,radlwin
+      real, dimension(ibl:iel,jbl:jel), intent(in) :: u10,v10,t2,q2,znt,ust,hpbl,zol,mol,br
+      real, dimension(ib:ie,jb:je,kb:ke), intent(in) :: dissten
+      real, dimension(ibb:ieb,jbb:jeb,kbb:keb), intent(in) :: thpten,qvpten,qcpten,qipten,upten,vpten
+      real, dimension(ibr:ier,jbr:jer,kbr:ker), intent(in) :: swten,lwten
+
+
+#ifdef DAMARIS
+      real, dimension(ni,nj,nk) :: ds
+      real, dimension(ni,nj) :: ds2
+      real, dimension(1:nk) :: zhcol,zfcol,u0col,v0col,th0col,pi0col,rho0col,pres0col,qv0col
+      real, dimension(1:ni) :: xfcol,xhcol
+      real, dimension(1:nj) :: yfcol,yhcol
+
+      integer i,j,k,n
+      character(len=20)   varname
+      character(len=160)  filename
+      character(LEN=20) :: qvarname
+      character(len=8) chid
+
+      integer ierror
+      integer sd_id, sds_id, status, dim_id, data_type
+      integer ix,iy
+      integer rank
+      integer itime,lt,flag
+      integer x0,x1,y0,y1; ! bounding box for each MPI rank within total domain
+
+#ifdef MPI
+      call MPI_BARRIER (MPI_COMM_WORLD,ierr)
+#endif
+      int_time = int(model_time)
+
+      x0 = (myi-1)*ni;
+      x1 = myi*ni-1;
+      y0 = (myj-1)*nj;
+      y1 = myj*nj-1;
+
+      varname='time'
+      call damaris_write_float(varname,int_time,model_time)
+
+      varname='dx'
+      call damaris_write_float(varname,int_time,dx)
+
+      varname='dy'
+      call damaris_write_float(varname,int_time,dy)
+
+      varname='x0'
+      call damaris_write_int  (varname,int_time,x0)
+
+      varname='x1'
+      call damaris_write_int  (varname,int_time,x1)
+
+      varname='y0'
+      call damaris_write_int  (varname,int_time,y0)
+
+      varname='y1'
+      call damaris_write_int  (varname,int_time,y1)
+
+      varname='myi'
+      call damaris_write_int  (varname,int_time,myi)
+
+      varname='myj'
+      call damaris_write_int  (varname,int_time,myj)
+
+      varname='ni'
+      call damaris_write_int  (varname,int_time,ni)
+
+      varname='nj'
+      call damaris_write_int  (varname,int_time,nj)
+
+      varname='nodex'
+      call damaris_write_int  (varname,int_time,nodex)
+
+      varname='nodey'
+      call damaris_write_int  (varname,int_time,nodey)
+
+      varname='nx'
+      call damaris_write_int  (varname,int_time,nx)
+
+      varname='ny'
+      call damaris_write_int  (varname,int_time,ny)
+
+      varname='nz'
+      call damaris_write_int  (varname,int_time,nz)
+
+! Always write out 1D vertical base state column varables. Full 3D
+! base state variables are written below if output_basestate.eq.1 for
+! you folks who run with terrain. If you have terrain then ignore the
+! following 1D basestate variables (i.e., x0col(k) )
+
+! In other words, if you run with terrain and want base state
+! variables, set output_basesteate.eq.1 and use vars in group
+! /3d_basestate. If you do not run with terrain (flat bottom), you can
+! set output_basestate.eq.0 and use vars in /basestate since all base
+! state variables will be horizontlaly homogeneous. 1D vars save space
+! over 3D vars. Of course nothing is stopping you from writing full 3D
+! basestate even if you are not running with terrain!
+
+      do k=1,nk
+          zhcol(k)=zh(1,1,k)
+          zfcol(k)=zf(1,1,k)
+          u0col(k) = u0(1,1,k)
+          v0col(k) = v0(1,1,k)
+          th0col(k) = th0(1,1,k)
+          pi0col(k) = pi0(1,1,k)
+          rho0col(k) = rho0(1,1,k)
+          pres0col(k) = p00*(pi0(1,1,k))**cpdrd
+          qv0col(k) = qv0(1,1,k)
+      enddo
+
+      do j = 1,nj
+          yfcol(j) = yf(j)
+          yhcol(j) = yh(j)
+      enddo
+
+      do i = 1,ni
+          xfcol(i) = xf(i)
+          xhcol(i) = xh(i)
+      enddo
+
+      varname='zh'
+      call damaris_write_1d_float(varname,int_time,zhcol,0,nk-1)
+
+      varname='zf'
+      call damaris_write_1d_float(varname,int_time,zfcol,0,nk-1)
+
+      varname='yh'
+      call damaris_write_1d_float(varname,int_time,yhcol,y0,y1)
+
+      varname='yf'
+      call damaris_write_1d_float(varname,int_time,yfcol,y0,y1)
+
+      varname='xh'
+      call damaris_write_1d_float(varname,int_time,xhcol,x0,x1)
+
+      varname='xf'
+      call damaris_write_1d_float(varname,int_time,xfcol,x0,x1)
+
+      varname='u0'
+      call damaris_write_1d_float(varname,int_time,u0col,0,nk-1)
+
+      varname='v0'
+      call damaris_write_1d_float(varname,int_time,v0col,0,nk-1)
+
+      varname='th0'
+      call damaris_write_1d_float(varname,int_time,th0col,0,nk-1)
+
+      varname='pi0'
+      call damaris_write_1d_float(varname,int_time,pi0col,0,nk-1)
+
+      varname='pres0'
+      call damaris_write_1d_float(varname,int_time,pres0col,0,nk-1)
+
+      varname='rh0'
+      call damaris_write_1d_float(varname,int_time,rho0col,0,nk-1)
+
+! terrain
+
+     if (output_zs.eq.1.and.terrain_flag) then
+       do j=1,nj
+       do i=1,ni
+         ds2(i,j)=zs(i,j)
+       enddo
+       enddo
+
+       varname='zs'
+       call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+      endif
+
+     if (output_zh.eq.1.and.terrain_flag) then
+       do k=1,nk
+       do j=1,nj
+       do i=1,ni
+         ds(i,j,k)=zh(i,j,k)
+       enddo
+       enddo
+       enddo
+
+       varname='zh'
+       call damaris_write_3d_float(varname,int_time,ds,x0,x1,y0,y1,0,nk-1)
+
+     endif
+            
+
+     if (output_basestate.eq.1) then
+
+          do k=1,nk
+          do j=1,nj
+          do i=1,ni
+            ds(i,j,k)=pi0(i,j,k)
+          enddo
+          enddo
+          enddo
+
+          varname='pi0'
+          call damaris_write_3d_float(varname,int_time,ds,x0,x1,y0,y1,0,nk-1)
+
+          do k=1,nk
+          do j=1,nj
+          do i=1,ni
+            ds(i,j,k)=th0(i,j,k)
+          enddo
+          enddo
+          enddo
+
+          varname='th0'
+          call damaris_write_3d_float(varname,int_time,ds,x0,x1,y0,y1,0,nk-1)
+
+          do k=1,nk
+          do j=1,nj
+          do i=1,ni
+            ds(i,j,k)=prs0(i,j,k)
+          enddo
+          enddo
+          enddo
+
+          varname='p0'
+          call damaris_write_3d_float(varname,int_time,ds,x0,x1,y0,y1,0,nk-1)
+
+          do k=1,nk
+          do j=1,nj
+          do i=1,ni
+            ds(i,j,k)=qv0(i,j,k)
+          enddo
+          enddo
+          enddo
+
+          varname='qv0'
+          call damaris_write_3d_float(varname,int_time,ds,x0,x1,y0,y1,0,nk-1)
+
+          do k=1,nk
+          do j=1,nj
+          do i=1,ni+1
+            dumu(i,j,k)=u0(i,j,k)
+          enddo
+          enddo
+          enddo
+
+          varname='u0'
+          call damaris_write_3d_float(varname,int_time,dumu,(myi-1)*(ni+1),myi*(ni+1)-1,y0,y1,0,nk-1)
+
+          do k=1,nk
+          do j=1,nj+1
+          do i=1,ni
+            dumv(i,j,k)=v0(i,j,k)
+          enddo
+          enddo
+          enddo
+
+          varname='v0'
+          call damaris_write_3d_float(varname,int_time,dumv,x0,x1,(myj-1)*(nj+1),myj*(nj+1)-1,0,nk-1)
+
+      endif !output_basestate.eq.1
+
+      if(output_rain.eq.1) then
+          do j=1,nj
+          do i=1,ni
+            ds2(i,j)=rain(i,j,1)
+          enddo
+          enddo
+          varname='sfcrain'
+          call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+          if (nrain.eq.2) then
+              do j=1,nj
+              do i=1,ni
+                ds2(i,j)=rain(i,j,2)
+              enddo
+              enddo
+              varname='sfcrain_trans'
+              call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+          endif
+      endif
+
+      if(output_sws.eq.1) then
+           do j=1,nj
+           do i=1,ni
+             ds2(i,j)=sws(i,j,1)
+           enddo
+           enddo
+           varname='maxsws'
+           call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+           do j=1,nj
+           do i=1,ni
+             ds2(i,j)=svs(i,j,1)
+           enddo
+           enddo
+           varname='maxsvs'
+           call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+           do j=1,nj
+           do i=1,ni
+             ds2(i,j)=sps(i,j,1)
+           enddo
+           enddo
+           varname='maxsps'
+           call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+           do j=1,nj
+           do i=1,ni
+             ds2(i,j)=srs(i,j,1)
+           enddo
+           enddo
+           varname='maxsrs'
+           call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+           do j=1,nj
+           do i=1,ni
+             ds2(i,j)=sgs(i,j,1)
+           enddo
+           enddo
+           varname='maxsgs'
+           call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+           do j=1,nj
+           do i=1,ni
+             ds2(i,j)=sus(i,j,1)
+           enddo
+           enddo
+           varname='maxsus'
+           call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+           do j=1,nj
+           do i=1,ni
+             ds2(i,j)=sus(i,j,1)
+           enddo
+           enddo
+           varname='maxshs'
+           call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+      endif !output_sws.eq.1
+
+      if (nrain.eq.2) then
+         if(output_rain.eq.1) then
+            do j=1,nj
+            do i=1,ni
+              ds2(i,j)=rain(i,j,2)
+            enddo
+            enddo
+            varname='maxrain_trans'
+            call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+          endif
+
+          if(output_sws.eq.1) then
+              do j=1,nj
+              do i=1,ni
+                ds2(i,j)=sws(i,j,2)
+              enddo
+              enddo
+              varname='maxsws_trans'
+              call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+              do j=1,nj
+              do i=1,ni
+                ds2(i,j)=svs(i,j,2)
+              enddo
+              enddo
+              varname='maxsvs_trans'
+              call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+              do j=1,nj
+              do i=1,ni
+                ds2(i,j)=sps(i,j,2)
+              enddo
+              enddo
+              varname='maxsps_trans'
+              call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+              do j=1,nj
+              do i=1,ni
+                ds2(i,j)=srs(i,j,2)
+              enddo
+              enddo
+              varname='maxsrs_trans'
+              call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+              do j=1,nj
+              do i=1,ni
+                ds2(i,j)=sgs(i,j,2)
+              enddo
+              enddo
+              varname='maxsgs_trans'
+              call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+              do j=1,nj
+              do i=1,ni
+                ds2(i,j)=sus(i,j,2)
+              enddo
+              enddo
+              varname='maxsus_trans'
+              call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+              do j=1,nj
+              do i=1,ni
+                ds2(i,j)=sus(i,j,2)
+              enddo
+              enddo
+              varname='maxshs_trans'
+              call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+           endif !output_sws.eq.1
+      endif !nrain.eq.2
+
+! Composite reflectivity
+
+      if(output_dbz.eq.1)then
+          call calccref(dum1(ib,jb,1),dbz)
+          do j=1,nj
+          do i=1,ni
+            ds2(i,j)=dum1(i,j,1)
+          enddo
+          enddo
+          varname='cref'
+          call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+      endif
+
+! Cold pool C and H (RKW)
+
+      if(output_coldpool.eq.1) then
+          call calccpch(zf,th0,qv0,dum1(ib,jb,1),dum1(ib,jb,2),tha,qa)
+          do j=1,nj
+          do i=1,ni
+            ds2(i,j)=dum1(i,j,1)
+          enddo
+          enddo
+          varname='cpc'
+          call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+          do j=1,nj
+          do i=1,ni
+            ds2(i,j)=dum1(i,j,2)
+          enddo
+          enddo
+          varname='cph'
+          call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+      endif !output_coldpool.eq.1
+
+! Surface fluxes
+
+      if(output_sfcflx.eq.1) then
+          do j=1,nj
+          do i=1,ni
+            ds2(i,j)=thflux(i,j)
+          enddo
+          enddo
+          varname='thflux'
+          call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+        
+          do j=1,nj
+          do i=1,ni
+            ds2(i,j)=qvflux(i,j)
+          enddo
+          enddo
+
+          varname='qvflux'
+          call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+          do j=1,nj
+            do i=1,ni
+             ds2(i,j)=0.25*( (cdu(i,j)+cdu(i+1,j))   &
+                           +(cdv(i,j)+cdv(i,j+1)) )
+            enddo
+          enddo
+
+          varname='cd'
+          call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+          do j=1,nj
+          do i=1,ni
+            ds2(i,j)=ce(i,j)
+          enddo
+          enddo
+
+          varname='ce'
+          call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+          do j=1,nj
+          do i=1,ni
+            ds2(i,j)=tsk(i,j)
+          enddo
+          enddo
+
+          varname='tsk'
+          call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+      endif !output_sfcflx.eq.1
+
+      if(output_sfcparams.eq.1) then
+
+          do j=1,nj
+          do i=1,ni
+            ds2(i,j)=xland(i,j)
+          enddo
+          enddo
+
+          varname='xland'
+          call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+          do j=1,nj
+          do i=1,ni
+            ds2(i,j)=lu_index(i,j)
+          enddo
+          enddo
+
+          varname='lu'
+          call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+          do j=1,nj
+          do i=1,ni
+            ds2(i,j)=mavail(i,j)
+          enddo
+          enddo
+
+          varname='mavail'
+          call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+      endif !output_sfcparams.eq.1
+
+      if((output_sfcparams.eq.1).and.(sfcmodel.eq.2.or.oceanmodel.eq.2))then
+
+          do j=1,nj
+          do i=1,ni
+            ds2(i,j)=tmn(i,j)
+          enddo
+          enddo
+          varname='tmn'
+          call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+          do j=1,nj
+          do i=1,ni
+            ds2(i,j)=hfx(i,j)
+          enddo
+          enddo
+          varname='hfx'
+          call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+          do j=1,nj
+          do i=1,ni
+            ds2(i,j)=qfx(i,j)
+          enddo
+          enddo
+          varname='qfx'
+          call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+          do j=1,nj
+          do i=1,ni
+            ds2(i,j)=gsw(i,j)
+          enddo
+          enddo
+          varname='gsw'
+          call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+          do j=1,nj
+          do i=1,ni
+            ds2(i,j)=glw(i,j)
+          enddo
+          enddo
+          varname='glw'
+          call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+      endif
+
+      if((output_sfcparams.eq.1).and.(sfcmodel.eq.2))then
+
+          do j=1,nj
+          do i=1,ni
+            ds2(i,j)=tslb(i,j,1)
+          enddo
+          enddo
+          varname='tslb1'
+          call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+          do j=1,nj
+          do i=1,ni
+            ds2(i,j)=tslb(i,j,2)
+          enddo
+          enddo
+          varname='tslb2'
+          call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+          do j=1,nj
+          do i=1,ni
+            ds2(i,j)=tslb(i,j,3)
+          enddo
+          enddo
+          varname='tslb3'
+          call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+          do j=1,nj
+          do i=1,ni
+            ds2(i,j)=tslb(i,j,4)
+          enddo
+          enddo
+          varname='tslb4'
+          call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+          do j=1,nj
+          do i=1,ni
+            ds2(i,j)=tslb(i,j,5)
+          enddo
+          enddo
+          varname='tslb5'
+          call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+      endif
+
+      if(output_sfcparams.eq.1.and.oceanmodel.eq.2)then
+
+          do j=1,nj
+          do i=1,ni
+            ds2(i,j)=tml(i,j)
+          enddo
+          enddo
+          varname='tml'
+          call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+          do j=1,nj
+          do i=1,ni
+            ds2(i,j)=hml(i,j)
+          enddo
+          enddo
+          varname='hml'
+          call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+          do j=1,nj
+          do i=1,ni
+            ds2(i,j)=huml(i,j)
+          enddo
+          enddo
+          varname='huml'
+          call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+          do j=1,nj
+          do i=1,ni
+            ds2(i,j)=hvml(i,j)
+          enddo
+          enddo
+          varname='hvml'
+          call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+      endif
+
+      if(output_radten.eq.1)then
+
+          do j=1,nj
+          do i=1,ni
+            ds2(i,j)=radsw(i,j)
+          enddo
+          enddo
+          varname='radsw'
+          call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+          do j=1,nj
+          do i=1,ni
+            ds2(i,j)=rnflx(i,j)
+          enddo
+          enddo
+          varname='rnflx'
+          call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+          do j=1,nj
+          do i=1,ni
+            ds2(i,j)=radswnet(i,j)
+          enddo
+          enddo
+          varname='radswnet'
+          call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+          do j=1,nj
+          do i=1,ni
+            ds2(i,j)=radlwin(i,j)
+          enddo
+          enddo
+          varname='radlwin'
+          call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+      endif
+
+      if(output_sfcdiags.eq.1)then
+
+          do j=1,nj
+          do i=1,ni
+            ds2(i,j)=u10(i,j)
+          enddo
+          enddo
+          varname='ul0'
+          call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+          do j=1,nj
+          do i=1,ni
+            ds2(i,j)=v10(i,j)
+          enddo
+          enddo
+          varname='vl0'
+          call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+          do j=1,nj
+          do i=1,ni
+            ds2(i,j)=t2(i,j)
+          enddo
+          enddo
+          varname='t2'
+          call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+          do j=1,nj
+          do i=1,ni
+            ds2(i,j)=q2(i,j)
+          enddo
+          enddo
+          varname='q2'
+          call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+          do j=1,nj
+          do i=1,ni
+            ds2(i,j)=znt(i,j)
+          enddo
+          enddo
+          varname='znt'
+          call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+          do j=1,nj
+          do i=1,ni
+            ds2(i,j)=ust(i,j)
+          enddo
+          enddo
+          varname='ust'
+          call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+          do j=1,nj
+          do i=1,ni
+            ds2(i,j)=hpbl(i,j)
+          enddo
+          enddo
+          varname='hpbl'
+          call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+          do j=1,nj
+          do i=1,ni
+            ds2(i,j)=zol(i,j)
+          enddo
+          enddo
+          varname='zol'
+          call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+          do j=1,nj
+          do i=1,ni
+            ds2(i,j)=mol(i,j)
+          enddo
+          enddo
+          varname='mol'
+          call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+          do j=1,nj
+          do i=1,ni
+            ds2(i,j)=br(i,j)
+          enddo
+          enddo
+          varname='br'
+          call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+      endif
+
+! begin 3d group
+
+      if(output_th  .eq.1)then
+          do k=1,nk
+          do j=1,nj
+          do i=1,ni
+            ds(i,j,k)=th0(i,j,k)+tha(i,j,k)
+          enddo
+          enddo
+          enddo
+          varname='th'
+          call damaris_write_3d_float(varname,int_time,ds,x0,x1,y0,y1,0,nk-1)
+      endif
+
+      if(output_thpert .eq.1) then
+          do k=1,nk
+          do j=1,nj
+          do i=1,ni
+            ds(i,j,k)=tha(i,j,k)
+          enddo
+          enddo
+          enddo
+          varname='thpert'
+          call damaris_write_3d_float(varname,int_time,ds,x0,x1,y0,y1,0,nk-1)
+      endif
+
+      if(output_prs    .eq.1) then
+          do k=1,nk
+          do j=1,nj
+          do i=1,ni
+            ds(i,j,k)=prs(i,j,k)
+          enddo
+          enddo
+          enddo
+          varname='p'
+          call damaris_write_3d_float(varname,int_time,ds,x0,x1,y0,y1,0,nk-1)
+      endif
+
+      if(output_prspert.eq.1)then
+          do k=1,nk
+          do j=1,nj
+          do i=1,ni
+            ds(i,j,k)=prs(i,j,k)-p00*(pi0(i,j,k)**cpdrd)
+          enddo
+          enddo
+          enddo
+          varname="ppert"
+          call damaris_write_3d_float(varname,int_time,ds,x0,x1,y0,y1,0,nk-1)
+      endif
+      if(output_pi.eq.1)then  
+          do k=1,nk
+          do j=1,nj
+          do i=1,ni
+            ds(i,j,k)=pi0(i,j,k)+ppi(i,j,k)
+          enddo
+          enddo
+          enddo
+          varname = "pi"
+          call damaris_write_3d_float(varname,int_time,ds,x0,x1,y0,y1,0,nk-1)
+      endif
+      if(output_pipert .eq.1) then
+          do k=1,nk
+          do j=1,nj
+          do i=1,ni
+            ds(i,j,k)=ppi(i,j,k)
+          enddo
+          enddo
+          enddo
+          varname='pipert'
+          call damaris_write_3d_float(varname,int_time,ds,x0,x1,y0,y1,0,nk-1)
+      endif
+
+      if(output_rho    .eq.1) then
+          do k=1,nk
+          do j=1,nj
+          do i=1,ni
+            ds(i,j,k)=rho(i,j,k)
+          enddo
+          enddo
+          enddo
+          varname = "rho"
+          call damaris_write_3d_float(varname,int_time,ds,x0,x1,y0,y1,0,nk-1)
+      endif
+      if(output_rhopert.eq.1)then
+          do k=1,nk
+          do j=1,nj
+          do i=1,ni
+            ds(i,j,k)=rho(i,j,k)-rho0(i,j,k)
+          enddo
+          enddo
+          enddo
+          varname="rhopert"
+          call damaris_write_3d_float(varname,int_time,ds,x0,x1,y0,y1,0,nk-1)
+      endif
+      if(iturb.eq.1)then
+          do k=1,nk
+          do j=1,nj
+          do i=1,ni
+            ds(i,j,k)=tkea(i,j,k)
+          enddo
+          enddo
+          enddo
+          varname="tke"
+          call damaris_write_3d_float(varname,int_time,ds,x0,x1,y0,y1,0,nk-1)
+      endif
+
+      if(iturb.ge.1)then
+
+          if(output_km  .eq.1) then
+              do k=1,nk
+              do j=1,nj
+              do i=1,ni
+                ds(i,j,k)=kmh(i,j,k)
+              enddo
+              enddo
+              enddo
+
+              varname='kmh'
+              call damaris_write_3d_float(varname,int_time,ds,x0,x1,y0,y1,0,nk-1)        
+
+              do k=1,nk
+              do j=1,nj
+              do i=1,ni
+                ds(i,j,k)=kmv(i,j,k)
+              enddo
+              enddo
+              enddo
+              varname='kmv'
+              call damaris_write_3d_float(varname,int_time,ds,x0,x1,y0,y1,0,nk-1)
+          endif
+
+         if(output_kh  .eq.1) then
+           do k=1,nk
+           do j=1,nj
+           do i=1,ni
+             ds(i,j,k)=khh(i,j,k)
+           enddo
+           enddo
+           enddo
+           varname='khh'
+           call damaris_write_3d_float(varname,int_time,ds,x0,x1,y0,y1,0,nk-1)
+
+           do k=1,nk
+           do j=1,nj
+           do i=1,ni
+             ds(i,j,k)=khv(i,j,k)
+           enddo
+           enddo
+           enddo
+           varname='khv'
+           call damaris_write_3d_float(varname,int_time,ds,x0,x1,y0,y1,0,nk-1)
+         endif
+      endif !iturb .ge. 1
+
+      if(imoist.eq.1)then
+          do k=1,nk
+          do j=1,nj
+          do i=1,ni
+            ds(i,j,k)=qa(i,j,k,nqv)
+          enddo
+          enddo
+          enddo
+          varname='qv'
+          if(output_qv .eq. 1)   call damaris_write_3d_float(varname,int_time,ds,x0,x1,y0,y1,0,nk-1)
+          if(output_qvpert.eq.1)then
+              do k=1,nk
+              do j=1,nj
+              do i=1,ni
+                ds(i,j,k)=qa(i,j,k,nqv)-qv0(i,j,k)
+              enddo
+              enddo
+              enddo
+              varname="qvpert"
+              call damaris_write_3d_float(varname,int_time,ds,x0,x1,y0,y1,0,nk-1)
+          endif
+
+          if(output_q.eq.1)then
+              do n=1,numq
+                  if(n.ne.nqv)then
+                      do k=1,nk
+                      do j=1,nj
+                      do i=1,ni
+                        ds(i,j,k)=qa(i,j,k,n)
+                      enddo
+                      enddo
+                      enddo
+                      qvarname='                    '
+                      write(qvarname(1:3),156) qname(n)
+156                   Format(a3)
+                      call damaris_write_3d_float(qvarname,int_time,ds,x0,x1,y0,y1,0,nk-1)
+                  endif
+              enddo
+          endif !output_q .eq.1
+          if(output_dbz.eq.1) then
+              do k=1,nk
+              do j=1,nj
+              do i=1,ni
+                ds(i,j,k)=dbz(i,j,k)
+              enddo
+              enddo
+              enddo
+              varname="dbz"
+              call damaris_write_3d_float(varname,int_time,ds,x0,x1,y0,y1,0,nk-1)
+          endif
+
+      endif !imoist.eq.1
+
+      if(output_uinterp.eq.1)then
+          do k=1,nk
+          do j=1,nj
+          do i=1,ni
+            ds(i,j,k)=0.5*(ua(i,j,k)+ua(i+1,j,k))
+          enddo
+          enddo
+          enddo
+          varname="uinterp"
+          call damaris_write_3d_float(varname,int_time,ds,x0,x1,y0,y1,0,nk-1)
+      endif
+      if(output_vinterp.eq.1)then
+          do k=1,nk
+          do j=1,nj
+          do i=1,ni
+            ds(i,j,k)=0.5*(va(i,j,k)+va(i,j+1,k))
+          enddo
+          enddo
+          enddo
+          varname="vinterp"
+          call damaris_write_3d_float(varname,int_time,ds,x0,x1,y0,y1,0,nk-1)
+      endif
+      if(output_winterp.eq.1)then
+          do k=1,nk
+          do j=1,nj
+          do i=1,ni
+            ds(i,j,k)=0.5*(wa(i,j,k)+wa(i,j,k+1))
+          enddo
+          enddo
+          enddo
+          varname='winterp'
+          call damaris_write_3d_float(varname,int_time,ds,x0,x1,y0,y1,0,nk-1)
+      endif
+
+
+      if(iptra.eq.1)then
+          do n=1,npt
+            do k=1,nk
+            do j=1,nj
+            do i=1,ni
+              ds(i,j,k)=pta(i,j,k,n)
+            enddo
+            enddo
+            enddo
+
+            chid = 'pt      '
+            write(chid(3:4),111) n
+111         format(i2.2)
+
+            varname=chid
+            call damaris_write_3d_float(varname,int_time,ds,x0,x1,y0,y1,0,nk-1)
+          enddo
+      endif
+
+
+      if(output_pblten.eq.1)then
+          do k=1,nk
+          do j=1,nj
+          do i=1,ni
+            ds(i,j,k)=thpten(i,j,k)
+          enddo
+          enddo
+          enddo
+
+          varname='thpten'
+          call damaris_write_3d_float(varname,int_time,ds,x0,x1,y0,y1,0,nk-1)
+
+          do k=1,nk
+          do j=1,nj
+          do i=1,ni
+            ds(i,j,k)=qvpten(i,j,k)
+          enddo
+          enddo
+          enddo
+
+          varname='qvpten'
+          call damaris_write_3d_float(varname,int_time,ds,x0,x1,y0,y1,0,nk-1)
+
+          do k=1,nk
+          do j=1,nj
+          do i=1,ni
+            ds(i,j,k)=qcpten(i,j,k)
+          enddo
+          enddo
+          enddo
+
+          varname='qcpten'
+          call damaris_write_3d_float(varname,int_time,ds,x0,x1,y0,y1,0,nk-1)
+
+          do k=1,nk
+          do j=1,nj
+          do i=1,ni
+            ds(i,j,k)=qipten(i,j,k)
+          enddo
+          enddo
+          enddo
+
+          varname='qipten'
+          call damaris_write_3d_float(varname,int_time,ds,x0,x1,y0,y1,0,nk-1)
+
+          do k=1,nk
+          do j=1,nj
+          do i=1,ni
+            ds(i,j,k)=upten(i,j,k)
+          enddo
+          enddo
+          enddo
+
+          varname='upten'
+          call damaris_write_3d_float(varname,int_time,ds,x0,x1,y0,y1,0,nk-1)
+
+          do k=1,nk
+          do j=1,nj
+          do i=1,ni
+            ds(i,j,k)=vpten(i,j,k)
+          enddo
+          enddo
+          enddo
+
+          varname='vpten'
+          call damaris_write_3d_float(varname,int_time,ds,x0,x1,y0,y1,0,nk-1)
+
+      endif !output_pblten.eq.1
+
+      if(output_uh.eq.1) then
+
+        ! get height AGL:
+          if( terrain_flag )then
+            do k=1,nk+1
+            do j=1,nj
+            do i=1,ni
+              dum3(i,j,k) = zh(i,j,k)-zs(i,j)
+              dumw(i,j,k) = zf(i,j,k)-zs(i,j)
+            enddo
+            enddo
+            enddo
+          else
+            do k=1,nk+1
+            do j=1,nj
+            do i=1,ni
+              dum3(i,j,k) = zh(i,j,k)
+              dumw(i,j,k) = zf(i,j,k)
+            enddo
+            enddo
+            enddo
+          endif
+          call calcuh(uf,vf,dum3,dumw,ua,va,wa,dum1(ib,jb,1),dum2)
+          do j=1,nj
+          do i=1,ni
+            ds2(i,j)=dum1(i,j,1)
+          enddo
+          enddo
+
+          varname='uh'
+          call damaris_write_2d_float(varname,int_time,ds2,x0,x1,y0,y1)
+
+      endif!output_uh.eq.1
+
+      if(output_vort.eq.1)then
+          call calcvort(xh,xf,uf,vf,zh,mf,zf,ua,va,wa,dum1,dum2,dum3,dum4)
+
+          do k=1,nk
+          do j=1,nj
+          do i=1,ni
+            ds(i,j,k)=dum1(i,j,k)
+          enddo
+          enddo
+          enddo
+
+          varname='xvort'
+          call damaris_write_3d_float(varname,int_time,ds,x0,x1,y0,y1,0,nk-1)
+
+          do k=1,nk
+          do j=1,nj
+          do i=1,ni
+            ds(i,j,k)=dum2(i,j,k)
+          enddo
+          enddo
+          enddo
+
+          varname='yvort'
+          call damaris_write_3d_float(varname,int_time,ds,x0,x1,y0,y1,0,nk-1)
+
+          do k=1,nk
+          do j=1,nj
+          do i=1,ni
+            ds(i,j,k)=dum3(i,j,k)
+          enddo
+          enddo
+          enddo
+
+          varname='zvort'
+          call damaris_write_3d_float(varname,int_time,ds,x0,x1,y0,y1,0,nk-1)
+
+      endif !output_vort.eq.1
+
+      if(output_dissten.eq.1) then
+
+          do k=1,nk
+          do j=1,nj
+          do i=1,ni
+            ds(i,j,k)=dissten(i,j,k)
+          enddo
+          enddo
+          enddo
+
+          varname='dissten'
+          call damaris_write_3d_float(varname,int_time,ds,x0,x1,y0,y1,0,nk-1)
+
+       endif
+
+
+!--------------------------------------------------------------
+!  writeout data on u-points
+
+! Note velocity data is staggered and requires 1 extra point
+
+       if(output_u    .eq.1) then
+           do k=1,nk
+           do j=1,nj
+           do i=1,ni+1
+             dumu(i,j,k)=ua(i,j,k)
+           enddo
+           enddo
+           enddo
+           varname='u'
+           call damaris_write_3d_float(varname,int_time,dumu(1:ni+1,1:nj,1:nk),(myi-1)*(ni+1),myi*(ni+1)-1,y0,y1,0,nk-1)
+       endif
+
+
+      if(output_upert.eq.1)then
+          do k=1,nk
+          do j=1,nj
+          do i=1,ni+1
+            dumu(i,j,k)=ua(i,j,k)-u0(i,j,k)
+          enddo
+          enddo
+          enddo
+          varname='upert'
+          call damaris_write_3d_float(varname,int_time,dumu(1:ni+1,1:nj,1:nk),(myi-1)*(ni+1),myi*(ni+1)-1,y0,y1,0,nk-1)
+      endif
+
+!--------------------------------------------------------------
+!  writeout data on v-points
+
+      if(output_v    .eq.1) then
+          do k=1,nk
+          do j=1,nj+1
+          do i=1,ni
+            dumv(i,j,k)=va(i,j,k)
+          enddo
+          enddo
+          enddo
+          varname='v'
+          call damaris_write_3d_float(varname,int_time,dumv(1:ni,1:nj+1,1:nk),x0,x1,(nj+1)*(myj-1),myj*(nj+1)-1,0,nk-1)
+      endif
+
+
+      if(output_vpert.eq.1)then
+          do k=1,nk
+          do j=1,nj+1
+          do i=1,ni
+            dumv(i,j,k)=va(i,j,k)-v0(i,j,k)
+          enddo
+          enddo
+          enddo
+          varname='vpert'
+          call damaris_write_3d_float(varname,int_time,dumv(1:ni,1:nj+1,1:nk),x0,x1,(myj-1)*(nj+1),myj*(nj+1)-1,0,nk-1)
+      endif
+
+!--------------------------------------------------------------
+!  writeout data on w-points
+
+      if(output_w    .eq.1) then
+          do k=1,nk+1
+          do j=1,nj
+          do i=1,ni
+            dumw(i,j,k)=wa(i,j,k)
+          enddo
+          enddo
+          enddo
+          varname='w'
+          call damaris_write_3d_float(varname,int_time,dumw(1:ni,1:nj,1:nk+1),x0,x1,y0,y1,0,nk)
+
+      endif
+
+!--------------------------------------------------------------
+
+      write(outfile,*) 'Done Writing Data to File: ',trim(filename)
+! NOTE if compiler says undefined symbol here, try flush_ (IBM)
+!     call flush(outfile)
+
+      call dc_poke("hdf5", int_time, ierror)
+! close everything
+
+#ifdef MPI
+!     call MPI_BARRIER (MPI_COMM_WORLD,ierr)
+#endif
+
+      return
+      end
+
+!--------------------------------------------------------------------------------------------MARK
+
+      subroutine damaris_write_3d_float(varname,step,fl_array_3d,numis,numie,numjs,numje,numks,numke)
+
+      implicit none
+      integer :: numis,numie,numjs,numje,numks,numke,ierr
+      integer :: step
+      character(LEN=20) :: varname
+      real, dimension(numis:numie,numjs:numje,numks:numke) :: fl_array_3d
+      integer*8 :: layout
+      call dc_define_a3d_layout(layout,4,numis,numie,numjs,numje,numks,numke)
+      call dc_write(varname,step,fl_array_3d,layout,ierr)      
+      call dc_free_layout(layout)
+      return
+      end
+
+!--------------------------------------------------------------------------------------------MARK
+      subroutine damaris_write_float(varname,step,value)
+      
+      implicit none
+      character(LEN=20) :: varname
+      real value
+      integer step
+      integer ierr
+      integer*8 :: layout
+      
+      call dc_define_scalar_layout(layout,4)
+      call dc_write(varname,step,value,layout,ierr)
+      call dc_free_layout(layout)
+
+      return
+      end
+!--------------------------------------------------------------------------------------------MARK
+      subroutine damaris_write_int(varname,step,value)
+      
+      implicit none
+      character(LEN=20) :: varname
+      integer value
+      integer step
+      integer ierr
+      integer*8 :: layout
+
+      call dc_define_scalar_layout(layout,2)
+      call dc_write(varname,step,value,layout,ierr)
+      call dc_free_layout(layout)
+      return
+      end
+!--------------------------------------------------------------------------------------------MARK
+      subroutine damaris_write_1d_float(varname,step,fl_array_1d,numks,numke)
+      
+      implicit none
+      character(LEN=20) :: varname
+
+      real value
+      integer step
+      integer numks,numke,ierr
+      real, dimension(numks:numke) :: fl_array_1d
+      integer*8 :: layout
+      call dc_define_a1d_layout(layout,4,numks,numke)
+      call dc_write(varname,step,fl_array_1d,layout,ierr)
+      call dc_free_layout(layout)
+      return
+      end
+!--------------------------------------------------------------------------------------------MARK
+
+      subroutine damaris_write_2d_float(varname,step,fl_array_2d,numis,numie,numjs,numje)
+
+      implicit none
+      character(LEN=20) :: varname
+      integer :: numis,numie,numjs,numje,ierr
+      real, dimension(numis:numie,numjs:numje) :: fl_array_2d
+      integer step
+      integer*8 :: layout
+
+      call dc_define_a2d_layout(layout,4,numis,numie,numjs,numje)
+      call dc_write(varname,step,fl_array_2d,layout,ierr)
+      call dc_free_layout(layout)
+      return
+      end
+#endif
+raddata3d.F/    1299847441  1000  1000  100644  206056    `
 !
 !##################################################################
 !##################################################################
@@ -67662,7 +69097,7 @@ raddata3d.F/    1298670057  19071 8000  100644  206056    `
 !
 
 END BLOCK DATA raddata
-radlib3d.F/     1298670057  19071 8000  100644  25359     `
+radlib3d.F/     1299847441  1000  1000  100644  25359     `
 !
 !
 !##################################################################
@@ -68573,7 +70008,7 @@ SUBROUTINE sagpol(tau,ssc,g0,rll,tll)
   RETURN
 END SUBROUTINE sagpol
 
-irrad3d.F/      1298670057  19071 8000  100644  58575     `
+irrad3d.F/      1299847440  1000  1000  100644  58575     `
 !
 !
 !##################################################################
@@ -70524,7 +71959,7 @@ SUBROUTINE co2kdis(m,n,np,k,co2exp,tco2,tran)
   RETURN
 END SUBROUTINE co2kdis
 
-sorad3d.F/      1298670057  19071 8000  100644  69155     `
+sorad3d.F/      1299847441  1000  1000  100644  69155     `
 !
 !
 !##################################################################
@@ -72812,7 +74247,7 @@ SUBROUTINE cldflx(m,n,np,ict,icb,cc,rr,tt,td,rs,ts,                     &
 END SUBROUTINE cldflx
 
 
-radtrns3d.F/    1298670057  19071 8000  100644  71817     `
+radtrns3d.F/    1299847440  1000  1000  100644  71817     `
 !
 !##################################################################
 !##################################################################
@@ -75014,7 +76449,7 @@ SUBROUTINE zenangl(nx,ny, x,y, hterain, cosz, cosss, a2dr2,             &
   RETURN
 END SUBROUTINE zenangl
 
-getcape.F/      1298670057  19071 8000  100644  16645     `
+getcape.F/      1299847439  1000  1000  100644  16645     `
 !-----------------------------------------------------------------------
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 !-----------------------------------------------------------------------
@@ -75600,7 +77035,7 @@ getcape.F/      1298670057  19071 8000  100644  16645     `
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 !-----------------------------------------------------------------------
 
-ysu.F/          1298670057  19071 8000  100644  52171     `
+ysu.F/          1299847441  1000  1000  100644  52171     `
 !WRf:model_layer:physics
 !
 !
@@ -77026,7 +78461,7 @@ contains
 !-------------------------------------------------------------------
 end module module_bl_ysu
 
-sfclay.F/       1298670057  19071 8000  100644  47402     `
+sfclay.F/       1299847440  1000  1000  100644  47402     `
 !WRF:MODEL_LAYER:PHYSICS
 !
 MODULE module_sf_sfclay
@@ -77915,7 +79350,7 @@ CONTAINS
 !-------------------------------------------------------------------          
 
 END MODULE module_sf_sfclay
-slab.F/         1298670057  19071 8000  100644  28086     `
+slab.F/         1299847442  1000  1000  100644  28086     `
 !WRF:MODEL_LAYER:PHYSICS
 !
 MODULE module_sf_slab
@@ -78479,7 +79914,7 @@ CONTAINS
 !-------------------------------------------------------------------          
 
 END MODULE module_sf_slab
-orfmod.F/       1298670057  19071 8000  100644  2899      `
+orfmod.F/       1299847439  1000  1000  100644  2899      `
 module orfiomod
 
 implicit none
@@ -78549,7 +79984,7 @@ module orfswathsmod
       real, dimension (:,:,:,:), allocatable :: orfswaths
 end module orfswathsmod
 
-oml.F/          1298670057  19071 8000  100644  11886     `
+oml.F/          1299847441  1000  1000  100644  11886     `
 !WRF:MODEL_LAYER:PHYSICS
 !
 MODULE module_sf_oml

@@ -194,6 +194,17 @@
 #endif
 
 !----------------------------------------------------------------------
+!  Initialize Damaris
+#ifdef DAMARIS
+      call dc_initialize("config.xml",myid,ierr)
+      IF(ierr.ne.0)THEN
+        print *,"Error while initializing Damaris."
+        call stopcm1
+      ENDIF
+#endif
+
+
+!----------------------------------------------------------------------
 !  Get domain dimensions, allocate some arrays, then call PARAM
 
       open(unit=20,file='namelist.input',form='formatted',status='old',    &
@@ -879,6 +890,18 @@
                       radsw,rnflx,radswnet,radlwin,u10,v10,t2,q2,znt,ust,hpbl,zol,mol,br,   &
                       dissten,thpten,qvpten,qcpten,qipten,upten,vpten,swten,lwten)
 #endif
+#ifdef DAMARIS
+      ELSEIF(output_format.eq.6) THEN
+       sten = 0.0
+        call writeout_mult_damaris(0.0,qname,sigma,sigmaf,xh,xf,uf,yh,yf,vf,mh,zh,mf,zf, &
+                      pi0,prs0,rho0,th0,qv0,u0,v0,                     &
+                      zs,rain,sws,svs,sps,srs,sgs,sus,shs,thflux,qvflux,cdu,cdv,ce,dum1,dum2,dum3,dum4,  &
+                      rho,prs,sten,ua,uten,va,vten,wa,wten,ppi,tha,    &
+                      qa,kmh,kmv,khh,khv,tkea,pta,num_soil_layers,   &
+                      lu_index,xland,mavail,tsk,tmn,tml,hml,huml,hvml,hfx,qfx,gsw,glw,tslb,   &
+                      radsw,rnflx,radswnet,radlwin,u10,v10,t2,q2,znt,ust,hpbl,zol,mol,br,   &
+                      dissten,thpten,qvpten,qcpten,qipten,upten,vpten,swten,lwten)
+#endif
       ENDIF
     endif
 
@@ -1138,7 +1161,10 @@
 ! ARGH... we don't need the timings file to be accessed in parallel;
 ! however, in order to use the existing h5_write_1d_float routine, we
 ! make it parallel, and pass rootonlyrank to it.
+      allocate ( timbuf(numprocs) )
+      allocate (time_solve_full(numprocs) )
 
+#ifdef HDFOUT
       filename = trim(output_basename)//'_timings.hdf5'
       call h5open_f (ierr)
 
@@ -1149,9 +1175,6 @@
       CALL h5pclose_f(plist_id, ierr)
 
       dims(1)=numprocs; hcount(1)=numprocs; offset(1)=0
-
-      allocate ( timbuf(numprocs) )
-      allocate ( time_solve_full(numprocs) )
 
       call MPI_GATHER(time_solve,1,MPI_REAL,time_solve_full,1,MPI_REAL,0,MPI_COMM_WORLD,ierr)
       varname='time_solve'; description='Time to solve'; units='seconds'
@@ -1331,7 +1354,7 @@
 
       if(myid.eq.0) call h5fclose_f(timings_file_id,ierr)
       call h5close_f(ierr)
-
+#endif
 ! ORF We output averaged values of all timings to the procfile
 
       time_solve_avg = 0.01 * time_solve_avg ! for percent, not fraction
@@ -1483,6 +1506,13 @@
 
 !  End time loop
 !----------------------------------------------------------------------
+
+!----------------------------------------------------------------------
+! Finalize Damaris
+
+#ifdef DAMARIS
+      call dc_finalize(ierr)
+#endif
 
       close(unit=51)
       close(unit=52)

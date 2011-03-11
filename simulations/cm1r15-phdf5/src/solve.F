@@ -4208,6 +4208,17 @@ endif
 !      enddo
 
 #endif
+#ifdef DAMARIS
+       ELSEIF(output_format.eq.6)THEN
+        call writeout_mult_damaris(rtime,qname,sigma,sigmaf,xh,xf,uf,yh,yf,vf,mh,zh,mf,zf, &
+                      pi0,prs0,rho0,th0,qv0,u0,v0,                     &
+                      zs,rain,sws,svs,sps,srs,sgs,sus,shs,thflux,qvflux,cdu,cdv,ce,dum1,dum2,dum3,dum4,  &
+                      rho,prs,sten,ua,uten,va,vten,wa,wten,ppi,tha,    &
+                      qa,kmh,kmv,khh,khv,tkea,pta,num_soil_layers,   &
+                      lu_index,xland,mavail,tsk,tmn,tml,hml,huml,hvml,hfx,qfx,gsw,glw,tslb,   &
+                      radsw,rnflx,radswnet,radlwin,u10,v10,t2,q2,znt,ust,hpbl,zol,mol,br,   &
+                      dissten,thpten,qvpten,qcpten,qipten,upten,vpten,swten,lwten)
+#endif
       ENDIF
 !ORF keep regular hist file dumps on schedule
       if (ctrldrophist.eq.0.and.ctrldropslice.eq.0)taptim=taptim+tapfrq
