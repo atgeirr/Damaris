@@ -113,6 +113,7 @@ void hdf5(const std::string* event, int32_t step, int32_t src, Damaris::Metadata
 	} // for 
 
 	H5Fclose(file_id);
+	H5close();
 	waiting = 0;
 	TIMER_STOP(write_time,"end writing")
 	}

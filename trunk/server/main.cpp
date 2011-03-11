@@ -6,6 +6,7 @@
 #include <boost/program_options.hpp>
 //#include <mpi.h>
 
+#include "common/Debug.hpp"
 #include "common/Util.hpp"
 #include "server/Server.hpp"
 
@@ -42,11 +43,11 @@ int main(int argc, char** argv)
 
 	if(vm.count("daemon")) {
 		if(!(vm.count("stdout"))) {
-			std::cout <<  "Daemon mode used, stdout must be defined\n";
+			ERROR("Daemon mode used, stdout must be defined");
 			exit(-1);
 		}
 		if(!(vm.count("stderr"))) {
-			std::cerr << "Daemon mode used, stderr must be defined\n";
+			ERROR("Daemon mode used, stderr must be defined");
 			exit(-1);
 		}
 		daemon();
@@ -62,12 +63,14 @@ int main(int argc, char** argv)
                 dup2(fd,2);
         }
 	
+	std::string* config = NULL;
 	if (vm.count("configuration")) {
-		
+		config = new std::string(vm["configuration"].as<std::string>());
 	} else {
 		//std::cout << "No configuration file specified.\n";
 		//return 1;
 		// TODO
+		config = new std::string("");
 	}
 	
 //	MPI_Init(&argc,&argv);
@@ -81,12 +84,11 @@ int main(int argc, char** argv)
 	signal(SIGTERM, &sighandler);
 	signal(SIGINT,  &sighandler);
 	
-	LOG("Starting server\n")
-	std::string config(vm["configuration"].as<std::string>());
-	server = new Damaris::Server(&config,id);
+	INFO("Starting server");
+	server = new Damaris::Server(config,id);
 	server->run();
 	
-	LOG("Correctly terminating server\n")
+	INFO("Correctly terminating server\n");
 	delete server;
 //	MPI_Finalize();
 	 
@@ -95,7 +97,7 @@ int main(int argc, char** argv)
 
 static void sighandler(int sig)
 {
-	LOGF("Signal %d caught, server will terminate...\n",sig);
+	INFO("Kill signal caught, server will terminate");
 	if(server != NULL) server->stop();
 }
 

@@ -88,7 +88,7 @@ namespace Damaris {
 		
 		if(msg->type == MSG_VAR)
 		{ 
-			LOGF("receving variable \"%s\" step is %ld\n",msg->content,(long int)iteration)
+			//LOGF("receving variable \"%s\" step is %ld\n",msg->content,(long int)iteration)
 			data = segment->get_address_from_handle(msg->handle);
 			layout = LayoutFactory::unserialize(msg->layoutInfo);
 			metadataManager->put(&name,iteration,sourceID,layout,data);

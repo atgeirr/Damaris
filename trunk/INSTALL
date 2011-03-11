@@ -32,10 +32,10 @@ get the archive and install it.
    Starting a single client:
 	./server --help
    will provide the needed argument. Typical command to start is
-        ./server -id X -D --stderr=stderr.X.log --stdout=stdout.X.log
+        ./server --id X -D --stderr=stderr.X.log --stdout=stdout.X.log
    Make sure X is different on each node!!!
    -D forces the server to run as a deamon, thus you can start
    the process remotely:
-   ssh nodename /path/to/server -id X -D --stderr=stderr.X.log --stdout.X.log
+   ssh nodename /path/to/server --id X -D --stderr=stderr.X.log --stdout.X.log
    (loop over each node and start the server with a different X each time)
 
