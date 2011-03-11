@@ -63,10 +63,11 @@ int main(int argc, char** argv)
         }
 	
 	if (vm.count("configuration")) {
-		// TODO
+		
 	} else {
-		std::cout << "No configuration file specified.\n";
-		return 1;
+		//std::cout << "No configuration file specified.\n";
+		//return 1;
+		// TODO
 	}
 	
 //	MPI_Init(&argc,&argv);
