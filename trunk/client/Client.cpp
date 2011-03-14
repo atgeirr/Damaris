@@ -74,7 +74,7 @@ namespace Damaris {
 		}
 		// allocate buffer
 		size = layout->getRequiredMemoryLength();
-		LOGF("Client writing %s:%ld (%d bytes)\n",varname->c_str(),(long int)iteration,(int)size);
+		//LOGF("Client writing %s:%ld (%d bytes)\n",varname->c_str(),(long int)iteration,(int)size);
 		char* buffer = static_cast<char*>(segment->allocate(size));
 		// copy data
 		memcpy(buffer,data,size);
