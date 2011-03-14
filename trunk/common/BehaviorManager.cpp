@@ -20,7 +20,7 @@ namespace Damaris {
 BehaviorManager::BehaviorManager(MetadataManager *mm)
 {
 	metadataManager = mm;
-	// Tests floowing
+	// Tests folowing
 	Reaction *r = new Reaction(&hdf5);
 	reactions.insert(std::pair<std::string,Reaction*>(std::string("hdf5"),r));
 	std::map<std::string,Reaction*>::iterator it = reactions.find(std::string("hdf5"));
@@ -106,7 +106,7 @@ void hdf5(const std::string* event, int32_t step, int32_t src, Damaris::Metadata
 		H5Pset_filter(chunk_id,1,0,1,gzip_filter_values);
 #endif
 		dataspace_id = H5Screate_simple(ly->getDimensions(), dims, NULL);
-		sprintf(dsetname,"%s",v->getName()->c_str());
+		sprintf(dsetname,"%d-%s",,v->getSource(),v->getName()->c_str());
 		dataset_id = H5Dcreate1(group_id, dsetname,H5T_NATIVE_FLOAT, dataspace_id, chunk_id);
 		H5Dwrite(dataset_id, H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, H5P_DEFAULT,v->getDataAddress());
 		H5Dclose(dataset_id);
