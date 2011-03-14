@@ -51,4 +51,9 @@ namespace Damaris {
 	{
 		std::cout << *name << ", iteration = " << iteration << " source = " << sourceID << std::endl; 
 	}
+
+	void Variable::setDataToNull()
+	{
+		data = NULL;
+	}
 }

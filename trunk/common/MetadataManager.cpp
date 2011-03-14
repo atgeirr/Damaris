@@ -1,6 +1,7 @@
+#include "common/Debug.hpp"
 #include "common/MetadataManager.hpp"
 
-using namespace std;
+using namespace boost::interprocess;
 
 namespace Damaris {
 	
@@ -38,7 +39,13 @@ namespace Damaris {
 
 	void MetadataManager::remove(Variable* v)
 	{
+		if(v->getDataAddress() != NULL) 
+		{
+			segment->deallocate(v->getDataAddress());
+			v->setDataToNull();
+		}
 		vars.remove(v);
+		INFO("removed variable \"" << v->getName()->c_str() << "\", available memory is now " << segment->get_free_memory());
 	}
 	
 	MetadataManager::MetadataManager(managed_shared_memory* s)

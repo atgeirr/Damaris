@@ -23,7 +23,8 @@ namespace Damaris {
 		Layout* getLayout() const;
 		void* getDataAddress() const;
 		bool compare(const Variable &v) const;
-		void print() const; 
+		void print() const;
+		void setDataToNull(); 
 	};
 	
 }
