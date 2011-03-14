@@ -11,6 +11,8 @@
 #include "common/Variable.hpp"
 #include "common/BehaviorManager.hpp"
 
+#define CCORES 23
+ 
 void hdf5(const std::string* event, int32_t step, int32_t src, Damaris::MetadataManager* db);
 
 namespace Damaris {
@@ -38,12 +40,13 @@ void BehaviorManager::reactToPoke(std::string *poke, int32_t iteration, int32_t 
 	
 }
 
+
 void hdf5(const std::string* event, int32_t step, int32_t src, Damaris::MetadataManager* db)
 {
 	static int waiting;
 	waiting++;
 
-	if(waiting == 1) {
+	if(waiting == CCORES) {
 	TIMER_START(write_time)	
         hid_t dataset_id, dataspace_id, chunk_id;
         hid_t file_id, group_id;
@@ -61,7 +64,7 @@ void hdf5(const std::string* event, int32_t step, int32_t src, Damaris::Metadata
 	file_id = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
 	// create group
-	sprintf(groupname,"/proc%05d",0);	
+	sprintf(groupname,"/proc");	
 	group_id = H5Gcreate(file_id, groupname, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
 	hsize_t dims[3], chunkdims[3];
@@ -88,7 +91,7 @@ void hdf5(const std::string* event, int32_t step, int32_t src, Damaris::Metadata
 		chunkdims[0] = dims[0] = ly->getExtentAlongDimension(0);
                 chunkdims[1] = dims[1] = ly->getExtentAlongDimension(1);
                 dataspace_id = H5Screate_simple(ly->getDimensions(), dims, NULL);
-                sprintf(dsetname,"%s",v->getName()->c_str());
+                sprintf(dsetname,"%d-%s",v->getSource(),v->getName()->c_str());
                 dataset_id = H5Dcreate(group_id, dsetname,H5T_NATIVE_FLOAT, dataspace_id, H5P_DEFAULT,H5P_DEFAULT,H5P_DEFAULT);
                 H5Dwrite(dataset_id, H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, H5P_DEFAULT,v->getDataAddress());
                 H5Dclose(dataset_id);
