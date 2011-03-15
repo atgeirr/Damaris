@@ -4160,7 +4160,7 @@
                       dissten,thpten,qvpten,qcpten,qipten,upten,vpten,swten,lwten)
 #endif
 #ifdef HDFOUT
-      ELSEIF(output_format.ge.3)THEN
+      ELSEIF((output_format.ge.3).and.(output_format.le.5))THEN
 
 !ORF TESTING
 
