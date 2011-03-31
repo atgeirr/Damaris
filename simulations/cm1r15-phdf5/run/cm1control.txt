@@ -1,6 +1,0 @@
- CM1 CONTROL FILE. Changing this file will signal to CM1 that you want to
- do something including: (1) drop a slice file (2) drop a full history
- (3) drop a restart file (4) exit gracefully. You can mix and match.
- File is read at the beginning of each time step. 0=no 1=yes
- ---slice---history---restart---exit---
-      0        0         0       0
