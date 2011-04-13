@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 2.8)
 project (DAMARIS)
 
-enable_language (Fortran)
+enable_language (Fortran OPTIONAL)
 
 #include(CMakeForceCompiler)
 #CMAKE_FORCE_CXX_COMPILER(mpicxx "MPI C++ Compiler")
@@ -16,7 +16,7 @@ set(BOOST_ROOT ${EXTERNAL_ROOT})
 
 set(HDF5_INCLUDE_DIR "${EXTERNAL_ROOT}/include")
 set(HDF5_LIBRARY_DIR "${EXTERNAL_ROOT}/lib")
-
+#FIND_PACKAGE(HDF5 "1.8.6" REQUIRED NO_MODULE)
 set(ZLIB_LIBRARY_DIR "${EXTERNAL_ROOT}/lib")
 set(ZLIB_INCLUDE_DIR "${EXTERNAL_ROOT}/include")
 
@@ -30,10 +30,16 @@ include_directories(${DAMARIS_SOURCE_DIR})
 link_directories(${HDF5_LIBRARY_DIR})
 link_directories(${ZLIB_LIBRARY_DIR})
 
-include(FortranCInterface)
-FortranCInterface_HEADER(${DAMARIS_SOURCE_DIR}/common/FCMangle.h
-			 MACRO_NAMESPACE "FC_FUNC_"
-                         SYMBOL_NAMESPACE "FC_SYM_")
+if(CMAKE_Fortran_COMPILER)
+  message(STATUS "Fortran binding will be enabled, compiler is ${CMAKE_Fortran_COMPILER}")
+  include(FortranCInterface)
+  add_definitions(-D__ENABLE_FORTRAN)
+  FortranCInterface_HEADER(${DAMARIS_SOURCE_DIR}/common/FCMangle.h
+			   MACRO_NAMESPACE "FC_FUNC_"
+                           SYMBOL_NAMESPACE "FC_SYM_")
+else(CMAKE_Fortran_COMPILER)
+  message(STATUS "Fortran binding will not be build")
+endif(CMAKE_Fortran_COMPILER)
 
 add_subdirectory (client)
 add_subdirectory (server)

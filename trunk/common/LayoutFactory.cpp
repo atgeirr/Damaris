@@ -1,4 +1,6 @@
-#include "common/FCMangle.h"
+#ifdef __ENABLE_FORTRAN
+	#include "common/FCMangle.h"
+#endif
 
 #include <stdio.h>
 #include "common/Layout.hpp"
@@ -13,8 +15,9 @@ namespace Damaris {
 
 // for Fortran binding
 extern "C" {
-	
-	int FC_FUNC_GLOBAL(dc_define_a3d_layout,DC_DEFINE_A3D_LAYOUT)
+#ifdef __ENABLE_FORTRAN
+
+	int FC_FUNC_GLOBAL(df_define_a3d_layout,DC_DEFINE_A3D_LAYOUT)
 		(int64_t* lptr, int32_t* type, int32_t* start_z, int32_t* end_z,
 		int32_t* start_y, int32_t* end_y, int32_t* start_x, int32_t* end_x)
 	{
@@ -30,7 +33,7 @@ extern "C" {
 		return 0;
 	}
 	
-	int FC_FUNC_GLOBAL(dc_define_a2d_layout,DC_DEFINE_A2D_LAYOUT)
+	int FC_FUNC_GLOBAL(df_define_a2d_layout,DC_DEFINE_A2D_LAYOUT)
 		(int64_t* lptr, int32_t* type, int32_t* start_y, int32_t* end_y,
 		int32_t* start_x, int32_t* end_x)
 	{
@@ -44,7 +47,7 @@ extern "C" {
 		return 0;
 	}
 	
-	int FC_FUNC_GLOBAL(dc_define_a1d_layout,DC_DEFINE_A1D_LAYOUT)
+	int FC_FUNC_GLOBAL(df_define_a1d_layout,DC_DEFINE_A1D_LAYOUT)
 		(int64_t* lptr, int32_t* type, int32_t* start_x, int32_t* end_x)
 	{
 		std::vector<int64_t> args(2,0);
@@ -55,18 +58,18 @@ extern "C" {
 		return 0;
 	}
 	
-	int FC_FUNC_GLOBAL(dc_define_scalar_layout,DC_DEFINE_SCALAR_LAYOUT)
+	int FC_FUNC_GLOBAL(df_define_scalar_layout,DC_DEFINE_SCALAR_LAYOUT)
 		(int64_t* lptr, int32_t* type)
 	{
 		*lptr = (int64_t)(new Damaris::Layout((Damaris::basic_type_e)(*type),(int32_t)0));
 		return 0;
 	}
 	
-	int FC_FUNC_GLOBAL(dc_free_layout,DC_FREE_LAYOUT)
+	int FC_FUNC_GLOBAL(df_free_layout,DC_FREE_LAYOUT)
 		(int64_t* lptr) 
 	{
 		delete ((Damaris::Layout*)(*lptr));
 		return 0;
 	}
-	
+#endif	
 }

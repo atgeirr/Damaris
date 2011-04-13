@@ -22,11 +22,11 @@
       end do
       end do
  
-      call dc_initialize("myconfig.xml",id,ierr)
-      call dc_define_A3D_layout(layout,4,0,63,16,31,2,3)
-      call dc_write("myvar",1,mydata,layout,ierr)
-      call dc_poke(poke,1,ierr)
-      call dc_free_layout(layout);
-      call dc_finalize(ierr)
+      call df_initialize("myconfig.xml",id,ierr)
+      call df_define_A3D_layout(layout,4,0,63,16,31,2,3)
+      call df_write("myvar",1,mydata,layout,ierr)
+      call df_signal(poke,1,ierr)
+      call df_free_layout(layout);
+      call df_finalize(ierr)
 
       end program test

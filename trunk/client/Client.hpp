@@ -23,7 +23,7 @@ namespace Damaris {
 	public:
 		Client(std::string* config,int32_t id);
 		int write(std::string* varname, int32_t iteration, const void* data, const Layout* layout);
-		int poke(std::string* pokename, int32_t iteration);
+		int signal(std::string* signame, int32_t iteration);
 		void* alloc(std::string* varname, int32_t iteration, const Layout* layout);
 		int commit(std::string* varname, int32_t iteration);
 		~Client();

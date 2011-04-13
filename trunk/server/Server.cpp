@@ -95,7 +95,7 @@ namespace Damaris {
 			return;
 		}
 		
-		if(msg->type == MSG_POKE) 
+		if(msg->type == MSG_SIG) 
 		{
 			//database->pretty_print();
 			behaviorManager->reactToPoke(&name,iteration,sourceID);		

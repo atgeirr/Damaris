@@ -1,4 +1,6 @@
-#include "common/FCMangle.h"
+#ifdef __ENABLE_FORTRAN
+	#include "common/FCMangle.h"
+#endif
 
 #include <string.h>
 #include <string>
@@ -102,27 +104,27 @@ namespace Damaris {
 		return size;
 	}
 	
-	int Client::poke(std::string* poke_name, int32_t iteration)
+	int Client::signal(std::string* signal_name, int32_t iteration)
 	{
-		Message* poke = new Message();
-		poke->sourceID = id;
-		poke->iteration = iteration;
-		poke->type = MSG_POKE;
-		poke->handle = 0;
+		Message* sig = new Message();
+		sig->sourceID = id;
+		sig->iteration = iteration;
+		sig->type = MSG_SIG;
+		sig->handle = 0;
 		
-		if(poke_name->length() > 63) {
+		if(signal_name->length() > 63) {
 			ERROR("Warning: poke tag length bigger than 63, will be truncated");
-			memcpy(poke->content,poke_name->c_str(),63);
-			poke->content[63] = '\0';
+			memcpy(sig->content,signal_name->c_str(),63);
+			sig->content[63] = '\0';
 		} else {
-			strcpy(poke->content,poke_name->c_str());
+			strcpy(sig->content,signal_name->c_str());
 		}
 		
 		try {
-			msgQueue->send(poke,sizeof(Message),0);
+			msgQueue->send(sig,sizeof(Message),0);
 			return 0;
 		} catch(interprocess_exception &e) {
-			ERROR("Error while poking " << *poke_name << ", " << e.what());
+			ERROR("Error while poking " << *signal_name << ", " << e.what());
 			return 1;
 		}
 	}
@@ -139,6 +141,7 @@ namespace Damaris {
 	
 }
 
+
 /* ====================================================================== 
  C Binding
  ====================================================================== */
@@ -146,7 +149,7 @@ namespace Damaris {
 extern "C" {
 	
 	Damaris::Client *client;
-	
+
 	int DC_initialize(const char* configfile, int32_t core_id)
 	{
 		std::string config_str(configfile);
@@ -172,10 +175,10 @@ extern "C" {
 		return client->commit(&varname_str,iteration);
 	}
 	
-	int DC_poke(const char* poke_name, int32_t iteration)
+	int DC_signal(const char* signal_name, int32_t iteration)
 	{
-		std::string poke_name_str(poke_name);
-		return client->poke(&poke_name_str,iteration);
+		std::string signal_name_str(signal_name);
+		return client->signal(&signal_name_str,iteration);
 	}
 	
 	int DC_finalize()
@@ -183,12 +186,12 @@ extern "C" {
 		delete client;
 		return 0;
 	}
-	
+#ifdef __ENABLE_FORTRAN	
 	/* ======================================================================
 	 Fortran Binding
 	 ====================================================================== */
 	
-	void FC_FUNC_GLOBAL(dc_initialize,DC_INITIALIZE)
+	void FC_FUNC_GLOBAL(df_initialize,DF_INITIALIZE)
 		(char* config_file_name_f, int32_t* core_id_f, int32_t* ierr_f, int config_file_name_size)
 	{
 		std::string config_file_name(config_file_name_f, config_file_name_size);
@@ -196,25 +199,25 @@ extern "C" {
 		*ierr_f = 0;
 	}
 	
-	void FC_FUNC_GLOBAL(dc_write,DC_WRITE)
+	void FC_FUNC_GLOBAL(df_write,DF_WRITE)
 		(char* var_name_f, int32_t* iteration_f, void* data_f, int64_t* layout_handle_f, int32_t* ierr_f, int var_name_size)
 	{
 		std::string var_name(var_name_f,var_name_size);
 		*ierr_f = client->write(&var_name,*iteration_f,data_f,(Damaris::Layout*)(*layout_handle_f));
 	}
 	
-	void FC_FUNC_GLOBAL(dc_poke,DC_POKE)
+	void FC_FUNC_GLOBAL(df_signal,DF_SIGNAL)
 		(char* event_name_f, int32_t* iteration_f, int* ierr_f, int event_name_size)
 	{
 		std::string event_name(event_name_f,event_name_size);
-		*ierr_f = client->poke(&event_name,*iteration_f);
+		*ierr_f = client->signal(&event_name,*iteration_f);
 	}
 	
-	void FC_FUNC_GLOBAL(dc_finalize,DC_FINALIZE)
+	void FC_FUNC_GLOBAL(df_finalize,DF_FINALIZE)
 		(int* ierr_f)
 	{
 		delete client;
 		*ierr_f = 0;
 	}
-	
+#endif
 }

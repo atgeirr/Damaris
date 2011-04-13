@@ -9,7 +9,7 @@ namespace Damaris {
 	
 	enum msg_type_e {
 		MSG_VAR,
-		MSG_POKE
+		MSG_SIG
 	};
 
 	struct Message {
