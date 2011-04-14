@@ -4,7 +4,6 @@
 //#include <boost/interprocess/ipc/message_queue.hpp>
 //#include <boost/interprocess/managed_shared_memory.hpp>
 #include "common/Debug.hpp"
-#include "common/Util.hpp"
 #include "common/Configuration.hpp"
 #include "common/Message.hpp"
 #include "common/Layout.hpp"
@@ -38,7 +37,7 @@ namespace Damaris {
 			behaviorManager = new BehaviorManager(metadataManager);
 		}
 		catch(interprocess_exception &ex) {
-			LOGF("Error when initializing the server: %s\n",ex.what())
+			ERROR("Error when initializing the server: " << ex.what());
 			exit(-1);
 		}
 		INFO("Server successfully started with configuration " << *configfile);

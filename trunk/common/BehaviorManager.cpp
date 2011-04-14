@@ -1,3 +1,20 @@
+/*******************************************************************
+This file is part of Damaris.
+
+Damaris is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Damaris is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
+********************************************************************/
+
 #include <stdint.h>
 #include <string>
 #include <list>
@@ -6,7 +23,6 @@
 
 #include "common/Debug.hpp"
 #include "common/Configuration.hpp"
-#include "common/Util.hpp"
 #include "common/MetadataManager.hpp"
 #include "common/Variable.hpp"
 #include "common/BehaviorManager.hpp"
@@ -26,15 +42,15 @@ BehaviorManager::BehaviorManager(MetadataManager *mm)
 	std::map<std::string,Reaction*>::iterator it = reactions.find(std::string("hdf5"));
 }
 
-void BehaviorManager::reactToPoke(std::string *poke, int32_t iteration, int32_t sourceID)
+void BehaviorManager::reactToPoke(std::string *sig, int32_t iteration, int32_t sourceID)
 {
-	std::map<std::string,Reaction*>::iterator it = reactions.find(*poke);
+	std::map<std::string,Reaction*>::iterator it = reactions.find(*sig);
 	if(it != reactions.end())
 	{
 		Reaction* r = (*it).second;
-		(*r)(poke,iteration,sourceID,metadataManager);
+		(*r)(sig,iteration,sourceID,metadataManager);
 	} else {
-		LOGF("Unable to process \"%s\" poke.\n",poke->c_str())
+		ERROR("Unable to process "<< sig <<" signal.\n");
 	}	
 }
 	

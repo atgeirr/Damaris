@@ -7,7 +7,6 @@
 //#include <mpi.h>
 
 #include "common/Debug.hpp"
-#include "common/Util.hpp"
 #include "server/Server.hpp"
 
 namespace po = boost::program_options;
