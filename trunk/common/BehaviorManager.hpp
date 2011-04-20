@@ -32,7 +32,7 @@ class BehaviorManager {
 		MetadataManager *metadataManager;
 	public:
 		BehaviorManager(MetadataManager* mm);
-		void reactToPoke(std::string* poke, int32_t iteration, int32_t sourceID);
+		void reactToSignal(std::string* sig, int32_t iteration, int32_t sourceID);
 };
 
 }

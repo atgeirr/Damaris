@@ -1,8 +1,23 @@
+/*******************************************************************
+This file is part of Damaris.
+
+Damaris is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Damaris is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
+********************************************************************/
+
 #include <iostream>
 #include <list>
 
-//#include <boost/interprocess/ipc/message_queue.hpp>
-//#include <boost/interprocess/managed_shared_memory.hpp>
 #include "common/Debug.hpp"
 #include "common/Configuration.hpp"
 #include "common/Message.hpp"
@@ -53,7 +68,6 @@ namespace Damaris {
 		
 		delete behaviorManager;
 		delete metadataManager;
-		
 		delete config;
 	}
 	
@@ -64,11 +78,11 @@ namespace Damaris {
 		Message *msg = new Message();
 		unsigned int priority;
 		size_t  recvSize;
-		bool c;
+		bool received;
 		
 		while(!needStop) {
-			c = msgQueue->try_receive(msg,sizeof(Message), recvSize, priority);
-			if(c) {
+			received = msgQueue->try_receive(msg,sizeof(Message), recvSize, priority);
+			if(received) {
 				processMessage(msg);
 			}
 		}
@@ -97,7 +111,7 @@ namespace Damaris {
 		if(msg->type == MSG_SIG) 
 		{
 			//database->pretty_print();
-			behaviorManager->reactToPoke(&name,iteration,sourceID);		
+			behaviorManager->reactToSignal(&name,iteration,sourceID);		
 			return;
 		}
 	}

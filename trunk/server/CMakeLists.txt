@@ -1,5 +1,6 @@
 set(DAMARIS_SERVER_SRC ${DAMARIS_SOURCE_DIR}/server/main.cpp
 		       ${DAMARIS_SOURCE_DIR}/server/Server.cpp
+		       ${DAMARIS_SOURCE_DIR}/server/Options.cpp
 		       ${DAMARIS_SOURCE_DIR}/common/Configuration.cpp
 		       ${DAMARIS_SOURCE_DIR}/common/Layout.cpp
 		       ${DAMARIS_SOURCE_DIR}/common/LayoutFactory.cpp

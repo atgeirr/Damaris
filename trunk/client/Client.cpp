@@ -93,6 +93,7 @@ namespace Damaris {
 		// allocate buffer
 		size = layout->getRequiredMemoryLength();
 		//LOGF("Client writing %s:%ld (%d bytes)\n",varname->c_str(),(long int)iteration,(int)size);
+
 		char* buffer = static_cast<char*>(segment->allocate(size));
 		// copy data
 		memcpy(buffer,data,size);
@@ -117,6 +118,7 @@ namespace Damaris {
 		msgQueue->send(message,sizeof(Message),0);
 		// free message
 		delete message;
+		
 		return size;
 	}
 	
@@ -129,7 +131,7 @@ namespace Damaris {
 		sig->handle = 0;
 		
 		if(signal_name->length() > 63) {
-			ERROR("Warning: poke tag length bigger than 63, will be truncated");
+			ERROR("Warning: signal tag length bigger than 63, will be truncated");
 			memcpy(sig->content,signal_name->c_str(),63);
 			sig->content[63] = '\0';
 		} else {
@@ -149,7 +151,6 @@ namespace Damaris {
 	{
 		delete msgQueue;
 		delete segment;
-		
 		delete config;
 		
 		INFO("Client destroyed successfuly");

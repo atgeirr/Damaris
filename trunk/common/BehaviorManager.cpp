@@ -42,7 +42,7 @@ BehaviorManager::BehaviorManager(MetadataManager *mm)
 	std::map<std::string,Reaction*>::iterator it = reactions.find(std::string("hdf5"));
 }
 
-void BehaviorManager::reactToPoke(std::string *sig, int32_t iteration, int32_t sourceID)
+void BehaviorManager::reactToSignal(std::string *sig, int32_t iteration, int32_t sourceID)
 {
 	std::map<std::string,Reaction*>::iterator it = reactions.find(*sig);
 	if(it != reactions.end())
@@ -50,7 +50,7 @@ void BehaviorManager::reactToPoke(std::string *sig, int32_t iteration, int32_t s
 		Reaction* r = (*it).second;
 		(*r)(sig,iteration,sourceID,metadataManager);
 	} else {
-		ERROR("Unable to process "<< sig <<" signal.\n");
+		ERROR("Unable to process "<< sig->c_str() <<" signal.");
 	}	
 }
 	
