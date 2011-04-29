@@ -15,37 +15,25 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 
-#ifndef __DAMARIS_CONFIG_H
-#define __DAMARIS_CONFIG_H
+#ifndef __DAMARIS_BEHAVIOR_H
+#define __DAMARIS_BEHAVIOR_H
 
+#include <map>
 #include <string>
+
+#include "common/MetadataManager.hpp"
+#include "common/Action.hpp"
 
 namespace Damaris {
 
-	class Configuration {
-		
+class ActionsManager {
 	private:
-		static Configuration* config;
-		std::string* configFile;
-		int id;
+		std::map<std::string,Action*> actions;
+		MetadataManager *metadataManager;
 	public:
-		Configuration(std::string* conf, int i);
-		
-		int getID() {
-			return config->getNodeID();
-		}
-
-		std::string* getFileName() {
-			return configFile;
-		}
-
-		int getCoresPerNode() const; 
-		int getNodeID() const;
-		std::string*  getSegmentName() const; 
-		size_t getSegmentSize() const;
-		std::string*  getMsgQueueName() const;
-		size_t getMsgQueueSize() const;
-	};
+		ActionsManager(MetadataManager* mm);
+		void reactToSignal(std::string* sig, int32_t iteration, int32_t sourceID);
+};
 
 }
 

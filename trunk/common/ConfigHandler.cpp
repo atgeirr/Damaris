@@ -14,27 +14,16 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
-
-#ifndef __DAMARIS_BEHAVIOR_H
-#define __DAMARIS_BEHAVIOR_H
-
-#include <map>
 #include <string>
 
-#include "common/MetadataManager.hpp"
-#include "common/Reaction.hpp"
+#include <xercesc/sax2/DefaultHandler.hpp>
+
+#include "common/ConfigHandler.hpp"
 
 namespace Damaris {
 
-class BehaviorManager {
-	private:
-		std::map<std::string,Reaction*> reactions;
-		MetadataManager *metadataManager;
-	public:
-		BehaviorManager(MetadataManager* mm);
-		void reactToSignal(std::string* sig, int32_t iteration, int32_t sourceID);
-};
-
-}
-
-#endif
+	ConfigHandler::ConfigHandler(Configuration* c)
+	{
+		config = c;
+	}
+}	

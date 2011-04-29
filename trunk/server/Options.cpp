@@ -1,3 +1,25 @@
+/*******************************************************************
+This file is part of Damaris.
+
+Damaris is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Damaris is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
+********************************************************************/
+/**
+ * \file Options.cpp
+ * \brief Program options parsing
+ * \author Matthieu Dorier
+ * \version 0.1
+ */
 #include <iostream>
 #include <list>
 #include <string>
@@ -27,8 +49,8 @@ Options::Options(int argc, char** argv)
 		("daemon,D","start the server as daemon process")
 		("stdout",po::value<std::string>(),"redirect stdout to a given file")
 		("stderr",po::value<std::string>(),"redirect stderr to a given file")
-		("basename,B",po::value<std::string>(),"base name for output files")
-		("extension,E",po::value<std::string>(),"extension for output files")
+		//("basename,B",po::value<std::string>(),"base name for output files")
+		//("extension,E",po::value<std::string>(),"extension for output files")
 	;
 	
 	po::variables_map vm;
@@ -57,10 +79,15 @@ Options::Options(int argc, char** argv)
                 int fd = open((vm["stderr"].as<std::string>()).c_str(),O_RDWR|O_CREAT,0644);
                 dup2(fd,2);
         }
-	
-	configFile = NULL;
+
+	configFile = NULL;	
 	if (vm.count("configuration")) {
 		configFile = new std::string(vm["configuration"].as<std::string>());
+		INFO("before creating config");
+		config = new Configuration(configFile,id);
+	} else {
+		ERROR("No configuration file provided, use --configuration=<file.xml> or -C <file.xml>");
+		exit(-1);
 	}
 }
 
@@ -69,11 +96,17 @@ std::string* Options::getConfigFile()
 	return configFile;
 }
 
+Configuration* Options::getConfiguration()
+{
+	return config;
+}
+
 int Options::getID()
 {
 	return id;
 }
 }
+
 static void daemon()
 {
 	int i;

@@ -15,35 +15,26 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 
-#include "common/Reaction.hpp"
+#ifndef __DAMARIS_CFGHANDLER_H
+#define __DAMARIS_CFGHANDLER_H
+
+#include <string>
+
+#include <xercesc/sax2/DefaultHandler.hpp>
+
+#include "common/Configuration.hpp"
 
 namespace Damaris {
-	
-	Reaction::Reaction()
-	{
-		function = NULL;
-	}
-	
-	Reaction::Reaction(void(*fptr)(const std::string*, int32_t, int32_t, MetadataManager*))
-	{
-		function = fptr;
-	}
-	
-	Reaction::~Reaction()
-	{}
-	
-	void Reaction::operator()(const std::string* event, 
-							  int32_t iteration, int32_t sourceID, MetadataManager* mm)
-	{
-		if(function != NULL)
-			(*function)(event,iteration,sourceID,mm);
-	}
-	
-	void Reaction::call(const std::string* event,
-						int32_t iteration, int32_t sourceID, MetadataManager* mm)
-	{
-		if(function != NULL)
-			(*function)(event,iteration,sourceID,mm);
-	}
-	
+
+	class ConfigHandler : public xercesc::DefaultHandler {
+		
+	private:
+		Configuration* config;
+	public:
+		ConfigHandler(Configuration* c);
+		
+	};
+
 }
+
+#endif

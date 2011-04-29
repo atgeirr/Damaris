@@ -29,7 +29,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "common/Configuration.hpp"
 #include "common/Message.hpp"
-#include "common/BehaviorManager.hpp"
+#include "common/ActionsManager.hpp"
 #include "common/MetadataManager.hpp"
 
 using namespace boost::interprocess;
@@ -38,7 +38,8 @@ namespace Damaris {
 	
 	class Server {
 	public:
-		Server(std::string *config, int id);
+		Server(std::string *configFile, int id);
+		Server(Configuration* config);
 		~Server();
 		void run();
 		void stop();
@@ -48,8 +49,9 @@ namespace Damaris {
 		message_queue *msgQueue;
 		managed_shared_memory *segment;
 		MetadataManager *metadataManager;
-		BehaviorManager *behaviorManager;
-		
+		ActionsManager *actionsManager;
+	
+		void init();	
 		void processMessage(Message* msg);
 	}; // class Server
 	

@@ -25,7 +25,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/Configuration.hpp"
 #include "common/MetadataManager.hpp"
 #include "common/Variable.hpp"
-#include "common/BehaviorManager.hpp"
+#include "common/ActionsManager.hpp"
 
 #define CCORES 23
  
@@ -33,22 +33,22 @@ void hdf5(const std::string* event, int32_t step, int32_t src, Damaris::Metadata
 
 namespace Damaris {
 	
-BehaviorManager::BehaviorManager(MetadataManager *mm)
+ActionsManager::ActionsManager(MetadataManager *mm)
 {
 	metadataManager = mm;
 	// Tests folowing
-	Reaction *r = new Reaction(&hdf5);
-	reactions.insert(std::pair<std::string,Reaction*>(std::string("hdf5"),r));
-	std::map<std::string,Reaction*>::iterator it = reactions.find(std::string("hdf5"));
+	Action *a = new Action(&hdf5);
+	actions.insert(std::pair<std::string,Action*>(std::string("hdf5"),a));
+	//std::map<std::string,Action*>::iterator it = actions.find(std::string("hdf5"));
 }
 
-void BehaviorManager::reactToSignal(std::string *sig, int32_t iteration, int32_t sourceID)
+void ActionsManager::reactToSignal(std::string *sig, int32_t iteration, int32_t sourceID)
 {
-	std::map<std::string,Reaction*>::iterator it = reactions.find(*sig);
-	if(it != reactions.end())
+	std::map<std::string,Action*>::iterator it = actions.find(*sig);
+	if(it != actions.end())
 	{
-		Reaction* r = (*it).second;
-		(*r)(sig,iteration,sourceID,metadataManager);
+		Action* a = (*it).second;
+		(*a)(sig,iteration,sourceID,metadataManager);
 	} else {
 		ERROR("Unable to process "<< sig->c_str() <<" signal.");
 	}	
@@ -59,6 +59,7 @@ void BehaviorManager::reactToSignal(std::string *sig, int32_t iteration, int32_t
 
 void hdf5(const std::string* event, int32_t step, int32_t src, Damaris::MetadataManager* db)
 {
+/*
 	static int waiting;
 	waiting++;
 
@@ -139,5 +140,6 @@ void hdf5(const std::string* event, int32_t step, int32_t src, Damaris::Metadata
 	waiting = 0;
 	TIMER_STOP(write_time,"end writing")
 	}
+*/
 }
 

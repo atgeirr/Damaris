@@ -20,13 +20,20 @@ set(HDF5_LIBRARY_DIR "${EXTERNAL_ROOT}/lib")
 set(ZLIB_LIBRARY_DIR "${EXTERNAL_ROOT}/lib")
 set(ZLIB_INCLUDE_DIR "${EXTERNAL_ROOT}/include")
 
+set(XERCESC_LIBRARY_DIR "${EXTERNAL_ROOT}/lib")
+set(XERCESC_INCLUDE_DIR "${EXTERNAL_ROOT}/include")
+#set(XERCES_ROOT ${EXTERNAL_ROOT})
+
 find_package(Boost REQUIRED)
+#find_package(XercesC REQUIRED)
 
 include_directories(${Boost_INCLUDE_DIR})
+include_directories(${XercesC_INCLUDE_DIR})
 include_directories(${HDF5_INCLUDE_DIR})
 include_directories(${ZLIB_INCLUDE_DIR})
 include_directories(${DAMARIS_SOURCE_DIR})
 
+link_directories(${XercesC_LIBRARY_DIR})
 link_directories(${HDF5_LIBRARY_DIR})
 link_directories(${ZLIB_LIBRARY_DIR})
 

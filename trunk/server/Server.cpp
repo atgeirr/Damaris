@@ -28,10 +28,21 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 using namespace boost::interprocess;
 
 namespace Damaris {
-	
-	Server::Server(std::string* configfile, int id) 
+
+	Server::Server(std::string* cf, int id)
 	{
-		config = new Configuration(configfile,id);
+		config = new Configuration(cf,id);
+		init();
+	}
+	
+	Server::Server(Configuration* c)
+	{
+		config = c;
+		init();
+	}
+
+	void Server::init() 
+	{
 		needStop = false;
 		
 		try {
@@ -49,13 +60,13 @@ namespace Damaris {
 								config->getSegmentSize());
 			
 			metadataManager = new MetadataManager(segment);
-			behaviorManager = new BehaviorManager(metadataManager);
+			actionsManager = new ActionsManager(metadataManager);
 		}
 		catch(interprocess_exception &ex) {
 			ERROR("Error when initializing the server: " << ex.what());
 			exit(-1);
 		}
-		INFO("Server successfully started with configuration " << *configfile);
+		INFO("Server successfully started with configuration " << config->getFileName()->c_str());
 	}
 	
 	Server::~Server()
@@ -66,7 +77,7 @@ namespace Damaris {
 		shared_memory_object::remove(config->getSegmentName()->c_str());
 		delete segment;
 		
-		delete behaviorManager;
+		delete actionsManager;
 		delete metadataManager;
 		delete config;
 	}
@@ -111,7 +122,7 @@ namespace Damaris {
 		if(msg->type == MSG_SIG) 
 		{
 			//database->pretty_print();
-			behaviorManager->reactToSignal(&name,iteration,sourceID);		
+			actionsManager->reactToSignal(&name,iteration,sourceID);		
 			return;
 		}
 	}

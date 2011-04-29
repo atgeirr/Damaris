@@ -15,30 +15,35 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 
-#ifndef __DAMARIS_REACTION_H
-#define __DAMARIS_REACTION_H
-
-#include <stdint.h>
-#include <string>
-
-#include "common/MetadataManager.hpp"
+#include "common/Action.hpp"
 
 namespace Damaris {
-
-class Reaction {
-	private:
-		void (*function)(const std::string*,int32_t,int32_t,MetadataManager*);
-	public:
-		Reaction();
-		Reaction(void(*fptr)(const std::string*, int32_t, int32_t, MetadataManager*));
-		~Reaction();
-		
-		void operator()(const std::string* event, 
-				int32_t iteration, int32_t sourceID, MetadataManager* mm);
-		void call(const std::string* event,
-			  int32_t iteration, int32_t sourceID, MetadataManager* mm);
-};
-
+	
+	Action::Action()
+	{
+		function = NULL;
+	}
+	
+	Action::Action(void(*fptr)(const std::string*, int32_t, int32_t, MetadataManager*))
+	{
+		function = fptr;
+	}
+	
+	Action::~Action()
+	{}
+	
+	void Action::operator()(const std::string* event, 
+				  int32_t iteration, int32_t sourceID, MetadataManager* mm)
+	{
+		if(function != NULL)
+			(*function)(event,iteration,sourceID,mm);
+	}
+	
+	void Action::call(const std::string* event,
+				int32_t iteration, int32_t sourceID, MetadataManager* mm)
+	{
+		if(function != NULL)
+			(*function)(event,iteration,sourceID,mm);
+	}
+	
 }
-
-#endif
