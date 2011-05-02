@@ -17,81 +17,30 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <string>
 #include <iostream>
-
-#include <xercesc/sax2/SAX2XMLReader.hpp>
-#include <xercesc/sax2/XMLReaderFactory.hpp>
-#include <xercesc/sax2/DefaultHandler.hpp>
-#include <xercesc/util/XMLString.hpp>
-
 #include "common/Debug.hpp"
 #include "common/ConfigHandler.hpp"
 #include "common/Configuration.hpp"
 
 namespace Damaris {
-	
+	// this is for a potentiel future Singleton implementation
+	// of the object, when multithread support will ve enabled	
 	Configuration* Configuration::config = NULL;	
 
 	Configuration::Configuration(std::string *cfgFile, int i)
 	{
 		id = i;
 		configFile = new std::string(*cfgFile);
-		xercesc::SAX2XMLReader* parser = xercesc::XMLReaderFactory::createXMLReader();
-		parser->setFeature(xercesc::XMLUni::fgSAX2CoreValidation, true);
-		parser->setFeature(xercesc::XMLUni::fgSAX2CoreNameSpaces, true);
-		
-		ConfigHandler* handler = new ConfigHandler(this);
-		parser->setContentHandler(handler);
-		parser->setErrorHandler(handler);
 
-		try {
-			parser->parse(cfgFile->c_str());
-		} catch (const xercesc::XMLException& toCatch) {
-			char* message = xercesc::XMLString::transcode(toCatch.getMessage());
-			ERROR("While parsing XML configuration: " << message);
-			xercesc::XMLString::release(&message);
-			exit(-1);
-		} catch (const xercesc::SAXParseException& toCatch) {
-			char* message = xercesc::XMLString::transcode(toCatch.getMessage());
-			ERROR("While parsing XML configuration: " << message);
-			xercesc::XMLString::release(&message);
-			exit(-1);
-		} catch (...) {
-			ERROR("Unexpected Exception while parsing XML configuration.");
-			exit(-1);
-		}
-		delete parser;
-		delete handler;
+		Damaris::ConfigHandler *configHandler = new Damaris::ConfigHandler(this);
+		configHandler->readConfigFile(configFile);
+		
+		delete configHandler;
 		Damaris::Configuration::config = this;
 	}
 
-	int Configuration::getCoresPerNode() const 
-	{ 
-		return 1; 
-	}
-		
 	int Configuration::getNodeID() const
 	{
 		return id;
-	}
-	
-	std::string* Configuration::getSegmentName() const 
-	{ 
-		return new std::string("my shared segment");
-	}
-		
-	size_t Configuration::getSegmentSize() const 
-	{ 
-		return 67108864; 
-	}
-	
-	std::string* Configuration::getMsgQueueName() const
-	{ 
-		return new std::string("my poke queue");
-	}
-	
-	size_t Configuration::getMsgQueueSize() const
-	{ 
-		return 100;
 	}
 	
 }

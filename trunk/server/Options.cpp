@@ -83,7 +83,6 @@ Options::Options(int argc, char** argv)
 	configFile = NULL;	
 	if (vm.count("configuration")) {
 		configFile = new std::string(vm["configuration"].as<std::string>());
-		INFO("before creating config");
 		config = new Configuration(configFile,id);
 	} else {
 		ERROR("No configuration file provided, use --configuration=<file.xml> or -C <file.xml>");

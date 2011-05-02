@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<root>
+<simulation name="my_simulation">
+	<nodes>
+		<cores  count="16"/>
+		<buffer name="my shared memory segment" size="67108864"/>
+		<queue  name="my msg queue" size="100"/>
+	</nodes>
    <ApplicationSettings option_a = "10" option_b = "24">
    </ApplicationSettings>
    <OtherStuff option_x = "500">
    </OtherStuff>
-</root>
+</simulation>

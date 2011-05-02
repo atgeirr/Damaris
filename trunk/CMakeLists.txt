@@ -8,7 +8,7 @@ enable_language (Fortran OPTIONAL)
 
 set(EXTERNAL_ROOT ~/deploy)
 
-add_definitions (-O2 -Wall -D__INFO -D__BENCHMARK -D__ENABLE_COMPRESSION)
+add_definitions (-O2 -Wall -D__DEBUG -D__INFO -D__BENCHMARK -D__ENABLE_COMPRESSION)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${DAMARIS_SOURCE_DIR}/cmake/Modules/")
 

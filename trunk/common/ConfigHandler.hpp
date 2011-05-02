@@ -19,20 +19,49 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #define __DAMARIS_CFGHANDLER_H
 
 #include <string>
+#include <stdexcept>
 
+#include <xercesc/dom/DOM.hpp>
+#include <xercesc/dom/DOMDocument.hpp>
+#include <xercesc/dom/DOMDocumentType.hpp>
+#include <xercesc/dom/DOMElement.hpp>
+#include <xercesc/dom/DOMImplementation.hpp>
+#include <xercesc/dom/DOMImplementationLS.hpp>
+#include <xercesc/dom/DOMNodeIterator.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+#include <xercesc/dom/DOMText.hpp>
+#include <xercesc/parsers/XercesDOMParser.hpp>
+#include <xercesc/util/XMLUni.hpp>
 #include <xercesc/sax2/DefaultHandler.hpp>
 
+#include "common/Debug.hpp"
 #include "common/Configuration.hpp"
+
+using namespace xercesc;
 
 namespace Damaris {
 
-	class ConfigHandler : public xercesc::DefaultHandler {
+	class ConfigHandler {
 		
 	private:
+		XercesDOMParser *configFileParser;
 		Configuration* config;
+
+		XMLCh* TAG_simulation;
+		XMLCh* TAG_nodes;
+		XMLCh* TAG_nodes_cores;
+		XMLCh* TAG_nodes_buffer;
+		XMLCh* TAG_nodes_queue;
+		
+		XMLCh* ATTR_name;
+		XMLCh* ATTR_size;
+		XMLCh* ATTR_count;
+
+		void readNodesConfig(DOMElement* elem) throw();
 	public:
 		ConfigHandler(Configuration* c);
-		
+		~ConfigHandler();
+		void readConfigFile(std::string *cfgFile);
 	};
 
 }

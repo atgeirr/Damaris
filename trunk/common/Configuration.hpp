@@ -26,8 +26,15 @@ namespace Damaris {
 		
 	private:
 		static Configuration* config;
+
 		std::string* configFile;
 		int id;
+		std::string* simulationName;
+		int coresPerNode;
+		std::string* segmentName;
+		size_t segmentSize;
+		std::string* msgQueueName;
+		size_t msgQueueSize;
 	public:
 		Configuration(std::string* conf, int i);
 		
@@ -35,16 +42,27 @@ namespace Damaris {
 			return config->getNodeID();
 		}
 
-		std::string* getFileName() {
-			return configFile;
-		}
+		std::string* getFileName() { return configFile; }
+		
+		std::string* getSimulationName() { return simulationName; }
+		void setSimulationName(char* name) { simulationName = new std::string(name); }
 
-		int getCoresPerNode() const; 
+		int getCoresPerNode() const { return coresPerNode; }
+		void setCoresPerNode(int cpn) { coresPerNode = cpn; }
+
 		int getNodeID() const;
-		std::string*  getSegmentName() const; 
-		size_t getSegmentSize() const;
-		std::string*  getMsgQueueName() const;
-		size_t getMsgQueueSize() const;
+
+		std::string* getSegmentName() const { return segmentName; }
+		void setSegmentName(char* name) { segmentName = new std::string(name); }
+
+		size_t getSegmentSize() const { return segmentSize; }
+		void setSegmentSize(int s) { segmentSize = (size_t)s; }
+
+		std::string* getMsgQueueName() const { return msgQueueName; }
+		void setMsgQueueName(char* name) { msgQueueName = new std::string(name); }
+
+		size_t getMsgQueueSize() const { return msgQueueSize; }
+		void setMsgQueueSize(int s) { msgQueueSize = s; }
 	};
 
 }
