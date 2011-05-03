@@ -25,7 +25,7 @@ namespace Damaris {
 	class Configuration {
 		
 	private:
-		static Configuration* config;
+		static Configuration* _config;
 
 		std::string* configFile;
 		int id;
@@ -36,8 +36,8 @@ namespace Damaris {
 		std::string* msgQueueName;
 		size_t msgQueueSize;
 	public:
-		Configuration(std::string* conf, int i);
-		
+		static Configuration* getInstance();
+
 		int getID() {
 			return config->getNodeID();
 		}

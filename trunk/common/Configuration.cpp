@@ -26,9 +26,31 @@ namespace Damaris {
 	// of the object, when multithread support will ve enabled	
 	Configuration* Configuration::config = NULL;	
 
-	Configuration::Configuration(std::string *cfgFile, int i)
+	Configuration* Configuration::_config = NULL;	
+
+	Configuration* Configuration::getInstance()
 	{
-		id = i;
+		if(_config == NULL)
+			return new Configuration();
+		else
+			return _config;
+	}
+
+	Configuration* Configuration::getInstance(std::string *cfgFile)
+	{
+		if(_config == NULL)
+			return new Configuration(cfgFile);
+		else
+			return _config;
+	}
+
+	Configuration::Configuration()
+	{
+		Damaris::Configuration::_config = this;
+	}
+	
+	Configuration::Configuration(std::string *cfgFile)
+	{
 		configFile = new std::string(*cfgFile);
 
 		Damaris::ConfigHandler *configHandler = new Damaris::ConfigHandler(this);
