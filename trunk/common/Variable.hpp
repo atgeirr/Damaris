@@ -23,26 +23,40 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/Layout.hpp"
 
 namespace Damaris {
-	
-	class Variable {
+
+/**
+ * The Variable object is used for describing a variable within
+ * a metadata structure. It has a pointer to the data and additional
+ * informations.
+ */
+class Variable {
 	private:
-		std::string* name;   // name of the variable
-		int64_t iteration;   // iteration of publication
-		int32_t sourceID; // source that published this variable
-		Layout* layout;     // layout of the data
-		void* data;     // pointer on the data
+		std::string* name;	// name of the variable
+		int64_t iteration;	// iteration of publication
+		int32_t sourceID;	// source that published this variable
+		Layout* layout;		// layout of the data
+		void* data;		// pointer on the data
 	
 	public:
+		/* Constructor */
 		Variable(std::string* vname, int32_t it, int32_t src, Layout* l, void* d);
+		/* returns the name of the variable */
 		std::string* getName() const;
-		int32_t getIteration() const;
-		int32_t getSource() const;
-		Layout* getLayout() const;
-		void* getDataAddress() const;
+		/* returns the iteration at which the variable has been created */
+		int32_t getIteration() const { return iteration; }
+		/* returns the source (client id) which published the variable */
+		int32_t getSource() const { return sourceID; }
+		/* returns the layout of the variable */
+		Layout* getLayout() const { return layout; }
+		/* returns the pointer over the data */
+		void* getDataAddress() const { return data; }
+		/* compares the records (except data and layout) with another variable */
 		bool compare(const Variable &v) const;
-		void print() const;
-		void setDataToNull(); 
-	};
+		/* print informations related to the variable */
+		// void print() const;
+		/* reset the pointer to the data */
+		void setDataToNull() { data = NULL; }
+};
 	
 }
 

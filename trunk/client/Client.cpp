@@ -39,7 +39,7 @@ namespace Damaris {
 	
 	Client::Client(std::string* configfile, int32_t coreID)
 	{
-		config = new Configuration(configfile,coreID);
+		config = new Configuration(configfile);
 		try {
 			msgQueue = new message_queue(open_only, config->getMsgQueueName()->c_str());
 			segment = new managed_shared_memory(open_only, config->getSegmentName()->c_str());
@@ -204,9 +204,9 @@ extern "C" {
 		return 0;
 	}
 #ifdef __ENABLE_FORTRAN	
-	/* ======================================================================
-	 Fortran Binding
-	 ====================================================================== */
+/* ======================================================================
+ Fortran Binding
+ ====================================================================== */
 	
 	void FC_FUNC_GLOBAL(df_initialize,DF_INITIALIZE)
 		(char* config_file_name_f, int32_t* core_id_f, int32_t* ierr_f, int config_file_name_size)

@@ -34,21 +34,29 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace po = boost::program_options;
 
+/**
+ * daemon is a function that creates a daemon process
+ * so the server can run in background (when used in
+ * standalone mode).
+ */
 static void daemon();
 
 namespace Damaris {
 
 Options::Options(int argc, char** argv)
 {
-	int id;
+	
+	int id; /* id of the server */
+
+	/* initializing the options descriptions */
 	po::options_description desc("Allowed options");
 	desc.add_options()
-		("help", "produce help message")
+		("help", "produces help message")
 		("configuration,C", po::value<std::string>(), "name of the configuration file")
-		("id",po::value<int>(&id)->default_value(0),"id of the node")
-		("daemon,D","start the server as daemon process")
-		("stdout",po::value<std::string>(),"redirect stdout to a given file")
-		("stderr",po::value<std::string>(),"redirect stderr to a given file")
+		("id",po::value<int>(&id)->default_value(0),"id of the server")
+		("daemon,D","starts the server as a daemon process")
+		("stdout",po::value<std::string>(),"redirects stdout to a given file")
+		("stderr",po::value<std::string>(),"redirects stderr to a given file")
 		//("basename,B",po::value<std::string>(),"base name for output files")
 		//("extension,E",po::value<std::string>(),"extension for output files")
 	;
@@ -57,12 +65,16 @@ Options::Options(int argc, char** argv)
 	po::store(po::parse_command_line(argc, argv, desc), vm);
 	po::notify(vm);
 
+	/* checking the "help" command */
 	if (vm.count("help")) {
 		std::cout << desc << "\n";
 		exit(-1);
 	}
-
+	
+	/* checking the "daemon" command */
 	if(vm.count("daemon")) {
+		/* the two std streams have to be redirected in that case,
+		   in order for the daemon to start properly */
 		if(!(vm.count("stdout") && vm.count("stderr"))) {
 			ERROR("Daemon mode used, stdout and stderr must be defined");
 			exit(-1);
@@ -70,24 +82,31 @@ Options::Options(int argc, char** argv)
 		daemon();
 	}
 
+	/* checking if we have to redirect stdout to a file */
 	if(vm.count("stdout")) {
 		int fd = open((vm["stdout"].as<std::string>()).c_str(),O_RDWR|O_CREAT,0644);
 		dup2(fd,1);
 	}
 	
+	/* checking if we have to redirect stderr to a file */
 	if(vm.count("stderr")) {
                 int fd = open((vm["stderr"].as<std::string>()).c_str(),O_RDWR|O_CREAT,0644);
                 dup2(fd,2);
         }
-
+	
+	/* now reading the configuration file and preparing the Configuration object */
 	configFile = NULL;	
 	if (vm.count("configuration")) {
 		configFile = new std::string(vm["configuration"].as<std::string>());
-		config = new Configuration(configFile,id);
+		config = new Configuration(configFile);
 	} else {
 		ERROR("No configuration file provided, use --configuration=<file.xml> or -C <file.xml>");
 		exit(-1);
 	}
+
+	/* preparing the Environment object */
+	env = new Environment();
+	env->setID(id);
 }
 
 std::string* Options::getConfigFile()
@@ -100,10 +119,11 @@ Configuration* Options::getConfiguration()
 	return config;
 }
 
-int Options::getID()
+Environment* Options::getEnvironment()
 {
-	return id;
+	return env;
 }
+
 }
 
 static void daemon()

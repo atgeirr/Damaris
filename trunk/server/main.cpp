@@ -1,48 +1,73 @@
+/*******************************************************************
+This file is part of Damaris.
+
+Damaris is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Damaris is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
+********************************************************************/
+/**
+ * This is the main function for the server
+ */
 #include <iostream>
 #include <list>
 #include <string>
 #include <signal.h>
 
-//#include <xercesc/util/PlatformUtils.hpp>
-
 #include "server/Options.hpp"
 #include "common/Debug.hpp"
 #include "server/Server.hpp"
 
-//using namespace xercesc;
-
+/**
+ * sighandler is defined to catch Ctr^C (kill signals)
+ * in order to clean everything before exiting.
+ */
 static void sighandler(int sig);
 
-Damaris::Server *server;
+/**
+ * A global instance of server (there should be only one
+ * so this one is set as extern to refer to the one defined
+ * in Server.cpp)
+ */
+extern Damaris::Server *server;
 
+/**
+ * Main function
+ **/
 int main(int argc, char** argv)
 {
-/*
-	try {
-		XMLPlatformUtils::Initialize();
-	} catch (const XMLException& e) {
-		ERROR("XML initialization exception: " << e.getMessage());
-		return 1;
-	}
-*/
 	INFO("Parsing program options");
-        Damaris::Options* opt = new Damaris::Options(argc,argv);
+	/* The Options object is used to parse the command line arguments */
+	Damaris::Options* opt = new Damaris::Options(argc,argv);
 
+	/* Attaching sighandler to signals */
 	signal(SIGABRT, &sighandler);
 	signal(SIGTERM, &sighandler);
 	signal(SIGINT,  &sighandler);
 	
 	INFO("Initializing server");
-	server = new Damaris::Server(opt->getConfiguration());
+	/* Initializing the server with a Configuration object 
+	   pre-initialized by the Options object */
+	server = new Damaris::Server(opt->getConfiguration(),opt->getEnvironment());
 	delete opt;
 	INFO("Starting server");
+
+	/* Starts the server */
 	server->run();
 	
+	/* If we go here, it means that a requests has been sent
+	   to the server for stoping it. This is the normal way
+	   of doing. */
 	INFO("Correctly terminating server\n");
 	delete server;
-/*
-	XMLPlatformUtils::Terminate();
-*/
 	return 0;
 }
 

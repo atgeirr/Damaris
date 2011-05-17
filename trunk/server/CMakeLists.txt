@@ -3,12 +3,15 @@ set(DAMARIS_SERVER_SRC ${DAMARIS_SOURCE_DIR}/server/main.cpp
 		       ${DAMARIS_SOURCE_DIR}/server/Options.cpp
 		       ${DAMARIS_SOURCE_DIR}/common/Configuration.cpp
 		       ${DAMARIS_SOURCE_DIR}/common/ConfigHandler.cpp
+		       ${DAMARIS_SOURCE_DIR}/common/Environment.cpp
 		       ${DAMARIS_SOURCE_DIR}/common/Layout.cpp
 		       ${DAMARIS_SOURCE_DIR}/common/LayoutFactory.cpp
 		       ${DAMARIS_SOURCE_DIR}/common/MetadataManager.cpp
 		       ${DAMARIS_SOURCE_DIR}/common/Variable.cpp
 		       ${DAMARIS_SOURCE_DIR}/common/Action.cpp
 		       ${DAMARIS_SOURCE_DIR}/common/ActionsManager.cpp)
+
+add_library (damaris-server ${DAMARIS_SERVER_SRC})
 
 add_executable (server ${DAMARIS_SERVER_SRC})
 

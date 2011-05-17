@@ -18,7 +18,11 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 #include <list>
 
+#ifdef __ENABLE_FORTRAN
+        #include "common/FCMangle.h"
+#endif
 #include "common/Debug.hpp"
+#include "common/Environment.hpp"
 #include "common/Configuration.hpp"
 #include "common/Message.hpp"
 #include "common/Layout.hpp"
@@ -29,22 +33,27 @@ using namespace boost::interprocess;
 
 namespace Damaris {
 
+	/** constructor for embedded mode */
 	Server::Server(std::string* cf, int id)
 	{
-		config = new Configuration(cf,id);
+		config = new Configuration(cf);
+		env = new Environment();
+		env->setID(id);
 		init();
 	}
 	
-	Server::Server(Configuration* c)
+	/** constructor for standalone mode */
+	Server::Server(Configuration* c, Environment *e)
 	{
 		config = c;
+		env = e;
 		init();
 	}
-
+	/** initialization */
 	void Server::init() 
 	{
 		needStop = false;
-		
+		/* creating shared structures */
 		try {
 			
 			shared_memory_object::remove(config->getMsgQueueName()->c_str());
@@ -58,17 +67,17 @@ namespace Damaris {
 			segment = new managed_shared_memory(create_only,
 								config->getSegmentName()->c_str(),
 								config->getSegmentSize());
-			
-			metadataManager = new MetadataManager(segment);
-			actionsManager = new ActionsManager(metadataManager);
 		}
 		catch(interprocess_exception &ex) {
 			ERROR("Error when initializing the server: " << ex.what());
 			exit(-1);
 		}
+
+		metadataManager = new MetadataManager(segment);
+		actionsManager = new ActionsManager(metadataManager);
 		INFO("Server successfully started with configuration " << config->getFileName()->c_str());
 	}
-	
+	/* destructor */
 	Server::~Server()
 	{
 		shared_memory_object::remove(config->getMsgQueueName()->c_str());
@@ -81,8 +90,8 @@ namespace Damaris {
 		delete metadataManager;
 		delete config;
 	}
-	
-	void Server::run()
+	/* starts the server and enter the main loop */
+	int Server::run()
 	{
 		INFO("Successfully entered in \"run\" mode");
 		
@@ -99,8 +108,10 @@ namespace Damaris {
 		}
 		
 		delete msg;
+		return 0;
 	}
 	
+	/* process a incoming message */
 	void Server::processMessage(Message* msg) 
 	{
 		
@@ -112,7 +123,6 @@ namespace Damaris {
 		
 		if(msg->type == MSG_VAR)
 		{ 
-			//LOGF("receving variable \"%s\" step is %ld\n",msg->content,(long int)iteration)
 			data = segment->get_address_from_handle(msg->handle);
 			layout = LayoutFactory::unserialize(msg->layoutInfo);
 			metadataManager->put(&name,iteration,sourceID,layout,data);
@@ -121,15 +131,46 @@ namespace Damaris {
 		
 		if(msg->type == MSG_SIG) 
 		{
-			//database->pretty_print();
 			actionsManager->reactToSignal(&name,iteration,sourceID);		
 			return;
 		}
 	}
 	
+	/* indicate that the server should stop */
 	void Server::stop()
 	{
 		needStop = true;
 	}
 	
+}
+
+/* ====================================================================== 
+ C Binding
+ ====================================================================== */
+extern "C" {
+
+	Damaris::Server *server;
+	/* Starts an embedded server inside the simulation,
+	   the function will block until the server is asked to
+	   stop. The server is initialized with a configuration
+	   file and an id. */
+	int DC_server(const char* configFile, int server_id)
+	{
+		std::string config_str(configFile);
+		server = new Damaris::Server(&config_str,server_id);
+		return server->run();
+	}
+
+#ifdef __ENABLE_FORTRAN
+/* ====================================================================== 
+ Fortran Binding
+ ====================================================================== */
+	void FC_FUNC_GLOBAL(df_server,DF_SERVER)
+		(char* configFile_f, int32_t* server_id_f, int32_t* ierr_f, int32_t configFile_size)
+	{
+		std::string config_str(configFile_f,configFile_size);
+		server = new Damaris::Server(&config_str,*server_id_f);
+		*ierr_f = server->run();
+	}
+#endif
 }

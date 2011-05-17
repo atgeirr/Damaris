@@ -21,26 +21,45 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 
 namespace Damaris {
-
+	/** 
+	 * The class Configuration holds all informations extrated from
+	 * both the command lines (for the server) and the external configuration
+	 * file. It is independant of the format of this configuration file
+	 * (which is loaded through the ConfigHandler object)
+	 */
 	class Configuration {
 		
 	private:
-		static Configuration* _config;
-
+		/**
+		 * for information, we keep the name of the external configuration file
+		 */
 		std::string* configFile;
-		int id;
+		/**
+		 * Name of the simulation we are running
+		 */
 		std::string* simulationName;
+		/**
+		 * number of cores per node
+		 */
 		int coresPerNode;
+		/**
+		 * name of the shared buffer
+		 */
 		std::string* segmentName;
+		/**
+		 * size of the buffer (in bytes)
+		 */
 		size_t segmentSize;
+		/**
+		 * name of the shared message queue
+		 */
 		std::string* msgQueueName;
+		/**
+		 * maximum number of messages in the queue
+		 */
 		size_t msgQueueSize;
 	public:
-		static Configuration* getInstance();
-
-		int getID() {
-			return config->getNodeID();
-		}
+		Configuration(std::string* configName);
 
 		std::string* getFileName() { return configFile; }
 		
@@ -49,8 +68,6 @@ namespace Damaris {
 
 		int getCoresPerNode() const { return coresPerNode; }
 		void setCoresPerNode(int cpn) { coresPerNode = cpn; }
-
-		int getNodeID() const;
 
 		std::string* getSegmentName() const { return segmentName; }
 		void setSegmentName(char* name) { segmentName = new std::string(name); }

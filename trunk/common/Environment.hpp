@@ -14,23 +14,27 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
+#ifndef __DAMARIS_ENVIRONMENT_H
+#define __DAMARIS_ENVIRONMENT_H
 
-#include <string>
-#include <iostream>
-#include "common/Debug.hpp"
-#include "common/ConfigHandler.hpp"
-#include "common/Configuration.hpp"
 
 namespace Damaris {
-	
-	Configuration::Configuration(std::string *cfgFile)
-	{
-		configFile = new std::string(*cfgFile);
-		/* here we create the ConfigHandler to load the xml file */
-		Damaris::ConfigHandler *configHandler = new Damaris::ConfigHandler(this);
-		configHandler->readConfigFile(configFile);
-		/* the ConfigHandler must be deleted afterward */
-		delete configHandler;
-	}
+/** 
+ * The class Configuration holds all local informations
+ * such as the id of the enclosing process.
+ */
+class Environment {
+		
+	private:
+		int id;
+	public:
+		Environment();
+		Environment(int i);
+		int getID() { return id; }
+		void setID(int i) { id = i; }
+
+};
+
 }
 
+#endif

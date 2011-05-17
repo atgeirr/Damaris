@@ -26,19 +26,47 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 
 #include "common/Configuration.hpp"
+#include "common/Environment.hpp"
 
 namespace Damaris {
 
+/**
+ * The Options object can be used to parse the command line,
+ * it will prepare the Configuration and the Environment
+ * objects. This object is used only with a standalone server,
+ * not with an embedded one.
+ */
 class Options {
 	private:
+		/**
+		 * The name of the configuration file
+		 */
 		std::string* configFile;
+		/**
+		 * The environment object
+		 */
+		Environment* env;
+		/**
+		 * The configuration object
+		 */
 		Configuration* config;
-		int id;
 	public:
+		/**
+		 * The constructor takes the same parameters than
+		 * a usual program */
 		Options(int argc, char** argv);
+		/**
+		 * Get the name of the configuration file
+		 */
 		std::string* getConfigFile();
+		/**
+		 * Get the prepared configuration
+		 */
 		Configuration* getConfiguration();
-		int getID();
+		/**
+		 * Get the prepared environment
+		 */
+		Environment* getEnvironment();
 };
 }
 

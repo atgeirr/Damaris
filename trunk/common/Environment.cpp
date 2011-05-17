@@ -15,22 +15,17 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 
-#include <string>
-#include <iostream>
-#include "common/Debug.hpp"
-#include "common/ConfigHandler.hpp"
-#include "common/Configuration.hpp"
+#include "common/Environment.hpp"
 
 namespace Damaris {
-	
-	Configuration::Configuration(std::string *cfgFile)
+
+	Environment::Environment()
 	{
-		configFile = new std::string(*cfgFile);
-		/* here we create the ConfigHandler to load the xml file */
-		Damaris::ConfigHandler *configHandler = new Damaris::ConfigHandler(this);
-		configHandler->readConfigFile(configFile);
-		/* the ConfigHandler must be deleted afterward */
-		delete configHandler;
+		id = 0;
+	}	
+
+	Environment::Environment(int entity_id)
+	{
+		id = entity_id;
 	}
 }
-

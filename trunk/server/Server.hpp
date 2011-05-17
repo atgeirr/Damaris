@@ -36,25 +36,46 @@ using namespace boost::interprocess;
 
 namespace Damaris {
 	
-	class Server {
+class Server {
 	public:
+		/* This constructor is used when starting a server
+		   from an external program */
 		Server(std::string *configFile, int id);
-		Server(Configuration* config);
+		/* This constructor is used by the standalone server
+		   program, which pre-initializes a configuration through
+		   command lines arguments, and a pre-initialized environment */
+		Server(Configuration* config, Environment* env);
+		/* Object destructor */
 		~Server();
-		void run();
+		/* Enters in the server main loop */
+		int run();
+		/* Forces the server to stop */
 		void stop();
 	private:
+		/* needStop indicated if the server has to exit the
+		   main loop at the next iteration */
 		bool needStop;
+		/* This is the configuration object initialized with the external file */
 		Configuration *config;
+		/* This is the environment pointer */
+		Environment *env;
+		/* Pointer to the message queue, this queue is used
+		   to send messages related to incoming variables and
+		   events */
 		message_queue *msgQueue;
+		/* Pointer to the shared memory segment, used to
+		   write variables */
 		managed_shared_memory *segment;
+		/* This is the entry to the metadata layer of Damaris */
 		MetadataManager *metadataManager;
+		/* This object contains all the user-defined actions */
 		ActionsManager *actionsManager;
-	
-		void init();	
+		/* The init function initializes everything (called by
+		   constructors */
+		void init();
+		/* This function processes an incoming message (no way ???) */
 		void processMessage(Message* msg);
-	}; // class Server
-	
+}; // class Server
 	
 } // namespace Damaris
 
