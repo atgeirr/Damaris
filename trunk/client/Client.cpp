@@ -32,27 +32,25 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "client/Client.hpp"
 
 using namespace boost::interprocess;
-/**
- * 
- */
+
 namespace Damaris {
 	
 	Client::Client(std::string* configfile, int32_t coreID)
 	{
+		/* creates the configuration object from the configuration file */
 		config = new Configuration(configfile);
+		id = coreID;
+		/* initializes the shared structures */
 		try {
 			msgQueue = new message_queue(open_only, config->getMsgQueueName()->c_str());
 			segment = new managed_shared_memory(open_only, config->getSegmentName()->c_str());
-			id = coreID;
 		}
 		catch(interprocess_exception &ex) {
 			std::cout << ex.what() << std::endl;
 		}
 		INFO("Client initialized successfully for core " << id << " with configuration " << *configfile);
 	}
-	/**
-	 *
-	 */
+	
 	void* Client::alloc(std::string* varname, int32_t iteration, const Layout* datalayout)
 	{
 		size_t size;

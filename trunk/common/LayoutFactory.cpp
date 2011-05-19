@@ -29,6 +29,11 @@ namespace Damaris {
 	
 }
 
+/** Note: the following functions allow the definition
+ * of a layout from a fortran program, they are used because
+ * the configuration part of Damaris is not programmed yet,
+ * but they are not part of the Damaris API.
+ */
 
 // for Fortran binding
 extern "C" {

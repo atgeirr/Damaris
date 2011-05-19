@@ -17,15 +17,17 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #ifndef DAMARIS_LAYOUTFACTORY_H
 #define DAMARIS_LAYOUTFACTORY_H
-	
+/**
+ * The LayoutFactory serializes and unserializes layouts so
+ * it can be sent through messages.
+ */	
 namespace Damaris {
 	
-	class LayoutFactory {
+class LayoutFactory {
 	private:
 		
 	public:
-		//static int SERIALIZED_SIZE = 8;
-		
+		/* serializes a layout */	
 		static int serialize(const Layout* layout, int64_t* buffer)
 		{
 			buffer[0] = (int64_t)(layout->getType());
@@ -40,6 +42,7 @@ namespace Damaris {
 			return 0;
 		}
 		
+		/* unserializes a layout */
 		static Layout* unserialize(const int64_t* buffer) 
 		{
 			Layout* layout = NULL;
@@ -55,7 +58,7 @@ namespace Damaris {
 			layout = new Layout(type,dimensions,extents);
 			return layout;
 		}
-	};
+};
 }
 
 #endif

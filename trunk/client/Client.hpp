@@ -29,22 +29,35 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 using namespace boost::interprocess;
 
 namespace Damaris {
-
-	class Client {
+/**
+ * The Client object represent a single core running the
+ * simulation. It is characterized by a uniq ID and is initialized
+ * with a configuration file.
+ */
+class Client {
 	private:
-		int id;
-		Configuration *config;
-		message_queue *msgQueue;
-		managed_shared_memory *segment;
+		int id; /* this is the ID of the client */
+		Configuration *config; /* configuration object */
+		message_queue *msgQueue; /* pointer to the message queue */
+		managed_shared_memory *segment; /* pointer to the shared memory segment */
 		
 	public:
+		/* constructor, initializes the client given the name
+		   of a configuration file and and ID. No one will check
+		   if two clients have the same ID so the user shoud be
+		   careful with that. */
 		Client(std::string* config,int32_t id);
+		/* writes a variable into shared memory and sends a message notifying the write */
 		int write(std::string* varname, int32_t iteration, const void* data, const Layout* layout);
+		/* sends en event to the dedicated core */
 		int signal(std::string* signame, int32_t iteration);
+		/* allocate a buffer in shared memory so it can be written after */
 		void* alloc(std::string* varname, int32_t iteration, const Layout* layout);
+		/* notify the dedicated core that the previously allocated buffer has been written */
 		int commit(std::string* varname, int32_t iteration);
+		/* destructor */
 		~Client();
-	}; // class Client
+}; // class Client
 
 } // namespace Damaris
 
