@@ -41,7 +41,7 @@ class Variable {
 		/* Constructor */
 		Variable(std::string* vname, int32_t it, int32_t src, Layout* l, void* d);
 		/* returns the name of the variable */
-		std::string* getName() const;
+		std::string* getName() const { return name; }
 		/* returns the iteration at which the variable has been created */
 		int32_t getIteration() const { return iteration; }
 		/* returns the source (client id) which published the variable */

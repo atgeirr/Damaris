@@ -18,7 +18,10 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __DAMARIS_CONFIG_H
 #define __DAMARIS_CONFIG_H
 
+#include <map>
 #include <string>
+
+#include "common/Parameter.hpp"
 
 namespace Damaris {
 	/** 
@@ -58,8 +61,13 @@ namespace Damaris {
 		 * maximum number of messages in the queue
 		 */
 		size_t msgQueueSize;
+		/**
+		 * list of parameters
+		 */
+		std::map<std::string,Parameter>* parameters;
 	public:
 		Configuration(std::string* configName);
+		~Configuration();
 
 		std::string* getFileName() { return configFile; }
 		
@@ -80,6 +88,11 @@ namespace Damaris {
 
 		size_t getMsgQueueSize() const { return msgQueueSize; }
 		void setMsgQueueSize(int s) { msgQueueSize = s; }
+
+		
+		void setParameter(char* name, char* type, char* value);
+		
+		void setVariable(char* name, char* layoutName);
 	};
 
 }

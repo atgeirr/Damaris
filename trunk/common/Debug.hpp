@@ -48,6 +48,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #ifdef __INFO
 #define __ERROR
+#define __WARN
 #define INFO(message) MESSAGE(std::cout, "INFO", message)
 #else
 #define INFO(message)
@@ -57,6 +58,12 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #define ERROR(message) MESSAGE(std::cerr, "ERROR", message)
 #else
 #define ERROR(message)
+#endif
+
+#ifdef __WARN
+#define WARN(message) MESSAGE(std::cerr, "WARNING", message)
+#else
+#define WARN(message)
 #endif
 
 #ifdef __ASSERT

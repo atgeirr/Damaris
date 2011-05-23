@@ -26,11 +26,14 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 using namespace xercesc;
 
 namespace Damaris {
-
+	
+	/* Constructor, takes a Configuration object */
 	ConfigHandler::ConfigHandler(Configuration* c)
 	{
 		config = c;
+		nodeParsed = false;
 
+		/* try initializing the XML utilities */
 		try
 		{
 			XMLPlatformUtils::Initialize();  // Initialize Xerces infrastructure
@@ -38,40 +41,77 @@ namespace Damaris {
 			char* message = XMLString::transcode(e.getMessage());
       			ERROR("XML toolkit initialization error: " << message);
       			XMLString::release(&message);
+			/* if Xerces-C has not been properly initialized, well there is no
+			   point continuing. We can stop here without leaving shared objects
+			   opened because shared objects are created after reading the
+			   configuration file anyway. */
 			exit(-1);
 		}
 
 		configFileParser = new xercesc::XercesDOMParser();
 
+		/* initializing all tags */
 		TAG_simulation 		= XMLString::transcode("simulation");
 		TAG_nodes 		= XMLString::transcode("nodes");
 		TAG_nodes_cores 	= XMLString::transcode("cores");
 		TAG_nodes_buffer 	= XMLString::transcode("buffer");
  		TAG_nodes_queue 	= XMLString::transcode("queue");
+		TAG_data		= XMLString::transcode("data");
+		TAG_data_variable	= XMLString::transcode("variable");
+		TAG_data_layout		= XMLString::transcode("layout");
+		TAG_data_parameter	= XMLString::transcode("parameter");
+		TAG_actions		= XMLString::transcode("actions");
+		TAG_actions_event	= XMLString::transcode("event");
 		
+		/* initializing all attributes */
 		ATTR_name 		= XMLString::transcode("name");
 		ATTR_count 		= XMLString::transcode("count");
 		ATTR_size 		= XMLString::transcode("size");
+		ATTR_type		= XMLString::transcode("type");
+		ATTR_layout		= XMLString::transcode("layout");
+		ATTR_dimensions		= XMLString::transcode("dimensions");
+		ATTR_language		= XMLString::transcode("language");
+		ATTR_value		= XMLString::transcode("value");
+		ATTR_action		= XMLString::transcode("action");
+		ATTR_using		= XMLString::transcode("using");
 	}
 
 	ConfigHandler::~ConfigHandler()
 	{
-		delete configFileParser;
+		/* first delete the parser */
+		if(configFileParser != NULL)
+			delete configFileParser;
 
+		/* now deleting all resources used by tags and attributes */
 		try {
 			XMLString::release(&TAG_simulation);
 			XMLString::release(&TAG_nodes);
 			XMLString::release(&TAG_nodes_cores);
 			XMLString::release(&TAG_nodes_buffer);
 			XMLString::release(&TAG_nodes_queue);
+			XMLString::release(&TAG_data);
+			XMLString::release(&TAG_data_parameter);
+			XMLString::release(&TAG_data_variable);
+			XMLString::release(&TAG_data_layout);
+			XMLString::release(&TAG_actions);
+			XMLString::release(&TAG_actions_event);
 			
 			XMLString::release(&ATTR_name);
 			XMLString::release(&ATTR_count);
 			XMLString::release(&ATTR_size);
+			XMLString::release(&ATTR_type);
+			XMLString::release(&ATTR_layout);
+			XMLString::release(&ATTR_dimensions);
+			XMLString::release(&ATTR_language);
+			XMLString::release(&ATTR_value);
+			XMLString::release(&ATTR_action);
+			XMLString::release(&ATTR_using);
+
 		} catch( ... ) {
 			ERROR("Error while releasing Xerces-C resources");
 		}
 
+		/* try terminating all XML-related stuff */
 		try {
 			XMLPlatformUtils::Terminate();  // Terminate after release of memory
 		} catch( xercesc::XMLException& e ) {
@@ -81,6 +121,7 @@ namespace Damaris {
    		}
 	}
 
+	/* reads a particular configuration file */
 	void ConfigHandler::readConfigFile(std::string* configFile)
 	{
    		// Test to see if the file is ok.
@@ -136,8 +177,13 @@ namespace Damaris {
 				{
 					// Found node which is an Element. Re-cast node as element
 					DOMElement* currentElement = dynamic_cast< xercesc::DOMElement* >( currentNode );
+					
+					// Does this element is a <node> ?
 					if(XMLString::equals(currentElement->getTagName(), TAG_nodes))
 						readNodesConfig(currentElement);
+					// Does this element is a <data> ?
+					if(XMLString::equals(currentElement->getTagName(), TAG_data))
+						readDataConfig(currentElement);
 				}
 			}
 
@@ -150,8 +196,15 @@ namespace Damaris {
 		}
 	}
 
+	/* Parse configuration within the <node> element 
+	   This function can be called only once */
 	void ConfigHandler::readNodesConfig(DOMElement* elem) throw ()
 	{
+		if(nodeParsed)
+		{
+			WARN("Several <node> items found in configuration, only the first one is considered.");
+			return;
+		}
 		INFO("Parsing internal configuration of nodes");
 		// elem is a <nodes> element, it can have the following childs
 		// <cores>, <buffer>, <queue>
@@ -217,5 +270,132 @@ namespace Damaris {
 				}
 			}
 		}
+
+		nodeParsed = true;
+	}
+
+	
+	/* Parse configuration within the <data> element  */
+	void ConfigHandler::readDataConfig(DOMElement* elem) throw ()
+	{
+		INFO("Parsing configuration for data");
+		// elem is a <data> element, it can have the following childs
+		// <variable>, <layout>, <parameter>
+		// iterates on childs
+		DOMNodeList* children = elem->getChildNodes();
+		const  XMLSize_t nodeCount = children->getLength();
+		
+		// For all nodes, children of "data" in the XML tree.
+		for(XMLSize_t i = 0; i < nodeCount; ++i )
+		{
+			DOMNode* currentNode = children->item(i);
+			
+			if( currentNode->getNodeType() &&
+			    currentNode->getNodeType() == DOMNode::ELEMENT_NODE )
+			{
+				DOMElement* currentElement = dynamic_cast< xercesc::DOMElement* >( currentNode );
+				//  Does the element equals <parameter>
+				if( XMLString::equals(currentElement->getTagName(), TAG_data_parameter))
+				{
+					readParameterInfo(currentElement);
+					continue;
+				} else
+				// Does the element equals <layout>
+				if( XMLString::equals(currentElement->getTagName(), TAG_data_layout))
+				{
+					readLayoutInfo(currentElement);
+					continue;
+				} else
+				// Does the element equals <variable>
+				if( XMLString::equals(currentElement->getTagName(), TAG_data_variable))
+				{
+					readVariableInfo(currentElement);
+					continue;
+				}
+			}
+		}
+	}
+
+	
+	/* Parse configuration within the <actions> element  */
+	void ConfigHandler::readActionsConfig(DOMElement* elem) throw ()
+	{
+		INFO("Parsing configuration for actions");
+		// elem is a <actions> element, it can have the following childs
+		// <event>
+		// iterates on childs
+		DOMNodeList* children = elem->getChildNodes();
+		const  XMLSize_t nodeCount = children->getLength();
+		
+		// For all nodes, children of "data" in the XML tree.
+		for(XMLSize_t i = 0; i < nodeCount; ++i )
+		{
+			DOMNode* currentNode = children->item(i);
+			
+			if( currentNode->getNodeType() &&
+			    currentNode->getNodeType() == DOMNode::ELEMENT_NODE )
+			{
+				DOMElement* currentElement = dynamic_cast< xercesc::DOMElement* >( currentNode );
+				//  Does the element equals <event>
+				if( XMLString::equals(currentElement->getTagName(), TAG_actions_event))
+				{
+					readEventInfo(currentElement);
+					continue;
+				}
+			}
+		}
+	}
+	
+	/* this function is called when finding a <parameter> tag */
+	void ConfigHandler::readParameterInfo(DOMElement* elem) throw()
+	{
+		/* getting attributes */
+		const XMLCh* xmlch_name = elem->getAttribute(ATTR_name);
+		const XMLCh* xmlch_type = elem->getAttribute(ATTR_type);
+		const XMLCh* xmlch_value = elem->getAttribute(ATTR_value);
+
+		/* converting into char* */
+		char* attr_name = XMLString::transcode(xmlch_name);
+		char* attr_type = XMLString::transcode(xmlch_type);
+		char* attr_value = XMLString::transcode(xmlch_value);
+
+		/* setting parameter in configuration */
+		config->setParameter(attr_name, attr_type, attr_value);
+
+		/* releasing memory */
+		XMLString::release(&attr_name);
+		XMLString::release(&attr_type);
+		XMLString::release(&attr_value);
+	}
+	
+	/* this function is called when finding a <variable> tag */
+	void ConfigHandler::readVariableInfo(DOMElement* elem) throw()
+	{
+		/* getting attributes */
+		const XMLCh* xmlch_name = elem->getAttribute(ATTR_name);
+		const XMLCh* xmlch_layout = elem->getAttribute(ATTR_layout);
+
+		/* converting into char* */
+		char* attr_name = XMLString::transcode(xmlch_name);
+		char* attr_layout = XMLString::transcode(xmlch_layout);
+
+		/* inserting variable into configuration */
+		config->setVariable(attr_name,attr_layout);
+		
+		/* releasing memory */
+		XMLString::release(&attr_name);
+		XMLString::release(&attr_layout);
+	}
+
+	/* this function is called when finding a <layout> tag */
+	void ConfigHandler::readLayoutInfo(DOMElement* elem) throw()
+	{
+	
+	}
+
+	/* this function is called when finding a <event> tag */
+	void ConfigHandler::readEventInfo(DOMElement* elem) throw()
+	{
+
 	}
 }

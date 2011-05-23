@@ -41,24 +41,53 @@ using namespace xercesc;
 
 namespace Damaris {
 
-	class ConfigHandler {
+/**
+ * This class serves as factory to build a Configuration object
+ * from an XML file using Xerces-C XML library.
+ */
+class ConfigHandler {
 		
 	private:
 		XercesDOMParser *configFileParser;
 		Configuration* config;
 
+		bool nodeParsed;
+
+		/* all these variables are used for identifying tag names */
 		XMLCh* TAG_simulation;
 		XMLCh* TAG_nodes;
 		XMLCh* TAG_nodes_cores;
 		XMLCh* TAG_nodes_buffer;
 		XMLCh* TAG_nodes_queue;
+		XMLCh* TAG_data;
+		XMLCh* TAG_data_parameter;
+		XMLCh* TAG_data_variable;
+		XMLCh* TAG_data_layout;
+		XMLCh* TAG_actions;
+		XMLCh* TAG_actions_event;
 		
+		/* all these variables are used for identifying attributes' names */
 		XMLCh* ATTR_name;
 		XMLCh* ATTR_size;
 		XMLCh* ATTR_count;
+		XMLCh* ATTR_type;
+		XMLCh* ATTR_layout;
+		XMLCh* ATTR_dimensions;
+		XMLCh* ATTR_language;
+		XMLCh* ATTR_value;
+		XMLCh* ATTR_action;
+		XMLCh* ATTR_using;
 
-		void readNodesConfig(DOMElement* elem) throw();
+		void readNodesConfig(DOMElement* elem) 		throw();
+		void readDataConfig(DOMElement* elem) 		throw();
+		void readActionsConfig(DOMElement* elem)	throw();
+		void readParameterInfo(DOMElement* elem) 	throw();
+		void readVariableInfo(DOMElement* elem) 	throw();
+		void readLayoutInfo(DOMElement* elem)		throw();
+		void readEventInfo(DOMElement* elem)		throw();
 	public:
+		/* the constructor takes a Configuration object as argument,
+		   this object will be filled when calling readConfigFiles */
 		ConfigHandler(Configuration* c);
 		~ConfigHandler();
 		void readConfigFile(std::string *cfgFile);

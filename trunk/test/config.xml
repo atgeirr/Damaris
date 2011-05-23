@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<simulation name="my_simulation">
+<simulation name="my lovely simulation" language="fortran">
 	<nodes>
 		<cores  count="16"/>
-		<buffer name="my shared memory segment" size="67108864"/>
-		<queue  name="my msg queue" size="100"/>
+		<buffer name="my sweet shared memory segment" size="67108864"/>
+		<queue  name="my cute message queue" size="100"/>
 	</nodes>
-   <ApplicationSettings option_a = "10" option_b = "24">
-   </ApplicationSettings>
-   <OtherStuff option_x = "500">
-   </OtherStuff>
+	<data>
+		<parameter name="my useful parameter" type="int" value="42" />
+		<layout name="my layout" type="float" dimensions="16,32,64" />
+		<variable name="my variable" layout="my layout"> this is an example of metadata </variable>
+	</data>
+	<actions>
+		<event name="my event" action="do_something" using="plugin.so"/>
+	</action>
 </simulation>
