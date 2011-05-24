@@ -19,8 +19,10 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #define __DAMARIS_CONFIG_H
 
 #include <map>
+#include <list>
 #include <string>
 
+#include "common/Language.hpp"
 #include "common/Parameter.hpp"
 
 namespace Damaris {
@@ -90,9 +92,13 @@ namespace Damaris {
 		void setMsgQueueSize(int s) { msgQueueSize = s; }
 
 		
-		void setParameter(char* name, char* type, char* value);
+		int getParameterValue(const char* name, void* value);
+		int getParameterType(const char* name, param_type_e* t);		
+		void setParameter(const char* name, const char* type, const char* value);
 		
 		void setVariable(char* name, char* layoutName);
+		
+		void setLayout(char* name, char* type, std::list<int>* dims, language_e);
 	};
 
 }

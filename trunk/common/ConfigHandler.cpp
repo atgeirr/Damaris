@@ -16,9 +16,12 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <stdio.h>
 #include <unistd.h>
 #include <errno.h>
 #include <string>
+
+#include <boost/algorithm/string.hpp>
 
 #include "common/Debug.hpp"
 #include "common/ConfigHandler.hpp"
@@ -390,7 +393,54 @@ namespace Damaris {
 	/* this function is called when finding a <layout> tag */
 	void ConfigHandler::readLayoutInfo(DOMElement* elem) throw()
 	{
-	
+		/* getting attributes */
+		const XMLCh* xmlch_name = elem->getAttribute(ATTR_name);
+		const XMLCh* xmlch_type = elem->getAttribute(ATTR_type);
+		const XMLCh* xmlch_dimensions = elem->getAttribute(ATTR_dimensions);
+		const XMLCh* xmlch_language = elem->getAttribute(ATTR_language);
+
+		/* converting into char* */
+		char* attr_name = XMLString::transcode(xmlch_name);
+		char* attr_type = XMLString::transcode(xmlch_type);
+		char* attr_dimensions = XMLString::transcode(xmlch_dimensions);
+		char* attr_language = XMLString::transcode(xmlch_language);
+
+		/* interpreting dimensions */
+		std::list<int>* dims = new std::list<int>();
+		std::vector<std::string> strs;
+		boost::split(strs, attr_dimensions, boost::is_any_of(","));
+		
+		for(int i=0; i < (signed int)strs.size(); i++) {
+			/* try scanning an integer */
+			int d = 0;
+			if(sscanf(strs[i].c_str(),"%d",&d) != 1) 
+			{	
+				/* it's not an integer, maybe a parameter */
+				param_type_e t;
+				if(config->getParameterType(strs[i].c_str(),&t) == PARAM_INT)
+				{
+					if(0 == config->getParameterValue(strs[i].c_str(),&d))
+					{
+						ERROR("Unable to read layout dimensions for layout \"" << attr_name << "\"");
+						return;
+					}
+				}
+			}
+			dims->push_back(d);
+		}
+		
+		language_e language = LG_C;
+
+		/* interpreting language */
+		if(strcmp("fortran",attr_language) == 0)
+			language = LG_FORTRAN;
+		else if(strcmp("C",attr_language) != 0)
+		{
+			WARN("Unknown language \"" << attr_language << "\", language is either \"fortran\" or \"C\". Default C language will be used.");
+		}
+
+		/* now calling the configuration object's function */
+		config->setLayout(attr_name, attr_type, dims, language);
 	}
 
 	/* this function is called when finding a <event> tag */

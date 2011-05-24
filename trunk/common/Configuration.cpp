@@ -17,10 +17,12 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <string>
 #include <map>
+#include <list>
 #include <iostream>
 #include <stdio.h>
 
 #include "common/Debug.hpp"
+#include "common/Language.hpp"
 #include "common/ConfigHandler.hpp"
 #include "common/Configuration.hpp"
 
@@ -44,9 +46,8 @@ namespace Damaris {
 		delete configFile;
 	}
 
-	void Configuration::setParameter(char* name, char* type, char* value)
+	void Configuration::setParameter(const char* name, const char* type, const char* value)
 	{
-		INFO("The parameter \"" << name << "\" of type \"" << type << "\" has been set to the value " << value);
 		std::string paramName(name);
 		Parameter paramValue;
 		
@@ -97,11 +98,55 @@ namespace Damaris {
 			return;
 		}
 		parameters->insert( std::pair<std::string,Parameter>(paramName,paramValue) );
+		INFO("The parameter \"" << name << "\" of type \"" << type << "\" has been set to the value " << value);
 	}
 	
 	void Configuration::setVariable(char* name, char* layoutName)
 	{
-		INFO("defining variable " << name);
+		INFO("Defining variable " << name);
+	}
+
+	void Configuration::setLayout(char* name, char* type, std::list<int>* dims, language_e l) 
+	{
+		INFO("Defining layout " << name);
+	}
+
+	int Configuration::getParameterType(const char* name, param_type_e* t)
+	{
+		std::map<std::string,Parameter>::iterator i;
+		i = parameters->find(std::string(name));
+		if(i == parameters->end())
+			return 0;
+		else
+			*t = (i->second).type;
+		return 1;
+	}
+	
+	int Configuration::getParameterValue(const char* name, void* v)
+	{
+		std::map<std::string,Parameter>::iterator it;
+		it = parameters->find(std::string(name));
+		if(it == parameters->end())
+			return 0;
+		else
+		{
+			param_type_e t = (it->second).type;
+			switch(t) {
+			case(PARAM_INT) :
+				memcpy(v,(it->second).value.int_ptr,sizeof(int)); break;
+			case(PARAM_LONG) :
+				memcpy(v,(it->second).value.long_ptr,sizeof(long)); break;
+			case(PARAM_FLOAT) : 
+				memcpy(v,(it->second).value.float_ptr,sizeof(float)); break;
+			case(PARAM_DOUBLE) :
+				memcpy(v,(it->second).value.double_ptr,sizeof(double)); break;
+			case(PARAM_CHAR) :
+				memcpy(v,(it->second).value.char_ptr,sizeof(char)); break;
+			case(PARAM_STR) :
+				/* *v = (void*)(new std::string(*((it->second).value.str_ptr)));*/ break;
+			}
+		}
+		return 1;
 	}
 }
 
