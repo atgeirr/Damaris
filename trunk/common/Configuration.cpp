@@ -31,6 +31,14 @@ namespace Damaris {
 	Configuration::Configuration(std::string *cfgFile)
 	{
 		configFile = new std::string(*cfgFile);
+		simulationName 	= NULL;
+		coresPerNode 	= -1;
+		segmentName 	= NULL;
+		segmentSize	= 0;
+		msgQueueName	= NULL;
+		msgQueueSize	= 0;
+		defaultLanguage = LG_UNKNOWN;
+
 		/* initializing the parameters list */
 		parameters = new std::map<std::string,Parameter>();
 		/* here we create the ConfigHandler to load the xml file */
@@ -38,12 +46,37 @@ namespace Damaris {
 		configHandler->readConfigFile(configFile);
 		/* the ConfigHandler must be deleted afterward */
 		delete configHandler;
+		if(!(this->checkConfiguration())) exit(-1);
 	}
 
 	Configuration::~Configuration()
 	{
 		delete parameters;
 		delete configFile;
+		delete msgQueueName;
+		delete segmentName;
+	}
+
+	bool Configuration::checkConfiguration()
+	{
+		bool res = true;
+		if(segmentName == NULL) {
+			ERROR("Buffer name not set.");
+			res = false;
+		}
+		if(segmentSize == 0) {
+			ERROR("Buffer size not set.");
+			res = false;
+		}
+		if(msgQueueName == NULL) {
+			ERROR("Message queue name not set.");
+			res = false;
+		}
+		if(msgQueueSize == 0) {
+			ERROR("Message queue size not set.");
+			res = false;
+		}
+		return res;
 	}
 
 	void Configuration::setParameter(const char* name, const char* type, const char* value)
@@ -101,12 +134,12 @@ namespace Damaris {
 		INFO("The parameter \"" << name << "\" of type \"" << type << "\" has been set to the value " << value);
 	}
 	
-	void Configuration::setVariable(char* name, char* layoutName)
+	void Configuration::setVariable(const char* name, const char* layoutName)
 	{
 		INFO("Defining variable " << name);
 	}
 
-	void Configuration::setLayout(char* name, char* type, std::list<int>* dims, language_e l) 
+	void Configuration::setLayout(const char* name, const char* type, const std::list<int>* dims, language_e l) 
 	{
 		INFO("Defining layout " << name);
 	}
@@ -143,10 +176,22 @@ namespace Damaris {
 			case(PARAM_CHAR) :
 				memcpy(v,(it->second).value.char_ptr,sizeof(char)); break;
 			case(PARAM_STR) :
-				/* *v = (void*)(new std::string(*((it->second).value.str_ptr)));*/ break;
+				/* */ break;
+			/* TODO : all other types including string shouldn't be used */
 			}
 		}
 		return 1;
+	}
+
+	int Configuration::getParameterString(const char* name, std::string* s)
+	{
+		/* TODO */
+		return 0;
+	}
+
+	void Configuration::setEvent(const char* name, const char* action, const char* plugin)
+	{
+		/* TODO */
 	}
 }
 

@@ -19,6 +19,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #define __DAMARIS_LANGUAGE_H
 
 enum language_e {
+	LG_UNKNOWN,
 	LG_FORTRAN,
 	LG_C
 };

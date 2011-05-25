@@ -64,9 +64,17 @@ namespace Damaris {
 		 */
 		size_t msgQueueSize;
 		/**
+		 * default language for simulations
+		 */
+		language_e defaultLanguage;
+		/**
 		 * list of parameters
 		 */
 		std::map<std::string,Parameter>* parameters;
+
+
+		/** checks that the object is correct */
+		bool checkConfiguration();
 	public:
 		Configuration(std::string* configName);
 		~Configuration();
@@ -74,8 +82,11 @@ namespace Damaris {
 		std::string* getFileName() { return configFile; }
 		
 		std::string* getSimulationName() { return simulationName; }
-		void setSimulationName(char* name) { simulationName = new std::string(name); }
+		void setSimulationName(const char* name) { simulationName = new std::string(name); }
 
+		language_e getDefaultLanguage() { return defaultLanguage; }
+		void setDefaultLanguage(language_e l) { defaultLanguage = l; }	
+	
 		int getCoresPerNode() const { return coresPerNode; }
 		void setCoresPerNode(int cpn) { coresPerNode = cpn; }
 
@@ -93,13 +104,16 @@ namespace Damaris {
 
 		
 		int getParameterValue(const char* name, void* value);
+		int getParameterString(const char* name, std::string* s);
 		int getParameterType(const char* name, param_type_e* t);		
 		void setParameter(const char* name, const char* type, const char* value);
 		
-		void setVariable(char* name, char* layoutName);
+		void setVariable(const char* name, const char* layoutName);
 		
-		void setLayout(char* name, char* type, std::list<int>* dims, language_e);
-	};
+		void setLayout(const char* name, const char* type, const std::list<int>* dims, language_e);
+	
+		void setEvent(const char* name, const char* action, const char* plugin);	
+};
 
 }
 

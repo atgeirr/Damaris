@@ -3,10 +3,10 @@
 	<nodes>
 		<cores  count="16"/>
 		<buffer name="my sweet shared memory segment" size="67108864"/>
-		<queue  name="my cute message queue" size="100"/>
+		<queue  name="my cute message queue" size="100" />
 	</nodes>
 	<data>
-		<parameter name="my useful parameter" type="int" value="AA" />
+		<parameter name="my useful parameter" type="int" value="42" />
 		<layout name="my layout" type="float" dimensions="16,32,64" />
 		<variable name="my variable" layout="my layout"> this is an example of metadata </variable>
 	</data>

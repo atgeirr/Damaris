@@ -162,11 +162,31 @@ namespace Damaris {
 			if(!XMLString::equals(elementSimulation->getTagName(), TAG_simulation))
 				throw(std::runtime_error("XML document does not start with a \"simulation\" element"));
 
+			// get the name of the simulation (optional attribute)
 			const XMLCh* xmlch_attr = elementSimulation->getAttribute(ATTR_name);
-			char* char_attr = XMLString::transcode(xmlch_attr);
-                        config->setSimulationName(char_attr);
-			INFO("Parsing configuration file for simulation " << char_attr);
-			XMLString::release(&char_attr);
+			
+			if(strcmp((char*)xmlch_attr,"") != 0)
+			{
+				char* char_attr = XMLString::transcode(xmlch_attr);
+                	        config->setSimulationName(char_attr);
+				INFO("Parsing configuration file for simulation \"" << char_attr << "\"");
+				XMLString::release(&char_attr);
+			}
+			// parsing the default language for the simulation (optional attribute)
+			xmlch_attr = elementSimulation->getAttribute(ATTR_language);
+			if(strcmp((char*)xmlch_attr,"") != 0) {
+				char* char_attr = XMLString::transcode(xmlch_attr);
+				if(strcmp(char_attr,"fortran") == 0)
+				{
+					config->setDefaultLanguage(LG_FORTRAN);
+					INFO("Default language is \"fortran\"");
+				} else if(strcmp(char_attr,"C") == 0)
+				{
+					config->setDefaultLanguage(LG_C);
+					INFO("Default language is \"C\"");
+				}
+				XMLString::release(&char_attr);
+			}
 
 			// Look one level nested within "simulation". (child of simulation)
 			DOMNodeList* children = elementSimulation->getChildNodes();
@@ -187,6 +207,10 @@ namespace Damaris {
 					// Does this element is a <data> ?
 					if(XMLString::equals(currentElement->getTagName(), TAG_data))
 						readDataConfig(currentElement);
+
+					// Does this element is a <actions> ?
+					if(XMLString::equals(currentElement->getTagName(), TAG_actions))
+						readActionsConfig(currentElement);
 				}
 			}
 
@@ -211,11 +235,10 @@ namespace Damaris {
 		INFO("Parsing internal configuration of nodes");
 		// elem is a <nodes> element, it can have the following childs
 		// <cores>, <buffer>, <queue>
-		// iterates on childs
+		// iterates on children
 		DOMNodeList* children = elem->getChildNodes();
 		const  XMLSize_t nodeCount = children->getLength();
 		
-		char* char_attr;
 		// For all nodes, children of "nodes" in the XML tree.
 		for(XMLSize_t i = 0; i < nodeCount; ++i )
 		{
@@ -228,13 +251,15 @@ namespace Damaris {
 				// <cores> parsing
 				if( XMLString::equals(currentElement->getTagName(), TAG_nodes_cores))
 				{
+					// get attribute for cores count (optional attribute)
 					const XMLCh* xmlch_attr = currentElement->getAttribute(ATTR_count);
-					char_attr = XMLString::transcode(xmlch_attr);
-					
-					config->setCoresPerNode(atoi(char_attr));
-					INFO("Using " << atoi(char_attr) << " cores per node");
-
-					XMLString::release(&char_attr);
+					if(strcmp((char*)xmlch_attr,"") != 0)
+					{
+						char* char_attr = XMLString::transcode(xmlch_attr);
+						config->setCoresPerNode(atoi(char_attr));
+						INFO("Using " << atoi(char_attr) << " cores per node");
+						XMLString::release(&char_attr);
+					}
 					continue;
 				} else
 				// <buffer> parsing
@@ -242,16 +267,25 @@ namespace Damaris {
 				{
 					const XMLCh* xmlch_name = currentElement->getAttribute(ATTR_name);
 					const XMLCh* xmlch_size = currentElement->getAttribute(ATTR_size);
+					// name and size are mandatory,
+					// but their initialization will be checked later
+					if(strcmp("",(char*)xmlch_name) != 0) {
+						char* char_attr = XMLString::transcode(xmlch_name);
+						config->setSegmentName(char_attr);
+						INFO("Buffer name is " << char_attr);
+						XMLString::release(&char_attr);
+					} else {
+						WARN("Buffer name not properly set.");
+					}
 
-					char_attr = XMLString::transcode(xmlch_name);
-					config->setSegmentName(char_attr);
-					INFO("Buffer name is " << char_attr);
-					XMLString::release(&char_attr);
-					
-					char_attr = XMLString::transcode(xmlch_size);
-					config->setSegmentSize(atoi(char_attr));
-					INFO("Buffer size is " << char_attr);
-					XMLString::release(&char_attr);
+					if(strcmp("",(char*)xmlch_size) != 0) {
+						char* char_attr = XMLString::transcode(xmlch_size);
+						config->setSegmentSize(atoi(char_attr));
+						INFO("Buffer size is " << char_attr);
+						XMLString::release(&char_attr);
+					} else {
+						WARN("Buffer size not properly set.");
+					}
 					continue;
 				} else
 				// <queue> parsing
@@ -259,21 +293,28 @@ namespace Damaris {
 				{
 					const XMLCh* xmlch_name = currentElement->getAttribute(ATTR_name);
 					const XMLCh* xmlch_size = currentElement->getAttribute(ATTR_size);
-					
-					char_attr = XMLString::transcode(xmlch_name);
-					config->setMsgQueueName(char_attr);
-					INFO("Message queue name is " << char_attr);
-					XMLString::release(&char_attr);
+				
+					if(strcmp("",(char*)xmlch_name)	!= 0) {
+						char* char_attr = XMLString::transcode(xmlch_name);
+						config->setMsgQueueName(char_attr);
+						INFO("Message queue name is \"" << char_attr << "\"");
+						XMLString::release(&char_attr);
+					} else {
+						WARN("Message queue name not properly set.");
+					}
 
-					char_attr = XMLString::transcode(xmlch_size);
-					config->setMsgQueueSize(atoi(char_attr));
-					INFO("Message queue size is " << char_attr);
-					XMLString::release(&char_attr);
+					if(strcmp("",(char*)xmlch_size) != 0) {
+						char* char_attr = XMLString::transcode(xmlch_size);
+						config->setMsgQueueSize(atoi(char_attr));
+						INFO("Message queue size is " << char_attr);
+						XMLString::release(&char_attr);
+					} else {
+						WARN("Message queue size not properly set.");
+					}
 					continue;
 				}
 			}
 		}
-
 		nodeParsed = true;
 	}
 
@@ -284,7 +325,7 @@ namespace Damaris {
 		INFO("Parsing configuration for data");
 		// elem is a <data> element, it can have the following childs
 		// <variable>, <layout>, <parameter>
-		// iterates on childs
+		// iterates on children
 		DOMNodeList* children = elem->getChildNodes();
 		const  XMLSize_t nodeCount = children->getLength();
 		
@@ -326,7 +367,7 @@ namespace Damaris {
 		INFO("Parsing configuration for actions");
 		// elem is a <actions> element, it can have the following childs
 		// <event>
-		// iterates on childs
+		// iterates on children
 		DOMNodeList* children = elem->getChildNodes();
 		const  XMLSize_t nodeCount = children->getLength();
 		
@@ -357,6 +398,24 @@ namespace Damaris {
 		const XMLCh* xmlch_type = elem->getAttribute(ATTR_type);
 		const XMLCh* xmlch_value = elem->getAttribute(ATTR_value);
 
+		/* checking attributes */
+		if(strcmp("",(char*)xmlch_name) == 0)
+		{
+			ERROR("Parameters must have a \"name\" attribute. The parameter won't be considered.");
+			return;	
+		}
+
+		if(strcmp("",(char*)xmlch_type) == 0)
+		{
+			ERROR("Parameters must have a \"type\" attribute. The parameter won't be considered.");
+			return;
+		}
+
+		if(strcmp("",(char*)xmlch_value) == 0)
+		{
+			ERROR("Parameters must have a value. The parameter won't be considered.");
+			return;
+		}
 		/* converting into char* */
 		char* attr_name = XMLString::transcode(xmlch_name);
 		char* attr_type = XMLString::transcode(xmlch_type);
@@ -378,12 +437,22 @@ namespace Damaris {
 		const XMLCh* xmlch_name = elem->getAttribute(ATTR_name);
 		const XMLCh* xmlch_layout = elem->getAttribute(ATTR_layout);
 
+		/* checking attributes */
+		if(strcmp("",(char*)xmlch_name) == 0)
+		{
+			ERROR("Variable must have a \"name\" attribute. The variable will not be considered.");	
+			return;
+		}
+		
 		/* converting into char* */
 		char* attr_name = XMLString::transcode(xmlch_name);
 		char* attr_layout = XMLString::transcode(xmlch_layout);
 
 		/* inserting variable into configuration */
-		config->setVariable(attr_name,attr_layout);
+		if(strcmp("",attr_layout) != 0)
+			config->setVariable(attr_name,attr_layout);
+		else
+			config->setVariable(attr_name,(char*)NULL);
 		
 		/* releasing memory */
 		XMLString::release(&attr_name);
@@ -399,6 +468,18 @@ namespace Damaris {
 		const XMLCh* xmlch_dimensions = elem->getAttribute(ATTR_dimensions);
 		const XMLCh* xmlch_language = elem->getAttribute(ATTR_language);
 
+		/* checking mandatory attributes */
+		if(strcmp("",(char*)xmlch_name) == 0)
+		{
+			ERROR("Layout must be defined with a name.");
+			return;
+		}
+		if(strcmp("",(char*)xmlch_type) == 0)
+		{
+			ERROR("Layout must be defined with a type.");
+			return;
+		}
+		
 		/* converting into char* */
 		char* attr_name = XMLString::transcode(xmlch_name);
 		char* attr_type = XMLString::transcode(xmlch_type);
@@ -417,26 +498,49 @@ namespace Damaris {
 			{	
 				/* it's not an integer, maybe a parameter */
 				param_type_e t;
-				if(config->getParameterType(strs[i].c_str(),&t) == PARAM_INT)
+				if(config->getParameterType(strs[i].c_str(),&t))
 				{
-					if(0 == config->getParameterValue(strs[i].c_str(),&d))
-					{
-						ERROR("Unable to read layout dimensions for layout \"" << attr_name << "\"");
+					if(t == PARAM_INT) {
+						config->getParameterValue(strs[i].c_str(),&d);
+					} else {
+						ERROR(  "Wrong type for parameter \""<< strs[i].c_str() 
+							<< "\", expected int. Cannot build layout \""
+							<< attr_name << "\"");
+						delete dims;
+						XMLString::release(&attr_name);
+						XMLString::release(&attr_type);
+						XMLString::release(&attr_dimensions);
+						XMLString::release(&attr_language);
 						return;
 					}
+				} else {
+					ERROR("Unable to find parameter \"" << strs[i].c_str() 
+						<< "\" for layout \"" << attr_name << "\"");
+					delete dims;
+					XMLString::release(&attr_name);
+					XMLString::release(&attr_type);
+					XMLString::release(&attr_dimensions);
+					XMLString::release(&attr_language);
+					return;
 				}
 			}
 			dims->push_back(d);
 		}
 		
-		language_e language = LG_C;
+		language_e language = LG_UNKNOWN;
 
 		/* interpreting language */
 		if(strcmp("fortran",attr_language) == 0)
 			language = LG_FORTRAN;
-		else if(strcmp("C",attr_language) != 0)
-		{
-			WARN("Unknown language \"" << attr_language << "\", language is either \"fortran\" or \"C\". Default C language will be used.");
+		else if(strcmp("C",attr_language) == 0)
+			language = LG_C;
+		else {
+			language = config->getDefaultLanguage();
+			if(language == LG_UNKNOWN) {
+				language = LG_C;
+				WARN("Unknown language for layout \"" << attr_name
+					<< "\", language is either \"fortran\" or \"C\". C language will be used.");
+			}
 		}
 
 		/* now calling the configuration object's function */
@@ -446,6 +550,38 @@ namespace Damaris {
 	/* this function is called when finding a <event> tag */
 	void ConfigHandler::readEventInfo(DOMElement* elem) throw()
 	{
+		const XMLCh* xmlch_name   = elem->getAttribute(ATTR_name);
+                const XMLCh* xmlch_action = elem->getAttribute(ATTR_action);
+		const XMLCh* xmlch_using  = elem->getAttribute(ATTR_using);
 
+		/* checking that the mandatory attributes are defined */
+		if(strcmp("",(char*)xmlch_name) == 0)
+		{
+			ERROR("Event defined without a name, will not be considered.");
+			return;
+		}
+		if(strcmp("",(char*)xmlch_action) == 0)
+		{
+			ERROR("Event defined without an action, will not be considered.");
+			return;
+		}
+		if(strcmp("",(char*)xmlch_using) == 0)
+		{
+			ERROR("Event defined without a plugin file, will not be considered.");
+			return;
+		}
+
+		/* retrieving char* strings from attributes */
+		char* attr_name   = XMLString::transcode(xmlch_name);
+                char* attr_action = XMLString::transcode(xmlch_action);
+		char* attr_using = XMLString::transcode(xmlch_using);
+		
+		/* adding the event into configuration */		
+		config->setEvent(attr_name, attr_action, attr_using);
+		
+		/* releasing memory */
+		XMLString::release(&attr_name);
+		XMLString::release(&attr_action);
+		XMLString::release(&attr_using);
 	}
 }
