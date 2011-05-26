@@ -15,6 +15,7 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 
+#include <dlfcn.h>
 #include <stdint.h>
 #include <string>
 #include <list>
@@ -27,19 +28,50 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/Variable.hpp"
 #include "common/ActionsManager.hpp"
 
-#define CCORES 23
+//#define CCORES 23
  
-void hdf5(const std::string* event, int32_t step, int32_t src, Damaris::MetadataManager* db);
+//void hdf5(const std::string* event, int32_t step, int32_t src, Damaris::MetadataManager* db);
 
 namespace Damaris {
 	
 ActionsManager::ActionsManager(MetadataManager *mm)
 {
 	metadataManager = mm;
-	// Tests folowing
-	Action *a = new Action(&hdf5);
-	actions.insert(std::pair<std::string,Action*>(std::string("hdf5"),a));
+// Tests folowing
+//	Action *a = new Action(&hdf5);
+//	actions.insert(std::pair<std::string,Action*>(std::string("hdf5"),a));
 	//std::map<std::string,Action*>::iterator it = actions.find(std::string("hdf5"));
+/*	std::string* name = new std::string("my_event");
+	std::string* file = new std::string("libhello.so.1.0.1");
+	std::string* fun = new std::string("my_function");
+		loadActionFromPlugin(name,file,fun);
+	delete name;
+	delete file;
+	delete fun;
+*/
+}
+
+void ActionsManager::loadActionFromPlugin(std::string* eventName, std::string* fileName, std::string* functionName)
+{
+	char* error;
+	/* opening the dynamic library */
+	void* handle = dlopen(fileName->c_str(),RTLD_LAZY);
+
+	if(!handle) 
+	{
+		ERROR("While loading plugin in \""<<fileName->c_str()<<"\"");
+	}
+
+	/* loading function */
+	void (* func)(const std::string*, int32_t, int32_t, Damaris::MetadataManager*) 
+		= (void (*)(const std::string*, int32_t, int32_t, Damaris::MetadataManager*))dlsym(handle,functionName->c_str());
+	if ((error = dlerror()) != NULL)  {
+        	ERROR("While loading function in dynamic library: " << error);
+	}
+	// creating the function
+	Action *a = new Action(func);
+	// inserting in the map
+	actions.insert(std::pair<std::string,Action*>(std::string(eventName->c_str()),a));
 }
 
 void ActionsManager::reactToSignal(std::string *sig, int32_t iteration, int32_t sourceID)
@@ -50,16 +82,16 @@ void ActionsManager::reactToSignal(std::string *sig, int32_t iteration, int32_t 
 		Action* a = (*it).second;
 		(*a)(sig,iteration,sourceID,metadataManager);
 	} else {
-		ERROR("Unable to process "<< sig->c_str() <<" signal.");
+		ERROR("Unable to process "<< sig->c_str() <<" signal: unknown event name");
 	}	
 }
 	
 }
 
-
+/*
 void hdf5(const std::string* event, int32_t step, int32_t src, Damaris::MetadataManager* db)
 {
-/*
+
 	static int waiting;
 	waiting++;
 
@@ -140,6 +172,6 @@ void hdf5(const std::string* event, int32_t step, int32_t src, Damaris::Metadata
 	waiting = 0;
 	TIMER_STOP(write_time,"end writing")
 	}
-*/
-}
 
+}
+*/

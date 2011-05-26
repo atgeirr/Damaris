@@ -26,12 +26,24 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Damaris {
 
+/**
+ * The ActionsManager keeps the list of defined actions
+ * It is in charge of loading functions from shared libraries
+ * and call functions.
+ */
 class ActionsManager {
 	private:
+		// map associating event names to actions
 		std::map<std::string,Action*> actions;
+		// pointer to the metadata manager
 		MetadataManager *metadataManager;
+
 	public:
+		// constructor, takes a pointer to the metadata manager
 		ActionsManager(MetadataManager* mm);
+		// loads a function from a dynamic library
+		void loadActionFromPlugin(std::string* eventName, std::string* fileName, std::string* functionName);
+		// call a function
 		void reactToSignal(std::string* sig, int32_t iteration, int32_t sourceID);
 };
 

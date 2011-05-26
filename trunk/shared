@@ -1,0 +1,5 @@
+commands to build a plugin from a c++ file:
+
+g++ -fPIC -c hello.cpp -I/home/matthieu/deploy/include -I.
+gcc -shared -Wl,-soname,libhello.so.1 -o libhello.so.1.0.1  hello.o
+LD_LIBRARY_PATH=.
