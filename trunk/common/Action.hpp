@@ -25,16 +25,29 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Damaris {
 
+/**
+ * The Action object is an interface to a user-defined action,
+ * for the moment it only contains a pointer to a dynamically loaded function
+ * but we plan to make it an abstract class and have several child classes
+ * to handle scripts in lua, ruby, python or perl also.
+ */
 class Action {
+
 	private:
+		// the pointer over the function
 		void (*function)(const std::string*,int32_t,int32_t,MetadataManager*);
 	public:
+		// a default constructor for void actions
 		Action();
+		// constructor, takes the pointer over the function to handle
 		Action(void(*fptr)(const std::string*, int32_t, int32_t, MetadataManager*));
+		// destructor
 		~Action();
 		
+		// a () operator to simplify the calling of the action
 		void operator()(const std::string* event, 
 				int32_t iteration, int32_t sourceID, MetadataManager* mm);
+		// call the inner function
 		void call(const std::string* event,
 			  int32_t iteration, int32_t sourceID, MetadataManager* mm);
 };
