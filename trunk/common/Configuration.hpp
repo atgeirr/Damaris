@@ -25,6 +25,10 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/Language.hpp"
 #include "common/Parameter.hpp"
 
+#ifdef __DAMARIS_SERVER
+	#include "common/ActionsManager.hpp"
+#endif
+
 namespace Damaris {
 	/** 
 	 * The class Configuration holds all informations extrated from
@@ -35,52 +39,39 @@ namespace Damaris {
 	class Configuration {
 		
 	private:
-		/**
-		 * for information, we keep the name of the external configuration file
-		 */
+		/* for information, we keep the name of the external configuration file */
 		std::string* configFile;
-		/**
-		 * Name of the simulation we are running
-		 */
+		/* Name of the simulation we are running */
 		std::string* simulationName;
-		/**
-		 * number of cores per node
-		 */
+		/* number of cores per node */
 		int coresPerNode;
-		/**
-		 * name of the shared buffer
-		 */
+		/* name of the shared buffer */
 		std::string* segmentName;
-		/**
-		 * size of the buffer (in bytes)
-		 */
+		/* size of the buffer (in bytes) */
 		size_t segmentSize;
-		/**
-		 * name of the shared message queue
-		 */
+		/* name of the shared message queue */
 		std::string* msgQueueName;
-		/**
-		 * maximum number of messages in the queue
-		 */
+		/* maximum number of messages in the queue */
 		size_t msgQueueSize;
-		/**
-		 * default language for simulations
-		 */
+		/* default language for simulations */
 		language_e defaultLanguage;
-		/**
-		 * list of parameters
-		 */
+		/* list of parameters */
 		std::map<std::string,Parameter>* parameters;
-
-
-		/** checks that the object is correct */
+#ifdef __DAMARIS_SERVER
+		/* container of actions */
+		ActionsManager* actionsManager;
+#endif
+		/* checks that the object is correct */
 		bool checkConfiguration();
 	public:
 		Configuration(std::string* configName);
 		~Configuration();
 
 		std::string* getFileName() { return configFile; }
-		
+
+#ifdef __DAMARIS_SERVER	
+		ActionsManager* getActionsManager();
+#endif
 		std::string* getSimulationName() { return simulationName; }
 		void setSimulationName(const char* name) { simulationName = new std::string(name); }
 

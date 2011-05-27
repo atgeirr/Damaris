@@ -489,7 +489,7 @@ namespace Damaris {
 		/* interpreting dimensions */
 		std::list<int>* dims = new std::list<int>();
 		std::vector<std::string> strs;
-		boost::split(strs, attr_dimensions, boost::is_any_of(","));
+		boost::algorithm::split(strs, attr_dimensions, boost::is_any_of(","));
 		
 		for(int i=0; i < (signed int)strs.size(); i++) {
 			/* try scanning an integer */

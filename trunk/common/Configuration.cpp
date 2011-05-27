@@ -38,7 +38,9 @@ namespace Damaris {
 		msgQueueName	= NULL;
 		msgQueueSize	= 0;
 		defaultLanguage = LG_UNKNOWN;
-
+#ifdef __DAMARIS_SERVER
+		actionsManager   = new ActionsManager();
+#endif
 		/* initializing the parameters list */
 		parameters = new std::map<std::string,Parameter>();
 		/* here we create the ConfigHandler to load the xml file */
@@ -55,6 +57,9 @@ namespace Damaris {
 		delete configFile;
 		delete msgQueueName;
 		delete segmentName;
+#ifdef __DAMARIS_SERVER
+		delete actionsManager;
+#endif
 	}
 
 	bool Configuration::checkConfiguration()
@@ -78,6 +83,13 @@ namespace Damaris {
 		}
 		return res;
 	}
+
+#ifdef __DAMARIS_SERVER	
+	ActionsManager* Configuration::getActionsManager()
+	{
+		return actionsManager;
+	}
+#endif
 
 	void Configuration::setParameter(const char* name, const char* type, const char* value)
 	{

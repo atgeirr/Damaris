@@ -74,7 +74,7 @@ namespace Damaris {
 		}
 
 		metadataManager = new MetadataManager(segment);
-		actionsManager = new ActionsManager(metadataManager);
+		actionsManager = config->getActionsManager();
 		INFO("Server successfully started with configuration " << config->getFileName()->c_str());
 	}
 	/* destructor */
@@ -131,7 +131,7 @@ namespace Damaris {
 		
 		if(msg->type == MSG_SIG) 
 		{
-			actionsManager->reactToSignal(&name,iteration,sourceID);		
+			actionsManager->reactToSignal(&name,iteration,sourceID,metadataManager);		
 			return;
 		}
 	}

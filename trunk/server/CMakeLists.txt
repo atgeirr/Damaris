@@ -1,3 +1,5 @@
+add_definitions(-D__DAMARIS_SERVER)
+
 set(DAMARIS_SERVER_SRC ${DAMARIS_SOURCE_DIR}/server/main.cpp
 		       ${DAMARIS_SOURCE_DIR}/server/Server.cpp
 		       ${DAMARIS_SOURCE_DIR}/server/Options.cpp

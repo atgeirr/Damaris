@@ -20,7 +20,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Damaris {
 /** 
- * The class Configuration holds all local informations
+ * The class Environment holds all local informations
  * such as the id of the enclosing process.
  */
 class Environment {

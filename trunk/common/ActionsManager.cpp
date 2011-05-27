@@ -34,9 +34,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Damaris {
 	
-ActionsManager::ActionsManager(MetadataManager *mm)
+ActionsManager::ActionsManager()//MetadataManager *mm)
 {
-	metadataManager = mm;
+	//metadataManager = mm;
 // Tests folowing
 //	Action *a = new Action(&hdf5);
 //	actions.insert(std::pair<std::string,Action*>(std::string("hdf5"),a));
@@ -74,13 +74,13 @@ void ActionsManager::loadActionFromPlugin(std::string* eventName, std::string* f
 	actions.insert(std::pair<std::string,Action*>(std::string(eventName->c_str()),a));
 }
 
-void ActionsManager::reactToSignal(std::string *sig, int32_t iteration, int32_t sourceID)
+void ActionsManager::reactToSignal(std::string *sig, int32_t iteration, int32_t sourceID, MetadataManager* mm)
 {
 	std::map<std::string,Action*>::iterator it = actions.find(*sig);
 	if(it != actions.end())
 	{
 		Action* a = (*it).second;
-		(*a)(sig,iteration,sourceID,metadataManager);
+		(*a)(sig,iteration,sourceID,mm);
 	} else {
 		ERROR("Unable to process "<< sig->c_str() <<" signal: unknown event name");
 	}	

@@ -36,15 +36,15 @@ class ActionsManager {
 		// map associating event names to actions
 		std::map<std::string,Action*> actions;
 		// pointer to the metadata manager
-		MetadataManager *metadataManager;
+		//MetadataManager *metadataManager;
 
 	public:
 		// constructor, takes a pointer to the metadata manager
-		ActionsManager(MetadataManager* mm);
+		ActionsManager();//MetadataManager* mm);
 		// loads a function from a dynamic library
 		void loadActionFromPlugin(std::string* eventName, std::string* fileName, std::string* functionName);
 		// call a function
-		void reactToSignal(std::string* sig, int32_t iteration, int32_t sourceID);
+		void reactToSignal(std::string* sig, int32_t iteration, int32_t sourceID, MetadataManager* mm);
 };
 
 }
