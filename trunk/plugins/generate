@@ -1,0 +1,31 @@
+#!/usr/bin/ruby
+
+$plugin_name = ARGV[0]
+$boost_inc = "-I"+ARGV[1]
+
+if $plugin_name == nil
+	print "Usage: ./generate <plugin name>\n"
+	exit
+end
+
+File.open("Makefile","w+") do | file |
+	f = File.open("Makefile.tpl")
+	lines = f.readlines
+	f.close
+	lines.each do | line | 
+		if line.include?("TARGET")
+			line.gsub!("XXXX",$plugin_name);
+		elsif line.include?("INCLUDE")
+			line.gsub!("XXXX",$boost_inc);
+			line.chomp!
+			line << " -I..\n"
+		end
+		file << line
+	end
+end
+
+File.open("template.cpp") do | src |
+	File.open($plugin_name+".cpp","w+") do | dst | 
+		dst << src.read
+	end
+end
