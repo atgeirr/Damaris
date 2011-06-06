@@ -66,13 +66,15 @@ namespace Damaris {
 		char* buffer = static_cast<char*>(segment->allocate(size));
 		
 		INFO("Warning: this function is not fully implemented yet!!!");
-		// TODO put the (varname,step,layout,ptr) in a hash table to it can be retrieved from the commit function
+		// TODO put the (varname,step,layout,ptr) in a hash table so 
+		// it can be retrieved from the commit function
 		return (void*)buffer;
 	}
 	
 	int Client::commit(std::string* varname, int32_t iteration)
 	{
-		// TODO
+		// TODO retrieve the variable name from a hash table somewhere
+		// then send a write-notification
 		ERROR("This function is not implemented");
 		return 0;
 	}
@@ -90,7 +92,6 @@ namespace Damaris {
 		}
 		// allocate buffer
 		size = layout->getRequiredMemoryLength();
-		//LOGF("Client writing %s:%ld (%d bytes)\n",varname->c_str(),(long int)iteration,(int)size);
 
 		char* buffer = static_cast<char*>(segment->allocate(size));
 		// copy data
