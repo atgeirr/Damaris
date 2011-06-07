@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<simulation name="my lovely simulation" language="fortran">
+<simulation name="my lovely simulation" language="C">
 	<nodes>
 		<cores  count="16"/>
 		<buffer name="my sweet shared memory segment" size="67108864"/>

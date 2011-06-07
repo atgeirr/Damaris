@@ -1,6 +1,7 @@
 #ifndef __DAMARIS_LAYOUT_H
 #define __DAMARIS_LAYOUT_H
 
+#include <string>
 #include <valarray>
 #include <vector>
 #include <stdint.h>
@@ -24,6 +25,8 @@ namespace Damaris {
 	
 	/* this function gives the size (in bytes) of each type */
 	int basicTypeSize(basic_type_e t);
+	/* this function returns a basic type from a string */
+	basic_type_e getTypeFromString(std::string* str);
 	
 class Layout {
 		
@@ -36,7 +39,7 @@ class Layout {
 	public:
 		/* initialize a layout from the data type, the dimensions d and the vector of extents */
 		Layout(basic_type_e t, int32_t d, std::vector<int64_t> extents);
-		/* idem but the extents are unknow yet */
+		/* idem but the extents are unknown yet */
 		Layout(basic_type_e t, int32_t d);
 		/* destructor */
 		~Layout();

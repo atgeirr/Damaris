@@ -24,6 +24,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "common/Language.hpp"
 #include "common/Parameter.hpp"
+#include "common/Layout.hpp"
 
 #ifdef __DAMARIS_SERVER
 	#include "common/ActionsManager.hpp"
@@ -57,6 +58,8 @@ namespace Damaris {
 		language_e defaultLanguage;
 		/* list of parameters */
 		std::map<std::string,Parameter>* parameters;
+		/* list of layouts */
+		std::map<std::string,Layout*>* layouts;
 #ifdef __DAMARIS_SERVER
 		/* container of actions */
 		ActionsManager* actionsManager;

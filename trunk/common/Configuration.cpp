@@ -15,10 +15,10 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 
-#include <string>
-#include <map>
 #include <list>
+#include <map>
 #include <iostream>
+#include <string>
 #include <stdio.h>
 
 #include "common/Debug.hpp"
@@ -43,6 +43,8 @@ namespace Damaris {
 #endif
 		/* initializing the parameters list */
 		parameters = new std::map<std::string,Parameter>();
+		/* initializing the layouts list */
+		layouts = new std::map<std::string,Layout*>();
 		/* here we create the ConfigHandler to load the xml file */
 		Damaris::ConfigHandler *configHandler = new Damaris::ConfigHandler(this);
 		configHandler->readConfigFile(configFile);
@@ -53,6 +55,7 @@ namespace Damaris {
 
 	Configuration::~Configuration()
 	{
+		delete layouts;
 		delete parameters;
 		delete configFile;
 		delete msgQueueName;
@@ -153,7 +156,36 @@ namespace Damaris {
 
 	void Configuration::setLayout(const char* name, const char* type, const std::list<int>* dims, language_e l) 
 	{
-		INFO("Defining layout " << name);
+		INFO("type = " << type );
+		INFO("dimensions = " << dims->size());
+
+		std::string layoutName(name);
+		std::string layoutType(type);
+		std::list<int> d(*dims);
+		std::vector<int64_t> extents(2*(dims->size()));
+
+		if(l == LG_FORTRAN)
+		{
+			std::list<int>::reverse_iterator rit = d.rbegin();
+			for(int i=0; rit != d.rend(); ++rit, i++) 
+			{
+				extents[2*i] = 0;
+				extents[2*i+1] = (int64_t)(*rit);
+			}
+		} else {
+			std::list<int>::const_iterator it = d.begin();
+			for(int i=0; it != d.end(); it++, i++)
+			{
+				extents[2*i] = 0;
+				extents[2*i+1] = (int64_t)(*it);
+			}
+		}
+		INFO("array size = " << extents.size());
+		basic_type_e t = getTypeFromString(&layoutType);
+		Layout* layout = new Layout(t,dims->size(),extents);
+		std::pair<std::string,Layout*> ly(layoutName,layout);
+		layouts->insert(ly);
+		INFO("Defined layout " << name);
 	}
 
 	int Configuration::getParameterType(const char* name, param_type_e* t)

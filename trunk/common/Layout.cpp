@@ -41,6 +41,17 @@ namespace Damaris {
 		}
 		return 0;
 	}
+
+	basic_type_e getTypeFromString(std::string* str)
+	{
+		if(str->compare("short") == 0) 	return SHORT;
+		if(str->compare("int") == 0) 	return INT;
+		if(str->compare("long") == 0)	return LONG;
+		if(str->compare("float") == 0)	return FLOAT;
+		if(str->compare("double") == 0) return DOUBLE;
+		if(str->compare("char") == 0) 	return CHAR;
+		return UNDEFINED_TYPE;
+	}
 	
 	Layout::Layout(basic_type_e t, int32_t d, std::vector<int64_t> extents)
 	{
