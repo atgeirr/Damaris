@@ -148,6 +148,19 @@ namespace Damaris {
 			return 1;
 		}
 	}
+
+	int Client::getParameter(std::string* paramName, void* buffer)
+	{
+		basic_type_e t;
+		if(config->getParameterType(paramName->c_str(),&t)) 
+		{
+			config->getParameterValue(paramName->c_str(),buffer);
+			return 0;
+		} else {
+			ERROR("Parameter \""<< paramName->c_str() <<"\"not found in the configuration");
+			return -1;
+		}
+	}
 	
 	Client::~Client() 
 	{
@@ -199,7 +212,13 @@ extern "C" {
 		std::string signal_name_str(signal_name);
 		return client->signal(&signal_name_str,iteration);
 	}
-	
+
+	int DC_get_parameter(const char* param_name, void* buffer)
+	{
+		std::string paramName(param_name);
+		return client->getParameter(&paramName,buffer);
+	}
+
 	int DC_finalize()
 	{
 		delete client;
@@ -232,6 +251,12 @@ extern "C" {
 		*ierr_f = client->signal(&event_name,*iteration_f);
 	}
 	
+	void FC_FUNC_GLOBAL(df_get_parameter,DF_GET_PARAMETER)
+		(char* param_name_f, void* buffer_f, int* ierr_f, int param_name_size)
+	{
+		std::string paramName(param_name_f,param_name_size);
+		*ierr_f = client->getParameter(&paramName,buffer_f);
+	}
 	void FC_FUNC_GLOBAL(df_finalize,DF_FINALIZE)
 		(int* ierr_f)
 	{

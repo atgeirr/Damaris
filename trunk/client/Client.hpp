@@ -55,6 +55,8 @@ class Client {
 		void* alloc(std::string* varname, int32_t iteration);//, const Layout* layout);
 		/* notify the dedicated core that the previously allocated buffer has been written */
 		int commit(std::string* varname, int32_t iteration);
+		/* get a parameter's value */
+		int getParameter(std::string* paramName, void* buffer);
 		/* destructor */
 		~Client();
 }; // class Client
