@@ -26,6 +26,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/Parameter.hpp"
 #include "common/Layout.hpp"
 
+/* TODO: having #define statements is not good, we should have
+   a child class of Configuration for the server, and another for
+   the Client */
 #ifdef __DAMARIS_SERVER
 	#include "common/ActionsManager.hpp"
 #endif
@@ -60,6 +63,11 @@ namespace Damaris {
 		std::map<std::string,Parameter>* parameters;
 		/* list of layouts */
 		std::map<std::string,Layout*>* layouts;
+		/* association  variables name -> layout name */
+		/* TODO: right now this association just contains names,
+		   it should further associate a variable name to a VariableInfo object
+		   containing ALL informations related to a variable */
+		std::map<std::string,std::string>* variableLayouts;
 #ifdef __DAMARIS_SERVER
 		/* container of actions */
 		ActionsManager* actionsManager;
@@ -102,10 +110,12 @@ namespace Damaris {
 		int getParameterType(const char* name, basic_type_e* t);		
 		void setParameter(const char* name, const char* type, const char* value);
 		
-		void setVariable(const char* name, const char* layoutName);
-		
-		void setLayout(const char* name, const char* type, const std::list<int>* dims, language_e);
+		void setVariableInfo(const char* name, const char* layoutName);
+		Layout* getVariableLayout(const char* name);
 	
+		void setLayout(const char* name, const char* type, const std::list<int>* dims, language_e);
+		Layout* getLayout(const char* name);
+			
 		void setEvent(const char* name, const char* action, const char* plugin);	
 };
 

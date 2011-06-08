@@ -95,8 +95,10 @@ namespace Damaris {
 	{
 		size_t result = 1;
 		result *= basicTypeSize(type);
-		for(int i = 0; i < dimensions; i++)
-			result *= (endIndex[i]-startIndex[i]+1);
+		for(int i = 0; i < dimensions; i++) {
+			size_t d = (endIndex[i]-startIndex[i]+1);
+			result *= d;
+		}
 		return result;
 	}
 	

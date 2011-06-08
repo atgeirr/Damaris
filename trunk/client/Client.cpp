@@ -51,16 +51,17 @@ namespace Damaris {
 		INFO("Client initialized successfully for core " << id << " with configuration " << *configfile);
 	}
 	
-	void* Client::alloc(std::string* varname, int32_t iteration, const Layout* datalayout)
+	void* Client::alloc(std::string* varname, int32_t iteration)//, const Layout* datalayout)
 	{
 		size_t size;
-		if(datalayout == (Layout*)NULL) {
+		Layout* layout = config->getVariableLayout(varname->c_str());
+		if(layout == (Layout*)NULL) {
 			// try retrieving layout from configuration
 			// TODO
 			ERROR("The current version of Damaris cannot make this function work without a layout");
 			return NULL;
 		} else {
-			size = datalayout->getRequiredMemoryLength();
+			size = layout->getRequiredMemoryLength();
 		}
 		// buffer allocation
 		char* buffer = static_cast<char*>(segment->allocate(size));
@@ -79,20 +80,22 @@ namespace Damaris {
 		return 0;
 	}
 	
-	int Client::write(std::string* varname, int32_t iteration, const void* data, const Layout* datalayout)
+	int Client::write(std::string* varname, int32_t iteration, const void* data)
 	{
-		const Layout* layout;
-        	size_t size = 0;
-        	if(datalayout == (Layout*)NULL) {
-			layout = NULL;// TODO should retrieve the layout from configuration
-			ERROR("Current version of Damaris cannot make this function work without a layout");
+		/* check that the variable is know in the configuration */
+		Layout* layout = config->getVariableLayout(varname->c_str());
+		size_t size = 0;
+        	if(layout == (Layout*)NULL) {
+			ERROR("No layout found in configuration for variable "<< varname->c_str());
 			return -1;
-        	} else {
-        		layout = datalayout;
-		}
+        	}
 		// allocate buffer
 		size = layout->getRequiredMemoryLength();
-
+		if(size == 0) {
+			ERROR("Layout has size 0");
+			return -1;
+		}
+		
 		char* buffer = static_cast<char*>(segment->allocate(size));
 		// copy data
 		memcpy(buffer,data,size);
@@ -173,16 +176,16 @@ extern "C" {
 		return 0;
 	}
 	
-	int DC_write(const char* varname, int32_t iteration, const void* data, const void* layout_handle)
+	int DC_write(const char* varname, int32_t iteration, const void* data)
 	{
 		std::string varname_str(varname);
-		return client->write(&varname_str,iteration,data,(Damaris::Layout*)layout_handle);
+		return client->write(&varname_str,iteration,data);
 	}
 	
-	void* DC_alloc(const char* varname, int32_t iteration, const void* layout_handle)
+	void* DC_alloc(const char* varname, int32_t iteration)
 	{
 		std::string varname_str(varname);
-		return client->alloc(&varname_str,iteration,(Damaris::Layout*)layout_handle);
+		return client->alloc(&varname_str,iteration);
 	}
 	
 	int DC_commit(const char* varname, int32_t iteration)
@@ -216,10 +219,10 @@ extern "C" {
 	}
 	
 	void FC_FUNC_GLOBAL(df_write,DF_WRITE)
-		(char* var_name_f, int32_t* iteration_f, void* data_f, int64_t* layout_handle_f, int32_t* ierr_f, int var_name_size)
+		(char* var_name_f, int32_t* iteration_f, void* data_f, int32_t* ierr_f, int var_name_size)
 	{
 		std::string var_name(var_name_f,var_name_size);
-		*ierr_f = client->write(&var_name,*iteration_f,data_f,(Damaris::Layout*)(*layout_handle_f));
+		*ierr_f = client->write(&var_name,*iteration_f,data_f);
 	}
 	
 	void FC_FUNC_GLOBAL(df_signal,DF_SIGNAL)

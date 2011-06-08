@@ -450,9 +450,9 @@ namespace Damaris {
 
 		/* inserting variable into configuration */
 		if(strcmp("",attr_layout) != 0)
-			config->setVariable(attr_name,attr_layout);
+			config->setVariableInfo(attr_name,attr_layout);
 		else
-			config->setVariable(attr_name,(char*)NULL);
+			config->setVariableInfo(attr_name,(char*)NULL);
 		
 		/* releasing memory */
 		XMLString::release(&attr_name);

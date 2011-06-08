@@ -48,11 +48,11 @@ class Client {
 		   careful with that. */
 		Client(std::string* config,int32_t id);
 		/* writes a variable into shared memory and sends a message notifying the write */
-		int write(std::string* varname, int32_t iteration, const void* data, const Layout* layout);
+		int write(std::string* varname, int32_t iteration, const void* data);//, const Layout* layout);
 		/* sends en event to the dedicated core */
 		int signal(std::string* signame, int32_t iteration);
 		/* allocate a buffer in shared memory so it can be written after */
-		void* alloc(std::string* varname, int32_t iteration, const Layout* layout);
+		void* alloc(std::string* varname, int32_t iteration);//, const Layout* layout);
 		/* notify the dedicated core that the previously allocated buffer has been written */
 		int commit(std::string* varname, int32_t iteration);
 		/* destructor */

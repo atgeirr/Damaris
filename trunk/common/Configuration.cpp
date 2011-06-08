@@ -46,6 +46,8 @@ namespace Damaris {
 		parameters = new std::map<std::string,Parameter>();
 		/* initializing the layouts list */
 		layouts = new std::map<std::string,Layout*>();
+		/* initializing the list of variables layouts */
+		variableLayouts = new std::map<std::string,std::string>();
 		/* here we create the ConfigHandler to load the xml file */
 		Damaris::ConfigHandler *configHandler = new Damaris::ConfigHandler(this);
 		configHandler->readConfigFile(configFile);
@@ -158,16 +160,21 @@ namespace Damaris {
 		INFO("The parameter \"" << name << "\" of type \"" << type << "\" has been set to the value " << value);
 	}
 	
-	void Configuration::setVariable(const char* name, const char* layoutName)
+	void Configuration::setVariableInfo(const char* name, const char* layoutName)
 	{
-		INFO("Defining variable " << name);
+		std::map<std::string,Layout*>::iterator it;
+		it = layouts->find(std::string(layoutName));
+		if(it == layouts->end()) {
+			WARN("When parsing variable \"" << name << "\", layout is not defined yet");
+			return; 
+		}
+
+		variableLayouts->insert(std::pair<std::string,std::string>(std::string(name),std::string(layoutName)));
+		INFO("Defining variable informations for \"" << name <<"\", layout is \""<< layoutName << "\"");
 	}
 
 	void Configuration::setLayout(const char* name, const char* type, const std::list<int>* dims, language_e l) 
 	{
-		INFO("type = " << type );
-		INFO("dimensions = " << dims->size());
-
 		std::string layoutName(name);
 		std::string layoutType(type);
 		std::list<int> d(*dims);
@@ -176,25 +183,47 @@ namespace Damaris {
 		if(l == LG_FORTRAN)
 		{
 			std::list<int>::reverse_iterator rit = d.rbegin();
-			for(int i=0; rit != d.rend(); ++rit, i++) 
+			for(int i=0; rit != d.rend(); rit++, i++) 
 			{
 				extents[2*i] = 0;
-				extents[2*i+1] = (int64_t)(*rit);
+				extents[2*i+1] = (int64_t)(*rit)-1;
 			}
 		} else {
 			std::list<int>::const_iterator it = d.begin();
 			for(int i=0; it != d.end(); it++, i++)
 			{
 				extents[2*i] = 0;
-				extents[2*i+1] = (int64_t)(*it);
+				extents[2*i+1] = (int64_t)(*it)-1;
 			}
 		}
-		INFO("array size = " << extents.size());
 		basic_type_e t = getTypeFromString(&layoutType);
 		Layout* layout = new Layout(t,dims->size(),extents);
 		std::pair<std::string,Layout*> ly(layoutName,layout);
 		layouts->insert(ly);
-		INFO("Defined layout " << name);
+		INFO("Layout \"" << name << "\" now defined");
+	}
+
+	Layout* Configuration::getLayout(const char* name)
+	{
+		std::map<std::string,Layout*>::iterator it;
+		it = layouts->find(std::string(name));
+                
+		if(it == layouts->end()) {
+			return NULL;
+		}
+		
+		return it->second;
+	}
+
+	Layout* Configuration::getVariableLayout(const char* varName)
+	{
+		std::map<std::string,std::string>::iterator it;
+		it = variableLayouts->find(std::string(varName));
+		if(it == variableLayouts->end()) {
+			return NULL;
+		}
+		
+		return getLayout((it->second).c_str());
 	}
 
 	int Configuration::getParameterType(const char* name, basic_type_e* t)
