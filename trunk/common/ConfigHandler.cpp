@@ -489,7 +489,7 @@ namespace Damaris {
 		/* interpreting dimensions */
 		std::list<int>* dims = new std::list<int>();
 		std::vector<std::string> strs;
-		boost::algorithm::split(strs, attr_dimensions, boost::is_any_of(","));
+		boost::algorithm::split(strs, attr_dimensions, boost::is_any_of(std::string(",")));
 		
 		for(int i=0; i < (signed int)strs.size(); i++) {
 			/* try scanning an integer */
@@ -497,13 +497,13 @@ namespace Damaris {
 			if(sscanf(strs[i].c_str(),"%d",&d) != 1) 
 			{	
 				/* it's not an integer, maybe a parameter */
-				param_type_e t;
+				basic_type_e t;
 				if(config->getParameterType(strs[i].c_str(),&t))
 				{
-					if(t == PARAM_INT) {
+					if(t == INT) {
 						config->getParameterValue(strs[i].c_str(),&d);
 					} else {
-						ERROR(  "Wrong type for parameter \""<< strs[i].c_str() 
+						ERROR(  "Wrong type ("<< t <<") for parameter \""<< strs[i].c_str() 
 							<< "\", expected int. Cannot build layout \""
 							<< attr_name << "\"");
 						delete dims;
@@ -545,6 +545,8 @@ namespace Damaris {
 
 		/* now calling the configuration object's function */
 		config->setLayout(attr_name, attr_type, dims, language);
+		/* deleting dims */
+		delete dims;
 	}
 
 	/* this function is called when finding a <event> tag */

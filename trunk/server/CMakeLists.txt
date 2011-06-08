@@ -6,6 +6,7 @@ set(DAMARIS_SERVER_SRC ${DAMARIS_SOURCE_DIR}/server/main.cpp
 		       ${DAMARIS_SOURCE_DIR}/common/Configuration.cpp
 		       ${DAMARIS_SOURCE_DIR}/common/ConfigHandler.cpp
 		       ${DAMARIS_SOURCE_DIR}/common/Environment.cpp
+		       ${DAMARIS_SOURCE_DIR}/common/Types.cpp
 		       ${DAMARIS_SOURCE_DIR}/common/Layout.cpp
 		       ${DAMARIS_SOURCE_DIR}/common/LayoutFactory.cpp
 		       ${DAMARIS_SOURCE_DIR}/common/MetadataManager.cpp

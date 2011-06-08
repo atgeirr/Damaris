@@ -23,6 +23,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "common/Debug.hpp"
 #include "common/Language.hpp"
+#include "common/Types.hpp"
 #include "common/ConfigHandler.hpp"
 #include "common/Configuration.hpp"
 
@@ -101,42 +102,50 @@ namespace Damaris {
 		
 		int readSuccessful = 1;
 
-		if(strcmp(type,"int")) {
-			paramValue.type = PARAM_INT;
+		if(strcmp(type,"short") ==0) {
+			paramValue.type = SHORT;
+			short* val = new short(0);
+			int v;
+			readSuccessful = sscanf(value,"%d",&v);
+			*val = (short)v;
+			paramValue.value.short_ptr = val;
+		} else
+		if(strcmp(type,"int") == 0) {
+			paramValue.type = INT;
 			int* val = new int(0);
 			readSuccessful = sscanf(value,"%d",val);
 			paramValue.value.int_ptr = val;
 		} else
-		if(strcmp(type,"long")) {
-			paramValue.type = PARAM_LONG;
+		if(strcmp(type,"long") == 0) {
+			paramValue.type = LONG;
 			long* val = new long(0);
 			readSuccessful = sscanf(value,"%ld",val);
 			paramValue.value.long_ptr = val;
 		} else
-		if(strcmp(type,"float")) {
-			paramValue.type = PARAM_FLOAT;
+		if(strcmp(type,"float") == 0) {
+			paramValue.type = FLOAT;
 			float* val = new float(0.0);
 			readSuccessful = sscanf(value,"%f",val);
 			paramValue.value.float_ptr = val;
 		} else
 		if(strcmp(type,"double")) {
-			paramValue.type = PARAM_DOUBLE;
+			paramValue.type = DOUBLE;
 			double* val = new double(0.0);
 			readSuccessful = sscanf(value,"%lf",val);
 			paramValue.value.double_ptr = val;
 		} else
 		if(strcmp(type,"char")) {
-			paramValue.type = PARAM_CHAR;
+			paramValue.type = CHAR;
 			char* val = new char();
 			readSuccessful = sscanf(value,"%c",val);
 			paramValue.value.char_ptr = val;
 		} else
 		if(strcmp(type,"string")) {
-			paramValue.type = PARAM_STR;
+			paramValue.type = STR;
 			std::string* val = new std::string(value);
 			paramValue.value.str_ptr = val;
 		} else {
-			paramValue.type = PARAM_INT; // just so the compiler doesn't shout
+			paramValue.type = INT; // just so the compiler doesn't shout
 			ERROR("Unknown type \"" << type << "\" for parameter \"" << name << "\"");
 			return;
 		}
@@ -188,7 +197,7 @@ namespace Damaris {
 		INFO("Defined layout " << name);
 	}
 
-	int Configuration::getParameterType(const char* name, param_type_e* t)
+	int Configuration::getParameterType(const char* name, basic_type_e* t)
 	{
 		std::map<std::string,Parameter>::iterator i;
 		i = parameters->find(std::string(name));
@@ -207,19 +216,21 @@ namespace Damaris {
 			return 0;
 		else
 		{
-			param_type_e t = (it->second).type;
+			basic_type_e t = (it->second).type;
 			switch(t) {
-			case(PARAM_INT) :
+			case(SHORT) :
+				memcpy(v,(it->second).value.short_ptr,sizeof(short)); break;
+			case(INT) :
 				memcpy(v,(it->second).value.int_ptr,sizeof(int)); break;
-			case(PARAM_LONG) :
+			case(LONG) :
 				memcpy(v,(it->second).value.long_ptr,sizeof(long)); break;
-			case(PARAM_FLOAT) : 
+			case(FLOAT) : 
 				memcpy(v,(it->second).value.float_ptr,sizeof(float)); break;
-			case(PARAM_DOUBLE) :
+			case(DOUBLE) :
 				memcpy(v,(it->second).value.double_ptr,sizeof(double)); break;
-			case(PARAM_CHAR) :
+			case(CHAR) :
 				memcpy(v,(it->second).value.char_ptr,sizeof(char)); break;
-			case(PARAM_STR) :
+			default :
 				/* */ break;
 			/* TODO : all other types including string shouldn't be used */
 			}

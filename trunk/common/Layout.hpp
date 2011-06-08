@@ -6,12 +6,13 @@
 #include <vector>
 #include <stdint.h>
 
+#include "common/Types.hpp"
 /**
  * Layouts are objects that describe the representation of
  * data in memory.
  */
 namespace Damaris {
-	
+/*	
 	enum basic_type_e {
 		SHORT  = 1,	// short int, integer*2
 		INT    = 2,	// int, integer*4
@@ -22,11 +23,11 @@ namespace Damaris {
 		
 		UNDEFINED_TYPE = 0  // don't know
 	}; // enum basic_type_e
-	
+*/	
 	/* this function gives the size (in bytes) of each type */
-	int basicTypeSize(basic_type_e t);
+//	int basicTypeSize(basic_type_e t);
 	/* this function returns a basic type from a string */
-	basic_type_e getTypeFromString(std::string* str);
+//	basic_type_e getTypeFromString(std::string* str);
 	
 class Layout {
 		

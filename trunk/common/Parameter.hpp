@@ -18,10 +18,11 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __DAMARIS_PARAMETER_H
 #define __DAMARIS_PARAMETER_H
 
+#include "common/Types.hpp"
 #include <string>
 
 namespace Damaris {
-	
+/*	
 	enum param_type_e {
 		PARAM_INT,
 		PARAM_LONG,
@@ -29,15 +30,17 @@ namespace Damaris {
 		PARAM_DOUBLE,
 		PARAM_CHAR,
 		PARAM_STR
-	};
+	};*/
 /**
  * The Parameter union defines a value read from the configuration file
  * We could have used a void* pointer instead of a union but I find this
  * way more elegant.
  */
 	struct Parameter {
-		param_type_e type;
+	//	param_type_e type;
+		basic_type_e type;
 		union {
+			short* short_ptr;
 			int* int_ptr;
 			long* long_ptr;
 			float* float_ptr;

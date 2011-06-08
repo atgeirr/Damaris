@@ -20,7 +20,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/Layout.hpp"
 
 namespace Damaris {
-	
+/*	
 	int basicTypeSize(basic_type_e t)
 	{
 		switch(t) {
@@ -52,7 +52,7 @@ namespace Damaris {
 		if(str->compare("char") == 0) 	return CHAR;
 		return UNDEFINED_TYPE;
 	}
-	
+*/	
 	Layout::Layout(basic_type_e t, int32_t d, std::vector<int64_t> extents)
 	{
 		type = t;
@@ -126,5 +126,5 @@ namespace Damaris {
 			return (endIndex[dim]-startIndex[dim]+1);
 		else
 			return 0;
-	}	
+	}
 }

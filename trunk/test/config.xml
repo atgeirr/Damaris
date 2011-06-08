@@ -6,8 +6,9 @@
 		<queue  name="my cute message queue" size="100" />
 	</nodes>
 	<data>
-		<parameter name="my useful parameter" type="int" value="42" />
+		<parameter name="x" type="int" value="42" />
 		<layout name="my layout" type="float" dimensions="16,32,64" />
+		<layout name="second layout" type="int" dimensions="x,4" />
 		<variable name="my variable" layout="my layout"> this is an example of metadata </variable>
 	</data>
 	<actions>
