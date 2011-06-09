@@ -1,13 +1,17 @@
 #!/usr/bin/ruby
 
 if ARGV.size != 2
-	print "Usage: ./generate <plugin name> <boost include location>\n"
+	print "Usage: ./generate <plugin name> <boost location>\n"
 	exit
 end
 
 $plugin_name = ARGV[0]
 $boost_inc = "-I"+ARGV[1]
-
+if $boost_inc[-1] == '/'[0]
+	$boost_inc += "include"
+else
+	$boost_inc += "/include"
+end
 
 File.open("Makefile","w+") do | file |
 	f = File.open("Makefile.tpl")

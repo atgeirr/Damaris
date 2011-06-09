@@ -27,6 +27,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/Message.hpp"
 #include "common/Layout.hpp"
 #include "common/LayoutFactory.hpp"
+extern "C" {
+#include "server/Server.h"
+}
 #include "server/Server.hpp"
 
 using namespace boost::interprocess;
