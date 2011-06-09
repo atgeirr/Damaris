@@ -275,7 +275,13 @@ namespace Damaris {
 
 	void Configuration::setEvent(const char* name, const char* action, const char* plugin)
 	{
-		/* TODO */
+#ifdef __DAMARIS_SERVER 
+		std::string actionName(name);
+		std::string actionFunc(action);
+		std::string actionFile(plugin);
+		INFO("In setEvent, registering " << name);
+		actionsManager->loadActionFromPlugin(&actionName, &actionFile, &actionFunc);
+#endif	
 	}
 }
 

@@ -11,6 +11,6 @@
 		<variable name="my variable" layout="my layout"> this is an example of metadata </variable>
 	</data>
 	<actions>
-		<event name="my event" action="do_something" using="plugin.so"/>
+		<event name="my event" action="my_function" using="hello.so"/>
 	</action>
 </simulation>
