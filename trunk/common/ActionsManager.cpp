@@ -20,7 +20,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 #include <list>
 #include <iostream>
-#include "hdf5.h"
 
 #include "common/Debug.hpp"
 #include "common/Configuration.hpp"
@@ -28,27 +27,10 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/Variable.hpp"
 #include "common/ActionsManager.hpp"
 
-//#define CCORES 23
- 
-//void hdf5(const std::string* event, int32_t step, int32_t src, Damaris::MetadataManager* db);
-
 namespace Damaris {
 	
-ActionsManager::ActionsManager()//MetadataManager *mm)
+ActionsManager::ActionsManager()
 {
-	//metadataManager = mm;
-// Tests folowing
-//	Action *a = new Action(&hdf5);
-//	actions.insert(std::pair<std::string,Action*>(std::string("hdf5"),a));
-	//std::map<std::string,Action*>::iterator it = actions.find(std::string("hdf5"));
-/*	std::string* name = new std::string("my_event");
-	std::string* file = new std::string("libhello.so.1.0.1");
-	std::string* fun = new std::string("my_function");
-		loadActionFromPlugin(name,file,fun);
-	delete name;
-	delete file;
-	delete fun;
-*/
 }
 
 void ActionsManager::loadActionFromPlugin(std::string* eventName, std::string* fileName, std::string* functionName)
@@ -88,7 +70,8 @@ void ActionsManager::reactToSignal(std::string *sig, int32_t iteration, int32_t 
 	
 }
 
-/*
+/* 
+// This was to test with a plugin that writes the data in HDF5 
 void hdf5(const std::string* event, int32_t step, int32_t src, Damaris::MetadataManager* db)
 {
 

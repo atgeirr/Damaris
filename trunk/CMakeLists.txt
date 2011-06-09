@@ -8,17 +8,17 @@ enable_language (Fortran OPTIONAL)
 
 set(EXTERNAL_ROOT ~/deploy)
 
-add_definitions (-O2 -Wall -D__DEBUG -D__INFO -D__BENCHMARK -D__ENABLE_COMPRESSION)
+add_definitions (-O2 -Wall -D__DEBUG -D__INFO -D_BENCHMARK)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${DAMARIS_SOURCE_DIR}/cmake/Modules/")
 
 set(BOOST_ROOT ${EXTERNAL_ROOT})
 
-set(HDF5_INCLUDE_DIR "${EXTERNAL_ROOT}/include")
-set(HDF5_LIBRARY_DIR "${EXTERNAL_ROOT}/lib")
+#set(HDF5_INCLUDE_DIR "${EXTERNAL_ROOT}/include")
+#set(HDF5_LIBRARY_DIR "${EXTERNAL_ROOT}/lib")
 #FIND_PACKAGE(HDF5 "1.8.6" REQUIRED NO_MODULE)
-set(ZLIB_LIBRARY_DIR "${EXTERNAL_ROOT}/lib")
-set(ZLIB_INCLUDE_DIR "${EXTERNAL_ROOT}/include")
+#set(ZLIB_LIBRARY_DIR "${EXTERNAL_ROOT}/lib")
+#set(ZLIB_INCLUDE_DIR "${EXTERNAL_ROOT}/include")
 
 set(XERCESC_LIBRARY_DIR "${EXTERNAL_ROOT}/lib")
 set(XERCESC_INCLUDE_DIR "${EXTERNAL_ROOT}/include")
@@ -29,13 +29,13 @@ find_package(Boost REQUIRED)
 
 include_directories(${Boost_INCLUDE_DIR})
 include_directories(${XercesC_INCLUDE_DIR})
-include_directories(${HDF5_INCLUDE_DIR})
-include_directories(${ZLIB_INCLUDE_DIR})
+#include_directories(${HDF5_INCLUDE_DIR})
+#include_directories(${ZLIB_INCLUDE_DIR})
 include_directories(${DAMARIS_SOURCE_DIR})
 
-link_directories(${XercesC_LIBRARY_DIR})
-link_directories(${HDF5_LIBRARY_DIR})
-link_directories(${ZLIB_LIBRARY_DIR})
+link_directories(${XERCESC_LIBRARY_DIR})
+#link_directories(${HDF5_LIBRARY_DIR})
+#link_directories(${ZLIB_LIBRARY_DIR})
 
 if(CMAKE_Fortran_COMPILER)
   message(STATUS "Fortran binding will be enabled, compiler is ${CMAKE_Fortran_COMPILER}")

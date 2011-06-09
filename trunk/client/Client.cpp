@@ -30,6 +30,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/LayoutFactory.hpp"
 #include "common/Message.hpp"
 #include "client/Client.hpp"
+extern "C" {
+#include "client/Client.h"
+}
 
 using namespace boost::interprocess;
 
