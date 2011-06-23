@@ -128,7 +128,8 @@ namespace Damaris {
 		{ 
 			data = segment->get_address_from_handle(msg->handle);
 			layout = LayoutFactory::unserialize(msg->layoutInfo);
-			metadataManager->put(&name,iteration,sourceID,layout,data);
+			Variable v(name,iteration,sourceID,layout,data);
+			metadataManager->put(v);
 			return;
 		}
 		

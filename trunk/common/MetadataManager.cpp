@@ -21,27 +21,33 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 using namespace boost::interprocess;
 
 namespace Damaris {
-	
-	Variable* MetadataManager::get(std::string* name, int32_t iteration, int32_t sourceID)
+
+	MetadataManager::MetadataManager(managed_shared_memory* s)
 	{
-		std::list<Variable*>::iterator i;
+		segment = s;
+	}
+	
+	Variable* MetadataManager::get(const std::string* name, int32_t iteration, int32_t sourceID)
+	{
+		std::list<Variable>::iterator i;
 		// TODO : this function bug
 		for(i=vars.begin(); i != vars.end(); i++)
 		{
 			bool c = true;
-			c =  (*i)->getName()->compare(*name) == 0;
-			c = c && (*i)->getIteration() == iteration;
-			c = c && (*i)->getSource() == sourceID;
-			if(c) return (*i);
+			c =  i->name.compare(*name) == 0;
+			c = c && i->iteration == iteration;
+			c = c && i->source == sourceID;
+			if(c) return (Variable*)(&(*i));
 		}
 		return NULL;
 	}
 	
-	void MetadataManager::put(Variable* v)
+	void MetadataManager::put(Variable v)
 	{
 		vars.push_back(v);
+		//vars.insert(v);
 	}
-	
+/*	
 	void MetadataManager::put(std::string* name, int32_t iteration, int32_t sourceID, Layout* l, void* data)
 	{
 		Variable* v = new Variable(name,iteration,sourceID,l,data);
@@ -53,28 +59,23 @@ namespace Damaris {
 		Variable* v = get(name,iteration,sourceID);
 		vars.remove(v);
 	}
-
-	void MetadataManager::remove(Variable* v)
+*/
+	void MetadataManager::remove(Variable v)
 	{
-		if(v->getDataAddress() != NULL) 
+		if(v.getDataAddress() != NULL) 
 		{
-			segment->deallocate(v->getDataAddress());
-			v->setDataToNull();
+			segment->deallocate(v.getDataAddress());
+			v.data = NULL;
 		}
 		vars.remove(v);
-		INFO("removed variable \"" << v->getName()->c_str() << "\", available memory is now " << segment->get_free_memory());
-	}
-	
-	MetadataManager::MetadataManager(managed_shared_memory* s)
-	{
-		segment = s;
-	}
-	
+		INFO("removed variable \"" << v.name.c_str() << "\", available memory is now " << segment->get_free_memory());
+	}	
+/*	
 	std::list<Variable*>* MetadataManager::getAllVariables()
 	{
 		return &vars;
 	}
-	
+*/	
 	MetadataManager::~MetadataManager()
 	{
 		vars.clear();
