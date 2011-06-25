@@ -19,6 +19,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/Types.hpp"
 
 namespace Damaris {
+namespace Types {
 	int basicTypeSize(basic_type_e t)
 	{
 		switch(t) {
@@ -51,4 +52,5 @@ namespace Damaris {
 		if(str->compare("string") == 0) return STR;
 		return UNDEFINED_TYPE;
 	}
+}
 }

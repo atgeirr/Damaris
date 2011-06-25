@@ -105,7 +105,7 @@ namespace Damaris {
 		int readSuccessful = 1;
 
 		if(strcmp(type,"short") ==0) {
-			paramValue.type = SHORT;
+			paramValue.type = Types::SHORT;
 			short* val = new short(0);
 			int v;
 			readSuccessful = sscanf(value,"%d",&v);
@@ -113,41 +113,41 @@ namespace Damaris {
 			paramValue.value.short_ptr = val;
 		} else
 		if(strcmp(type,"int") == 0) {
-			paramValue.type = INT;
+			paramValue.type = Types::INT;
 			int* val = new int(0);
 			readSuccessful = sscanf(value,"%d",val);
 			paramValue.value.int_ptr = val;
 		} else
 		if(strcmp(type,"long") == 0) {
-			paramValue.type = LONG;
+			paramValue.type = Types::LONG;
 			long* val = new long(0);
 			readSuccessful = sscanf(value,"%ld",val);
 			paramValue.value.long_ptr = val;
 		} else
 		if(strcmp(type,"float") == 0) {
-			paramValue.type = FLOAT;
+			paramValue.type = Types::FLOAT;
 			float* val = new float(0.0);
 			readSuccessful = sscanf(value,"%f",val);
 			paramValue.value.float_ptr = val;
 		} else
 		if(strcmp(type,"double")) {
-			paramValue.type = DOUBLE;
+			paramValue.type = Types::DOUBLE;
 			double* val = new double(0.0);
 			readSuccessful = sscanf(value,"%lf",val);
 			paramValue.value.double_ptr = val;
 		} else
 		if(strcmp(type,"char")) {
-			paramValue.type = CHAR;
+			paramValue.type = Types::CHAR;
 			char* val = new char();
 			readSuccessful = sscanf(value,"%c",val);
 			paramValue.value.char_ptr = val;
 		} else
 		if(strcmp(type,"string")) {
-			paramValue.type = STR;
+			paramValue.type = Types::STR;
 			std::string* val = new std::string(value);
 			paramValue.value.str_ptr = val;
 		} else {
-			paramValue.type = INT; // just so the compiler doesn't shout
+			paramValue.type = Types::INT; // just so the compiler doesn't shout
 			ERROR("Unknown type \"" << type << "\" for parameter \"" << name << "\"");
 			return;
 		}
@@ -196,7 +196,7 @@ namespace Damaris {
 				extents[2*i+1] = (int64_t)(*it)-1;
 			}
 		}
-		basic_type_e t = getTypeFromString(&layoutType);
+		Types::basic_type_e t = Types::getTypeFromString(&layoutType);
 		Layout* layout = new Layout(t,dims->size(),extents);
 		std::pair<std::string,Layout*> ly(layoutName,layout);
 		layouts->insert(ly);
@@ -226,7 +226,7 @@ namespace Damaris {
 		return getLayout((it->second).c_str());
 	}
 
-	int Configuration::getParameterType(const char* name, basic_type_e* t)
+	int Configuration::getParameterType(const char* name, Types::basic_type_e* t)
 	{
 		std::map<std::string,Parameter>::iterator i;
 		i = parameters->find(std::string(name));
@@ -245,19 +245,19 @@ namespace Damaris {
 			return 0;
 		else
 		{
-			basic_type_e t = (it->second).type;
+			Types::basic_type_e t = (it->second).type;
 			switch(t) {
-			case(SHORT) :
+			case(Types::SHORT) :
 				memcpy(v,(it->second).value.short_ptr,sizeof(short)); break;
-			case(INT) :
+			case(Types::INT) :
 				memcpy(v,(it->second).value.int_ptr,sizeof(int)); break;
-			case(LONG) :
+			case(Types::LONG) :
 				memcpy(v,(it->second).value.long_ptr,sizeof(long)); break;
-			case(FLOAT) : 
+			case(Types::FLOAT) : 
 				memcpy(v,(it->second).value.float_ptr,sizeof(float)); break;
-			case(DOUBLE) :
+			case(Types::DOUBLE) :
 				memcpy(v,(it->second).value.double_ptr,sizeof(double)); break;
-			case(CHAR) :
+			case(Types::CHAR) :
 				memcpy(v,(it->second).value.char_ptr,sizeof(char)); break;
 			default :
 				/* */ break;

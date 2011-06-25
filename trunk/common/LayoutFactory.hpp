@@ -46,7 +46,7 @@ class LayoutFactory {
 		static Layout* unserialize(const int64_t* buffer) 
 		{
 			Layout* layout = NULL;
-			basic_type_e type = (basic_type_e)(buffer[0]);
+			Types::basic_type_e type = (Types::basic_type_e)(buffer[0]);
 			int32_t dimensions = (int32_t)(buffer[1]);
 			
 			std::vector<int64_t> extents(2*dimensions,0);

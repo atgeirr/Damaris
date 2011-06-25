@@ -497,10 +497,10 @@ namespace Damaris {
 			if(sscanf(strs[i].c_str(),"%d",&d) != 1) 
 			{	
 				/* it's not an integer, maybe a parameter */
-				basic_type_e t;
+				Types::basic_type_e t;
 				if(config->getParameterType(strs[i].c_str(),&t))
 				{
-					if(t == INT) {
+					if(t == Types::INT) {
 						config->getParameterValue(strs[i].c_str(),&d);
 					} else {
 						ERROR(  "Wrong type ("<< t <<") for parameter \""<< strs[i].c_str() 

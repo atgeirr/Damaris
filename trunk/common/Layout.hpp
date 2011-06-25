@@ -32,23 +32,23 @@ namespace Damaris {
 class Layout {
 		
 	private:
-		basic_type_e type; /* type of the data */
+		Types::basic_type_e type; /* type of the data */
 		int32_t dimensions; /* number of dimensions */
 		int64_t* startIndex; /* start index along each dimension */
 		int64_t* endIndex; /* end index along each dimencion */
 		
 	public:
 		/* initialize a layout from the data type, the dimensions d and the vector of extents */
-		Layout(basic_type_e t, int32_t d, std::vector<int64_t> extents);
+		Layout(Types::basic_type_e t, int32_t d, std::vector<int64_t> extents);
 		/* idem but the extents are unknown yet */
-		Layout(basic_type_e t, int32_t d);
+		Layout(Types::basic_type_e t, int32_t d);
 		/* destructor */
 		~Layout();
 		
 		/* returns the size of a buffer that would hold the data */
 		size_t  getRequiredMemoryLength() const;
 		/* returns the type of the data */
-		basic_type_e getType() const;
+		Types::basic_type_e getType() const;
 		/* returns the number of dimensions */
 		int32_t getDimensions() const;
 		/* returns the starting index along a particular dimension */

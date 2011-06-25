@@ -17,8 +17,13 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #ifndef __DAMARIS_TYPES_H
 #define __DAMARIS_TYPES_H
-
+/** 
+ * This file defines basic types used by variables and basic type sizes
+ * TODO: allow user-defined datatypes
+ */
 namespace Damaris {
+namespace Types {
+
 	enum basic_type_e {
 		SHORT  = 1,     // short int, integer*2
 		INT    = 2,     // int, integer*4
@@ -35,5 +40,6 @@ namespace Damaris {
 	int basicTypeSize(basic_type_e t);
 	/* this function returns a basic type from a string */
 	basic_type_e getTypeFromString(std::string* str);
+}
 }
 #endif

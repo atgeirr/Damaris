@@ -38,7 +38,7 @@ namespace Damaris {
  */
 	struct Parameter {
 	//	param_type_e type;
-		basic_type_e type;
+		Types::basic_type_e type;
 		union {
 			short* short_ptr;
 			int* int_ptr;

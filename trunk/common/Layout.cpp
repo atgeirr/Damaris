@@ -20,40 +20,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/Layout.hpp"
 
 namespace Damaris {
-/*	
-	int basicTypeSize(basic_type_e t)
-	{
-		switch(t) {
-			case SHORT :
-				return sizeof(short int);
-			case INT :
-				return sizeof(int);
-			case LONG :
-				return sizeof(long int);
-			case FLOAT :
-				return sizeof(float);
-			case DOUBLE :
-				return sizeof(double);
-			case CHAR :
-				return sizeof(char);
-			case UNDEFINED_TYPE :
-				return 0;
-		}
-		return 0;
-	}
-
-	basic_type_e getTypeFromString(std::string* str)
-	{
-		if(str->compare("short") == 0) 	return SHORT;
-		if(str->compare("int") == 0) 	return INT;
-		if(str->compare("long") == 0)	return LONG;
-		if(str->compare("float") == 0)	return FLOAT;
-		if(str->compare("double") == 0) return DOUBLE;
-		if(str->compare("char") == 0) 	return CHAR;
-		return UNDEFINED_TYPE;
-	}
-*/	
-	Layout::Layout(basic_type_e t, int32_t d, std::vector<int64_t> extents)
+	
+	Layout::Layout(Types::basic_type_e t, int32_t d, std::vector<int64_t> extents)
 	{
 		type = t;
 		dimensions = d;
@@ -74,7 +42,7 @@ namespace Damaris {
 		}
 	}
 	
-	Layout::Layout(basic_type_e t, int32_t d)
+	Layout::Layout(Types::basic_type_e t, int32_t d)
 	{
 		type = t;
 		dimensions = d;
@@ -102,7 +70,7 @@ namespace Damaris {
 		return result;
 	}
 	
-	basic_type_e Layout::getType() const
+	Types::basic_type_e Layout::getType() const
 	{
 		return type;
 	}

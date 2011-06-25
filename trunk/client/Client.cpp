@@ -154,7 +154,7 @@ namespace Damaris {
 
 	int Client::getParameter(std::string* paramName, void* buffer)
 	{
-		basic_type_e t;
+		Types::basic_type_e t;
 		if(config->getParameterType(paramName->c_str(),&t)) 
 		{
 			config->getParameterValue(paramName->c_str(),buffer);

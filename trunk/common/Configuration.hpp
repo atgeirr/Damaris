@@ -107,7 +107,7 @@ namespace Damaris {
 		
 		int getParameterValue(const char* name, void* value);
 		int getParameterString(const char* name, std::string* s);
-		int getParameterType(const char* name, basic_type_e* t);		
+		int getParameterType(const char* name, Types::basic_type_e* t);		
 		void setParameter(const char* name, const char* type, const char* value);
 		
 		void setVariableInfo(const char* name, const char* layoutName);

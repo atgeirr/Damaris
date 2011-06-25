@@ -15,6 +15,10 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 
+/**
+ * MetadataManager holds pointers to all Variables published.
+ * These variables can be retrieved by their identifier (name,source, iteration)
+ */
 #ifndef __DAMARIS_METADATA_H
 #define __DAMARIS_METADATA_H
 
