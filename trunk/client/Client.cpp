@@ -122,6 +122,7 @@ namespace Damaris {
 		// send message
 		msgQueue->send(message,sizeof(Message),0);
 		// free message
+		INFO("variable has been written");
 		delete message;
 		
 		return size;

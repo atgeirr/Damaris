@@ -33,15 +33,34 @@ ActionsManager::ActionsManager()
 {
 }
 
+/* This function load an action from a dynamic library. 
+ * eventName is the name to give to this action in the system.
+ * fileName is the name of the dynamic library to load (.so file on Linux, .dylib on MacOSX)
+ * functionName is the name of the function within the dynamic library to be loaded.
+ * If the dynamic library does not exist, the function prints an error and returns.
+ * If the function within the library does not exist, the function prints an error and returns.
+ * Finally, if an action has already been loaded with the same event name, the function does
+ * not overwrite it, it prints a warning and returns.
+ */
 void ActionsManager::loadActionFromPlugin(std::string* eventName, std::string* fileName, std::string* functionName)
 {
 	char* error;
+	
+	/* check if the event already exists */
+	std::map<std::string,Action*>::iterator it = actions.find(*eventName);
+        if(it != actions.end())
+        {
+		WARN("Trying to overwrite an already defined event, first version is kept");
+		return;
+	}
+
 	/* opening the dynamic library */
 	void* handle = dlopen(fileName->c_str(),RTLD_LAZY);
 
 	if(!handle) 
 	{
 		ERROR("While loading plugin in \""<<fileName->c_str()<<"\"");
+		return;
 	}
 
 	/* loading function */
@@ -49,6 +68,7 @@ void ActionsManager::loadActionFromPlugin(std::string* eventName, std::string* f
 		= (void (*)(const std::string*, int32_t, int32_t, Damaris::MetadataManager*))dlsym(handle,functionName->c_str());
 	if ((error = dlerror()) != NULL)  {
         	ERROR("While loading function in dynamic library: " << error);
+		return;
 	}
 	// creating the function
 	Action *a = new Action(func);
@@ -64,7 +84,7 @@ void ActionsManager::reactToSignal(std::string *sig, int32_t iteration, int32_t 
 		Action* a = (*it).second;
 		(*a)(sig,iteration,sourceID,mm);
 	} else {
-		ERROR("Unable to process "<< sig->c_str() <<" signal: unknown event name");
+		ERROR("Unable to process \""<< sig->c_str() <<"\" signal: unknown event name");
 	}	
 }
 	

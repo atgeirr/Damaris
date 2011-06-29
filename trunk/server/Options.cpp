@@ -53,7 +53,7 @@ Options::Options(int argc, char** argv)
 	desc.add_options()
 		("help", "produces help message")
 		("configuration,C", po::value<std::string>(), "name of the configuration file")
-		("id",po::value<int>(&id)->default_value(0),"id of the server")
+		("id",po::value<int>(&id),"id of the server")
 		("daemon,D","starts the server as a daemon process")
 		("stdout",po::value<std::string>(),"redirects stdout to a given file")
 		("stderr",po::value<std::string>(),"redirects stderr to a given file")
@@ -70,7 +70,7 @@ Options::Options(int argc, char** argv)
 		std::cout << desc << "\n";
 		exit(-1);
 	}
-	
+
 	/* checking the "daemon" command */
 	if(vm.count("daemon")) {
 		/* the two std streams have to be redirected in that case,
@@ -92,6 +92,12 @@ Options::Options(int argc, char** argv)
 	if(vm.count("stderr")) {
                 int fd = open((vm["stderr"].as<std::string>()).c_str(),O_RDWR|O_CREAT,0644);
                 dup2(fd,2);
+        }
+
+	/* check that we provide an id for the server */
+        if (vm.count("id") == 0) {
+                ERROR("Must provide a server id using --id");
+                exit(-1);
         }
 	
 	/* now reading the configuration file and preparing the Configuration object */

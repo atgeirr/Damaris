@@ -1,4 +1,4 @@
-add_definitions(-g -D__DAMARIS_SERVER)
+add_definitions(-D__DEBUG -D__INFO -D__DAMARIS_SERVER)
 
 set(DAMARIS_SERVER_SRC ${DAMARIS_SOURCE_DIR}/server/main.cpp
 		       ${DAMARIS_SOURCE_DIR}/server/Server.cpp

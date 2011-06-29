@@ -38,7 +38,7 @@ class Action {
 		void (*function)(const std::string*,int32_t,int32_t,MetadataManager*);
 	public:
 		// a default constructor for void actions
-		Action();
+		// Action();
 		// constructor, takes the pointer over the function to handle
 		Action(void(*fptr)(const std::string*, int32_t, int32_t, MetadataManager*));
 		// destructor
