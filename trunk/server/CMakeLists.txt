@@ -2,6 +2,8 @@ add_definitions(-D__DEBUG -D__INFO -D__DAMARIS_SERVER)
 
 set(DAMARIS_SERVER_SRC ${DAMARIS_SOURCE_DIR}/server/main.cpp
 		       ${DAMARIS_SOURCE_DIR}/server/Server.cpp
+		       ${DAMARIS_SOURCE_DIR}/server/ServerC.cpp
+		       ${DAMARIS_SOURCE_DIR}/server/ServerFortran.cpp
 		       ${DAMARIS_SOURCE_DIR}/server/Options.cpp
 		       ${DAMARIS_SOURCE_DIR}/common/Configuration.cpp
 		       ${DAMARIS_SOURCE_DIR}/common/ConfigHandler.cpp

@@ -19,11 +19,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \date July 2011
  * \author Matthieu Dorier
  * \version 0.1
+ * This file contains the main function for the server in standalone mode.
  */
 
-/**
- * This is the main function for the server
- */
 #include <iostream>
 #include <list>
 #include <string>
@@ -34,8 +32,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "server/Server.hpp"
 
 /**
- * sighandler is defined to catch Ctr^C (kill signals)
+ * Catches Ctr^C (kill signals)
  * in order to clean everything before exiting.
+ * \param[in] sig : the signal to catch.
  */
 static void sighandler(int sig);
 
@@ -47,7 +46,9 @@ static void sighandler(int sig);
 extern Damaris::Server *server;
 
 /**
- * Main function
+ * Main function for the standalone mode server.
+ * \param[in] argc : argc
+ * \param[in] argv : argv
  **/
 int main(int argc, char** argv)
 {

@@ -15,20 +15,30 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file Server.h
+ * \file ServerFortran.cpp
  * \date July 2011
  * \author Matthieu Dorier
  * \version 0.1
- * Defines the C server interface.
+ * Contains the definition of functions for the Server in Fortran.
  */
-#ifndef __DAMARIS_SERVER_C_H
-#define __DAMARIS_SERVER_C_H
+#ifdef __ENABLE_FORTRAN
+#include "common/FCMangle.h"
+#include "server/Server.hpp"
 
-/**
- * Starts a server (blocks in the server's mainloop).
- * \param[in] configFile : name of the XML configuration file.
- * \param[in] server_id : an identifier for this server.
+/** 
+ * This object is declared extern and is associated to the Server object 
+ * defined in Server.cpp.
  */
-int DC_server(const char* configFile, int server_id);
+extern Damaris::Server *server;
 
+extern "C" {
+
+void FC_FUNC_GLOBAL(df_server,DF_SERVER)
+	(char* configFile_f, int32_t* server_id_f, int32_t* ierr_f, int32_t configFile_size)
+	{
+		std::string config_str(configFile_f,configFile_size);
+		server = new Damaris::Server(&config_str,*server_id_f);
+		*ierr_f = server->run();
+	}
+}
 #endif

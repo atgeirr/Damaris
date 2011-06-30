@@ -15,20 +15,29 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file Server.h
+ * \file ServerC.cpp
  * \date July 2011
  * \author Matthieu Dorier
  * \version 0.1
- * Defines the C server interface.
+ * Contains the definition of functions for the Server object in C.
  */
-#ifndef __DAMARIS_SERVER_C_H
-#define __DAMARIS_SERVER_C_H
 
-/**
- * Starts a server (blocks in the server's mainloop).
- * \param[in] configFile : name of the XML configuration file.
- * \param[in] server_id : an identifier for this server.
+#include "server/Server.hpp"
+
+/** 
+ * This object is declared extern and is associated to the Server object 
+ * defined in Server.cpp.
  */
-int DC_server(const char* configFile, int server_id);
+extern Damaris::Server* server;
 
-#endif
+extern "C" {
+
+#include "server/Server.h"
+
+	int DC_server(const char* configFile, int server_id)
+	{
+		std::string config_str(configFile);
+		server = new Damaris::Server(&config_str,server_id);
+		return server->run();
+	}
+}

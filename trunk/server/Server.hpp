@@ -19,6 +19,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \date July 2011
  * \author Matthieu Dorier
  * \version 0.1
+ * 
+ * Contains the definition of the Server object. The Server is the code
+ * running on dedicated cores.
  */
 #ifndef __DAMARIS_SERVER_H
 #define __DAMARIS_SERVER_H
@@ -28,6 +31,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/interprocess/managed_shared_memory.hpp>
 
 #include "common/Configuration.hpp"
+#include "common/Environment.hpp"
 #include "common/Message.hpp"
 #include "common/ActionsManager.hpp"
 #include "common/MetadataManager.hpp"
@@ -38,42 +42,81 @@ namespace Damaris {
 	
 class Server {
 	public:
-		/* This constructor is used when starting a server
-		   from an external program */
+		/**
+		 * \brief Constructor.
+		 * Used when starting a server from an external program
+		 * 
+		 * \param[in] configFile : name of the configuration file.
+		 * \param[in] id : identifier for this server.
+		 */
 		Server(std::string *configFile, int id);
-		/* This constructor is used by the standalone server
-		   program, which pre-initializes a configuration through
-		   command lines arguments, and a pre-initialized environment */
+
+		/**
+		 * \brief Constructor. 
+		 * Used by the standalone server program, which pre-initializes 
+		 * a configuration through command line arguments, 
+		 * and a pre-initialized environment 
+		 *
+		 * \param[in] config : a fully initialized Configuration object.
+		 * \param[in] env : a fully initialized Environment object.
+		 */
 		Server(Configuration* config, Environment* env);
-		/* Object destructor */
+
+		/**
+		 * \brief Destructor 
+		 * Delete all related objects (configuration, environment, shared memory objects).
+		 */
 		~Server();
-		/* Enters in the server main loop */
+
+		/** 
+		 * \brief Enters in the server main loop.
+		 */
 		int run();
-		/* Forces the server to stop */
+
+		/** 
+		 * \brief Forces the server to stop after the next iteration of the main loop. 
+		 */
 		void stop();
+	
 	private:
-		/* needStop indicated if the server has to exit the
-		   main loop at the next iteration */
-		bool needStop;
-		/* This is the configuration object initialized with the external file */
-		Configuration *config;
-		/* This is the environment pointer */
-		Environment *env;
-		/* Pointer to the message queue, this queue is used
-		   to send messages related to incoming variables and
-		   events */
+
+		bool needStop; /*!< indicates wether the server has to exit the main loop at the next iteration */
+
+		Configuration *config; /*!< This is the configuration object initialized with the external file. */
+		Environment *env; /*!< This is the pointer to the Environment object. */
+		
+		/** 
+		 * Pointer to the message queue, this queue is used
+		 * to send messages related to incoming variables and events.
+		 */
 		message_queue *msgQueue;
-		/* Pointer to the shared memory segment, used to
-		   write variables */
+
+		/**
+		 * Pointer to the shared memory segment, used for writing variables. 
+		 */
 		managed_shared_memory *segment;
-		/* This is the entry to the metadata layer of Damaris */
+
+		/**
+		 * This is the entry point to the metadata layer of Damaris. 
+		 * \see Damaris::MetadataManager
+		 */
 		MetadataManager *metadataManager;
-		/* This object contains all the user-defined actions */
+		
+		/** 
+		 * This object contains all the user-defined actions. 
+		 * \see Damaris::ActionsManager
+		 */
 		ActionsManager *actionsManager;
-		/* The init function initializes everything (called by
-		   constructors */
+		
+		/** 
+		 * Initializes everything (called by constructors).
+		 */
 		void init();
-		/* This function processes an incoming message (no way ???) */
+
+		/** 
+		 * This function processes an incoming message (no way?!).
+		 * \see Damaris::Message
+		 */
 		void processMessage(Message* msg);
 }; // class Server
 	

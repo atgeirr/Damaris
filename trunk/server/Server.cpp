@@ -19,29 +19,27 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \date July 2011
  * \author Matthieu Dorier
  * \version 0.1
+ *
+ * Contains the definition of functions for the Server object.
  */
 #include <iostream>
 #include <list>
 
-#ifdef __ENABLE_FORTRAN
-        #include "common/FCMangle.h"
-#endif
 #include "common/Debug.hpp"
 #include "common/Environment.hpp"
 #include "common/Configuration.hpp"
 #include "common/Message.hpp"
 #include "common/Layout.hpp"
 #include "common/LayoutFactory.hpp"
-extern "C" {
-#include "server/Server.h"
-}
 #include "server/Server.hpp"
 
 using namespace boost::interprocess;
 
+Damaris::Server *server;
+
 namespace Damaris {
 
-	/** constructor for embedded mode */
+	/* constructor for embedded mode */
 	Server::Server(std::string* cf, int id)
 	{
 		config = new Configuration(cf);
@@ -50,14 +48,15 @@ namespace Damaris {
 		init();
 	}
 	
-	/** constructor for standalone mode */
+	/* constructor for standalone mode */
 	Server::Server(Configuration* c, Environment *e)
 	{
 		config = c;
 		env = e;
 		init();
 	}
-	/** initialization */
+
+	/* initialization */
 	void Server::init() 
 	{
 		needStop = false;
@@ -85,6 +84,7 @@ namespace Damaris {
 		actionsManager = config->getActionsManager();
 		INFO("Server successfully started with configuration " << config->getFileName()->c_str());
 	}
+	
 	/* destructor */
 	Server::~Server()
 	{
@@ -98,6 +98,7 @@ namespace Damaris {
 		delete metadataManager;
 		delete config;
 	}
+	
 	/* starts the server and enter the main loop */
 	int Server::run()
 	{
@@ -153,33 +154,3 @@ namespace Damaris {
 	
 }
 
-/* ====================================================================== 
- C Binding
- ====================================================================== */
-extern "C" {
-
-	Damaris::Server *server;
-	/* Starts an embedded server inside the simulation,
-	   the function will block until the server is asked to
-	   stop. The server is initialized with a configuration
-	   file and an id. */
-	int DC_server(const char* configFile, int server_id)
-	{
-		std::string config_str(configFile);
-		server = new Damaris::Server(&config_str,server_id);
-		return server->run();
-	}
-
-#ifdef __ENABLE_FORTRAN
-/* ====================================================================== 
- Fortran Binding
- ====================================================================== */
-	void FC_FUNC_GLOBAL(df_server,DF_SERVER)
-		(char* configFile_f, int32_t* server_id_f, int32_t* ierr_f, int32_t configFile_size)
-	{
-		std::string config_str(configFile_f,configFile_size);
-		server = new Damaris::Server(&config_str,*server_id_f);
-		*ierr_f = server->run();
-	}
-#endif
-}
