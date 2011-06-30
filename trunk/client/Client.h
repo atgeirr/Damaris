@@ -19,7 +19,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \date July 2011
  * \author Matthieu Dorier
  * \version 0.1
- * \brief Main header to include in a C client.
+ * Main header to include in a C client.
  */
 #ifndef __DAMARIS_CLIENT_C_H
 #define __DAMARIS_CLIENT_C_H

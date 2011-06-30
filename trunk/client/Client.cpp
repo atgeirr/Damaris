@@ -19,6 +19,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \date July 2011
  * \author Matthieu Dorier
  * \version 0.1
+ * \see Client.hpp
  */
 #ifdef __ENABLE_FORTRAN
 	#include "common/FCMangle.h"
@@ -35,9 +36,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/LayoutFactory.hpp"
 #include "common/Message.hpp"
 #include "client/Client.hpp"
-extern "C" {
-#include "client/Client.h"
-}
 
 using namespace boost::interprocess;
 
@@ -59,7 +57,7 @@ namespace Damaris {
 		}
 	}
 	
-	void* Client::alloc(std::string* varname, int32_t iteration)//, const Layout* datalayout)
+	void* Client::alloc(std::string* varname, int32_t iteration)
 	{
 		// TODO : this function is not fully implemented
 		return NULL;
@@ -197,95 +195,3 @@ namespace Damaris {
 	
 }
 
-
-/* ====================================================================== 
- C Binding
- ====================================================================== */
-
-extern "C" {
-	
-	Damaris::Client *client;
-
-	int DC_initialize(const char* configfile, int32_t core_id)
-	{
-		std::string config_str(configfile);
-		client = new Damaris::Client(&config_str,core_id);
-		return 0;
-	}
-	
-	int DC_write(const char* varname, int32_t iteration, const void* data)
-	{
-		std::string varname_str(varname);
-		return client->write(&varname_str,iteration,data);
-	}
-	
-	void* DC_alloc(const char* varname, int32_t iteration)
-	{
-		std::string varname_str(varname);
-		return client->alloc(&varname_str,iteration);
-	}
-	
-	int DC_commit(const char* varname, int32_t iteration)
-	{
-		std::string varname_str(varname);
-		return client->commit(&varname_str,iteration);
-	}
-	
-	int DC_signal(const char* signal_name, int32_t iteration)
-	{
-		std::string signal_name_str(signal_name);
-		return client->signal(&signal_name_str,iteration);
-	}
-
-	int DC_get_parameter(const char* param_name, void* buffer)
-	{
-		std::string paramName(param_name);
-		return client->getParameter(&paramName,buffer);
-	}
-
-	int DC_finalize()
-	{
-		delete client;
-		return 0;
-	}
-#ifdef __ENABLE_FORTRAN	
-/* ======================================================================
- Fortran Binding
- ====================================================================== */
-	
-	void FC_FUNC_GLOBAL(df_initialize,DF_INITIALIZE)
-		(char* config_file_name_f, int32_t* core_id_f, int32_t* ierr_f, int config_file_name_size)
-	{
-		std::string config_file_name(config_file_name_f, config_file_name_size);
-		client = new Damaris::Client(&config_file_name,*core_id_f);
-		*ierr_f = 0;
-	}
-	
-	void FC_FUNC_GLOBAL(df_write,DF_WRITE)
-		(char* var_name_f, int32_t* iteration_f, void* data_f, int32_t* ierr_f, int var_name_size)
-	{
-		std::string var_name(var_name_f,var_name_size);
-		*ierr_f = client->write(&var_name,*iteration_f,data_f);
-	}
-	
-	void FC_FUNC_GLOBAL(df_signal,DF_SIGNAL)
-		(char* event_name_f, int32_t* iteration_f, int* ierr_f, int event_name_size)
-	{
-		std::string event_name(event_name_f,event_name_size);
-		*ierr_f = client->signal(&event_name,*iteration_f);
-	}
-	
-	void FC_FUNC_GLOBAL(df_get_parameter,DF_GET_PARAMETER)
-		(char* param_name_f, void* buffer_f, int* ierr_f, int param_name_size)
-	{
-		std::string paramName(param_name_f,param_name_size);
-		*ierr_f = client->getParameter(&paramName,buffer_f);
-	}
-	void FC_FUNC_GLOBAL(df_finalize,DF_FINALIZE)
-		(int* ierr_f)
-	{
-		delete client;
-		*ierr_f = 0;
-	}
-#endif
-}
