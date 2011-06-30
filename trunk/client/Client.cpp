@@ -14,7 +14,12 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
-
+/**
+ * \file Client.cpp
+ * \date July 2011
+ * \author Matthieu Dorier
+ * \version 0.1
+ */
 #ifdef __ENABLE_FORTRAN
 	#include "common/FCMangle.h"
 #endif
@@ -47,15 +52,18 @@ namespace Damaris {
 		try {
 			msgQueue = new message_queue(open_only, config->getMsgQueueName()->c_str());
 			segment = new managed_shared_memory(open_only, config->getSegmentName()->c_str());
+			INFO("Client initialized successfully for core " << id << " with configuration " << *configfile);
 		}
 		catch(interprocess_exception &ex) {
 			std::cout << ex.what() << std::endl;
 		}
-		INFO("Client initialized successfully for core " << id << " with configuration " << *configfile);
 	}
 	
 	void* Client::alloc(std::string* varname, int32_t iteration)//, const Layout* datalayout)
 	{
+		// TODO : this function is not fully implemented
+		return NULL;
+
 		size_t size;
 		Layout* layout = config->getVariableLayout(varname->c_str());
 		if(layout == (Layout*)NULL) {
@@ -80,7 +88,7 @@ namespace Damaris {
 		// TODO retrieve the variable name from a hash table somewhere
 		// then send a write-notification
 		ERROR("This function is not implemented");
-		return 0;
+		return -1;
 	}
 	
 	int Client::write(std::string* varname, int32_t iteration, const void* data)
@@ -89,17 +97,29 @@ namespace Damaris {
 		Layout* layout = config->getVariableLayout(varname->c_str());
 		size_t size = 0;
         	if(layout == (Layout*)NULL) {
-			ERROR("No layout found in configuration for variable "<< varname->c_str());
+			ERROR("No layout found in configuration for variable \""<< varname->c_str() << "\" or variable not defined");
 			return -1;
         	}
-		// allocate buffer
+
+		// get required size
 		size = layout->getRequiredMemoryLength();
 		if(size == 0) {
 			ERROR("Layout has size 0");
-			return -1;
+			return -2;
+		}
+
+		// allocate buffer
+		char* buffer = NULL;
+		try {		
+			buffer = static_cast<char*>(segment->allocate(size));
+		} catch (std::bad_alloc &e) {
+			buffer = NULL;
+		}
+		if(buffer == NULL) {
+			ERROR("While writing \"" << varname->c_str() << "\", allocation failed");
+			return -3;
 		}
 		
-		char* buffer = static_cast<char*>(segment->allocate(size));
 		// copy data
 		memcpy(buffer,data,size);
 		// create message
@@ -107,7 +127,7 @@ namespace Damaris {
 		message->sourceID = id;
 		
 		if(varname->length() > 63) {
-			ERROR("Warning: variable name length bigger than 63, will be truncated");
+			WARN("Variable name length bigger than 63, will be truncated");
 			memcpy(message->content,varname->c_str(),63);
 			message->content[63] = '\0';
 		} else {
@@ -122,7 +142,7 @@ namespace Damaris {
 		// send message
 		msgQueue->send(message,sizeof(Message),0);
 		// free message
-		INFO("variable has been written");
+		INFO("Variable \"" << varname->c_str() "\" has been written");
 		delete message;
 		
 		return size;
@@ -137,7 +157,7 @@ namespace Damaris {
 		sig->handle = 0;
 		
 		if(signal_name->length() > 63) {
-			ERROR("Warning: signal tag length bigger than 63, will be truncated");
+			WARN("Signal's name length bigger than 63, will be truncated");
 			memcpy(sig->content,signal_name->c_str(),63);
 			sig->content[63] = '\0';
 		} else {
@@ -148,8 +168,8 @@ namespace Damaris {
 			msgQueue->send(sig,sizeof(Message),0);
 			return 0;
 		} catch(interprocess_exception &e) {
-			ERROR("Error while poking " << *signal_name << ", " << e.what());
-			return 1;
+			ERROR("Error while sending event \"" << *signal_name << "\", " << e.what());
+			return -1;
 		}
 	}
 

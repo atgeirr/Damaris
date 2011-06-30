@@ -16,7 +16,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Options.hpp
- * \brief Program options parsing
+ * \date July 2011
  * \author Matthieu Dorier
  * \version 0.1
  */

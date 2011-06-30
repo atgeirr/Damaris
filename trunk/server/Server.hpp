@@ -16,7 +16,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Server.hpp
- * \brief Damaris Server object
+ * \date July 2011
  * \author Matthieu Dorier
  * \version 0.1
  */

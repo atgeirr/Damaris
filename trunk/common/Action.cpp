@@ -14,7 +14,12 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
-
+/**
+ * \file Action.cpp
+ * \date July 2011
+ * \author Matthieu Dorier
+ * \version 0.1
+ */
 #include "common/Action.hpp"
 
 namespace Damaris {
