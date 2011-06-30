@@ -21,12 +21,10 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \author Matthieu Dorier
  * \version 0.1
  */
-#include <sys/types.h>
-#include <sys/stat.h>
+
 #include <stdio.h>
-#include <unistd.h>
-#include <errno.h>
 #include <string>
+#include <fstream>
 
 #include <boost/algorithm/string.hpp>
 
@@ -134,19 +132,14 @@ namespace Damaris {
 	/* reads a particular configuration file */
 	void ConfigHandler::readConfigFile(std::string* configFile)
 	{
-   		// Test to see if the file is ok.
-		struct stat fileStatus;
-		int iretStat = stat(configFile->c_str(), &fileStatus);
-		if( iretStat == ENOENT )
-			throw ( std::runtime_error("Path file_name does not exist, or path is an empty string.") );
-		else if( iretStat == ENOTDIR )
-			throw ( std::runtime_error("A component of the path is not a directory."));
-		else if( iretStat == ELOOP )
-			throw ( std::runtime_error("Too many symbolic links encountered while traversing the path."));
-		else if( iretStat == EACCES )
-			throw ( std::runtime_error("Permission denied."));
-		else if( iretStat == ENAMETOOLONG )
-			throw ( std::runtime_error("File can not be read"));
+   		// Test to see if the file exist
+		std::fstream fin(configFile->c_str(),std::fstream::in);
+		if( !(fin.is_open()) )
+		{
+			ERROR("Configuration file \"" << configFile->c_str() << "\" does not exist or cannor be accessed");
+			throw std::runtime_error("Configuration");
+		}
+		fin.close();
 
 		// Configure DOM parser.
 		configFileParser->setValidationScheme( XercesDOMParser::Val_Never );

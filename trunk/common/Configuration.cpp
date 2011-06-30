@@ -50,7 +50,11 @@ namespace Damaris {
 		variableLayouts = new std::map<std::string,std::string>();
 		/* here we create the ConfigHandler to load the xml file */
 		Damaris::ConfigHandler *configHandler = new Damaris::ConfigHandler(this);
-		configHandler->readConfigFile(configFile);
+		try {
+			configHandler->readConfigFile(configFile);
+		} catch(...) {
+			exit(-1);
+		}
 		/* the ConfigHandler must be deleted afterward */
 		delete configHandler;
 		if(!(this->checkConfiguration())) exit(-1);
