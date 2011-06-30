@@ -21,10 +21,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \version 0.1
  * \see Client.hpp
  */
-#ifdef __ENABLE_FORTRAN
-	#include "common/FCMangle.h"
-#endif
-
 #include <string.h>
 #include <string>
 #include <stdlib.h>
