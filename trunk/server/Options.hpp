@@ -19,6 +19,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \date July 2011
  * \author Matthieu Dorier
  * \version 0.1
+ * 
+ * The Options object parses the command line, creates an Environment
+ * and a Configuration object that will be passed to the Server object.
  */
 #ifndef __DAMARIS_OPTIONS_H
 #define __DAMARIS_OPTIONS_H
@@ -38,33 +41,24 @@ namespace Damaris {
  */
 class Options {
 	private:
-		/**
-		 * The name of the configuration file
-		 */
-		std::string* configFile;
-		/**
-		 * The environment object
-		 */
-		Environment* env;
-		/**
-		 * The configuration object
-		 */
-		Configuration* config;
+		std::string* configFile; /*!< Name of the configuration file. */
+		Environment* env; /*!< Pointer to the Environment object that will be filled. */
+		Configuration* config; /*!< Pointer to the Configuration that will be initialized. */
 	public:
 		/**
-		 * The constructor takes the same parameters than
-		 * a usual program */
+		 * The constructor takes the same parameters than a usual program. 
+		 */
 		Options(int argc, char** argv);
 		/**
-		 * Get the name of the configuration file
+		 * Get the name of the configuration file.
 		 */
 		std::string* getConfigFile();
 		/**
-		 * Get the prepared configuration
+		 * Get the prepared configuration.
 		 */
 		Configuration* getConfiguration();
 		/**
-		 * Get the prepared environment
+		 * Get the prepared environment.
 		 */
 		Environment* getEnvironment();
 };

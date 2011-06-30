@@ -35,9 +35,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 namespace po = boost::program_options;
 
 /**
- * daemon is a function that creates a daemon process
- * so the server can run in background (when used in
- * standalone mode).
+ * Creates a daemon process so the server can run in background 
+ * (when used in standalone mode).
  */
 static void daemon();
 
