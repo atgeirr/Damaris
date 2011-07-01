@@ -23,7 +23,11 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 using namespace boost::interprocess;
 
 namespace Damaris {
-	
+
+/**
+ * The msg_type_e enumeration provides two types of messages
+ * to distinguish between notifications of writes and user-defined event.
+ */	
 	enum msg_type_e {
 		MSG_VAR,
 		MSG_SIG
@@ -33,12 +37,12 @@ namespace Damaris {
  * from simulation's cores to dedicated cores.
  */
 	struct Message {
-		msg_type_e type;			// the type of message (MSG_VAR, MSG_POKE)
-		int32_t sourceID;			// the id of the source sending the message
-		int64_t iteration;			// the iteration number in the simulation
-		char content[64];			// the content (name of the variable or the poke)
-		int64_t layoutInfo[8]; 			// information related to the data layout
-		managed_shared_memory::handle_t handle; // pointer on data
+		msg_type_e type;			/*!< The type of message (MSG_VAR, MSG_SIG). */
+		int32_t sourceID;			/*!< The id of the source sending the message. */
+		int32_t iteration;			/*!< The iteration number in the simulation. */
+		char content[64];			/*!< The content (name of the variable or the event). */
+		int64_t layoutInfo[8]; 			/*!< Information related to the data layout. */
+		managed_shared_memory::handle_t handle; /*!< Pointer to data (handle can be understood by all processes in their own space) */
 	};
 	
 }

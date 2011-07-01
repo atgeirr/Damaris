@@ -14,7 +14,15 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
-
+/**
+ * \file MetadataManager.cpp
+ * \date July 2011
+ * \author Matthieu Dorier
+ * \version 0.1
+ *
+ * MetadataManager holds pointers to all Variables published.
+ * These variables can be retrieved by their identifier (name,source,iteration).
+ */
 #include "common/Debug.hpp"
 #include "common/MetadataManager.hpp"
 
@@ -30,7 +38,6 @@ namespace Damaris {
 	Variable* MetadataManager::get(const std::string* name, int32_t iteration, int32_t sourceID)
 	{
 		std::list<Variable>::iterator i;
-		// TODO : this function bug
 		for(i=vars.begin(); i != vars.end(); i++)
 		{
 			bool c = true;
@@ -42,10 +49,13 @@ namespace Damaris {
 		return NULL;
 	}
 	
-	void MetadataManager::put(Variable v)
+	int MetadataManager::put(Variable v)
 	{
+		if(this->get(&(v.name),v.iteration,v.source) != NULL) {
+			return -1;
+		}
 		vars.push_back(v);
-		//vars.insert(v);
+		return 0;
 	}
 /*	
 	void MetadataManager::put(std::string* name, int32_t iteration, int32_t sourceID, Layout* l, void* data)
@@ -68,7 +78,7 @@ namespace Damaris {
 			v.data = NULL;
 		}
 		vars.remove(v);
-		INFO("removed variable \"" << v.name.c_str() << "\", available memory is now " << segment->get_free_memory());
+		INFO("Removed variable \"" << v.name.c_str() << "\", available memory is now " << segment->get_free_memory());
 	}	
 /*	
 	std::list<Variable*>* MetadataManager::getAllVariables()

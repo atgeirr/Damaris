@@ -14,10 +14,14 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
-
 /**
+ * \file MetadataManager.hpp
+ * \date July 2011
+ * \author Matthieu Dorier
+ * \version 0.1
+ *
  * MetadataManager holds pointers to all Variables published.
- * These variables can be retrieved by their identifier (name,source, iteration)
+ * These variables can be retrieved by their identifier (name,source,iteration).
  */
 #ifndef __DAMARIS_METADATA_H
 #define __DAMARIS_METADATA_H
@@ -56,13 +60,34 @@ namespace Damaris {
 	class MetadataManager {
 	private:
 	//	variable_set vars;
-		std::list<Variable> vars;
-		managed_shared_memory* segment;
+		std::list<Variable> vars; /*!< List of all recorded variables. */
+		managed_shared_memory* segment; /*!< A pointer to the shared memory segment. */ 
 	public:
+		/**
+		 * \brief Retrieves a variable given its name, iteration and source.
+		 * \param[in] n : name of the variable to retrieve.
+		 * \param[in] it : iteration of the variable to retrieve.
+		 * \param[in] srcID : source id of the variable to retrieve.
+		 * \return A pointer to the first Variable record found, or NULL if none has been found.
+		 *         Do not use delete on this pointer, it is managed by the MetadataManager.
+		 */
 		Variable* get(const std::string *n, int32_t it, int32_t srcID);
-		void put(Variable v);
+		
+		/**
+		 * \brief Puts a new variable record into the MetadataManager.
+		 * \param[in] v : instance of the Variable record to register. A copy of this variable
+		 *                is done, so you can safely delete the original one after calling this function.
+		 * \return 0 in case of success, -1 if there is already a record identified by the same name, iteration and source.
+		 *           In that case, the new Variable is not inserted in the MetadataManager.
+		 */
+		int put(Variable v);
 	//	void put(std::string *name, int32_t iteration, int32_t sourceID, Layout* l, void* data);
 	//	void remove(std::string* name, int32_t iteration, int32_t sourceID);	
+		
+		/**
+		 * \brief Removes a variable from the MetadataManager (its content is deleted from shared memory).
+		 * \param[in] v : instance of the variable to delete.
+		 */
 		void remove(Variable v);
 
 		// TODO getVariablesByName(std::string n);
@@ -70,9 +95,18 @@ namespace Damaris {
 		// TODO getVariablesBySource(int32_t src);
 
 		// TODO getVariablesByIteration(int32_t it);
-		
+		/**
+		 * \brief Constructor.
+		 * Takes a pointer to the shared memory segment that holds the data.
+		 * \param[in] s : pointer to the shared memory segment.
+		 */	
 		MetadataManager(managed_shared_memory* s);
 	//	std::list<Variable*>* getAllVariables();
+
+		/**
+		 * \brief Destructor.
+		 * Will iterate on each variable recorded and delete them (including freeing the memory).
+		 */
 		~MetadataManager();
 	};
 	
