@@ -17,6 +17,14 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 
 #include "common/Types.hpp"
+/**
+ * \file Types.cpp
+ * \date July 2011
+ * \author Matthieu Dorier
+ * \version 0.1
+ *
+ * This file defines the functions on data types.
+ */
 
 namespace Damaris {
 namespace Types {
