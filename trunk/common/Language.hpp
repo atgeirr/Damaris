@@ -14,10 +14,23 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
+/**
+ * \file Language.hpp
+ * \date July 2011
+ * \author Matthieu Dorier
+ * \version 0.1
+ *
+ * Language.hpp contains the enumeration that makes the distinction
+ * between C and Fortran. This distinction is important because C and
+ * Fortran programs don't have the same array layout.
+ */
 
 #ifndef __DAMARIS_LANGUAGE_H
 #define __DAMARIS_LANGUAGE_H
-
+/**
+ * The language_e enumeration distinguishes between C and Fortran
+ * (and a potential unknown language).
+ */
 enum language_e {
 	LG_UNKNOWN,
 	LG_FORTRAN,

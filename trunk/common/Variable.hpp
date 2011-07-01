@@ -14,7 +14,14 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
-
+/**
+ * \file Variable.hpp
+ * \date July 2011
+ * \author Matthieu Dorier
+ * \version 0.1
+ *
+ * Variable.hpp contains the definition of the Variable record.
+ */
 #ifndef __DAMARIS_VARIABLE_H
 #define __DAMARIS_VARIABLE_H
 
@@ -26,35 +33,49 @@ namespace Damaris {
 
 /**
  * The Variable object is used for describing a variable within
- * a metadata structure. It has a pointer to the data and additional
- * informations.
+ * a metadata structure. It holds a pointer to the data and additional
+ * informations. A Variable record is identified by a name, an iteration
+ * and a source.
  */
 struct Variable {
 		
-		std::string name;	// name of the variable
-		int32_t iteration;	// iteration of publication
-		int32_t source;		// source that published this variable
-		Layout* layout;		// layout of the data
-		void* data;		// pointer on the data
+		std::string name;	/*!< Name of the variable. */
+		int32_t iteration;	/*!< Iteration of publication. */
+		int32_t source;		/*!< Source that published this variable. */
+		Layout* layout;		/*!< Layout of the data. */
+		void* data;		/*!< Pointer to the data. */
 	
-		/* Constructor */
+		/**
+		 * \brief Constructor. 
+		 * Creates a Variable record given a name, an iteration, a source, a layout
+		 * and a pointer to the data.
+		 * 
+		 * \param[in] vname : Name of the variable.
+		 * \param[in] it : Iteration of the variable.
+		 * \param[in] src : Source of the variable.
+		 * \param[in] l : Layout that physically describe the data.
+		 * \param[in] d : Pointer to the data.
+		 */
 		Variable(std::string vname, int32_t it, int32_t src, Layout* l, void* d);
-		/* returns the name of the variable */
-		//std::string getName() const { return name; }
-		/* returns the iteration at which the variable has been created */
-		//int32_t getIteration() const { return iteration; }
-		/* returns the source (client id) which published the variable */
-		//int32_t getSource() const { return sourceID; }
+
+		// All the following accessors are useless since we use a structure with public members
+
+
 		/* returns the layout of the variable */
-		Layout* getLayout() const { return layout; }
+		/* Layout* getLayout() const { return layout; } */
 		/* returns the pointer over the data */
-		void* getDataAddress() const { return data; }
+		/* void* getDataAddress() const { return data; } */
 		/* compares the records (except data and layout) with another variable */
 		//bool compare(const Variable &v) const;
 		/* print informations related to the variable */
 		// void print() const;
 		/* reset the pointer to the data */
 		//void setDataToNull() { data = NULL; }
+
+		/**
+		 * \brief Comparison operator between variables.
+		 * Variables are equals if they have a same name, iteration and source.
+		 */
 		bool operator==(const Variable &another);
 };
 

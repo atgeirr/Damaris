@@ -72,9 +72,9 @@ namespace Damaris {
 */
 	void MetadataManager::remove(Variable v)
 	{
-		if(v.getDataAddress() != NULL) 
+		if(v.data != NULL) 
 		{
-			segment->deallocate(v.getDataAddress());
+			segment->deallocate(v.data);
 			v.data = NULL;
 		}
 		vars.remove(v);
