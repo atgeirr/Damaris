@@ -235,10 +235,10 @@ namespace Damaris {
 		std::map<std::string,Parameter>::iterator i;
 		i = parameters->find(std::string(name));
 		if(i == parameters->end())
-			return 0;
+			return -1;
 		else
 			*t = (i->second).type;
-		return 1;
+		return 0;
 	}
 	
 	int Configuration::getParameterValue(const char* name, void* v)
@@ -246,7 +246,7 @@ namespace Damaris {
 		std::map<std::string,Parameter>::iterator it;
 		it = parameters->find(std::string(name));
 		if(it == parameters->end())
-			return 0;
+			return -1;
 		else
 		{
 			Types::basic_type_e t = (it->second).type;
@@ -268,7 +268,7 @@ namespace Damaris {
 			/* TODO : all other types including string shouldn't be used */
 			}
 		}
-		return 1;
+		return 0;
 	}
 
 	int Configuration::getParameterString(const char* name, std::string* s)

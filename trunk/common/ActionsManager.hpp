@@ -38,17 +38,29 @@ namespace Damaris {
  */
 class ActionsManager {
 	private:
-		// map associating event names to actions
-		std::map<std::string,Action*> actions;
-		// pointer to the metadata manager
-		//MetadataManager *metadataManager;
+		std::map<std::string,Action*> actions; /*!< Map associating event names to actions. */
 
 	public:
-		// constructor, takes a pointer to the metadata manager
-		ActionsManager();//MetadataManager* mm);
-		// loads a function from a dynamic library
+		/**
+		 * \brief Constructor.
+		 */
+		ActionsManager();
+		
+		/** 
+		 * \brief Loads a function from a dynamic library.
+		 * \param[in] eventName : Name of the event taken as a key for this action.
+		 * \param[in] fileName : Name of the dynamic library (.so, .dylib...)
+		 * \param[in] functionName : Name of the function to load in this dynamic library.
+		 */
 		void loadActionFromPlugin(std::string* eventName, std::string* fileName, std::string* functionName);
-		// call a function
+
+		/**
+		 * \brief Call a function. In reaction to a fired event.
+		 * \param[in] sig : name of the event.
+		 * \param[in] iteration : iteration at which the event is sent.
+		 * \param[in] sourceID : source that fired the event.
+		 * \param[in,out] mm : Pointer to the MetadataManager.
+		 */
 		void reactToSignal(std::string* sig, int32_t iteration, int32_t sourceID, MetadataManager* mm);
 };
 

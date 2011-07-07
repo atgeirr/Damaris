@@ -26,11 +26,30 @@ namespace Damaris {
 class Environment {
 		
 	private:
-		int id;
+		int id; /*!< ID of the server. */
 	public:
+		
+		/**
+		 * \brief Constructor.
+	  	 */
 		Environment();
+
+		/**
+		 * \brief Constructor taking an ID. 
+		 * \param[in] i : id of the server.
+		 */
 		Environment(int i);
+
+		/**
+		 * \brief Get the ID of the server.
+		 * \return ID of the server.
+		 */
 		int getID() { return id; }
+		
+		/**
+		 * \brief Set the ID of the server.
+		 * \param[in] i : new ID.
+		 */
 		void setID(int i) { id = i; }
 
 };

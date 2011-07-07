@@ -15,6 +15,13 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 
+/**
+ * \file Layout.cpp
+ * \date July 2011
+ * \author Matthieu Dorier
+ * \version 0.1
+ */
+
 #include <cstring>
 #include "common/Debug.hpp"
 #include "common/Layout.hpp"

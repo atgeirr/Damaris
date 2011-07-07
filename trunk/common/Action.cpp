@@ -23,13 +23,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/Action.hpp"
 
 namespace Damaris {
-/*	
-	Action::Action()
-	{
-		function = NULL;
-	}
-*/	
-	// main constructor
+	
 	Action::Action(void(*fptr)(const std::string*, int32_t, int32_t, MetadataManager*))
 	{
 		function = fptr;
@@ -51,5 +45,4 @@ namespace Damaris {
 		if(function != NULL)
 			(*function)(event,iteration,sourceID,mm);
 	}
-	
 }

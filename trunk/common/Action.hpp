@@ -39,20 +39,33 @@ namespace Damaris {
 class Action {
 
 	private:
-		// the pointer over the function
-		void (*function)(const std::string*,int32_t,int32_t,MetadataManager*);
+		void (*function)(const std::string*,int32_t,int32_t,MetadataManager*); /*!< Pointer to the loaded function */
 	public:
-		// a default constructor for void actions
-		// Action();
-		// constructor, takes the pointer over the function to handle
+		/**
+		 * \brief Constructor. Takes the pointer over the function to handle.
+		 * \param[in] fptr : Pointer to the function.
+		 */
 		Action(void(*fptr)(const std::string*, int32_t, int32_t, MetadataManager*));
-		// destructor
+		
+		/**
+		 * \brief Destructor.
+		 */
 		~Action();
 		
-		// a () operator to simplify the calling of the action
+		/**
+		 * \brief Operator overloaded to simplify the call to an action.
+		 * \param[in] event : name of the event that induced the action.
+		 * \param[in] iteration : iteration at which the action is called.
+		 * \param[in] sourceID : ID of the client that fired the action.
+		 * \param[in,out] mm : pointer to the MetadataManager that contains all recorded variables.
+		 */
 		void operator()(const std::string* event, 
 				int32_t iteration, int32_t sourceID, MetadataManager* mm);
-		// call the inner function
+		
+		/**
+		 * \brief Another way of calling the inner function.
+		 * \see Damaris::Actions::operator()
+		 */
 		void call(const std::string* event,
 			  int32_t iteration, int32_t sourceID, MetadataManager* mm);
 };

@@ -27,7 +27,12 @@ class LayoutFactory {
 	private:
 		
 	public:
-		/* serializes a layout */	
+		/**
+		 * \brief Serializes a layout into a buffer of int64_t.
+		 * \param[in] layout : Layout to be serialized.
+		 * \param[out] buffer : Buffer to hold the result.
+		 * return 0.
+		 */	
 		static int serialize(const Layout* layout, int64_t* buffer)
 		{
 			buffer[0] = (int64_t)(layout->getType());
@@ -42,7 +47,11 @@ class LayoutFactory {
 			return 0;
 		}
 		
-		/* unserializes a layout */
+		/**
+		 * \brief Unserializes a Layout.
+		 * \param[in] buffer : Buffer holding the serialized Layout.
+		 * \return A pointer to the unserialized Layout.
+		 */
 		static Layout* unserialize(const int64_t* buffer) 
 		{
 			Layout* layout = NULL;

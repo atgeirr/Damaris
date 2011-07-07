@@ -54,7 +54,7 @@ namespace Damaris {
 class ConfigHandler {
 		
 	private:
-		XercesDOMParser *configFileParser;
+		XercesDOMParser *configFileParser; 
 		Configuration* config;
 
 		bool nodeParsed;
@@ -92,10 +92,23 @@ class ConfigHandler {
 		void readLayoutInfo(DOMElement* elem)		throw();
 		void readEventInfo(DOMElement* elem)		throw();
 	public:
-		/* the constructor takes a Configuration object as argument,
-		   this object will be filled when calling readConfigFiles */
+		/** 
+		 * The constructor takes a Configuration object as argument,
+		 * this object will be filled when calling readConfigFiles. 
+		 * \param[in,out] c : pointer to the Configuration object to be filled.
+		 */
 		ConfigHandler(Configuration* c);
+
+		/**
+		 * Destructor.
+		 */
 		~ConfigHandler();
+
+		/**
+		 * Reads a configuration file and fill the Configuration object that
+		 * has been given to the constructor.
+		 * \param[in] cfgFile : name of the configuration file.
+		 */
 		void readConfigFile(std::string *cfgFile);
 	};
 
