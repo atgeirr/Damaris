@@ -23,6 +23,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * Definition of the Fortran functions.
  */
 #ifdef __ENABLE_FORTRAN
+#define __DEBUG
+#include "common/Debug.hpp"
 #include "common/FCMangle.h"
 #include "client/ClientFortran.hpp"
 
@@ -44,6 +46,29 @@ void FC_FUNC_GLOBAL(df_write,DF_WRITE)
 	{
 		std::string var_name(var_name_f,var_name_size);
 		*ierr_f = client->write(&var_name,*iteration_f,data_f);
+	}
+
+void* FC_FUNC_GLOBAL(df_alloc,DF_ALLOC)
+        (char* var_name_f, int32_t* iteration_f, int32_t* ierr_f, int var_name_size)
+	{
+		std::string var_name(var_name_f,var_name_size);
+		void* result = client->alloc(&var_name,*iteration_f);
+		DBG("function alloc called with argument " << var_name.c_str() << ", " << *iteration_f);
+		if(result == NULL) {
+			*ierr_f = -1;
+			return NULL;
+		} else {
+			*ierr_f = 0;
+			return result;
+		}
+	}
+
+void FC_FUNC_GLOBAL(df_commit,DF_COMMIT)
+	(char* var_name_f, int32_t* iteration_f, int32_t* ierr_f, int var_name_size)
+	{
+		std::string var_name(var_name_f,var_name_size);
+		DBG("commiting " << var_name.c_str());
+		*ierr_f = client->commit(&var_name,*iteration_f);
 	}
 
 void FC_FUNC_GLOBAL(df_signal,DF_SIGNAL)

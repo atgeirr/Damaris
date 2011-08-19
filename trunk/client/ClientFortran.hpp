@@ -45,7 +45,7 @@ void FC_FUNC_GLOBAL(df_initialize,DF_INITIALIZE)
  * \param[in] var_name : name of the variable to write (character*).
  * \param[in] iteration : iteration at which the variable is written (integer).
  * \param[in] data : pointer to the data to write (integer).
- * \param[out] ierr: error core. 0 in case of success,
+ * \param[out] ierr: error code. 0 in case of success,
  *         -1 if the layout or the variable is not defined,
  *         -2 if the layout has a bad size (0 or < 0),
  *         -3 if it fails to allocate shared memory to write.
@@ -53,6 +53,21 @@ void FC_FUNC_GLOBAL(df_initialize,DF_INITIALIZE)
 void FC_FUNC_GLOBAL(df_write,DF_WRITE)
 	(char* var_name_f, int32_t* iteration_f, void* data_f, int32_t* ierr_f, int var_name_size);
 
+/** 
+ * \fn df_alloc(var_name, iteration, ierr)
+ * \brief Allocate space for a variable.
+ * \see Damaris::Client::alloc
+ * \param[in] var_name : name of the variable to allocate (character*).
+ * \param[in] iteration : iteration at which the variable is written (integer).
+ * \param[out] ierr: error code. 0 in case of success,
+ *         -1 in case of error.
+ * \return a c_ptr that has to be converted (using c_f_pointer) to be used in fortran.
+ */
+void* FC_FUNC_GLOBAL(df_alloc,DF_ALLOC)
+	(char* var_name_f, int32_t* iteration_f, int32_t* ierr_f, int var_name_size);
+
+void FC_FUNC_GLOBAL(df_commit,DF_COMMIT)
+	(char* var_name_f, int32_t* iteration_f, int32_t* ierr_f, int var_name_size);
 /**
  * \fn df_signal(event_name, iteration, ierr)
  * \brief Sends an event to the dedicated core.
