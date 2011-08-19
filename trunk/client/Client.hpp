@@ -33,6 +33,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/interprocess/managed_shared_memory.hpp>
 
 #include "common/Configuration.hpp"
+#include "common/MetadataManager.hpp"
 #include "common/Layout.hpp"
 
 using namespace boost::interprocess;
@@ -56,7 +57,8 @@ class Client {
 		Configuration *config; /*!< configuration object */
 		message_queue *msgQueue; /*!< pointer to the message queue */
 		managed_shared_memory *segment; /*!< pointer to the shared memory segment */
-		
+		MetadataManager *variables; /*!< pointer to the metadata manager for allocated variables */
+	
 	public:
 		/** 
 		 * \brief Constructor.
@@ -114,7 +116,7 @@ class Client {
 		 * \return a pointer to the allocated memory in case of success,
 		 *         NULL in case of failure (variable not defined, allocation error).
 		 */
-		void* alloc(std::string* varname, int32_t iteration);//, const Layout* layout);
+		void* alloc(std::string* varname, int32_t iteration);
 
 		/** 
 		 * \brief THIS FUNCTION IS NOT SUPPORTED YET.
@@ -124,7 +126,8 @@ class Client {
 		 * \param[in] varname : name of the variable to notify (must have been previously allocated).
 		 * \param[in] iteration : iteration of the associated variable.
 		 * 
-		 * \return 0 in case of success, -1 in case of failure.
+		 * \return 0 in case of success,
+                 *        -1 if the variable hasn't been allocated.
 		 */
 		int commit(std::string* varname, int32_t iteration);
 

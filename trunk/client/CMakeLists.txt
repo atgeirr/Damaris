@@ -6,6 +6,8 @@ set(DAMARIS_CLIENT_SRC
 	${DAMARIS_SOURCE_DIR}/client/ClientFortran.cpp
 	${DAMARIS_SOURCE_DIR}/common/Configuration.cpp
 	${DAMARIS_SOURCE_DIR}/common/ConfigHandler.cpp
+	${DAMARIS_SOURCE_DIR}/common/Variable.cpp
+	${DAMARIS_SOURCE_DIR}/common/MetadataManager.cpp
 	${DAMARIS_SOURCE_DIR}/common/Types.cpp 
         ${DAMARIS_SOURCE_DIR}/common/LayoutFactory.cpp
 	${DAMARIS_SOURCE_DIR}/common/Layout.cpp)

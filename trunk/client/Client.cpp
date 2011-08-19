@@ -51,38 +51,67 @@ namespace Damaris {
 		catch(interprocess_exception &ex) {
 			std::cout << ex.what() << std::endl;
 		}
+		variables = new MetadataManager(segment);
 	}
 	
 	void* Client::alloc(std::string* varname, int32_t iteration)
 	{
-		// TODO : this function is not fully implemented
-		return NULL;
+		size_t size = 0;
+		char* buffer = NULL;
 
-		size_t size;
 		Layout* layout = config->getVariableLayout(varname->c_str());
 		if(layout == (Layout*)NULL) {
-			// try retrieving layout from configuration
-			// TODO
-			ERROR("The current version of Damaris cannot make this function work without a layout");
+			ERROR("Unknown variable \"" << varname->c_str() << "\" or undefined layout for this variable");	
 			return NULL;
 		} else {
+			Variable* allocated = variables->get(varname,iteration,id);
+			if(allocated != NULL) return (void*)(allocated->data);
 			size = layout->getRequiredMemoryLength();
 		}
 		// buffer allocation
-		char* buffer = static_cast<char*>(segment->allocate(size));
+		buffer = static_cast<char*>(segment->allocate(size));
+		Variable allocated(*varname,iteration,id,layout,buffer);
+		variables->put(allocated);
 		
-		INFO("Warning: this function is not fully implemented yet!!!");
-		// TODO put the (varname,step,layout,ptr) in a hash table so 
-		// it can be retrieved from the commit function
 		return (void*)buffer;
 	}
 	
 	int Client::commit(std::string* varname, int32_t iteration)
 	{
-		// TODO retrieve the variable name from a hash table somewhere
-		// then send a write-notification
-		ERROR("This function is not implemented");
-		return -1;
+		Variable* allocated = variables->get(varname,iteration,id);
+		if(allocated == NULL)
+			return -1;
+		
+		// create notification message
+		Message* message = new Message();
+		message->sourceID = id;
+
+		if(varname->length() > 63) {
+			WARN("Variable name length bigger than 63, will be truncated");
+			memcpy(message->content,varname->c_str(),63);
+			message->content[63] = '\0';
+		} else {
+			strcpy(message->content,varname->c_str());
+		}
+		
+		Layout* layout = allocated->layout;
+		LayoutFactory::serialize(layout, message->layoutInfo);
+
+		char* buffer = (char*)(allocated->data);
+		message->iteration = iteration;
+		message->type = MSG_VAR;
+		message->handle = segment->get_handle_from_address((void*)buffer);
+                // send message
+		msgQueue->send(message,sizeof(Message),0);
+                // free message
+		INFO("Variable \"" << varname->c_str() "\" has been commited");
+		delete message;
+
+		// remove variable from metadata
+		allocated->data = NULL; // prevent metadata manager from deleting content
+		variables->remove(*allocated);
+
+                return 0;
 	}
 	
 	int Client::write(std::string* varname, int32_t iteration, const void* data)

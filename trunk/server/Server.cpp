@@ -24,7 +24,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <iostream>
 #include <list>
-
 #include "common/Debug.hpp"
 #include "common/Environment.hpp"
 #include "common/Configuration.hpp"
@@ -123,7 +122,7 @@ namespace Damaris {
 	/* process a incoming message */
 	void Server::processMessage(Message* msg) 
 	{
-		
+			
 		std::string name(msg->content);
 		int32_t iteration = msg->iteration;
 		int32_t sourceID = msg->sourceID;
@@ -131,7 +130,8 @@ namespace Damaris {
 		void* data = NULL;
 		
 		if(msg->type == MSG_VAR)
-		{ 
+		{
+			DBG("Received notification for variable " << name.c_str()); 
 			data = segment->get_address_from_handle(msg->handle);
 			layout = LayoutFactory::unserialize(msg->layoutInfo);
 			Variable v(name,iteration,sourceID,layout,data);
