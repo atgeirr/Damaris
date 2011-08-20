@@ -13,7 +13,7 @@
       type(c_ptr) :: cptr
       integer :: ierr,id
       integer :: length
-      character*128,  pointer :: mydata(:)
+      character,  pointer :: mydata(:)
       
  
       id     = 42 
@@ -24,9 +24,18 @@
       cptr = df_alloc("my string",1,ierr)
       call c_f_pointer(cptr,mydata,[length])
 
-      mydata = "bonjour"
+      mydata(1) = 'b'
+      mydata(2) = 'o'
+      mydata(3) = 'n'
+      mydata(4) = 'j'
+      mydata(5) = 'o'
+      mydata(6) = 'u'
+      mydata(7) = 'r'
+      mydata(8) = '\0'
  
       call df_commit("my string",1,ierr);
+
+      call df_signal("my event",1,ierr);
  
       call df_finalize(ierr)
 

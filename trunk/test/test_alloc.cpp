@@ -4,7 +4,7 @@
 
 int main(int argc, char** argv) 
 {
-	int id = 0;
+	int id = 42;
 	char* mydata = NULL;
 
 	if(argc != 2) {
@@ -17,17 +17,18 @@ int main(int argc, char** argv)
 	Damaris::Client* client = new Damaris::Client(&config,id);
 	
 	std::string varname("my string");
+	std::string eventname("my event");
 
-	mydata = (char*)client->alloc(&varname,0);
+	mydata = (char*)client->alloc(&varname,1);
 	if(mydata == NULL) {
 		std::cout << "Error when allocating buffer" << std::endl;
 		exit(0);
 	}
 
 	strcpy(mydata,"this is written in shared memory");
-	
-	client->commit(&varname,0);
-
+		
+	client->commit(&varname,1);
+	client->signal(&eventname,1);
 	delete client;
 	return 0;
 }
