@@ -85,6 +85,12 @@ void FC_FUNC_GLOBAL(df_get_parameter,DF_GET_PARAMETER)
 		*ierr_f = client->getParameter(&paramName,buffer_f);
 	}
 
+void FC_FUNC_GLOBAL(df_kill_server,DF_KILL_SERVER)
+	(int* ierr_f)
+	{
+		*ierr_f = client->killServer();
+	}
+
 void FC_FUNC_GLOBAL(df_finalize,DF_FINALIZE)
 	(int* ierr_f)
 	{

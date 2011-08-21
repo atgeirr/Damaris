@@ -29,11 +29,14 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Damaris {
 	
+	Configuration* Configuration::m_instance = NULL;
+
 	Configuration::Configuration(std::string *cfgFile)
 	{
 		configFile = new std::string(*cfgFile);
 		simulationName 	= NULL;
-		coresPerNode 	= -1;
+		clientsPerNode 	= -1;
+		coresPerNode	= -1;
 		segmentName 	= NULL;
 		segmentSize	= 0;
 		msgQueueName	= NULL;
@@ -70,6 +73,30 @@ namespace Damaris {
 #ifdef __DAMARIS_SERVER
 		delete actionsManager;
 #endif
+	}
+		
+	Configuration* Configuration::getInstance()
+	{
+		return m_instance;
+	}
+
+	void Configuration::initialize(std::string* configFile)
+	{
+		if(m_instance) {
+			WARN("Configuration already initialized.");
+			return;
+		}
+		m_instance = new Configuration(configFile);
+	}
+
+	void Configuration::finalize()
+	{
+		if(m_instance) {
+			delete m_instance;
+			m_instance = NULL;
+		} else {
+			WARN("Configuration not initialized, cannot be finalized.");
+		}
 	}
 
 	bool Configuration::checkConfiguration()

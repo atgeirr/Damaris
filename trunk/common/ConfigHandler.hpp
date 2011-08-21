@@ -63,6 +63,7 @@ class ConfigHandler {
 		XMLCh* TAG_simulation;
 		XMLCh* TAG_nodes;
 		XMLCh* TAG_nodes_cores;
+		XMLCh* TAG_nodes_clients;
 		XMLCh* TAG_nodes_buffer;
 		XMLCh* TAG_nodes_queue;
 		XMLCh* TAG_data;

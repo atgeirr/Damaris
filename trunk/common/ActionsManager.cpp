@@ -81,7 +81,7 @@ void ActionsManager::loadActionFromPlugin(std::string* eventName, std::string* f
 	actions.insert(std::pair<std::string,Action*>(std::string(eventName->c_str()),a));
 }
 
-void ActionsManager::reactToSignal(std::string *sig, int32_t iteration, int32_t sourceID, MetadataManager* mm)
+void ActionsManager::reactToUserSignal(std::string *sig, int32_t iteration, int32_t sourceID, MetadataManager* mm)
 {
 	std::map<std::string,Action*>::iterator it = actions.find(*sig);
 	if(it != actions.end())
@@ -92,7 +92,7 @@ void ActionsManager::reactToSignal(std::string *sig, int32_t iteration, int32_t 
 		ERROR("Unable to process \""<< sig->c_str() <<"\" signal: unknown event name");
 	}	
 }
-	
+
 }
 
 /* 

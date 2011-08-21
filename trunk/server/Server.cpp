@@ -41,7 +41,8 @@ namespace Damaris {
 	/* constructor for embedded mode */
 	Server::Server(std::string* cf, int id)
 	{
-		config = new Configuration(cf);
+		Configuration::initialize(cf);
+		config = Configuration::getInstance();
 		env = new Environment();
 		env->setID(id);
 		init();
@@ -58,7 +59,7 @@ namespace Damaris {
 	/* initialization */
 	void Server::init() 
 	{
-		needStop = false;
+		needStop = config->getClientsPerNode();
 		/* creating shared structures */
 		try {
 			
@@ -95,7 +96,7 @@ namespace Damaris {
 		
 		delete actionsManager;
 		delete metadataManager;
-		delete config;
+		config->finalize();
 	}
 	
 	/* starts the server and enter the main loop */
@@ -108,7 +109,7 @@ namespace Damaris {
 		size_t  recvSize;
 		bool received;
 		
-		while(!needStop) {
+		while(needStop != 0) {
 			received = msgQueue->try_receive(msg,sizeof(Message), recvSize, priority);
 			if(received) {
 				processMessage(msg);
@@ -141,7 +142,11 @@ namespace Damaris {
 		
 		if(msg->type == MSG_SIG) 
 		{
-			actionsManager->reactToSignal(&name,iteration,sourceID,metadataManager);		
+			if(msg->content[0] == '#') {
+				if(name == "#kill") needStop -= 1;
+			} else {
+				actionsManager->reactToUserSignal(&name,iteration,sourceID,metadataManager);		
+			}
 			return;
 		}
 	}

@@ -67,6 +67,11 @@ int DC_get_parameter(const char* param_name, void* buffer)
 	return client->getParameter(&paramName,buffer);
 }
 
+int DC_kill_server()
+{
+	return client->killServer();
+}
+
 int DC_finalize()
 {
 	delete client;

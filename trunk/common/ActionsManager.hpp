@@ -26,6 +26,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <map>
 #include <string>
 
+#include "common/Configuration.hpp"
 #include "common/MetadataManager.hpp"
 #include "common/Action.hpp"
 
@@ -61,7 +62,8 @@ class ActionsManager {
 		 * \param[in] sourceID : source that fired the event.
 		 * \param[in,out] mm : Pointer to the MetadataManager.
 		 */
-		void reactToSignal(std::string* sig, int32_t iteration, int32_t sourceID, MetadataManager* mm);
+		void reactToUserSignal(std::string* sig, int32_t iteration, int32_t sourceID, MetadataManager* mm);
+
 };
 
 }

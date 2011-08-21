@@ -142,6 +142,13 @@ class Client {
 		int getParameter(std::string* paramName, void* buffer);
 		
 		/**
+		 * Sends a signal to the server to shut it down (all clients in node need
+		 * to call this function before the server is actually killed.
+		 * \return 0 in case of success, -1 in case of failure.
+		 */
+		int killServer();
+				
+		/**
 		 * \brief Destructor.
 		 * To be called at the end of the before stopping the client program.
 		 */

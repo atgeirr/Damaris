@@ -36,8 +36,8 @@ namespace Damaris {
  * to distinguish between notifications of writes and user-defined event.
  */	
 	enum msg_type_e {
-		MSG_VAR,
-		MSG_SIG
+		MSG_VAR, // Notifies that a variable has been written
+		MSG_SIG, // Notifies of an incoming event
 	};
 /**
  * The Message structure describes a message, used to communicate

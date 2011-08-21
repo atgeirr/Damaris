@@ -62,6 +62,7 @@ namespace Damaris {
 		TAG_simulation 		= XMLString::transcode("simulation");
 		TAG_nodes 		= XMLString::transcode("nodes");
 		TAG_nodes_cores 	= XMLString::transcode("cores");
+		TAG_nodes_clients	= XMLString::transcode("clients");
 		TAG_nodes_buffer 	= XMLString::transcode("buffer");
  		TAG_nodes_queue 	= XMLString::transcode("queue");
 		TAG_data		= XMLString::transcode("data");
@@ -258,6 +259,19 @@ namespace Damaris {
 						char* char_attr = XMLString::transcode(xmlch_attr);
 						config->setCoresPerNode(atoi(char_attr));
 						INFO("Using " << atoi(char_attr) << " cores per node");
+						XMLString::release(&char_attr);
+					}
+					continue;
+				} else
+				// <clients> parsing
+				if( XMLString::equals(currentElement->getTagName(), TAG_nodes_clients))
+				{
+					const XMLCh* xmlch_attr = currentElement->getAttribute(ATTR_count);
+					if(strcmp((char*)xmlch_attr,"") != 0)
+					{
+						char* char_attr = XMLString::transcode(xmlch_attr);
+						config->setClientsPerNode(atoi(char_attr));
+						INFO("Interacting with " << atoi(char_attr) << " clients per node");
 						XMLString::release(&char_attr);
 					}
 					continue;
@@ -560,6 +574,11 @@ namespace Damaris {
 		if(strcmp("",(char*)xmlch_name) == 0)
 		{
 			ERROR("Event defined without a name, will not be considered.");
+			return;
+		}
+		if(((char*)xmlch_name)[0] == '#')
+		{
+			ERROR("Event name cannot start with \"#\" (reserved for internal events).");
 			return;
 		}
 		if(strcmp("",(char*)xmlch_action) == 0)

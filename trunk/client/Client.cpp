@@ -40,7 +40,8 @@ namespace Damaris {
 	Client::Client(std::string* configfile, int32_t coreID)
 	{
 		/* creates the configuration object from the configuration file */
-		config = new Configuration(configfile);
+		Configuration::initialize(configfile);
+		config = Configuration::getInstance();
 		id = coreID;
 		/* initializes the shared structures */
 		try {
@@ -208,12 +209,26 @@ namespace Damaris {
 			return -1;
 		}
 	}
+		
+	int Client::killServer()
+	{
+		static int killed;
+		if(!killed) {
+			std::string sig("#kill");
+			int res = signal(&sig,0);
+			if(res == 0) killed = 1;
+			return 0;
+		} else {
+			WARN("Trying to send kill signal multiple times to the server.");
+			return -1;
+		}
+	}
 	
 	Client::~Client() 
 	{
 		delete msgQueue;
 		delete segment;
-		delete config;
+		config->finalize();
 		
 		INFO("Client destroyed successfuly");
 	}

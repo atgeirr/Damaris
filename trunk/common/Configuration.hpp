@@ -44,9 +44,12 @@ namespace Damaris {
 	class Configuration {
 		
 	private:
+		static Configuration* m_instance; /*!< Pointer to a unique Configuration object (singleton). */
+
 		std::string* configFile; 	/*!< For information, we keep the name of the configuration file. */
 		std::string* simulationName; 	/*!< Name of the simulation. */
 		int coresPerNode;	 	/*!< Total number of cores per node. */
+		int clientsPerNode;		/*!< Total number of clients per node. */
 		std::string* segmentName; 	/*!< Name of the shared memory segment. */
 		size_t segmentSize; 		/*!< Size of the shared memory segment. */
 		std::string* msgQueueName; 	/*!< Name of the shared messages queue. */
@@ -63,18 +66,37 @@ namespace Damaris {
 		ActionsManager* actionsManager; /*!< Container of actions. */
 #endif
 		bool checkConfiguration(); /*!< Check if the Configuration is correctly loaded. */
-	public:
+	
 		/**
 		 * \brief Constructor.
 		 * \param[in] configName : name of the configuration file to load.
 		 */
 		Configuration(std::string* configName);
-		
+
 		/**
 		 * \brief Destructor.
 		 */
 		~Configuration();
 
+	public:
+		/**
+		 * \brief Retrieve an instance of Configuration (singleton design pattern).
+		 * \return NULL if Configuration::initialize has never been called before, a valid pointer otherwise.
+		 */
+		static Configuration* getInstance();
+
+		/**
+		 * \brief Initializes Configuration with a given configuration file.
+		 * \param[in] configName : name of the configuration file to load.
+		 */
+		static void initialize(std::string* configName);
+		
+		/**
+		 * \brief Finalize (free resources) Configuration.
+		 * If Configuration::getInstance() is called after finalize, NULL is returned.
+		 */
+		static void finalize();
+		
 		/**
 		 * \brief Get the name of the XML file.
 		 * \return Name of the XML file. Do not delete this pointer.
@@ -109,11 +131,20 @@ namespace Damaris {
 		void setDefaultLanguage(language_e l) { defaultLanguage = l; }	
 	
 		/**
-		 * \brief Get the number of cores per node (including those used by Damaris).
+		 * \brief Get the number of clients per node.
+		 */
+		int getClientsPerNode() const { return clientsPerNode; }
+		/**
+		 * \brief Set the number of clients per node.
+		 */
+		void setClientsPerNode(int cpn) { clientsPerNode = cpn; }
+
+		/**
+		 * \brief Get the number of cores per node.
 		 */
 		int getCoresPerNode() const { return coresPerNode; }
 		/**
-		 * \brief Set the number of cores per node (including those used by Damaris).
+		 * \brief Set the number of cores per node.
 		 */
 		void setCoresPerNode(int cpn) { coresPerNode = cpn; }
 
