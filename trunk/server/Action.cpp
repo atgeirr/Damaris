@@ -20,7 +20,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \author Matthieu Dorier
  * \version 0.1
  */
-#include "common/Action.hpp"
+#include "server/Action.hpp"
 
 namespace Damaris {
 	

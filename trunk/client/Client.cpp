@@ -27,7 +27,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 
 #include "common/Debug.hpp"
-#include "common/Configuration.hpp"
+#include "client/ClientConfiguration.hpp"
 #include "common/Layout.hpp"
 #include "common/LayoutFactory.hpp"
 #include "common/Message.hpp"
@@ -40,8 +40,8 @@ namespace Damaris {
 	Client::Client(std::string* configfile, int32_t coreID)
 	{
 		/* creates the configuration object from the configuration file */
-		Configuration::initialize(configfile);
-		config = Configuration::getInstance();
+		ClientConfiguration::initialize(configfile);
+		config = ClientConfiguration::getInstance();
 		id = coreID;
 		/* initializes the shared structures */
 		try {

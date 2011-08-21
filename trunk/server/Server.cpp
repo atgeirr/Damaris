@@ -26,7 +26,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <list>
 #include "common/Debug.hpp"
 #include "common/Environment.hpp"
-#include "common/Configuration.hpp"
+#include "server/ServerConfiguration.hpp"
 #include "common/Message.hpp"
 #include "common/Layout.hpp"
 #include "common/LayoutFactory.hpp"
@@ -41,15 +41,15 @@ namespace Damaris {
 	/* constructor for embedded mode */
 	Server::Server(std::string* cf, int id)
 	{
-		Configuration::initialize(cf);
-		config = Configuration::getInstance();
+		ServerConfiguration::initialize(cf);
+		config = ServerConfiguration::getInstance();
 		env = new Environment();
 		env->setID(id);
 		init();
 	}
 	
 	/* constructor for standalone mode */
-	Server::Server(Configuration* c, Environment *e)
+	Server::Server(ServerConfiguration* c, Environment *e)
 	{
 		config = c;
 		env = e;
@@ -96,7 +96,7 @@ namespace Damaris {
 		
 		delete actionsManager;
 		delete metadataManager;
-		config->finalize();
+		ServerConfiguration::finalize();
 	}
 	
 	/* starts the server and enter the main loop */

@@ -32,7 +32,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/interprocess/ipc/message_queue.hpp>
 #include <boost/interprocess/managed_shared_memory.hpp>
 
-#include "common/Configuration.hpp"
+#include "client/ClientConfiguration.hpp"
 #include "common/MetadataManager.hpp"
 #include "common/Layout.hpp"
 
@@ -54,7 +54,7 @@ namespace Damaris {
 class Client {
 	private:
 		int id; /*!< the ID of the client */
-		Configuration *config; /*!< configuration object */
+		ClientConfiguration *config; /*!< configuration object */
 		message_queue *msgQueue; /*!< pointer to the message queue */
 		managed_shared_memory *segment; /*!< pointer to the shared memory segment */
 		MetadataManager *variables; /*!< pointer to the metadata manager for allocated variables */

@@ -29,9 +29,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 /* TODO: having #define statements is not good, we should have
    a child class of Configuration for the server, and another for
    the Client */
-#ifdef __DAMARIS_SERVER
-	#include "common/ActionsManager.hpp"
-#endif
+//#ifdef __DAMARIS_SERVER
+//	#include "common/ActionsManager.hpp"
+//#endif
 
 namespace Damaris {
 
@@ -58,15 +58,14 @@ namespace Damaris {
 		
 		std::map<std::string,Parameter>* parameters; 	/*!< List of parameters. */
 		std::map<std::string,Layout*>* layouts; 	/*!< List of layouts. Associate layout names to layouts. */
-		/* TODO: right now this association just contains names,
-		   it should further associate a variable name to a VariableInfo object
-		   containing ALL informations related to a variable */
 		std::map<std::string,std::string>* variableLayouts; /*!< Association from variable names to layout names. */
-#ifdef __DAMARIS_SERVER
-		ActionsManager* actionsManager; /*!< Container of actions. */
-#endif
+
+//#ifdef __DAMARIS_SERVER
+//		ActionsManager* actionsManager; /*!< Container of actions. */
+//#endif
+	protected:
 		bool checkConfiguration(); /*!< Check if the Configuration is correctly loaded. */
-	
+
 		/**
 		 * \brief Constructor.
 		 * \param[in] configName : name of the configuration file to load.
@@ -103,14 +102,14 @@ namespace Damaris {
 		 */
 		std::string* getFileName() { return configFile; }
 
-#ifdef __DAMARIS_SERVER	
-		/**
-		 * \brief Get the ActionManager initialized within the configuration.
-		 * Only available for Server.
-		 * \return The ActionManager.
-		 */
-		ActionsManager* getActionsManager();
-#endif
+//#ifdef __DAMARIS_SERVER	
+//		/**
+//		 * \brief Get the ActionManager initialized within the configuration.
+//		 * Only available for Server.
+//		 * \return The ActionManager.
+//		 */
+//		ActionsManager* getActionsManager();
+//#endif
 		
 		/**
 		 * \brief Get the name of the simulation.
@@ -251,7 +250,7 @@ namespace Damaris {
 		 * \param[in] action : Name of the function to load.
 		 * \param[in] plugin : Name of the dynamic library to load.
 		 */	
-		void setEvent(const char* name, const char* action, const char* plugin);	
+		virtual void setEvent(const char* name, const char* action, const char* plugin) = 0;	
 };
 
 }

@@ -30,7 +30,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/Configuration.hpp"
 #include "common/MetadataManager.hpp"
 #include "common/Variable.hpp"
-#include "common/ActionsManager.hpp"
+#include "server/ActionsManager.hpp"
 
 namespace Damaris {
 	

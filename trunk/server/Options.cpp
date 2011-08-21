@@ -103,8 +103,8 @@ Options::Options(int argc, char** argv)
 	configFile = NULL;	
 	if (vm.count("configuration")) {
 		configFile = new std::string(vm["configuration"].as<std::string>());
-		Configuration::initialize(configFile);
-		config = Configuration::getInstance();
+		ServerConfiguration::initialize(configFile);
+		config = ServerConfiguration::getInstance();
 	} else {
 		ERROR("No configuration file provided, use --configuration=<file.xml> or -C <file.xml>");
 		exit(-1);
@@ -120,7 +120,7 @@ std::string* Options::getConfigFile()
 	return configFile;
 }
 
-Configuration* Options::getConfiguration()
+ServerConfiguration* Options::getServerConfiguration()
 {
 	return config;
 }

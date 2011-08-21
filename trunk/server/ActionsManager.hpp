@@ -28,7 +28,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "common/Configuration.hpp"
 #include "common/MetadataManager.hpp"
-#include "common/Action.hpp"
+#include "server/Action.hpp"
 
 namespace Damaris {
 

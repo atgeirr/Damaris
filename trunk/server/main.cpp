@@ -64,7 +64,7 @@ int main(int argc, char** argv)
 	INFO("Initializing server");
 	/* Initializing the server with a Configuration object 
 	   pre-initialized by the Options object */
-	server = new Damaris::Server(opt->getConfiguration(),opt->getEnvironment());
+	server = new Damaris::Server(opt->getServerConfiguration(),opt->getEnvironment());
 	delete opt;
 	INFO("Starting server");
 

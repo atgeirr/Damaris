@@ -76,6 +76,13 @@ int 	DC_signal(const char* signal_name, int32_t iteration);
 int 	DC_get_parameter(const char* param_name, void* buffer);
 
 /**
+ * \brief Send a kill signal to the server.
+ * \see Damaris::Client::killServer
+ * \return 0 in case of success, -1 in case of failure.
+ */
+int	DC_kill_server();
+
+/**
  * \brief Call client's destructor.
  * \see Damaris::Client::~Client
  * \return 0

@@ -29,8 +29,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Damaris {
 	
-	Configuration* Configuration::m_instance = NULL;
-
 	Configuration::Configuration(std::string *cfgFile)
 	{
 		configFile = new std::string(*cfgFile);
@@ -42,9 +40,9 @@ namespace Damaris {
 		msgQueueName	= NULL;
 		msgQueueSize	= 0;
 		defaultLanguage = LG_UNKNOWN;
-#ifdef __DAMARIS_SERVER
-		actionsManager   = new ActionsManager();
-#endif
+//#ifdef __DAMARIS_SERVER
+//		actionsManager   = new ActionsManager();
+//#endif
 		/* initializing the parameters list */
 		parameters = new std::map<std::string,Parameter>();
 		/* initializing the layouts list */
@@ -52,15 +50,15 @@ namespace Damaris {
 		/* initializing the list of variables layouts */
 		variableLayouts = new std::map<std::string,std::string>();
 		/* here we create the ConfigHandler to load the xml file */
-		Damaris::ConfigHandler *configHandler = new Damaris::ConfigHandler(this);
-		try {
-			configHandler->readConfigFile(configFile);
-		} catch(...) {
-			exit(-1);
-		}
-		/* the ConfigHandler must be deleted afterward */
-		delete configHandler;
-		if(!(this->checkConfiguration())) exit(-1);
+//		Damaris::ConfigHandler *configHandler = new Damaris::ConfigHandler(this);
+//		try {
+//			configHandler->readConfigFile(configFile);
+//		} catch(...) {
+//			exit(-1);
+//		}
+//		/* the ConfigHandler must be deleted afterward */
+//		delete configHandler;
+//		if(!(this->checkConfiguration())) exit(-1);
 	}
 
 	Configuration::~Configuration()
@@ -70,34 +68,35 @@ namespace Damaris {
 		delete configFile;
 		delete msgQueueName;
 		delete segmentName;
-#ifdef __DAMARIS_SERVER
-		delete actionsManager;
-#endif
+//#ifdef __DAMARIS_SERVER
+//		delete actionsManager;
+//#endif
 	}
 		
-	Configuration* Configuration::getInstance()
-	{
-		return m_instance;
-	}
+//	Configuration* Configuration::getInstance()
+//	{
+//		return m_instance;
+//	}
 
-	void Configuration::initialize(std::string* configFile)
-	{
-		if(m_instance) {
-			WARN("Configuration already initialized.");
-			return;
-		}
-		m_instance = new Configuration(configFile);
-	}
+//	void Configuration::initialize(std::string* configFile)
+//	{
+//		
+//		if(m_instance) {
+//			WARN("Configuration already initialized.");
+//			return;
+//		}
+//		m_instance = new Configuration(configFile);
+//	}
 
-	void Configuration::finalize()
-	{
-		if(m_instance) {
-			delete m_instance;
-			m_instance = NULL;
-		} else {
-			WARN("Configuration not initialized, cannot be finalized.");
-		}
-	}
+//	void Configuration::finalize()
+//	{
+//		if(m_instance) {
+//			delete m_instance;
+//			m_instance = NULL;
+//		} else {
+//			WARN("Configuration not initialized, cannot be finalized.");
+//		}
+//	}
 
 	bool Configuration::checkConfiguration()
 	{
@@ -121,12 +120,12 @@ namespace Damaris {
 		return res;
 	}
 
-#ifdef __DAMARIS_SERVER	
-	ActionsManager* Configuration::getActionsManager()
-	{
-		return actionsManager;
-	}
-#endif
+//#ifdef __DAMARIS_SERVER	
+//	ActionsManager* Configuration::getActionsManager()
+//	{
+//		return actionsManager;
+//	}
+//#endif
 
 	void Configuration::setParameter(const char* name, const char* type, const char* value)
 	{
@@ -304,15 +303,15 @@ namespace Damaris {
 		return 0;
 	}
 
-	void Configuration::setEvent(const char* name, const char* action, const char* plugin)
-	{
-#ifdef __DAMARIS_SERVER 
-		std::string actionName(name);
-		std::string actionFunc(action);
-		std::string actionFile(plugin);
-		INFO("In setEvent, registering " << name);
-		actionsManager->loadActionFromPlugin(&actionName, &actionFile, &actionFunc);
-#endif	
-	}
+//	void Configuration::setEvent(const char* name, const char* action, const char* plugin)
+//	{
+//#ifdef __DAMARIS_SERVER 
+//		std::string actionName(name);
+//		std::string actionFunc(action);
+//		std::string actionFile(plugin);
+//		INFO("In setEvent, registering " << name);
+//		actionsManager->loadActionFromPlugin(&actionName, &actionFile, &actionFunc);
+//#endif	
+//	}
 }
 

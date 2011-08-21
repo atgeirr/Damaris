@@ -1,10 +1,12 @@
 cmake_minimum_required (VERSION 2.8)
-project (DAMARIS)
 
 enable_language (Fortran OPTIONAL)
 
-#include(CMakeForceCompiler)
-#CMAKE_FORCE_CXX_COMPILER(mpicxx "MPI C++ Compiler")
+include(CMakeForceCompiler)
+CMAKE_FORCE_CXX_COMPILER(mpicxx "MPI C++ Compiler")
+CMAKE_FORCE_C_COMPILER(mpicc "MPI C Compiler")
+
+project(DAMARIS)
 
 set(EXTERNAL_ROOT ~/deploy)
 

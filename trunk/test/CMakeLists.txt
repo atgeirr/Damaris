@@ -14,3 +14,7 @@ target_link_libraries (test_cpp_alloc ${BOOST_LIBRARIES} xerces-c damaris rt)
 
 add_executable (test_c ${DAMARIS_SOURCE_DIR}/test/test.c)
 target_link_libraries (test_c ${BOOST_LIBRARIES} xerces-c damaris rt)
+
+add_executable (test_mpi ${DAMARIS_SOURCE_DIR}/test/test_mpi.c)
+target_link_libraries (test_mpi ${BOOST_LIBRARIES} xerces-c damaris-server damaris rt dl)
+
