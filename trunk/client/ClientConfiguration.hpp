@@ -15,8 +15,8 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 
-#ifndef __DAMARIS_SERVER_CONFIG_H
-#define __DAMARIS_SERVER_CONFIG_H
+#ifndef __DAMARIS_CLIENT_CONFIG_H
+#define __DAMARIS_CLIENT_CONFIG_H
 
 #include <map>
 #include <list>
@@ -27,10 +27,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 namespace Damaris {
 
 	/** 
-	 * The class Configuration holds all informations extrated from
-	 * both the command lines (for the server) and the external configuration
-	 * file. It is independant of the format of this configuration file
-	 * (which is loaded through the ConfigHandler object).
+	 * The class ClientConfiguration is a child class of Configuration,
+	 * implementing configuration features that are specific to the Client.
 	 */
 	class ClientConfiguration : public Configuration {
 		
@@ -50,24 +48,28 @@ namespace Damaris {
 
 	public:
 		/**
-		 * \brief Retrieve an instance of Configuration (singleton design pattern).
-		 * \return NULL if Configuration::initialize has never been called before, a valid pointer otherwise.
+		 * \brief Retrieve an instance of ClientConfiguration (singleton design pattern).
+		 * \return NULL if ClientConfiguration::initialize has never been called before, 
+		 *         a valid pointer otherwise.
 		 */
 		static ClientConfiguration* getInstance();
 
 		/**
-		 * \brief Initializes Configuration with a given configuration file.
+		 * \brief Initializes ClientConfiguration with a given configuration file.
 		 * \param[in] configName : name of the configuration file to load.
 		 */
 		static void initialize(std::string* configName);
 		
 		/**
-		 * \brief Finalize (free resources) Configuration.
-		 * If Configuration::getInstance() is called after finalize, NULL is returned.
+		 * \brief Finalize (free resources) ClientConfiguration.
+		 * If ClientConfiguration::getInstance() is called after finalize, NULL is returned.
 		 */
 		static void finalize();
 		
-		
+		/**
+		 * For ClientConfiguration, this function is empty since the client doesn't
+		 * have to play with plugins loading.
+		 */ 
 		void setEvent(const char* name, const char* action, const char* plugin);
 };
 

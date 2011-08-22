@@ -26,13 +26,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/Parameter.hpp"
 #include "common/Layout.hpp"
 
-/* TODO: having #define statements is not good, we should have
-   a child class of Configuration for the server, and another for
-   the Client */
-//#ifdef __DAMARIS_SERVER
-//	#include "common/ActionsManager.hpp"
-//#endif
-
 namespace Damaris {
 
 	/** 
@@ -60,9 +53,6 @@ namespace Damaris {
 		std::map<std::string,Layout*>* layouts; 	/*!< List of layouts. Associate layout names to layouts. */
 		std::map<std::string,std::string>* variableLayouts; /*!< Association from variable names to layout names. */
 
-//#ifdef __DAMARIS_SERVER
-//		ActionsManager* actionsManager; /*!< Container of actions. */
-//#endif
 	protected:
 		bool checkConfiguration(); /*!< Check if the Configuration is correctly loaded. */
 
@@ -102,15 +92,6 @@ namespace Damaris {
 		 */
 		std::string* getFileName() { return configFile; }
 
-//#ifdef __DAMARIS_SERVER	
-//		/**
-//		 * \brief Get the ActionManager initialized within the configuration.
-//		 * Only available for Server.
-//		 * \return The ActionManager.
-//		 */
-//		ActionsManager* getActionsManager();
-//#endif
-		
 		/**
 		 * \brief Get the name of the simulation.
 		 */

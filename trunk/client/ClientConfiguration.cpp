@@ -25,7 +25,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/Language.hpp"
 #include "common/Types.hpp"
 #include "common/ConfigHandler.hpp"
-#include "common/Configuration.hpp"
 #include "client/ClientConfiguration.hpp"
 
 namespace Damaris {

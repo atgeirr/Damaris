@@ -28,10 +28,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 namespace Damaris {
 
 	/** 
-	 * The class Configuration holds all informations extrated from
-	 * both the command lines (for the server) and the external configuration
-	 * file. It is independant of the format of this configuration file
-	 * (which is loaded through the ConfigHandler object).
+	 * The class ServerConfiguration implements the functions that are specific
+	 * to the configuration of the server, in particular it holds an ActionsManager.
 	 */
 	class ServerConfiguration : public Configuration {
 		
@@ -71,12 +69,15 @@ namespace Damaris {
 		static void finalize();
 		
 		/**
-		 * \brief Get the ActionManager initialized within the configuration.
+		 * \brief Get the ActionsManager initialized within the configuration.
 		 * Only available for Server.
 		 * \return The ActionManager.
 		 */
 		ActionsManager* getActionsManager();
 		
+		/**
+		 * \brief Adds an event to the ActionsManager and load associated plugins.
+		 */
 		void setEvent(const char* name, const char* action, const char* plugin);
 };
 
