@@ -1,0 +1,35 @@
+<map id="G" name="G">
+<area shape="rect" href="$_client_8cpp.html" title="client/Client.cpp" alt="" coords="736,315,851,344"/>
+<area shape="rect" href="$_client_configuration_8cpp.html" title="client/ClientConfiguration.cpp" alt="" coords="499,315,688,344"/>
+<area shape="rect" href="$_configuration_8cpp.html" title="common/Configuration.cpp" alt="" coords="43,315,219,344"/>
+<area shape="rect" href="$_layout_8hpp.html" title="common/Layout.hpp" alt="" coords="1111,83,1249,112"/>
+<area shape="rect" href="$_server_configuration_8cpp.html" title="server/ServerConfiguration.cpp" alt="" coords="508,547,708,576"/>
+<area shape="rect" href="$_parameter_8hpp.html" title="common/Parameter.hpp" alt="" coords="765,83,925,112"/>
+<area shape="rect" href="$_types_8cpp.html" title="common/Types.cpp" alt="" coords="1273,83,1409,112"/>
+<area shape="rect" href="$_client_8hpp.html" title="client/Client.hpp" alt="" coords="1051,315,1165,344"/>
+<area shape="rect" href="$_configuration_8hpp.html" title="common/Configuration.hpp" alt="" coords="757,160,933,189"/>
+<area shape="rect" href="$_server_8cpp.html" title="server/Server.cpp" alt="" coords="1493,624,1616,653"/>
+<area shape="rect" href="$_layout_8cpp.html" title="common/Layout.cpp" alt="" coords="1253,160,1392,189"/>
+<area shape="rect" href="$_layout_factory_8cpp.html" title="common/LayoutFactory.cpp" alt="" coords="1627,160,1811,189"/>
+<area shape="rect" href="$_metadata_manager_8hpp.html" title="common/MetadataManager.hpp" alt="" coords="1428,237,1631,267"/>
+<area shape="rect" href="$_variable_8hpp.html" title="common/Variable.hpp" alt="" coords="1456,160,1603,189"/>
+<area shape="rect" href="$_client_c_8cpp.html" title="client/ClientC.cpp" alt="" coords="1203,392,1325,421"/>
+<area shape="rect" href="$test_8cpp.html" title="test/test.cpp" alt="" coords="1373,392,1467,421"/>
+<area shape="rect" href="$test__alloc_8cpp.html" title="test/test_alloc.cpp" alt="" coords="1051,392,1179,421"/>
+<area shape="rect" href="$_client_configuration_8hpp.html" title="client/ClientConfiguration.hpp" alt="" coords="685,237,875,267"/>
+<area shape="rect" href="$_config_handler_8hpp.html" title="common/ConfigHandler.hpp" alt="" coords="256,237,437,267"/>
+<area shape="rect" href="$_actions_manager_8cpp.html" title="server/ActionsManager.cpp" alt="" coords="1925,392,2104,421"/>
+<area shape="rect" href="$_actions_manager_8hpp.html" title="server/ActionsManager.hpp" alt="" coords="1541,392,1720,421"/>
+<area shape="rect" href="$main_8cpp.html" title="server/main.cpp" alt="" coords="1377,547,1492,576"/>
+<area shape="rect" href="$_server_configuration_8hpp.html" title="server/ServerConfiguration.hpp" alt="" coords="1051,469,1251,499"/>
+<area shape="rect" href="$_config_handler_8cpp.html" title="common/ConfigHandler.cpp" alt="" coords="293,315,475,344"/>
+<area shape="rect" href="$_server_8hpp.html" title="server/Server.hpp" alt="" coords="1569,547,1692,576"/>
+<area shape="rect" href="$_server_c_8cpp.html" title="server/ServerC.cpp" alt="" coords="1640,624,1773,653"/>
+<area shape="rect" href="$_options_8hpp.html" title="server/Options.hpp" alt="" coords="1085,547,1216,576"/>
+<area shape="rect" href="$_options_8cpp.html" title="server/Options.cpp" alt="" coords="1085,624,1216,653"/>
+<area shape="rect" href="$_metadata_manager_8cpp.html" title="common/MetadataManager.cpp" alt="" coords="1824,315,2027,344"/>
+<area shape="rect" href="$template_8cpp.html" title="plugins/template.cpp" alt="" coords="1341,315,1483,344"/>
+<area shape="rect" href="$_action_8cpp.html" title="server/Action.cpp" alt="" coords="1507,315,1629,344"/>
+<area shape="rect" href="$_action_8hpp.html" title="server/Action.hpp" alt="" coords="1677,315,1800,344"/>
+<area shape="rect" href="$_variable_8cpp.html" title="common/Variable.cpp" alt="" coords="2032,237,2179,267"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="G" name="G">
+<area shape="rect" href="$_actions_manager_8cpp.html" title="common/ActionsManager.cpp" alt="" coords="5,83,200,112"/>
+<area shape="rect" href="$_config_handler_8cpp.html" title="common/ConfigHandler.cpp" alt="" coords="248,83,429,112"/>
+<area shape="rect" href="$_config_handler_8hpp.html" title="common/ConfigHandler.hpp" alt="" coords="477,83,659,112"/>
+<area shape="rect" href="$_configuration_8cpp.html" title="common/Configuration.cpp" alt="" coords="544,160,720,189"/>
+<area shape="rect" href="$_layout_8cpp.html" title="common/Layout.cpp" alt="" coords="733,83,872,112"/>
+<area shape="rect" href="$_metadata_manager_8cpp.html" title="common/MetadataManager.cpp" alt="" coords="896,83,1099,112"/>
+<area shape="rect" href="$main_8cpp.html" title="server/main.cpp" alt="" coords="1123,83,1237,112"/>
+<area shape="rect" href="$_options_8cpp.html" title="server/Options.cpp" alt="" coords="1285,83,1416,112"/>
+<area shape="rect" href="$_server_8cpp.html" title="server/Server.cpp" alt="" coords="1440,83,1563,112"/>
+</map>

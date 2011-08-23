@@ -1,0 +1,17 @@
+<map id="G" name="G">
+<area shape="rect" href="$_configuration_8hpp.html" title="common/Configuration.hpp" alt="" coords="845,83,1021,112"/>
+<area shape="rect" href="$_client_8cpp.html" title="client/Client.cpp" alt="" coords="5,160,120,189"/>
+<area shape="rect" href="$_client_8hpp.html" title="client/Client.hpp" alt="" coords="168,160,283,189"/>
+<area shape="rect" href="$_actions_manager_8cpp.html" title="common/ActionsManager.cpp" alt="" coords="307,160,501,189"/>
+<area shape="rect" href="$_config_handler_8cpp.html" title="common/ConfigHandler.cpp" alt="" coords="549,160,731,189"/>
+<area shape="rect" href="$_config_handler_8hpp.html" title="common/ConfigHandler.hpp" alt="" coords="779,160,960,189"/>
+<area shape="rect" href="$_configuration_8cpp.html" title="common/Configuration.cpp" alt="" coords="845,237,1021,267"/>
+<area shape="rect" href="$main_8cpp.html" title="server/main.cpp" alt="" coords="1035,160,1149,189"/>
+<area shape="rect" href="$_options_8hpp.html" title="server/Options.hpp" alt="" coords="1197,160,1328,189"/>
+<area shape="rect" href="$_server_8cpp.html" title="server/Server.cpp" alt="" coords="1328,237,1451,267"/>
+<area shape="rect" href="$_server_8hpp.html" title="server/Server.hpp" alt="" coords="1403,160,1525,189"/>
+<area shape="rect" href="$_client_c_8cpp.html" title="client/ClientC.cpp" alt="" coords="85,237,208,267"/>
+<area shape="rect" href="$test_8cpp.html" title="test/test.cpp" alt="" coords="256,237,349,267"/>
+<area shape="rect" href="$_options_8cpp.html" title="server/Options.cpp" alt="" coords="1173,237,1304,267"/>
+<area shape="rect" href="$_server_c_8cpp.html" title="server/ServerC.cpp" alt="" coords="1475,237,1608,267"/>
+</map>

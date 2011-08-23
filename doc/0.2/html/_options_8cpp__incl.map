@@ -1,0 +1,15 @@
+<map id="G" name="G">
+<area shape="rect" href="$_options_8hpp.html" title="server/Options.hpp" alt="" coords="1479,83,1609,112"/>
+<area shape="rect" href="$_debug_8hpp.html" title="common/Debug.hpp" alt="" coords="2352,83,2488,112"/>
+<area shape="rect" href="$_server_configuration_8hpp.html" title="server/ServerConfiguration.hpp" alt="" coords="1480,160,1680,189"/>
+<area shape="rect" href="$_environment_8hpp.html" title="common/Environment.hpp" alt="" coords="1957,160,2128,189"/>
+<area shape="rect" href="$_configuration_8hpp.html" title="common/Configuration.hpp" alt="" coords="1441,392,1617,421"/>
+<area shape="rect" href="$_actions_manager_8hpp.html" title="server/ActionsManager.hpp" alt="" coords="1400,237,1579,267"/>
+<area shape="rect" href="$_language_8hpp.html" title="common/Language.hpp" alt="" coords="1557,469,1712,499"/>
+<area shape="rect" href="$_parameter_8hpp.html" title="common/Parameter.hpp" alt="" coords="1171,547,1331,576"/>
+<area shape="rect" href="$_layout_8hpp.html" title="common/Layout.hpp" alt="" coords="345,547,484,576"/>
+<area shape="rect" href="$_types_8hpp.html" title="common/Types.hpp" alt="" coords="847,624,983,653"/>
+<area shape="rect" href="$_metadata_manager_8hpp.html" title="common/MetadataManager.hpp" alt="" coords="781,392,984,421"/>
+<area shape="rect" href="$_action_8hpp.html" title="server/Action.hpp" alt="" coords="1329,315,1452,344"/>
+<area shape="rect" href="$_variable_8hpp.html" title="common/Variable.hpp" alt="" coords="27,469,173,499"/>
+</map>

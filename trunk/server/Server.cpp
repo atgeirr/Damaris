@@ -154,7 +154,7 @@ namespace Damaris {
 	/* indicate that the server should stop */
 	void Server::stop()
 	{
-		needStop = true;
+		needStop = 0;
 	}
 	
 }
