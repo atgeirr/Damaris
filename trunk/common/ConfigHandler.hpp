@@ -41,6 +41,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <xercesc/sax2/DefaultHandler.hpp>
 
 #include "common/Debug.hpp"
+#include "common/Group.hpp"
 #include "common/Configuration.hpp"
 
 using namespace xercesc;
@@ -56,6 +57,7 @@ class ConfigHandler {
 	private:
 		XercesDOMParser *configFileParser; 
 		Configuration* config;
+		Group* currentGroup;
 
 		bool nodeParsed;
 
@@ -69,6 +71,7 @@ class ConfigHandler {
 		XMLCh* TAG_data;
 		XMLCh* TAG_data_parameter;
 		XMLCh* TAG_data_variable;
+		XMLCh* TAG_data_group;
 		XMLCh* TAG_data_layout;
 		XMLCh* TAG_actions;
 		XMLCh* TAG_actions_event;
@@ -84,12 +87,14 @@ class ConfigHandler {
 		XMLCh* ATTR_value;
 		XMLCh* ATTR_action;
 		XMLCh* ATTR_using;
+		XMLCh* ATTR_enabled;
 
 		void readNodesConfig(DOMElement* elem) 		throw();
 		void readDataConfig(DOMElement* elem) 		throw();
 		void readActionsConfig(DOMElement* elem)	throw();
 		void readParameterInfo(DOMElement* elem) 	throw();
 		void readVariableInfo(DOMElement* elem) 	throw();
+		void readGroupInfo(DOMElement*)			throw();
 		void readLayoutInfo(DOMElement* elem)		throw();
 		void readEventInfo(DOMElement* elem)		throw();
 	public:

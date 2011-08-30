@@ -18,6 +18,7 @@ set(DAMARIS_SERVER_PRG_SRC
 		${DAMARIS_SOURCE_DIR}/common/Layout.cpp
 		${DAMARIS_SOURCE_DIR}/common/LayoutFactory.cpp
 		${DAMARIS_SOURCE_DIR}/common/MetadataManager.cpp
+		${DAMARIS_SOURCE_DIR}/common/Group.cpp
 		${DAMARIS_SOURCE_DIR}/common/Variable.cpp)
 
 add_library (damaris-server ${DAMARIS_SERVER_LIB_SRC})

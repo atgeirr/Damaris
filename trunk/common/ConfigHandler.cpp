@@ -40,6 +40,7 @@ namespace Damaris {
 	{
 		config = c;
 		nodeParsed = false;
+		currentGroup = new Group("");
 
 		/* try initializing the XML utilities */
 		try
@@ -67,6 +68,7 @@ namespace Damaris {
  		TAG_nodes_queue 	= XMLString::transcode("queue");
 		TAG_data		= XMLString::transcode("data");
 		TAG_data_variable	= XMLString::transcode("variable");
+		TAG_data_group		= XMLString::transcode("group");
 		TAG_data_layout		= XMLString::transcode("layout");
 		TAG_data_parameter	= XMLString::transcode("parameter");
 		TAG_actions		= XMLString::transcode("actions");
@@ -83,6 +85,7 @@ namespace Damaris {
 		ATTR_value		= XMLString::transcode("value");
 		ATTR_action		= XMLString::transcode("action");
 		ATTR_using		= XMLString::transcode("using");
+		ATTR_enabled		= XMLString::transcode("enabled");
 	}
 
 	ConfigHandler::~ConfigHandler()
@@ -101,6 +104,7 @@ namespace Damaris {
 			XMLString::release(&TAG_data);
 			XMLString::release(&TAG_data_parameter);
 			XMLString::release(&TAG_data_variable);
+			XMLString::release(&TAG_data_group);
 			XMLString::release(&TAG_data_layout);
 			XMLString::release(&TAG_actions);
 			XMLString::release(&TAG_actions_event);
@@ -115,6 +119,7 @@ namespace Damaris {
 			XMLString::release(&ATTR_value);
 			XMLString::release(&ATTR_action);
 			XMLString::release(&ATTR_using);
+			XMLString::release(&ATTR_enabled);
 
 		} catch( ... ) {
 			ERROR("Error while releasing Xerces-C resources");
@@ -336,9 +341,9 @@ namespace Damaris {
 	/* Parse configuration within the <data> element  */
 	void ConfigHandler::readDataConfig(DOMElement* elem) throw ()
 	{
-		INFO("Parsing configuration for data");
-		// elem is a <data> element, it can have the following childs
-		// <variable>, <layout>, <parameter>
+		// elem is a <data> or a <group> element, 
+		// it can have the following childs
+		// <variable>, <layout>, <parameter>, <group>
 		// iterates on children
 		DOMNodeList* children = elem->getChildNodes();
 		const  XMLSize_t nodeCount = children->getLength();
@@ -368,6 +373,13 @@ namespace Damaris {
 				if( XMLString::equals(currentElement->getTagName(), TAG_data_variable))
 				{
 					readVariableInfo(currentElement);
+					continue;
+				}
+				// Does the element equals <group>
+				if( XMLString::equals(currentElement->getTagName(), TAG_data_group))
+				{
+					// enters in a group
+					readGroupInfo(currentElement);
 					continue;
 				}
 			}
@@ -465,12 +477,61 @@ namespace Damaris {
 		/* inserting variable into configuration */
 		if(strcmp("",attr_layout) != 0)
 			config->setVariableInfo(attr_name,attr_layout);
-		else
+		else {
 			config->setVariableInfo(attr_name,(char*)NULL);
-		
+			WARN("Variable \"" << attr_name << "\" defined without a layout.");
+		}
 		/* releasing memory */
 		XMLString::release(&attr_name);
 		XMLString::release(&attr_layout);
+	}
+
+	/* this function is called when findin a <group> tag */
+	void ConfigHandler::readGroupInfo(DOMElement* elem) throw()
+	{
+		/* getting attributes */
+		const XMLCh* xmlch_name = elem->getAttribute(ATTR_name);
+		const XMLCh* xmlch_enabled = elem->getAttribute(ATTR_enabled);
+		
+		bool is_enabled = false;
+		/* checking attributes */
+		if(strcmp("",(char*)xmlch_name) == 0)
+		{
+			ERROR("Group must have a \"name\" attribute. The groupe will be ignored.");
+			return;
+		}
+
+		/* converting into char */
+		char* attr_name = XMLString::transcode(xmlch_name);
+		char* attr_enabled = XMLString::transcode(xmlch_enabled);
+
+		/* check if enabled */
+		if(boost::iequals(std::string(attr_enabled),std::string("yes")))
+		{
+			is_enabled = true;
+		} 
+		else if(boost::iequals(std::string(attr_enabled),std::string("no")))
+		{
+			is_enabled = false;
+		}
+		else
+		{
+			WARN("Attribute \"enabled\" missdefined for group \"" << attr_name <<"\", will be disabled by default.");
+		}
+ 
+		/* parse recursively if enabled */
+		if(is_enabled) {
+			/* change the scope */
+			Group* newGroup = new Group(currentGroup,attr_name);
+			Group* oldGroup = currentGroup;
+			currentGroup->addChild(newGroup);
+			currentGroup = newGroup;
+			/* parse content of the group */
+			readDataConfig(elem);
+			
+			/* reset old group */
+			currentGroup = oldGroup;
+		}
 	}
 
 	/* this function is called when finding a <layout> tag */

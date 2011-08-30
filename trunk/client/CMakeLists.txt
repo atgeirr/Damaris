@@ -8,6 +8,7 @@ set(DAMARIS_CLIENT_SRC
 	${DAMARIS_SOURCE_DIR}/common/Configuration.cpp
 	${DAMARIS_SOURCE_DIR}/client/ClientConfiguration.cpp
 	${DAMARIS_SOURCE_DIR}/common/ConfigHandler.cpp
+	${DAMARIS_SOURCE_DIR}/common/Group.cpp
 	${DAMARIS_SOURCE_DIR}/common/Variable.cpp
 	${DAMARIS_SOURCE_DIR}/common/MetadataManager.cpp
 	${DAMARIS_SOURCE_DIR}/common/Types.cpp 
