@@ -26,6 +26,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/Parameter.hpp"
 #include "common/Layout.hpp"
 #include "common/Group.hpp"
+#include "common/Calc.hpp"
 
 namespace Damaris {
 
@@ -36,7 +37,7 @@ namespace Damaris {
 	 * (which is loaded through the ConfigHandler object).
 	 */
 	class Configuration {
-		
+				
 	private:
 		static Configuration* m_instance; /*!< Pointer to a unique Configuration object (singleton). */
 
@@ -50,11 +51,16 @@ namespace Damaris {
 		size_t msgQueueSize; 		/*!< Size (in number of messages) of the queue of messages. */
 		language_e defaultLanguage;	/*!< Default language (C, Fortran or Unknown) */
 		
-		std::map<std::string,Parameter>* parameters; 	/*!< List of parameters. */
+		//std::map<std::string,Parameter>* parameters; 	/*!< List of parameters. */
+		
+		std::map<std::string,Parameter>* parameters;	 	/*!< List of parameters. */
+		std::map<std::string,int> intparams;		/*!< Subset of parameters that are integers */
+		// TODO : use boost::any to handle parameters properly
 		std::map<std::string,Layout*>* layouts; 	/*!< List of layouts. Associate layout names to layouts. */
 		std::map<std::string,std::string>* variableLayouts; /*!< Association from variable names to layout names. */
 		
 		Group* dataHierarchy; /*!< Parent Group for the data (parameters, variables, layouts) hierarchy. */
+		Calc<std::string::const_iterator,std::map<std::string,int> >* layoutInterp; /*!< Parser for layout interpretation */
 
 	protected:
 		bool checkConfiguration(); /*!< Check if the Configuration is correctly loaded. */
@@ -216,10 +222,10 @@ namespace Damaris {
 		 * \brief Set a layout by its name, type, list of dimensions and language.
 		 * \param[in] name : Name of the layout.
 		 * \param[in] type : Type of the data to be hold.
-		 * \param[in] dims : List of the dimensions (see Layout).
+		 * \param[in] descriptor : string descriptor for the list of dimensions.
 		 * \param[in] l : Langage for the layout.
 		 */
-		void setLayout(const char* name, const char* type, const std::list<int>* dims, language_e l);
+		void setLayout(const char* name, const char* type, const char* descriptor, language_e l);
 		/**
 		 * \brief Get the layout by its name.
 		 * \param[in] name : Name of the layout to retrieve.

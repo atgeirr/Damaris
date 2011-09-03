@@ -567,18 +567,17 @@ namespace Damaris {
 		char* attr_type = XMLString::transcode(xmlch_type);
 		char* attr_dimensions = XMLString::transcode(xmlch_dimensions);
 		char* attr_language = XMLString::transcode(xmlch_language);
-
+// OLD
 		/* interpreting dimensions */
-		std::list<int>* dims = new std::list<int>();
+/*		std::list<int>* dims = new std::list<int>();
 		std::vector<std::string> strs;
 		boost::algorithm::split(strs, attr_dimensions, boost::is_any_of(std::string(",")));
-		
+			
 		for(int i=0; i < (signed int)strs.size(); i++) {
-			/* try scanning an integer */
+			
 			int d = 0;
 			if(sscanf(strs[i].c_str(),"%d",&d) != 1) 
 			{	
-				/* it's not an integer, maybe a parameter */
 				Types::basic_type_e t;
 				if(config->getParameterType(strs[i].c_str(),&t))
 				{
@@ -608,7 +607,7 @@ namespace Damaris {
 			}
 			dims->push_back(d);
 		}
-		
+*/		
 		language_e language = LG_UNKNOWN;
 
 		/* interpreting language */
@@ -626,9 +625,9 @@ namespace Damaris {
 		}
 
 		/* now calling the configuration object's function */
-		config->setLayout(attr_name, attr_type, dims, language);
+		config->setLayout(attr_name, attr_type, attr_dimensions, language);
 		/* deleting dims */
-		delete dims;
+		//delete dims;
 	}
 
 	/* this function is called when finding a <event> tag */

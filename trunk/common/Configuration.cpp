@@ -46,6 +46,8 @@ namespace Damaris {
 		layouts = new std::map<std::string,Layout*>();
 		/* initializing the list of variables layouts */
 		variableLayouts = new std::map<std::string,std::string>();
+		/* initialize the layout interpretor */
+		layoutInterp = new Calc<std::string::const_iterator,std::map<std::string,int> >(intparams);
 	}
 
 	Configuration::~Configuration()
@@ -55,6 +57,7 @@ namespace Damaris {
 		delete configFile;
 		delete msgQueueName;
 		delete segmentName;
+		delete layoutInterp;
 	}
 		
 	bool Configuration::checkConfiguration()
@@ -93,12 +96,14 @@ namespace Damaris {
 			readSuccessful = sscanf(value,"%d",&v);
 			*val = (short)v;
 			paramValue.value.short_ptr = val;
+			intparams.insert(std::pair<std::string,int>(std::string(name),(int)v));
 		} else
 		if(strcmp(type,"int") == 0) {
 			paramValue.type = Types::INT;
 			int* val = new int(0);
 			readSuccessful = sscanf(value,"%d",val);
 			paramValue.value.int_ptr = val;
+			intparams.insert(std::pair<std::string,int>(std::string(name),*val));
 		} else
 		if(strcmp(type,"long") == 0) {
 			paramValue.type = Types::LONG;
@@ -155,31 +160,44 @@ namespace Damaris {
 		INFO("Defining variable informations for \"" << name <<"\", layout is \""<< layoutName << "\"");
 	}
 
-	void Configuration::setLayout(const char* name, const char* type, const std::list<int>* dims, language_e l) 
+	void Configuration::setLayout(const char* name, const char* type, const char* description, language_e l) 
 	{
 		std::string layoutName(name);
 		std::string layoutType(type);
-		std::list<int> d(*dims);
-		std::vector<int64_t> extents(2*(dims->size()));
+		std::vector<int> dims;
+
+		std::string str(description);
+		std::string::const_iterator iter = str.begin();
+		std::string::const_iterator end = str.end();
+		
+		bool r = phrase_parse(iter, end, *layoutInterp, boost::spirit::ascii::space, dims);
+		if((!r) || (iter != end)) {
+			ERROR("While parsing dimension descriptor for layout \"" << name << "\"");
+			return;
+		}
+		
+		std::vector<int64_t> extents(2*dims.size());
 
 		if(l == LG_FORTRAN)
 		{
-			std::list<int>::reverse_iterator rit = d.rbegin();
-			for(int i=0; rit != d.rend(); rit++, i++) 
+			std::vector<int>::reverse_iterator rit = dims.rbegin();
+			for(int i=0; rit != dims.rend(); rit++, i++) 
 			{
 				extents[2*i] = 0;
 				extents[2*i+1] = (int64_t)(*rit)-1;
 			}
 		} else {
-			std::list<int>::const_iterator it = d.begin();
-			for(int i=0; it != d.end(); it++, i++)
+			std::vector<int>::const_iterator it = dims.begin();
+			for(int i=0; it != dims.end(); it++, i++)
 			{
 				extents[2*i] = 0;
 				extents[2*i+1] = (int64_t)(*it)-1;
 			}
 		}
+
 		Types::basic_type_e t = Types::getTypeFromString(&layoutType);
-		Layout* layout = new Layout(t,dims->size(),extents);
+
+		Layout* layout = new Layout(t,dims.size(),extents);
 		std::pair<std::string,Layout*> ly(layoutName,layout);
 		layouts->insert(ly);
 		INFO("Layout \"" << name << "\" now defined");
