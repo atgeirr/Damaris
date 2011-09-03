@@ -28,6 +28,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdint.h>
 #include <string>
 #include "common/Layout.hpp"
+#include "common/Group.hpp"
 
 namespace Damaris {
 
@@ -44,7 +45,7 @@ struct Variable {
 		int32_t source;		/*!< Source that published this variable. */
 		Layout* layout;		/*!< Layout of the data. */
 		void* data;		/*!< Pointer to the data. */
-	
+		Group* parent;		/*!< Parent Group. */
 		/**
 		 * \brief Constructor. 
 		 * Creates a Variable record given a name, an iteration, a source, a layout

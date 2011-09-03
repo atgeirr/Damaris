@@ -208,23 +208,24 @@ namespace Damaris {
 		return getLayout((it->second).c_str());
 	}
 
-	int Configuration::getParameterType(const char* name, Types::basic_type_e* t)
+	bool Configuration::getParameterType(const char* name, Types::basic_type_e* t)
 	{
+		INFO("searching parameter " << name);
 		std::map<std::string,Parameter>::iterator i;
 		i = parameters->find(std::string(name));
 		if(i == parameters->end())
-			return -1;
+			return false;
 		else
 			*t = (i->second).type;
-		return 0;
+		return true;
 	}
 	
-	int Configuration::getParameterValue(const char* name, void* v)
+	bool Configuration::getParameterValue(const char* name, void* v)
 	{
 		std::map<std::string,Parameter>::iterator it;
 		it = parameters->find(std::string(name));
 		if(it == parameters->end())
-			return -1;
+			return false;
 		else
 		{
 			Types::basic_type_e t = (it->second).type;
@@ -246,7 +247,7 @@ namespace Damaris {
 			/* TODO : all other types including string shouldn't be used */
 			}
 		}
-		return 0;
+		return true;
 	}
 
 	int Configuration::getParameterString(const char* name, std::string* s)
@@ -255,5 +256,9 @@ namespace Damaris {
 		return 0;
 	}
 
+	void Configuration::setDataHierarchy(Group* g)
+	{
+		dataHierarchy = g;
+	}
 }
 

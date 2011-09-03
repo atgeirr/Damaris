@@ -67,9 +67,9 @@ namespace Damaris {
 
 	void ServerConfiguration::finalize()
 	{
-		if(m_instance) {
+		if(m_instance != NULL) {
 			delete m_instance;
-			m_instance = NULL;
+			//m_instance = NULL;
 		} else {
 			WARN("Configuration not initialized, cannot be finalized.");
 		}

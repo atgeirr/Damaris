@@ -40,7 +40,6 @@ namespace Damaris {
 	{
 		config = c;
 		nodeParsed = false;
-		currentGroup = new Group("");
 
 		/* try initializing the XML utilities */
 		try
@@ -337,9 +336,15 @@ namespace Damaris {
 		nodeParsed = true;
 	}
 
-	
-	/* Parse configuration within the <data> element  */
-	void ConfigHandler::readDataConfig(DOMElement* elem) throw ()
+	/* Parse configuration within a <data> element */
+	void ConfigHandler::readDataConfig(DOMElement* elem) throw()
+	{
+		currentGroup = new Group("");
+		readDataGroups(elem);
+		config->setDataHierarchy(currentGroup);
+	}
+	/* Parse configuration within the <data> element or a <group> element */
+	void ConfigHandler::readDataGroups(DOMElement* elem) throw ()
 	{
 		// elem is a <data> or a <group> element, 
 		// it can have the following childs
@@ -474,12 +479,13 @@ namespace Damaris {
 		char* attr_name = XMLString::transcode(xmlch_name);
 		char* attr_layout = XMLString::transcode(xmlch_layout);
 
+		std::string name = currentGroup->getFullPath() + std::string(attr_name);
 		/* inserting variable into configuration */
 		if(strcmp("",attr_layout) != 0)
-			config->setVariableInfo(attr_name,attr_layout);
+			config->setVariableInfo(name.c_str(),attr_layout);
 		else {
-			config->setVariableInfo(attr_name,(char*)NULL);
-			WARN("Variable \"" << attr_name << "\" defined without a layout.");
+			config->setVariableInfo(name.c_str(),(char*)NULL);
+			WARN("Variable \"" << name.c_str() << "\" defined without a layout.");
 		}
 		/* releasing memory */
 		XMLString::release(&attr_name);
@@ -492,7 +498,7 @@ namespace Damaris {
 		/* getting attributes */
 		const XMLCh* xmlch_name = elem->getAttribute(ATTR_name);
 		const XMLCh* xmlch_enabled = elem->getAttribute(ATTR_enabled);
-		
+	
 		bool is_enabled = false;
 		/* checking attributes */
 		if(strcmp("",(char*)xmlch_name) == 0)
@@ -526,8 +532,9 @@ namespace Damaris {
 			Group* oldGroup = currentGroup;
 			currentGroup->addChild(newGroup);
 			currentGroup = newGroup;
+			INFO("Entering in group " << currentGroup->getFullPath().c_str());
 			/* parse content of the group */
-			readDataConfig(elem);
+			readDataGroups(elem);
 			
 			/* reset old group */
 			currentGroup = oldGroup;

@@ -91,6 +91,7 @@ class ConfigHandler {
 
 		void readNodesConfig(DOMElement* elem) 		throw();
 		void readDataConfig(DOMElement* elem) 		throw();
+		void readDataGroups(DOMElement* elem)		throw();
 		void readActionsConfig(DOMElement* elem)	throw();
 		void readParameterInfo(DOMElement* elem) 	throw();
 		void readVariableInfo(DOMElement* elem) 	throw();

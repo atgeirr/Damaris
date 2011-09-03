@@ -42,9 +42,7 @@ namespace Damaris {
 	Group::~Group()
 	{
 		delete name;
-		std::map<std::string,Group*>::iterator it;
-		for(it = children.begin(); it != children.end(); it++)
-			delete (*it).second;
+		children.clear();
 	}
 	
 	void Group::addChild(Group* g)
@@ -60,6 +58,14 @@ namespace Damaris {
 	Group* Group::getChild(const char* cname)
 	{
 		return children[std::string(cname)];
+	}
+
+	std::string Group::getFullPath()
+	{
+		if(parent == NULL)
+			return (*name)+"/";
+		else
+			return parent->getFullPath() + (*name) + "/";
 	}
 }
 

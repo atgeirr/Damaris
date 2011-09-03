@@ -37,6 +37,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdexcept>
 #include <sstream>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/filesystem/path.hpp>
+
+#define __RFILE__ boost::filesystem::path(__FILE__).leaf()
 
 #ifdef __BENCHMARK
 #define TIMER_START(timer) boost::posix_time::ptime timer(boost::posix_time::microsec_clock::local_time());
@@ -52,7 +55,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #define MESSAGE(out, level, message)\
     out << "[" << level << " " << boost::posix_time::microsec_clock::local_time() << "] [" \
-    << __FILE__ << ":" << __LINE__ << ":" << __FUNCTION__ << "] " << message << std::endl
+    << __RFILE__ << ":" << __LINE__ << ":" << __FUNCTION__ << "] " << message << std::endl
 
 #ifdef __INFO
 #define __ERROR

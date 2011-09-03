@@ -94,7 +94,6 @@ namespace Damaris {
 		shared_memory_object::remove(config->getSegmentName()->c_str());
 		delete segment;
 		
-		delete actionsManager;
 		delete metadataManager;
 		ServerConfiguration::finalize();
 	}

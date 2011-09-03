@@ -9,10 +9,13 @@
 		<parameter name="x" type="int" value="42" />
 
 		<layout name="my layout" type="float" dimensions="64,16,2" />
-		<layout name="str layout" type="char" dimensions="128" />
+
+		<group name="info" enabled="yes">
+			<layout name="str layout" type="char" dimensions="128" />
+			<variable name="my string" layout="str layout"/>
+		</group>
 
 		<variable name="my variable" layout="my layout"> this is an example of metadata </variable>
-		<variable name="my string" layout="str layout"/>
 	</data>
 	<actions>
 		<event name="my event" action="my_function" using="hello.so"/>

@@ -56,6 +56,8 @@ class Group {
 		void addChild(const char* cname, Group* g);
 
 		Group* getChild(const char* cname);
+
+		std::string getFullPath();
 };
 
 }

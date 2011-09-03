@@ -25,6 +25,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/Language.hpp"
 #include "common/Parameter.hpp"
 #include "common/Layout.hpp"
+#include "common/Group.hpp"
 
 namespace Damaris {
 
@@ -52,6 +53,8 @@ namespace Damaris {
 		std::map<std::string,Parameter>* parameters; 	/*!< List of parameters. */
 		std::map<std::string,Layout*>* layouts; 	/*!< List of layouts. Associate layout names to layouts. */
 		std::map<std::string,std::string>* variableLayouts; /*!< Association from variable names to layout names. */
+		
+		Group* dataHierarchy; /*!< Parent Group for the data (parameters, variables, layouts) hierarchy. */
 
 	protected:
 		bool checkConfiguration(); /*!< Check if the Configuration is correctly loaded. */
@@ -169,9 +172,9 @@ namespace Damaris {
 		 * This function doesn't work with string parameters.
 		 * \param[in] name : Name of the parameter to retrieve.
 		 * \param[out] value : Buffer to hold the value.
-		 * \return 0 in case of success, -1 if the parameter is not found.
+		 * \return true in case of success, false if the parameter is not found.
 		 */
-		int getParameterValue(const char* name, void* value);
+		bool getParameterValue(const char* name, void* value);
 		
 		/**
 		 * THIS FUNCTION IS NOT IMPLEMENTED YET...
@@ -182,9 +185,9 @@ namespace Damaris {
 		 * \brief Get the type of a parameter.
 		 * \param[in] name : Name of the parameter to consider.
 		 * \param[out] t : buffer of Types::basic_type_e to hold to result.
-		 * \return 0 in case of success, -1 if the parameter is not found.
+		 * \return true in case of success, false if the parameter is not found.
 		 */
-		int getParameterType(const char* name, Types::basic_type_e* t);		
+		bool getParameterType(const char* name, Types::basic_type_e* t);		
 		
 		/**
 		 * \brief Set a parameter (type and value).
@@ -232,6 +235,12 @@ namespace Damaris {
 		 * \param[in] plugin : Name of the dynamic library to load.
 		 */	
 		virtual void setEvent(const char* name, const char* action, const char* plugin) = 0;	
+
+		/**
+		 * \brief Set the parent group for the data hierarchy.
+		 * \param[in] g : new parent Group.
+		 */
+		void setDataHierarchy(Group* g);
 };
 
 }

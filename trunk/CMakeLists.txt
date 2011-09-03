@@ -28,6 +28,7 @@ set(XERCESC_INCLUDE_DIR "${EXTERNAL_ROOT}/include")
 
 find_package(Boost REQUIRED)
 #find_package(XercesC REQUIRED)
+set(BOOST_LIBRARIES boost_filesystem boost_program_options)
 
 include_directories(${Boost_INCLUDE_DIR})
 include_directories(${XercesC_INCLUDE_DIR})
