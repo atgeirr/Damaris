@@ -101,7 +101,8 @@ namespace Damaris {
 		 * \param[in] s : pointer to the shared memory segment.
 		 */	
 		MetadataManager(managed_shared_memory* s);
-	//	std::list<Variable*>* getAllVariables();
+	
+		std::list<Variable*>* getAllVariables();
 
 		/**
 		 * \brief Destructor.

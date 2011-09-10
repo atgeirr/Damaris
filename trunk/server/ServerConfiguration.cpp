@@ -80,6 +80,16 @@ namespace Damaris {
 		return actionsManager;
 	}
 
+	int ServerConfiguration::getServerID()
+	{
+		return serverID;
+	}
+
+	void ServerConfiguration::setServerID(int id)
+	{
+		serverID = id;
+	}
+
 	void ServerConfiguration::setEvent(const char* name, const char* action, const char* plugin)
 	{
 		std::string actionName(name);

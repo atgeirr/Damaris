@@ -35,7 +35,8 @@ namespace Damaris {
 		
 	private:
 		static ServerConfiguration* m_instance;
-		
+
+		int serverID; /*!< ID of the server. */		
 		ActionsManager* actionsManager; /*!< Container of actions. */
 	
 		/**
@@ -75,6 +76,9 @@ namespace Damaris {
 		 */
 		ActionsManager* getActionsManager();
 		
+		int getServerID();
+		void setServerID(int id);
+
 		/**
 		 * \brief Adds an event to the ActionsManager and load associated plugins.
 		 */
