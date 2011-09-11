@@ -60,11 +60,11 @@ void ActionsManager::loadActionFromPlugin(std::string* eventName, std::string* f
 	}
 
 	/* opening the dynamic library */
-	void* handle = dlopen(fileName->c_str(),RTLD_LAZY);
+	void* handle = dlopen(fileName->c_str(),RTLD_NOW | RTLD_GLOBAL);
 
 	if(!handle) 
 	{
-		ERROR("While loading plugin in \""<<fileName->c_str()<<"\"");
+		ERROR("While loading plugin in \""<<fileName->c_str()<<"\":" << dlerror());
 		return;
 	}
 

@@ -102,7 +102,7 @@ namespace Damaris {
 		 */	
 		MetadataManager(managed_shared_memory* s);
 	
-		std::list<Variable*>* getAllVariables();
+		std::list<Variable>* getAllVariables();
 
 		/**
 		 * \brief Destructor.

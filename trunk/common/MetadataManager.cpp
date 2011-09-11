@@ -81,7 +81,7 @@ namespace Damaris {
 		INFO("Removed variable \"" << v.name.c_str() << "\", available memory is now " << segment->get_free_memory());
 	}	
 	
-	std::list<Variable*>* MetadataManager::getAllVariables()
+	std::list<Variable>* MetadataManager::getAllVariables()
 	{
 		return &vars;
 	}

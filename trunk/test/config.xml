@@ -18,6 +18,6 @@
 		<variable name="my variable" layout="my layout"> this is an example of metadata </variable>
 	</data>
 	<actions>
-		<event name="my event" action="my_function" using="hello.so"/>
+		<event name="dump" action="dump_hdf5" using="persistence.so"/>
 	</action>
 </simulation>

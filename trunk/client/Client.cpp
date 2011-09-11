@@ -105,7 +105,7 @@ namespace Damaris {
                 // send message
 		msgQueue->send(message,sizeof(Message),0);
                 // free message
-		INFO("Variable \"" << varname->c_str() "\" has been commited");
+		INFO("Variable \"" << varname->c_str() << "\" has been commited");
 		delete message;
 
 		// remove variable from metadata
@@ -166,7 +166,7 @@ namespace Damaris {
 		// send message
 		msgQueue->send(message,sizeof(Message),0);
 		// free message
-		INFO("Variable \"" << varname->c_str() "\" has been written");
+		INFO("Variable \"" << varname->c_str() << "\" has been written");
 		delete message;
 		
 		return size;

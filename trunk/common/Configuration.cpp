@@ -205,6 +205,7 @@ namespace Damaris {
 
 	Layout* Configuration::getLayout(const char* name)
 	{
+		INFO("in getLayout");
 		std::map<std::string,Layout*>::iterator it;
 		it = layouts->find(std::string(name));
                 
@@ -217,6 +218,7 @@ namespace Damaris {
 
 	Layout* Configuration::getVariableLayout(const char* varName)
 	{
+		INFO("in getVariableLayout");
 		std::map<std::string,std::string>::iterator it;
 		it = variableLayouts->find(std::string(varName));
 		if(it == variableLayouts->end()) {

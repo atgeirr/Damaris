@@ -6,7 +6,7 @@
 #include "server/Server.h"
 #include "client/Client.h"
 
-#define CORES_PER_NODE 4
+#define CORES_PER_NODE 2 
 
 void client_main_loop(MPI_Comm c, int rank);
 
@@ -42,6 +42,7 @@ void client_main_loop(MPI_Comm c, int rank)
 	sleep(5);
 	DC_initialize("config.xml",rank);
 	
+		
 	sleep(5);
 	DC_kill_server();
 

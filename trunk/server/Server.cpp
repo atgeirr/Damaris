@@ -43,8 +43,9 @@ namespace Damaris {
 	{
 		ServerConfiguration::initialize(cf);
 		config = ServerConfiguration::getInstance();
-		env = new Environment();
-		env->setID(id);
+		//env = new Environment();
+		//env->setID(id);
+		config->setServerID(id);
 		init();
 	}
 	
@@ -53,6 +54,7 @@ namespace Damaris {
 	{
 		config = c;
 		env = e;
+		config->setServerID(env->getID());
 		init();
 	}
 
@@ -108,12 +110,13 @@ namespace Damaris {
 		size_t  recvSize;
 		bool received;
 		
-		while(needStop != 0) {
+		while(needStop > 0) {
 			received = msgQueue->try_receive(msg,sizeof(Message), recvSize, priority);
 			if(received) {
 				processMessage(msg);
 			}
 		}
+		//INFO("out of main loop");
 		
 		delete msg;
 		return 0;
@@ -141,6 +144,7 @@ namespace Damaris {
 		
 		if(msg->type == MSG_SIG) 
 		{
+			DBG("Received event " << msg->content);
 			if(msg->content[0] == '#') {
 				if(name == "#kill") needStop -= 1;
 			} else {

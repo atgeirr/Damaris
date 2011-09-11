@@ -1,4 +1,4 @@
-add_definitions(-D__DAMARIS_CLIENT)
+#add_definitions(-D__DAMARIS_CLIENT -D__INFO)
 
 set(DAMARIS_CLIENT_SRC 
 	${DAMARIS_SOURCE_DIR}/client/Client.cpp
