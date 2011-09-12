@@ -27,6 +27,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #define __DAMARIS_SHMEMSEGMENT_H
 
 #include <string>
+#include <boost/interprocess/managed_shared_memory.hpp>
 #include "common/SharedMemory.hpp"
 
 namespace Damaris {
@@ -56,7 +57,12 @@ class SharedMemorySegment {
 		virtual size_t getFreeMemory() = 0;
 };
 
+using namespace boost::interprocess;
+
 class SharedMemorySegment::POSIX_ShMem : public SharedMemorySegment {
+	private:
+		managed_shared_memory* impl;
+		char* base_address;
 	public:
 		POSIX_ShMem(const char* name, int64_t size);
 		POSIX_ShMem(const char* name);

@@ -50,20 +50,19 @@ SharedMemorySegment* SharedMemorySegment::open(sysv_shmem_t sysv_shmem, const ch
 	return new SharedMemorySegment::SYSV_ShMem(name);
 }
 
-
 SharedMemorySegment::POSIX_ShMem::POSIX_ShMem(const char* name, int64_t size)
 {
-
+	impl = new managed_shared_memory(create_only,name,size);
 }
 
 SharedMemorySegment::POSIX_ShMem::POSIX_ShMem(const char* name)
 {
-
+	impl = new managed_shared_memory(open_only,name);
 }
 
 SharedMemorySegment::SYSV_ShMem::SYSV_ShMem(const char* name, int64_t size)
 {
-
+	
 }
 
 SharedMemorySegment::SYSV_ShMem::SYSV_ShMem(const char* name)
@@ -73,27 +72,27 @@ SharedMemorySegment::SYSV_ShMem::SYSV_ShMem(const char* name)
 
 SharedMemorySegment::ptr SharedMemorySegment::POSIX_ShMem::getAddressFromHandle(handle_t h)
 {
-	return NULL;
+	return impl->get_address_from_handle(h);;
 }
 
 handle_t SharedMemorySegment::POSIX_ShMem::getHandleFromAddress(SharedMemorySegment::ptr p)
 {
-	return 0;
+	return impl->get_handle_from_address(p);
 }
 
 SharedMemorySegment::ptr SharedMemorySegment::POSIX_ShMem::allocate(size_t size)
 {
-	return NULL;
+	return impl->allocate(size);
 }
 
 void SharedMemorySegment::POSIX_ShMem::deallocate(void* addr)
 {
-
+	impl->deallocate(addr);
 }
 
 size_t SharedMemorySegment::POSIX_ShMem::getFreeMemory()
 {
-	return 0;
+	return impl->get_free_memory();
 }
 
 SharedMemorySegment::ptr SharedMemorySegment::SYSV_ShMem::getAddressFromHandle(handle_t h)
