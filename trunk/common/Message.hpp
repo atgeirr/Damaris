@@ -25,9 +25,10 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __DAMARIS_MESSAGE_H
 #define __DAMARIS_MESSAGE_H
 
-#include <boost/interprocess/managed_shared_memory.hpp>
+//#include <boost/interprocess/managed_shared_memory.hpp>
+#include "common/SharedMemory.hpp"
 
-using namespace boost::interprocess;
+//using namespace boost::interprocess;
 
 namespace Damaris {
 
@@ -49,7 +50,8 @@ namespace Damaris {
 		int32_t iteration;			/*!< The iteration number in the simulation. */
 		char content[64];			/*!< The content (name of the variable or the event). */
 		int64_t layoutInfo[8]; 			/*!< Information related to the data layout. */
-		managed_shared_memory::handle_t handle; /*!< Pointer to data (handle can be understood by all processes in their own space) */
+//		managed_shared_memory::handle_t handle; /*!< Pointer to data (handle can be understood by all processes in their own space) */
+		handle_t handle;			/*!< Pointer to data relatively to the beginning of the shared memory segment */
 	};
 	
 }

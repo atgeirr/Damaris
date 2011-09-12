@@ -46,7 +46,8 @@ namespace Damaris {
 		/* initializes the shared structures */
 		try {
 			msgQueue = new message_queue(open_only, config->getMsgQueueName()->c_str());
-			segment = new managed_shared_memory(open_only, config->getSegmentName()->c_str());
+			segment = SharedMemorySegment::open(posix_shmem,config->getSegmentName()->c_str());
+					//new managed_shared_memory(open_only, config->getSegmentName()->c_str());
 			INFO("Client initialized successfully for core " << id << " with configuration " << *configfile);
 		}
 		catch(interprocess_exception &ex) {
@@ -101,7 +102,7 @@ namespace Damaris {
 		char* buffer = (char*)(allocated->data);
 		message->iteration = iteration;
 		message->type = MSG_VAR;
-		message->handle = segment->get_handle_from_address((void*)buffer);
+		message->handle = segment->getHandleFromAddress((void*)buffer);
                 // send message
 		msgQueue->send(message,sizeof(Message),0);
                 // free message
@@ -162,7 +163,7 @@ namespace Damaris {
 		
 		message->iteration = iteration;
 		message->type = MSG_VAR;
-		message->handle = segment->get_handle_from_address(buffer);
+		message->handle = segment->getHandleFromAddress(buffer);
 		// send message
 		msgQueue->send(message,sizeof(Message),0);
 		// free message

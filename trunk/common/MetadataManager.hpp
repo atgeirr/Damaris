@@ -26,16 +26,17 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __DAMARIS_METADATA_H
 #define __DAMARIS_METADATA_H
 
-#include <boost/interprocess/managed_shared_memory.hpp>
+//#include <boost/interprocess/managed_shared_memory.hpp>
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/member.hpp>
 #include <boost/multi_index/ordered_index.hpp>
 #include <list>
 
+#include "common/SharedMemorySegment.hpp"
 #include "common/Layout.hpp"
 #include "common/Variable.hpp"
 
-using namespace boost::interprocess;
+//using namespace boost::interprocess;
 //using boost::multi_index_container;
 //using namespace boost::multi_index;
 
@@ -61,7 +62,8 @@ namespace Damaris {
 	private:
 	//	variable_set vars;
 		std::list<Variable> vars; /*!< List of all recorded variables. */
-		managed_shared_memory* segment; /*!< A pointer to the shared memory segment. */ 
+//		managed_shared_memory* segment; /*!< A pointer to the shared memory segment. */ 
+		SharedMemorySegment* segment; /*!< A pointer to the shared memory segment. */
 	public:
 		/**
 		 * \brief Retrieves a variable given its name, iteration and source.
@@ -100,7 +102,8 @@ namespace Damaris {
 		 * Takes a pointer to the shared memory segment that holds the data.
 		 * \param[in] s : pointer to the shared memory segment.
 		 */	
-		MetadataManager(managed_shared_memory* s);
+		MetadataManager(SharedMemorySegment* s);
+		//MetadataManager(managed_shared_memory* s);
 	
 		std::list<Variable>* getAllVariables();
 

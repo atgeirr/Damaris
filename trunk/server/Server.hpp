@@ -28,9 +28,10 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <string>
 #include <boost/interprocess/ipc/message_queue.hpp>
-#include <boost/interprocess/managed_shared_memory.hpp>
+//#include <boost/interprocess/managed_shared_memory.hpp>
 
 #include "server/ServerConfiguration.hpp"
+//#include "common/SharedMemorySegment.hpp"
 #include "common/Environment.hpp"
 #include "common/Message.hpp"
 #include "server/ActionsManager.hpp"
@@ -94,8 +95,9 @@ class Server {
 		/**
 		 * Pointer to the shared memory segment, used for writing variables. 
 		 */
-		managed_shared_memory *segment;
-
+		SharedMemorySegment *segment;
+		//managed_shared_memory *segment;
+		
 		/**
 		 * This is the entry point to the metadata layer of Damaris. 
 		 * \see Damaris::MetadataManager

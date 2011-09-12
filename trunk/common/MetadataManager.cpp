@@ -26,11 +26,12 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/Debug.hpp"
 #include "common/MetadataManager.hpp"
 
-using namespace boost::interprocess;
+//using namespace boost::interprocess;
 
 namespace Damaris {
 
-	MetadataManager::MetadataManager(managed_shared_memory* s)
+//	MetadataManager::MetadataManager(managed_shared_memory* s)
+	MetadataManager::MetadataManager(SharedMemorySegment* s)
 	{
 		segment = s;
 	}
@@ -78,7 +79,7 @@ namespace Damaris {
 			v.data = NULL;
 		}
 		vars.remove(v);
-		INFO("Removed variable \"" << v.name.c_str() << "\", available memory is now " << segment->get_free_memory());
+		INFO("Removed variable \"" << v.name.c_str() << "\", available memory is now " << segment->getFreeMemory());
 	}	
 	
 	std::list<Variable>* MetadataManager::getAllVariables()

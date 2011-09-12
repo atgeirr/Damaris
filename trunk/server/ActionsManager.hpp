@@ -26,7 +26,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <map>
 #include <string>
 
-#include "common/Configuration.hpp"
+//#include "common/Configuration.hpp"
 #include "common/MetadataManager.hpp"
 #include "server/Action.hpp"
 

@@ -26,11 +26,13 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <list>
 #include "common/Debug.hpp"
 #include "common/Environment.hpp"
+#include "common/SharedMemorySegment.hpp"
+#include "server/Server.hpp"
 #include "server/ServerConfiguration.hpp"
 #include "common/Message.hpp"
 #include "common/Layout.hpp"
 #include "common/LayoutFactory.hpp"
-#include "server/Server.hpp"
+#include "common/SharedMemory.hpp"
 
 using namespace boost::interprocess;
 
@@ -73,9 +75,10 @@ namespace Damaris {
 							config->getMsgQueueSize(),
 							sizeof(Message));
 			
-			segment = new managed_shared_memory(create_only,
-								config->getSegmentName()->c_str(),
-								config->getSegmentSize());
+			segment = SharedMemorySegment::create(posix_shmem,
+							      config->getSegmentName()->c_str(),
+							      config->getSegmentSize());
+			//new managed_shared_memory(create_only
 		}
 		catch(interprocess_exception &ex) {
 			ERROR("Error when initializing the server: " << ex.what());
@@ -135,7 +138,7 @@ namespace Damaris {
 		if(msg->type == MSG_VAR)
 		{
 			DBG("Received notification for variable " << name.c_str()); 
-			data = segment->get_address_from_handle(msg->handle);
+			data = segment->getAddressFromHandle(msg->handle);
 			layout = LayoutFactory::unserialize(msg->layoutInfo);
 			Variable v(name,iteration,sourceID,layout,data);
 			metadataManager->put(v);
