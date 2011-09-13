@@ -85,6 +85,7 @@ namespace Damaris {
 		ATTR_action		= XMLString::transcode("action");
 		ATTR_using		= XMLString::transcode("using");
 		ATTR_enabled		= XMLString::transcode("enabled");
+		ATTR_shmem		= XMLString::transcode("shmem");
 	}
 
 	ConfigHandler::~ConfigHandler()
@@ -238,6 +239,15 @@ namespace Damaris {
 			return;
 		}
 		INFO("Parsing internal configuration of nodes");
+		// node can have an optional "shmem" attribute
+		const XMLCh* xmlch_attr = elem->getAttribute(ATTR_shmem);
+		if(strcmp((char*)xmlch_attr,"") != 0)
+		{
+			char* char_attr = XMLString::transcode(xmlch_attr);
+			config->setSharedMemoryType(char_attr);
+			INFO("Memory type is set to \""<< char_attr <<"\".");
+			XMLString::release(&char_attr);
+		}
 		// elem is a <nodes> element, it can have the following childs
 		// <cores>, <buffer>, <queue>
 		// iterates on children
@@ -311,7 +321,7 @@ namespace Damaris {
 				{
 					const XMLCh* xmlch_name = currentElement->getAttribute(ATTR_name);
 					const XMLCh* xmlch_size = currentElement->getAttribute(ATTR_size);
-				
+	
 					if(strcmp("",(char*)xmlch_name)	!= 0) {
 						char* char_attr = XMLString::transcode(xmlch_name);
 						config->setMsgQueueName(char_attr);
@@ -320,7 +330,7 @@ namespace Damaris {
 					} else {
 						WARN("Message queue name not properly set.");
 					}
-
+					
 					if(strcmp("",(char*)xmlch_size) != 0) {
 						char* char_attr = XMLString::transcode(xmlch_size);
 						config->setMsgQueueSize(atoi(char_attr));
@@ -329,6 +339,7 @@ namespace Damaris {
 					} else {
 						WARN("Message queue size not properly set.");
 					}
+
 					continue;
 				}
 			}

@@ -280,5 +280,15 @@ namespace Damaris {
 	{
 		dataHierarchy = g;
 	}
+
+	void Configuration::setSharedMemoryType(const char* str)
+	{
+		sharedMemoryModel = std::string(str);;
+	}
+
+	std::string Configuration::getSharedMemoryType()
+	{
+		return sharedMemoryModel;
+	}
 }
 

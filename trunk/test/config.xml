@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <simulation name="my lovely simulation" language="fortran">
-	<nodes>
+	<nodes shmem="sysv">
 		<cores  count="16"/>
 		<clients count="15"/>
-		<buffer name="test" size="67108864" type="posix" />
-		<queue  name="my cute message queue" size="100" type="posix" />
+		<buffer name="/home/matthieu/Work/damaris/trunk/server/test3" size="67108864" />
+		<queue  name="/home/matthieu/Work/damaris/trunk/server/test2" size="100" />
 	</nodes>
 	<data>
 		<parameter name="x" type="int" value="42" />

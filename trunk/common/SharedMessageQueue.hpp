@@ -25,6 +25,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #define __DAMARIS_SH_MSG_QUEUE_H
 
 #include <boost/interprocess/ipc/message_queue.hpp>
+#include "common/xsi_msg_queue.hpp"
 #include "common/SharedMemory.hpp"
 using namespace boost::interprocess;
 
@@ -43,7 +44,7 @@ class SharedMessageQueue {
 		static SharedMessageQueue* open(sysv_shmem_t sysv_shmem, const char* name);
 
 		static bool remove(posix_shmem_t posix_shmem, const char* name);
-		static bool remove(sysv_shmem_t sysv_shmem, int shmid);
+		static bool remove(sysv_shmem_t sysv_shmem, const char* name);
 
 		virtual void send(const void* buffer, size_t size, unsigned int priority) = 0;
 		virtual bool trySend(const void* buffer, size_t size, unsigned int priority) = 0;
@@ -73,7 +74,7 @@ class SharedMessageQueue::POSIX_ShMsgQueue : public SharedMessageQueue {
 
 class SharedMessageQueue::SYSV_ShMsgQueue : public SharedMessageQueue {
         private:
-        	
+        	xsi_message_queue* impl;	
 	public:
 		SYSV_ShMsgQueue(const char* name);
 		SYSV_ShMsgQueue(const char* name, size_t num_msg, size_t msg_size);

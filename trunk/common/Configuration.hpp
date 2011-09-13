@@ -50,7 +50,7 @@ namespace Damaris {
 		std::string* msgQueueName; 	/*!< Name of the shared messages queue. */
 		size_t msgQueueSize; 		/*!< Size (in number of messages) of the queue of messages. */
 		language_e defaultLanguage;	/*!< Default language (C, Fortran or Unknown) */
-		
+		std::string sharedMemoryModel;	/*!< True is shared memory model is XSI */
 		//std::map<std::string,Parameter>* parameters; 	/*!< List of parameters. */
 		
 		std::map<std::string,Parameter>* parameters;	 	/*!< List of parameters. */
@@ -61,7 +61,7 @@ namespace Damaris {
 		
 		Group* dataHierarchy; /*!< Parent Group for the data (parameters, variables, layouts) hierarchy. */
 		Calc<std::string::const_iterator,std::map<std::string,int> >* layoutInterp; /*!< Parser for layout interpretation */
-
+		
 	protected:
 		bool checkConfiguration(); /*!< Check if the Configuration is correctly loaded. */
 
@@ -247,6 +247,18 @@ namespace Damaris {
 		 * \param[in] g : new parent Group.
 		 */
 		void setDataHierarchy(Group* g);
+
+		/**
+		 * \brief Set the shared memory functions to use (posix = shm_open, sysv = shmget).
+		 * \param[in] model : string representing the model to use.
+		 */
+		void setSharedMemoryType(const char* str);
+
+		/**
+		 * \brief Get the shared memory functions to use.
+		 * \return a string representing the functions to use.
+		 */
+		std::string getSharedMemoryType();
 };
 
 }

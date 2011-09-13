@@ -55,7 +55,8 @@ bool SharedMemorySegment::remove(posix_shmem_t posix_shmem, const char* name)
 bool SharedMemorySegment::remove(sysv_shmem_t sysv_shmem, const char* name)
 {
         xsi_key key(name,0);
-        return xsi_shared_memory::remove(key.get_key());
+	int id = shmget(key.get_key(),0,0600);
+        return xsi_shared_memory::remove(id);
 }
 
 

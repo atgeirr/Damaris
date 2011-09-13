@@ -66,19 +66,33 @@ namespace Damaris {
 		needStop = config->getClientsPerNode();
 		/* creating shared structures */
 		try {
+			if(config->getSharedMemoryType() == "sysv") {
 			
-			SharedMessageQueue::remove(posix_shmem,config->getMsgQueueName()->c_str());
-			SharedMemorySegment::remove(posix_shmem,config->getSegmentName()->c_str());	
-			
-			msgQueue = SharedMessageQueue::create(posix_shmem,
+				SharedMessageQueue::remove(sysv_shmem,config->getMsgQueueName()->c_str());
+				SharedMemorySegment::remove(sysv_shmem,config->getSegmentName()->c_str());	
+				
+				msgQueue = SharedMessageQueue::create(sysv_shmem,
 							      config->getMsgQueueName()->c_str(),
 							      (size_t)config->getMsgQueueSize(),
 							      sizeof(Message));
+				segment = SharedMemorySegment::create(sysv_shmem,
+								config->getSegmentName()->c_str(),
+								(size_t)config->getSegmentSize());
+
+			} else {
 			
-			segment = SharedMemorySegment::create(posix_shmem,
-							      config->getSegmentName()->c_str(),
-							      (size_t)config->getSegmentSize());
-			//new managed_shared_memory(create_only
+				SharedMessageQueue::remove(posix_shmem,config->getMsgQueueName()->c_str());
+				SharedMemorySegment::remove(posix_shmem,config->getSegmentName()->c_str());      
+                        
+				msgQueue = SharedMessageQueue::create(posix_shmem,
+								config->getMsgQueueName()->c_str(),
+								(size_t)config->getMsgQueueSize(),
+								sizeof(Message));
+                        
+				segment = SharedMemorySegment::create(posix_shmem,
+								config->getSegmentName()->c_str(),
+								(size_t)config->getSegmentSize());
+			}
 		}
 		catch(interprocess_exception &ex) {
 			ERROR("Error when initializing the server: " << ex.what());
@@ -93,12 +107,15 @@ namespace Damaris {
 	/* destructor */
 	Server::~Server()
 	{
-		SharedMessageQueue::remove(posix_shmem,config->getMsgQueueName()->c_str());
+		if(config->getSharedMemoryType() == "sysv") {
+			SharedMessageQueue::remove(sysv_shmem,config->getMsgQueueName()->c_str());
+			SharedMemorySegment::remove(sysv_shmem,config->getSegmentName()->c_str());
+		} else {
+			SharedMessageQueue::remove(posix_shmem,config->getMsgQueueName()->c_str());
+			SharedMemorySegment::remove(posix_shmem,config->getSegmentName()->c_str());
+		}
 		delete msgQueue;
-		
-		SharedMemorySegment::remove(posix_shmem,config->getSegmentName()->c_str());
 		delete segment;
-		
 		delete metadataManager;
 		ServerConfiguration::finalize();
 	}

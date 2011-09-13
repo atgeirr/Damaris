@@ -51,9 +51,10 @@ bool SharedMessageQueue::remove(posix_shmem_t posix_shmem, const char* name)
 	return shared_memory_object::remove(name);
 }
 
-bool SharedMessageQueue::remove(sysv_shmem_t sysv_shmem, int key)
+bool SharedMessageQueue::remove(sysv_shmem_t sysv_shmem, const char* name)
 {
-	return xsi_shared_memory::remove(key);
+	xsi_key key(name,1);
+	return xsi_message_queue::remove(key);
 }
 
 SharedMessageQueue::POSIX_ShMsgQueue::POSIX_ShMsgQueue(const char* name, size_t num_msg, size_t size_msg)
@@ -104,52 +105,49 @@ size_t SharedMessageQueue::POSIX_ShMsgQueue::getNumMsg()
 
 SharedMessageQueue::SYSV_ShMsgQueue::SYSV_ShMsgQueue(const char* name, size_t num_msg, size_t size_msg)
 {
-	// TODO
+	xsi_key key(name,1);
+	impl = new xsi_message_queue(create_only,key,num_msg,size_msg);
 }
 
 SharedMessageQueue::SYSV_ShMsgQueue::SYSV_ShMsgQueue(const char* name)
 {
-	// TODO
+	xsi_key key(name,1);
+	impl = new xsi_message_queue(open_only,key);
 }
 
 void SharedMessageQueue::SYSV_ShMsgQueue::send(const void* buffer, size_t size, unsigned int priority)
 {
-	// TODO
+	impl->send(buffer,size,priority);
 }
 
 bool SharedMessageQueue::SYSV_ShMsgQueue::trySend(const void* buffer, size_t size, unsigned int priority)
 {
-	// TODO
-	return false;
+	return impl->try_send(buffer,size,priority);
 }
 
 void SharedMessageQueue::SYSV_ShMsgQueue::receive(void* buffer, size_t buffer_size, size_t &recv_size, unsigned int &priority)
 {
-	// TODO
+	impl->receive(buffer,buffer_size,recv_size,priority);
 }
 
-bool SharedMessageQueue::SYSV_ShMsgQueue::tryReceive(void *, size_t buffer_size, size_t &recv_size, unsigned int &priority)
+bool SharedMessageQueue::SYSV_ShMsgQueue::tryReceive(void *buffer, size_t buffer_size, size_t &recv_size, unsigned int &priority)
 {
-	// TODO
-	return false;
+	return impl->try_receive(buffer,buffer_size,recv_size,priority);
 }
 
 size_t SharedMessageQueue::SYSV_ShMsgQueue::getMaxMsg() const
 {
-	// TODO
-	return 0;
+	return impl->get_max_msg();
 }
 
 size_t SharedMessageQueue::SYSV_ShMsgQueue::getMaxMsgSize() const
 {
-	// TODO
-	return 0;
+	return impl->get_max_msg_size();
 }
 
 size_t SharedMessageQueue::SYSV_ShMsgQueue::getNumMsg()
 {
-	// TODO
-	return 0;
+	return impl->get_num_msg();
 }
 
 }

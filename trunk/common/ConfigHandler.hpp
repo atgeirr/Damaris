@@ -88,6 +88,7 @@ class ConfigHandler {
 		XMLCh* ATTR_action;
 		XMLCh* ATTR_using;
 		XMLCh* ATTR_enabled;
+		XMLCh* ATTR_shmem;
 
 		void readNodesConfig(DOMElement* elem) 		throw();
 		void readDataConfig(DOMElement* elem) 		throw();
