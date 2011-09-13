@@ -29,10 +29,11 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <string>
 #include <stdint.h>
-#include <boost/interprocess/ipc/message_queue.hpp>
+//#include <boost/interprocess/ipc/message_queue.hpp>
 //#include <boost/interprocess/managed_shared_memory.hpp>
 
 #include "client/ClientConfiguration.hpp"
+#include "common/SharedMessageQueue.hpp"
 #include "common/SharedMemorySegment.hpp"
 #include "common/MetadataManager.hpp"
 #include "common/Layout.hpp"
@@ -56,7 +57,7 @@ class Client {
 	private:
 		int id; /*!< the ID of the client */
 		ClientConfiguration *config; /*!< configuration object */
-		message_queue *msgQueue; /*!< pointer to the message queue */
+		SharedMessageQueue *msgQueue; /*!< pointer to the message queue */
 		//managed_shared_memory *segment; /*!< pointer to the shared memory segment */
 		SharedMemorySegment* segment; /*!< pointer to the shared memory segment */
 		MetadataManager *variables; /*!< pointer to the metadata manager for allocated variables */

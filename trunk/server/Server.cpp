@@ -67,17 +67,17 @@ namespace Damaris {
 		/* creating shared structures */
 		try {
 			
-			shared_memory_object::remove(config->getMsgQueueName()->c_str());
-			shared_memory_object::remove(config->getSegmentName()->c_str());	
+			SharedMessageQueue::remove(posix_shmem,config->getMsgQueueName()->c_str());
+			SharedMemorySegment::remove(posix_shmem,config->getSegmentName()->c_str());	
 			
-			msgQueue = new message_queue(create_only,
-							config->getMsgQueueName()->c_str(),
-							config->getMsgQueueSize(),
-							sizeof(Message));
+			msgQueue = SharedMessageQueue::create(posix_shmem,
+							      config->getMsgQueueName()->c_str(),
+							      (size_t)config->getMsgQueueSize(),
+							      sizeof(Message));
 			
 			segment = SharedMemorySegment::create(posix_shmem,
 							      config->getSegmentName()->c_str(),
-							      config->getSegmentSize());
+							      (size_t)config->getSegmentSize());
 			//new managed_shared_memory(create_only
 		}
 		catch(interprocess_exception &ex) {
@@ -93,10 +93,10 @@ namespace Damaris {
 	/* destructor */
 	Server::~Server()
 	{
-		shared_memory_object::remove(config->getMsgQueueName()->c_str());
+		SharedMessageQueue::remove(posix_shmem,config->getMsgQueueName()->c_str());
 		delete msgQueue;
 		
-		shared_memory_object::remove(config->getSegmentName()->c_str());
+		SharedMemorySegment::remove(posix_shmem,config->getSegmentName()->c_str());
 		delete segment;
 		
 		delete metadataManager;
@@ -114,7 +114,7 @@ namespace Damaris {
 		bool received;
 		
 		while(needStop > 0) {
-			received = msgQueue->try_receive(msg,sizeof(Message), recvSize, priority);
+			received = msgQueue->tryReceive(msg,sizeof(Message), recvSize, priority);
 			if(received) {
 				processMessage(msg);
 			}

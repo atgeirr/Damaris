@@ -2,8 +2,9 @@
 <simulation name="my lovely simulation" language="fortran">
 	<nodes>
 		<cores  count="16"/>
-		<buffer name="my sweet shared memory segment" size="67108864"/>
-		<queue  name="my cute message queue" size="100" />
+		<clients count="15"/>
+		<buffer name="test" size="67108864" type="posix" />
+		<queue  name="my cute message queue" size="100" type="posix" />
 	</nodes>
 	<data>
 		<parameter name="x" type="int" value="42" />

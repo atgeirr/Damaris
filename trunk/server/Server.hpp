@@ -27,11 +27,12 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #define __DAMARIS_SERVER_H
 
 #include <string>
-#include <boost/interprocess/ipc/message_queue.hpp>
+//#include <boost/interprocess/ipc/message_queue.hpp>
 //#include <boost/interprocess/managed_shared_memory.hpp>
 
 #include "server/ServerConfiguration.hpp"
-//#include "common/SharedMemorySegment.hpp"
+#include "common/SharedMessageQueue.hpp"
+#include "common/SharedMemorySegment.hpp"
 #include "common/Environment.hpp"
 #include "common/Message.hpp"
 #include "server/ActionsManager.hpp"
@@ -90,7 +91,7 @@ class Server {
 		 * Pointer to the message queue, this queue is used
 		 * to send messages related to incoming variables and events.
 		 */
-		message_queue *msgQueue;
+		SharedMessageQueue *msgQueue;
 
 		/**
 		 * Pointer to the shared memory segment, used for writing variables. 

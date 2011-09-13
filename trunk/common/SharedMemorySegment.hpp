@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file SharedMemoryBuffer.hpp
+ * \file SharedMemorySegment.hpp
  * \date September 2011
  * \author Matthieu Dorier
  * \version 0.3
@@ -28,6 +28,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <string>
 #include <boost/interprocess/managed_shared_memory.hpp>
+#include <boost/interprocess/managed_xsi_shared_memory.hpp>
 #include "common/SharedMemory.hpp"
 
 namespace Damaris {
@@ -48,6 +49,9 @@ class SharedMemorySegment {
 		static SharedMemorySegment* open(posix_shmem_t shmem, const char* name);
 		static SharedMemorySegment* open(sysv_shmem_t shmem, const char* name);
 
+		static bool remove(posix_shmem_t shmem, const char* name);
+		static bool remove(sysv_shmem_t shmem, const char* name);
+
 		typedef void* ptr;
 
 		virtual ptr getAddressFromHandle(handle_t h) = 0;
@@ -62,7 +66,6 @@ using namespace boost::interprocess;
 class SharedMemorySegment::POSIX_ShMem : public SharedMemorySegment {
 	private:
 		managed_shared_memory* impl;
-		char* base_address;
 	public:
 		POSIX_ShMem(const char* name, int64_t size);
 		POSIX_ShMem(const char* name);
@@ -75,6 +78,9 @@ class SharedMemorySegment::POSIX_ShMem : public SharedMemorySegment {
 };
 
 class SharedMemorySegment::SYSV_ShMem : public SharedMemorySegment {
+	private:
+		managed_xsi_shared_memory* impl;
+		xsi_key key;
 	public:
 		SYSV_ShMem(const char* name, int64_t size);
 		SYSV_ShMem(const char* name);

@@ -11,6 +11,7 @@ set(DAMARIS_SERVER_LIB_SRC
 
 set(DAMARIS_SERVER_PRG_SRC
 		${DAMARIS_SOURCE_DIR}/server/main.cpp
+		${DAMARIS_SOURCE_DIR}/common/SharedMessageQueue.cpp
 		${DAMARIS_SOURCE_DIR}/common/SharedMemorySegment.cpp
 		${DAMARIS_SOURCE_DIR}/common/ConfigHandler.cpp
 		${DAMARIS_SOURCE_DIR}/common/Environment.cpp

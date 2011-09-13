@@ -20,15 +20,12 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \author Matthieu Dorier
  * \version 0.3
  */
-
+#include <boost/interprocess/xsi_shared_memory.hpp>
 #include "common/SharedMemorySegment.hpp"
 
 namespace Damaris {
 
-SharedMemorySegment::SharedMemorySegment()
-{
-
-}
+SharedMemorySegment::SharedMemorySegment() {}
 	
 SharedMemorySegment* SharedMemorySegment::create(posix_shmem_t posix_shmem, const char* name, int64_t size)
 {
@@ -50,6 +47,18 @@ SharedMemorySegment* SharedMemorySegment::open(sysv_shmem_t sysv_shmem, const ch
 	return new SharedMemorySegment::SYSV_ShMem(name);
 }
 
+bool SharedMemorySegment::remove(posix_shmem_t posix_shmem, const char* name)
+{
+        return shared_memory_object::remove(name);
+}
+
+bool SharedMemorySegment::remove(sysv_shmem_t sysv_shmem, const char* name)
+{
+        xsi_key key(name,0);
+        return xsi_shared_memory::remove(key.get_key());
+}
+
+
 SharedMemorySegment::POSIX_ShMem::POSIX_ShMem(const char* name, int64_t size)
 {
 	impl = new managed_shared_memory(create_only,name,size);
@@ -62,12 +71,14 @@ SharedMemorySegment::POSIX_ShMem::POSIX_ShMem(const char* name)
 
 SharedMemorySegment::SYSV_ShMem::SYSV_ShMem(const char* name, int64_t size)
 {
-	
+	key = xsi_key(name,0);
+	impl = new managed_xsi_shared_memory(create_only,key,size);
 }
 
 SharedMemorySegment::SYSV_ShMem::SYSV_ShMem(const char* name)
 {
-	
+	key = xsi_key(name,0);
+	impl = new managed_xsi_shared_memory(open_only,key);
 }
 
 SharedMemorySegment::ptr SharedMemorySegment::POSIX_ShMem::getAddressFromHandle(handle_t h)
@@ -97,27 +108,27 @@ size_t SharedMemorySegment::POSIX_ShMem::getFreeMemory()
 
 SharedMemorySegment::ptr SharedMemorySegment::SYSV_ShMem::getAddressFromHandle(handle_t h)
 {
-	return NULL;
+	return impl->get_address_from_handle(h);
 }
 
 handle_t SharedMemorySegment::SYSV_ShMem::getHandleFromAddress(SharedMemorySegment::ptr p) 
 {               
-	return 0;
+	return impl->get_handle_from_address(p);;
 }
 
 SharedMemorySegment::ptr SharedMemorySegment::SYSV_ShMem::allocate(size_t size)
 {
-	return NULL;
+	return impl->allocate(size);
 }
 
 void SharedMemorySegment::SYSV_ShMem::deallocate(void* addr) 
 {               
-	
+	impl->deallocate(addr);
 }
 
 size_t SharedMemorySegment::SYSV_ShMem::getFreeMemory()
 {
-	return 0;
+	return impl->get_free_memory();
 }
 
 }

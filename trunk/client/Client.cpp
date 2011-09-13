@@ -33,7 +33,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/Message.hpp"
 #include "client/Client.hpp"
 
-using namespace boost::interprocess;
+//using namespace boost::interprocess;
 
 namespace Damaris {
 	
@@ -45,7 +45,8 @@ namespace Damaris {
 		id = coreID;
 		/* initializes the shared structures */
 		try {
-			msgQueue = new message_queue(open_only, config->getMsgQueueName()->c_str());
+			msgQueue = SharedMessageQueue::open(posix_shmem,config->getSegmentName()->c_str());
+					//new message_queue(open_only, config->getMsgQueueName()->c_str());
 			segment = SharedMemorySegment::open(posix_shmem,config->getSegmentName()->c_str());
 					//new managed_shared_memory(open_only, config->getSegmentName()->c_str());
 			INFO("Client initialized successfully for core " << id << " with configuration " << *configfile);
