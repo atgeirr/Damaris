@@ -24,7 +24,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifndef __DAMARIS_SHARED_MEMORY_H
 #define __DAMARIS_SHARED_MEMORY_H
-#include <stdint.h>
+#include <boost/interprocess/managed_shared_memory.hpp>
 
 namespace Damaris {
 
@@ -34,7 +34,7 @@ namespace Damaris {
 	static const struct posix_shmem_t posix_shmem = posix_shmem_t();
 	static const struct sysv_shmem_t sysv_shmem = sysv_shmem_t();
 	
-	typedef int64_t handle_t;
+	typedef boost::interprocess::managed_shared_memory::handle_t handle_t;
 }
 
 #endif

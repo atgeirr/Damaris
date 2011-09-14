@@ -49,7 +49,7 @@ namespace Damaris {
 				msgQueue = SharedMessageQueue::open(sysv_shmem,config->getMsgQueueName()->c_str());
 				segment = SharedMemorySegment::open(sysv_shmem,config->getSegmentName()->c_str());
 			} else {
-				msgQueue = SharedMessageQueue::open(posix_shmem,config->getSegmentName()->c_str());
+				msgQueue = SharedMessageQueue::open(posix_shmem,config->getMsgQueueName()->c_str());
 				segment = SharedMemorySegment::open(posix_shmem,config->getSegmentName()->c_str());
 			}
 			INFO("Client initialized successfully for core " << id << " with configuration " << *configfile);
@@ -141,8 +141,7 @@ namespace Damaris {
 		char* buffer = NULL;
 		try {		
 			buffer = static_cast<char*>(segment->allocate(size));
-		} catch (std::bad_alloc &e) {
-			buffer = NULL;
+		} catch (...) {
 		}
 		if(buffer == NULL) {
 			ERROR("While writing \"" << varname->c_str() << "\", allocation failed");

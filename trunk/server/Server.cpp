@@ -75,6 +75,7 @@ namespace Damaris {
 							      config->getMsgQueueName()->c_str(),
 							      (size_t)config->getMsgQueueSize(),
 							      sizeof(Message));
+				INFO("initialized with sizeof message = " << sizeof(Message));
 				segment = SharedMemorySegment::create(sysv_shmem,
 								config->getSegmentName()->c_str(),
 								(size_t)config->getSegmentSize());
@@ -83,7 +84,7 @@ namespace Damaris {
 			
 				SharedMessageQueue::remove(posix_shmem,config->getMsgQueueName()->c_str());
 				SharedMemorySegment::remove(posix_shmem,config->getSegmentName()->c_str());      
-                        
+				INFO("initialized with sizeof message = " << sizeof(Message));                        
 				msgQueue = SharedMessageQueue::create(posix_shmem,
 								config->getMsgQueueName()->c_str(),
 								(size_t)config->getMsgQueueSize(),
