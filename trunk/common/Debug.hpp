@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Debug.hpp
- * \date July 2011
+ * \date September 2011
  * \author Matthieu Dorier
- * \version 0.1
+ * \version 0.3
  *
  * Debug.hpp contains all macros to print informations, error messages, etc.
  */

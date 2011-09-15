@@ -14,10 +14,6 @@
 #include <boost/interprocess/ipc/message_queue.hpp>
 #include <boost/interprocess/xsi_shared_memory.hpp>
 #include <boost/interprocess/detail/xsi_shared_memory_file_wrapper.hpp>
-//#include <algorithm> //std::lower_bound
-//#include <cstddef>   //std::size_t
-//#include <cstring>   //memcpy
-
 
 //!\file
 //!Describes an inter-process message queue using XSI shared memory. 
@@ -163,8 +159,10 @@ inline xsi_message_queue::~xsi_message_queue()
 
 inline std::size_t xsi_message_queue::get_mem_size
    (std::size_t max_msg_size, std::size_t max_num_msg)
-{  return detail::mq_hdr_t::get_mem_size(max_msg_size, max_num_msg);   }
-// TODO modify the previous function
+{  return detail::mq_hdr_t::get_mem_size(max_msg_size, max_num_msg) 
+	  - detail::managed_open_or_create_impl<shared_memory_object>::ManagedOpenOrCreateUserOffset
+          + detail::managed_open_or_create_impl<xsi_shared_memory_file_wrapper,false,true>::ManagedOpenOrCreateUserOffset;
+}
 
 inline xsi_message_queue::xsi_message_queue(create_only_t create_only,
 				    xsi_key key,

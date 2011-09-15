@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Client.hpp
- * \date July 2011
+ * \date September 2011
  * \author Matthieu Dorier
- * \version 0.1
+ * \version 0.3
  * 
  * Client.hpp is the main file to be included in a C++ 
  * client in order to access the main client-side functions
@@ -29,16 +29,12 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <string>
 #include <stdint.h>
-//#include <boost/interprocess/ipc/message_queue.hpp>
-//#include <boost/interprocess/managed_shared_memory.hpp>
 
 #include "client/ClientConfiguration.hpp"
 #include "common/SharedMessageQueue.hpp"
 #include "common/SharedMemorySegment.hpp"
 #include "common/MetadataManager.hpp"
 #include "common/Layout.hpp"
-
-using namespace boost::interprocess;
 
 /**
  * \namespace Damaris
@@ -58,7 +54,6 @@ class Client {
 		int id; /*!< the ID of the client */
 		ClientConfiguration *config; /*!< configuration object */
 		SharedMessageQueue *msgQueue; /*!< pointer to the message queue */
-		//managed_shared_memory *segment; /*!< pointer to the shared memory segment */
 		SharedMemorySegment* segment; /*!< pointer to the shared memory segment */
 		MetadataManager *variables; /*!< pointer to the metadata manager for allocated variables */
 	
@@ -109,7 +104,7 @@ class Client {
 		int signal(std::string* signame, int32_t iteration);
 
 		/**
-		 * \brief THIS FUNCTION IS NOT SUPPORTED YET.
+		 * \brief Allocate a buffer directly in shared memory for future writing.
 		 * Allocates a buffer in shared memory so it can be written after by the simulation.
 		 * Requires a call to commit to notify the dedicated core that the variable has been written. 
 		 *
@@ -122,7 +117,7 @@ class Client {
 		void* alloc(std::string* varname, int32_t iteration);
 
 		/** 
-		 * \brief THIS FUNCTION IS NOT SUPPORTED YET.
+		 * \brief Commit a variable.
 		 * Notifies the dedicated core that the previously allocated buffer has been written 
 		 * Blocks if the message queue is full.
 		 *

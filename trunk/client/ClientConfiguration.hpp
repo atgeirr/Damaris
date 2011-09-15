@@ -14,7 +14,15 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
-
+/**
+ * \file ClientConfiguration.hpp
+ * \date September 2011
+ * \author Matthieu Dorier
+ * \version 0.3
+ * 
+ * This file contains the definition of a child class of Configuration
+ * that has to be used in Client.
+ */
 #ifndef __DAMARIS_CLIENT_CONFIG_H
 #define __DAMARIS_CLIENT_CONFIG_H
 
@@ -33,7 +41,7 @@ namespace Damaris {
 	class ClientConfiguration : public Configuration {
 		
 	private:
-		static ClientConfiguration* m_instance;
+		static ClientConfiguration* m_instance; /*!< Singleton instance of ClientConfiguration. */
 		
 		/**
 		 * \brief Constructor.

@@ -37,6 +37,7 @@ namespace Damaris {
 		try {
 			configHandler->readConfigFile(cfgFile);
 		} catch(...) {
+			ERROR("While loading configuration file \"" << *cfgFile << "\", aborting");
 			exit(-1);
 		}
 		/* the ConfigHandler must be deleted afterward */
@@ -56,7 +57,7 @@ namespace Damaris {
 	void ClientConfiguration::initialize(std::string* configFile)
 	{
 		if(m_instance) {
-			WARN("Configuration already initialized.");
+			WARN("Configuration already initialized, won't be re-initialized");
 			return;
 		}
 		m_instance = new ClientConfiguration(configFile);
@@ -68,7 +69,7 @@ namespace Damaris {
 			delete m_instance;
 			m_instance = NULL;
 		} else {
-			WARN("Configuration not initialized, cannot be finalized.");
+			WARN("Configuration not initialized, cannot be finalized");
 		}
 	}
 

@@ -14,6 +14,16 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
+/**
+ * \file Calc.hpp
+ * \date September 2011
+ * \author Matthieu Dorier
+ * \version 0.3
+ * 
+ * This file defines the Calc structure, which is used to
+ * compute list of values from a string representation of a Layout.
+ * It uses a Boost.Spirit parser.
+ */
 #ifndef __DAMARIS_CALC_H
 #define __DAMARIS_CALC_H
 
@@ -26,6 +36,13 @@ namespace sp = boost::spirit;
 namespace qi = boost::spirit::qi;
 namespace ascii = boost::spirit::ascii;
 
+/**
+ * Calc is a structure containing Boost.Spirit parser elements
+ * required to compute a list of values from a string-based
+ * representation of a Layout. The input is a comma-separated
+ * list of arythmetic expressions using +, -, *, /, % and
+ * identifier whose value is defined in a SymTable mapping.
+ */
 template <typename Iterator, typename SymTable>
 struct Calc : qi::grammar<Iterator, std::vector<int>(), ascii::space_type>
 {

@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Client.cpp
- * \date July 2011
+ * \date September 2011
  * \author Matthieu Dorier
- * \version 0.1
+ * \version 0.3
  * \see Client.hpp
  */
 #include <string.h>
@@ -32,8 +32,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/LayoutFactory.hpp"
 #include "common/Message.hpp"
 #include "client/Client.hpp"
-
-//using namespace boost::interprocess;
 
 namespace Damaris {
 	
@@ -52,10 +50,12 @@ namespace Damaris {
 				msgQueue = SharedMessageQueue::open(posix_shmem,config->getMsgQueueName()->c_str());
 				segment = SharedMemorySegment::open(posix_shmem,config->getSegmentName()->c_str());
 			}
-			INFO("Client initialized successfully for core " << id << " with configuration " << *configfile);
+			DBG("Client initialized successfully for core " << id 
+			    << " with configuration \"" << *configfile << "\"");
 		}
 		catch(interprocess_exception &ex) {
-			std::cout << ex.what() << std::endl;
+			ERROR("While initializing shared memory objects:  " << ex.what());
+			exit(-1);
 		}
 		variables = new MetadataManager(segment);
 	}
@@ -74,10 +74,15 @@ namespace Damaris {
 			if(allocated != NULL) return (void*)(allocated->data);
 			size = layout->getRequiredMemoryLength();
 		}
-		// buffer allocation
-		buffer = static_cast<char*>(segment->allocate(size));
-		Variable allocated(*varname,iteration,id,layout,buffer);
-		variables->put(allocated);
+		// try buffer allocation
+		try {
+			buffer = static_cast<char*>(segment->allocate(size));
+			Variable allocated(*varname,iteration,id,layout,buffer);
+			variables->put(allocated);
+		} catch(boost::interprocess::bad_alloc &ex) {
+			WARN("Allocation failed for variable \"" << *varname << "\"");
+			buffer = NULL;
+		}
 		
 		return (void*)buffer;
 	}
@@ -110,11 +115,11 @@ namespace Damaris {
                 // send message
 		msgQueue->send(message,sizeof(Message),0);
                 // free message
-		INFO("Variable \"" << varname->c_str() << "\" has been commited");
+		DBG("Variable \"" << varname->c_str() << "\" has been commited");
 		delete message;
 
 		// remove variable from metadata
-		allocated->data = NULL; // prevent metadata manager from deleting content
+		allocated->data = NULL; // prevents metadata manager from deleting content
 		variables->remove(*allocated);
 
                 return 0;
@@ -142,8 +147,6 @@ namespace Damaris {
 		try {		
 			buffer = static_cast<char*>(segment->allocate(size));
 		} catch (...) {
-		}
-		if(buffer == NULL) {
 			ERROR("While writing \"" << varname->c_str() << "\", allocation failed");
 			return -3;
 		}
@@ -170,7 +173,7 @@ namespace Damaris {
 		// send message
 		msgQueue->send(message,sizeof(Message),0);
 		// free message
-		INFO("Variable \"" << varname->c_str() << "\" has been written");
+		DBG("Variable \"" << varname->c_str() << "\" has been written");
 		delete message;
 		
 		return size;
@@ -223,7 +226,7 @@ namespace Damaris {
 			if(res == 0) killed = 1;
 			return 0;
 		} else {
-			WARN("Trying to send kill signal multiple times to the server.");
+			WARN("Trying to send kill signal multiple times to the server");
 			return -1;
 		}
 	}
