@@ -16,19 +16,16 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Message.hpp
- * \date July 2011
+ * \date October 2011
  * \author Matthieu Dorier
- * \version 0.1
+ * \version 0.3
  * 
  * The Message.hpp file contains the definition of the Message structure.
  */
 #ifndef __DAMARIS_MESSAGE_H
 #define __DAMARIS_MESSAGE_H
 
-//#include <boost/interprocess/managed_shared_memory.hpp>
 #include "common/SharedMemory.hpp"
-
-//using namespace boost::interprocess;
 
 namespace Damaris {
 
@@ -45,13 +42,12 @@ namespace Damaris {
  * from simulation's cores to dedicated cores.
  */
 	struct Message {
-		msg_type_e type;			/*!< The type of message (MSG_VAR, MSG_SIG). */
-		int32_t sourceID;			/*!< The id of the source sending the message. */
-		int32_t iteration;			/*!< The iteration number in the simulation. */
-		char content[64];			/*!< The content (name of the variable or the event). */
-		int64_t layoutInfo[8]; 			/*!< Information related to the data layout. */
-//		managed_shared_memory::handle_t handle; /*!< Pointer to data (handle can be understood by all processes in their own space) */
-		handle_t handle;			/*!< Pointer to data relatively to the beginning of the shared memory segment */
+		msg_type_e 	type;		/*!< The type of message (MSG_VAR, MSG_SIG). */
+		int32_t 	sourceID;	/*!< The id of the source sending the message. */
+		int32_t 	iteration;	/*!< The iteration number in the simulation. */
+		char 		content[128];	/*!< The content (name of the variable or the event). */
+		int64_t 	layoutInfo[8]; 	/*!< Information related to the data layout. */
+		handle_t 	handle;		/*!< Pointer to data relatively to the beginning of the shared memory segment */
 	};
 	
 }

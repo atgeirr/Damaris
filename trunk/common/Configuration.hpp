@@ -51,7 +51,6 @@ namespace Damaris {
 		size_t msgQueueSize; 		/*!< Size (in number of messages) of the queue of messages. */
 		language_e defaultLanguage;	/*!< Default language (C, Fortran or Unknown) */
 		std::string sharedMemoryModel;	/*!< True is shared memory model is XSI */
-		//std::map<std::string,Parameter>* parameters; 	/*!< List of parameters. */
 		
 		std::map<std::string,Parameter>* parameters;	 	/*!< List of parameters. */
 		std::map<std::string,int> intparams;		/*!< Subset of parameters that are integers */

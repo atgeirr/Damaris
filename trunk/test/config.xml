@@ -1,18 +1,18 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<simulation name="my lovely simulation" language="fortran">
-	<nodes shmem="sysv">
-		<cores  count="16"/>
-		<clients count="15"/>
+<?xml version="1.0"?>
+<simulation name="my simulation" language="fortran">
+	<architecture>
+		<cores  count="16">
+			<clients count="15"/>
+		</cores>
 		<buffer name="/home/matthieu/Work/damaris/trunk/server/test3" size="67108864" />
 		<queue  name="/home/matthieu/Work/damaris/trunk/server/test2" size="100" />
-	</nodes>
+	</architecture>
 	<data>
 		<parameter name="x" type="int" value="42" />
 
 		<layout name="my layout" type="float" dimensions="64,16,2" />
-
+		<layout name="str layout" type="char" dimensiones="128" />
 		<group name="info" enabled="yes">
-			<layout name="str layout" type="char" dimensions="128" />
 			<variable name="my string" layout="str layout"/>
 		</group>
 
@@ -20,5 +20,5 @@
 	</data>
 	<actions>
 		<event name="dump" action="dump_hdf5" using="persistence.so"/>
-	</action>
+	</actions>
 </simulation>

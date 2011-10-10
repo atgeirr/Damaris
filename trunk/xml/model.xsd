@@ -1,0 +1,116 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<!-- Client node -->
+	<xs:complexType name="clients_mdl">
+	<xs:attribute name="count" type="xs:unsignedInt" use="required"/>	
+	</xs:complexType>
+
+	<!-- Cores node -->
+	<xs:complexType name="cores_mdl">
+	<xs:sequence>
+		<xs:element name="clients" type="clients_mdl"/>
+	</xs:sequence>
+	<xs:attribute name="count" type="xs:unsignedInt" use="required"/>
+	</xs:complexType>
+
+	<!-- Buffer node -->
+	<xs:complexType name="buffer_mdl">
+	<xs:attribute name="name" type="xs:string"      use="required"/>
+	<xs:attribute name="size" type="xs:unsignedInt" use="required"/>
+	</xs:complexType>	
+
+	<!-- Queue node -->
+	<xs:complexType name="queue_mdl">
+	<xs:attribute name="name" type="xs:string"      use="required"/>
+	<xs:attribute name="size" type="xs:unsignedInt" use="required"/>
+	</xs:complexType>
+
+	<!-- Architecture node -->
+	<xs:complexType name="architecture_mdl">
+	<xs:sequence>
+		<xs:element name="cores"  type="cores_mdl" />
+		<xs:element name="buffer" type="buffer_mdl"/>
+		<xs:element name="queue"  type="queue_mdl" />
+	</xs:sequence>
+	<xs:attribute name="name" type="xs:string" use="optional"/>
+	</xs:complexType>
+
+	<!-- Layout node -->
+	<xs:complexType name="layout_mdl">
+	<xs:sequence>
+		<xs:element name="description" type="xs:string" minOccurs="0"/>
+	</xs:sequence>
+	<xs:attribute name="name"       type="xs:string" use="required"/>
+	<xs:attribute name="type"       type="xs:string" use="required"/>
+	<xs:attribute name="dimensions" type="xs:string" use="optional"/>
+	</xs:complexType>
+
+	<!-- Variable node -->
+	<xs:complexType name="variable_mdl">
+	<xs:sequence>
+		<xs:element name="description" type="xs:string" minOccurs="0"/>
+	</xs:sequence>
+	<xs:attribute name="name"    type="xs:string"  use="required"/>
+	<xs:attribute name="layout"  type="xs:string"  use="required"/>
+	<xs:attribute name="enabled" type="xs:boolean" use="optional"/>
+	</xs:complexType>
+
+	<!-- Group node -->
+	<xs:complexType name="group_mdl">
+	<xs:sequence>
+		<xs:element name="variable" type="variable_mdl" minOccurs="0" maxOccurs="unbounded"/>
+		<xs:element name="group"    type="group_mdl"    minOccurs="0" maxOccurs="unbounded"/>
+	</xs:sequence>
+	<xs:attribute name="name"    type="xs:string"  use="required"/>
+	<xs:attribute name="enabled" type="xs:boolean" use="optional"/>
+	</xs:complexType>
+
+	<!-- Parameter node -->
+	<xs:complexType name="parameter_mdl">
+	<xs:sequence>
+		<xs:element name="description" type="xs:string" minOccurs="0"/>
+	</xs:sequence>
+	<xs:attribute name="name"  type="xs:string" use="required"/>
+	<xs:attribute name="type"  type="xs:string" use="required"/>
+	<xs:attribute name="value" type="xs:string" use="optional"/>
+	</xs:complexType>
+
+	<!-- Data node -->
+	<xs:complexType name="data_mdl">
+	<xs:sequence>
+		<xs:element name="parameter" type="parameter_mdl" minOccurs="0" maxOccurs="unbounded"/>
+		<xs:element name="layout"    type="layout_mdl"    minOccurs="0" maxOccurs="unbounded"/>
+		<xs:element name="variable"  type="variable_mdl"  minOccurs="0" maxOccurs="unbounded"/>
+		<xs:element name="group"     type="group_mdl"     minOccurs="0" maxOccurs="unbounded"/>
+	</xs:sequence>
+	</xs:complexType>
+
+	<!-- Event node -->
+	<xs:complexType name="event_mdl">
+	<xs:attribute name="name"   type="xs:string" use="required"/>
+	<xs:attribute name="action" type="xs:string" use="required"/>
+	<xs:attribute name="using"  type="xs:string" use="required"/>
+	</xs:complexType>
+
+	<!-- Actions node -->
+	<xs:complexType name="actions_mdl">
+	<xs:sequence>
+		<xs:element name="event" type="event_mdl" minOccurs="0" maxOccurs="unbounded"/>
+	</xs:sequence>
+	</xs:complexType>
+
+	<!-- Simulation node -->
+	<xs:complexType name="simulation_mdl">
+	<xs:sequence>
+		<xs:element name="architecture" type="architecture_mdl" minOccurs="1" maxOccurs="1"/>
+		<xs:element name="data"         type="data_mdl"         maxOccurs="1"/>
+		<xs:element name="actions"      type="actions_mdl"      maxOccurs="1"/>
+	</xs:sequence>
+	<xs:attribute name="name"     type="xs:string" use="required"/>
+	<xs:attribute name="language" type="xs:string" use="optional" default="C"/>
+	</xs:complexType>
+
+	<!-- Root element -->
+	<xs:element name="simulation" type="simulation_mdl"/>
+</xs:schema>

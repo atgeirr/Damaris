@@ -24,6 +24,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifndef __DAMARIS_SHARED_MEMORY_H
 #define __DAMARIS_SHARED_MEMORY_H
+
 #include <boost/interprocess/managed_shared_memory.hpp>
 
 namespace Damaris {

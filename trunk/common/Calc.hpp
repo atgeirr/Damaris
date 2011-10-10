@@ -36,6 +36,7 @@ namespace sp = boost::spirit;
 namespace qi = boost::spirit::qi;
 namespace ascii = boost::spirit::ascii;
 
+namespace Damaris {
 /**
  * Calc is a structure containing Boost.Spirit parser elements
  * required to compute a list of values from a string-based
@@ -76,4 +77,5 @@ struct Calc : qi::grammar<Iterator, std::vector<int>(), ascii::space_type>
 	}
 };
 
+}
 #endif
