@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified"
+	targetNamespace="http://damaris.gforge.inria.fr/Damaris/Model"
+	xmlns:mdl="http://damaris.gforge.inria.fr/Damaris/Model">
 
 	<!-- Client node -->
 	<xs:complexType name="clients_mdl">
@@ -9,7 +12,7 @@
 	<!-- Cores node -->
 	<xs:complexType name="cores_mdl">
 	<xs:sequence>
-		<xs:element name="clients" type="clients_mdl"/>
+		<xs:element name="clients" type="mdl:clients_mdl"/>
 	</xs:sequence>
 	<xs:attribute name="count" type="xs:unsignedInt" use="required"/>
 	</xs:complexType>
@@ -29,9 +32,9 @@
 	<!-- Architecture node -->
 	<xs:complexType name="architecture_mdl">
 	<xs:sequence>
-		<xs:element name="cores"  type="cores_mdl" />
-		<xs:element name="buffer" type="buffer_mdl"/>
-		<xs:element name="queue"  type="queue_mdl" />
+		<xs:element name="cores"  type="mdl:cores_mdl" />
+		<xs:element name="buffer" type="mdl:buffer_mdl"/>
+		<xs:element name="queue"  type="mdl:queue_mdl" />
 	</xs:sequence>
 	<xs:attribute name="name" type="xs:string" use="optional"/>
 	</xs:complexType>
@@ -59,8 +62,8 @@
 	<!-- Group node -->
 	<xs:complexType name="group_mdl">
 	<xs:sequence>
-		<xs:element name="variable" type="variable_mdl" minOccurs="0" maxOccurs="unbounded"/>
-		<xs:element name="group"    type="group_mdl"    minOccurs="0" maxOccurs="unbounded"/>
+		<xs:element name="variable" type="mdl:variable_mdl" minOccurs="0" maxOccurs="unbounded"/>
+		<xs:element name="group"    type="mdl:group_mdl"    minOccurs="0" maxOccurs="unbounded"/>
 	</xs:sequence>
 	<xs:attribute name="name"    type="xs:string"  use="required"/>
 	<xs:attribute name="enabled" type="xs:boolean" use="optional"/>
@@ -79,10 +82,10 @@
 	<!-- Data node -->
 	<xs:complexType name="data_mdl">
 	<xs:sequence>
-		<xs:element name="parameter" type="parameter_mdl" minOccurs="0" maxOccurs="unbounded"/>
-		<xs:element name="layout"    type="layout_mdl"    minOccurs="0" maxOccurs="unbounded"/>
-		<xs:element name="variable"  type="variable_mdl"  minOccurs="0" maxOccurs="unbounded"/>
-		<xs:element name="group"     type="group_mdl"     minOccurs="0" maxOccurs="unbounded"/>
+		<xs:element name="parameter" type="mdl:parameter_mdl" minOccurs="0" maxOccurs="unbounded"/>
+		<xs:element name="layout"    type="mdl:layout_mdl"    minOccurs="0" maxOccurs="unbounded"/>
+		<xs:element name="variable"  type="mdl:variable_mdl"  minOccurs="0" maxOccurs="unbounded"/>
+		<xs:element name="group"     type="mdl:group_mdl"     minOccurs="0" maxOccurs="unbounded"/>
 	</xs:sequence>
 	</xs:complexType>
 
@@ -96,21 +99,21 @@
 	<!-- Actions node -->
 	<xs:complexType name="actions_mdl">
 	<xs:sequence>
-		<xs:element name="event" type="event_mdl" minOccurs="0" maxOccurs="unbounded"/>
+		<xs:element name="event" type="mdl:event_mdl" minOccurs="0" maxOccurs="unbounded"/>
 	</xs:sequence>
 	</xs:complexType>
 
 	<!-- Simulation node -->
 	<xs:complexType name="simulation_mdl">
 	<xs:sequence>
-		<xs:element name="architecture" type="architecture_mdl" minOccurs="1" maxOccurs="1"/>
-		<xs:element name="data"         type="data_mdl"         maxOccurs="1"/>
-		<xs:element name="actions"      type="actions_mdl"      maxOccurs="1"/>
+		<xs:element name="architecture" type="mdl:architecture_mdl" minOccurs="1" maxOccurs="1"/>
+		<xs:element name="data"         type="mdl:data_mdl"         maxOccurs="1"/>
+		<xs:element name="actions"      type="mdl:actions_mdl"      maxOccurs="1"/>
 	</xs:sequence>
 	<xs:attribute name="name"     type="xs:string" use="required"/>
 	<xs:attribute name="language" type="xs:string" use="optional" default="C"/>
 	</xs:complexType>
 
 	<!-- Root element -->
-	<xs:element name="simulation" type="simulation_mdl"/>
+	<xs:element name="simulation" type="mdl:simulation_mdl"/>
 </xs:schema>

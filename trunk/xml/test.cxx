@@ -2,7 +2,7 @@
 #include "model.hpp"
 
 using namespace std;
-
+using namespace Damaris::Model;
 int
 main (int argc, char* argv[])
 {

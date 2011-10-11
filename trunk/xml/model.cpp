@@ -56,2797 +56,2814 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "model.hpp"
 
-// clients_mdl
-// 
-
-const clients_mdl::count_type& clients_mdl::
-count () const
-{
-  return this->count_.get ();
-}
-
-clients_mdl::count_type& clients_mdl::
-count ()
-{
-  return this->count_.get ();
-}
-
-void clients_mdl::
-count (const count_type& x)
-{
-  this->count_.set (x);
-}
-
-
-// cores_mdl
-// 
-
-const cores_mdl::clients_type& cores_mdl::
-clients () const
-{
-  return this->clients_.get ();
-}
-
-cores_mdl::clients_type& cores_mdl::
-clients ()
-{
-  return this->clients_.get ();
-}
-
-void cores_mdl::
-clients (const clients_type& x)
-{
-  this->clients_.set (x);
-}
-
-void cores_mdl::
-clients (::std::auto_ptr< clients_type > x)
-{
-  this->clients_.set (x);
-}
-
-const cores_mdl::count_type& cores_mdl::
-count () const
-{
-  return this->count_.get ();
-}
-
-cores_mdl::count_type& cores_mdl::
-count ()
-{
-  return this->count_.get ();
-}
-
-void cores_mdl::
-count (const count_type& x)
-{
-  this->count_.set (x);
-}
-
-
-// buffer_mdl
-// 
-
-const buffer_mdl::name_type& buffer_mdl::
-name () const
-{
-  return this->name_.get ();
-}
-
-buffer_mdl::name_type& buffer_mdl::
-name ()
-{
-  return this->name_.get ();
-}
-
-void buffer_mdl::
-name (const name_type& x)
-{
-  this->name_.set (x);
-}
-
-void buffer_mdl::
-name (::std::auto_ptr< name_type > x)
-{
-  this->name_.set (x);
-}
-
-const buffer_mdl::size_type& buffer_mdl::
-size () const
-{
-  return this->size_.get ();
-}
-
-buffer_mdl::size_type& buffer_mdl::
-size ()
-{
-  return this->size_.get ();
-}
-
-void buffer_mdl::
-size (const size_type& x)
-{
-  this->size_.set (x);
-}
-
-
-// queue_mdl
-// 
-
-const queue_mdl::name_type& queue_mdl::
-name () const
-{
-  return this->name_.get ();
-}
-
-queue_mdl::name_type& queue_mdl::
-name ()
-{
-  return this->name_.get ();
-}
-
-void queue_mdl::
-name (const name_type& x)
-{
-  this->name_.set (x);
-}
-
-void queue_mdl::
-name (::std::auto_ptr< name_type > x)
-{
-  this->name_.set (x);
-}
-
-const queue_mdl::size_type& queue_mdl::
-size () const
-{
-  return this->size_.get ();
-}
-
-queue_mdl::size_type& queue_mdl::
-size ()
-{
-  return this->size_.get ();
-}
-
-void queue_mdl::
-size (const size_type& x)
-{
-  this->size_.set (x);
-}
-
-
-// architecture_mdl
-// 
-
-const architecture_mdl::cores_type& architecture_mdl::
-cores () const
-{
-  return this->cores_.get ();
-}
-
-architecture_mdl::cores_type& architecture_mdl::
-cores ()
-{
-  return this->cores_.get ();
-}
-
-void architecture_mdl::
-cores (const cores_type& x)
-{
-  this->cores_.set (x);
-}
-
-void architecture_mdl::
-cores (::std::auto_ptr< cores_type > x)
-{
-  this->cores_.set (x);
-}
-
-const architecture_mdl::buffer_type& architecture_mdl::
-buffer () const
-{
-  return this->buffer_.get ();
-}
-
-architecture_mdl::buffer_type& architecture_mdl::
-buffer ()
-{
-  return this->buffer_.get ();
-}
-
-void architecture_mdl::
-buffer (const buffer_type& x)
-{
-  this->buffer_.set (x);
-}
-
-void architecture_mdl::
-buffer (::std::auto_ptr< buffer_type > x)
-{
-  this->buffer_.set (x);
-}
-
-const architecture_mdl::queue_type& architecture_mdl::
-queue () const
-{
-  return this->queue_.get ();
-}
-
-architecture_mdl::queue_type& architecture_mdl::
-queue ()
-{
-  return this->queue_.get ();
-}
-
-void architecture_mdl::
-queue (const queue_type& x)
-{
-  this->queue_.set (x);
-}
-
-void architecture_mdl::
-queue (::std::auto_ptr< queue_type > x)
-{
-  this->queue_.set (x);
-}
-
-const architecture_mdl::name_optional& architecture_mdl::
-name () const
-{
-  return this->name_;
-}
-
-architecture_mdl::name_optional& architecture_mdl::
-name ()
-{
-  return this->name_;
-}
-
-void architecture_mdl::
-name (const name_type& x)
-{
-  this->name_.set (x);
-}
-
-void architecture_mdl::
-name (const name_optional& x)
-{
-  this->name_ = x;
-}
-
-void architecture_mdl::
-name (::std::auto_ptr< name_type > x)
-{
-  this->name_.set (x);
-}
-
-
-// layout_mdl
-// 
-
-const layout_mdl::description_optional& layout_mdl::
-description () const
-{
-  return this->description_;
-}
-
-layout_mdl::description_optional& layout_mdl::
-description ()
-{
-  return this->description_;
-}
-
-void layout_mdl::
-description (const description_type& x)
-{
-  this->description_.set (x);
-}
-
-void layout_mdl::
-description (const description_optional& x)
-{
-  this->description_ = x;
-}
-
-void layout_mdl::
-description (::std::auto_ptr< description_type > x)
-{
-  this->description_.set (x);
-}
-
-const layout_mdl::name_type& layout_mdl::
-name () const
-{
-  return this->name_.get ();
-}
-
-layout_mdl::name_type& layout_mdl::
-name ()
-{
-  return this->name_.get ();
-}
-
-void layout_mdl::
-name (const name_type& x)
-{
-  this->name_.set (x);
-}
-
-void layout_mdl::
-name (::std::auto_ptr< name_type > x)
-{
-  this->name_.set (x);
-}
-
-const layout_mdl::type_type& layout_mdl::
-type () const
-{
-  return this->type_.get ();
-}
-
-layout_mdl::type_type& layout_mdl::
-type ()
-{
-  return this->type_.get ();
-}
-
-void layout_mdl::
-type (const type_type& x)
-{
-  this->type_.set (x);
-}
-
-void layout_mdl::
-type (::std::auto_ptr< type_type > x)
-{
-  this->type_.set (x);
-}
-
-const layout_mdl::dimensions_optional& layout_mdl::
-dimensions () const
-{
-  return this->dimensions_;
-}
-
-layout_mdl::dimensions_optional& layout_mdl::
-dimensions ()
-{
-  return this->dimensions_;
-}
-
-void layout_mdl::
-dimensions (const dimensions_type& x)
-{
-  this->dimensions_.set (x);
-}
-
-void layout_mdl::
-dimensions (const dimensions_optional& x)
-{
-  this->dimensions_ = x;
-}
-
-void layout_mdl::
-dimensions (::std::auto_ptr< dimensions_type > x)
-{
-  this->dimensions_.set (x);
-}
-
-
-// variable_mdl
-// 
-
-const variable_mdl::description_optional& variable_mdl::
-description () const
-{
-  return this->description_;
-}
-
-variable_mdl::description_optional& variable_mdl::
-description ()
-{
-  return this->description_;
-}
-
-void variable_mdl::
-description (const description_type& x)
-{
-  this->description_.set (x);
-}
-
-void variable_mdl::
-description (const description_optional& x)
-{
-  this->description_ = x;
-}
-
-void variable_mdl::
-description (::std::auto_ptr< description_type > x)
-{
-  this->description_.set (x);
-}
-
-const variable_mdl::name_type& variable_mdl::
-name () const
-{
-  return this->name_.get ();
-}
-
-variable_mdl::name_type& variable_mdl::
-name ()
-{
-  return this->name_.get ();
-}
-
-void variable_mdl::
-name (const name_type& x)
-{
-  this->name_.set (x);
-}
-
-void variable_mdl::
-name (::std::auto_ptr< name_type > x)
-{
-  this->name_.set (x);
-}
-
-const variable_mdl::layout_type& variable_mdl::
-layout () const
-{
-  return this->layout_.get ();
-}
-
-variable_mdl::layout_type& variable_mdl::
-layout ()
-{
-  return this->layout_.get ();
-}
-
-void variable_mdl::
-layout (const layout_type& x)
-{
-  this->layout_.set (x);
-}
-
-void variable_mdl::
-layout (::std::auto_ptr< layout_type > x)
-{
-  this->layout_.set (x);
-}
-
-const variable_mdl::enabled_optional& variable_mdl::
-enabled () const
-{
-  return this->enabled_;
-}
-
-variable_mdl::enabled_optional& variable_mdl::
-enabled ()
-{
-  return this->enabled_;
-}
-
-void variable_mdl::
-enabled (const enabled_type& x)
-{
-  this->enabled_.set (x);
-}
-
-void variable_mdl::
-enabled (const enabled_optional& x)
-{
-  this->enabled_ = x;
-}
-
-
-// group_mdl
-// 
-
-const group_mdl::variable_sequence& group_mdl::
-variable () const
-{
-  return this->variable_;
-}
-
-group_mdl::variable_sequence& group_mdl::
-variable ()
-{
-  return this->variable_;
-}
-
-void group_mdl::
-variable (const variable_sequence& s)
-{
-  this->variable_ = s;
-}
-
-const group_mdl::group_sequence& group_mdl::
-group () const
-{
-  return this->group_;
-}
-
-group_mdl::group_sequence& group_mdl::
-group ()
-{
-  return this->group_;
-}
-
-void group_mdl::
-group (const group_sequence& s)
-{
-  this->group_ = s;
-}
-
-const group_mdl::name_type& group_mdl::
-name () const
-{
-  return this->name_.get ();
-}
-
-group_mdl::name_type& group_mdl::
-name ()
-{
-  return this->name_.get ();
-}
-
-void group_mdl::
-name (const name_type& x)
-{
-  this->name_.set (x);
-}
-
-void group_mdl::
-name (::std::auto_ptr< name_type > x)
-{
-  this->name_.set (x);
-}
-
-const group_mdl::enabled_optional& group_mdl::
-enabled () const
-{
-  return this->enabled_;
-}
-
-group_mdl::enabled_optional& group_mdl::
-enabled ()
-{
-  return this->enabled_;
-}
-
-void group_mdl::
-enabled (const enabled_type& x)
-{
-  this->enabled_.set (x);
-}
-
-void group_mdl::
-enabled (const enabled_optional& x)
-{
-  this->enabled_ = x;
-}
-
-
-// parameter_mdl
-// 
-
-const parameter_mdl::description_optional& parameter_mdl::
-description () const
-{
-  return this->description_;
-}
-
-parameter_mdl::description_optional& parameter_mdl::
-description ()
-{
-  return this->description_;
-}
-
-void parameter_mdl::
-description (const description_type& x)
-{
-  this->description_.set (x);
-}
-
-void parameter_mdl::
-description (const description_optional& x)
-{
-  this->description_ = x;
-}
-
-void parameter_mdl::
-description (::std::auto_ptr< description_type > x)
-{
-  this->description_.set (x);
-}
-
-const parameter_mdl::name_type& parameter_mdl::
-name () const
-{
-  return this->name_.get ();
-}
-
-parameter_mdl::name_type& parameter_mdl::
-name ()
-{
-  return this->name_.get ();
-}
-
-void parameter_mdl::
-name (const name_type& x)
-{
-  this->name_.set (x);
-}
-
-void parameter_mdl::
-name (::std::auto_ptr< name_type > x)
-{
-  this->name_.set (x);
-}
-
-const parameter_mdl::type_type& parameter_mdl::
-type () const
-{
-  return this->type_.get ();
-}
-
-parameter_mdl::type_type& parameter_mdl::
-type ()
-{
-  return this->type_.get ();
-}
-
-void parameter_mdl::
-type (const type_type& x)
-{
-  this->type_.set (x);
-}
-
-void parameter_mdl::
-type (::std::auto_ptr< type_type > x)
-{
-  this->type_.set (x);
-}
-
-const parameter_mdl::value_optional& parameter_mdl::
-value () const
-{
-  return this->value_;
-}
-
-parameter_mdl::value_optional& parameter_mdl::
-value ()
-{
-  return this->value_;
-}
-
-void parameter_mdl::
-value (const value_type& x)
-{
-  this->value_.set (x);
-}
-
-void parameter_mdl::
-value (const value_optional& x)
-{
-  this->value_ = x;
-}
-
-void parameter_mdl::
-value (::std::auto_ptr< value_type > x)
-{
-  this->value_.set (x);
-}
-
-
-// data_mdl
-// 
-
-const data_mdl::parameter_sequence& data_mdl::
-parameter () const
-{
-  return this->parameter_;
-}
-
-data_mdl::parameter_sequence& data_mdl::
-parameter ()
-{
-  return this->parameter_;
-}
-
-void data_mdl::
-parameter (const parameter_sequence& s)
-{
-  this->parameter_ = s;
-}
-
-const data_mdl::layout_sequence& data_mdl::
-layout () const
-{
-  return this->layout_;
-}
-
-data_mdl::layout_sequence& data_mdl::
-layout ()
-{
-  return this->layout_;
-}
-
-void data_mdl::
-layout (const layout_sequence& s)
-{
-  this->layout_ = s;
-}
-
-const data_mdl::variable_sequence& data_mdl::
-variable () const
-{
-  return this->variable_;
-}
-
-data_mdl::variable_sequence& data_mdl::
-variable ()
-{
-  return this->variable_;
-}
-
-void data_mdl::
-variable (const variable_sequence& s)
-{
-  this->variable_ = s;
-}
-
-const data_mdl::group_sequence& data_mdl::
-group () const
-{
-  return this->group_;
-}
-
-data_mdl::group_sequence& data_mdl::
-group ()
-{
-  return this->group_;
-}
-
-void data_mdl::
-group (const group_sequence& s)
-{
-  this->group_ = s;
-}
-
-
-// event_mdl
-// 
-
-const event_mdl::name_type& event_mdl::
-name () const
-{
-  return this->name_.get ();
-}
-
-event_mdl::name_type& event_mdl::
-name ()
-{
-  return this->name_.get ();
-}
-
-void event_mdl::
-name (const name_type& x)
-{
-  this->name_.set (x);
-}
-
-void event_mdl::
-name (::std::auto_ptr< name_type > x)
-{
-  this->name_.set (x);
-}
-
-const event_mdl::action_type& event_mdl::
-action () const
-{
-  return this->action_.get ();
-}
-
-event_mdl::action_type& event_mdl::
-action ()
-{
-  return this->action_.get ();
-}
-
-void event_mdl::
-action (const action_type& x)
-{
-  this->action_.set (x);
-}
-
-void event_mdl::
-action (::std::auto_ptr< action_type > x)
-{
-  this->action_.set (x);
-}
-
-const event_mdl::using_type& event_mdl::
-using_ () const
-{
-  return this->using__.get ();
-}
-
-event_mdl::using_type& event_mdl::
-using_ ()
-{
-  return this->using__.get ();
-}
-
-void event_mdl::
-using_ (const using_type& x)
-{
-  this->using__.set (x);
-}
-
-void event_mdl::
-using_ (::std::auto_ptr< using_type > x)
-{
-  this->using__.set (x);
-}
-
-
-// actions_mdl
-// 
-
-const actions_mdl::event_sequence& actions_mdl::
-event () const
-{
-  return this->event_;
-}
-
-actions_mdl::event_sequence& actions_mdl::
-event ()
-{
-  return this->event_;
-}
-
-void actions_mdl::
-event (const event_sequence& s)
-{
-  this->event_ = s;
-}
-
-
-// simulation_mdl
-// 
-
-const simulation_mdl::architecture_type& simulation_mdl::
-architecture () const
-{
-  return this->architecture_.get ();
-}
-
-simulation_mdl::architecture_type& simulation_mdl::
-architecture ()
-{
-  return this->architecture_.get ();
-}
-
-void simulation_mdl::
-architecture (const architecture_type& x)
-{
-  this->architecture_.set (x);
-}
-
-void simulation_mdl::
-architecture (::std::auto_ptr< architecture_type > x)
-{
-  this->architecture_.set (x);
-}
-
-const simulation_mdl::data_type& simulation_mdl::
-data () const
-{
-  return this->data_.get ();
-}
-
-simulation_mdl::data_type& simulation_mdl::
-data ()
-{
-  return this->data_.get ();
-}
-
-void simulation_mdl::
-data (const data_type& x)
-{
-  this->data_.set (x);
-}
-
-void simulation_mdl::
-data (::std::auto_ptr< data_type > x)
-{
-  this->data_.set (x);
-}
-
-const simulation_mdl::actions_type& simulation_mdl::
-actions () const
-{
-  return this->actions_.get ();
-}
-
-simulation_mdl::actions_type& simulation_mdl::
-actions ()
-{
-  return this->actions_.get ();
-}
-
-void simulation_mdl::
-actions (const actions_type& x)
-{
-  this->actions_.set (x);
+namespace Damaris
+{
+  namespace Model
+  {
+    // clients_mdl
+    // 
+
+    const clients_mdl::count_type& clients_mdl::
+    count () const
+    {
+      return this->count_.get ();
+    }
+
+    clients_mdl::count_type& clients_mdl::
+    count ()
+    {
+      return this->count_.get ();
+    }
+
+    void clients_mdl::
+    count (const count_type& x)
+    {
+      this->count_.set (x);
+    }
+
+
+    // cores_mdl
+    // 
+
+    const cores_mdl::clients_type& cores_mdl::
+    clients () const
+    {
+      return this->clients_.get ();
+    }
+
+    cores_mdl::clients_type& cores_mdl::
+    clients ()
+    {
+      return this->clients_.get ();
+    }
+
+    void cores_mdl::
+    clients (const clients_type& x)
+    {
+      this->clients_.set (x);
+    }
+
+    void cores_mdl::
+    clients (::std::auto_ptr< clients_type > x)
+    {
+      this->clients_.set (x);
+    }
+
+    const cores_mdl::count_type& cores_mdl::
+    count () const
+    {
+      return this->count_.get ();
+    }
+
+    cores_mdl::count_type& cores_mdl::
+    count ()
+    {
+      return this->count_.get ();
+    }
+
+    void cores_mdl::
+    count (const count_type& x)
+    {
+      this->count_.set (x);
+    }
+
+
+    // buffer_mdl
+    // 
+
+    const buffer_mdl::name_type& buffer_mdl::
+    name () const
+    {
+      return this->name_.get ();
+    }
+
+    buffer_mdl::name_type& buffer_mdl::
+    name ()
+    {
+      return this->name_.get ();
+    }
+
+    void buffer_mdl::
+    name (const name_type& x)
+    {
+      this->name_.set (x);
+    }
+
+    void buffer_mdl::
+    name (::std::auto_ptr< name_type > x)
+    {
+      this->name_.set (x);
+    }
+
+    const buffer_mdl::size_type& buffer_mdl::
+    size () const
+    {
+      return this->size_.get ();
+    }
+
+    buffer_mdl::size_type& buffer_mdl::
+    size ()
+    {
+      return this->size_.get ();
+    }
+
+    void buffer_mdl::
+    size (const size_type& x)
+    {
+      this->size_.set (x);
+    }
+
+
+    // queue_mdl
+    // 
+
+    const queue_mdl::name_type& queue_mdl::
+    name () const
+    {
+      return this->name_.get ();
+    }
+
+    queue_mdl::name_type& queue_mdl::
+    name ()
+    {
+      return this->name_.get ();
+    }
+
+    void queue_mdl::
+    name (const name_type& x)
+    {
+      this->name_.set (x);
+    }
+
+    void queue_mdl::
+    name (::std::auto_ptr< name_type > x)
+    {
+      this->name_.set (x);
+    }
+
+    const queue_mdl::size_type& queue_mdl::
+    size () const
+    {
+      return this->size_.get ();
+    }
+
+    queue_mdl::size_type& queue_mdl::
+    size ()
+    {
+      return this->size_.get ();
+    }
+
+    void queue_mdl::
+    size (const size_type& x)
+    {
+      this->size_.set (x);
+    }
+
+
+    // architecture_mdl
+    // 
+
+    const architecture_mdl::cores_type& architecture_mdl::
+    cores () const
+    {
+      return this->cores_.get ();
+    }
+
+    architecture_mdl::cores_type& architecture_mdl::
+    cores ()
+    {
+      return this->cores_.get ();
+    }
+
+    void architecture_mdl::
+    cores (const cores_type& x)
+    {
+      this->cores_.set (x);
+    }
+
+    void architecture_mdl::
+    cores (::std::auto_ptr< cores_type > x)
+    {
+      this->cores_.set (x);
+    }
+
+    const architecture_mdl::buffer_type& architecture_mdl::
+    buffer () const
+    {
+      return this->buffer_.get ();
+    }
+
+    architecture_mdl::buffer_type& architecture_mdl::
+    buffer ()
+    {
+      return this->buffer_.get ();
+    }
+
+    void architecture_mdl::
+    buffer (const buffer_type& x)
+    {
+      this->buffer_.set (x);
+    }
+
+    void architecture_mdl::
+    buffer (::std::auto_ptr< buffer_type > x)
+    {
+      this->buffer_.set (x);
+    }
+
+    const architecture_mdl::queue_type& architecture_mdl::
+    queue () const
+    {
+      return this->queue_.get ();
+    }
+
+    architecture_mdl::queue_type& architecture_mdl::
+    queue ()
+    {
+      return this->queue_.get ();
+    }
+
+    void architecture_mdl::
+    queue (const queue_type& x)
+    {
+      this->queue_.set (x);
+    }
+
+    void architecture_mdl::
+    queue (::std::auto_ptr< queue_type > x)
+    {
+      this->queue_.set (x);
+    }
+
+    const architecture_mdl::name_optional& architecture_mdl::
+    name () const
+    {
+      return this->name_;
+    }
+
+    architecture_mdl::name_optional& architecture_mdl::
+    name ()
+    {
+      return this->name_;
+    }
+
+    void architecture_mdl::
+    name (const name_type& x)
+    {
+      this->name_.set (x);
+    }
+
+    void architecture_mdl::
+    name (const name_optional& x)
+    {
+      this->name_ = x;
+    }
+
+    void architecture_mdl::
+    name (::std::auto_ptr< name_type > x)
+    {
+      this->name_.set (x);
+    }
+
+
+    // layout_mdl
+    // 
+
+    const layout_mdl::description_optional& layout_mdl::
+    description () const
+    {
+      return this->description_;
+    }
+
+    layout_mdl::description_optional& layout_mdl::
+    description ()
+    {
+      return this->description_;
+    }
+
+    void layout_mdl::
+    description (const description_type& x)
+    {
+      this->description_.set (x);
+    }
+
+    void layout_mdl::
+    description (const description_optional& x)
+    {
+      this->description_ = x;
+    }
+
+    void layout_mdl::
+    description (::std::auto_ptr< description_type > x)
+    {
+      this->description_.set (x);
+    }
+
+    const layout_mdl::name_type& layout_mdl::
+    name () const
+    {
+      return this->name_.get ();
+    }
+
+    layout_mdl::name_type& layout_mdl::
+    name ()
+    {
+      return this->name_.get ();
+    }
+
+    void layout_mdl::
+    name (const name_type& x)
+    {
+      this->name_.set (x);
+    }
+
+    void layout_mdl::
+    name (::std::auto_ptr< name_type > x)
+    {
+      this->name_.set (x);
+    }
+
+    const layout_mdl::type_type& layout_mdl::
+    type () const
+    {
+      return this->type_.get ();
+    }
+
+    layout_mdl::type_type& layout_mdl::
+    type ()
+    {
+      return this->type_.get ();
+    }
+
+    void layout_mdl::
+    type (const type_type& x)
+    {
+      this->type_.set (x);
+    }
+
+    void layout_mdl::
+    type (::std::auto_ptr< type_type > x)
+    {
+      this->type_.set (x);
+    }
+
+    const layout_mdl::dimensions_optional& layout_mdl::
+    dimensions () const
+    {
+      return this->dimensions_;
+    }
+
+    layout_mdl::dimensions_optional& layout_mdl::
+    dimensions ()
+    {
+      return this->dimensions_;
+    }
+
+    void layout_mdl::
+    dimensions (const dimensions_type& x)
+    {
+      this->dimensions_.set (x);
+    }
+
+    void layout_mdl::
+    dimensions (const dimensions_optional& x)
+    {
+      this->dimensions_ = x;
+    }
+
+    void layout_mdl::
+    dimensions (::std::auto_ptr< dimensions_type > x)
+    {
+      this->dimensions_.set (x);
+    }
+
+
+    // variable_mdl
+    // 
+
+    const variable_mdl::description_optional& variable_mdl::
+    description () const
+    {
+      return this->description_;
+    }
+
+    variable_mdl::description_optional& variable_mdl::
+    description ()
+    {
+      return this->description_;
+    }
+
+    void variable_mdl::
+    description (const description_type& x)
+    {
+      this->description_.set (x);
+    }
+
+    void variable_mdl::
+    description (const description_optional& x)
+    {
+      this->description_ = x;
+    }
+
+    void variable_mdl::
+    description (::std::auto_ptr< description_type > x)
+    {
+      this->description_.set (x);
+    }
+
+    const variable_mdl::name_type& variable_mdl::
+    name () const
+    {
+      return this->name_.get ();
+    }
+
+    variable_mdl::name_type& variable_mdl::
+    name ()
+    {
+      return this->name_.get ();
+    }
+
+    void variable_mdl::
+    name (const name_type& x)
+    {
+      this->name_.set (x);
+    }
+
+    void variable_mdl::
+    name (::std::auto_ptr< name_type > x)
+    {
+      this->name_.set (x);
+    }
+
+    const variable_mdl::layout_type& variable_mdl::
+    layout () const
+    {
+      return this->layout_.get ();
+    }
+
+    variable_mdl::layout_type& variable_mdl::
+    layout ()
+    {
+      return this->layout_.get ();
+    }
+
+    void variable_mdl::
+    layout (const layout_type& x)
+    {
+      this->layout_.set (x);
+    }
+
+    void variable_mdl::
+    layout (::std::auto_ptr< layout_type > x)
+    {
+      this->layout_.set (x);
+    }
+
+    const variable_mdl::enabled_optional& variable_mdl::
+    enabled () const
+    {
+      return this->enabled_;
+    }
+
+    variable_mdl::enabled_optional& variable_mdl::
+    enabled ()
+    {
+      return this->enabled_;
+    }
+
+    void variable_mdl::
+    enabled (const enabled_type& x)
+    {
+      this->enabled_.set (x);
+    }
+
+    void variable_mdl::
+    enabled (const enabled_optional& x)
+    {
+      this->enabled_ = x;
+    }
+
+
+    // group_mdl
+    // 
+
+    const group_mdl::variable_sequence& group_mdl::
+    variable () const
+    {
+      return this->variable_;
+    }
+
+    group_mdl::variable_sequence& group_mdl::
+    variable ()
+    {
+      return this->variable_;
+    }
+
+    void group_mdl::
+    variable (const variable_sequence& s)
+    {
+      this->variable_ = s;
+    }
+
+    const group_mdl::group_sequence& group_mdl::
+    group () const
+    {
+      return this->group_;
+    }
+
+    group_mdl::group_sequence& group_mdl::
+    group ()
+    {
+      return this->group_;
+    }
+
+    void group_mdl::
+    group (const group_sequence& s)
+    {
+      this->group_ = s;
+    }
+
+    const group_mdl::name_type& group_mdl::
+    name () const
+    {
+      return this->name_.get ();
+    }
+
+    group_mdl::name_type& group_mdl::
+    name ()
+    {
+      return this->name_.get ();
+    }
+
+    void group_mdl::
+    name (const name_type& x)
+    {
+      this->name_.set (x);
+    }
+
+    void group_mdl::
+    name (::std::auto_ptr< name_type > x)
+    {
+      this->name_.set (x);
+    }
+
+    const group_mdl::enabled_optional& group_mdl::
+    enabled () const
+    {
+      return this->enabled_;
+    }
+
+    group_mdl::enabled_optional& group_mdl::
+    enabled ()
+    {
+      return this->enabled_;
+    }
+
+    void group_mdl::
+    enabled (const enabled_type& x)
+    {
+      this->enabled_.set (x);
+    }
+
+    void group_mdl::
+    enabled (const enabled_optional& x)
+    {
+      this->enabled_ = x;
+    }
+
+
+    // parameter_mdl
+    // 
+
+    const parameter_mdl::description_optional& parameter_mdl::
+    description () const
+    {
+      return this->description_;
+    }
+
+    parameter_mdl::description_optional& parameter_mdl::
+    description ()
+    {
+      return this->description_;
+    }
+
+    void parameter_mdl::
+    description (const description_type& x)
+    {
+      this->description_.set (x);
+    }
+
+    void parameter_mdl::
+    description (const description_optional& x)
+    {
+      this->description_ = x;
+    }
+
+    void parameter_mdl::
+    description (::std::auto_ptr< description_type > x)
+    {
+      this->description_.set (x);
+    }
+
+    const parameter_mdl::name_type& parameter_mdl::
+    name () const
+    {
+      return this->name_.get ();
+    }
+
+    parameter_mdl::name_type& parameter_mdl::
+    name ()
+    {
+      return this->name_.get ();
+    }
+
+    void parameter_mdl::
+    name (const name_type& x)
+    {
+      this->name_.set (x);
+    }
+
+    void parameter_mdl::
+    name (::std::auto_ptr< name_type > x)
+    {
+      this->name_.set (x);
+    }
+
+    const parameter_mdl::type_type& parameter_mdl::
+    type () const
+    {
+      return this->type_.get ();
+    }
+
+    parameter_mdl::type_type& parameter_mdl::
+    type ()
+    {
+      return this->type_.get ();
+    }
+
+    void parameter_mdl::
+    type (const type_type& x)
+    {
+      this->type_.set (x);
+    }
+
+    void parameter_mdl::
+    type (::std::auto_ptr< type_type > x)
+    {
+      this->type_.set (x);
+    }
+
+    const parameter_mdl::value_optional& parameter_mdl::
+    value () const
+    {
+      return this->value_;
+    }
+
+    parameter_mdl::value_optional& parameter_mdl::
+    value ()
+    {
+      return this->value_;
+    }
+
+    void parameter_mdl::
+    value (const value_type& x)
+    {
+      this->value_.set (x);
+    }
+
+    void parameter_mdl::
+    value (const value_optional& x)
+    {
+      this->value_ = x;
+    }
+
+    void parameter_mdl::
+    value (::std::auto_ptr< value_type > x)
+    {
+      this->value_.set (x);
+    }
+
+
+    // data_mdl
+    // 
+
+    const data_mdl::parameter_sequence& data_mdl::
+    parameter () const
+    {
+      return this->parameter_;
+    }
+
+    data_mdl::parameter_sequence& data_mdl::
+    parameter ()
+    {
+      return this->parameter_;
+    }
+
+    void data_mdl::
+    parameter (const parameter_sequence& s)
+    {
+      this->parameter_ = s;
+    }
+
+    const data_mdl::layout_sequence& data_mdl::
+    layout () const
+    {
+      return this->layout_;
+    }
+
+    data_mdl::layout_sequence& data_mdl::
+    layout ()
+    {
+      return this->layout_;
+    }
+
+    void data_mdl::
+    layout (const layout_sequence& s)
+    {
+      this->layout_ = s;
+    }
+
+    const data_mdl::variable_sequence& data_mdl::
+    variable () const
+    {
+      return this->variable_;
+    }
+
+    data_mdl::variable_sequence& data_mdl::
+    variable ()
+    {
+      return this->variable_;
+    }
+
+    void data_mdl::
+    variable (const variable_sequence& s)
+    {
+      this->variable_ = s;
+    }
+
+    const data_mdl::group_sequence& data_mdl::
+    group () const
+    {
+      return this->group_;
+    }
+
+    data_mdl::group_sequence& data_mdl::
+    group ()
+    {
+      return this->group_;
+    }
+
+    void data_mdl::
+    group (const group_sequence& s)
+    {
+      this->group_ = s;
+    }
+
+
+    // event_mdl
+    // 
+
+    const event_mdl::name_type& event_mdl::
+    name () const
+    {
+      return this->name_.get ();
+    }
+
+    event_mdl::name_type& event_mdl::
+    name ()
+    {
+      return this->name_.get ();
+    }
+
+    void event_mdl::
+    name (const name_type& x)
+    {
+      this->name_.set (x);
+    }
+
+    void event_mdl::
+    name (::std::auto_ptr< name_type > x)
+    {
+      this->name_.set (x);
+    }
+
+    const event_mdl::action_type& event_mdl::
+    action () const
+    {
+      return this->action_.get ();
+    }
+
+    event_mdl::action_type& event_mdl::
+    action ()
+    {
+      return this->action_.get ();
+    }
+
+    void event_mdl::
+    action (const action_type& x)
+    {
+      this->action_.set (x);
+    }
+
+    void event_mdl::
+    action (::std::auto_ptr< action_type > x)
+    {
+      this->action_.set (x);
+    }
+
+    const event_mdl::using_type& event_mdl::
+    using_ () const
+    {
+      return this->using__.get ();
+    }
+
+    event_mdl::using_type& event_mdl::
+    using_ ()
+    {
+      return this->using__.get ();
+    }
+
+    void event_mdl::
+    using_ (const using_type& x)
+    {
+      this->using__.set (x);
+    }
+
+    void event_mdl::
+    using_ (::std::auto_ptr< using_type > x)
+    {
+      this->using__.set (x);
+    }
+
+
+    // actions_mdl
+    // 
+
+    const actions_mdl::event_sequence& actions_mdl::
+    event () const
+    {
+      return this->event_;
+    }
+
+    actions_mdl::event_sequence& actions_mdl::
+    event ()
+    {
+      return this->event_;
+    }
+
+    void actions_mdl::
+    event (const event_sequence& s)
+    {
+      this->event_ = s;
+    }
+
+
+    // simulation_mdl
+    // 
+
+    const simulation_mdl::architecture_type& simulation_mdl::
+    architecture () const
+    {
+      return this->architecture_.get ();
+    }
+
+    simulation_mdl::architecture_type& simulation_mdl::
+    architecture ()
+    {
+      return this->architecture_.get ();
+    }
+
+    void simulation_mdl::
+    architecture (const architecture_type& x)
+    {
+      this->architecture_.set (x);
+    }
+
+    void simulation_mdl::
+    architecture (::std::auto_ptr< architecture_type > x)
+    {
+      this->architecture_.set (x);
+    }
+
+    const simulation_mdl::data_type& simulation_mdl::
+    data () const
+    {
+      return this->data_.get ();
+    }
+
+    simulation_mdl::data_type& simulation_mdl::
+    data ()
+    {
+      return this->data_.get ();
+    }
+
+    void simulation_mdl::
+    data (const data_type& x)
+    {
+      this->data_.set (x);
+    }
+
+    void simulation_mdl::
+    data (::std::auto_ptr< data_type > x)
+    {
+      this->data_.set (x);
+    }
+
+    const simulation_mdl::actions_type& simulation_mdl::
+    actions () const
+    {
+      return this->actions_.get ();
+    }
+
+    simulation_mdl::actions_type& simulation_mdl::
+    actions ()
+    {
+      return this->actions_.get ();
+    }
+
+    void simulation_mdl::
+    actions (const actions_type& x)
+    {
+      this->actions_.set (x);
+    }
+
+    void simulation_mdl::
+    actions (::std::auto_ptr< actions_type > x)
+    {
+      this->actions_.set (x);
+    }
+
+    const simulation_mdl::name_type& simulation_mdl::
+    name () const
+    {
+      return this->name_.get ();
+    }
+
+    simulation_mdl::name_type& simulation_mdl::
+    name ()
+    {
+      return this->name_.get ();
+    }
+
+    void simulation_mdl::
+    name (const name_type& x)
+    {
+      this->name_.set (x);
+    }
+
+    void simulation_mdl::
+    name (::std::auto_ptr< name_type > x)
+    {
+      this->name_.set (x);
+    }
+
+    const simulation_mdl::language_type& simulation_mdl::
+    language () const
+    {
+      return this->language_.get ();
+    }
+
+    simulation_mdl::language_type& simulation_mdl::
+    language ()
+    {
+      return this->language_.get ();
+    }
+
+    void simulation_mdl::
+    language (const language_type& x)
+    {
+      this->language_.set (x);
+    }
+
+    void simulation_mdl::
+    language (::std::auto_ptr< language_type > x)
+    {
+      this->language_.set (x);
+    }
+
+    const simulation_mdl::language_type& simulation_mdl::
+    language_default_value ()
+    {
+      return language_default_value_;
+    }
+  }
 }
-
-void simulation_mdl::
-actions (::std::auto_ptr< actions_type > x)
-{
-  this->actions_.set (x);
-}
-
-const simulation_mdl::name_type& simulation_mdl::
-name () const
-{
-  return this->name_.get ();
-}
-
-simulation_mdl::name_type& simulation_mdl::
-name ()
-{
-  return this->name_.get ();
-}
-
-void simulation_mdl::
-name (const name_type& x)
-{
-  this->name_.set (x);
-}
-
-void simulation_mdl::
-name (::std::auto_ptr< name_type > x)
-{
-  this->name_.set (x);
-}
-
-const simulation_mdl::language_type& simulation_mdl::
-language () const
-{
-  return this->language_.get ();
-}
-
-simulation_mdl::language_type& simulation_mdl::
-language ()
-{
-  return this->language_.get ();
-}
-
-void simulation_mdl::
-language (const language_type& x)
-{
-  this->language_.set (x);
-}
-
-void simulation_mdl::
-language (::std::auto_ptr< language_type > x)
-{
-  this->language_.set (x);
-}
-
-const simulation_mdl::language_type& simulation_mdl::
-language_default_value ()
-{
-  return language_default_value_;
-}
-
 
 #include <xsd/cxx/xml/dom/parsing-source.hxx>
 
-// clients_mdl
-//
-
-clients_mdl::
-clients_mdl (const count_type& count)
-: ::xml_schema::type (),
-  count_ (count, ::xml_schema::flags (), this)
+namespace Damaris
 {
-}
-
-clients_mdl::
-clients_mdl (const clients_mdl& x,
-             ::xml_schema::flags f,
-             ::xml_schema::container* c)
-: ::xml_schema::type (x, f, c),
-  count_ (x.count_, f, this)
-{
-}
-
-clients_mdl::
-clients_mdl (const ::xercesc::DOMElement& e,
-             ::xml_schema::flags f,
-             ::xml_schema::container* c)
-: ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
-  count_ (f, this)
-{
-  if ((f & ::xml_schema::flags::base) == 0)
+  namespace Model
   {
-    ::xsd::cxx::xml::dom::parser< char > p (e, false, true);
-    this->parse (p, f);
-  }
-}
-
-void clients_mdl::
-parse (::xsd::cxx::xml::dom::parser< char >& p,
-       ::xml_schema::flags f)
-{
-  while (p.more_attributes ())
-  {
-    const ::xercesc::DOMAttr& i (p.next_attribute ());
-    const ::xsd::cxx::xml::qualified_name< char > n (
-      ::xsd::cxx::xml::dom::name< char > (i));
-
-    if (n.name () == "count" && n.namespace_ ().empty ())
-    {
-      this->count_.set (count_traits::create (i, f, this));
-      continue;
-    }
-  }
-
-  if (!count_.present ())
-  {
-    throw ::xsd::cxx::tree::expected_attribute< char > (
-      "count",
-      "");
-  }
-}
-
-clients_mdl* clients_mdl::
-_clone (::xml_schema::flags f,
-        ::xml_schema::container* c) const
-{
-  return new class clients_mdl (*this, f, c);
-}
-
-clients_mdl::
-~clients_mdl ()
-{
-}
-
-// cores_mdl
-//
-
-cores_mdl::
-cores_mdl (const clients_type& clients,
-           const count_type& count)
-: ::xml_schema::type (),
-  clients_ (clients, ::xml_schema::flags (), this),
-  count_ (count, ::xml_schema::flags (), this)
-{
-}
-
-cores_mdl::
-cores_mdl (::std::auto_ptr< clients_type >& clients,
-           const count_type& count)
-: ::xml_schema::type (),
-  clients_ (clients, ::xml_schema::flags (), this),
-  count_ (count, ::xml_schema::flags (), this)
-{
-}
-
-cores_mdl::
-cores_mdl (const cores_mdl& x,
-           ::xml_schema::flags f,
-           ::xml_schema::container* c)
-: ::xml_schema::type (x, f, c),
-  clients_ (x.clients_, f, this),
-  count_ (x.count_, f, this)
-{
-}
-
-cores_mdl::
-cores_mdl (const ::xercesc::DOMElement& e,
-           ::xml_schema::flags f,
-           ::xml_schema::container* c)
-: ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
-  clients_ (f, this),
-  count_ (f, this)
-{
-  if ((f & ::xml_schema::flags::base) == 0)
-  {
-    ::xsd::cxx::xml::dom::parser< char > p (e, true, true);
-    this->parse (p, f);
-  }
-}
-
-void cores_mdl::
-parse (::xsd::cxx::xml::dom::parser< char >& p,
-       ::xml_schema::flags f)
-{
-  for (; p.more_elements (); p.next_element ())
-  {
-    const ::xercesc::DOMElement& i (p.cur_element ());
-    const ::xsd::cxx::xml::qualified_name< char > n (
-      ::xsd::cxx::xml::dom::name< char > (i));
-
-    // clients
+    // clients_mdl
     //
-    if (n.name () == "clients" && n.namespace_ ().empty ())
+
+    clients_mdl::
+    clients_mdl (const count_type& count)
+    : ::xml_schema::type (),
+      count_ (count, ::xml_schema::flags (), this)
     {
-      ::std::auto_ptr< clients_type > r (
-        clients_traits::create (i, f, this));
+    }
+
+    clients_mdl::
+    clients_mdl (const clients_mdl& x,
+                 ::xml_schema::flags f,
+                 ::xml_schema::container* c)
+    : ::xml_schema::type (x, f, c),
+      count_ (x.count_, f, this)
+    {
+    }
+
+    clients_mdl::
+    clients_mdl (const ::xercesc::DOMElement& e,
+                 ::xml_schema::flags f,
+                 ::xml_schema::container* c)
+    : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+      count_ (f, this)
+    {
+      if ((f & ::xml_schema::flags::base) == 0)
+      {
+        ::xsd::cxx::xml::dom::parser< char > p (e, false, true);
+        this->parse (p, f);
+      }
+    }
+
+    void clients_mdl::
+    parse (::xsd::cxx::xml::dom::parser< char >& p,
+           ::xml_schema::flags f)
+    {
+      while (p.more_attributes ())
+      {
+        const ::xercesc::DOMAttr& i (p.next_attribute ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        if (n.name () == "count" && n.namespace_ ().empty ())
+        {
+          this->count_.set (count_traits::create (i, f, this));
+          continue;
+        }
+      }
+
+      if (!count_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_attribute< char > (
+          "count",
+          "");
+      }
+    }
+
+    clients_mdl* clients_mdl::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class clients_mdl (*this, f, c);
+    }
+
+    clients_mdl::
+    ~clients_mdl ()
+    {
+    }
+
+    // cores_mdl
+    //
+
+    cores_mdl::
+    cores_mdl (const clients_type& clients,
+               const count_type& count)
+    : ::xml_schema::type (),
+      clients_ (clients, ::xml_schema::flags (), this),
+      count_ (count, ::xml_schema::flags (), this)
+    {
+    }
+
+    cores_mdl::
+    cores_mdl (::std::auto_ptr< clients_type >& clients,
+               const count_type& count)
+    : ::xml_schema::type (),
+      clients_ (clients, ::xml_schema::flags (), this),
+      count_ (count, ::xml_schema::flags (), this)
+    {
+    }
+
+    cores_mdl::
+    cores_mdl (const cores_mdl& x,
+               ::xml_schema::flags f,
+               ::xml_schema::container* c)
+    : ::xml_schema::type (x, f, c),
+      clients_ (x.clients_, f, this),
+      count_ (x.count_, f, this)
+    {
+    }
+
+    cores_mdl::
+    cores_mdl (const ::xercesc::DOMElement& e,
+               ::xml_schema::flags f,
+               ::xml_schema::container* c)
+    : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+      clients_ (f, this),
+      count_ (f, this)
+    {
+      if ((f & ::xml_schema::flags::base) == 0)
+      {
+        ::xsd::cxx::xml::dom::parser< char > p (e, true, true);
+        this->parse (p, f);
+      }
+    }
+
+    void cores_mdl::
+    parse (::xsd::cxx::xml::dom::parser< char >& p,
+           ::xml_schema::flags f)
+    {
+      for (; p.more_elements (); p.next_element ())
+      {
+        const ::xercesc::DOMElement& i (p.cur_element ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        // clients
+        //
+        if (n.name () == "clients" && n.namespace_ () == "http://damaris.gforge.inria.fr/Damaris/Model")
+        {
+          ::std::auto_ptr< clients_type > r (
+            clients_traits::create (i, f, this));
+
+          if (!clients_.present ())
+          {
+            this->clients_.set (r);
+            continue;
+          }
+        }
+
+        break;
+      }
 
       if (!clients_.present ())
       {
-        this->clients_.set (r);
-        continue;
+        throw ::xsd::cxx::tree::expected_element< char > (
+          "clients",
+          "http://damaris.gforge.inria.fr/Damaris/Model");
+      }
+
+      while (p.more_attributes ())
+      {
+        const ::xercesc::DOMAttr& i (p.next_attribute ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        if (n.name () == "count" && n.namespace_ ().empty ())
+        {
+          this->count_.set (count_traits::create (i, f, this));
+          continue;
+        }
+      }
+
+      if (!count_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_attribute< char > (
+          "count",
+          "");
       }
     }
 
-    break;
-  }
-
-  if (!clients_.present ())
-  {
-    throw ::xsd::cxx::tree::expected_element< char > (
-      "clients",
-      "");
-  }
-
-  while (p.more_attributes ())
-  {
-    const ::xercesc::DOMAttr& i (p.next_attribute ());
-    const ::xsd::cxx::xml::qualified_name< char > n (
-      ::xsd::cxx::xml::dom::name< char > (i));
-
-    if (n.name () == "count" && n.namespace_ ().empty ())
+    cores_mdl* cores_mdl::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
     {
-      this->count_.set (count_traits::create (i, f, this));
-      continue;
-    }
-  }
-
-  if (!count_.present ())
-  {
-    throw ::xsd::cxx::tree::expected_attribute< char > (
-      "count",
-      "");
-  }
-}
-
-cores_mdl* cores_mdl::
-_clone (::xml_schema::flags f,
-        ::xml_schema::container* c) const
-{
-  return new class cores_mdl (*this, f, c);
-}
-
-cores_mdl::
-~cores_mdl ()
-{
-}
-
-// buffer_mdl
-//
-
-buffer_mdl::
-buffer_mdl (const name_type& name,
-            const size_type& size)
-: ::xml_schema::type (),
-  name_ (name, ::xml_schema::flags (), this),
-  size_ (size, ::xml_schema::flags (), this)
-{
-}
-
-buffer_mdl::
-buffer_mdl (const buffer_mdl& x,
-            ::xml_schema::flags f,
-            ::xml_schema::container* c)
-: ::xml_schema::type (x, f, c),
-  name_ (x.name_, f, this),
-  size_ (x.size_, f, this)
-{
-}
-
-buffer_mdl::
-buffer_mdl (const ::xercesc::DOMElement& e,
-            ::xml_schema::flags f,
-            ::xml_schema::container* c)
-: ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
-  name_ (f, this),
-  size_ (f, this)
-{
-  if ((f & ::xml_schema::flags::base) == 0)
-  {
-    ::xsd::cxx::xml::dom::parser< char > p (e, false, true);
-    this->parse (p, f);
-  }
-}
-
-void buffer_mdl::
-parse (::xsd::cxx::xml::dom::parser< char >& p,
-       ::xml_schema::flags f)
-{
-  while (p.more_attributes ())
-  {
-    const ::xercesc::DOMAttr& i (p.next_attribute ());
-    const ::xsd::cxx::xml::qualified_name< char > n (
-      ::xsd::cxx::xml::dom::name< char > (i));
-
-    if (n.name () == "name" && n.namespace_ ().empty ())
-    {
-      ::std::auto_ptr< name_type > r (
-        name_traits::create (i, f, this));
-
-      this->name_.set (r);
-      continue;
+      return new class cores_mdl (*this, f, c);
     }
 
-    if (n.name () == "size" && n.namespace_ ().empty ())
+    cores_mdl::
+    ~cores_mdl ()
     {
-      this->size_.set (size_traits::create (i, f, this));
-      continue;
-    }
-  }
-
-  if (!name_.present ())
-  {
-    throw ::xsd::cxx::tree::expected_attribute< char > (
-      "name",
-      "");
-  }
-
-  if (!size_.present ())
-  {
-    throw ::xsd::cxx::tree::expected_attribute< char > (
-      "size",
-      "");
-  }
-}
-
-buffer_mdl* buffer_mdl::
-_clone (::xml_schema::flags f,
-        ::xml_schema::container* c) const
-{
-  return new class buffer_mdl (*this, f, c);
-}
-
-buffer_mdl::
-~buffer_mdl ()
-{
-}
-
-// queue_mdl
-//
-
-queue_mdl::
-queue_mdl (const name_type& name,
-           const size_type& size)
-: ::xml_schema::type (),
-  name_ (name, ::xml_schema::flags (), this),
-  size_ (size, ::xml_schema::flags (), this)
-{
-}
-
-queue_mdl::
-queue_mdl (const queue_mdl& x,
-           ::xml_schema::flags f,
-           ::xml_schema::container* c)
-: ::xml_schema::type (x, f, c),
-  name_ (x.name_, f, this),
-  size_ (x.size_, f, this)
-{
-}
-
-queue_mdl::
-queue_mdl (const ::xercesc::DOMElement& e,
-           ::xml_schema::flags f,
-           ::xml_schema::container* c)
-: ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
-  name_ (f, this),
-  size_ (f, this)
-{
-  if ((f & ::xml_schema::flags::base) == 0)
-  {
-    ::xsd::cxx::xml::dom::parser< char > p (e, false, true);
-    this->parse (p, f);
-  }
-}
-
-void queue_mdl::
-parse (::xsd::cxx::xml::dom::parser< char >& p,
-       ::xml_schema::flags f)
-{
-  while (p.more_attributes ())
-  {
-    const ::xercesc::DOMAttr& i (p.next_attribute ());
-    const ::xsd::cxx::xml::qualified_name< char > n (
-      ::xsd::cxx::xml::dom::name< char > (i));
-
-    if (n.name () == "name" && n.namespace_ ().empty ())
-    {
-      ::std::auto_ptr< name_type > r (
-        name_traits::create (i, f, this));
-
-      this->name_.set (r);
-      continue;
     }
 
-    if (n.name () == "size" && n.namespace_ ().empty ())
-    {
-      this->size_.set (size_traits::create (i, f, this));
-      continue;
-    }
-  }
-
-  if (!name_.present ())
-  {
-    throw ::xsd::cxx::tree::expected_attribute< char > (
-      "name",
-      "");
-  }
-
-  if (!size_.present ())
-  {
-    throw ::xsd::cxx::tree::expected_attribute< char > (
-      "size",
-      "");
-  }
-}
-
-queue_mdl* queue_mdl::
-_clone (::xml_schema::flags f,
-        ::xml_schema::container* c) const
-{
-  return new class queue_mdl (*this, f, c);
-}
-
-queue_mdl::
-~queue_mdl ()
-{
-}
-
-// architecture_mdl
-//
-
-architecture_mdl::
-architecture_mdl (const cores_type& cores,
-                  const buffer_type& buffer,
-                  const queue_type& queue)
-: ::xml_schema::type (),
-  cores_ (cores, ::xml_schema::flags (), this),
-  buffer_ (buffer, ::xml_schema::flags (), this),
-  queue_ (queue, ::xml_schema::flags (), this),
-  name_ (::xml_schema::flags (), this)
-{
-}
-
-architecture_mdl::
-architecture_mdl (::std::auto_ptr< cores_type >& cores,
-                  ::std::auto_ptr< buffer_type >& buffer,
-                  ::std::auto_ptr< queue_type >& queue)
-: ::xml_schema::type (),
-  cores_ (cores, ::xml_schema::flags (), this),
-  buffer_ (buffer, ::xml_schema::flags (), this),
-  queue_ (queue, ::xml_schema::flags (), this),
-  name_ (::xml_schema::flags (), this)
-{
-}
-
-architecture_mdl::
-architecture_mdl (const architecture_mdl& x,
-                  ::xml_schema::flags f,
-                  ::xml_schema::container* c)
-: ::xml_schema::type (x, f, c),
-  cores_ (x.cores_, f, this),
-  buffer_ (x.buffer_, f, this),
-  queue_ (x.queue_, f, this),
-  name_ (x.name_, f, this)
-{
-}
-
-architecture_mdl::
-architecture_mdl (const ::xercesc::DOMElement& e,
-                  ::xml_schema::flags f,
-                  ::xml_schema::container* c)
-: ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
-  cores_ (f, this),
-  buffer_ (f, this),
-  queue_ (f, this),
-  name_ (f, this)
-{
-  if ((f & ::xml_schema::flags::base) == 0)
-  {
-    ::xsd::cxx::xml::dom::parser< char > p (e, true, true);
-    this->parse (p, f);
-  }
-}
-
-void architecture_mdl::
-parse (::xsd::cxx::xml::dom::parser< char >& p,
-       ::xml_schema::flags f)
-{
-  for (; p.more_elements (); p.next_element ())
-  {
-    const ::xercesc::DOMElement& i (p.cur_element ());
-    const ::xsd::cxx::xml::qualified_name< char > n (
-      ::xsd::cxx::xml::dom::name< char > (i));
-
-    // cores
+    // buffer_mdl
     //
-    if (n.name () == "cores" && n.namespace_ ().empty ())
+
+    buffer_mdl::
+    buffer_mdl (const name_type& name,
+                const size_type& size)
+    : ::xml_schema::type (),
+      name_ (name, ::xml_schema::flags (), this),
+      size_ (size, ::xml_schema::flags (), this)
     {
-      ::std::auto_ptr< cores_type > r (
-        cores_traits::create (i, f, this));
+    }
+
+    buffer_mdl::
+    buffer_mdl (const buffer_mdl& x,
+                ::xml_schema::flags f,
+                ::xml_schema::container* c)
+    : ::xml_schema::type (x, f, c),
+      name_ (x.name_, f, this),
+      size_ (x.size_, f, this)
+    {
+    }
+
+    buffer_mdl::
+    buffer_mdl (const ::xercesc::DOMElement& e,
+                ::xml_schema::flags f,
+                ::xml_schema::container* c)
+    : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+      name_ (f, this),
+      size_ (f, this)
+    {
+      if ((f & ::xml_schema::flags::base) == 0)
+      {
+        ::xsd::cxx::xml::dom::parser< char > p (e, false, true);
+        this->parse (p, f);
+      }
+    }
+
+    void buffer_mdl::
+    parse (::xsd::cxx::xml::dom::parser< char >& p,
+           ::xml_schema::flags f)
+    {
+      while (p.more_attributes ())
+      {
+        const ::xercesc::DOMAttr& i (p.next_attribute ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        if (n.name () == "name" && n.namespace_ ().empty ())
+        {
+          ::std::auto_ptr< name_type > r (
+            name_traits::create (i, f, this));
+
+          this->name_.set (r);
+          continue;
+        }
+
+        if (n.name () == "size" && n.namespace_ ().empty ())
+        {
+          this->size_.set (size_traits::create (i, f, this));
+          continue;
+        }
+      }
+
+      if (!name_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_attribute< char > (
+          "name",
+          "");
+      }
+
+      if (!size_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_attribute< char > (
+          "size",
+          "");
+      }
+    }
+
+    buffer_mdl* buffer_mdl::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class buffer_mdl (*this, f, c);
+    }
+
+    buffer_mdl::
+    ~buffer_mdl ()
+    {
+    }
+
+    // queue_mdl
+    //
+
+    queue_mdl::
+    queue_mdl (const name_type& name,
+               const size_type& size)
+    : ::xml_schema::type (),
+      name_ (name, ::xml_schema::flags (), this),
+      size_ (size, ::xml_schema::flags (), this)
+    {
+    }
+
+    queue_mdl::
+    queue_mdl (const queue_mdl& x,
+               ::xml_schema::flags f,
+               ::xml_schema::container* c)
+    : ::xml_schema::type (x, f, c),
+      name_ (x.name_, f, this),
+      size_ (x.size_, f, this)
+    {
+    }
+
+    queue_mdl::
+    queue_mdl (const ::xercesc::DOMElement& e,
+               ::xml_schema::flags f,
+               ::xml_schema::container* c)
+    : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+      name_ (f, this),
+      size_ (f, this)
+    {
+      if ((f & ::xml_schema::flags::base) == 0)
+      {
+        ::xsd::cxx::xml::dom::parser< char > p (e, false, true);
+        this->parse (p, f);
+      }
+    }
+
+    void queue_mdl::
+    parse (::xsd::cxx::xml::dom::parser< char >& p,
+           ::xml_schema::flags f)
+    {
+      while (p.more_attributes ())
+      {
+        const ::xercesc::DOMAttr& i (p.next_attribute ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        if (n.name () == "name" && n.namespace_ ().empty ())
+        {
+          ::std::auto_ptr< name_type > r (
+            name_traits::create (i, f, this));
+
+          this->name_.set (r);
+          continue;
+        }
+
+        if (n.name () == "size" && n.namespace_ ().empty ())
+        {
+          this->size_.set (size_traits::create (i, f, this));
+          continue;
+        }
+      }
+
+      if (!name_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_attribute< char > (
+          "name",
+          "");
+      }
+
+      if (!size_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_attribute< char > (
+          "size",
+          "");
+      }
+    }
+
+    queue_mdl* queue_mdl::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class queue_mdl (*this, f, c);
+    }
+
+    queue_mdl::
+    ~queue_mdl ()
+    {
+    }
+
+    // architecture_mdl
+    //
+
+    architecture_mdl::
+    architecture_mdl (const cores_type& cores,
+                      const buffer_type& buffer,
+                      const queue_type& queue)
+    : ::xml_schema::type (),
+      cores_ (cores, ::xml_schema::flags (), this),
+      buffer_ (buffer, ::xml_schema::flags (), this),
+      queue_ (queue, ::xml_schema::flags (), this),
+      name_ (::xml_schema::flags (), this)
+    {
+    }
+
+    architecture_mdl::
+    architecture_mdl (::std::auto_ptr< cores_type >& cores,
+                      ::std::auto_ptr< buffer_type >& buffer,
+                      ::std::auto_ptr< queue_type >& queue)
+    : ::xml_schema::type (),
+      cores_ (cores, ::xml_schema::flags (), this),
+      buffer_ (buffer, ::xml_schema::flags (), this),
+      queue_ (queue, ::xml_schema::flags (), this),
+      name_ (::xml_schema::flags (), this)
+    {
+    }
+
+    architecture_mdl::
+    architecture_mdl (const architecture_mdl& x,
+                      ::xml_schema::flags f,
+                      ::xml_schema::container* c)
+    : ::xml_schema::type (x, f, c),
+      cores_ (x.cores_, f, this),
+      buffer_ (x.buffer_, f, this),
+      queue_ (x.queue_, f, this),
+      name_ (x.name_, f, this)
+    {
+    }
+
+    architecture_mdl::
+    architecture_mdl (const ::xercesc::DOMElement& e,
+                      ::xml_schema::flags f,
+                      ::xml_schema::container* c)
+    : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+      cores_ (f, this),
+      buffer_ (f, this),
+      queue_ (f, this),
+      name_ (f, this)
+    {
+      if ((f & ::xml_schema::flags::base) == 0)
+      {
+        ::xsd::cxx::xml::dom::parser< char > p (e, true, true);
+        this->parse (p, f);
+      }
+    }
+
+    void architecture_mdl::
+    parse (::xsd::cxx::xml::dom::parser< char >& p,
+           ::xml_schema::flags f)
+    {
+      for (; p.more_elements (); p.next_element ())
+      {
+        const ::xercesc::DOMElement& i (p.cur_element ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        // cores
+        //
+        if (n.name () == "cores" && n.namespace_ () == "http://damaris.gforge.inria.fr/Damaris/Model")
+        {
+          ::std::auto_ptr< cores_type > r (
+            cores_traits::create (i, f, this));
+
+          if (!cores_.present ())
+          {
+            this->cores_.set (r);
+            continue;
+          }
+        }
+
+        // buffer
+        //
+        if (n.name () == "buffer" && n.namespace_ () == "http://damaris.gforge.inria.fr/Damaris/Model")
+        {
+          ::std::auto_ptr< buffer_type > r (
+            buffer_traits::create (i, f, this));
+
+          if (!buffer_.present ())
+          {
+            this->buffer_.set (r);
+            continue;
+          }
+        }
+
+        // queue
+        //
+        if (n.name () == "queue" && n.namespace_ () == "http://damaris.gforge.inria.fr/Damaris/Model")
+        {
+          ::std::auto_ptr< queue_type > r (
+            queue_traits::create (i, f, this));
+
+          if (!queue_.present ())
+          {
+            this->queue_.set (r);
+            continue;
+          }
+        }
+
+        break;
+      }
 
       if (!cores_.present ())
       {
-        this->cores_.set (r);
-        continue;
+        throw ::xsd::cxx::tree::expected_element< char > (
+          "cores",
+          "http://damaris.gforge.inria.fr/Damaris/Model");
       }
-    }
-
-    // buffer
-    //
-    if (n.name () == "buffer" && n.namespace_ ().empty ())
-    {
-      ::std::auto_ptr< buffer_type > r (
-        buffer_traits::create (i, f, this));
 
       if (!buffer_.present ())
       {
-        this->buffer_.set (r);
-        continue;
+        throw ::xsd::cxx::tree::expected_element< char > (
+          "buffer",
+          "http://damaris.gforge.inria.fr/Damaris/Model");
       }
-    }
-
-    // queue
-    //
-    if (n.name () == "queue" && n.namespace_ ().empty ())
-    {
-      ::std::auto_ptr< queue_type > r (
-        queue_traits::create (i, f, this));
 
       if (!queue_.present ())
       {
-        this->queue_.set (r);
-        continue;
+        throw ::xsd::cxx::tree::expected_element< char > (
+          "queue",
+          "http://damaris.gforge.inria.fr/Damaris/Model");
       }
-    }
 
-    break;
-  }
-
-  if (!cores_.present ())
-  {
-    throw ::xsd::cxx::tree::expected_element< char > (
-      "cores",
-      "");
-  }
-
-  if (!buffer_.present ())
-  {
-    throw ::xsd::cxx::tree::expected_element< char > (
-      "buffer",
-      "");
-  }
-
-  if (!queue_.present ())
-  {
-    throw ::xsd::cxx::tree::expected_element< char > (
-      "queue",
-      "");
-  }
-
-  while (p.more_attributes ())
-  {
-    const ::xercesc::DOMAttr& i (p.next_attribute ());
-    const ::xsd::cxx::xml::qualified_name< char > n (
-      ::xsd::cxx::xml::dom::name< char > (i));
-
-    if (n.name () == "name" && n.namespace_ ().empty ())
-    {
-      ::std::auto_ptr< name_type > r (
-        name_traits::create (i, f, this));
-
-      this->name_.set (r);
-      continue;
-    }
-  }
-}
-
-architecture_mdl* architecture_mdl::
-_clone (::xml_schema::flags f,
-        ::xml_schema::container* c) const
-{
-  return new class architecture_mdl (*this, f, c);
-}
-
-architecture_mdl::
-~architecture_mdl ()
-{
-}
-
-// layout_mdl
-//
-
-layout_mdl::
-layout_mdl (const name_type& name,
-            const type_type& type)
-: ::xml_schema::type (),
-  description_ (::xml_schema::flags (), this),
-  name_ (name, ::xml_schema::flags (), this),
-  type_ (type, ::xml_schema::flags (), this),
-  dimensions_ (::xml_schema::flags (), this)
-{
-}
-
-layout_mdl::
-layout_mdl (const layout_mdl& x,
-            ::xml_schema::flags f,
-            ::xml_schema::container* c)
-: ::xml_schema::type (x, f, c),
-  description_ (x.description_, f, this),
-  name_ (x.name_, f, this),
-  type_ (x.type_, f, this),
-  dimensions_ (x.dimensions_, f, this)
-{
-}
-
-layout_mdl::
-layout_mdl (const ::xercesc::DOMElement& e,
-            ::xml_schema::flags f,
-            ::xml_schema::container* c)
-: ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
-  description_ (f, this),
-  name_ (f, this),
-  type_ (f, this),
-  dimensions_ (f, this)
-{
-  if ((f & ::xml_schema::flags::base) == 0)
-  {
-    ::xsd::cxx::xml::dom::parser< char > p (e, true, true);
-    this->parse (p, f);
-  }
-}
-
-void layout_mdl::
-parse (::xsd::cxx::xml::dom::parser< char >& p,
-       ::xml_schema::flags f)
-{
-  for (; p.more_elements (); p.next_element ())
-  {
-    const ::xercesc::DOMElement& i (p.cur_element ());
-    const ::xsd::cxx::xml::qualified_name< char > n (
-      ::xsd::cxx::xml::dom::name< char > (i));
-
-    // description
-    //
-    if (n.name () == "description" && n.namespace_ ().empty ())
-    {
-      ::std::auto_ptr< description_type > r (
-        description_traits::create (i, f, this));
-
-      if (!this->description_)
+      while (p.more_attributes ())
       {
-        this->description_.set (r);
-        continue;
+        const ::xercesc::DOMAttr& i (p.next_attribute ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        if (n.name () == "name" && n.namespace_ ().empty ())
+        {
+          ::std::auto_ptr< name_type > r (
+            name_traits::create (i, f, this));
+
+          this->name_.set (r);
+          continue;
+        }
       }
     }
 
-    break;
-  }
-
-  while (p.more_attributes ())
-  {
-    const ::xercesc::DOMAttr& i (p.next_attribute ());
-    const ::xsd::cxx::xml::qualified_name< char > n (
-      ::xsd::cxx::xml::dom::name< char > (i));
-
-    if (n.name () == "name" && n.namespace_ ().empty ())
+    architecture_mdl* architecture_mdl::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
     {
-      ::std::auto_ptr< name_type > r (
-        name_traits::create (i, f, this));
-
-      this->name_.set (r);
-      continue;
+      return new class architecture_mdl (*this, f, c);
     }
 
-    if (n.name () == "type" && n.namespace_ ().empty ())
+    architecture_mdl::
+    ~architecture_mdl ()
     {
-      ::std::auto_ptr< type_type > r (
-        type_traits::create (i, f, this));
-
-      this->type_.set (r);
-      continue;
     }
 
-    if (n.name () == "dimensions" && n.namespace_ ().empty ())
-    {
-      ::std::auto_ptr< dimensions_type > r (
-        dimensions_traits::create (i, f, this));
-
-      this->dimensions_.set (r);
-      continue;
-    }
-  }
-
-  if (!name_.present ())
-  {
-    throw ::xsd::cxx::tree::expected_attribute< char > (
-      "name",
-      "");
-  }
-
-  if (!type_.present ())
-  {
-    throw ::xsd::cxx::tree::expected_attribute< char > (
-      "type",
-      "");
-  }
-}
-
-layout_mdl* layout_mdl::
-_clone (::xml_schema::flags f,
-        ::xml_schema::container* c) const
-{
-  return new class layout_mdl (*this, f, c);
-}
-
-layout_mdl::
-~layout_mdl ()
-{
-}
-
-// variable_mdl
-//
-
-variable_mdl::
-variable_mdl (const name_type& name,
-              const layout_type& layout)
-: ::xml_schema::type (),
-  description_ (::xml_schema::flags (), this),
-  name_ (name, ::xml_schema::flags (), this),
-  layout_ (layout, ::xml_schema::flags (), this),
-  enabled_ (::xml_schema::flags (), this)
-{
-}
-
-variable_mdl::
-variable_mdl (const variable_mdl& x,
-              ::xml_schema::flags f,
-              ::xml_schema::container* c)
-: ::xml_schema::type (x, f, c),
-  description_ (x.description_, f, this),
-  name_ (x.name_, f, this),
-  layout_ (x.layout_, f, this),
-  enabled_ (x.enabled_, f, this)
-{
-}
-
-variable_mdl::
-variable_mdl (const ::xercesc::DOMElement& e,
-              ::xml_schema::flags f,
-              ::xml_schema::container* c)
-: ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
-  description_ (f, this),
-  name_ (f, this),
-  layout_ (f, this),
-  enabled_ (f, this)
-{
-  if ((f & ::xml_schema::flags::base) == 0)
-  {
-    ::xsd::cxx::xml::dom::parser< char > p (e, true, true);
-    this->parse (p, f);
-  }
-}
-
-void variable_mdl::
-parse (::xsd::cxx::xml::dom::parser< char >& p,
-       ::xml_schema::flags f)
-{
-  for (; p.more_elements (); p.next_element ())
-  {
-    const ::xercesc::DOMElement& i (p.cur_element ());
-    const ::xsd::cxx::xml::qualified_name< char > n (
-      ::xsd::cxx::xml::dom::name< char > (i));
-
-    // description
+    // layout_mdl
     //
-    if (n.name () == "description" && n.namespace_ ().empty ())
-    {
-      ::std::auto_ptr< description_type > r (
-        description_traits::create (i, f, this));
 
-      if (!this->description_)
-      {
-        this->description_.set (r);
-        continue;
-      }
+    layout_mdl::
+    layout_mdl (const name_type& name,
+                const type_type& type)
+    : ::xml_schema::type (),
+      description_ (::xml_schema::flags (), this),
+      name_ (name, ::xml_schema::flags (), this),
+      type_ (type, ::xml_schema::flags (), this),
+      dimensions_ (::xml_schema::flags (), this)
+    {
     }
 
-    break;
-  }
-
-  while (p.more_attributes ())
-  {
-    const ::xercesc::DOMAttr& i (p.next_attribute ());
-    const ::xsd::cxx::xml::qualified_name< char > n (
-      ::xsd::cxx::xml::dom::name< char > (i));
-
-    if (n.name () == "name" && n.namespace_ ().empty ())
-    {
-      ::std::auto_ptr< name_type > r (
-        name_traits::create (i, f, this));
-
-      this->name_.set (r);
-      continue;
-    }
-
-    if (n.name () == "layout" && n.namespace_ ().empty ())
-    {
-      ::std::auto_ptr< layout_type > r (
-        layout_traits::create (i, f, this));
-
-      this->layout_.set (r);
-      continue;
-    }
-
-    if (n.name () == "enabled" && n.namespace_ ().empty ())
-    {
-      this->enabled_.set (enabled_traits::create (i, f, this));
-      continue;
-    }
-  }
-
-  if (!name_.present ())
-  {
-    throw ::xsd::cxx::tree::expected_attribute< char > (
-      "name",
-      "");
-  }
-
-  if (!layout_.present ())
-  {
-    throw ::xsd::cxx::tree::expected_attribute< char > (
-      "layout",
-      "");
-  }
-}
-
-variable_mdl* variable_mdl::
-_clone (::xml_schema::flags f,
-        ::xml_schema::container* c) const
-{
-  return new class variable_mdl (*this, f, c);
-}
-
-variable_mdl::
-~variable_mdl ()
-{
-}
-
-// group_mdl
-//
-
-group_mdl::
-group_mdl (const name_type& name)
-: ::xml_schema::type (),
-  variable_ (::xml_schema::flags (), this),
-  group_ (::xml_schema::flags (), this),
-  name_ (name, ::xml_schema::flags (), this),
-  enabled_ (::xml_schema::flags (), this)
-{
-}
-
-group_mdl::
-group_mdl (const group_mdl& x,
-           ::xml_schema::flags f,
-           ::xml_schema::container* c)
-: ::xml_schema::type (x, f, c),
-  variable_ (x.variable_, f, this),
-  group_ (x.group_, f, this),
-  name_ (x.name_, f, this),
-  enabled_ (x.enabled_, f, this)
-{
-}
-
-group_mdl::
-group_mdl (const ::xercesc::DOMElement& e,
-           ::xml_schema::flags f,
-           ::xml_schema::container* c)
-: ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
-  variable_ (f, this),
-  group_ (f, this),
-  name_ (f, this),
-  enabled_ (f, this)
-{
-  if ((f & ::xml_schema::flags::base) == 0)
-  {
-    ::xsd::cxx::xml::dom::parser< char > p (e, true, true);
-    this->parse (p, f);
-  }
-}
-
-void group_mdl::
-parse (::xsd::cxx::xml::dom::parser< char >& p,
-       ::xml_schema::flags f)
-{
-  for (; p.more_elements (); p.next_element ())
-  {
-    const ::xercesc::DOMElement& i (p.cur_element ());
-    const ::xsd::cxx::xml::qualified_name< char > n (
-      ::xsd::cxx::xml::dom::name< char > (i));
-
-    // variable
-    //
-    if (n.name () == "variable" && n.namespace_ ().empty ())
-    {
-      ::std::auto_ptr< variable_type > r (
-        variable_traits::create (i, f, this));
-
-      this->variable_.push_back (r);
-      continue;
-    }
-
-    // group
-    //
-    if (n.name () == "group" && n.namespace_ ().empty ())
-    {
-      ::std::auto_ptr< group_type > r (
-        group_traits::create (i, f, this));
-
-      this->group_.push_back (r);
-      continue;
-    }
-
-    break;
-  }
-
-  while (p.more_attributes ())
-  {
-    const ::xercesc::DOMAttr& i (p.next_attribute ());
-    const ::xsd::cxx::xml::qualified_name< char > n (
-      ::xsd::cxx::xml::dom::name< char > (i));
-
-    if (n.name () == "name" && n.namespace_ ().empty ())
-    {
-      ::std::auto_ptr< name_type > r (
-        name_traits::create (i, f, this));
-
-      this->name_.set (r);
-      continue;
-    }
-
-    if (n.name () == "enabled" && n.namespace_ ().empty ())
-    {
-      this->enabled_.set (enabled_traits::create (i, f, this));
-      continue;
-    }
-  }
-
-  if (!name_.present ())
-  {
-    throw ::xsd::cxx::tree::expected_attribute< char > (
-      "name",
-      "");
-  }
-}
-
-group_mdl* group_mdl::
-_clone (::xml_schema::flags f,
-        ::xml_schema::container* c) const
-{
-  return new class group_mdl (*this, f, c);
-}
-
-group_mdl::
-~group_mdl ()
-{
-}
-
-// parameter_mdl
-//
-
-parameter_mdl::
-parameter_mdl (const name_type& name,
-               const type_type& type)
-: ::xml_schema::type (),
-  description_ (::xml_schema::flags (), this),
-  name_ (name, ::xml_schema::flags (), this),
-  type_ (type, ::xml_schema::flags (), this),
-  value_ (::xml_schema::flags (), this)
-{
-}
-
-parameter_mdl::
-parameter_mdl (const parameter_mdl& x,
-               ::xml_schema::flags f,
-               ::xml_schema::container* c)
-: ::xml_schema::type (x, f, c),
-  description_ (x.description_, f, this),
-  name_ (x.name_, f, this),
-  type_ (x.type_, f, this),
-  value_ (x.value_, f, this)
-{
-}
-
-parameter_mdl::
-parameter_mdl (const ::xercesc::DOMElement& e,
-               ::xml_schema::flags f,
-               ::xml_schema::container* c)
-: ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
-  description_ (f, this),
-  name_ (f, this),
-  type_ (f, this),
-  value_ (f, this)
-{
-  if ((f & ::xml_schema::flags::base) == 0)
-  {
-    ::xsd::cxx::xml::dom::parser< char > p (e, true, true);
-    this->parse (p, f);
-  }
-}
-
-void parameter_mdl::
-parse (::xsd::cxx::xml::dom::parser< char >& p,
-       ::xml_schema::flags f)
-{
-  for (; p.more_elements (); p.next_element ())
-  {
-    const ::xercesc::DOMElement& i (p.cur_element ());
-    const ::xsd::cxx::xml::qualified_name< char > n (
-      ::xsd::cxx::xml::dom::name< char > (i));
-
-    // description
-    //
-    if (n.name () == "description" && n.namespace_ ().empty ())
-    {
-      ::std::auto_ptr< description_type > r (
-        description_traits::create (i, f, this));
-
-      if (!this->description_)
-      {
-        this->description_.set (r);
-        continue;
-      }
-    }
-
-    break;
-  }
-
-  while (p.more_attributes ())
-  {
-    const ::xercesc::DOMAttr& i (p.next_attribute ());
-    const ::xsd::cxx::xml::qualified_name< char > n (
-      ::xsd::cxx::xml::dom::name< char > (i));
-
-    if (n.name () == "name" && n.namespace_ ().empty ())
-    {
-      ::std::auto_ptr< name_type > r (
-        name_traits::create (i, f, this));
-
-      this->name_.set (r);
-      continue;
-    }
-
-    if (n.name () == "type" && n.namespace_ ().empty ())
-    {
-      ::std::auto_ptr< type_type > r (
-        type_traits::create (i, f, this));
-
-      this->type_.set (r);
-      continue;
-    }
-
-    if (n.name () == "value" && n.namespace_ ().empty ())
-    {
-      ::std::auto_ptr< value_type > r (
-        value_traits::create (i, f, this));
-
-      this->value_.set (r);
-      continue;
-    }
-  }
-
-  if (!name_.present ())
-  {
-    throw ::xsd::cxx::tree::expected_attribute< char > (
-      "name",
-      "");
-  }
-
-  if (!type_.present ())
-  {
-    throw ::xsd::cxx::tree::expected_attribute< char > (
-      "type",
-      "");
-  }
-}
-
-parameter_mdl* parameter_mdl::
-_clone (::xml_schema::flags f,
-        ::xml_schema::container* c) const
-{
-  return new class parameter_mdl (*this, f, c);
-}
-
-parameter_mdl::
-~parameter_mdl ()
-{
-}
-
-// data_mdl
-//
-
-data_mdl::
-data_mdl ()
-: ::xml_schema::type (),
-  parameter_ (::xml_schema::flags (), this),
-  layout_ (::xml_schema::flags (), this),
-  variable_ (::xml_schema::flags (), this),
-  group_ (::xml_schema::flags (), this)
-{
-}
-
-data_mdl::
-data_mdl (const data_mdl& x,
-          ::xml_schema::flags f,
-          ::xml_schema::container* c)
-: ::xml_schema::type (x, f, c),
-  parameter_ (x.parameter_, f, this),
-  layout_ (x.layout_, f, this),
-  variable_ (x.variable_, f, this),
-  group_ (x.group_, f, this)
-{
-}
-
-data_mdl::
-data_mdl (const ::xercesc::DOMElement& e,
-          ::xml_schema::flags f,
-          ::xml_schema::container* c)
-: ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
-  parameter_ (f, this),
-  layout_ (f, this),
-  variable_ (f, this),
-  group_ (f, this)
-{
-  if ((f & ::xml_schema::flags::base) == 0)
-  {
-    ::xsd::cxx::xml::dom::parser< char > p (e, true, false);
-    this->parse (p, f);
-  }
-}
-
-void data_mdl::
-parse (::xsd::cxx::xml::dom::parser< char >& p,
-       ::xml_schema::flags f)
-{
-  for (; p.more_elements (); p.next_element ())
-  {
-    const ::xercesc::DOMElement& i (p.cur_element ());
-    const ::xsd::cxx::xml::qualified_name< char > n (
-      ::xsd::cxx::xml::dom::name< char > (i));
-
-    // parameter
-    //
-    if (n.name () == "parameter" && n.namespace_ ().empty ())
-    {
-      ::std::auto_ptr< parameter_type > r (
-        parameter_traits::create (i, f, this));
-
-      this->parameter_.push_back (r);
-      continue;
-    }
-
-    // layout
-    //
-    if (n.name () == "layout" && n.namespace_ ().empty ())
-    {
-      ::std::auto_ptr< layout_type > r (
-        layout_traits::create (i, f, this));
-
-      this->layout_.push_back (r);
-      continue;
-    }
-
-    // variable
-    //
-    if (n.name () == "variable" && n.namespace_ ().empty ())
-    {
-      ::std::auto_ptr< variable_type > r (
-        variable_traits::create (i, f, this));
-
-      this->variable_.push_back (r);
-      continue;
-    }
-
-    // group
-    //
-    if (n.name () == "group" && n.namespace_ ().empty ())
-    {
-      ::std::auto_ptr< group_type > r (
-        group_traits::create (i, f, this));
-
-      this->group_.push_back (r);
-      continue;
-    }
-
-    break;
-  }
-}
-
-data_mdl* data_mdl::
-_clone (::xml_schema::flags f,
-        ::xml_schema::container* c) const
-{
-  return new class data_mdl (*this, f, c);
-}
-
-data_mdl::
-~data_mdl ()
-{
-}
-
-// event_mdl
-//
-
-event_mdl::
-event_mdl (const name_type& name,
-           const action_type& action,
-           const using_type& using_)
-: ::xml_schema::type (),
-  name_ (name, ::xml_schema::flags (), this),
-  action_ (action, ::xml_schema::flags (), this),
-  using__ (using_, ::xml_schema::flags (), this)
-{
-}
-
-event_mdl::
-event_mdl (const event_mdl& x,
-           ::xml_schema::flags f,
-           ::xml_schema::container* c)
-: ::xml_schema::type (x, f, c),
-  name_ (x.name_, f, this),
-  action_ (x.action_, f, this),
-  using__ (x.using__, f, this)
-{
-}
-
-event_mdl::
-event_mdl (const ::xercesc::DOMElement& e,
-           ::xml_schema::flags f,
-           ::xml_schema::container* c)
-: ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
-  name_ (f, this),
-  action_ (f, this),
-  using__ (f, this)
-{
-  if ((f & ::xml_schema::flags::base) == 0)
-  {
-    ::xsd::cxx::xml::dom::parser< char > p (e, false, true);
-    this->parse (p, f);
-  }
-}
-
-void event_mdl::
-parse (::xsd::cxx::xml::dom::parser< char >& p,
-       ::xml_schema::flags f)
-{
-  while (p.more_attributes ())
-  {
-    const ::xercesc::DOMAttr& i (p.next_attribute ());
-    const ::xsd::cxx::xml::qualified_name< char > n (
-      ::xsd::cxx::xml::dom::name< char > (i));
-
-    if (n.name () == "name" && n.namespace_ ().empty ())
-    {
-      ::std::auto_ptr< name_type > r (
-        name_traits::create (i, f, this));
-
-      this->name_.set (r);
-      continue;
-    }
-
-    if (n.name () == "action" && n.namespace_ ().empty ())
-    {
-      ::std::auto_ptr< action_type > r (
-        action_traits::create (i, f, this));
-
-      this->action_.set (r);
-      continue;
-    }
-
-    if (n.name () == "using" && n.namespace_ ().empty ())
-    {
-      ::std::auto_ptr< using_type > r (
-        using_traits::create (i, f, this));
-
-      this->using__.set (r);
-      continue;
-    }
-  }
-
-  if (!name_.present ())
-  {
-    throw ::xsd::cxx::tree::expected_attribute< char > (
-      "name",
-      "");
-  }
-
-  if (!action_.present ())
-  {
-    throw ::xsd::cxx::tree::expected_attribute< char > (
-      "action",
-      "");
-  }
-
-  if (!using__.present ())
-  {
-    throw ::xsd::cxx::tree::expected_attribute< char > (
-      "using",
-      "");
-  }
-}
-
-event_mdl* event_mdl::
-_clone (::xml_schema::flags f,
-        ::xml_schema::container* c) const
-{
-  return new class event_mdl (*this, f, c);
-}
-
-event_mdl::
-~event_mdl ()
-{
-}
-
-// actions_mdl
-//
-
-actions_mdl::
-actions_mdl ()
-: ::xml_schema::type (),
-  event_ (::xml_schema::flags (), this)
-{
-}
-
-actions_mdl::
-actions_mdl (const actions_mdl& x,
-             ::xml_schema::flags f,
-             ::xml_schema::container* c)
-: ::xml_schema::type (x, f, c),
-  event_ (x.event_, f, this)
-{
-}
-
-actions_mdl::
-actions_mdl (const ::xercesc::DOMElement& e,
-             ::xml_schema::flags f,
-             ::xml_schema::container* c)
-: ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
-  event_ (f, this)
-{
-  if ((f & ::xml_schema::flags::base) == 0)
-  {
-    ::xsd::cxx::xml::dom::parser< char > p (e, true, false);
-    this->parse (p, f);
-  }
-}
-
-void actions_mdl::
-parse (::xsd::cxx::xml::dom::parser< char >& p,
-       ::xml_schema::flags f)
-{
-  for (; p.more_elements (); p.next_element ())
-  {
-    const ::xercesc::DOMElement& i (p.cur_element ());
-    const ::xsd::cxx::xml::qualified_name< char > n (
-      ::xsd::cxx::xml::dom::name< char > (i));
-
-    // event
-    //
-    if (n.name () == "event" && n.namespace_ ().empty ())
-    {
-      ::std::auto_ptr< event_type > r (
-        event_traits::create (i, f, this));
-
-      this->event_.push_back (r);
-      continue;
-    }
-
-    break;
-  }
-}
-
-actions_mdl* actions_mdl::
-_clone (::xml_schema::flags f,
-        ::xml_schema::container* c) const
-{
-  return new class actions_mdl (*this, f, c);
-}
-
-actions_mdl::
-~actions_mdl ()
-{
-}
-
-// simulation_mdl
-//
-
-const simulation_mdl::language_type simulation_mdl::language_default_value_ (
-  "C");
-
-simulation_mdl::
-simulation_mdl (const architecture_type& architecture,
-                const data_type& data,
-                const actions_type& actions,
-                const name_type& name)
-: ::xml_schema::type (),
-  architecture_ (architecture, ::xml_schema::flags (), this),
-  data_ (data, ::xml_schema::flags (), this),
-  actions_ (actions, ::xml_schema::flags (), this),
-  name_ (name, ::xml_schema::flags (), this),
-  language_ (language_default_value (), ::xml_schema::flags (), this)
-{
-}
-
-simulation_mdl::
-simulation_mdl (::std::auto_ptr< architecture_type >& architecture,
-                ::std::auto_ptr< data_type >& data,
-                ::std::auto_ptr< actions_type >& actions,
-                const name_type& name)
-: ::xml_schema::type (),
-  architecture_ (architecture, ::xml_schema::flags (), this),
-  data_ (data, ::xml_schema::flags (), this),
-  actions_ (actions, ::xml_schema::flags (), this),
-  name_ (name, ::xml_schema::flags (), this),
-  language_ (language_default_value (), ::xml_schema::flags (), this)
-{
-}
-
-simulation_mdl::
-simulation_mdl (const simulation_mdl& x,
+    layout_mdl::
+    layout_mdl (const layout_mdl& x,
                 ::xml_schema::flags f,
                 ::xml_schema::container* c)
-: ::xml_schema::type (x, f, c),
-  architecture_ (x.architecture_, f, this),
-  data_ (x.data_, f, this),
-  actions_ (x.actions_, f, this),
-  name_ (x.name_, f, this),
-  language_ (x.language_, f, this)
-{
-}
+    : ::xml_schema::type (x, f, c),
+      description_ (x.description_, f, this),
+      name_ (x.name_, f, this),
+      type_ (x.type_, f, this),
+      dimensions_ (x.dimensions_, f, this)
+    {
+    }
 
-simulation_mdl::
-simulation_mdl (const ::xercesc::DOMElement& e,
+    layout_mdl::
+    layout_mdl (const ::xercesc::DOMElement& e,
                 ::xml_schema::flags f,
                 ::xml_schema::container* c)
-: ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
-  architecture_ (f, this),
-  data_ (f, this),
-  actions_ (f, this),
-  name_ (f, this),
-  language_ (f, this)
-{
-  if ((f & ::xml_schema::flags::base) == 0)
-  {
-    ::xsd::cxx::xml::dom::parser< char > p (e, true, true);
-    this->parse (p, f);
-  }
-}
-
-void simulation_mdl::
-parse (::xsd::cxx::xml::dom::parser< char >& p,
-       ::xml_schema::flags f)
-{
-  for (; p.more_elements (); p.next_element ())
-  {
-    const ::xercesc::DOMElement& i (p.cur_element ());
-    const ::xsd::cxx::xml::qualified_name< char > n (
-      ::xsd::cxx::xml::dom::name< char > (i));
-
-    // architecture
-    //
-    if (n.name () == "architecture" && n.namespace_ ().empty ())
+    : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+      description_ (f, this),
+      name_ (f, this),
+      type_ (f, this),
+      dimensions_ (f, this)
     {
-      ::std::auto_ptr< architecture_type > r (
-        architecture_traits::create (i, f, this));
+      if ((f & ::xml_schema::flags::base) == 0)
+      {
+        ::xsd::cxx::xml::dom::parser< char > p (e, true, true);
+        this->parse (p, f);
+      }
+    }
+
+    void layout_mdl::
+    parse (::xsd::cxx::xml::dom::parser< char >& p,
+           ::xml_schema::flags f)
+    {
+      for (; p.more_elements (); p.next_element ())
+      {
+        const ::xercesc::DOMElement& i (p.cur_element ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        // description
+        //
+        if (n.name () == "description" && n.namespace_ () == "http://damaris.gforge.inria.fr/Damaris/Model")
+        {
+          ::std::auto_ptr< description_type > r (
+            description_traits::create (i, f, this));
+
+          if (!this->description_)
+          {
+            this->description_.set (r);
+            continue;
+          }
+        }
+
+        break;
+      }
+
+      while (p.more_attributes ())
+      {
+        const ::xercesc::DOMAttr& i (p.next_attribute ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        if (n.name () == "name" && n.namespace_ ().empty ())
+        {
+          ::std::auto_ptr< name_type > r (
+            name_traits::create (i, f, this));
+
+          this->name_.set (r);
+          continue;
+        }
+
+        if (n.name () == "type" && n.namespace_ ().empty ())
+        {
+          ::std::auto_ptr< type_type > r (
+            type_traits::create (i, f, this));
+
+          this->type_.set (r);
+          continue;
+        }
+
+        if (n.name () == "dimensions" && n.namespace_ ().empty ())
+        {
+          ::std::auto_ptr< dimensions_type > r (
+            dimensions_traits::create (i, f, this));
+
+          this->dimensions_.set (r);
+          continue;
+        }
+      }
+
+      if (!name_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_attribute< char > (
+          "name",
+          "");
+      }
+
+      if (!type_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_attribute< char > (
+          "type",
+          "");
+      }
+    }
+
+    layout_mdl* layout_mdl::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class layout_mdl (*this, f, c);
+    }
+
+    layout_mdl::
+    ~layout_mdl ()
+    {
+    }
+
+    // variable_mdl
+    //
+
+    variable_mdl::
+    variable_mdl (const name_type& name,
+                  const layout_type& layout)
+    : ::xml_schema::type (),
+      description_ (::xml_schema::flags (), this),
+      name_ (name, ::xml_schema::flags (), this),
+      layout_ (layout, ::xml_schema::flags (), this),
+      enabled_ (::xml_schema::flags (), this)
+    {
+    }
+
+    variable_mdl::
+    variable_mdl (const variable_mdl& x,
+                  ::xml_schema::flags f,
+                  ::xml_schema::container* c)
+    : ::xml_schema::type (x, f, c),
+      description_ (x.description_, f, this),
+      name_ (x.name_, f, this),
+      layout_ (x.layout_, f, this),
+      enabled_ (x.enabled_, f, this)
+    {
+    }
+
+    variable_mdl::
+    variable_mdl (const ::xercesc::DOMElement& e,
+                  ::xml_schema::flags f,
+                  ::xml_schema::container* c)
+    : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+      description_ (f, this),
+      name_ (f, this),
+      layout_ (f, this),
+      enabled_ (f, this)
+    {
+      if ((f & ::xml_schema::flags::base) == 0)
+      {
+        ::xsd::cxx::xml::dom::parser< char > p (e, true, true);
+        this->parse (p, f);
+      }
+    }
+
+    void variable_mdl::
+    parse (::xsd::cxx::xml::dom::parser< char >& p,
+           ::xml_schema::flags f)
+    {
+      for (; p.more_elements (); p.next_element ())
+      {
+        const ::xercesc::DOMElement& i (p.cur_element ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        // description
+        //
+        if (n.name () == "description" && n.namespace_ () == "http://damaris.gforge.inria.fr/Damaris/Model")
+        {
+          ::std::auto_ptr< description_type > r (
+            description_traits::create (i, f, this));
+
+          if (!this->description_)
+          {
+            this->description_.set (r);
+            continue;
+          }
+        }
+
+        break;
+      }
+
+      while (p.more_attributes ())
+      {
+        const ::xercesc::DOMAttr& i (p.next_attribute ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        if (n.name () == "name" && n.namespace_ ().empty ())
+        {
+          ::std::auto_ptr< name_type > r (
+            name_traits::create (i, f, this));
+
+          this->name_.set (r);
+          continue;
+        }
+
+        if (n.name () == "layout" && n.namespace_ ().empty ())
+        {
+          ::std::auto_ptr< layout_type > r (
+            layout_traits::create (i, f, this));
+
+          this->layout_.set (r);
+          continue;
+        }
+
+        if (n.name () == "enabled" && n.namespace_ ().empty ())
+        {
+          this->enabled_.set (enabled_traits::create (i, f, this));
+          continue;
+        }
+      }
+
+      if (!name_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_attribute< char > (
+          "name",
+          "");
+      }
+
+      if (!layout_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_attribute< char > (
+          "layout",
+          "");
+      }
+    }
+
+    variable_mdl* variable_mdl::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class variable_mdl (*this, f, c);
+    }
+
+    variable_mdl::
+    ~variable_mdl ()
+    {
+    }
+
+    // group_mdl
+    //
+
+    group_mdl::
+    group_mdl (const name_type& name)
+    : ::xml_schema::type (),
+      variable_ (::xml_schema::flags (), this),
+      group_ (::xml_schema::flags (), this),
+      name_ (name, ::xml_schema::flags (), this),
+      enabled_ (::xml_schema::flags (), this)
+    {
+    }
+
+    group_mdl::
+    group_mdl (const group_mdl& x,
+               ::xml_schema::flags f,
+               ::xml_schema::container* c)
+    : ::xml_schema::type (x, f, c),
+      variable_ (x.variable_, f, this),
+      group_ (x.group_, f, this),
+      name_ (x.name_, f, this),
+      enabled_ (x.enabled_, f, this)
+    {
+    }
+
+    group_mdl::
+    group_mdl (const ::xercesc::DOMElement& e,
+               ::xml_schema::flags f,
+               ::xml_schema::container* c)
+    : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+      variable_ (f, this),
+      group_ (f, this),
+      name_ (f, this),
+      enabled_ (f, this)
+    {
+      if ((f & ::xml_schema::flags::base) == 0)
+      {
+        ::xsd::cxx::xml::dom::parser< char > p (e, true, true);
+        this->parse (p, f);
+      }
+    }
+
+    void group_mdl::
+    parse (::xsd::cxx::xml::dom::parser< char >& p,
+           ::xml_schema::flags f)
+    {
+      for (; p.more_elements (); p.next_element ())
+      {
+        const ::xercesc::DOMElement& i (p.cur_element ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        // variable
+        //
+        if (n.name () == "variable" && n.namespace_ () == "http://damaris.gforge.inria.fr/Damaris/Model")
+        {
+          ::std::auto_ptr< variable_type > r (
+            variable_traits::create (i, f, this));
+
+          this->variable_.push_back (r);
+          continue;
+        }
+
+        // group
+        //
+        if (n.name () == "group" && n.namespace_ () == "http://damaris.gforge.inria.fr/Damaris/Model")
+        {
+          ::std::auto_ptr< group_type > r (
+            group_traits::create (i, f, this));
+
+          this->group_.push_back (r);
+          continue;
+        }
+
+        break;
+      }
+
+      while (p.more_attributes ())
+      {
+        const ::xercesc::DOMAttr& i (p.next_attribute ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        if (n.name () == "name" && n.namespace_ ().empty ())
+        {
+          ::std::auto_ptr< name_type > r (
+            name_traits::create (i, f, this));
+
+          this->name_.set (r);
+          continue;
+        }
+
+        if (n.name () == "enabled" && n.namespace_ ().empty ())
+        {
+          this->enabled_.set (enabled_traits::create (i, f, this));
+          continue;
+        }
+      }
+
+      if (!name_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_attribute< char > (
+          "name",
+          "");
+      }
+    }
+
+    group_mdl* group_mdl::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class group_mdl (*this, f, c);
+    }
+
+    group_mdl::
+    ~group_mdl ()
+    {
+    }
+
+    // parameter_mdl
+    //
+
+    parameter_mdl::
+    parameter_mdl (const name_type& name,
+                   const type_type& type)
+    : ::xml_schema::type (),
+      description_ (::xml_schema::flags (), this),
+      name_ (name, ::xml_schema::flags (), this),
+      type_ (type, ::xml_schema::flags (), this),
+      value_ (::xml_schema::flags (), this)
+    {
+    }
+
+    parameter_mdl::
+    parameter_mdl (const parameter_mdl& x,
+                   ::xml_schema::flags f,
+                   ::xml_schema::container* c)
+    : ::xml_schema::type (x, f, c),
+      description_ (x.description_, f, this),
+      name_ (x.name_, f, this),
+      type_ (x.type_, f, this),
+      value_ (x.value_, f, this)
+    {
+    }
+
+    parameter_mdl::
+    parameter_mdl (const ::xercesc::DOMElement& e,
+                   ::xml_schema::flags f,
+                   ::xml_schema::container* c)
+    : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+      description_ (f, this),
+      name_ (f, this),
+      type_ (f, this),
+      value_ (f, this)
+    {
+      if ((f & ::xml_schema::flags::base) == 0)
+      {
+        ::xsd::cxx::xml::dom::parser< char > p (e, true, true);
+        this->parse (p, f);
+      }
+    }
+
+    void parameter_mdl::
+    parse (::xsd::cxx::xml::dom::parser< char >& p,
+           ::xml_schema::flags f)
+    {
+      for (; p.more_elements (); p.next_element ())
+      {
+        const ::xercesc::DOMElement& i (p.cur_element ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        // description
+        //
+        if (n.name () == "description" && n.namespace_ () == "http://damaris.gforge.inria.fr/Damaris/Model")
+        {
+          ::std::auto_ptr< description_type > r (
+            description_traits::create (i, f, this));
+
+          if (!this->description_)
+          {
+            this->description_.set (r);
+            continue;
+          }
+        }
+
+        break;
+      }
+
+      while (p.more_attributes ())
+      {
+        const ::xercesc::DOMAttr& i (p.next_attribute ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        if (n.name () == "name" && n.namespace_ ().empty ())
+        {
+          ::std::auto_ptr< name_type > r (
+            name_traits::create (i, f, this));
+
+          this->name_.set (r);
+          continue;
+        }
+
+        if (n.name () == "type" && n.namespace_ ().empty ())
+        {
+          ::std::auto_ptr< type_type > r (
+            type_traits::create (i, f, this));
+
+          this->type_.set (r);
+          continue;
+        }
+
+        if (n.name () == "value" && n.namespace_ ().empty ())
+        {
+          ::std::auto_ptr< value_type > r (
+            value_traits::create (i, f, this));
+
+          this->value_.set (r);
+          continue;
+        }
+      }
+
+      if (!name_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_attribute< char > (
+          "name",
+          "");
+      }
+
+      if (!type_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_attribute< char > (
+          "type",
+          "");
+      }
+    }
+
+    parameter_mdl* parameter_mdl::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class parameter_mdl (*this, f, c);
+    }
+
+    parameter_mdl::
+    ~parameter_mdl ()
+    {
+    }
+
+    // data_mdl
+    //
+
+    data_mdl::
+    data_mdl ()
+    : ::xml_schema::type (),
+      parameter_ (::xml_schema::flags (), this),
+      layout_ (::xml_schema::flags (), this),
+      variable_ (::xml_schema::flags (), this),
+      group_ (::xml_schema::flags (), this)
+    {
+    }
+
+    data_mdl::
+    data_mdl (const data_mdl& x,
+              ::xml_schema::flags f,
+              ::xml_schema::container* c)
+    : ::xml_schema::type (x, f, c),
+      parameter_ (x.parameter_, f, this),
+      layout_ (x.layout_, f, this),
+      variable_ (x.variable_, f, this),
+      group_ (x.group_, f, this)
+    {
+    }
+
+    data_mdl::
+    data_mdl (const ::xercesc::DOMElement& e,
+              ::xml_schema::flags f,
+              ::xml_schema::container* c)
+    : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+      parameter_ (f, this),
+      layout_ (f, this),
+      variable_ (f, this),
+      group_ (f, this)
+    {
+      if ((f & ::xml_schema::flags::base) == 0)
+      {
+        ::xsd::cxx::xml::dom::parser< char > p (e, true, false);
+        this->parse (p, f);
+      }
+    }
+
+    void data_mdl::
+    parse (::xsd::cxx::xml::dom::parser< char >& p,
+           ::xml_schema::flags f)
+    {
+      for (; p.more_elements (); p.next_element ())
+      {
+        const ::xercesc::DOMElement& i (p.cur_element ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        // parameter
+        //
+        if (n.name () == "parameter" && n.namespace_ () == "http://damaris.gforge.inria.fr/Damaris/Model")
+        {
+          ::std::auto_ptr< parameter_type > r (
+            parameter_traits::create (i, f, this));
+
+          this->parameter_.push_back (r);
+          continue;
+        }
+
+        // layout
+        //
+        if (n.name () == "layout" && n.namespace_ () == "http://damaris.gforge.inria.fr/Damaris/Model")
+        {
+          ::std::auto_ptr< layout_type > r (
+            layout_traits::create (i, f, this));
+
+          this->layout_.push_back (r);
+          continue;
+        }
+
+        // variable
+        //
+        if (n.name () == "variable" && n.namespace_ () == "http://damaris.gforge.inria.fr/Damaris/Model")
+        {
+          ::std::auto_ptr< variable_type > r (
+            variable_traits::create (i, f, this));
+
+          this->variable_.push_back (r);
+          continue;
+        }
+
+        // group
+        //
+        if (n.name () == "group" && n.namespace_ () == "http://damaris.gforge.inria.fr/Damaris/Model")
+        {
+          ::std::auto_ptr< group_type > r (
+            group_traits::create (i, f, this));
+
+          this->group_.push_back (r);
+          continue;
+        }
+
+        break;
+      }
+    }
+
+    data_mdl* data_mdl::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class data_mdl (*this, f, c);
+    }
+
+    data_mdl::
+    ~data_mdl ()
+    {
+    }
+
+    // event_mdl
+    //
+
+    event_mdl::
+    event_mdl (const name_type& name,
+               const action_type& action,
+               const using_type& using_)
+    : ::xml_schema::type (),
+      name_ (name, ::xml_schema::flags (), this),
+      action_ (action, ::xml_schema::flags (), this),
+      using__ (using_, ::xml_schema::flags (), this)
+    {
+    }
+
+    event_mdl::
+    event_mdl (const event_mdl& x,
+               ::xml_schema::flags f,
+               ::xml_schema::container* c)
+    : ::xml_schema::type (x, f, c),
+      name_ (x.name_, f, this),
+      action_ (x.action_, f, this),
+      using__ (x.using__, f, this)
+    {
+    }
+
+    event_mdl::
+    event_mdl (const ::xercesc::DOMElement& e,
+               ::xml_schema::flags f,
+               ::xml_schema::container* c)
+    : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+      name_ (f, this),
+      action_ (f, this),
+      using__ (f, this)
+    {
+      if ((f & ::xml_schema::flags::base) == 0)
+      {
+        ::xsd::cxx::xml::dom::parser< char > p (e, false, true);
+        this->parse (p, f);
+      }
+    }
+
+    void event_mdl::
+    parse (::xsd::cxx::xml::dom::parser< char >& p,
+           ::xml_schema::flags f)
+    {
+      while (p.more_attributes ())
+      {
+        const ::xercesc::DOMAttr& i (p.next_attribute ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        if (n.name () == "name" && n.namespace_ ().empty ())
+        {
+          ::std::auto_ptr< name_type > r (
+            name_traits::create (i, f, this));
+
+          this->name_.set (r);
+          continue;
+        }
+
+        if (n.name () == "action" && n.namespace_ ().empty ())
+        {
+          ::std::auto_ptr< action_type > r (
+            action_traits::create (i, f, this));
+
+          this->action_.set (r);
+          continue;
+        }
+
+        if (n.name () == "using" && n.namespace_ ().empty ())
+        {
+          ::std::auto_ptr< using_type > r (
+            using_traits::create (i, f, this));
+
+          this->using__.set (r);
+          continue;
+        }
+      }
+
+      if (!name_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_attribute< char > (
+          "name",
+          "");
+      }
+
+      if (!action_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_attribute< char > (
+          "action",
+          "");
+      }
+
+      if (!using__.present ())
+      {
+        throw ::xsd::cxx::tree::expected_attribute< char > (
+          "using",
+          "");
+      }
+    }
+
+    event_mdl* event_mdl::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class event_mdl (*this, f, c);
+    }
+
+    event_mdl::
+    ~event_mdl ()
+    {
+    }
+
+    // actions_mdl
+    //
+
+    actions_mdl::
+    actions_mdl ()
+    : ::xml_schema::type (),
+      event_ (::xml_schema::flags (), this)
+    {
+    }
+
+    actions_mdl::
+    actions_mdl (const actions_mdl& x,
+                 ::xml_schema::flags f,
+                 ::xml_schema::container* c)
+    : ::xml_schema::type (x, f, c),
+      event_ (x.event_, f, this)
+    {
+    }
+
+    actions_mdl::
+    actions_mdl (const ::xercesc::DOMElement& e,
+                 ::xml_schema::flags f,
+                 ::xml_schema::container* c)
+    : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+      event_ (f, this)
+    {
+      if ((f & ::xml_schema::flags::base) == 0)
+      {
+        ::xsd::cxx::xml::dom::parser< char > p (e, true, false);
+        this->parse (p, f);
+      }
+    }
+
+    void actions_mdl::
+    parse (::xsd::cxx::xml::dom::parser< char >& p,
+           ::xml_schema::flags f)
+    {
+      for (; p.more_elements (); p.next_element ())
+      {
+        const ::xercesc::DOMElement& i (p.cur_element ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        // event
+        //
+        if (n.name () == "event" && n.namespace_ () == "http://damaris.gforge.inria.fr/Damaris/Model")
+        {
+          ::std::auto_ptr< event_type > r (
+            event_traits::create (i, f, this));
+
+          this->event_.push_back (r);
+          continue;
+        }
+
+        break;
+      }
+    }
+
+    actions_mdl* actions_mdl::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class actions_mdl (*this, f, c);
+    }
+
+    actions_mdl::
+    ~actions_mdl ()
+    {
+    }
+
+    // simulation_mdl
+    //
+
+    const simulation_mdl::language_type simulation_mdl::language_default_value_ (
+      "C");
+
+    simulation_mdl::
+    simulation_mdl (const architecture_type& architecture,
+                    const data_type& data,
+                    const actions_type& actions,
+                    const name_type& name)
+    : ::xml_schema::type (),
+      architecture_ (architecture, ::xml_schema::flags (), this),
+      data_ (data, ::xml_schema::flags (), this),
+      actions_ (actions, ::xml_schema::flags (), this),
+      name_ (name, ::xml_schema::flags (), this),
+      language_ (language_default_value (), ::xml_schema::flags (), this)
+    {
+    }
+
+    simulation_mdl::
+    simulation_mdl (::std::auto_ptr< architecture_type >& architecture,
+                    ::std::auto_ptr< data_type >& data,
+                    ::std::auto_ptr< actions_type >& actions,
+                    const name_type& name)
+    : ::xml_schema::type (),
+      architecture_ (architecture, ::xml_schema::flags (), this),
+      data_ (data, ::xml_schema::flags (), this),
+      actions_ (actions, ::xml_schema::flags (), this),
+      name_ (name, ::xml_schema::flags (), this),
+      language_ (language_default_value (), ::xml_schema::flags (), this)
+    {
+    }
+
+    simulation_mdl::
+    simulation_mdl (const simulation_mdl& x,
+                    ::xml_schema::flags f,
+                    ::xml_schema::container* c)
+    : ::xml_schema::type (x, f, c),
+      architecture_ (x.architecture_, f, this),
+      data_ (x.data_, f, this),
+      actions_ (x.actions_, f, this),
+      name_ (x.name_, f, this),
+      language_ (x.language_, f, this)
+    {
+    }
+
+    simulation_mdl::
+    simulation_mdl (const ::xercesc::DOMElement& e,
+                    ::xml_schema::flags f,
+                    ::xml_schema::container* c)
+    : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+      architecture_ (f, this),
+      data_ (f, this),
+      actions_ (f, this),
+      name_ (f, this),
+      language_ (f, this)
+    {
+      if ((f & ::xml_schema::flags::base) == 0)
+      {
+        ::xsd::cxx::xml::dom::parser< char > p (e, true, true);
+        this->parse (p, f);
+      }
+    }
+
+    void simulation_mdl::
+    parse (::xsd::cxx::xml::dom::parser< char >& p,
+           ::xml_schema::flags f)
+    {
+      for (; p.more_elements (); p.next_element ())
+      {
+        const ::xercesc::DOMElement& i (p.cur_element ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        // architecture
+        //
+        if (n.name () == "architecture" && n.namespace_ () == "http://damaris.gforge.inria.fr/Damaris/Model")
+        {
+          ::std::auto_ptr< architecture_type > r (
+            architecture_traits::create (i, f, this));
+
+          if (!architecture_.present ())
+          {
+            this->architecture_.set (r);
+            continue;
+          }
+        }
+
+        // data
+        //
+        if (n.name () == "data" && n.namespace_ () == "http://damaris.gforge.inria.fr/Damaris/Model")
+        {
+          ::std::auto_ptr< data_type > r (
+            data_traits::create (i, f, this));
+
+          if (!data_.present ())
+          {
+            this->data_.set (r);
+            continue;
+          }
+        }
+
+        // actions
+        //
+        if (n.name () == "actions" && n.namespace_ () == "http://damaris.gforge.inria.fr/Damaris/Model")
+        {
+          ::std::auto_ptr< actions_type > r (
+            actions_traits::create (i, f, this));
+
+          if (!actions_.present ())
+          {
+            this->actions_.set (r);
+            continue;
+          }
+        }
+
+        break;
+      }
 
       if (!architecture_.present ())
       {
-        this->architecture_.set (r);
-        continue;
+        throw ::xsd::cxx::tree::expected_element< char > (
+          "architecture",
+          "http://damaris.gforge.inria.fr/Damaris/Model");
       }
-    }
-
-    // data
-    //
-    if (n.name () == "data" && n.namespace_ ().empty ())
-    {
-      ::std::auto_ptr< data_type > r (
-        data_traits::create (i, f, this));
 
       if (!data_.present ())
       {
-        this->data_.set (r);
-        continue;
+        throw ::xsd::cxx::tree::expected_element< char > (
+          "data",
+          "http://damaris.gforge.inria.fr/Damaris/Model");
       }
-    }
-
-    // actions
-    //
-    if (n.name () == "actions" && n.namespace_ ().empty ())
-    {
-      ::std::auto_ptr< actions_type > r (
-        actions_traits::create (i, f, this));
 
       if (!actions_.present ())
       {
-        this->actions_.set (r);
-        continue;
+        throw ::xsd::cxx::tree::expected_element< char > (
+          "actions",
+          "http://damaris.gforge.inria.fr/Damaris/Model");
+      }
+
+      while (p.more_attributes ())
+      {
+        const ::xercesc::DOMAttr& i (p.next_attribute ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        if (n.name () == "name" && n.namespace_ ().empty ())
+        {
+          ::std::auto_ptr< name_type > r (
+            name_traits::create (i, f, this));
+
+          this->name_.set (r);
+          continue;
+        }
+
+        if (n.name () == "language" && n.namespace_ ().empty ())
+        {
+          ::std::auto_ptr< language_type > r (
+            language_traits::create (i, f, this));
+
+          this->language_.set (r);
+          continue;
+        }
+      }
+
+      if (!name_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_attribute< char > (
+          "name",
+          "");
+      }
+
+      if (!language_.present ())
+      {
+        this->language_.set (language_default_value ());
       }
     }
 
-    break;
-  }
-
-  if (!architecture_.present ())
-  {
-    throw ::xsd::cxx::tree::expected_element< char > (
-      "architecture",
-      "");
-  }
-
-  if (!data_.present ())
-  {
-    throw ::xsd::cxx::tree::expected_element< char > (
-      "data",
-      "");
-  }
-
-  if (!actions_.present ())
-  {
-    throw ::xsd::cxx::tree::expected_element< char > (
-      "actions",
-      "");
-  }
-
-  while (p.more_attributes ())
-  {
-    const ::xercesc::DOMAttr& i (p.next_attribute ());
-    const ::xsd::cxx::xml::qualified_name< char > n (
-      ::xsd::cxx::xml::dom::name< char > (i));
-
-    if (n.name () == "name" && n.namespace_ ().empty ())
+    simulation_mdl* simulation_mdl::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
     {
-      ::std::auto_ptr< name_type > r (
-        name_traits::create (i, f, this));
-
-      this->name_.set (r);
-      continue;
+      return new class simulation_mdl (*this, f, c);
     }
 
-    if (n.name () == "language" && n.namespace_ ().empty ())
+    simulation_mdl::
+    ~simulation_mdl ()
     {
-      ::std::auto_ptr< language_type > r (
-        language_traits::create (i, f, this));
-
-      this->language_.set (r);
-      continue;
     }
   }
-
-  if (!name_.present ())
-  {
-    throw ::xsd::cxx::tree::expected_attribute< char > (
-      "name",
-      "");
-  }
-
-  if (!language_.present ())
-  {
-    this->language_.set (language_default_value ());
-  }
-}
-
-simulation_mdl* simulation_mdl::
-_clone (::xml_schema::flags f,
-        ::xml_schema::container* c) const
-{
-  return new class simulation_mdl (*this, f, c);
-}
-
-simulation_mdl::
-~simulation_mdl ()
-{
 }
 
 #include <istream>
 #include <xsd/cxx/xml/sax/std-input-source.hxx>
 #include <xsd/cxx/tree/error-handler.hxx>
 
-::std::auto_ptr< ::simulation_mdl >
-simulation (const ::std::string& u,
-            ::xml_schema::flags f,
-            const ::xml_schema::properties& p)
+namespace Damaris
 {
-  ::xsd::cxx::xml::auto_initializer i (
-    (f & ::xml_schema::flags::dont_initialize) == 0,
-    (f & ::xml_schema::flags::keep_dom) == 0);
-
-  ::xsd::cxx::tree::error_handler< char > h;
-
-  ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
-    ::xsd::cxx::xml::dom::parse< char > (
-      u, h, p, f));
-
-  h.throw_if_failed< ::xsd::cxx::tree::parsing< char > > ();
-
-  ::std::auto_ptr< ::simulation_mdl > r (
-    ::simulation (
-      d, f | ::xml_schema::flags::own_dom, p));
-
-  return r;
-}
-
-::std::auto_ptr< ::simulation_mdl >
-simulation (const ::std::string& u,
-            ::xml_schema::error_handler& h,
-            ::xml_schema::flags f,
-            const ::xml_schema::properties& p)
-{
-  ::xsd::cxx::xml::auto_initializer i (
-    (f & ::xml_schema::flags::dont_initialize) == 0,
-    (f & ::xml_schema::flags::keep_dom) == 0);
-
-  ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
-    ::xsd::cxx::xml::dom::parse< char > (
-      u, h, p, f));
-
-  if (!d.get ())
-    throw ::xsd::cxx::tree::parsing< char > ();
-
-  ::std::auto_ptr< ::simulation_mdl > r (
-    ::simulation (
-      d, f | ::xml_schema::flags::own_dom, p));
-
-  return r;
-}
-
-::std::auto_ptr< ::simulation_mdl >
-simulation (const ::std::string& u,
-            ::xercesc::DOMErrorHandler& h,
-            ::xml_schema::flags f,
-            const ::xml_schema::properties& p)
-{
-  ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
-    ::xsd::cxx::xml::dom::parse< char > (
-      u, h, p, f));
-
-  if (!d.get ())
-    throw ::xsd::cxx::tree::parsing< char > ();
-
-  ::std::auto_ptr< ::simulation_mdl > r (
-    ::simulation (
-      d, f | ::xml_schema::flags::own_dom, p));
-
-  return r;
-}
-
-::std::auto_ptr< ::simulation_mdl >
-simulation (::std::istream& is,
-            ::xml_schema::flags f,
-            const ::xml_schema::properties& p)
-{
-  ::xsd::cxx::xml::auto_initializer i (
-    (f & ::xml_schema::flags::dont_initialize) == 0,
-    (f & ::xml_schema::flags::keep_dom) == 0);
-
-  ::xsd::cxx::xml::sax::std_input_source isrc (is);
-  return ::simulation (isrc, f, p);
-}
-
-::std::auto_ptr< ::simulation_mdl >
-simulation (::std::istream& is,
-            ::xml_schema::error_handler& h,
-            ::xml_schema::flags f,
-            const ::xml_schema::properties& p)
-{
-  ::xsd::cxx::xml::auto_initializer i (
-    (f & ::xml_schema::flags::dont_initialize) == 0,
-    (f & ::xml_schema::flags::keep_dom) == 0);
-
-  ::xsd::cxx::xml::sax::std_input_source isrc (is);
-  return ::simulation (isrc, h, f, p);
-}
-
-::std::auto_ptr< ::simulation_mdl >
-simulation (::std::istream& is,
-            ::xercesc::DOMErrorHandler& h,
-            ::xml_schema::flags f,
-            const ::xml_schema::properties& p)
-{
-  ::xsd::cxx::xml::sax::std_input_source isrc (is);
-  return ::simulation (isrc, h, f, p);
-}
-
-::std::auto_ptr< ::simulation_mdl >
-simulation (::std::istream& is,
-            const ::std::string& sid,
-            ::xml_schema::flags f,
-            const ::xml_schema::properties& p)
-{
-  ::xsd::cxx::xml::auto_initializer i (
-    (f & ::xml_schema::flags::dont_initialize) == 0,
-    (f & ::xml_schema::flags::keep_dom) == 0);
-
-  ::xsd::cxx::xml::sax::std_input_source isrc (is, sid);
-  return ::simulation (isrc, f, p);
-}
-
-::std::auto_ptr< ::simulation_mdl >
-simulation (::std::istream& is,
-            const ::std::string& sid,
-            ::xml_schema::error_handler& h,
-            ::xml_schema::flags f,
-            const ::xml_schema::properties& p)
-{
-  ::xsd::cxx::xml::auto_initializer i (
-    (f & ::xml_schema::flags::dont_initialize) == 0,
-    (f & ::xml_schema::flags::keep_dom) == 0);
-
-  ::xsd::cxx::xml::sax::std_input_source isrc (is, sid);
-  return ::simulation (isrc, h, f, p);
-}
-
-::std::auto_ptr< ::simulation_mdl >
-simulation (::std::istream& is,
-            const ::std::string& sid,
-            ::xercesc::DOMErrorHandler& h,
-            ::xml_schema::flags f,
-            const ::xml_schema::properties& p)
-{
-  ::xsd::cxx::xml::sax::std_input_source isrc (is, sid);
-  return ::simulation (isrc, h, f, p);
-}
-
-::std::auto_ptr< ::simulation_mdl >
-simulation (::xercesc::InputSource& i,
-            ::xml_schema::flags f,
-            const ::xml_schema::properties& p)
-{
-  ::xsd::cxx::tree::error_handler< char > h;
-
-  ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
-    ::xsd::cxx::xml::dom::parse< char > (
-      i, h, p, f));
-
-  h.throw_if_failed< ::xsd::cxx::tree::parsing< char > > ();
-
-  ::std::auto_ptr< ::simulation_mdl > r (
-    ::simulation (
-      d, f | ::xml_schema::flags::own_dom, p));
-
-  return r;
-}
-
-::std::auto_ptr< ::simulation_mdl >
-simulation (::xercesc::InputSource& i,
-            ::xml_schema::error_handler& h,
-            ::xml_schema::flags f,
-            const ::xml_schema::properties& p)
-{
-  ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
-    ::xsd::cxx::xml::dom::parse< char > (
-      i, h, p, f));
-
-  if (!d.get ())
-    throw ::xsd::cxx::tree::parsing< char > ();
-
-  ::std::auto_ptr< ::simulation_mdl > r (
-    ::simulation (
-      d, f | ::xml_schema::flags::own_dom, p));
-
-  return r;
-}
-
-::std::auto_ptr< ::simulation_mdl >
-simulation (::xercesc::InputSource& i,
-            ::xercesc::DOMErrorHandler& h,
-            ::xml_schema::flags f,
-            const ::xml_schema::properties& p)
-{
-  ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
-    ::xsd::cxx::xml::dom::parse< char > (
-      i, h, p, f));
-
-  if (!d.get ())
-    throw ::xsd::cxx::tree::parsing< char > ();
-
-  ::std::auto_ptr< ::simulation_mdl > r (
-    ::simulation (
-      d, f | ::xml_schema::flags::own_dom, p));
-
-  return r;
-}
-
-::std::auto_ptr< ::simulation_mdl >
-simulation (const ::xercesc::DOMDocument& d,
-            ::xml_schema::flags f,
-            const ::xml_schema::properties& p)
-{
-  if (f & ::xml_schema::flags::keep_dom)
+  namespace Model
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > c (
-      static_cast< ::xercesc::DOMDocument* > (d.cloneNode (true)));
+    ::std::auto_ptr< ::Damaris::Model::simulation_mdl >
+    simulation (const ::std::string& u,
+                ::xml_schema::flags f,
+                const ::xml_schema::properties& p)
+    {
+      ::xsd::cxx::xml::auto_initializer i (
+        (f & ::xml_schema::flags::dont_initialize) == 0,
+        (f & ::xml_schema::flags::keep_dom) == 0);
 
-    ::std::auto_ptr< ::simulation_mdl > r (
-      ::simulation (
-        c, f | ::xml_schema::flags::own_dom, p));
+      ::xsd::cxx::tree::error_handler< char > h;
 
-    return r;
+      ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+        ::xsd::cxx::xml::dom::parse< char > (
+          u, h, p, f));
+
+      h.throw_if_failed< ::xsd::cxx::tree::parsing< char > > ();
+
+      ::std::auto_ptr< ::Damaris::Model::simulation_mdl > r (
+        ::Damaris::Model::simulation (
+          d, f | ::xml_schema::flags::own_dom, p));
+
+      return r;
+    }
+
+    ::std::auto_ptr< ::Damaris::Model::simulation_mdl >
+    simulation (const ::std::string& u,
+                ::xml_schema::error_handler& h,
+                ::xml_schema::flags f,
+                const ::xml_schema::properties& p)
+    {
+      ::xsd::cxx::xml::auto_initializer i (
+        (f & ::xml_schema::flags::dont_initialize) == 0,
+        (f & ::xml_schema::flags::keep_dom) == 0);
+
+      ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+        ::xsd::cxx::xml::dom::parse< char > (
+          u, h, p, f));
+
+      if (!d.get ())
+        throw ::xsd::cxx::tree::parsing< char > ();
+
+      ::std::auto_ptr< ::Damaris::Model::simulation_mdl > r (
+        ::Damaris::Model::simulation (
+          d, f | ::xml_schema::flags::own_dom, p));
+
+      return r;
+    }
+
+    ::std::auto_ptr< ::Damaris::Model::simulation_mdl >
+    simulation (const ::std::string& u,
+                ::xercesc::DOMErrorHandler& h,
+                ::xml_schema::flags f,
+                const ::xml_schema::properties& p)
+    {
+      ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+        ::xsd::cxx::xml::dom::parse< char > (
+          u, h, p, f));
+
+      if (!d.get ())
+        throw ::xsd::cxx::tree::parsing< char > ();
+
+      ::std::auto_ptr< ::Damaris::Model::simulation_mdl > r (
+        ::Damaris::Model::simulation (
+          d, f | ::xml_schema::flags::own_dom, p));
+
+      return r;
+    }
+
+    ::std::auto_ptr< ::Damaris::Model::simulation_mdl >
+    simulation (::std::istream& is,
+                ::xml_schema::flags f,
+                const ::xml_schema::properties& p)
+    {
+      ::xsd::cxx::xml::auto_initializer i (
+        (f & ::xml_schema::flags::dont_initialize) == 0,
+        (f & ::xml_schema::flags::keep_dom) == 0);
+
+      ::xsd::cxx::xml::sax::std_input_source isrc (is);
+      return ::Damaris::Model::simulation (isrc, f, p);
+    }
+
+    ::std::auto_ptr< ::Damaris::Model::simulation_mdl >
+    simulation (::std::istream& is,
+                ::xml_schema::error_handler& h,
+                ::xml_schema::flags f,
+                const ::xml_schema::properties& p)
+    {
+      ::xsd::cxx::xml::auto_initializer i (
+        (f & ::xml_schema::flags::dont_initialize) == 0,
+        (f & ::xml_schema::flags::keep_dom) == 0);
+
+      ::xsd::cxx::xml::sax::std_input_source isrc (is);
+      return ::Damaris::Model::simulation (isrc, h, f, p);
+    }
+
+    ::std::auto_ptr< ::Damaris::Model::simulation_mdl >
+    simulation (::std::istream& is,
+                ::xercesc::DOMErrorHandler& h,
+                ::xml_schema::flags f,
+                const ::xml_schema::properties& p)
+    {
+      ::xsd::cxx::xml::sax::std_input_source isrc (is);
+      return ::Damaris::Model::simulation (isrc, h, f, p);
+    }
+
+    ::std::auto_ptr< ::Damaris::Model::simulation_mdl >
+    simulation (::std::istream& is,
+                const ::std::string& sid,
+                ::xml_schema::flags f,
+                const ::xml_schema::properties& p)
+    {
+      ::xsd::cxx::xml::auto_initializer i (
+        (f & ::xml_schema::flags::dont_initialize) == 0,
+        (f & ::xml_schema::flags::keep_dom) == 0);
+
+      ::xsd::cxx::xml::sax::std_input_source isrc (is, sid);
+      return ::Damaris::Model::simulation (isrc, f, p);
+    }
+
+    ::std::auto_ptr< ::Damaris::Model::simulation_mdl >
+    simulation (::std::istream& is,
+                const ::std::string& sid,
+                ::xml_schema::error_handler& h,
+                ::xml_schema::flags f,
+                const ::xml_schema::properties& p)
+    {
+      ::xsd::cxx::xml::auto_initializer i (
+        (f & ::xml_schema::flags::dont_initialize) == 0,
+        (f & ::xml_schema::flags::keep_dom) == 0);
+
+      ::xsd::cxx::xml::sax::std_input_source isrc (is, sid);
+      return ::Damaris::Model::simulation (isrc, h, f, p);
+    }
+
+    ::std::auto_ptr< ::Damaris::Model::simulation_mdl >
+    simulation (::std::istream& is,
+                const ::std::string& sid,
+                ::xercesc::DOMErrorHandler& h,
+                ::xml_schema::flags f,
+                const ::xml_schema::properties& p)
+    {
+      ::xsd::cxx::xml::sax::std_input_source isrc (is, sid);
+      return ::Damaris::Model::simulation (isrc, h, f, p);
+    }
+
+    ::std::auto_ptr< ::Damaris::Model::simulation_mdl >
+    simulation (::xercesc::InputSource& i,
+                ::xml_schema::flags f,
+                const ::xml_schema::properties& p)
+    {
+      ::xsd::cxx::tree::error_handler< char > h;
+
+      ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+        ::xsd::cxx::xml::dom::parse< char > (
+          i, h, p, f));
+
+      h.throw_if_failed< ::xsd::cxx::tree::parsing< char > > ();
+
+      ::std::auto_ptr< ::Damaris::Model::simulation_mdl > r (
+        ::Damaris::Model::simulation (
+          d, f | ::xml_schema::flags::own_dom, p));
+
+      return r;
+    }
+
+    ::std::auto_ptr< ::Damaris::Model::simulation_mdl >
+    simulation (::xercesc::InputSource& i,
+                ::xml_schema::error_handler& h,
+                ::xml_schema::flags f,
+                const ::xml_schema::properties& p)
+    {
+      ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+        ::xsd::cxx::xml::dom::parse< char > (
+          i, h, p, f));
+
+      if (!d.get ())
+        throw ::xsd::cxx::tree::parsing< char > ();
+
+      ::std::auto_ptr< ::Damaris::Model::simulation_mdl > r (
+        ::Damaris::Model::simulation (
+          d, f | ::xml_schema::flags::own_dom, p));
+
+      return r;
+    }
+
+    ::std::auto_ptr< ::Damaris::Model::simulation_mdl >
+    simulation (::xercesc::InputSource& i,
+                ::xercesc::DOMErrorHandler& h,
+                ::xml_schema::flags f,
+                const ::xml_schema::properties& p)
+    {
+      ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+        ::xsd::cxx::xml::dom::parse< char > (
+          i, h, p, f));
+
+      if (!d.get ())
+        throw ::xsd::cxx::tree::parsing< char > ();
+
+      ::std::auto_ptr< ::Damaris::Model::simulation_mdl > r (
+        ::Damaris::Model::simulation (
+          d, f | ::xml_schema::flags::own_dom, p));
+
+      return r;
+    }
+
+    ::std::auto_ptr< ::Damaris::Model::simulation_mdl >
+    simulation (const ::xercesc::DOMDocument& d,
+                ::xml_schema::flags f,
+                const ::xml_schema::properties& p)
+    {
+      if (f & ::xml_schema::flags::keep_dom)
+      {
+        ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > c (
+          static_cast< ::xercesc::DOMDocument* > (d.cloneNode (true)));
+
+        ::std::auto_ptr< ::Damaris::Model::simulation_mdl > r (
+          ::Damaris::Model::simulation (
+            c, f | ::xml_schema::flags::own_dom, p));
+
+        return r;
+      }
+
+      const ::xercesc::DOMElement& e (*d.getDocumentElement ());
+      const ::xsd::cxx::xml::qualified_name< char > n (
+        ::xsd::cxx::xml::dom::name< char > (e));
+
+      if (n.name () == "simulation" &&
+          n.namespace_ () == "http://damaris.gforge.inria.fr/Damaris/Model")
+      {
+        ::std::auto_ptr< ::Damaris::Model::simulation_mdl > r (
+          ::xsd::cxx::tree::traits< ::Damaris::Model::simulation_mdl, char >::create (
+            e, f, 0));
+        return r;
+      }
+
+      throw ::xsd::cxx::tree::unexpected_element < char > (
+        n.name (),
+        n.namespace_ (),
+        "simulation",
+        "http://damaris.gforge.inria.fr/Damaris/Model");
+    }
+
+    ::std::auto_ptr< ::Damaris::Model::simulation_mdl >
+    simulation (::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument >& d,
+                ::xml_schema::flags f,
+                const ::xml_schema::properties&)
+    {
+      ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > c (
+        ((f & ::xml_schema::flags::keep_dom) &&
+         !(f & ::xml_schema::flags::own_dom))
+        ? static_cast< ::xercesc::DOMDocument* > (d->cloneNode (true))
+        : 0);
+
+      ::xercesc::DOMDocument& doc (c.get () ? *c : *d);
+      const ::xercesc::DOMElement& e (*doc.getDocumentElement ());
+
+      const ::xsd::cxx::xml::qualified_name< char > n (
+        ::xsd::cxx::xml::dom::name< char > (e));
+
+      if (f & ::xml_schema::flags::keep_dom)
+        doc.setUserData (::xml_schema::dom::tree_node_key,
+                         (c.get () ? &c : &d),
+                         0);
+
+      if (n.name () == "simulation" &&
+          n.namespace_ () == "http://damaris.gforge.inria.fr/Damaris/Model")
+      {
+        ::std::auto_ptr< ::Damaris::Model::simulation_mdl > r (
+          ::xsd::cxx::tree::traits< ::Damaris::Model::simulation_mdl, char >::create (
+            e, f, 0));
+        return r;
+      }
+
+      throw ::xsd::cxx::tree::unexpected_element < char > (
+        n.name (),
+        n.namespace_ (),
+        "simulation",
+        "http://damaris.gforge.inria.fr/Damaris/Model");
+    }
   }
-
-  const ::xercesc::DOMElement& e (*d.getDocumentElement ());
-  const ::xsd::cxx::xml::qualified_name< char > n (
-    ::xsd::cxx::xml::dom::name< char > (e));
-
-  if (n.name () == "simulation" &&
-      n.namespace_ () == "")
-  {
-    ::std::auto_ptr< ::simulation_mdl > r (
-      ::xsd::cxx::tree::traits< ::simulation_mdl, char >::create (
-        e, f, 0));
-    return r;
-  }
-
-  throw ::xsd::cxx::tree::unexpected_element < char > (
-    n.name (),
-    n.namespace_ (),
-    "simulation",
-    "");
-}
-
-::std::auto_ptr< ::simulation_mdl >
-simulation (::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument >& d,
-            ::xml_schema::flags f,
-            const ::xml_schema::properties&)
-{
-  ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > c (
-    ((f & ::xml_schema::flags::keep_dom) &&
-     !(f & ::xml_schema::flags::own_dom))
-    ? static_cast< ::xercesc::DOMDocument* > (d->cloneNode (true))
-    : 0);
-
-  ::xercesc::DOMDocument& doc (c.get () ? *c : *d);
-  const ::xercesc::DOMElement& e (*doc.getDocumentElement ());
-
-  const ::xsd::cxx::xml::qualified_name< char > n (
-    ::xsd::cxx::xml::dom::name< char > (e));
-
-  if (f & ::xml_schema::flags::keep_dom)
-    doc.setUserData (::xml_schema::dom::tree_node_key,
-                     (c.get () ? &c : &d),
-                     0);
-
-  if (n.name () == "simulation" &&
-      n.namespace_ () == "")
-  {
-    ::std::auto_ptr< ::simulation_mdl > r (
-      ::xsd::cxx::tree::traits< ::simulation_mdl, char >::create (
-        e, f, 0));
-    return r;
-  }
-
-  throw ::xsd::cxx::tree::unexpected_element < char > (
-    n.name (),
-    n.namespace_ (),
-    "simulation",
-    "");
 }
 
 #include <xsd/cxx/post.hxx>
