@@ -21,16 +21,11 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <map>
 #include <list>
 #include <string>
-#include <iostream>
 
-#include "xml/Model.hpp"
-#include "common/ParameterSet.hpp"
-#include "common/MetadataManager.hpp"
-#include "common/ActionsManager.hpp"
 #include "common/Language.hpp"
-//#include "common/Parameter.hpp"
+#include "common/Parameter.hpp"
 #include "common/Layout.hpp"
-//#include "common/Group.hpp"
+#include "common/Group.hpp"
 #include "common/Calc.hpp"
 
 namespace Damaris {
@@ -46,38 +41,34 @@ namespace Damaris {
 	private:
 		static Configuration* m_instance; /*!< Pointer to a unique Configuration object (singleton). */
 
-		std::auto_ptr<Model::simulation_mdl> baseModel;/*!< Model extracted from the XML file */
 		std::string* configFile; 	/*!< For information, we keep the name of the configuration file. */
+		std::string* simulationName; 	/*!< Name of the simulation. */
+		int coresPerNode;	 	/*!< Total number of cores per node. */
+		int clientsPerNode;		/*!< Total number of clients per node. */
+		std::string* segmentName; 	/*!< Name of the shared memory segment. */
+		size_t segmentSize; 		/*!< Size of the shared memory segment. */
+		std::string* msgQueueName; 	/*!< Name of the shared messages queue. */
+		size_t msgQueueSize; 		/*!< Size (in number of messages) of the queue of messages. */
+		language_e defaultLanguage;	/*!< Default language (C, Fortran or Unknown) */
+		std::string sharedMemoryModel;	/*!< True is shared memory model is XSI */
 		
-		ParameterSet parameters;	 	/*!< List of parameters. */
-		ActionsManager* actionsManager;
-		MetadataManager* metadataManager;
-//		std::map<std::string,int> intparams;		/*!< Subset of parameters that are integers */
-//		std::map<std::string,Layout*>* layouts; 	/*!< List of layouts. Associate layout names to layouts. */
-//		std::map<std::string,std::string>* variableLayouts; /*!< Association from variable names to layout names. */
+		std::map<std::string,Parameter>* parameters;	 	/*!< List of parameters. */
+		std::map<std::string,int> intparams;		/*!< Subset of parameters that are integers */
+		// TODO : use boost::any to handle parameters properly
+		std::map<std::string,Layout*>* layouts; 	/*!< List of layouts. Associate layout names to layouts. */
+		std::map<std::string,std::string>* variableLayouts; /*!< Association from variable names to layout names. */
 		
-		Calc<std::string::const_iterator,ParameterSet>* layoutInterp; /*!< Parser for layout interpretation */
+		Group* dataHierarchy; /*!< Parent Group for the data (parameters, variables, layouts) hierarchy. */
+		Calc<std::string::const_iterator,std::map<std::string,int> >* layoutInterp; /*!< Parser for layout interpretation */
 		
-		void fillParameterSet();
-		void fillMetadataManager();
-		void readVariablesInSubGroup(const Model::group_mdl* g, std::string name);
-		void fillActionsManager();
-
 	protected:
-//		bool checkConfiguration(); /*!< Check if the Configuration is correctly loaded. */
+		bool checkConfiguration(); /*!< Check if the Configuration is correctly loaded. */
 
 		/**
 		 * \brief Constructor.
-		 * \param[in] mdl : simulation base model from XML file.
 		 * \param[in] configName : name of the configuration file to load.
 		 */
-		Configuration(std::auto_ptr<Model::simulation_mdl> mdl, std::string* configName);
-
-		/**
-		 * \brief Constructor from a base model.
-		 * \param[in] simMdl : simulation model
-		 */
-//		Configuration(Model::simulation_mdl* mdl);
+		Configuration(std::string* configName);
 
 		/**
 		 * \brief Destructor.
@@ -93,10 +84,9 @@ namespace Damaris {
 
 		/**
 		 * \brief Initializes Configuration with a given configuration file.
-		 * \param[in] mdl : simulation base model.
 		 * \param[in] configName : name of the configuration file to load.
 		 */
-		static void initialize(std::auto_ptr<Model::simulation_mdl> mdl, std::string* configName);
+		static void initialize(std::string* configName);
 		
 		/**
 		 * \brief Finalize (free resources) Configuration.
@@ -113,74 +103,74 @@ namespace Damaris {
 		/**
 		 * \brief Get the name of the simulation.
 		 */
-		std::string* getSimulationName();// { return simulationName; }
+		std::string* getSimulationName() { return simulationName; }
 		/**
 		 * \brief Set the name of the simulation.
 		 */
-		//void setSimulationName(const char* name);// { simulationName = new std::string(name); }
+		void setSimulationName(const char* name) { simulationName = new std::string(name); }
 
 		/**
 		 * \brief Get the default language for the running simulation.
 		 */
-//		language_e getDefaultLanguage();// { return defaultLanguage; }
+		language_e getDefaultLanguage() { return defaultLanguage; }
 		/**
 		 * \brief Set the default language for the running simulation.
 		 */
-		//void setDefaultLanguage(language_e l);// { defaultLanguage = l; }	
+		void setDefaultLanguage(language_e l) { defaultLanguage = l; }	
 	
 		/**
 		 * \brief Get the number of clients per node.
 		 */
-		int getClientsPerNode() const;// { return clientsPerNode; }
+		int getClientsPerNode() const { return clientsPerNode; }
 		/**
 		 * \brief Set the number of clients per node.
 		 */
-		//void setClientsPerNode(int cpn);// { clientsPerNode = cpn; }
+		void setClientsPerNode(int cpn) { clientsPerNode = cpn; }
 
 		/**
 		 * \brief Get the number of cores per node.
 		 */
-		int getCoresPerNode() const;// { return coresPerNode; }
+		int getCoresPerNode() const { return coresPerNode; }
 		/**
 		 * \brief Set the number of cores per node.
 		 */
-		//void setCoresPerNode(int cpn);// { coresPerNode = cpn; }
+		void setCoresPerNode(int cpn) { coresPerNode = cpn; }
 
 		/**
 		 * \brief Get the name of the shared memory segment.
 		 */
-		std::string* getSegmentName() const;// { return segmentName; }
+		std::string* getSegmentName() const { return segmentName; }
 		/**
 		 * \brief Set the name of the shared memory segment.
 		 */
-		//void setSegmentName(char* name) { segmentName = new std::string(name); }
+		void setSegmentName(char* name) { segmentName = new std::string(name); }
 
 		/**
 		 * \brief Get the size (in bytes) of the shared memory segment.
 		 */
-		size_t getSegmentSize() const;// { return segmentSize; }
+		size_t getSegmentSize() const { return segmentSize; }
 		/**
 		 * \brief Set the size (in bytes) of the shared memory segment.
 		 */
-		//void setSegmentSize(int s) { segmentSize = (size_t)s; }
+		void setSegmentSize(int s) { segmentSize = (size_t)s; }
 		
 		/**
 		 * \brief Get the name of the message queue.
 		 */
-		std::string* getMsgQueueName() const;// { return msgQueueName; }
+		std::string* getMsgQueueName() const { return msgQueueName; }
 		/**
 		 * \brief Set the name of the message queue.
 		 */
-		//void setMsgQueueName(char* name) { msgQueueName = new std::string(name); }
+		void setMsgQueueName(char* name) { msgQueueName = new std::string(name); }
 
 		/**
 		 * \brief Get the size (in number of messages) of the message queue.
 		 */
-		size_t getMsgQueueSize() const;// { return msgQueueSize; }
+		size_t getMsgQueueSize() const { return msgQueueSize; }
 		/**
 		 * \brief Set the size (in number of messages) of the message queue.
 		 */
-		//void setMsgQueueSize(int s) { msgQueueSize = s; }
+		void setMsgQueueSize(int s) { msgQueueSize = s; }
 
 		/**
 		 * \brief Get the value associated to a parameter.
@@ -189,12 +179,12 @@ namespace Damaris {
 		 * \param[out] value : Buffer to hold the value.
 		 * \return true in case of success, false if the parameter is not found.
 		 */
-//		bool getParameterValue(const char* name, void* value);
-		ParameterSet* getParameterSet();		
+		bool getParameterValue(const char* name, void* value);
+		
 		/**
 		 * THIS FUNCTION IS NOT IMPLEMENTED YET...
 		 */
-//		int getParameterString(const char* name, std::string* s);
+		int getParameterString(const char* name, std::string* s);
 		
 		/**
 		 * \brief Get the type of a parameter.
@@ -202,7 +192,7 @@ namespace Damaris {
 		 * \param[out] t : buffer of Types::basic_type_e to hold to result.
 		 * \return true in case of success, false if the parameter is not found.
 		 */
-//		bool getParameterType(const char* name, Types::basic_type_e* t);		
+		bool getParameterType(const char* name, Types::basic_type_e* t);		
 		
 		/**
 		 * \brief Set a parameter (type and value).
@@ -210,14 +200,14 @@ namespace Damaris {
 		 * \param[in] type : Type of the parameter.
 		 * \param[in] value : value of the parameter.
 		 */
-		//void setParameter(const char* name, const char* type, const char* value);
+		void setParameter(const char* name, const char* type, const char* value);
 		
 		/**
 		 * \brief Associate a variable name to the name of its layout.
 		 * \param[in] name : Name of the variable.
 		 * \param[in] layoutName : Name of the layout.
 		 */
-		//void setVariableInfo(const char* name, const char* layoutName);
+		void setVariableInfo(const char* name, const char* layoutName);
 		
 		/**
 		 * \brief Get the layout associated to a variable.
@@ -234,7 +224,7 @@ namespace Damaris {
 		 * \param[in] descriptor : string descriptor for the list of dimensions.
 		 * \param[in] l : Langage for the layout.
 		 */
-		//void setLayout(const char* name, const char* type, const char* descriptor, language_e l);
+		void setLayout(const char* name, const char* type, const char* descriptor, language_e l);
 		/**
 		 * \brief Get the layout by its name.
 		 * \param[in] name : Name of the layout to retrieve.
@@ -249,29 +239,25 @@ namespace Damaris {
 		 * \param[in] action : Name of the function to load.
 		 * \param[in] plugin : Name of the dynamic library to load.
 		 */	
-		//virtual void setEvent(const char* name, const char* action, const char* plugin) = 0;	
+		virtual void setEvent(const char* name, const char* action, const char* plugin) = 0;	
 
 		/**
 		 * \brief Set the parent group for the data hierarchy.
 		 * \param[in] g : new parent Group.
 		 */
-		//void setDataHierarchy(Group* g);
+		void setDataHierarchy(Group* g);
 
 		/**
 		 * \brief Set the shared memory functions to use (posix = shm_open, sysv = shmget).
 		 * \param[in] model : string representing the model to use.
 		 */
-		//void setSharedMemoryType(const char* str);
+		void setSharedMemoryType(const char* str);
 
 		/**
 		 * \brief Get the shared memory functions to use.
 		 * \return a string representing the functions to use.
 		 */
-		//std::string getSharedMemoryType();
-
-		ActionsManager* getActionsManager();
-
-		MetadataManager* getMetadataManager();
+		std::string getSharedMemoryType();
 };
 
 }

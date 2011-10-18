@@ -27,12 +27,14 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #define __DAMARIS_METADATA_H
 
 //#include <boost/interprocess/managed_shared_memory.hpp>
-#include <boost/multi_index_container.hpp>
-#include <boost/multi_index/member.hpp>
-#include <boost/multi_index/ordered_index.hpp>
-#include <list>
+//#include <boost/multi_index_container.hpp>
+//#include <boost/multi_index/member.hpp>
+//#include <boost/multi_index/ordered_index.hpp>
+//#include <list>
+#include <map>
+#include <vector>
 
-#include "common/SharedMemorySegment.hpp"
+//#include "common/SharedMemorySegment.hpp"
 #include "common/Layout.hpp"
 #include "common/Variable.hpp"
 
@@ -60,11 +62,20 @@ namespace Damaris {
 */
 	class MetadataManager {
 	private:
-	//	variable_set vars;
-		std::list<Variable> vars; /*!< List of all recorded variables. */
+		int numberOfEntries;		 /*!< Number of variables defined */
+		std::map<std::string,int> varID; /*!< Association variable name <-> ID */
+		std::map<std::string,Layout> layouts;
+		std::vector<Variable> variables; /*!< vector of variables entries */
+
+//		std::list<Variable> vars; /*!< List of all recorded variables. */
 //		managed_shared_memory* segment; /*!< A pointer to the shared memory segment. */ 
-		SharedMemorySegment* segment; /*!< A pointer to the shared memory segment. */
+//		SharedMemorySegment* segment; /*!< A pointer to the shared memory segment. */
 	public:
+		bool addVariableEntry(Variable &v);
+		Variable* getVariableByName(std::string &name);
+		Variable* getVariableByID(int id);
+		bool setLayout(std::string& lname, Layout &l);
+		Layout* getLayout(std::string& lname);
 		/**
 		 * \brief Retrieves a variable given its name, iteration and source.
 		 * \param[in] n : name of the variable to retrieve.
@@ -73,7 +84,7 @@ namespace Damaris {
 		 * \return A pointer to the first Variable record found, or NULL if none has been found.
 		 *         Do not use delete on this pointer, it is managed by the MetadataManager.
 		 */
-		Variable* get(const std::string *n, int32_t it, int32_t srcID);
+//		Variable* get(const std::string *n, int32_t it, int32_t srcID);
 		
 		/**
 		 * \brief Puts a new variable record into the MetadataManager.
@@ -82,7 +93,7 @@ namespace Damaris {
 		 * \return 0 in case of success, -1 if there is already a record identified by the same name, iteration and source.
 		 *           In that case, the new Variable is not inserted in the MetadataManager.
 		 */
-		int put(Variable v);
+//		int put(Variable v);
 	//	void put(std::string *name, int32_t iteration, int32_t sourceID, Layout* l, void* data);
 	//	void remove(std::string* name, int32_t iteration, int32_t sourceID);	
 		
@@ -90,7 +101,7 @@ namespace Damaris {
 		 * \brief Removes a variable from the MetadataManager (its content is deleted from shared memory).
 		 * \param[in] v : instance of the variable to delete.
 		 */
-		void remove(Variable v);
+//		void remove(Variable v);
 
 		// TODO getVariablesByName(std::string n);
 
@@ -102,10 +113,10 @@ namespace Damaris {
 		 * Takes a pointer to the shared memory segment that holds the data.
 		 * \param[in] s : pointer to the shared memory segment.
 		 */	
-		MetadataManager(SharedMemorySegment* s);
+//		MetadataManager(SharedMemorySegment* s);
 		//MetadataManager(managed_shared_memory* s);
-	
-		std::list<Variable>* getAllVariables();
+		MetadataManager();	
+//		std::list<Variable>* getAllVariables();
 
 		/**
 		 * \brief Destructor.

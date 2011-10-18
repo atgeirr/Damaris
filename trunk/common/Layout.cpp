@@ -25,16 +25,19 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <cstring>
 #include "common/Debug.hpp"
 #include "common/Layout.hpp"
+#include "common/Chunk.hpp"
 
 namespace Damaris {
 	
-	Layout::Layout(Types::basic_type_e t, int32_t d, std::vector<int64_t> extents)
+	Layout::Layout(Types::basic_type_e t, unsigned int d, std::vector<int> &ex)
 	{
 		type = t;
 		dimensions = d;
-		if((int)extents.size() != (2*d)) {
-			ERROR("Error in layout initialization");
+		if(ex.size() != d) {
+			ERROR("In layout initialization: extents size and dimensions do not match");
 		}
+		extents = ex;
+		/*
 		if(dimensions > 0){
 			startIndex = new int64_t[dimensions];
 			endIndex = new int64_t[dimensions];
@@ -47,8 +50,9 @@ namespace Damaris {
 			startIndex = NULL;
 			endIndex = NULL;
 		}
+		*/
 	}
-	
+	/*
 	Layout::Layout(Types::basic_type_e t, int32_t d)
 	{
 		type = t;
@@ -59,19 +63,19 @@ namespace Damaris {
 		startIndex = NULL;
 		endIndex = NULL;
 	}
-	
+	*/
 	Layout::~Layout()
 	{
-		if(startIndex) delete startIndex;
-		if(endIndex) delete endIndex;
+	//	if(startIndex) delete startIndex;
+	//	if(endIndex) delete endIndex;
 	}
-	
+	/*
 	size_t  Layout::getRequiredMemoryLength() const
 	{
 		size_t result = 1;
 		result *= basicTypeSize(type);
-		for(int i = 0; i < dimensions; i++) {
-			size_t d = (endIndex[i]-startIndex[i]+1);
+		for(unsigned int i = 0; i < dimensions; i++) {
+			size_t d = extents[i]; //(endIndex[i]-startIndex[i]+1);
 			result *= d;
 		}
 		return result;
@@ -82,11 +86,11 @@ namespace Damaris {
 		return type;
 	}
 	
-	int32_t Layout::getDimensions() const
+	unsigned int Layout::getDimensions() const
 	{
 		return dimensions;
 	}
-	
+
 	int64_t Layout::getStartIndex(int dim) const
 	{
 		return startIndex[dim];
@@ -96,12 +100,24 @@ namespace Damaris {
 	{
 		return endIndex[dim];
 	}
-
-	int64_t Layout::getExtentAlongDimension(int dim) const
+*/
+	int Layout::getExtentAlongDimension(unsigned int dim) const
 	{
 		if(dim < dimensions)
-			return (endIndex[dim]-startIndex[dim]+1);
+			return extents[dim]; //return (endIndex[dim]-startIndex[dim]+1);
 		else
 			return 0;
 	}
+
+/*	Chunk toChunk() const
+	{
+		std::vector<int> si;
+		std::vector<int> ei;
+		for(std::vector<int>::const_iterator it = extents.begin(); it != extents.end(); it++) {
+			si.push_back((*it) - 1);
+			ei.push_back(0);
+		}
+		return Chunk(type,dimensions,si,ei);
+	}
+*/
 }

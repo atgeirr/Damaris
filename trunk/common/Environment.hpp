@@ -17,6 +17,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __DAMARIS_ENVIRONMENT_H
 #define __DAMARIS_ENVIRONMENT_H
 
+#include <iostream>
+
+#include "xml/Model.hpp"
 
 namespace Damaris {
 /** 
@@ -26,20 +29,38 @@ namespace Damaris {
 class Environment {
 		
 	private:
-		int id; /*!< ID of the server. */
-	public:
-		
-		/**
-		 * \brief Constructor.
-	  	 */
-		Environment();
+		static Environment* m_instance; /*!< Pointer to the singleton instance. */
 
+		std::auto_ptr<Model::simulation_mdl> model; /*! Pointer to the base model. */
+		int id; /*!< ID of the process. */
+	
+	protected:	
 		/**
 		 * \brief Constructor taking an ID. 
-		 * \param[in] i : id of the server.
+		 * \param[in] mdl : base model from the configuration file.
+		 * \param[in] i : id of the process.
 		 */
-		Environment(int i);
+		Environment(std::auto_ptr<Model::simulation_mdl> mdl, int i);
 
+	public:
+		/**
+		 * \brief Returns the singleton instance for the Environment object.
+		 * \return NULL if Configuration::initialize has never been called before, a valid pointer otherwise.
+		 */
+		static Environment* getInstance();
+
+		/**
+		 * \brief Initialize the Environment singleton object.
+		 * \param[in] mdl : base model from the configuration file.
+		 * \param[in] i : id of the process.
+		 */
+		static void initialize(std::auto_ptr<Model::simulation_mdl> mdl, int i);
+		
+		/**
+		 * \brief Destroy the singleton object. 
+		 */
+		static void finalize();
+		
 		/**
 		 * \brief Get the ID of the server.
 		 * \return ID of the server.

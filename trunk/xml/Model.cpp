@@ -54,7 +54,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <xsd/cxx/pre.hxx>
 
-#include "model.hpp"
+#include "Model.hpp"
 
 namespace Damaris
 {
@@ -407,28 +407,22 @@ namespace Damaris
       this->type_.set (x);
     }
 
-    const layout_mdl::dimensions_optional& layout_mdl::
+    const layout_mdl::dimensions_type& layout_mdl::
     dimensions () const
     {
-      return this->dimensions_;
+      return this->dimensions_.get ();
     }
 
-    layout_mdl::dimensions_optional& layout_mdl::
+    layout_mdl::dimensions_type& layout_mdl::
     dimensions ()
     {
-      return this->dimensions_;
+      return this->dimensions_.get ();
     }
 
     void layout_mdl::
     dimensions (const dimensions_type& x)
     {
       this->dimensions_.set (x);
-    }
-
-    void layout_mdl::
-    dimensions (const dimensions_optional& x)
-    {
-      this->dimensions_ = x;
     }
 
     void layout_mdl::
@@ -871,28 +865,28 @@ namespace Damaris
       this->action_.set (x);
     }
 
-    const event_mdl::using_type& event_mdl::
-    using_ () const
+    const event_mdl::library_type& event_mdl::
+    library () const
     {
-      return this->using__.get ();
+      return this->library_.get ();
     }
 
-    event_mdl::using_type& event_mdl::
-    using_ ()
+    event_mdl::library_type& event_mdl::
+    library ()
     {
-      return this->using__.get ();
-    }
-
-    void event_mdl::
-    using_ (const using_type& x)
-    {
-      this->using__.set (x);
+      return this->library_.get ();
     }
 
     void event_mdl::
-    using_ (::std::auto_ptr< using_type > x)
+    library (const library_type& x)
     {
-      this->using__.set (x);
+      this->library_.set (x);
+    }
+
+    void event_mdl::
+    library (::std::auto_ptr< library_type > x)
+    {
+      this->library_.set (x);
     }
 
 
@@ -1584,12 +1578,13 @@ namespace Damaris
 
     layout_mdl::
     layout_mdl (const name_type& name,
-                const type_type& type)
+                const type_type& type,
+                const dimensions_type& dimensions)
     : ::xml_schema::type (),
       description_ (::xml_schema::flags (), this),
       name_ (name, ::xml_schema::flags (), this),
       type_ (type, ::xml_schema::flags (), this),
-      dimensions_ (::xml_schema::flags (), this)
+      dimensions_ (dimensions, ::xml_schema::flags (), this)
     {
     }
 
@@ -1694,6 +1689,13 @@ namespace Damaris
       {
         throw ::xsd::cxx::tree::expected_attribute< char > (
           "type",
+          "");
+      }
+
+      if (!dimensions_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_attribute< char > (
+          "dimensions",
           "");
       }
     }
@@ -2206,11 +2208,11 @@ namespace Damaris
     event_mdl::
     event_mdl (const name_type& name,
                const action_type& action,
-               const using_type& using_)
+               const library_type& library)
     : ::xml_schema::type (),
       name_ (name, ::xml_schema::flags (), this),
       action_ (action, ::xml_schema::flags (), this),
-      using__ (using_, ::xml_schema::flags (), this)
+      library_ (library, ::xml_schema::flags (), this)
     {
     }
 
@@ -2221,7 +2223,7 @@ namespace Damaris
     : ::xml_schema::type (x, f, c),
       name_ (x.name_, f, this),
       action_ (x.action_, f, this),
-      using__ (x.using__, f, this)
+      library_ (x.library_, f, this)
     {
     }
 
@@ -2232,7 +2234,7 @@ namespace Damaris
     : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
       name_ (f, this),
       action_ (f, this),
-      using__ (f, this)
+      library_ (f, this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
       {
@@ -2269,12 +2271,12 @@ namespace Damaris
           continue;
         }
 
-        if (n.name () == "using" && n.namespace_ ().empty ())
+        if (n.name () == "library" && n.namespace_ ().empty ())
         {
-          ::std::auto_ptr< using_type > r (
-            using_traits::create (i, f, this));
+          ::std::auto_ptr< library_type > r (
+            library_traits::create (i, f, this));
 
-          this->using__.set (r);
+          this->library_.set (r);
           continue;
         }
       }
@@ -2293,10 +2295,10 @@ namespace Damaris
           "");
       }
 
-      if (!using__.present ())
+      if (!library_.present ())
       {
         throw ::xsd::cxx::tree::expected_attribute< char > (
-          "using",
+          "library",
           "");
       }
     }

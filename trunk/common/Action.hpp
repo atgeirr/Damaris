@@ -20,9 +20,10 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \author Matthieu Dorier
  * \version 0.1
  */
-#ifndef __DAMARIS_REACTION_H
-#define __DAMARIS_REACTION_H
+#ifndef __DAMARIS_ACTION_H
+#define __DAMARIS_ACTION_H
 
+#include <dlfcn.h>
 #include <stdint.h>
 #include <string>
 
@@ -38,19 +39,27 @@ namespace Damaris {
  */
 class Action {
 
-	private:
-		void (*function)(const std::string*,int32_t,int32_t,MetadataManager*); /*!< Pointer to the loaded function */
+//	private:
+//		void (*function)(int32_t,int32_t,MetadataManager*); /*!< Pointer to the loaded function */
+
+	protected:
+		bool loaded;
+
 	public:
+		std::string name;
+		int id;
 		/**
 		 * \brief Constructor. Takes the pointer over the function to handle.
 		 * \param[in] fptr : Pointer to the function.
 		 */
-		Action(void(*fptr)(const std::string*, int32_t, int32_t, MetadataManager*));
+		Action(std::string n,int i);
+		Action();
+//		Action(void(*fptr)(int32_t, int32_t, MetadataManager*));
 		
 		/**
 		 * \brief Destructor.
 		 */
-		~Action();
+//		~Action();
 		
 		/**
 		 * \brief Operator overloaded to simplify the call to an action.
@@ -59,15 +68,15 @@ class Action {
 		 * \param[in] sourceID : ID of the client that fired the action.
 		 * \param[in,out] mm : pointer to the MetadataManager that contains all recorded variables.
 		 */
-		void operator()(const std::string* event, 
-				int32_t iteration, int32_t sourceID, MetadataManager* mm);
+		void operator()(int32_t iteration, int32_t sourceID, MetadataManager* mm);
 		
 		/**
 		 * \brief Another way of calling the inner function.
 		 * \see Damaris::Actions::operator()
 		 */
-		void call(const std::string* event,
-			  int32_t iteration, int32_t sourceID, MetadataManager* mm);
+		virtual void call(int32_t iteration, int32_t sourceID, MetadataManager* mm) = 0;
+
+		virtual void load() = 0;
 };
 
 }

@@ -27,9 +27,12 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 
 #include "common/Debug.hpp"
-#include "client/ClientConfiguration.hpp"
-#include "common/Layout.hpp"
-#include "common/LayoutFactory.hpp"
+//#include "client/ClientConfiguration.hpp"
+//#include "common/Configuration.hpp"
+//#include "common/Layout.hpp"
+//#include "common/LayoutFactory.hpp"
+#include "common/ChunkHandle.hpp"
+#include "common/ShmChunk.hpp"
 #include "common/Message.hpp"
 #include "client/Client.hpp"
 
@@ -38,18 +41,26 @@ namespace Damaris {
 	Client::Client(std::string* configfile, int32_t coreID)
 	{
 		/* creates the configuration object from the configuration file */
-		ClientConfiguration::initialize(configfile);
-		config = ClientConfiguration::getInstance();
-		id = coreID;
+		std::auto_ptr<Model::simulation_mdl> mdl(Model::simulation(configfile->c_str(),xml_schema::flags::dont_validate));
+
+		Configuration::initialize(mdl,configfile);
+		config = Configuration::getInstance();
+
+		Environment::initialize(mdl,coreID);
+		env = Environment::getInstance();
+		id = env->getID();
+
+		metadataManager = config->getMetadataManager();
+		actionsManager = config->getActionsManager();
 		/* initializes the shared structures */
 		try {
-			if(config->getSharedMemoryType() == "sysv") {
+#ifdef __SYSV
 				msgQueue = SharedMessageQueue::open(sysv_shmem,config->getMsgQueueName()->c_str());
 				segment = SharedMemorySegment::open(sysv_shmem,config->getSegmentName()->c_str());
-			} else {
+#else
 				msgQueue = SharedMessageQueue::open(posix_shmem,config->getMsgQueueName()->c_str());
 				segment = SharedMemorySegment::open(posix_shmem,config->getSegmentName()->c_str());
-			}
+#endif
 			DBG("Client initialized successfully for core " << id 
 			    << " with configuration \"" << *configfile << "\"");
 		}
@@ -57,38 +68,48 @@ namespace Damaris {
 			ERROR("While initializing shared memory objects:  " << ex.what());
 			exit(-1);
 		}
-		variables = new MetadataManager(segment);
+
+		metadataManager = config->getMetadataManager();
+		actionsManager = config->getActionsManager();
 	}
 	
 	void* Client::alloc(std::string* varname, int32_t iteration)
 	{
-		size_t size = 0;
-		char* buffer = NULL;
 
-		Layout* layout = config->getVariableLayout(varname->c_str());
-		if(layout == (Layout*)NULL) {
-			ERROR("Unknown variable \"" << varname->c_str() << "\" or undefined layout for this variable");	
+		/* check that the variable is know in the configuration */
+		std::string name(*varname);
+		Variable* variable = metadataManager->getVariableByName(name);
+
+        	if(variable == NULL) {
+			ERROR("Variable \""<< varname->c_str() << "\" not defined in configuration");
 			return NULL;
-		} else {
-			Variable* allocated = variables->get(varname,iteration,id);
-			if(allocated != NULL) return (void*)(allocated->data);
-			size = layout->getRequiredMemoryLength();
+        	}
+
+		Layout* layout = variable->layout;
+
+		std::vector<int> si(layout->getDimensions()),ei(layout->getDimensions());
+		for(unsigned int i=0; i < layout->getDimensions(); i++)	{
+			ei[i] = layout->getExtentAlongDimension(i)-1;
+			si[i] = 0;
 		}
-		// try buffer allocation
-		try {
-			buffer = static_cast<char*>(segment->allocate(size));
-			Variable allocated(*varname,iteration,id,layout,buffer);
-			variables->put(allocated);
-		} catch(boost::interprocess::bad_alloc &ex) {
-			WARN("Allocation failed for variable \"" << *varname << "\"");
-			buffer = NULL;
+
+		try {		
+			ShmChunk* chunk = new ShmChunk(segment,layout->getType(),layout->getDimensions(),si,ei);
+			chunk->setSource(id);
+			chunk->setIteration(iteration);
+			return chunk->data();
+		} catch (...) {
+			ERROR("While allocating \"" << varname->c_str() << "\", allocation failed");
 		}
-		
-		return (void*)buffer;
+
+		return NULL;
+		// TODO store this chunk somewhere to be able to commit it
 	}
 	
 	int Client::commit(std::string* varname, int32_t iteration)
 	{
+// TODO
+/*		
 		Variable* allocated = variables->get(varname,iteration,id);
 		if(allocated == NULL)
 			return -1;
@@ -122,78 +143,134 @@ namespace Damaris {
 		allocated->data = NULL; // prevents metadata manager from deleting content
 		variables->remove(*allocated);
 
-                return 0;
+		return 0;
+*/
+                return -1;
 	}
 	
 	int Client::write(std::string* varname, int32_t iteration, const void* data)
 	{
 		/* check that the variable is know in the configuration */
-		Layout* layout = config->getVariableLayout(varname->c_str());
-		size_t size = 0;
-        	if(layout == (Layout*)NULL) {
-			ERROR("No layout found in configuration for variable \""<< varname->c_str() << "\" or variable not defined");
+		std::string name(*varname);
+		Variable* variable = metadataManager->getVariableByName(name);
+
+        	if(variable == NULL) {
+			ERROR("Variable \""<< varname->c_str() << "\" not defined in configuration");
 			return -1;
         	}
 
-		// get required size
-		size = layout->getRequiredMemoryLength();
-		if(size == 0) {
-			ERROR("Layout has size 0");
-			return -2;
+		Layout* layout = variable->layout;
+
+		std::vector<int> si(layout->getDimensions()),ei(layout->getDimensions());
+                for(unsigned int i=0; i < layout->getDimensions(); i++) {
+                        ei[i] = layout->getExtentAlongDimension(i)-1;
+                        si[i] = 0;
+                }
+
+		ShmChunk* chunk = NULL;
+                try {
+                        chunk = new ShmChunk(segment,layout->getType(),layout->getDimensions(),si,ei);
+                        chunk->setSource(id);
+                        chunk->setIteration(iteration);
+                } catch (...) {
+                        ERROR("While writing \"" << varname->c_str() << "\", allocation failed");
+                	return -2;
 		}
 
-		// allocate buffer
-		char* buffer = NULL;
-		try {		
-			buffer = static_cast<char*>(segment->allocate(size));
-		} catch (...) {
-			ERROR("While writing \"" << varname->c_str() << "\", allocation failed");
-			return -3;
-		}
-		
 		// copy data
-		memcpy(buffer,data,size);
+		size_t size = chunk->getRequiredMemoryLength();
+		memcpy(chunk->data(),data,size);
+		
 		// create message
 		Message* message = new Message();
-		message->sourceID = id;
 		
-		if(varname->length() > 63) {
-			WARN("Variable name length bigger than 63, will be truncated");
-			memcpy(message->content,varname->c_str(),63);
-			message->content[63] = '\0';
-		} else {
-			strcpy(message->content,varname->c_str());
-		}
-		
-		LayoutFactory::serialize(layout, message->layoutInfo);
-		
+		message->source = id;
 		message->iteration = iteration;
+		message->object = variable->id;
 		message->type = MSG_VAR;
-		message->handle = segment->getHandleFromAddress(buffer);
+		message->handle = chunk->getHandle();
+		
 		// send message
 		msgQueue->send(message,sizeof(Message),0);
-		// free message
 		DBG("Variable \"" << varname->c_str() << "\" has been written");
+	
+		// free message	
 		delete message;
 		
 		return size;
 	}
+
+	int Client::write(std::string* varname, int32_t iteration, int64_t chunkh, const void* data)
+	{
+		/* check that the variable is know in the configuration */
+		std::string name(*varname);
+		Variable* variable = metadataManager->getVariableByName(name);
+
+        	if(variable == NULL) {
+			ERROR("Variable \""<< varname->c_str() << "\" not defined in configuration");
+			return -1;
+        	}
+
+		ChunkHandle* chunkHandle = (ChunkHandle*)chunkh;
+
+		/* check if the chunk matches the layout boundaries */
+		Layout* layout = variable->layout;
+		if(not chunkHandle->within(layout)) {
+			ERROR("Chunk boundaries do not match variable's layout");
+			return -3;
+		}
+
+		ShmChunk* chunk = NULL;
+                try {
+			Types::basic_type_e t = chunkHandle->getType();
+			unsigned int d = chunkHandle->getDimensions();
+			std::vector<int> si(d);
+			std::vector<int> ei(d);
+
+			for(unsigned int i=0;i<d; i++) {
+				si[i] = chunkHandle->getStartIndex(i);
+				ei[i] = chunkHandle->getEndIndex(i);
+			}
+
+                        chunk = new ShmChunk(segment,t,d,si,ei);
+                        chunk->setSource(id);
+                        chunk->setIteration(iteration);
+                } catch (...) {
+                        ERROR("While writing \"" << varname->c_str() << "\", allocation failed");
+                	return -2;
+		}
+
+		// copy data
+		size_t size = chunk->getRequiredMemoryLength();
+		memcpy(chunk->data(),data,size);
+		
+		// create message
+		Message* message = new Message();
+		
+		message->source = id;
+		message->iteration = iteration;
+		message->object = variable->id;
+		message->type = MSG_VAR;
+		message->handle = chunk->getHandle();
+		
+		// send message
+		msgQueue->send(message,sizeof(Message),0);
+		DBG("Variable \"" << varname->c_str() << "\" has been written");
 	
+		// free message	
+		delete message;
+		
+		return size;
+	}
+
 	int Client::signal(std::string* signal_name, int32_t iteration)
 	{
 		Message* sig = new Message();
-		sig->sourceID = id;
+		sig->source = id;
 		sig->iteration = iteration;
 		sig->type = MSG_SIG;
 		sig->handle = 0;
-		
-		if(signal_name->length() > 63) {
-			WARN("Signal's name length bigger than 63, will be truncated");
-			memcpy(sig->content,signal_name->c_str(),63);
-			sig->content[63] = '\0';
-		} else {
-			strcpy(sig->content,signal_name->c_str());
-		}
+		sig->object = 0; // TODO : put the Id of the action
 		
 		try {
 			msgQueue->send(sig,sizeof(Message),0);
@@ -206,6 +283,7 @@ namespace Damaris {
 
 	int Client::getParameter(std::string* paramName, void* buffer)
 	{
+		/*
 		Types::basic_type_e t;
 		if(config->getParameterType(paramName->c_str(),&t)) 
 		{
@@ -214,7 +292,9 @@ namespace Damaris {
 		} else {
 			ERROR("Parameter \""<< paramName->c_str() <<"\"not found in the configuration");
 			return -1;
-		}
+		}*/
+		// TODO THIS FUNCTION HAS TO BE RE-IMPLEMENTED
+		return -1;
 	}
 		
 	int Client::killServer()
@@ -235,8 +315,10 @@ namespace Damaris {
 	{
 		delete msgQueue;
 		delete segment;
+
 		config->finalize();
-		
+		env->finalize();
+
 		INFO("Client destroyed successfuly");
 	}
 	

@@ -29,6 +29,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <fcntl.h>
 #include <boost/program_options.hpp>
 
+#include "xml/Model.hpp"
 #include "server/Options.hpp"
 #include "common/Debug.hpp"
 
@@ -103,16 +104,17 @@ Options::Options(int argc, char** argv)
 	configFile = NULL;	
 	if (vm.count("configuration")) {
 		configFile = new std::string(vm["configuration"].as<std::string>());
-		ServerConfiguration::initialize(configFile);
-		config = ServerConfiguration::getInstance();
+		std::auto_ptr<Model::simulation_mdl> mdl(Model::simulation(configFile->c_str(),xml_schema::flags::dont_validate));
+		//Model::simulation_mdl* mdl = new simulation_mdl(configFile->c_str(),xml_schema::flags::dont_validate);
+		Configuration::initialize(mdl,configFile);
+		config = Configuration::getInstance();
+
+		Environment::initialize(mdl,id);
+		env = Environment::getInstance();
 	} else {
 		ERROR("No configuration file provided, use --configuration=<file.xml> or -C <file.xml>");
 		exit(-1);
 	}
-
-	/* preparing the Environment object */
-	env = new Environment();
-	env->setID(id);
 }
 
 std::string* Options::getConfigFile()
@@ -120,7 +122,7 @@ std::string* Options::getConfigFile()
 	return configFile;
 }
 
-ServerConfiguration* Options::getServerConfiguration()
+Configuration* Options::getConfiguration()
 {
 	return config;
 }

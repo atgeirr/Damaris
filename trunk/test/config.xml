@@ -4,14 +4,14 @@
 		<cores  count="16">
 			<clients count="15"/>
 		</cores>
-		<buffer name="/home/matthieu/Work/damaris/trunk/server/test3" size="67108864" />
-		<queue  name="/home/matthieu/Work/damaris/trunk/server/test2" size="100" />
+		<buffer name="buffer" size="67108864" />
+		<queue  name="queue" size="100" />
 	</architecture>
 	<data>
 		<parameter name="x" type="int" value="42" />
 
 		<layout name="my layout" type="float" dimensions="64,16,2" />
-		<layout name="str layout" type="char" dimensiones="128" />
+		<layout name="str layout" type="char" dimensions="128" />
 		<group name="info" enabled="yes">
 			<variable name="my string" layout="str layout"/>
 		</group>
@@ -19,6 +19,6 @@
 		<variable name="my variable" layout="my layout"> this is an example of metadata </variable>
 	</data>
 	<actions>
-		<event name="dump" action="dump_hdf5" using="persistence.so"/>
+		<event name="dump" action="dump_hdf5" library="persistence.so"/>
 	</actions>
 </simulation>

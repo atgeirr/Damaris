@@ -30,12 +30,13 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 //#include <boost/interprocess/ipc/message_queue.hpp>
 //#include <boost/interprocess/managed_shared_memory.hpp>
 
-#include "server/ServerConfiguration.hpp"
+//#include "server/ServerConfiguration.hpp"
+#include "common/Configuration.hpp"
 #include "common/SharedMessageQueue.hpp"
 #include "common/SharedMemorySegment.hpp"
 #include "common/Environment.hpp"
 #include "common/Message.hpp"
-#include "server/ActionsManager.hpp"
+#include "common/ActionsManager.hpp"
 #include "common/MetadataManager.hpp"
 
 using namespace boost::interprocess;
@@ -62,7 +63,7 @@ class Server {
 		 * \param[in] config : a fully initialized Configuration object.
 		 * \param[in] env : a fully initialized Environment object.
 		 */
-		Server(ServerConfiguration* config, Environment* env);
+		Server(Configuration* config, Environment* env);
 
 		/**
 		 * \brief Destructor 
@@ -84,8 +85,8 @@ class Server {
 
 		bool needStop; /*!< indicates wether the server has to exit the main loop at the next iteration */
 
-		ServerConfiguration *config; /*!< This is the configuration object initialized with the external file. */
-		Environment *env; /*!< This is the pointer to the Environment object. */
+		Configuration *config; 	/*!< This is the configuration object initialized with the external file. */
+		Environment *env;	/*!< This is the pointer to the Environment object. */
 		
 		/** 
 		 * Pointer to the message queue, this queue is used

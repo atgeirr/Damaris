@@ -24,11 +24,13 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #define __DAMARIS_BEHAVIOR_H
 
 #include <map>
+#include <vector>
 #include <string>
 
 //#include "common/Configuration.hpp"
 #include "common/MetadataManager.hpp"
-#include "server/Action.hpp"
+#include "common/Action.hpp"
+#include "common/DynamicAction.hpp"
 
 namespace Damaris {
 
@@ -39,7 +41,8 @@ namespace Damaris {
  */
 class ActionsManager {
 	private:
-		std::map<std::string,Action*> actions; /*!< Map associating event names to actions. */
+		std::map<std::string,int> actionsID; /*!< Map associating event names to identifiers. */
+		std::vector<Action*> actions; /*!< Vector of actions. */
 
 	public:
 		/**
@@ -54,7 +57,6 @@ class ActionsManager {
 		 * \param[in] functionName : Name of the function to load in this dynamic library.
 		 */
 		void loadActionFromPlugin(std::string* eventName, std::string* fileName, std::string* functionName);
-
 		/**
 		 * \brief Call a function. In reaction to a fired event.
 		 * \param[in] sig : name of the event.
@@ -64,6 +66,7 @@ class ActionsManager {
 		 */
 		void reactToUserSignal(std::string* sig, int32_t iteration, int32_t sourceID, MetadataManager* mm);
 
+		void reactToUserSignal(int sigID, int32_t iteration, int32_t sourceID, MetadataManager* mm);
 };
 
 }

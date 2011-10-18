@@ -31,11 +31,58 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 namespace Damaris {
 
 //	MetadataManager::MetadataManager(managed_shared_memory* s)
-	MetadataManager::MetadataManager(SharedMemorySegment* s)
+//	MetadataManager::MetadataManager(SharedMemorySegment* s)
+	MetadataManager::MetadataManager()
 	{
-		segment = s;
+//		segment = s;
+	}	
+
+	bool MetadataManager::addVariableEntry(Variable& v)
+	{
+		// check if the variable has already an ID defined
+		if(varID.find(v.name) != varID.end())
+			return false;
+		// the variable does not exist, give it an ID
+		int id = (int) variables.size();
+		v.id = id;
+		// put it into the variables vector and register its ID
+		variables.push_back(v);
+		varID.insert(std::pair<std::string,int>(v.name,id));
+
+		return true;
 	}
-	
+
+	Variable* MetadataManager::getVariableByName(std::string &name)
+	{
+		std::map<std::string,int>::iterator it = varID.find(name);
+		if(it == varID.end()) return NULL;
+		else return getVariableByID(it->second);
+	}
+
+	Variable* MetadataManager::getVariableByID(int id)
+	{
+		if(variables.size() >= (unsigned int)id && id >= 0) return &(variables[id]);
+		else return NULL;
+	}
+
+	bool MetadataManager::setLayout(std::string& lname, Layout &l)
+	{
+		if(layouts.find(lname) != layouts.end())
+		{
+			ERROR("Trying to define two layouts with the same name \"" << lname << "\"");
+			return false;
+		}
+		layouts.insert(std::pair<std::string,Layout>(lname,l));
+		return true;
+	}
+
+	Layout* MetadataManager::getLayout(std::string& lname)
+	{
+		std::map<std::string,Layout>::iterator it = layouts.find(lname);
+		if(it == layouts.end()) return NULL;
+		return &(it->second);
+	}
+/*
 	Variable* MetadataManager::get(const std::string* name, int32_t iteration, int32_t sourceID)
 	{
 		std::list<Variable>::iterator i;
@@ -49,7 +96,8 @@ namespace Damaris {
 		}
 		return NULL;
 	}
-	
+*/
+/*	
 	int MetadataManager::put(Variable v)
 	{
 		if(this->get(&(v.name),v.iteration,v.source) != NULL) {
@@ -58,6 +106,7 @@ namespace Damaris {
 		vars.push_back(v);
 		return 0;
 	}
+*/
 /*	
 	void MetadataManager::put(std::string* name, int32_t iteration, int32_t sourceID, Layout* l, void* data)
 	{
@@ -71,6 +120,7 @@ namespace Damaris {
 		vars.remove(v);
 	}
 */
+/*
 	void MetadataManager::remove(Variable v)
 	{
 		if(v.data != NULL) 
@@ -86,10 +136,10 @@ namespace Damaris {
 	{
 		return &vars;
 	}
-	
+*/	
 	MetadataManager::~MetadataManager()
 	{
-		vars.clear();
+		//vars.clear();
 	}
 	
 }

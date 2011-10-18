@@ -52,8 +52,8 @@ struct Calc : qi::grammar<Iterator, std::vector<int>(), ascii::space_type>
 	qi::rule<Iterator, int(), ascii::space_type> factor;
 	qi::rule<Iterator, int(), ascii::space_type> simple;
 	qi::rule<Iterator, std::string(), ascii::space_type> identifier;
-	qi::rule<Iterator, int(std::map<std::string,int>), ascii::space_type> value;
-
+	qi::rule<Iterator, int(SymTable), ascii::space_type> value;
+	
 	Calc(SymTable &sym) : Calc::base_type(start)
 	{
 		identifier = qi::lexeme[( qi::alpha | '_') >> *( qi::alnum | '_')];

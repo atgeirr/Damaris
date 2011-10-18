@@ -49,7 +49,7 @@ namespace Types {
 		return 0;
 	}
 
-	basic_type_e getTypeFromString(std::string* str)
+	basic_type_e getTypeFromString(const std::string* str)
 	{
 		if(str->compare("short") == 0)  return SHORT;
 		if(str->compare("int") == 0)    return INT;

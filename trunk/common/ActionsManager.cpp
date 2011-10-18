@@ -30,7 +30,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/Configuration.hpp"
 #include "common/MetadataManager.hpp"
 #include "common/Variable.hpp"
-#include "server/ActionsManager.hpp"
+#include "common/ActionsManager.hpp"
 
 namespace Damaris {
 	
@@ -49,48 +49,37 @@ ActionsManager::ActionsManager()
  */
 void ActionsManager::loadActionFromPlugin(std::string* eventName, std::string* fileName, std::string* functionName)
 {
-	char* error;
-	
-	/* check if the event already exists */
-	std::map<std::string,Action*>::iterator it = actions.find(*eventName);
-        if(it != actions.end())
-        {
-		WARN("Trying to overwrite an already defined event, first version is kept");
-		return;
-	}
+	// TODO find a way to check if the function already exists or not
 
-	/* opening the dynamic library */
-	void* handle = dlopen(fileName->c_str(),RTLD_NOW | RTLD_GLOBAL);
+	DynamicAction* a = new DynamicAction(*eventName,*functionName,*fileName);
 
-	if(!handle) 
-	{
-		ERROR("While loading plugin in \""<<fileName->c_str()<<"\":" << dlerror());
-		return;
-	}
-
-	/* loading function */
-	void (* func)(const std::string*, int32_t, int32_t, Damaris::MetadataManager*) 
-		= (void (*)(const std::string*, int32_t, int32_t, Damaris::MetadataManager*))dlsym(handle,functionName->c_str());
-	if ((error = dlerror()) != NULL)  {
-        	ERROR("While loading function in dynamic library: " << error);
-		return;
-	}
-	// creating the function
-	Action *a = new Action(func);
-	// inserting in the map
-	actions.insert(std::pair<std::string,Action*>(std::string(eventName->c_str()),a));
+	// attribute an ID to the action
+	a->id = actions.size();
+	// put the action into the array
+	actions.push_back((Action*)a);
+	// insert the id in the map
+	actionsID.insert(std::pair<std::string,int>(std::string(eventName->c_str()),a->id));
 }
 
 void ActionsManager::reactToUserSignal(std::string *sig, int32_t iteration, int32_t sourceID, MetadataManager* mm)
 {
-	std::map<std::string,Action*>::iterator it = actions.find(*sig);
-	if(it != actions.end())
+	std::map<std::string,int>::iterator it = actionsID.find(*sig);
+	if(it != actionsID.end())
 	{
-		Action* a = (*it).second;
-		(*a)(sig,iteration,sourceID,mm);
+		(*(actions[it->second]))(iteration,sourceID,mm);
 	} else {
 		ERROR("Unable to process \""<< sig->c_str() <<"\" signal: unknown event name");
 	}	
+}
+
+void ActionsManager::reactToUserSignal(int sigID, int32_t iteration, int32_t sourceID, MetadataManager* mm)
+{
+	if(sigID >= 0 && sigID < (int)actions.size())
+	{
+		(*(actions[sigID]))(iteration,sourceID,mm);
+	} else {
+		ERROR("Unknown action ID " << sigID);
+	}
 }
 
 }

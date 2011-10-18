@@ -14,40 +14,47 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
-
-#include "common/Debug.hpp"
-#include "common/Environment.hpp"
+/**
+ * \file Action.cpp
+ * \date July 2011
+ * \author Matthieu Dorier
+ * \version 0.1
+ */
+#include "common/Action.hpp"
 
 namespace Damaris {
 
-	Environment* Environment::m_instance = NULL;
-
-	Environment::Environment(std::auto_ptr<Model::simulation_mdl> mdl, int pid)
+	Action::Action()
 	{
-		model = mdl;
-		id = pid;
+		loaded = false;
 	}
 
-	Environment* Environment::getInstance()
+	Action::Action(std::string n, int i)
 	{
-		return m_instance;
+		loaded = false;
+		name = n;
+		id = i;
 	}
-
-	void Environment::initialize(std::auto_ptr<Model::simulation_mdl> mdl, int pid)
+/*	
+	Action::Action(void(*fptr)(int32_t, int32_t, MetadataManager*))
 	{
-		if(m_instance) {
-			WARN("Environment already initialized.");
-			return;
-		}
-		m_instance = new Environment(mdl,pid);
+		function = fptr;
 	}
-
-	void Environment::finalize()
+	
+	Action::~Action()
+	{}
+*/	
+	void Action::operator()(int32_t iteration, int32_t sourceID, MetadataManager* mm)
 	{
-		if(m_instance == NULL) {
-			WARN("Environment already finalized.");
-			return;
-		}
-		delete m_instance;
+//		if(function != NULL)
+//			(*function)(iteration,sourceID,mm);
+		this->call(iteration, sourceID, mm);
 	}
+/*
+	void Action::call(int32_t iteration, int32_t sourceID, MetadataManager* mm)
+	{
+		if(function != NULL)
+			(*function)(iteration,sourceID,mm);
+	}
+*/
 }

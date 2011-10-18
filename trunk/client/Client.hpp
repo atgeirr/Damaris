@@ -30,9 +30,11 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 #include <stdint.h>
 
-#include "client/ClientConfiguration.hpp"
+#include "common/Environment.hpp"
+#include "common/Configuration.hpp"
 #include "common/SharedMessageQueue.hpp"
 #include "common/SharedMemorySegment.hpp"
+#include "common/ActionsManager.hpp"
 #include "common/MetadataManager.hpp"
 #include "common/Layout.hpp"
 
@@ -51,11 +53,14 @@ namespace Damaris {
  */
 class Client {
 	private:
-		int id; /*!< the ID of the client */
-		ClientConfiguration *config; /*!< configuration object */
-		SharedMessageQueue *msgQueue; /*!< pointer to the message queue */
-		SharedMemorySegment* segment; /*!< pointer to the shared memory segment */
-		MetadataManager *variables; /*!< pointer to the metadata manager for allocated variables */
+		Environment *env; /*!< environment object. */
+		Configuration *config; /*!< configuration object. */
+		MetadataManager *metadataManager; /*! metadata manager object. */
+		ActionsManager *actionsManager; /*! for future use... */
+		int id; /*!< ID of the process as set in Environment. */
+
+		SharedMessageQueue *msgQueue; /*!< pointer to the message queue. */
+		SharedMemorySegment* segment; /*!< pointer to the shared memory segment. */
 	
 	public:
 		/** 
@@ -70,7 +75,7 @@ class Client {
 		Client(std::string* config,int32_t id);
 
 		/**
-		 * \brief Writes some data.
+		 * \brief Writes a full variable.
 		 * Writes a variable into shared memory and sends a message 
 		 * notifying the write to the dedicated core running on the same node.
 		 * If the memory segment is full, this function will fail.
@@ -81,13 +86,28 @@ class Client {
 		 * \param[in] iteration : iteration number for this write.
 		 * \param[in] data : pointer to the data to be copied to the shared memory buffer.
 		 * 
-		 * \return 0 in case of success,
-		 *         -1 if the layout or the variable has not been defined,
-		 *         -2 if the layout has a bad size (0 or < 0),
-		 *         -3 if the allocation of memory failed (not enough memory).
+		 * \return the amount of bytes written in case of success,
+		 *         -1 if the variable has not been defined,
+		 *         -2 if the allocation of memory failed.
 		 */
-		int write(std::string* varname, int32_t iteration, const void* data);//, const Layout* layout);
+		int write(std::string* varname, int32_t iteration, const void* data);
 		
+		/**
+		 * \brief Writes a chunk of a variable.
+		 * Checks that the chunk is within the bound of the variable's layout first.
+		 * 
+		 * \param[in] varname : name of the variable to write in. This variable should
+		 *                      be defined in the XML configuration.
+		 * \param[in] iteration : iteration number for this write.
+		 * \param[in] chunkh : handle of a pre-defined chunk.
+		 * \param[in] data : pointer to the data to be written in the shared memory buffer.
+		 * \return the amount of bytes written in case of success,
+		 *         -1 if the variable has not been defined,
+		 *         -2 if the allocation of memory failed,
+		 *         -3 if the chunk has an inapropriate shape.
+		 */
+		int write(std::string* varname, int32_t iteration, int64_t chunkh, const void* data);		
+
 		/**
 		 * \brief Sends an event.
 		 * Sends en event to the dedicated core running on the dedicated core.

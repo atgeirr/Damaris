@@ -1,6 +1,6 @@
 XSD = xsd cxx-tree
 
-TARGET = model.xsd
+SOURCE = Model.xsd
 NAMING = --type-naming knr 
 SUFFIX = --hxx-suffix .hpp --cxx-suffix .cpp
 PROLOG = --prologue-file prologue.txt 
@@ -15,8 +15,8 @@ OBJ = $(SRC:.c=.o)
 
 all: xml
 
-xml: model.xsd
-	$(XSD) $(OPT) $(TARGET)
+xml: $(SOURCE)
+	$(XSD) $(OPT) $(SOURCE)
 
 %.o: %.cpp
 	g++ -o $@ -c $<

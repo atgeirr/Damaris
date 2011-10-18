@@ -43,10 +43,11 @@ namespace Damaris {
  */
 	struct Message {
 		msg_type_e 	type;		/*!< The type of message (MSG_VAR, MSG_SIG). */
-		int32_t 	sourceID;	/*!< The id of the source sending the message. */
+		int32_t 	source;		/*!< The id of the source sending the message. */
 		int32_t 	iteration;	/*!< The iteration number in the simulation. */
-		char 		content[128];	/*!< The content (name of the variable or the event). */
-		int64_t 	layoutInfo[8]; 	/*!< Information related to the data layout. */
+		int32_t		object;		/*!< An identifier to an object defined in the configuration. */
+//		char 		content[128];	/*!< The content (name of the variable or the event). */
+//		int64_t 	layoutInfo[8]; 	/*!< Information related to the data layout. */
 		handle_t 	handle;		/*!< Pointer to data relatively to the beginning of the shared memory segment */
 	};
 	

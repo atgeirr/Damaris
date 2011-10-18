@@ -28,7 +28,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <string>
 
-#include "server/ServerConfiguration.hpp"
+#include "common/Configuration.hpp"
 #include "common/Environment.hpp"
 
 namespace Damaris {
@@ -43,7 +43,7 @@ class Options {
 	private:
 		std::string* configFile; /*!< Name of the configuration file. */
 		Environment* env; /*!< Pointer to the Environment object that will be filled. */
-		ServerConfiguration* config; /*!< Pointer to the Configuration that will be initialized. */
+		Configuration* config; /*!< Pointer to the Configuration that will be initialized. */
 	public:
 		/**
 		 * The constructor takes the same parameters than a usual program. 
@@ -56,7 +56,7 @@ class Options {
 		/**
 		 * Get the prepared configuration.
 		 */
-		ServerConfiguration* getServerConfiguration();
+		Configuration* getConfiguration();
 		/**
 		 * Get the prepared environment.
 		 */

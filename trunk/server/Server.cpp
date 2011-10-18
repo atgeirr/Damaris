@@ -27,11 +27,14 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/Debug.hpp"
 #include "common/Environment.hpp"
 #include "common/SharedMemorySegment.hpp"
+#include "common/Configuration.hpp"
 #include "server/Server.hpp"
-#include "server/ServerConfiguration.hpp"
+//#include "server/ServerConfiguration.hpp"
 #include "common/Message.hpp"
+#include "common/ChunkHeader.hpp"
+#include "common/Chunk.hpp"
 #include "common/Layout.hpp"
-#include "common/LayoutFactory.hpp"
+//#include "common/LayoutFactory.hpp"
 #include "common/SharedMemory.hpp"
 
 using namespace boost::interprocess;
@@ -43,20 +46,24 @@ namespace Damaris {
 	/* constructor for embedded mode */
 	Server::Server(std::string* cf, int id)
 	{
-		ServerConfiguration::initialize(cf);
-		config = ServerConfiguration::getInstance();
-		//env = new Environment();
-		//env->setID(id);
-		config->setServerID(id);
+		//Model::simulation_mdl* mdl = new simulation_mdl(cf->c_str(),xml_schema::flags::dont_validate);
+		std::auto_ptr<Model::simulation_mdl> mdl(Model::simulation(cf->c_str(),xml_schema::flags::dont_validate));
+
+		Configuration::initialize(mdl,cf);
+		Environment::initialize(mdl,id);
+
+		config = Configuration::getInstance();
+		env    = Environment::getInstance();
+
 		init();
 	}
 	
 	/* constructor for standalone mode */
-	Server::Server(ServerConfiguration* c, Environment *e)
+	Server::Server(Configuration* c, Environment *e)
 	{
 		config = c;
-		env = e;
-		config->setServerID(env->getID());
+		env    = e;
+		
 		init();
 	}
 
@@ -66,59 +73,58 @@ namespace Damaris {
 		needStop = config->getClientsPerNode();
 		/* creating shared structures */
 		try {
-			if(config->getSharedMemoryType() == "sysv") {
+#ifdef __SYSV	
+			SharedMessageQueue::remove(sysv_shmem,config->getMsgQueueName()->c_str());
+			SharedMemorySegment::remove(sysv_shmem,config->getSegmentName()->c_str());	
 			
-				SharedMessageQueue::remove(sysv_shmem,config->getMsgQueueName()->c_str());
-				SharedMemorySegment::remove(sysv_shmem,config->getSegmentName()->c_str());	
-				
-				msgQueue = SharedMessageQueue::create(sysv_shmem,
-							      config->getMsgQueueName()->c_str(),
-							      (size_t)config->getMsgQueueSize(),
-							      sizeof(Message));
-				INFO("initialized with sizeof message = " << sizeof(Message));
-				segment = SharedMemorySegment::create(sysv_shmem,
-								config->getSegmentName()->c_str(),
-								(size_t)config->getSegmentSize());
+			msgQueue = SharedMessageQueue::create(sysv_shmem,
+						      config->getMsgQueueName()->c_str(),
+						      (size_t)config->getMsgQueueSize(),
+						      sizeof(Message));
+			segment = SharedMemorySegment::create(sysv_shmem,
+							config->getSegmentName()->c_str(),
+							(size_t)config->getSegmentSize());
 
-			} else {
+#else
+			SharedMessageQueue::remove(posix_shmem,config->getMsgQueueName()->c_str());
+			SharedMemorySegment::remove(posix_shmem,config->getSegmentName()->c_str());      
 			
-				SharedMessageQueue::remove(posix_shmem,config->getMsgQueueName()->c_str());
-				SharedMemorySegment::remove(posix_shmem,config->getSegmentName()->c_str());      
-				INFO("initialized with sizeof message = " << sizeof(Message));                        
-				msgQueue = SharedMessageQueue::create(posix_shmem,
-								config->getMsgQueueName()->c_str(),
-								(size_t)config->getMsgQueueSize(),
-								sizeof(Message));
+			msgQueue = SharedMessageQueue::create(posix_shmem,
+							config->getMsgQueueName()->c_str(),
+							(size_t)config->getMsgQueueSize(),
+							sizeof(Message));
                         
-				segment = SharedMemorySegment::create(posix_shmem,
-								config->getSegmentName()->c_str(),
-								(size_t)config->getSegmentSize());
-			}
+			segment = SharedMemorySegment::create(posix_shmem,
+							config->getSegmentName()->c_str(),
+							(size_t)config->getSegmentSize());
+#endif
 		}
 		catch(interprocess_exception &ex) {
 			ERROR("Error when initializing the server: " << ex.what());
 			exit(-1);
 		}
 
-		metadataManager = new MetadataManager(segment);
+		metadataManager = config->getMetadataManager();
 		actionsManager = config->getActionsManager();
-		INFO("Server successfully started with configuration " << config->getFileName()->c_str());
+
+		INFO("Server successfully initialized with configuration " << config->getFileName()->c_str());
 	}
 	
 	/* destructor */
 	Server::~Server()
 	{
-		if(config->getSharedMemoryType() == "sysv") {
-			SharedMessageQueue::remove(sysv_shmem,config->getMsgQueueName()->c_str());
-			SharedMemorySegment::remove(sysv_shmem,config->getSegmentName()->c_str());
-		} else {
-			SharedMessageQueue::remove(posix_shmem,config->getMsgQueueName()->c_str());
-			SharedMemorySegment::remove(posix_shmem,config->getSegmentName()->c_str());
-		}
+#ifdef __SYSV
+		SharedMessageQueue::remove(sysv_shmem,config->getMsgQueueName()->c_str());
+		SharedMemorySegment::remove(sysv_shmem,config->getSegmentName()->c_str());
+#else
+		SharedMessageQueue::remove(posix_shmem,config->getMsgQueueName()->c_str());
+		SharedMemorySegment::remove(posix_shmem,config->getSegmentName()->c_str());
+#endif
 		delete msgQueue;
 		delete segment;
-		delete metadataManager;
-		ServerConfiguration::finalize();
+		
+		Configuration::finalize();
+		Environment::finalize();
 	}
 	
 	/* starts the server and enter the main loop */
@@ -147,31 +153,35 @@ namespace Damaris {
 	void Server::processMessage(Message* msg) 
 	{
 			
-		std::string name(msg->content);
+		//std::string name(msg->content);
 		int32_t iteration = msg->iteration;
-		int32_t sourceID = msg->sourceID;
-		Layout* layout = NULL;
-		void* data = NULL;
+		int32_t source = msg->source;
+		char* data = NULL;
 		
 		if(msg->type == MSG_VAR)
 		{
-			DBG("Received notification for variable " << name.c_str()); 
-			data = segment->getAddressFromHandle(msg->handle);
-			layout = LayoutFactory::unserialize(msg->layoutInfo);
-			Variable v(name,iteration,sourceID,layout,data);
-			metadataManager->put(v);
+			//DBG("Received notification for variable " << name.c_str()); 
+			data = (char*)segment->getAddressFromHandle(msg->handle);
+			ChunkHeader *header = ChunkHeader::fromBuffer((void*)data);
+			data = data + header.size();
+			Chunk chunk(header,source,iteration,data);
+			metadataManager->attachChunk(msg->object,chunk);
+			//layout = LayoutFactory::unserialize(msg->layoutInfo);
+			//Variable v(name,iteration,sourceID,layout,data);
+			//metadataManager->put(v);
 			return;
 		}
 		
 		if(msg->type == MSG_SIG) 
 		{
-			DBG("Received event " << msg->content);
-			if(msg->content[0] == '#') {
-				if(name == "#kill") needStop -= 1;
-			} else {
-				actionsManager->reactToUserSignal(&name,iteration,sourceID,metadataManager);		
-			}
-			return;
+			//DBG("Received event " << msg->content);
+		//	if(msg->content[0] == '#') {
+		//		if(name == "#kill") needStop -= 1;
+		//	} else {
+		//		actionsManager->reactToUserSignal(&name,iteration,sourceID,metadataManager);		
+		//	}
+		//	return;
+			actionsManager->reactToUserSignal(msg->object,iteration,source,metadataManager);
 		}
 	}
 	

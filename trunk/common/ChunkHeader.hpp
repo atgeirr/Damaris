@@ -15,38 +15,31 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file Layout.hpp
- * \date July 2011
+ * \file ChunkHeader.hpp
+ * \date October 2011
  * \author Matthieu Dorier
- * \version 0.1
+ * \version 0.3
  *
- * This file defines the Layout object.
+ * This file defines the Chunk object.
  */
-#ifndef __DAMARIS_LAYOUT_H
-#define __DAMARIS_LAYOUT_H
+#ifndef __DAMARIS_CHUNK_HEADER_H
+#define __DAMARIS_CHUNK_HEADER_H
 
-#include <string>
-#include <vector>
-
+#include <stdlib.h>
 #include "common/Types.hpp"
 
 namespace Damaris {
 
 /**
- * Layouts are objects that describe the representation of
- * data in memory. For example "an 3D array of integers which extents are
- * 4,2 and 16". Actually we choosed to represent layouts as in Fortran, using
- * a starting index and an ending index rather than a size. This way allows 
- * plugins to potentially know that the variable is a chunk of a bigger
- * global array.
+
  */	
-class Layout {
+struct ChunkHeader {
 		
-	private:
 		Types::basic_type_e type; 	/*!< Type of the data. */
-		unsigned int dimensions; 		/*!< Number of dimensions. */
-		std::vector<int> extents;		
-	public:
+		unsigned int dimensions; 	/*!< Number of dimensions. */
+		int* startIndex; 		/*!< Start index along each dimension. */
+		int* endIndex; 			/*!< End index along each dimencion. */
+		
 		/**
 		 * \brief Constructor.
 		 * Initializes a Layout from the data type, the dimensions and the vector of extents. 
@@ -56,21 +49,22 @@ class Layout {
 		 * \param[in] extents : list of extents, even indices hold starting indices, 
 		 *                      non-even hold ending indices.
 		 */
-		Layout(Types::basic_type_e t, unsigned int d, std::vector<int> &ex);
-		
-		/** 
-		 * \brief Constructor.
-		 * Initializes a Layout without knowing its extents.
-		 *
-		 * \param[in] t : basic type.
-		 * \param[in] d = number of dimensions.
-		 */
-//		Layout(Types::basic_type_e t, int32_t d);
-		
+		ChunkHeader(Types::basic_type_e t, unsigned int d);
+
+		ChunkHeader(Types::basic_type_e t, unsigned int d, int* sIndex, int* eIndex);
+
+		ChunkHeader(const ChunkHeader &h);
+		//ChunkHeader(ChunkHeader& h);					
 		/**
 		 * \brief Destructor.
 		 */
-		~Layout();
+		~ChunkHeader();
+		
+		size_t size();
+
+		void toBuffer(void* dest) const;
+
+		static ChunkHeader fromBuffer(void* src);
 		
 		/**
 		 * \return Size of the buffer that would hold the data.
@@ -78,32 +72,13 @@ class Layout {
 		size_t  getRequiredMemoryLength() const;
 	
 		/**
-		 * \return The type of the data. 
-		 */
-		Types::basic_type_e getType() const;
-		
-		/**
-		 * \return the number of dimensions. 
-		 */
-		unsigned int getDimensions() const;
-
-		/**
-		 * \return the starting index along a particular dimension.
-		 */
-//		int64_t getStartIndex(int dim) const;
-		
-		/**
-		 * \return the ending index along a particular dimension. 
-		 */
-//		int64_t getEndIndex(int dim) const;
-		
-		/**
 		 * \return the extent (start-end+1) along a given dimension. 
 		 */
 		int getExtentAlongDimension(unsigned int dim) const;
 		
-}; // class Layout
+}; // class Chunk
 	
 } // namespace Damaris
 
 #endif
+

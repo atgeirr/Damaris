@@ -698,20 +698,16 @@ namespace Damaris
       // dimensions
       // 
       typedef ::xml_schema::string dimensions_type;
-      typedef ::xsd::cxx::tree::optional< dimensions_type > dimensions_optional;
       typedef ::xsd::cxx::tree::traits< dimensions_type, char > dimensions_traits;
 
-      const dimensions_optional&
+      const dimensions_type&
       dimensions () const;
 
-      dimensions_optional&
+      dimensions_type&
       dimensions ();
 
       void
       dimensions (const dimensions_type& x);
-
-      void
-      dimensions (const dimensions_optional& x);
 
       void
       dimensions (::std::auto_ptr< dimensions_type > p);
@@ -719,7 +715,8 @@ namespace Damaris
       // Constructors.
       //
       layout_mdl (const name_type&,
-                  const type_type&);
+                  const type_type&,
+                  const dimensions_type&);
 
       layout_mdl (const ::xercesc::DOMElement& e,
                   ::xml_schema::flags f = 0,
@@ -747,7 +744,7 @@ namespace Damaris
       description_optional description_;
       ::xsd::cxx::tree::one< name_type > name_;
       ::xsd::cxx::tree::one< type_type > type_;
-      dimensions_optional dimensions_;
+      ::xsd::cxx::tree::one< dimensions_type > dimensions_;
     };
 
     class variable_mdl: public ::xml_schema::type
@@ -1219,28 +1216,28 @@ namespace Damaris
       void
       action (::std::auto_ptr< action_type > p);
 
-      // using
+      // library
       // 
-      typedef ::xml_schema::string using_type;
-      typedef ::xsd::cxx::tree::traits< using_type, char > using_traits;
+      typedef ::xml_schema::string library_type;
+      typedef ::xsd::cxx::tree::traits< library_type, char > library_traits;
 
-      const using_type&
-      using_ () const;
+      const library_type&
+      library () const;
 
-      using_type&
-      using_ ();
-
-      void
-      using_ (const using_type& x);
+      library_type&
+      library ();
 
       void
-      using_ (::std::auto_ptr< using_type > p);
+      library (const library_type& x);
+
+      void
+      library (::std::auto_ptr< library_type > p);
 
       // Constructors.
       //
       event_mdl (const name_type&,
                  const action_type&,
-                 const using_type&);
+                 const library_type&);
 
       event_mdl (const ::xercesc::DOMElement& e,
                  ::xml_schema::flags f = 0,
@@ -1267,7 +1264,7 @@ namespace Damaris
       protected:
       ::xsd::cxx::tree::one< name_type > name_;
       ::xsd::cxx::tree::one< action_type > action_;
-      ::xsd::cxx::tree::one< using_type > using__;
+      ::xsd::cxx::tree::one< library_type > library_;
     };
 
     class actions_mdl: public ::xml_schema::type

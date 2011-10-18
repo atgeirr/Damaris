@@ -23,7 +23,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * Definition of the Fortran functions.
  */
 #ifdef __ENABLE_FORTRAN
-#define __DEBUG
 #include "common/Debug.hpp"
 #include "common/FCMangle.h"
 #include "client/ClientFortran.hpp"

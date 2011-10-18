@@ -15,34 +15,30 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file Action.cpp
- * \date July 2011
+ * \file ParameterSet.cpp
+ * \date October 2011
  * \author Matthieu Dorier
- * \version 0.1
+ * \version 0.3
+ *
+ * ParameterSet.cpp defines the holder of a set of parameters.
  */
-#include "server/Action.hpp"
+#include "common/ParameterSet.hpp"
+#include "common/Debug.hpp"
 
 namespace Damaris {
-	
-	Action::Action(void(*fptr)(const std::string*, int32_t, int32_t, MetadataManager*))
-	{
-		function = fptr;
+
+ParameterSet::ParameterSet()
+{}
+
+int ParameterSet::operator[](std::string& n)
+{
+	int* result = get<int>(n);
+	if(result == NULL) {
+		WARN("Parameter \"" << n << "\" undefined, value 0 returned instead, may lead to inconsistencies");
+		return 0;
 	}
-	
-	Action::~Action()
-	{}
-	
-	void Action::operator()(const std::string* event, 
-				  int32_t iteration, int32_t sourceID, MetadataManager* mm)
-	{
-		if(function != NULL)
-			(*function)(event,iteration,sourceID,mm);
-	}
-	
-	void Action::call(const std::string* event,
-				int32_t iteration, int32_t sourceID, MetadataManager* mm)
-	{
-		if(function != NULL)
-			(*function)(event,iteration,sourceID,mm);
-	}
+	return *result;
 }
+	
+}
+

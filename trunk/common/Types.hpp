@@ -26,6 +26,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __DAMARIS_TYPES_H
 #define __DAMARIS_TYPES_H
 
+#include <string>
+
 namespace Damaris {
 
 /**
@@ -62,7 +64,7 @@ namespace Types {
 	 * \return The associated basic type or UNDEFINED_TYPE if it does
 	 *         not correspond to any known type.
 	 */
-	basic_type_e getTypeFromString(std::string* str);
+	basic_type_e getTypeFromString(const std::string* str);
 }
 }
 #endif

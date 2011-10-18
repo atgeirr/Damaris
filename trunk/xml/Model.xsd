@@ -46,7 +46,7 @@
 	</xs:sequence>
 	<xs:attribute name="name"       type="xs:string" use="required"/>
 	<xs:attribute name="type"       type="xs:string" use="required"/>
-	<xs:attribute name="dimensions" type="xs:string" use="optional"/>
+	<xs:attribute name="dimensions" type="xs:string" use="required"/>
 	</xs:complexType>
 
 	<!-- Variable node -->
@@ -91,9 +91,9 @@
 
 	<!-- Event node -->
 	<xs:complexType name="event_mdl">
-	<xs:attribute name="name"   type="xs:string" use="required"/>
-	<xs:attribute name="action" type="xs:string" use="required"/>
-	<xs:attribute name="using"  type="xs:string" use="required"/>
+	<xs:attribute name="name"    type="xs:string" use="required"/>
+	<xs:attribute name="action"  type="xs:string" use="required"/>
+	<xs:attribute name="library" type="xs:string" use="required"/>
 	</xs:complexType>
 
 	<!-- Actions node -->

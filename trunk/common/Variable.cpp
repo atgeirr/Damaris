@@ -30,14 +30,40 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 namespace Damaris {
 	/* The constructor takes the name of the variable, the iteration t, the source id src
 	   the layout l and a pointer to the data (d) */
-	Variable::Variable(std::string n, int32_t t, int32_t src, Layout* l, void* d)
+//	Variable::Variable(std::string n, int32_t t, int32_t src, Layout* l, void* d)
+//	{
+//		//name = new std::string(*n);
+//		name = n;
+//		iteration = t;
+//		source = src;
+//		layout = l;
+//		data = d;
+//	}
+	
+	Variable::Variable(int i, std::string& n, Layout* l)
 	{
-		//name = new std::string(*n);
+		id = i;
 		name = n;
-		iteration = t;
-		source = src;
 		layout = l;
-		data = d;
+	}
+
+	Variable::Variable(int i, Layout* l)
+	{
+		id = i;
+		layout = l;
+	}
+
+	Variable::Variable(std::string& n, Layout* l)
+	{
+		id = 0;
+		name = n;
+		layout =l;
+	}
+
+	Variable::Variable(Layout* l)
+	{
+		id = 0;
+		layout = l;
 	}
 /*	
 	bool Variable::compare(const Variable &v) const
@@ -59,8 +85,8 @@ namespace Damaris {
 	{
 		bool c = true;
 		c = c && another.name.compare(name) == 0;
-		c = c && another.source == source;
-		c = c && another.iteration == iteration;
+//		c = c && another.source == source;
+//		c = c && another.iteration == iteration;
 		return c;
 	}
 }

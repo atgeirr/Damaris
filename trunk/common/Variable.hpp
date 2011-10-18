@@ -28,7 +28,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdint.h>
 #include <string>
 #include "common/Layout.hpp"
-#include "common/Group.hpp"
 
 namespace Damaris {
 
@@ -41,11 +40,12 @@ namespace Damaris {
 struct Variable {
 		
 		std::string name;	/*!< Name of the variable. */
-		int32_t iteration;	/*!< Iteration of publication. */
-		int32_t source;		/*!< Source that published this variable. */
+//		int32_t iteration;	/*!< Iteration of publication. */
+//		int32_t source;		/*!< Source that published this variable. */
 		Layout* layout;		/*!< Layout of the data. */
-		void* data;		/*!< Pointer to the data. */
-		Group* parent;		/*!< Parent Group. */
+		int id;			/*!< The ID is used to avoid passing variable's name in shared-memory. */
+//		void* data;		/*!< Pointer to the data. */
+//		Group* parent;		/*!< Parent Group. */
 		/**
 		 * \brief Constructor. 
 		 * Creates a Variable record given a name, an iteration, a source, a layout
@@ -57,10 +57,16 @@ struct Variable {
 		 * \param[in] l : Layout that physically describe the data.
 		 * \param[in] d : Pointer to the data.
 		 */
-		Variable(std::string vname, int32_t it, int32_t src, Layout* l, void* d);
-
-		// All the following accessors are useless since we use a structure with public members
-
+//		Variable(std::string vname, int32_t it, int32_t src, Layout* l, void* d);
+		Variable(int id, std::string& vname, Layout* layout);
+		// unidentified variable
+		Variable(std::string& vname, Layout* layout);
+		// identified anonymous variable
+		Variable(int id, Layout* layout);
+		// fully anonymous
+		Variable(Layout* layout);
+	// All the following accessors are useless since we use a structure with public members
+		
 
 		/* returns the layout of the variable */
 		/* Layout* getLayout() const { return layout; } */

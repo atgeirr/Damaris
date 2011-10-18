@@ -26,7 +26,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __DAMARIS_PARAMETER_H
 #define __DAMARIS_PARAMETER_H
 
-#include "common/Types.hpp"
+#include <boost/any.hpp>
 #include <string>
 
 namespace Damaris {
@@ -35,18 +35,25 @@ namespace Damaris {
  * We could have used a void* pointer instead of a union but I find this
  * way more elegant.
  */
+//	struct Parameter {
+//		Types::basic_type_e type; /*!< Type of the parameter. */
+//		union {
+//			short* short_ptr; 	/*!< Pointer to a short value. */
+//			int* int_ptr;		/*!< Pointer to an int value. */
+//			long* long_ptr; 	/*!< Pointer to a long value. */
+//			float* float_ptr; 	/*!< Pointer to a float value. */
+//			double* double_ptr;	/*!< Pointer to a double value. */
+//			char* char_ptr; 	/*!< Pointer to a char value. */
+//			std::string* str_ptr;	/*!< Pointer to a string value. */
+//		} value; /*!< Pointer to the parameter's value */
+//	};
+	
 	struct Parameter {
-		Types::basic_type_e type; /*!< Type of the parameter. */
-		union {
-			short* short_ptr; 	/*!< Pointer to a short value. */
-			int* int_ptr;		/*!< Pointer to an int value. */
-			long* long_ptr; 	/*!< Pointer to a long value. */
-			float* float_ptr; 	/*!< Pointer to a float value. */
-			double* double_ptr;	/*!< Pointer to a double value. */
-			char* char_ptr; 	/*!< Pointer to a char value. */
-			std::string* str_ptr;	/*!< Pointer to a string value. */
-		} value; /*!< Pointer to the parameter's value */
+		Parameter(const std::string &, const boost::any &);
+		std::string name;
+    		boost::any value;
 	};
+
 }
 
 #endif
