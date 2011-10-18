@@ -78,14 +78,14 @@ namespace Damaris {
 
 		/* check that the variable is know in the configuration */
 		std::string name(*varname);
-		Variable* variable = metadataManager->getVariableByName(name);
+		Variable* variable = metadataManager->getVariable(name);
 
         	if(variable == NULL) {
 			ERROR("Variable \""<< varname->c_str() << "\" not defined in configuration");
 			return NULL;
         	}
 
-		Layout* layout = variable->layout;
+		Layout* layout = variable->getLayout();
 
 		std::vector<int> si(layout->getDimensions()),ei(layout->getDimensions());
 		for(unsigned int i=0; i < layout->getDimensions(); i++)	{
@@ -152,14 +152,14 @@ namespace Damaris {
 	{
 		/* check that the variable is know in the configuration */
 		std::string name(*varname);
-		Variable* variable = metadataManager->getVariableByName(name);
+		Variable* variable = metadataManager->getVariable(name);
 
         	if(variable == NULL) {
 			ERROR("Variable \""<< varname->c_str() << "\" not defined in configuration");
 			return -1;
         	}
 
-		Layout* layout = variable->layout;
+		Layout* layout = variable->getLayout();
 
 		std::vector<int> si(layout->getDimensions()),ei(layout->getDimensions());
                 for(unsigned int i=0; i < layout->getDimensions(); i++) {
@@ -186,7 +186,7 @@ namespace Damaris {
 		
 		message->source = id;
 		message->iteration = iteration;
-		message->object = variable->id;
+		message->object = variable->getID();
 		message->type = MSG_VAR;
 		message->handle = chunk->getHandle();
 		
@@ -204,7 +204,7 @@ namespace Damaris {
 	{
 		/* check that the variable is know in the configuration */
 		std::string name(*varname);
-		Variable* variable = metadataManager->getVariableByName(name);
+		Variable* variable = metadataManager->getVariable(name);
 
         	if(variable == NULL) {
 			ERROR("Variable \""<< varname->c_str() << "\" not defined in configuration");
@@ -214,7 +214,7 @@ namespace Damaris {
 		ChunkHandle* chunkHandle = (ChunkHandle*)chunkh;
 
 		/* check if the chunk matches the layout boundaries */
-		Layout* layout = variable->layout;
+		Layout* layout = variable->getLayout();
 		if(not chunkHandle->within(layout)) {
 			ERROR("Chunk boundaries do not match variable's layout");
 			return -3;
@@ -249,7 +249,7 @@ namespace Damaris {
 		
 		message->source = id;
 		message->iteration = iteration;
-		message->object = variable->id;
+		message->object = variable->getID();
 		message->type = MSG_VAR;
 		message->handle = chunk->getHandle();
 		

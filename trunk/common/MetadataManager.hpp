@@ -43,6 +43,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 //using namespace boost::multi_index;
 
 namespace Damaris {
+
 /* TODO : this is for a later use of Boost::MultiIndex
 	struct name{};
 	struct source{};
@@ -61,6 +62,7 @@ namespace Damaris {
 		> variable_set;
 */
 	class MetadataManager {
+
 	private:
 		int numberOfEntries;		 /*!< Number of variables defined */
 		std::map<std::string,int> varID; /*!< Association variable name <-> ID */
@@ -72,10 +74,12 @@ namespace Damaris {
 //		SharedMemorySegment* segment; /*!< A pointer to the shared memory segment. */
 	public:
 		bool addVariableEntry(Variable &v);
-		Variable* getVariableByName(std::string &name);
-		Variable* getVariableByID(int id);
+		Variable* getVariable(std::string &name);
+		Variable* getVariable(int id);
 		bool setLayout(std::string& lname, Layout &l);
 		Layout* getLayout(std::string& lname);
+
+		
 		/**
 		 * \brief Retrieves a variable given its name, iteration and source.
 		 * \param[in] n : name of the variable to retrieve.

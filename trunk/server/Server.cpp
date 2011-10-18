@@ -31,8 +31,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "server/Server.hpp"
 //#include "server/ServerConfiguration.hpp"
 #include "common/Message.hpp"
-#include "common/ChunkHeader.hpp"
-#include "common/Chunk.hpp"
+#include "common/ShmChunk.hpp"
 #include "common/Layout.hpp"
 //#include "common/LayoutFactory.hpp"
 #include "common/SharedMemory.hpp"
@@ -153,19 +152,24 @@ namespace Damaris {
 	void Server::processMessage(Message* msg) 
 	{
 			
-		//std::string name(msg->content);
 		int32_t iteration = msg->iteration;
 		int32_t source = msg->source;
-		char* data = NULL;
 		
 		if(msg->type == MSG_VAR)
 		{
-			//DBG("Received notification for variable " << name.c_str()); 
-			data = (char*)segment->getAddressFromHandle(msg->handle);
-			ChunkHeader *header = ChunkHeader::fromBuffer((void*)data);
-			data = data + header.size();
-			Chunk chunk(header,source,iteration,data);
-			metadataManager->attachChunk(msg->object,chunk);
+			//data = (char*)segment->getAddressFromHandle(msg->handle);
+			//ChunkHeader *header = ChunkHeader::fromBuffer((void*)data);
+			//data = data + header.size();
+			//Chunk chunk(header,source,iteration,data);
+			ShmChunk* chunk = new ShmChunk(segment,msg->handle); 
+			Variable* v = metadataManager->getVariable(msg->object);
+			if(v != NULL) v->attachChunk(chunk);
+			else {
+				// the variable is unkwnow, discarde it
+				ERROR("Server received a chunk for an unknown variable, discarding");
+				chunk->remove();
+				delete chunk;
+			}
 			//layout = LayoutFactory::unserialize(msg->layoutInfo);
 			//Variable v(name,iteration,sourceID,layout,data);
 			//metadataManager->put(v);

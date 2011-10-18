@@ -106,6 +106,7 @@ bool Chunk::within(Chunk* enclosing)
 {
 	bool b = (enclosing->getDimensions() == dimensions);
 	b = b && (enclosing->getType() == type);
+
 	if(b) {
 		for(unsigned int i=0; i < dimensions; i++) {
 			b = b && (startIndices[i] >= enclosing->getStartIndex(i));

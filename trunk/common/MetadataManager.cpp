@@ -40,26 +40,26 @@ namespace Damaris {
 	bool MetadataManager::addVariableEntry(Variable& v)
 	{
 		// check if the variable has already an ID defined
-		if(varID.find(v.name) != varID.end())
+		if(varID.find(v.getName()) != varID.end())
 			return false;
 		// the variable does not exist, give it an ID
 		int id = (int) variables.size();
 		v.id = id;
 		// put it into the variables vector and register its ID
 		variables.push_back(v);
-		varID.insert(std::pair<std::string,int>(v.name,id));
+		varID.insert(std::pair<std::string,int>(v.getName(),id));
 
 		return true;
 	}
 
-	Variable* MetadataManager::getVariableByName(std::string &name)
+	Variable* MetadataManager::getVariable(std::string &name)
 	{
 		std::map<std::string,int>::iterator it = varID.find(name);
 		if(it == varID.end()) return NULL;
-		else return getVariableByID(it->second);
+		else return getVariable(it->second);
 	}
 
-	Variable* MetadataManager::getVariableByID(int id)
+	Variable* MetadataManager::getVariable(int id)
 	{
 		if(variables.size() >= (unsigned int)id && id >= 0) return &(variables[id]);
 		else return NULL;

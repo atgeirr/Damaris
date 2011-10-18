@@ -27,9 +27,12 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <stdint.h>
 #include <string>
+#include "common/Chunk.hpp"
 #include "common/Layout.hpp"
 
 namespace Damaris {
+
+class MetadataManager;
 
 /**
  * The Variable object is used for describing a variable within
@@ -37,8 +40,10 @@ namespace Damaris {
  * informations. A Variable record is identified by a name, an iteration
  * and a source.
  */
-struct Variable {
-		
+class Variable {
+	friend class MetadataManager;
+	
+	private:	
 		std::string name;	/*!< Name of the variable. */
 //		int32_t iteration;	/*!< Iteration of publication. */
 //		int32_t source;		/*!< Source that published this variable. */
@@ -46,6 +51,7 @@ struct Variable {
 		int id;			/*!< The ID is used to avoid passing variable's name in shared-memory. */
 //		void* data;		/*!< Pointer to the data. */
 //		Group* parent;		/*!< Parent Group. */
+	public:
 		/**
 		 * \brief Constructor. 
 		 * Creates a Variable record given a name, an iteration, a source, a layout
@@ -69,7 +75,13 @@ struct Variable {
 		
 
 		/* returns the layout of the variable */
-		/* Layout* getLayout() const { return layout; } */
+		Layout* getLayout() const { return layout; }
+
+		std::string getName() const {return name; }
+
+		int getID() const {return id; }
+
+		void attachChunk(Chunk* chunk);
 		/* returns the pointer over the data */
 		/* void* getDataAddress() const { return data; } */
 		/* compares the records (except data and layout) with another variable */
