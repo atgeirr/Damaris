@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Language.hpp
- * \date July 2011
+ * \date October 2011
  * \author Matthieu Dorier
- * \version 0.1
+ * \version 0.3
  *
  * Language.hpp contains the enumeration that makes the distinction
  * between C and Fortran. This distinction is important because C and
@@ -27,6 +27,13 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #ifndef __DAMARIS_LANGUAGE_H
 #define __DAMARIS_LANGUAGE_H
+
+#include <string>
+
+namespace Damaris {
+
+namespace Language {
+
 /**
  * The language_e enumeration distinguishes between C and Fortran
  * (and a potential unknown language).
@@ -37,4 +44,11 @@ enum language_e {
 	LG_C
 };
 
+/**
+ * \brief Converts a string representing the name of a language into a language.
+ */
+language_e getLanguageFromString(const std::string* s);
+
+}
+}
 #endif

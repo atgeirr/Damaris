@@ -47,6 +47,7 @@
 	<xs:attribute name="name"       type="xs:string" use="required"/>
 	<xs:attribute name="type"       type="xs:string" use="required"/>
 	<xs:attribute name="dimensions" type="xs:string" use="required"/>
+	<xs:attribute name="language"   type="xs:string" use="optional" default="?"/>
 	</xs:complexType>
 
 	<!-- Variable node -->
@@ -66,7 +67,7 @@
 		<xs:element name="group"    type="mdl:group_mdl"    minOccurs="0" maxOccurs="unbounded"/>
 	</xs:sequence>
 	<xs:attribute name="name"    type="xs:string"  use="required"/>
-	<xs:attribute name="enabled" type="xs:boolean" use="optional"/>
+	<xs:attribute name="enabled" type="xs:boolean" use="optional" default="true"/>
 	</xs:complexType>
 
 	<!-- Parameter node -->
@@ -76,7 +77,7 @@
 	</xs:sequence>
 	<xs:attribute name="name"  type="xs:string" use="required"/>
 	<xs:attribute name="type"  type="xs:string" use="required"/>
-	<xs:attribute name="value" type="xs:string" use="optional"/>
+	<xs:attribute name="value" type="xs:string" use="required"/>
 	</xs:complexType>
 
 	<!-- Data node -->

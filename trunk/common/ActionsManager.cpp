@@ -27,9 +27,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 
 #include "common/Debug.hpp"
-#include "common/Configuration.hpp"
-#include "common/MetadataManager.hpp"
-#include "common/Variable.hpp"
 #include "common/ActionsManager.hpp"
 
 namespace Damaris {
@@ -47,26 +44,33 @@ ActionsManager::ActionsManager()
  * Finally, if an action has already been loaded with the same event name, the function does
  * not overwrite it, it prints a warning and returns.
  */
-void ActionsManager::loadActionFromPlugin(std::string* eventName, std::string* fileName, std::string* functionName)
+void ActionsManager::addDynamicAction(std::string* eventName, std::string* fileName, std::string* functionName)
 {
-	// TODO find a way to check if the function already exists or not
 
-	DynamicAction* a = new DynamicAction(*eventName,*functionName,*fileName);
+	// check if there is already an action with the same name recorded
+	ActionsSet::index<by_name>::type::iterator it = actions.get<by_name>().find(*eventName);
+	if(it != actions.get<by_name>().end()) {
+		WARN("Inserting an action with a name identical to a previously defined action");
+		return;
+	}
 
-	// attribute an ID to the action
+	// create the action
+	DynamicAction* a = new DynamicAction(*functionName,*fileName);
+
+	// attribute an ID and a name to the action
 	a->id = actions.size();
-	// put the action into the array
-	actions.push_back((Action*)a);
-	// insert the id in the map
-	actionsID.insert(std::pair<std::string,int>(std::string(eventName->c_str()),a->id));
+	a->name = *eventName;
+
+	// put the action into the ActionsSet
+	actions.insert(boost::shared_ptr<Action>((Action*)a));
 }
 
 void ActionsManager::reactToUserSignal(std::string *sig, int32_t iteration, int32_t sourceID, MetadataManager* mm)
 {
-	std::map<std::string,int>::iterator it = actionsID.find(*sig);
-	if(it != actionsID.end())
+	ActionsSet::index<by_name>::type::iterator it = actions.get<by_name>().find(*sig);
+	if(it != actions.get<by_name>().end())
 	{
-		(*(actions[it->second]))(iteration,sourceID,mm);
+		(*(it->get()))(iteration,sourceID,mm);
 	} else {
 		ERROR("Unable to process \""<< sig->c_str() <<"\" signal: unknown event name");
 	}	
@@ -74,11 +78,12 @@ void ActionsManager::reactToUserSignal(std::string *sig, int32_t iteration, int3
 
 void ActionsManager::reactToUserSignal(int sigID, int32_t iteration, int32_t sourceID, MetadataManager* mm)
 {
-	if(sigID >= 0 && sigID < (int)actions.size())
+	ActionsSet::index<by_id>::type::iterator it = actions.get<by_id>().find(sigID);
+	if(it != actions.get<by_id>().end())
 	{
-		(*(actions[sigID]))(iteration,sourceID,mm);
+		(*(it->get()))(iteration,sourceID,mm);
 	} else {
-		ERROR("Unknown action ID " << sigID);
+		ERROR("Unknown action ID " << sigID <<", may come from contract inconsistency between clients and servers");
 	}
 }
 

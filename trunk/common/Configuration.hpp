@@ -14,7 +14,12 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
-
+/**
+ * \file Configuration.hpp
+ * \date October 2011
+ * \author Matthieu Dorier
+ * \version 0.3
+ */
 #ifndef __DAMARIS_CONFIG_H
 #define __DAMARIS_CONFIG_H
 
@@ -28,9 +33,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/MetadataManager.hpp"
 #include "common/ActionsManager.hpp"
 #include "common/Language.hpp"
-//#include "common/Parameter.hpp"
 #include "common/Layout.hpp"
-//#include "common/Group.hpp"
 #include "common/Calc.hpp"
 
 namespace Damaris {
@@ -39,45 +42,35 @@ namespace Damaris {
 	 * The class Configuration holds all informations extrated from
 	 * both the command lines (for the server) and the external configuration
 	 * file. It is independant of the format of this configuration file
-	 * (which is loaded through the ConfigHandler object).
+	 * (which is loaded through the Damaris::Model::simulation_mdl object).
 	 */
 	class Configuration {
 				
 	private:
 		static Configuration* m_instance; /*!< Pointer to a unique Configuration object (singleton). */
 
-		std::auto_ptr<Model::simulation_mdl> baseModel;/*!< Model extracted from the XML file */
-		std::string* configFile; 	/*!< For information, we keep the name of the configuration file. */
+		std::auto_ptr<Model::simulation_mdl> baseModel; /*!< Model extracted from the XML file */
+		std::string* configFile; /*!< For information, we keep the name of the configuration file. */
 		
-		ParameterSet parameters;	 	/*!< List of parameters. */
-		ActionsManager* actionsManager;
-		MetadataManager* metadataManager;
-//		std::map<std::string,int> intparams;		/*!< Subset of parameters that are integers */
-//		std::map<std::string,Layout*>* layouts; 	/*!< List of layouts. Associate layout names to layouts. */
-//		std::map<std::string,std::string>* variableLayouts; /*!< Association from variable names to layout names. */
+		ParameterSet parameters; 		/*!< List of parameters. */
+		ActionsManager* actionsManager;		/*!< Pointer to the ActionsManager. */
+		MetadataManager* metadataManager; 	/*!< Pointer to the MetadataManager. */
 		
-		Calc<std::string::const_iterator,ParameterSet>* layoutInterp; /*!< Parser for layout interpretation */
+		Calc<std::string::const_iterator,ParameterSet>* layoutInterp; /*!< Parser for layout interpretation. */
 		
-		void fillParameterSet();
-		void fillMetadataManager();
-		void readVariablesInSubGroup(const Model::group_mdl* g, std::string name);
-		void fillActionsManager();
+		void fillParameterSet(); 	/*!< Fills the set of parameters from the base model. */
+		void fillMetadataManager(); 	/*!< Fills the metadata manager with variables from the base model. */
+		void readVariablesInSubGroup(const Model::group_mdl* g, std::string name); 
+		void fillActionsManager(); 	/*!< Fills the ActionsManager with Actions from the base model. */
 
 	protected:
-//		bool checkConfiguration(); /*!< Check if the Configuration is correctly loaded. */
-
+		
 		/**
 		 * \brief Constructor.
 		 * \param[in] mdl : simulation base model from XML file.
-		 * \param[in] configName : name of the configuration file to load.
+		 * \param[in] configName : name of the configuration file that has been loaded.
 		 */
 		Configuration(std::auto_ptr<Model::simulation_mdl> mdl, std::string* configName);
-
-		/**
-		 * \brief Constructor from a base model.
-		 * \param[in] simMdl : simulation model
-		 */
-//		Configuration(Model::simulation_mdl* mdl);
 
 		/**
 		 * \brief Destructor.
@@ -92,7 +85,7 @@ namespace Damaris {
 		static Configuration* getInstance();
 
 		/**
-		 * \brief Initializes Configuration with a given configuration file.
+		 * \brief Initializes Configuration with a given model and configuration file.
 		 * \param[in] mdl : simulation base model.
 		 * \param[in] configName : name of the configuration file to load.
 		 */
@@ -113,167 +106,58 @@ namespace Damaris {
 		/**
 		 * \brief Get the name of the simulation.
 		 */
-		std::string* getSimulationName();// { return simulationName; }
-		/**
-		 * \brief Set the name of the simulation.
-		 */
-		//void setSimulationName(const char* name);// { simulationName = new std::string(name); }
+		std::string getSimulationName() const;
 
 		/**
 		 * \brief Get the default language for the running simulation.
 		 */
-//		language_e getDefaultLanguage();// { return defaultLanguage; }
-		/**
-		 * \brief Set the default language for the running simulation.
-		 */
-		//void setDefaultLanguage(language_e l);// { defaultLanguage = l; }	
-	
+		Language::language_e getDefaultLanguage() const;
+
 		/**
 		 * \brief Get the number of clients per node.
 		 */
-		int getClientsPerNode() const;// { return clientsPerNode; }
-		/**
-		 * \brief Set the number of clients per node.
-		 */
-		//void setClientsPerNode(int cpn);// { clientsPerNode = cpn; }
+		int getClientsPerNode() const;
 
 		/**
 		 * \brief Get the number of cores per node.
 		 */
-		int getCoresPerNode() const;// { return coresPerNode; }
-		/**
-		 * \brief Set the number of cores per node.
-		 */
-		//void setCoresPerNode(int cpn);// { coresPerNode = cpn; }
+		int getCoresPerNode() const;
 
 		/**
 		 * \brief Get the name of the shared memory segment.
 		 */
-		std::string* getSegmentName() const;// { return segmentName; }
-		/**
-		 * \brief Set the name of the shared memory segment.
-		 */
-		//void setSegmentName(char* name) { segmentName = new std::string(name); }
+		std::string* getSegmentName() const;
 
 		/**
 		 * \brief Get the size (in bytes) of the shared memory segment.
 		 */
-		size_t getSegmentSize() const;// { return segmentSize; }
-		/**
-		 * \brief Set the size (in bytes) of the shared memory segment.
-		 */
-		//void setSegmentSize(int s) { segmentSize = (size_t)s; }
+		size_t getSegmentSize() const;
 		
 		/**
 		 * \brief Get the name of the message queue.
 		 */
-		std::string* getMsgQueueName() const;// { return msgQueueName; }
-		/**
-		 * \brief Set the name of the message queue.
-		 */
-		//void setMsgQueueName(char* name) { msgQueueName = new std::string(name); }
+		std::string* getMsgQueueName() const;
 
 		/**
 		 * \brief Get the size (in number of messages) of the message queue.
 		 */
-		size_t getMsgQueueSize() const;// { return msgQueueSize; }
-		/**
-		 * \brief Set the size (in number of messages) of the message queue.
-		 */
-		//void setMsgQueueSize(int s) { msgQueueSize = s; }
+		size_t getMsgQueueSize() const;
 
 		/**
-		 * \brief Get the value associated to a parameter.
-		 * This function doesn't work with string parameters.
-		 * \param[in] name : Name of the parameter to retrieve.
-		 * \param[out] value : Buffer to hold the value.
-		 * \return true in case of success, false if the parameter is not found.
+		 * \brief Get the parameters set.
 		 */
-//		bool getParameterValue(const char* name, void* value);
-		ParameterSet* getParameterSet();		
-		/**
-		 * THIS FUNCTION IS NOT IMPLEMENTED YET...
-		 */
-//		int getParameterString(const char* name, std::string* s);
+		ParameterSet* getParameterSet();
 		
 		/**
-		 * \brief Get the type of a parameter.
-		 * \param[in] name : Name of the parameter to consider.
-		 * \param[out] t : buffer of Types::basic_type_e to hold to result.
-		 * \return true in case of success, false if the parameter is not found.
+		 * \brief Get the ActionsManager.
 		 */
-//		bool getParameterType(const char* name, Types::basic_type_e* t);		
-		
-		/**
-		 * \brief Set a parameter (type and value).
-		 * \param[in] name : Name of the parameter to set.
-		 * \param[in] type : Type of the parameter.
-		 * \param[in] value : value of the parameter.
-		 */
-		//void setParameter(const char* name, const char* type, const char* value);
-		
-		/**
-		 * \brief Associate a variable name to the name of its layout.
-		 * \param[in] name : Name of the variable.
-		 * \param[in] layoutName : Name of the layout.
-		 */
-		//void setVariableInfo(const char* name, const char* layoutName);
-		
-		/**
-		 * \brief Get the layout associated to a variable.
-		 * \param[in] name : Name of the variable.
-		 * \return A pointer to the associated Layout, NULL if the layout is not found.
-		 * The returned pointer is hold by the Configuration object and doesn't have to be deleted.
-		 */
-		Layout* getVariableLayout(const char* name);
-	
-		/**
-		 * \brief Set a layout by its name, type, list of dimensions and language.
-		 * \param[in] name : Name of the layout.
-		 * \param[in] type : Type of the data to be hold.
-		 * \param[in] descriptor : string descriptor for the list of dimensions.
-		 * \param[in] l : Langage for the layout.
-		 */
-		//void setLayout(const char* name, const char* type, const char* descriptor, language_e l);
-		/**
-		 * \brief Get the layout by its name.
-		 * \param[in] name : Name of the layout to retrieve.
-		 * \return A pointer to the layout found, or NULL if not found. The returned pointer is
-		 * hold by the Configuration and doesn't have to be deleted.
-		 */
-		Layout* getLayout(const char* name);
-		
-		/**
-		 * \brief Set an event by its name, name of function and name of plugin's file.
-		 * \param[in] name : Name of the event.
-		 * \param[in] action : Name of the function to load.
-		 * \param[in] plugin : Name of the dynamic library to load.
-		 */	
-		//virtual void setEvent(const char* name, const char* action, const char* plugin) = 0;	
-
-		/**
-		 * \brief Set the parent group for the data hierarchy.
-		 * \param[in] g : new parent Group.
-		 */
-		//void setDataHierarchy(Group* g);
-
-		/**
-		 * \brief Set the shared memory functions to use (posix = shm_open, sysv = shmget).
-		 * \param[in] model : string representing the model to use.
-		 */
-		//void setSharedMemoryType(const char* str);
-
-		/**
-		 * \brief Get the shared memory functions to use.
-		 * \return a string representing the functions to use.
-		 */
-		//std::string getSharedMemoryType();
-
 		ActionsManager* getActionsManager();
 
+		/**
+		 * \brief Get the MetadataManager.
+		 */
 		MetadataManager* getMetadataManager();
 };
 
 }
-
 #endif

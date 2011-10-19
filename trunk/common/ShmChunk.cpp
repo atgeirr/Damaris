@@ -32,7 +32,7 @@ ShmChunk::ShmChunk(SharedMemorySegment* s, Types::basic_type_e t, unsigned int d
 	buffer = NULL;
 
 	size_t sizeOfHeader = size();
-	size_t sizeOfData = getRequiredMemoryLength();
+	size_t sizeOfData = getDataMemoryLength();
 	size_t totalSize = sizeOfHeader + sizeOfData;
 
 	header = static_cast<void*>(segment->allocate(totalSize));

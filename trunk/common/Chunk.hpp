@@ -19,8 +19,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \date October 2011
  * \author Matthieu Dorier
  * \version 0.3
- *
- * This file defines the Chunk object.
  */
 #ifndef __DAMARIS_CHUNK_H
 #define __DAMARIS_CHUNK_H
@@ -34,55 +32,136 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 namespace Damaris {
 
 /**
-
+ * The Chunk class is an abstract class defining
+ * the extents and types of a chunk of variable.
+ * It inherits from Serializable so its representation
+ * can be written into a buffer (used to pass this
+ * representation from a process to another using
+ * shared memory).
  */
 class Chunk : public Serializable {
 		
-//		Chunk(ChunkHeader* h,int src,int it, void* ptr);
-
-//		ChunkHeader* header;
-
 	private:
-		Types::basic_type_e type;
-		unsigned int dimensions;
+		Types::basic_type_e type; /*!< Type of the data. */
+		unsigned int dimensions;  /*!< Number of dimensions. */
 
-		std::vector<int> startIndices;
-		std::vector<int> endIndices;
+		std::vector<int> startIndices; /*!< Start indices. */
+		std::vector<int> endIndices;   /*!< End indices. */
 
 	protected:
-		int source;
-		int iteration;
+		int source; 	/*!< ID of the process that generated the chunk.*/
+		int iteration; 	/*!< iteration at which the chunk has been generated. */
 
+		/**
+		 * \brief Constructor.
+		 * This constructor is protected so only child classes can call it.
+		 */
 		Chunk();
+	
+		/**
+		 * \brief Constructor.
+		 * \param[in] t : type of data.
+		 * \param[in] d : number of dimensions.
+		 * \param[in] si : start indices.
+		 * \param[in] ei : end indices.
+		 * The size of ei and si must match the number of dimensions d.
+		 * Otherwise a warning is print and the extents and dimensions are set to 0.
+		 * This constructor is protected so only child classes can call it.
+		 */
 		Chunk(Types::basic_type_e t, unsigned int d, std::vector<int> &si, std::vector<int> &ei);
 
 	public:
+		/**
+		 * \brief Destructor.
+		 */
 		~Chunk();
 		
+		/**
+		 * \brief Gets the ID of the process that has written the chunk.
+		 */
 		int getSource();
+	
+		/**
+		 * \brief Sets the ID of the process that has written the chunk.
+		 */
 		void setSource(int s);
 		
+		/**
+		 * \brief Gets the iteration at which the chunk has been written.
+		 */
 		int getIteration();
+	
+		/**
+		 * \brief Sets the iteration at which the chunk has been written.
+		 */
 		void setIteration(int i);
 
+		/**
+		 * \brief Gets the number of dimensions.
+		 */
 		unsigned int getDimensions();
 
+		/**
+		 * \brief Gets the type of data.
+		 */
 		Types::basic_type_e getType();
 
+		/**
+		 * \brief Gets a start index.
+		 */
 		int getStartIndex(int i);
+		
+		/**
+		 * \brief Gets an end index.
+		 */
 		int getEndIndex(int i);
 
-		size_t getRequiredMemoryLength();
+		/**
+		 * \brief Computes the required number of bytes to allocate for the data.
+		 */
+		size_t getDataMemoryLength();
 
+		/**
+		 * \brief Check if the chunk is within an enclosing Layout.
+		 * Note: returns false if NULL is passed.
+		 */
 		bool within(Layout* enclosing);
+
+		/**
+		 * \brief Check if the chunk is within an enclosing other Chunk.
+		 * Note: returns false if NULL is passed.
+		 */
 		bool within(Chunk* enclosing);
 
+		/**
+		 * \brief Overloaded function for the Serializable interface.
+		 * Writes the chunk representation into a buffer.
+		 */
 		void toBuffer(void*);
+
+		/**
+		 * \brief Overloaded function for the Serializable interface.
+		 * Reads the chunk from its serialized representation.
+		 */
 		void fromBuffer(const void*);
 
+		/**
+		 * \brief Overloaded function for the Serializable interface.
+		 * Returns the size of the buffer required to serialize the representation.
+		 * \warning The size returned does not take into account the size required
+		 *          for the data, only the size of the metadata (type, dimensions,
+		 *          extents, source and iteration).
+		 */
 		size_t size();
 
+		/**
+		 * \brief Returns a pointer over the actual data (to be overloaded in child classes).
+		 */
 		virtual void* data() = 0;
+
+		/**
+		 * \brief Removes (if possible) the data from its underlying storage.
+		 */
 		virtual bool remove() = 0;
 
 }; // class Chunk
@@ -90,4 +169,3 @@ class Chunk : public Serializable {
 } // namespace Damaris
 
 #endif
-

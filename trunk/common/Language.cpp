@@ -14,50 +14,25 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
-
 /**
- * \file Layout.cpp
+ * \file Language.cpp
  * \date October 2011
  * \author Matthieu Dorier
  * \version 0.3
  */
-
-#include <cstring>
-#include "common/Debug.hpp"
-#include "common/Layout.hpp"
-#include "common/Chunk.hpp"
+#include "common/Language.hpp"
 
 namespace Damaris {
-	
-	Layout::Layout(Types::basic_type_e t, unsigned int d, std::vector<int> &ex)
-	{
-		type = t;
-		dimensions = d;
-		if(ex.size() != d) {
-			ERROR("In layout initialization: extents size and dimensions do not match");
-		}
-		extents = ex;
-	}
-	
-	Layout::~Layout()
-	{
-	}
-	
-	Types::basic_type_e Layout::getType() const
-	{
-		return type;
-	}
-	
-	unsigned int Layout::getDimensions() const
-	{
-		return dimensions;
-	}
-	
-	int Layout::getExtentAlongDimension(unsigned int dim) const
-	{
-		if(dim < dimensions)
-			return extents[dim];
-		else
-			return 0;
-	}
+
+namespace Language {
+
+language_e getLanguageFromString(const std::string* s)
+{
+	if(*s == "Fortran" || *s == "fortran" || *s == "FORTRAN" || *s == "F90" || *s == "F77"
+		|| *s == "f90" || *s == "f77") return LG_FORTRAN;
+	else if(*s == "?") return LG_UNKNOWN;
+	else return LG_C;
+}
+
+}
 }

@@ -18,6 +18,7 @@ set(DAMARIS_CLIENT_SRC
 	${DAMARIS_SOURCE_DIR}/common/ActionsManager.cpp
 	${DAMARIS_SOURCE_DIR}/common/Chunk.cpp
 	${DAMARIS_SOURCE_DIR}/common/ShmChunk.cpp
+	${DAMARIS_SOURCE_DIR}/common/Language.cpp
 	${DAMARIS_SOURCE_DIR}/common/Types.cpp 
 	${DAMARIS_SOURCE_DIR}/common/Layout.cpp)
 

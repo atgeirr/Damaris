@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Action.hpp
- * \date July 2011
+ * \date October 2011
  * \author Matthieu Dorier
- * \version 0.1
+ * \version 0.3
  */
 #ifndef __DAMARIS_ACTION_H
 #define __DAMARIS_ACTION_H
@@ -32,38 +32,49 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 namespace Damaris {
 
 /**
- * The Action object is an interface to a user-defined action,
- * for the moment it only contains a pointer to a dynamically loaded function
- * but we plan to make it an abstract class and have several child classes
- * to handle scripts in lua, ruby, python or perl also.
+ * The Action object is an interface to a user-defined action.
+ * It is an abstract class that.
  */
+
 class Action {
-
-//	private:
-//		void (*function)(int32_t,int32_t,MetadataManager*); /*!< Pointer to the loaded function */
-
+	
 	protected:
-		bool loaded;
+		bool loaded; 	  /*!< Indicates wether associated ressources are loaded and ready to call the action. */
+		std::string name; /*!< Name of the action. */
+		int id; 	  /*!< ID given to the action when set in the ActionsManager. */
 
-	public:
-		std::string name;
-		int id;
 		/**
-		 * \brief Constructor. Takes the pointer over the function to handle.
-		 * \param[in] fptr : Pointer to the function.
+		 * \brief Constructor.
+		 * Builds an anonymous action without name of ID. 
+		 * Accessible only to friend classes who will set the name and ID themselves.
+		 */
+		Action();
+	public:
+		/**
+		 * \brief Constructor. 
+		 * \param[in] n : Name of the action.
+		 * \param[in] i : ID of the action.
 		 */
 		Action(std::string n,int i);
-		Action();
-//		Action(void(*fptr)(int32_t, int32_t, MetadataManager*));
 		
 		/**
 		 * \brief Destructor.
 		 */
-//		~Action();
-		
+		~Action();
+
+		/**
+		 * \brief Gets the ID of the action.
+		 */		
+		int getID() const { return id; }
+
+		/**
+		 * \brief Gets the name of the action.
+		 */
+		std::string getName() const { return name; }	
+
 		/**
 		 * \brief Operator overloaded to simplify the call to an action.
-		 * \param[in] event : name of the event that induced the action.
+		 * This operator simply call the virtual "call" function.
 		 * \param[in] iteration : iteration at which the action is called.
 		 * \param[in] sourceID : ID of the client that fired the action.
 		 * \param[in,out] mm : pointer to the MetadataManager that contains all recorded variables.
@@ -71,11 +82,20 @@ class Action {
 		void operator()(int32_t iteration, int32_t sourceID, MetadataManager* mm);
 		
 		/**
-		 * \brief Another way of calling the inner function.
+		 * \brief Call the action. To be overloaded by child classes.
+		 * \param[in] iteration : iteration at which the action is called.
+		 * \param[in] sourceID : ID of the client that fired the action.
+		 * \param[in,out] mm : pointer to the MetadataManager that contains all recorded variables.
 		 * \see Damaris::Actions::operator()
 		 */
 		virtual void call(int32_t iteration, int32_t sourceID, MetadataManager* mm) = 0;
 
+		/**
+		 * \brief Loads required resources for the action to be called. 
+		 * This function is virtual and has to be overloaded by child classes depending on
+		 * there needs. Only the server will load the action the first time the action is called
+		 * (lazy loading).
+		 */
 		virtual void load() = 0;
 };
 

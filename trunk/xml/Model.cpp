@@ -431,6 +431,36 @@ namespace Damaris
       this->dimensions_.set (x);
     }
 
+    const layout_mdl::language_type& layout_mdl::
+    language () const
+    {
+      return this->language_.get ();
+    }
+
+    layout_mdl::language_type& layout_mdl::
+    language ()
+    {
+      return this->language_.get ();
+    }
+
+    void layout_mdl::
+    language (const language_type& x)
+    {
+      this->language_.set (x);
+    }
+
+    void layout_mdl::
+    language (::std::auto_ptr< language_type > x)
+    {
+      this->language_.set (x);
+    }
+
+    const layout_mdl::language_type& layout_mdl::
+    language_default_value ()
+    {
+      return language_default_value_;
+    }
+
 
     // variable_mdl
     // 
@@ -601,16 +631,16 @@ namespace Damaris
       this->name_.set (x);
     }
 
-    const group_mdl::enabled_optional& group_mdl::
+    const group_mdl::enabled_type& group_mdl::
     enabled () const
     {
-      return this->enabled_;
+      return this->enabled_.get ();
     }
 
-    group_mdl::enabled_optional& group_mdl::
+    group_mdl::enabled_type& group_mdl::
     enabled ()
     {
-      return this->enabled_;
+      return this->enabled_.get ();
     }
 
     void group_mdl::
@@ -619,10 +649,10 @@ namespace Damaris
       this->enabled_.set (x);
     }
 
-    void group_mdl::
-    enabled (const enabled_optional& x)
+    group_mdl::enabled_type group_mdl::
+    enabled_default_value ()
     {
-      this->enabled_ = x;
+      return enabled_type (true);
     }
 
 
@@ -707,28 +737,22 @@ namespace Damaris
       this->type_.set (x);
     }
 
-    const parameter_mdl::value_optional& parameter_mdl::
+    const parameter_mdl::value_type& parameter_mdl::
     value () const
     {
-      return this->value_;
+      return this->value_.get ();
     }
 
-    parameter_mdl::value_optional& parameter_mdl::
+    parameter_mdl::value_type& parameter_mdl::
     value ()
     {
-      return this->value_;
+      return this->value_.get ();
     }
 
     void parameter_mdl::
     value (const value_type& x)
     {
       this->value_.set (x);
-    }
-
-    void parameter_mdl::
-    value (const value_optional& x)
-    {
-      this->value_ = x;
     }
 
     void parameter_mdl::
@@ -1576,6 +1600,9 @@ namespace Damaris
     // layout_mdl
     //
 
+    const layout_mdl::language_type layout_mdl::language_default_value_ (
+      "?");
+
     layout_mdl::
     layout_mdl (const name_type& name,
                 const type_type& type,
@@ -1584,7 +1611,8 @@ namespace Damaris
       description_ (::xml_schema::flags (), this),
       name_ (name, ::xml_schema::flags (), this),
       type_ (type, ::xml_schema::flags (), this),
-      dimensions_ (dimensions, ::xml_schema::flags (), this)
+      dimensions_ (dimensions, ::xml_schema::flags (), this),
+      language_ (language_default_value (), ::xml_schema::flags (), this)
     {
     }
 
@@ -1596,7 +1624,8 @@ namespace Damaris
       description_ (x.description_, f, this),
       name_ (x.name_, f, this),
       type_ (x.type_, f, this),
-      dimensions_ (x.dimensions_, f, this)
+      dimensions_ (x.dimensions_, f, this),
+      language_ (x.language_, f, this)
     {
     }
 
@@ -1608,7 +1637,8 @@ namespace Damaris
       description_ (f, this),
       name_ (f, this),
       type_ (f, this),
-      dimensions_ (f, this)
+      dimensions_ (f, this),
+      language_ (f, this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
       {
@@ -1676,6 +1706,15 @@ namespace Damaris
           this->dimensions_.set (r);
           continue;
         }
+
+        if (n.name () == "language" && n.namespace_ ().empty ())
+        {
+          ::std::auto_ptr< language_type > r (
+            language_traits::create (i, f, this));
+
+          this->language_.set (r);
+          continue;
+        }
       }
 
       if (!name_.present ())
@@ -1697,6 +1736,11 @@ namespace Damaris
         throw ::xsd::cxx::tree::expected_attribute< char > (
           "dimensions",
           "");
+      }
+
+      if (!language_.present ())
+      {
+        this->language_.set (language_default_value ());
       }
     }
 
@@ -1849,7 +1893,7 @@ namespace Damaris
       variable_ (::xml_schema::flags (), this),
       group_ (::xml_schema::flags (), this),
       name_ (name, ::xml_schema::flags (), this),
-      enabled_ (::xml_schema::flags (), this)
+      enabled_ (enabled_default_value (), ::xml_schema::flags (), this)
     {
     }
 
@@ -1945,6 +1989,11 @@ namespace Damaris
           "name",
           "");
       }
+
+      if (!enabled_.present ())
+      {
+        this->enabled_.set (enabled_default_value ());
+      }
     }
 
     group_mdl* group_mdl::
@@ -1964,12 +2013,13 @@ namespace Damaris
 
     parameter_mdl::
     parameter_mdl (const name_type& name,
-                   const type_type& type)
+                   const type_type& type,
+                   const value_type& value)
     : ::xml_schema::type (),
       description_ (::xml_schema::flags (), this),
       name_ (name, ::xml_schema::flags (), this),
       type_ (type, ::xml_schema::flags (), this),
-      value_ (::xml_schema::flags (), this)
+      value_ (value, ::xml_schema::flags (), this)
     {
     }
 
@@ -2074,6 +2124,13 @@ namespace Damaris
       {
         throw ::xsd::cxx::tree::expected_attribute< char > (
           "type",
+          "");
+      }
+
+      if (!value_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_attribute< char > (
+          "value",
           "");
       }
     }

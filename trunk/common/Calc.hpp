@@ -21,7 +21,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \version 0.3
  * 
  * This file defines the Calc structure, which is used to
- * compute list of values from a string representation of a Layout.
+ * compute list of values from a string representation of a Layout
+ * (comma-separated list of arithmetical expressions).
  * It uses a Boost.Spirit parser.
  */
 #ifndef __DAMARIS_CALC_H
@@ -54,6 +55,10 @@ struct Calc : qi::grammar<Iterator, std::vector<int>(), ascii::space_type>
 	qi::rule<Iterator, std::string(), ascii::space_type> identifier;
 	qi::rule<Iterator, int(SymTable), ascii::space_type> value;
 	
+	/**
+	 * \brief Constructor.
+	 * \param[in] sym : table of symboles.
+	 */
 	Calc(SymTable &sym) : Calc::base_type(start)
 	{
 		identifier = qi::lexeme[( qi::alpha | '_') >> *( qi::alnum | '_')];
@@ -78,4 +83,5 @@ struct Calc : qi::grammar<Iterator, std::vector<int>(), ascii::space_type>
 };
 
 }
+
 #endif

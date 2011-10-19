@@ -712,6 +712,26 @@ namespace Damaris
       void
       dimensions (::std::auto_ptr< dimensions_type > p);
 
+      // language
+      // 
+      typedef ::xml_schema::string language_type;
+      typedef ::xsd::cxx::tree::traits< language_type, char > language_traits;
+
+      const language_type&
+      language () const;
+
+      language_type&
+      language ();
+
+      void
+      language (const language_type& x);
+
+      void
+      language (::std::auto_ptr< language_type > p);
+
+      static const language_type&
+      language_default_value ();
+
       // Constructors.
       //
       layout_mdl (const name_type&,
@@ -745,6 +765,8 @@ namespace Damaris
       ::xsd::cxx::tree::one< name_type > name_;
       ::xsd::cxx::tree::one< type_type > type_;
       ::xsd::cxx::tree::one< dimensions_type > dimensions_;
+      ::xsd::cxx::tree::one< language_type > language_;
+      static const language_type language_default_value_;
     };
 
     class variable_mdl: public ::xml_schema::type
@@ -914,20 +936,19 @@ namespace Damaris
       // enabled
       // 
       typedef ::xml_schema::boolean enabled_type;
-      typedef ::xsd::cxx::tree::optional< enabled_type > enabled_optional;
       typedef ::xsd::cxx::tree::traits< enabled_type, char > enabled_traits;
 
-      const enabled_optional&
+      const enabled_type&
       enabled () const;
 
-      enabled_optional&
+      enabled_type&
       enabled ();
 
       void
       enabled (const enabled_type& x);
 
-      void
-      enabled (const enabled_optional& x);
+      static enabled_type
+      enabled_default_value ();
 
       // Constructors.
       //
@@ -959,7 +980,7 @@ namespace Damaris
       variable_sequence variable_;
       group_sequence group_;
       ::xsd::cxx::tree::one< name_type > name_;
-      enabled_optional enabled_;
+      ::xsd::cxx::tree::one< enabled_type > enabled_;
     };
 
     class parameter_mdl: public ::xml_schema::type
@@ -1023,20 +1044,16 @@ namespace Damaris
       // value
       // 
       typedef ::xml_schema::string value_type;
-      typedef ::xsd::cxx::tree::optional< value_type > value_optional;
       typedef ::xsd::cxx::tree::traits< value_type, char > value_traits;
 
-      const value_optional&
+      const value_type&
       value () const;
 
-      value_optional&
+      value_type&
       value ();
 
       void
       value (const value_type& x);
-
-      void
-      value (const value_optional& x);
 
       void
       value (::std::auto_ptr< value_type > p);
@@ -1044,7 +1061,8 @@ namespace Damaris
       // Constructors.
       //
       parameter_mdl (const name_type&,
-                     const type_type&);
+                     const type_type&,
+                     const value_type&);
 
       parameter_mdl (const ::xercesc::DOMElement& e,
                      ::xml_schema::flags f = 0,
@@ -1072,7 +1090,7 @@ namespace Damaris
       description_optional description_;
       ::xsd::cxx::tree::one< name_type > name_;
       ::xsd::cxx::tree::one< type_type > type_;
-      value_optional value_;
+      ::xsd::cxx::tree::one< value_type > value_;
     };
 
     class data_mdl: public ::xml_schema::type

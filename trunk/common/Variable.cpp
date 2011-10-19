@@ -85,8 +85,14 @@ namespace Damaris {
 	{
 		bool c = true;
 		c = c && another.name.compare(name) == 0;
+		c = c && another.id == id;
 //		c = c && another.source == source;
 //		c = c && another.iteration == iteration;
 		return c;
+	}
+
+	void Variable::attachChunk(Chunk* chunk)
+	{
+		// TODO
 	}
 }

@@ -15,32 +15,42 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file Chunk.hpp
+ * \file Chunk.cpp
  * \date October 2011
  * \author Matthieu Dorier
  * \version 0.3
- *
- * This file defines the Chunk object.
  */
-#include <string.h> 
+
+#include <string.h>
+ 
+#include "common/Debug.hpp"
 #include "common/Chunk.hpp"
 
 namespace Damaris {
 
-/**
-
- */	
+Chunk::Chunk()
+{
+	source = -1;
+	iteration = -1;
+	
+	type = Types::UNDEFINED_TYPE;
+	dimensions = 0;
+}
 
 Chunk::Chunk(Types::basic_type_e t, unsigned int d, std::vector<int> &si, std::vector<int> &ei)
 {
 	source = -1;
 	iteration = -1;
 
-	type = t;
-	dimensions = d;
+	if(d != si.size() or d != ei.size()) {
+		WARN("Dimensions and extents sizes do not match when creating a chunk.");
+	} else {
+		type = t;
+		dimensions = d;
 
-	startIndices = si;
-	endIndices = ei;
+		startIndices = si;
+		endIndices = ei;
+	}
 }
 
 Chunk::~Chunk()
@@ -78,7 +88,17 @@ Types::basic_type_e Chunk::getType()
 	return type;
 }
 
-size_t Chunk::getRequiredMemoryLength()
+int Chunk::getStartIndex(int i)
+{
+	return startIndices[i];
+}
+
+int Chunk::getEndIndex(int i)
+{
+	return endIndices[i];
+}
+
+size_t Chunk::getDataMemoryLength()
 {
 	size_t result = 1;
 	result *= Types::basicTypeSize(type);

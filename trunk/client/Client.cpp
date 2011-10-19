@@ -178,7 +178,7 @@ namespace Damaris {
 		}
 
 		// copy data
-		size_t size = chunk->getRequiredMemoryLength();
+		size_t size = chunk->getDataMemoryLength();
 		memcpy(chunk->data(),data,size);
 		
 		// create message
@@ -241,7 +241,7 @@ namespace Damaris {
 		}
 
 		// copy data
-		size_t size = chunk->getRequiredMemoryLength();
+		size_t size = chunk->getDataMemoryLength();
 		memcpy(chunk->data(),data,size);
 		
 		// create message
