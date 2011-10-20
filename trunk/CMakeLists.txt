@@ -3,8 +3,9 @@ cmake_minimum_required (VERSION 2.8)
 enable_language (Fortran OPTIONAL)
 
 include(CMakeForceCompiler)
-#CMAKE_FORCE_CXX_COMPILER(mpicxx "MPI C++ Compiler")
-#CMAKE_FORCE_C_COMPILER(mpicc "MPI C Compiler")
+CMAKE_FORCE_CXX_COMPILER(mpicxx "MPI C++ Compiler")
+CMAKE_FORCE_C_COMPILER(mpicc "MPI C Compiler")
+#CMAKE_FORCE_FORTRAN_COMPILER(mpif90 "MPI Fortran Compiler")
 
 project(DAMARIS)
 
@@ -46,7 +47,7 @@ if(CMAKE_Fortran_COMPILER)
   FortranCInterface_HEADER(${DAMARIS_SOURCE_DIR}/common/FCMangle.h
 			   MACRO_NAMESPACE "FC_FUNC_"
                            SYMBOL_NAMESPACE "FC_SYM_")
-  FortranCInterface_VERIFY(CXX)
+#  FortranCInterface_VERIFY(CXX)
   add_definitions(-D__ENABLE_FORTRAN)
   message(STATUS "Fortran binding will be enabled, compiler is ${CMAKE_Fortran_COMPILER}")
 else(CMAKE_Fortran_COMPILER)

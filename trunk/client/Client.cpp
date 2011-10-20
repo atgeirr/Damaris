@@ -27,10 +27,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 
 #include "common/Debug.hpp"
-//#include "client/ClientConfiguration.hpp"
-//#include "common/Configuration.hpp"
-//#include "common/Layout.hpp"
-//#include "common/LayoutFactory.hpp"
 #include "common/ChunkHandle.hpp"
 #include "common/ShmChunk.hpp"
 #include "common/Message.hpp"
@@ -41,7 +37,8 @@ namespace Damaris {
 	Client::Client(std::string* configfile, int32_t coreID)
 	{
 		/* creates the configuration object from the configuration file */
-		std::auto_ptr<Model::simulation_mdl> mdl(Model::simulation(configfile->c_str(),xml_schema::flags::dont_validate));
+		std::auto_ptr<Model::simulation_mdl> 
+			mdl(Model::simulation(configfile->c_str(),xml_schema::flags::dont_validate));
 
 		Configuration::initialize(mdl,configfile);
 		config = Configuration::getInstance();
@@ -55,11 +52,15 @@ namespace Damaris {
 		/* initializes the shared structures */
 		try {
 #ifdef __SYSV
-				msgQueue = SharedMessageQueue::open(sysv_shmem,config->getMsgQueueName()->c_str());
-				segment = SharedMemorySegment::open(sysv_shmem,config->getSegmentName()->c_str());
+			msgQueue = SharedMessageQueue::open(sysv_shmem,
+					config->getMsgQueueName()->c_str());
+			segment = SharedMemorySegment::open(sysv_shmem,
+					config->getSegmentName()->c_str());
 #else
-				msgQueue = SharedMessageQueue::open(posix_shmem,config->getMsgQueueName()->c_str());
-				segment = SharedMemorySegment::open(posix_shmem,config->getSegmentName()->c_str());
+			msgQueue = SharedMessageQueue::open(posix_shmem,
+					config->getMsgQueueName()->c_str());
+			segment = SharedMemorySegment::open(posix_shmem,
+					config->getSegmentName()->c_str());
 #endif
 			DBG("Client initialized successfully for core " << id 
 			    << " with configuration \"" << *configfile << "\"");
@@ -81,7 +82,8 @@ namespace Damaris {
 		Variable* variable = metadataManager->getVariable(name);
 
         	if(variable == NULL) {
-			ERROR("Variable \""<< varname->c_str() << "\" not defined in configuration");
+			ERROR("Variable \""<< varname->c_str() 
+				<< "\" not defined in configuration");
 			return NULL;
         	}
 
@@ -93,59 +95,58 @@ namespace Damaris {
 			si[i] = 0;
 		}
 
-		try {		
-			ShmChunk* chunk = new ShmChunk(segment,layout->getType(),layout->getDimensions(),si,ei);
+		try {
+			ShmChunk* chunk = 
+				new ShmChunk(segment,layout->getType(),layout->getDimensions(),si,ei);
 			chunk->setSource(id);
 			chunk->setIteration(iteration);
+			variable->attachChunk(chunk);
 			return chunk->data();
+
 		} catch (...) {
-			ERROR("While allocating \"" << varname->c_str() << "\", allocation failed");
+			ERROR("While allocating \"" << varname->c_str() 
+				<< "\", allocation failed");
 		}
 
 		return NULL;
-		// TODO store this chunk somewhere to be able to commit it
 	}
 	
 	int Client::commit(std::string* varname, int32_t iteration)
-	{
-// TODO
-/*		
-		Variable* allocated = variables->get(varname,iteration,id);
-		if(allocated == NULL)
+	{		
+		Variable* v = metadataManager->getVariable(*varname);
+		if(v == NULL)
 			return -1;
-		
-		// create notification message
-		Message* message = new Message();
-		message->sourceID = id;
 
-		if(varname->length() > 63) {
-			WARN("Variable name length bigger than 63, will be truncated");
-			memcpy(message->content,varname->c_str(),63);
-			message->content[63] = '\0';
-		} else {
-			strcpy(message->content,varname->c_str());
+		ShmChunk* chunk = NULL;
+		// get the pointer to the allocated chunk and delete it from the
+		// variable container.
+		// TODO gets only the Chunk which iteration is the right one.
+		if(v->getAllChunks().empty())
+			return -2;
+
+		try {
+			chunk = dynamic_cast<ShmChunk*>(v->getAllChunks().back());
+		} catch(exception &e) {
+			ERROR("When doing dynamic cast: " << e.what());
+			v->getAllChunks().pop_back();
 		}
-		
-		Layout* layout = allocated->layout;
-		LayoutFactory::serialize(layout, message->layoutInfo);
 
-		char* buffer = (char*)(allocated->data);
-		message->iteration = iteration;
-		message->type = MSG_VAR;
-		message->handle = segment->getHandleFromAddress((void*)buffer);
+		// create notification message
+		Message message;
+		message.source = id;
+
+		message.iteration = iteration;
+		message.type = MSG_VAR;
+		message.handle = chunk->getHandle();
+		message.object = v->getID();
                 // send message
-		msgQueue->send(message,sizeof(Message),0);
+		msgQueue->send(&message,sizeof(Message),0);
                 // free message
 		DBG("Variable \"" << varname->c_str() << "\" has been commited");
-		delete message;
-
-		// remove variable from metadata
-		allocated->data = NULL; // prevents metadata manager from deleting content
-		variables->remove(*allocated);
+		// delete the chunk
+		delete chunk;
 
 		return 0;
-*/
-                return -1;
 	}
 	
 	int Client::write(std::string* varname, int32_t iteration, const void* data)
@@ -155,7 +156,8 @@ namespace Damaris {
 		Variable* variable = metadataManager->getVariable(name);
 
         	if(variable == NULL) {
-			ERROR("Variable \""<< varname->c_str() << "\" not defined in configuration");
+			ERROR("Variable \""<< varname->c_str() 
+				<< "\" not defined in configuration");
 			return -1;
         	}
 
@@ -169,7 +171,8 @@ namespace Damaris {
 
 		ShmChunk* chunk = NULL;
                 try {
-                        chunk = new ShmChunk(segment,layout->getType(),layout->getDimensions(),si,ei);
+                        chunk = new ShmChunk(segment,layout->getType(),
+						layout->getDimensions(),si,ei);
                         chunk->setSource(id);
                         chunk->setIteration(iteration);
                 } catch (...) {
@@ -182,21 +185,19 @@ namespace Damaris {
 		memcpy(chunk->data(),data,size);
 		
 		// create message
-		Message* message = new Message();
+		Message message;
 		
-		message->source = id;
-		message->iteration = iteration;
-		message->object = variable->getID();
-		message->type = MSG_VAR;
-		message->handle = chunk->getHandle();
+		message.source = id;
+		message.iteration = iteration;
+		message.object = variable->getID();
+		message.type = MSG_VAR;
+		message.handle = chunk->getHandle();
 		
 		// send message
-		msgQueue->send(message,sizeof(Message),0);
+		msgQueue->send(&message,sizeof(Message),0);
 		DBG("Variable \"" << varname->c_str() << "\" has been written");
 	
-		// free message	
-		delete message;
-		
+		delete chunk;
 		return size;
 	}
 
@@ -245,35 +246,35 @@ namespace Damaris {
 		memcpy(chunk->data(),data,size);
 		
 		// create message
-		Message* message = new Message();
+		Message message;
 		
-		message->source = id;
-		message->iteration = iteration;
-		message->object = variable->getID();
-		message->type = MSG_VAR;
-		message->handle = chunk->getHandle();
+		message.source = id;
+		message.iteration = iteration;
+		message.object = variable->getID();
+		message.type = MSG_VAR;
+		message.handle = chunk->getHandle();
 		
 		// send message
-		msgQueue->send(message,sizeof(Message),0);
+		msgQueue->send(&message,sizeof(Message),0);
 		DBG("Variable \"" << varname->c_str() << "\" has been written");
 	
 		// free message	
-		delete message;
+		delete chunk;
 		
 		return size;
 	}
 
 	int Client::signal(std::string* signal_name, int32_t iteration)
 	{
-		Message* sig = new Message();
-		sig->source = id;
-		sig->iteration = iteration;
-		sig->type = MSG_SIG;
-		sig->handle = 0;
-		sig->object = 0; // TODO : put the Id of the action
+		Message sig;
+		sig.source = id;
+		sig.iteration = iteration;
+		sig.type = MSG_SIG;
+		sig.handle = 0;
+		sig.object = 0; // TODO : put the Id of the action
 		
 		try {
-			msgQueue->send(sig,sizeof(Message),0);
+			msgQueue->send(&sig,sizeof(Message),0);
 			return 0;
 		} catch(interprocess_exception &e) {
 			ERROR("Error while sending event \"" << *signal_name << "\", " << e.what());
@@ -301,9 +302,12 @@ namespace Damaris {
 	{
 		static int killed;
 		if(!killed) {
-			std::string sig("#kill");
-			int res = signal(&sig,0);
-			if(res == 0) killed = 1;
+			Message kill;
+			kill.type = MSG_INT;
+			kill.source = id;
+			kill.iteration = -1;
+			kill.object = KILL_SERVER;
+			msgQueue->send(&kill,sizeof(Message),0);
 			return 0;
 		} else {
 			WARN("Trying to send kill signal multiple times to the server");

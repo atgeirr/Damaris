@@ -16,12 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Parameter.hpp
- * \date July 2011
+ * \date October 2011
  * \author Matthieu Dorier
- * \version 0.1
- *
- * Parameter.hpp defines the parameter structure: a structure that can hold
- * a pointer to most basic types.
+ * \version 0.3
  */
 #ifndef __DAMARIS_PARAMETER_H
 #define __DAMARIS_PARAMETER_H
@@ -30,30 +27,39 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 
 namespace Damaris {
-/**
- * The Parameter union defines a value read from the configuration file
- * We could have used a void* pointer instead of a union but I find this
- * way more elegant.
- */
-//	struct Parameter {
-//		Types::basic_type_e type; /*!< Type of the parameter. */
-//		union {
-//			short* short_ptr; 	/*!< Pointer to a short value. */
-//			int* int_ptr;		/*!< Pointer to an int value. */
-//			long* long_ptr; 	/*!< Pointer to a long value. */
-//			float* float_ptr; 	/*!< Pointer to a float value. */
-//			double* double_ptr;	/*!< Pointer to a double value. */
-//			char* char_ptr; 	/*!< Pointer to a char value. */
-//			std::string* str_ptr;	/*!< Pointer to a string value. */
-//		} value; /*!< Pointer to the parameter's value */
-//	};
-	
-	struct Parameter {
-		Parameter(const std::string &, const boost::any &);
-		std::string name;
-    		boost::any value;
-	};
+	/**
+	 * The Parameter class is based on boost::any to hold
+	 * any type of data and associate it with a name.
+	 */	
+	class Parameter {
+		private:
+			std::string name; /*!< Name of the parameter. */
 
+		public:
+			boost::any value; /*!< Value of the parameter. */
+		
+			/**
+			 * Constructor.
+			 */
+			template<typename T>
+			Parameter(const std::string&, const T&);
+
+			/**
+			 * Gets the name of the parameter.
+			 */
+			std::string getName() const;
+	};
 }
 
 #endif
+
+namespace Damaris {
+
+template<typename T>
+Parameter::Parameter(const std::string& n, const T& v)
+{
+        name = n;
+        value = boost::any(v);
+}
+
+}

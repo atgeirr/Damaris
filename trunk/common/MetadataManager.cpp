@@ -16,130 +16,85 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file MetadataManager.cpp
- * \date July 2011
+ * \date October 2011
  * \author Matthieu Dorier
- * \version 0.1
- *
- * MetadataManager holds pointers to all Variables published.
- * These variables can be retrieved by their identifier (name,source,iteration).
+ * \version 0.3
  */
 #include "common/Debug.hpp"
 #include "common/MetadataManager.hpp"
 
-//using namespace boost::interprocess;
-
 namespace Damaris {
 
-//	MetadataManager::MetadataManager(managed_shared_memory* s)
-//	MetadataManager::MetadataManager(SharedMemorySegment* s)
-	MetadataManager::MetadataManager()
-	{
-//		segment = s;
-	}	
+MetadataManager::MetadataManager()
+{
+}	
 
-	bool MetadataManager::addVariableEntry(Variable& v)
-	{
-		// check if the variable has already an ID defined
-		if(varID.find(v.getName()) != varID.end())
-			return false;
-		// the variable does not exist, give it an ID
-		int id = (int) variables.size();
-		v.id = id;
-		// put it into the variables vector and register its ID
-		variables.push_back(v);
-		varID.insert(std::pair<std::string,int>(v.getName(),id));
-
-		return true;
+bool MetadataManager::addVariable(std::string varname, std::string layoutname)
+{
+	VariablesSet::index<by_name>::type::iterator it = 
+		variables.get<by_name>().find(varname);
+	
+	if(it != variables.get<by_name>().end()) {
+		WARN("Inserting a variable with a name identical to a previously defined variable");
+		return false;
 	}
 
-	Variable* MetadataManager::getVariable(std::string &name)
-	{
-		std::map<std::string,int>::iterator it = varID.find(name);
-		if(it == varID.end()) return NULL;
-		else return getVariable(it->second);
+	// check that the layout exists
+	Layout* l = getLayout(layoutname);
+	if(l == NULL) {
+		ERROR("Undefined layout \"" << layoutname << "\" for variable \""
+			<< varname << "\"");
+		return false;
 	}
 
-	Variable* MetadataManager::getVariable(int id)
-	{
-		if(variables.size() >= (unsigned int)id && id >= 0) return &(variables[id]);
-		else return NULL;
-	}
+	// allocate the variable
+	int id = variables.size();
+	Variable* v = new Variable(id,varname,l);
 
-	bool MetadataManager::setLayout(std::string& lname, Layout &l)
-	{
-		if(layouts.find(lname) != layouts.end())
-		{
-			ERROR("Trying to define two layouts with the same name \"" << lname << "\"");
-			return false;
-		}
-		layouts.insert(std::pair<std::string,Layout>(lname,l));
-		return true;
-	}
+	variables.insert(boost::shared_ptr<Variable>(v));
+	return true;
+}
 
-	Layout* MetadataManager::getLayout(std::string& lname)
-	{
-		std::map<std::string,Layout>::iterator it = layouts.find(lname);
-		if(it == layouts.end()) return NULL;
-		return &(it->second);
-	}
-/*
-	Variable* MetadataManager::get(const std::string* name, int32_t iteration, int32_t sourceID)
-	{
-		std::list<Variable>::iterator i;
-		for(i=vars.begin(); i != vars.end(); i++)
-		{
-			bool c = true;
-			c =  i->name.compare(*name) == 0;
-			c = c && i->iteration == iteration;
-			c = c && i->source == sourceID;
-			if(c) return (Variable*)(&(*i));
-		}
+Variable* MetadataManager::getVariable(std::string &name)
+{
+	VariablesSet::index<by_name>::type::iterator it = 
+		variables.get<by_name>().find(name);
+	if(it == variables.get<by_name>().end()) {
 		return NULL;
 	}
-*/
-/*	
-	int MetadataManager::put(Variable v)
-	{
-		if(this->get(&(v.name),v.iteration,v.source) != NULL) {
-			return -1;
-		}
-		vars.push_back(v);
-		return 0;
+	return it->get();
+}
+
+Variable* MetadataManager::getVariable(int id)
+{
+	VariablesSet::index<by_id>::type::iterator it =
+		variables.get<by_id>().find(id);
+	if(it == variables.get<by_id>().end()) {
+		return NULL;
 	}
-*/
-/*	
-	void MetadataManager::put(std::string* name, int32_t iteration, int32_t sourceID, Layout* l, void* data)
+	return it->get();
+}
+
+bool MetadataManager::addLayout(std::string& lname, Layout &l)
+{
+	if(layouts.find(lname) != layouts.end())
 	{
-		Variable* v = new Variable(name,iteration,sourceID,l,data);
-		vars.push_back(v);
+		ERROR("Trying to define two layouts with the same name \"" << lname << "\"");
+		return false;
 	}
-	
-	void MetadataManager::remove(std::string* name, int32_t iteration, int32_t sourceID)
-	{
-		Variable* v = get(name,iteration,sourceID);
-		vars.remove(v);
-	}
-*/
-/*
-	void MetadataManager::remove(Variable v)
-	{
-		if(v.data != NULL) 
-		{
-			segment->deallocate(v.data);
-			v.data = NULL;
-		}
-		vars.remove(v);
-		INFO("Removed variable \"" << v.name.c_str() << "\", available memory is now " << segment->getFreeMemory());
-	}	
-	
-	std::list<Variable>* MetadataManager::getAllVariables()
-	{
-		return &vars;
-	}
-*/	
-	MetadataManager::~MetadataManager()
-	{
-		//vars.clear();
-	}
-	
+	layouts.insert(std::pair<std::string,Layout>(lname,l));
+	return true;
+}
+
+Layout* MetadataManager::getLayout(std::string& lname)
+{
+	std::map<std::string,Layout>::iterator it = layouts.find(lname);
+	if(it == layouts.end()) return NULL;
+	return &(it->second);
+}
+
+MetadataManager::~MetadataManager()
+{
+}
+
 }

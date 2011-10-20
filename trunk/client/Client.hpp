@@ -40,8 +40,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * \namespace Damaris
- * All classes related to Damaris are defined under the 
- * Damaris namespace.
+ * All classes related to Damaris are defined under the Damaris namespace.
  */
 namespace Damaris {
 
@@ -56,7 +55,7 @@ class Client {
 		Environment *env; /*!< environment object. */
 		Configuration *config; /*!< configuration object. */
 		MetadataManager *metadataManager; /*! metadata manager object. */
-		ActionsManager *actionsManager; /*! for future use... */
+		ActionsManager *actionsManager; /*! keeps actions. */
 		int id; /*!< ID of the process as set in Environment. */
 
 		SharedMessageQueue *msgQueue; /*!< pointer to the message queue. */

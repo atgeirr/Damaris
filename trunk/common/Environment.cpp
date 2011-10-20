@@ -14,6 +14,12 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
+/**
+ * \file Environment.hpp
+ * \date October 2011
+ * \author Matthieu Dorier
+ * \version 0.3
+ */
 
 #include "common/Debug.hpp"
 #include "common/Environment.hpp"

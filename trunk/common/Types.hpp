@@ -16,12 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Types.hpp
- * \date July 2011
+ * \date October 2011
  * \author Matthieu Dorier
- * \version 0.1
- *
- * Types.hpp defines the basic types (short, int, float, ...). 
- * It will hold Derived types in future versions.
+ * \version 0.3
  */
 #ifndef __DAMARIS_TYPES_H
 #define __DAMARIS_TYPES_H

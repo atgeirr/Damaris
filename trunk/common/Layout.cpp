@@ -14,7 +14,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
-
 /**
  * \file Layout.cpp
  * \date October 2011
@@ -25,7 +24,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <cstring>
 #include "common/Debug.hpp"
 #include "common/Layout.hpp"
-#include "common/Chunk.hpp"
 
 namespace Damaris {
 	

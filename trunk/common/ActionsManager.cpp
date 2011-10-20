@@ -44,7 +44,8 @@ ActionsManager::ActionsManager()
  * Finally, if an action has already been loaded with the same event name, the function does
  * not overwrite it, it prints a warning and returns.
  */
-void ActionsManager::addDynamicAction(std::string* eventName, std::string* fileName, std::string* functionName)
+void ActionsManager::addDynamicAction(std::string* eventName, 
+		std::string* fileName, std::string* functionName)
 {
 
 	// check if there is already an action with the same name recorded

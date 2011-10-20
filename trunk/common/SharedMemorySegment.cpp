@@ -15,8 +15,8 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file SharedMemorySegment.hpp
- * \date September 2011
+ * \file SharedMemorySegment.cpp
+ * \date October 2011
  * \author Matthieu Dorier
  * \version 0.3
  */
@@ -27,32 +27,38 @@ namespace Damaris {
 
 SharedMemorySegment::SharedMemorySegment() {}
 	
-SharedMemorySegment* SharedMemorySegment::create(posix_shmem_t posix_shmem, const char* name, int64_t size)
+SharedMemorySegment* SharedMemorySegment::create(posix_shmem_t posix_shmem, 
+	const char* name, int64_t size)
 {
 	return new SharedMemorySegment::POSIX_ShMem(name,size);
 }
 
-SharedMemorySegment* SharedMemorySegment::create(sysv_shmem_t sysv_shmem, const char* name, int64_t size)
+SharedMemorySegment* SharedMemorySegment::create(sysv_shmem_t sysv_shmem, 
+	const char* name, int64_t size)
 {
 	return new SharedMemorySegment::SYSV_ShMem(name,size);
 }
 
-SharedMemorySegment* SharedMemorySegment::open(posix_shmem_t posix_shmem, const char* name)
+SharedMemorySegment* SharedMemorySegment::open(posix_shmem_t posix_shmem, 
+	const char* name)
 {
 	return new SharedMemorySegment::POSIX_ShMem(name);
 }
 
-SharedMemorySegment* SharedMemorySegment::open(sysv_shmem_t sysv_shmem, const char* name)
+SharedMemorySegment* SharedMemorySegment::open(sysv_shmem_t sysv_shmem, 
+	const char* name)
 {
 	return new SharedMemorySegment::SYSV_ShMem(name);
 }
 
-bool SharedMemorySegment::remove(posix_shmem_t posix_shmem, const char* name)
+bool SharedMemorySegment::remove(posix_shmem_t posix_shmem, 
+	const char* name)
 {
         return shared_memory_object::remove(name);
 }
 
-bool SharedMemorySegment::remove(sysv_shmem_t sysv_shmem, const char* name)
+bool SharedMemorySegment::remove(sysv_shmem_t sysv_shmem, 
+	const char* name)
 {
         xsi_key key(name,0);
 	int id = shmget(key.get_key(),0,0600);

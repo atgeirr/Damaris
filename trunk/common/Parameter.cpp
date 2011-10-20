@@ -19,18 +19,14 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \date October 2011
  * \author Matthieu Dorier
  * \version 0.3
- *
- * Parameter.cpp defines the parameter structure: a structure that can hold
- * a pointer to most basic types.
  */
 #include "common/Parameter.hpp"
 
 namespace Damaris {
-	
-Parameter::Parameter(const std::string& n, const boost::any& v)
+
+std::string Parameter::getName() const
 {
-	name = n;
-	value = v;
+	return name;
 }
 
 }

@@ -15,10 +15,10 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file Action.cpp
- * \date July 2011
+ * \file DynamicAction.cpp
+ * \date October 2011
  * \author Matthieu Dorier
- * \version 0.1
+ * \version 0.3
  */
 #include "common/Debug.hpp"
 #include "common/DynamicAction.hpp"
@@ -28,19 +28,19 @@ namespace Damaris {
 	DynamicAction::DynamicAction(std::string fun, std::string file)
 	: Action()
 	{
-		funname = fun;
-		filename = file;
-		handle = NULL;
-		function = NULL;
+		funName 	= fun;
+		fileName	= file;
+		handle 		= NULL;
+		function	= NULL;
 	}
 	
 	DynamicAction::DynamicAction(std::string n, int i, std::string fun, std::string file)
 	: Action(n,i)
 	{
-		funname = fun;
-		filename = file;
-		handle = NULL;
-		function = NULL;
+		funName 	= fun;
+		fileName 	= file;
+		handle 		= NULL;
+		function 	= NULL;
 	}
 
 	DynamicAction::~DynamicAction()
@@ -61,16 +61,16 @@ namespace Damaris {
 		if(loaded) return;
 
 		char* error;
-		void* handle = dlopen(filename.c_str(),RTLD_NOW | RTLD_GLOBAL);
+		void* handle = dlopen(fileName.c_str(),RTLD_NOW | RTLD_GLOBAL);
 		
 		if(!handle)
 		{
-			ERROR("While loading plugin in \"" << filename.c_str() << "\":" << dlerror());
+			ERROR("While loading plugin in \"" << fileName.c_str() << "\":" << dlerror());
 			return;
 		}
 
 		/* loading function */
-		function = (void (*)(std::string,int32_t, int32_t, Damaris::MetadataManager*))dlsym(handle,funname.c_str());
+		function = (void (*)(std::string,int32_t, int32_t, Damaris::MetadataManager*))dlsym(handle,funName.c_str());
 
 		if ((error = dlerror()) != NULL)  {
 			ERROR("While loading function in dynamic library: " << error);

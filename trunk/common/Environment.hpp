@@ -14,6 +14,13 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
+/**
+ * \file Environment.cpp
+ * \date October 2011
+ * \author Matthieu Dorier
+ * \version 0.3
+ */
+
 #ifndef __DAMARIS_ENVIRONMENT_H
 #define __DAMARIS_ENVIRONMENT_H
 
@@ -22,6 +29,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "xml/Model.hpp"
 
 namespace Damaris {
+
 /** 
  * The class Environment holds all local informations
  * such as the id of the enclosing process.
@@ -34,9 +42,10 @@ class Environment {
 		std::auto_ptr<Model::simulation_mdl> model; /*! Pointer to the base model. */
 		int id; /*!< ID of the process. */
 	
-	protected:	
+	protected:
+
 		/**
-		 * \brief Constructor taking an ID. 
+		 * \brief Constructor taking a base model and an ID. 
 		 * \param[in] mdl : base model from the configuration file.
 		 * \param[in] i : id of the process.
 		 */

@@ -46,6 +46,8 @@ enum language_e {
 
 /**
  * \brief Converts a string representing the name of a language into a language.
+ * Recognized languages are Fortran, fortran, FORTRAN, F90, f90, F77, f77, C, c,
+ * CPP, cpp, C++, c++, CXX, cxx.
  */
 language_e getLanguageFromString(const std::string* s);
 

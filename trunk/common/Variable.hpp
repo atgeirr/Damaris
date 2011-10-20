@@ -16,16 +16,15 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Variable.hpp
- * \date July 2011
+ * \date October 2011
  * \author Matthieu Dorier
- * \version 0.1
- *
- * Variable.hpp contains the definition of the Variable record.
+ * \version 0.3
  */
 #ifndef __DAMARIS_VARIABLE_H
 #define __DAMARIS_VARIABLE_H
 
 #include <stdint.h>
+#include <list>
 #include <string>
 #include "common/Chunk.hpp"
 #include "common/Layout.hpp"
@@ -36,66 +35,71 @@ class MetadataManager;
 
 /**
  * The Variable object is used for describing a variable within
- * a metadata structure. It holds a pointer to the data and additional
- * informations. A Variable record is identified by a name, an iteration
- * and a source.
+ * a metadata structure. It holds an index of chunks and additional
+ * informations. A Variable record is identified by a name and an ID.
+ * A Variable cannot be created in a vacuum, only the MetadataManager
+ * has the permission to create instance of them.
  */
 class Variable {
 	friend class MetadataManager;
 	
 	private:	
 		std::string name;	/*!< Name of the variable. */
-//		int32_t iteration;	/*!< Iteration of publication. */
-//		int32_t source;		/*!< Source that published this variable. */
 		Layout* layout;		/*!< Layout of the data. */
-		int id;			/*!< The ID is used to avoid passing variable's name in shared-memory. */
-//		void* data;		/*!< Pointer to the data. */
-//		Group* parent;		/*!< Parent Group. */
-	public:
+		int id;			/*!< The ID is used to avoid 
+					  passing variable's name in shared-memory. */
+		std::list<Chunk*> chunks; /*!< Chunks hold by the variable. */
+
 		/**
 		 * \brief Constructor. 
 		 * Creates a Variable record given a name, an iteration, a source, a layout
 		 * and a pointer to the data.
+		 * The constructor is private, only a MetadataManager has the permission
+		 * to create a new instance of Variable.
 		 * 
 		 * \param[in] vname : Name of the variable.
-		 * \param[in] it : Iteration of the variable.
-		 * \param[in] src : Source of the variable.
-		 * \param[in] l : Layout that physically describe the data.
-		 * \param[in] d : Pointer to the data.
+		 * \param[in] id : id of the variable in the MetadataManager.
+		 * \param[in] layout : Layout that physically describe the data.
 		 */
-//		Variable(std::string vname, int32_t it, int32_t src, Layout* l, void* d);
 		Variable(int id, std::string& vname, Layout* layout);
-		// unidentified variable
-		Variable(std::string& vname, Layout* layout);
-		// identified anonymous variable
-		Variable(int id, Layout* layout);
-		// fully anonymous
-		Variable(Layout* layout);
-	// All the following accessors are useless since we use a structure with public members
-		
 
-		/* returns the layout of the variable */
+		/**
+		 * \brief Constructor.
+		 */
+		Variable();
+	
+	public:	
+
+		/**
+		 * Returns the layout of the variable.
+		 */
 		Layout* getLayout() const { return layout; }
-
+	
+		/**
+		 * Returns the name of the variable.
+		 */
 		std::string getName() const {return name; }
 
+		/**
+		 * Returns the ID of the variable.
+		 */
 		int getID() const {return id; }
 
+		/**
+		 * Attach a new chunk to the variable.
+		 */
 		void attachChunk(Chunk* chunk);
-		/* returns the pointer over the data */
-		/* void* getDataAddress() const { return data; } */
-		/* compares the records (except data and layout) with another variable */
-		//bool compare(const Variable &v) const;
-		/* print informations related to the variable */
-		// void print() const;
-		/* reset the pointer to the data */
-		//void setDataToNull() { data = NULL; }
 
 		/**
 		 * \brief Comparison operator between variables.
 		 * Variables are equals if they have a same name, iteration and source.
 		 */
 		bool operator==(const Variable &another);
+
+		/**
+		 * Returns the list of chunks.
+		 */
+		std::list<Chunk*>& getAllChunks();
 };
 
 }

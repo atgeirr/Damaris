@@ -16,12 +16,11 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Layout.hpp
- * \date July 2011
+ * \date October 2011
  * \author Matthieu Dorier
- * \version 0.1
- *
- * This file defines the Layout object.
+ * \version 0.3
  */
+
 #ifndef __DAMARIS_LAYOUT_H
 #define __DAMARIS_LAYOUT_H
 
@@ -33,19 +32,21 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 namespace Damaris {
 
 /**
- * Layouts are objects that describe the representation of
- * data in memory. For example "an 3D array of integers which extents are
- * 4,2 and 16". Actually we choosed to represent layouts as in Fortran, using
- * a starting index and an ending index rather than a size. This way allows 
- * plugins to potentially know that the variable is a chunk of a bigger
- * global array.
+ * Layouts are objects that describe the representation of data. 
+ * For example "a 3D array of integers which extents are 4,2 and 16".
+ * Layouts are represented like in C, each index along each dimension
+ * starting from 0 and going to n-1, where n is the extent of the
+ * array along that dimension.
+ *
+ * Layouts are not used to hold data. See Chunk for that purpose.
  */	
 class Layout {
 		
 	private:
 		Types::basic_type_e type; 	/*!< Type of the data. */
-		unsigned int dimensions; 		/*!< Number of dimensions. */
-		std::vector<int> extents;		
+		unsigned int dimensions; 	/*!< Number of dimensions. */
+		std::vector<int> extents;	/*!< Extents along each dimension. */	
+
 	public:
 		/**
 		 * \brief Constructor.
@@ -58,25 +59,11 @@ class Layout {
 		 */
 		Layout(Types::basic_type_e t, unsigned int d, std::vector<int> &ex);
 		
-		/** 
-		 * \brief Constructor.
-		 * Initializes a Layout without knowing its extents.
-		 *
-		 * \param[in] t : basic type.
-		 * \param[in] d = number of dimensions.
-		 */
-//		Layout(Types::basic_type_e t, int32_t d);
-		
 		/**
 		 * \brief Destructor.
 		 */
 		~Layout();
 		
-		/**
-		 * \return Size of the buffer that would hold the data.
-		 */
-		size_t  getRequiredMemoryLength() const;
-	
 		/**
 		 * \return The type of the data. 
 		 */
@@ -87,16 +74,6 @@ class Layout {
 		 */
 		unsigned int getDimensions() const;
 
-		/**
-		 * \return the starting index along a particular dimension.
-		 */
-//		int64_t getStartIndex(int dim) const;
-		
-		/**
-		 * \return the ending index along a particular dimension. 
-		 */
-//		int64_t getEndIndex(int dim) const;
-		
 		/**
 		 * \return the extent (start-end+1) along a given dimension. 
 		 */

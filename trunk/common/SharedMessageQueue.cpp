@@ -16,7 +16,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file SharedMessageQueue.cpp
- * \date September 2011
+ * \date October 2011
  * \author Matthieu Dorier
  * \version 0.3
  *
@@ -26,22 +26,26 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Damaris {
 
-SharedMessageQueue* SharedMessageQueue::create(posix_shmem_t posix_shmem, const char* name, size_t num_msg, size_t size_msg)
+SharedMessageQueue* SharedMessageQueue::create(posix_shmem_t posix_shmem, 
+		const char* name, size_t num_msg, size_t size_msg)
 {
 	return new POSIX_ShMsgQueue(name,num_msg,size_msg);
 }
 
-SharedMessageQueue* SharedMessageQueue::create(sysv_shmem_t sysv_shmem, const char* name, size_t num_msg, size_t size_msg)
+SharedMessageQueue* SharedMessageQueue::create(sysv_shmem_t sysv_shmem, 
+		const char* name, size_t num_msg, size_t size_msg)
 {
 	return new SYSV_ShMsgQueue(name,num_msg,size_msg);
 }
 
-SharedMessageQueue* SharedMessageQueue::open(posix_shmem_t posix_shmem, const char* name)
+SharedMessageQueue* SharedMessageQueue::open(posix_shmem_t posix_shmem, 
+		const char* name)
 {
 	return new POSIX_ShMsgQueue(name);
 }
 
-SharedMessageQueue* SharedMessageQueue::open(sysv_shmem_t sysv_shmem, const char* name)
+SharedMessageQueue* SharedMessageQueue::open(sysv_shmem_t sysv_shmem, 
+		const char* name)
 {
 	return new SYSV_ShMsgQueue(name);
 }
@@ -57,7 +61,8 @@ bool SharedMessageQueue::remove(sysv_shmem_t sysv_shmem, const char* name)
 	return xsi_message_queue::remove(key);
 }
 
-SharedMessageQueue::POSIX_ShMsgQueue::POSIX_ShMsgQueue(const char* name, size_t num_msg, size_t size_msg)
+SharedMessageQueue::POSIX_ShMsgQueue::POSIX_ShMsgQueue(const char* name, 
+		size_t num_msg, size_t size_msg)
 {
 	impl = new message_queue(create_only,name,num_msg,size_msg);
 }
@@ -67,22 +72,26 @@ SharedMessageQueue::POSIX_ShMsgQueue::POSIX_ShMsgQueue(const char* name)
 	impl = new message_queue(open_only,name);
 }
 
-void SharedMessageQueue::POSIX_ShMsgQueue::send(const void* buffer, size_t size, unsigned int priority)
+void SharedMessageQueue::POSIX_ShMsgQueue::send(const void* buffer, 
+		size_t size, unsigned int priority)
 {
 	impl->send(buffer,size,priority);
 }
 
-bool SharedMessageQueue::POSIX_ShMsgQueue::trySend(const void* buffer, size_t size, unsigned int priority)
+bool SharedMessageQueue::POSIX_ShMsgQueue::trySend(const void* buffer, 
+		size_t size, unsigned int priority)
 {
 	return impl->try_send(buffer,size,priority);
 }
 
-void SharedMessageQueue::POSIX_ShMsgQueue::receive(void* buffer, size_t buffer_size, size_t &recv_size, unsigned int &priority)
+void SharedMessageQueue::POSIX_ShMsgQueue::receive(void* buffer, 
+		size_t buffer_size, size_t &recv_size, unsigned int &priority)
 {
 	impl->receive(buffer,buffer_size,recv_size,priority);
 }
 
-bool SharedMessageQueue::POSIX_ShMsgQueue::tryReceive(void* buffer, size_t buffer_size, size_t &recv_size, unsigned int &priority)
+bool SharedMessageQueue::POSIX_ShMsgQueue::tryReceive(void* buffer, 
+		size_t buffer_size, size_t &recv_size, unsigned int &priority)
 {
 	return impl->try_receive(buffer,buffer_size,recv_size,priority);
 }
@@ -115,22 +124,26 @@ SharedMessageQueue::SYSV_ShMsgQueue::SYSV_ShMsgQueue(const char* name)
 	impl = new xsi_message_queue(open_only,key);
 }
 
-void SharedMessageQueue::SYSV_ShMsgQueue::send(const void* buffer, size_t size, unsigned int priority)
+void SharedMessageQueue::SYSV_ShMsgQueue::send(const void* buffer, size_t size, 
+		unsigned int priority)
 {
 	impl->send(buffer,size,priority);
 }
 
-bool SharedMessageQueue::SYSV_ShMsgQueue::trySend(const void* buffer, size_t size, unsigned int priority)
+bool SharedMessageQueue::SYSV_ShMsgQueue::trySend(const void* buffer, size_t size, 
+		unsigned int priority)
 {
 	return impl->try_send(buffer,size,priority);
 }
 
-void SharedMessageQueue::SYSV_ShMsgQueue::receive(void* buffer, size_t buffer_size, size_t &recv_size, unsigned int &priority)
+void SharedMessageQueue::SYSV_ShMsgQueue::receive(void* buffer, 
+		size_t buffer_size, size_t &recv_size, unsigned int &priority)
 {
 	impl->receive(buffer,buffer_size,recv_size,priority);
 }
 
-bool SharedMessageQueue::SYSV_ShMsgQueue::tryReceive(void *buffer, size_t buffer_size, size_t &recv_size, unsigned int &priority)
+bool SharedMessageQueue::SYSV_ShMsgQueue::tryReceive(void *buffer, 
+		size_t buffer_size, size_t &recv_size, unsigned int &priority)
 {
 	return impl->try_receive(buffer,buffer_size,recv_size,priority);
 }

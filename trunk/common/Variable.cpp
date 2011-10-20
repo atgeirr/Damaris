@@ -16,83 +16,41 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Variable.cpp
- * \date July 2011
+ * \date October 2011
  * \author Matthieu Dorier
- * \version 0.1
- *
- * Variable.cpp contains the definition of the Variable record.
+ * \version 0.3
  */
-
-#include <iostream>
 
 #include "common/Variable.hpp"
 
 namespace Damaris {
-	/* The constructor takes the name of the variable, the iteration t, the source id src
-	   the layout l and a pointer to the data (d) */
-//	Variable::Variable(std::string n, int32_t t, int32_t src, Layout* l, void* d)
-//	{
-//		//name = new std::string(*n);
-//		name = n;
-//		iteration = t;
-//		source = src;
-//		layout = l;
-//		data = d;
-//	}
 	
-	Variable::Variable(int i, std::string& n, Layout* l)
-	{
-		id = i;
-		name = n;
-		layout = l;
-	}
+Variable::Variable(int i, std::string& n, Layout* l)
+{
+	id = i;
+	name = n;
+	layout = l;
+}
 
-	Variable::Variable(int i, Layout* l)
-	{
-		id = i;
-		layout = l;
-	}
+Variable::Variable()
+{
+}
 
-	Variable::Variable(std::string& n, Layout* l)
-	{
-		id = 0;
-		name = n;
-		layout =l;
-	}
+bool Variable::operator==(const Variable &another)
+{
+	bool c = true;
+	c = c && another.name.compare(name) == 0;
+	c = c && another.id == id;
+	return c;
+}
 
-	Variable::Variable(Layout* l)
-	{
-		id = 0;
-		layout = l;
-	}
-/*	
-	bool Variable::compare(const Variable &v) const
-	{
-		bool c = true;
-		c = c && (v.getName()->compare(*name) == 0);
-		c = c && (v.getSource() == sourceID);
-		c = c && (v.getIteration() == iteration);
-		return c;
-	}
-*/
-/*	
-	void Variable::print() const 
-	{
-		std::cout << *name << ", iteration = " << iteration << " source = " << sourceID << std::endl; 
-	}
-*/
-	bool Variable::operator==(const Variable &another)
-	{
-		bool c = true;
-		c = c && another.name.compare(name) == 0;
-		c = c && another.id == id;
-//		c = c && another.source == source;
-//		c = c && another.iteration == iteration;
-		return c;
-	}
+void Variable::attachChunk(Chunk* chunk)
+{
+	chunks.push_back(chunk);
+}
 
-	void Variable::attachChunk(Chunk* chunk)
-	{
-		// TODO
-	}
+std::list<Chunk*>& Variable::getAllChunks()
+{
+	return chunks;
+}
 }

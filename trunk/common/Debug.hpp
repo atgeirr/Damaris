@@ -16,7 +16,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Debug.hpp
- * \date September 2011
+ * \date October 2011
  * \author Matthieu Dorier
  * \version 0.3
  *

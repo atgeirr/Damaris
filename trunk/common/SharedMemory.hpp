@@ -16,11 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file SharedMemory.hpp
- * \date September 2011
+ * \date October 2011
  * \author Matthieu Dorier
  * \version 0.3
- *
- * Contains some definitions useful for shared memory support.
  */
 #ifndef __DAMARIS_SHARED_MEMORY_H
 #define __DAMARIS_SHARED_MEMORY_H

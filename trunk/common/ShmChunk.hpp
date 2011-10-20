@@ -19,9 +19,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \date October 2011
  * \author Matthieu Dorier
  * \version 0.3
- *
- * This file defines the ShmChunk class,
- * a Chunk placed in shared memory.
  */
 #ifndef __DAMARIS_SHMCHUNK_H
 #define __DAMARIS_SHMCHUNK_H
@@ -33,13 +30,16 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 namespace Damaris {
 
 /**
-
+ * The ShmChunk class inherites from Chunk, it represents
+ * a chunk located in shared memory.
  */
 class ShmChunk : public Chunk {
 
 	private:
-		SharedMemorySegment* segment; /*!< Pointer to the shared memory segment containing the data. */
-		void* header; /*!< Pointer to the header in the shared segment (where the layout is described. */
+		SharedMemorySegment* segment; /*!< Pointer to the shared memory 
+						segment containing the data. */
+		void* header; /*!< Pointer to the header 
+				in the shared segment (where the layout is described. */
 		void* buffer; /*!< Pointer to the actual data in shared memory. */
 
 	public:
@@ -54,7 +54,8 @@ class ShmChunk : public Chunk {
 		 * This function may throw an exception if it doesn't manage to open the memory region
 		 * or if a wrong shared memory segment argument (for instance "NULL") is passed.
 		 */
-		ShmChunk(SharedMemorySegment* s, Types::basic_type_e t, unsigned int d, std::vector<int> &si, std::vector<int> &ei);
+		ShmChunk(SharedMemorySegment* s, Types::basic_type_e t, 
+				unsigned int d, std::vector<int> &si, std::vector<int> &ei);
 		
 		/**
 		 * \brief Constructor from an existing chunk placed in shared memory.
@@ -90,10 +91,20 @@ class ShmChunk : public Chunk {
 		 */
 		bool remove();
 
+		/**
+		 * Returns a relative pointer (handle) to the memory region where the 
+		 * chunk is located. Warning: this handle points to the header, not the data.
+		 */
 		handle_t getHandle();
 
+		/**
+		 * Set the iteration number of the chunk.
+		 */
 		void setIteration(int i);
 		
+		/**
+		 * Set the source of the chunk.
+		 */
 		void setSource(int s);
 }; // class ShmChunk
 	

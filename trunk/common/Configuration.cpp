@@ -119,7 +119,8 @@ namespace Damaris {
 			Language::language_e language = Language::getLanguageFromString(&(l->language()));
 
 			if(type == Types::UNDEFINED_TYPE) {
-				ERROR("Unknown type \"" << l->type() << "\" for layout \"" << l->name() << "\"");
+				ERROR("Unknown type \"" << l->type() 
+						<< "\" for layout \"" << l->name() << "\"");
 				continue;
 			}
 			
@@ -129,9 +130,11 @@ namespace Damaris {
 			std::string::const_iterator iter = str.begin();
 			std::string::const_iterator end = str.end();
                 
-			bool r = phrase_parse(iter, end, *layoutInterp, boost::spirit::ascii::space, dims);
+			bool r = phrase_parse(iter, end, *layoutInterp, 
+					boost::spirit::ascii::space, dims);
 			if((!r) || (iter != str.end())) {
-				ERROR("While parsing dimension descriptor for layout \"" << l->name() << "\"");
+				ERROR("While parsing dimension descriptor for layout \"" 
+						<< l->name() << "\"");
                         	continue;
 			}
 			if(language == Language::LG_FORTRAN) {
@@ -139,7 +142,7 @@ namespace Damaris {
 				dims = rdims;
 			}
                  	Layout l(type,dims.size(),dims);
-			metadataManager->setLayout(name,l);
+			metadataManager->addLayout(name,l);
 		}
 		
 		// build all the variables in root group
@@ -148,13 +151,7 @@ namespace Damaris {
 		{
 			std::string name = (std::string)(v->name());
 			std::string layoutName = (std::string)(v->layout());
-			Layout *l = metadataManager->getLayout(layoutName);
-			if(l == NULL) {
-				ERROR("No layout found for variable \"" << v->name() << "\"");
-				continue;
-			}
-			Variable var(name,l);
-			metadataManager->addVariableEntry(var);
+			metadataManager->addVariable(name,layoutName);
 		}		
 
 		// build all variables in sub-groups
@@ -173,20 +170,15 @@ namespace Damaris {
                 {
 			std::string name = (std::string)(v->name());
 			std::string layoutName = (std::string)(v->layout());
-                        Layout *l = metadataManager->getLayout(layoutName);
-                        if(l == NULL) {
-                                ERROR("No layout found for variable \"" << (groupName + "/" + name) << "\"");
-                                continue;
-                        }
 			std::string varName = groupName+"/"+name;
-			Variable var(varName,l);
-                        metadataManager->addVariableEntry(var);
+                        metadataManager->addVariable(varName,layoutName);
                 }
 
 		// build recursively all the subgroups
 		Model::data_mdl::group_const_iterator subg(g->group().begin());
 		for(; subg != g->group().end(); subg++)
-			readVariablesInSubGroup(&(*subg),groupName + "/" + (std::string)(subg->name()));
+			readVariablesInSubGroup(&(*subg),groupName 
+							 + "/" + (std::string)(subg->name()));
 	}
 
 	ActionsManager* Configuration::getActionsManager()

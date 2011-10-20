@@ -16,11 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Server.cpp
- * \date July 2011
+ * \date October 2011
  * \author Matthieu Dorier
- * \version 0.1
- *
- * Contains the definition of functions for the Server object.
+ * \version 0.3
  */
 #include <iostream>
 #include <list>
@@ -29,14 +27,12 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/SharedMemorySegment.hpp"
 #include "common/Configuration.hpp"
 #include "server/Server.hpp"
-//#include "server/ServerConfiguration.hpp"
 #include "common/Message.hpp"
 #include "common/ShmChunk.hpp"
 #include "common/Layout.hpp"
-//#include "common/LayoutFactory.hpp"
 #include "common/SharedMemory.hpp"
 
-using namespace boost::interprocess;
+//using namespace boost::interprocess;
 
 Damaris::Server *server;
 
@@ -45,8 +41,8 @@ namespace Damaris {
 	/* constructor for embedded mode */
 	Server::Server(std::string* cf, int id)
 	{
-		//Model::simulation_mdl* mdl = new simulation_mdl(cf->c_str(),xml_schema::flags::dont_validate);
-		std::auto_ptr<Model::simulation_mdl> mdl(Model::simulation(cf->c_str(),xml_schema::flags::dont_validate));
+		std::auto_ptr<Model::simulation_mdl> 
+			mdl(Model::simulation(cf->c_str(),xml_schema::flags::dont_validate));
 
 		Configuration::initialize(mdl,cf);
 		Environment::initialize(mdl,id);
@@ -106,7 +102,8 @@ namespace Damaris {
 		metadataManager = config->getMetadataManager();
 		actionsManager = config->getActionsManager();
 
-		INFO("Server successfully initialized with configuration " << config->getFileName()->c_str());
+		INFO("Server successfully initialized with configuration " 
+				<< config->getFileName()->c_str());
 	}
 	
 	/* destructor */
@@ -142,7 +139,6 @@ namespace Damaris {
 				processMessage(msg);
 			}
 		}
-		//INFO("out of main loop");
 		
 		delete msg;
 		return 0;
@@ -152,40 +148,43 @@ namespace Damaris {
 	void Server::processMessage(Message* msg) 
 	{
 			
-		int32_t iteration = msg->iteration;
-		int32_t source = msg->source;
+		int32_t& iteration 	= msg->iteration;
+		int32_t& source 	= msg->source;
+		int32_t& object 	= msg->object;
+		handle_t& handle	= msg->handle;
 		
 		if(msg->type == MSG_VAR)
 		{
-			//data = (char*)segment->getAddressFromHandle(msg->handle);
-			//ChunkHeader *header = ChunkHeader::fromBuffer((void*)data);
-			//data = data + header.size();
-			//Chunk chunk(header,source,iteration,data);
-			ShmChunk* chunk = new ShmChunk(segment,msg->handle); 
-			Variable* v = metadataManager->getVariable(msg->object);
+			ShmChunk* chunk = new ShmChunk(segment,handle); 
+			Variable* v = metadataManager->getVariable(object);
 			if(v != NULL) v->attachChunk(chunk);
 			else {
-				// the variable is unkwnow, discarde it
+				// the variable is unknow, discarde it
 				ERROR("Server received a chunk for an unknown variable, discarding");
 				chunk->remove();
 				delete chunk;
 			}
-			//layout = LayoutFactory::unserialize(msg->layoutInfo);
-			//Variable v(name,iteration,sourceID,layout,data);
-			//metadataManager->put(v);
 			return;
 		}
 		
 		if(msg->type == MSG_SIG) 
 		{
-			//DBG("Received event " << msg->content);
-		//	if(msg->content[0] == '#') {
-		//		if(name == "#kill") needStop -= 1;
-		//	} else {
-		//		actionsManager->reactToUserSignal(&name,iteration,sourceID,metadataManager);		
-		//	}
-		//	return;
-			actionsManager->reactToUserSignal(msg->object,iteration,source,metadataManager);
+			actionsManager->reactToUserSignal(object,
+					iteration,source,metadataManager);
+			return;
+		}
+
+		if(msg->type == MSG_INT)
+		{
+			processInternalSignal(object);
+		}
+	}
+
+	void Server::processInternalSignal(int32_t object)
+	{
+		switch(object) {
+		case KILL_SERVER:
+			needStop--; break;
 		}
 	}
 	

@@ -16,21 +16,15 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Server.hpp
- * \date July 2011
+ * \date October 2011
  * \author Matthieu Dorier
- * \version 0.1
- * 
- * Contains the definition of the Server object. The Server is the code
- * running on dedicated cores.
+ * \version 0.3
  */
 #ifndef __DAMARIS_SERVER_H
 #define __DAMARIS_SERVER_H
 
 #include <string>
-//#include <boost/interprocess/ipc/message_queue.hpp>
-//#include <boost/interprocess/managed_shared_memory.hpp>
 
-//#include "server/ServerConfiguration.hpp"
 #include "common/Configuration.hpp"
 #include "common/SharedMessageQueue.hpp"
 #include "common/SharedMemorySegment.hpp"
@@ -39,7 +33,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/ActionsManager.hpp"
 #include "common/MetadataManager.hpp"
 
-using namespace boost::interprocess;
+//using namespace boost::interprocess;
 
 namespace Damaris {
 	
@@ -83,9 +77,11 @@ class Server {
 	
 	private:
 
-		bool needStop; /*!< indicates wether the server has to exit the main loop at the next iteration */
+		int needStop; /*!< indicates wether the server has to 
+				 exit the main loop at the next iteration. */
 
-		Configuration *config; 	/*!< This is the configuration object initialized with the external file. */
+		Configuration *config; 	/*!< This is the configuration 
+					  object initialized with the external file. */
 		Environment *env;	/*!< This is the pointer to the Environment object. */
 		
 		/** 
@@ -98,7 +94,6 @@ class Server {
 		 * Pointer to the shared memory segment, used for writing variables. 
 		 */
 		SharedMemorySegment *segment;
-		//managed_shared_memory *segment;
 		
 		/**
 		 * This is the entry point to the metadata layer of Damaris. 
@@ -122,6 +117,13 @@ class Server {
 		 * \see Damaris::Message
 		 */
 		void processMessage(Message* msg);
+
+		/**
+		 * This function is called when receiving a message of type MSG_INT;
+		 * See the #define statements in Message.hpp.
+		 */
+		void processInternalSignal(int32_t obj);
+
 }; // class Server
 	
 } // namespace Damaris

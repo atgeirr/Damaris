@@ -26,105 +26,58 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __DAMARIS_METADATA_H
 #define __DAMARIS_METADATA_H
 
-//#include <boost/interprocess/managed_shared_memory.hpp>
-//#include <boost/multi_index_container.hpp>
-//#include <boost/multi_index/member.hpp>
-//#include <boost/multi_index/ordered_index.hpp>
-//#include <list>
 #include <map>
 #include <vector>
 
-//#include "common/SharedMemorySegment.hpp"
 #include "common/Layout.hpp"
 #include "common/Variable.hpp"
-
-//using namespace boost::interprocess;
-//using boost::multi_index_container;
-//using namespace boost::multi_index;
+#include "common/VariablesSet.hpp"
 
 namespace Damaris {
 
-/* TODO : this is for a later use of Boost::MultiIndex
-	struct name{};
-	struct source{};
-	struct iteration{};
-
-	typedef multi_index_container<
-		Variable,
-		indexed_by<
-			ordered_non_unique<
-				tag<name>,  BOOST_MULTI_INDEX_MEMBER(Variable,std::string,name)>,
-			ordered_non_unique<
-				tag<source>,  BOOST_MULTI_INDEX_MEMBER(Variable,int32_t,source)>,
-			ordered_non_unique<
-				tag<iteration>, BOOST_MULTI_INDEX_MEMBER(Variable,int32_t,iteration)>
-			>
-		> variable_set;
-*/
 	class MetadataManager {
 
 	private:
-		int numberOfEntries;		 /*!< Number of variables defined */
-		std::map<std::string,int> varID; /*!< Association variable name <-> ID */
-		std::map<std::string,Layout> layouts;
-		std::vector<Variable> variables; /*!< vector of variables entries */
+		std::map<std::string,Layout> layouts; /*!< Map associating names with layouts. */
+		VariablesSet variables; /*!< Variables indexed by name and by id. */
 
-//		std::list<Variable> vars; /*!< List of all recorded variables. */
-//		managed_shared_memory* segment; /*!< A pointer to the shared memory segment. */ 
-//		SharedMemorySegment* segment; /*!< A pointer to the shared memory segment. */
 	public:
-		bool addVariableEntry(Variable &v);
+		/**
+		 * Add a new variable entry within the metadata manager.
+		 * An error is printed if a variable is already defined with the same name,
+		 * or if the layout does not exist.
+		 */
+		bool addVariable(std::string varname, std::string layoutName);
+
+		/**
+		 * Retrieve a variable from its name.
+		 */
 		Variable* getVariable(std::string &name);
+
+		/**
+		 * Retrieve a variable by ID.
+		 */
 		Variable* getVariable(int id);
-		bool setLayout(std::string& lname, Layout &l);
+
+		/**
+		 * Adds a layout.
+		 */
+		bool addLayout(std::string& lname, Layout &l);
+
+		/**
+		 * Retrieve a layout by name.
+		 */
 		Layout* getLayout(std::string& lname);
 
-		
 		/**
-		 * \brief Retrieves a variable given its name, iteration and source.
-		 * \param[in] n : name of the variable to retrieve.
-		 * \param[in] it : iteration of the variable to retrieve.
-		 * \param[in] srcID : source id of the variable to retrieve.
-		 * \return A pointer to the first Variable record found, or NULL if none has been found.
-		 *         Do not use delete on this pointer, it is managed by the MetadataManager.
+		 * Constructor.
 		 */
-//		Variable* get(const std::string *n, int32_t it, int32_t srcID);
-		
-		/**
-		 * \brief Puts a new variable record into the MetadataManager.
-		 * \param[in] v : instance of the Variable record to register. A copy of this variable
-		 *                is done, so you can safely delete the original one after calling this function.
-		 * \return 0 in case of success, -1 if there is already a record identified by the same name, iteration and source.
-		 *           In that case, the new Variable is not inserted in the MetadataManager.
-		 */
-//		int put(Variable v);
-	//	void put(std::string *name, int32_t iteration, int32_t sourceID, Layout* l, void* data);
-	//	void remove(std::string* name, int32_t iteration, int32_t sourceID);	
-		
-		/**
-		 * \brief Removes a variable from the MetadataManager (its content is deleted from shared memory).
-		 * \param[in] v : instance of the variable to delete.
-		 */
-//		void remove(Variable v);
-
-		// TODO getVariablesByName(std::string n);
-
-		// TODO getVariablesBySource(int32_t src);
-
-		// TODO getVariablesByIteration(int32_t it);
-		/**
-		 * \brief Constructor.
-		 * Takes a pointer to the shared memory segment that holds the data.
-		 * \param[in] s : pointer to the shared memory segment.
-		 */	
-//		MetadataManager(SharedMemorySegment* s);
-		//MetadataManager(managed_shared_memory* s);
-		MetadataManager();	
-//		std::list<Variable>* getAllVariables();
+		MetadataManager();
 
 		/**
 		 * \brief Destructor.
-		 * Will iterate on each variable recorded and delete them (including freeing the memory).
+		 * \warning The destructor does not free the
+		 * variables or their associated chunks.
 		 */
 		~MetadataManager();
 	};

@@ -19,9 +19,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \date September 2011
  * \author Matthieu Dorier
  * \version 0.3
- *
- * Contains the definition of a shared memory segment in which
- * we can store variables. This definition is abstract.
  */
 #ifndef __DAMARIS_SHMEMSEGMENT_H
 #define __DAMARIS_SHMEMSEGMENT_H
@@ -32,7 +29,12 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/SharedMemory.hpp"
 
 namespace Damaris {
-
+/*
+ * Contains the definition of a shared memory segment in which
+ * we can store variables. This definition is abstract.
+ * Two internal classes are provided to implement SharedMemorySegment
+ * based either on shm_open (posix) or shmget (xsi).
+ */
 class SharedMemorySegment {
 	private:
 		std::string* name;	/*!< Name of the shared memory segment. */
@@ -40,24 +42,69 @@ class SharedMemorySegment {
 		class POSIX_ShMem;
 		class SYSV_ShMem;
 
+		/**
+		 * Constructor.
+		 */
 		SharedMemorySegment();
 	public:
-		
-		static SharedMemorySegment* create(posix_shmem_t shmem, const char* name, int64_t size);
-		static SharedMemorySegment* create(sysv_shmem_t shmem, const char* name, int64_t size);
+	
+		/**
+		 * Creates a shared memory segment based on POSIX functions.
+		 */	
+		static SharedMemorySegment* create(posix_shmem_t shmem, 
+				const char* name, int64_t size);
 
+		/**
+		 * Creates a shared memory segment based on XSI functions.
+		 */
+		static SharedMemorySegment* create(sysv_shmem_t shmem, 
+				const char* name, int64_t size);
+
+		/**
+		 * Opens an existing shared memory segment based on POSIX functions.
+		 */
 		static SharedMemorySegment* open(posix_shmem_t shmem, const char* name);
+
+		/**
+		 * Opens an existing shared memory segment based in XSI functions.
+		 */
 		static SharedMemorySegment* open(sysv_shmem_t shmem, const char* name);
 
+		/**
+		 * Removes an existing shared memory segment based on POSIX.
+		 */
 		static bool remove(posix_shmem_t shmem, const char* name);
+
+		/**
+		 * Removes an existing shared memory segment based on XSI.
+		 */
 		static bool remove(sysv_shmem_t shmem, const char* name);
 
 		typedef void* ptr;
 
+		/**
+		 * Gets an absolute address from a relative handle.
+		 */
 		virtual ptr getAddressFromHandle(handle_t h) = 0;
+
+		/**
+		 * Gets a relative handle from an absolute pointer.
+		 */
 		virtual handle_t getHandleFromAddress(ptr p) = 0;
+
+		/**
+		 * Allocates size bytes inside the shared memory segment.
+		 */
 		virtual ptr allocate(size_t size) = 0;
+
+		/**
+		 * Deallocate an allocated region.
+		 */
 		virtual void deallocate(void* addr) = 0;
+
+		/**
+		 * Gets the amount of free memory left.
+		 */
 		virtual size_t getFreeMemory() = 0;
 };
 

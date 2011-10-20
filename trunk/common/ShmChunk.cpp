@@ -24,7 +24,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Damaris {
 
-ShmChunk::ShmChunk(SharedMemorySegment* s, Types::basic_type_e t, unsigned int d, std::vector<int> &si, std::vector<int> &ei)
+ShmChunk::ShmChunk(SharedMemorySegment* s, Types::basic_type_e t, 
+		unsigned int d, std::vector<int> &si, std::vector<int> &ei)
 : Chunk(t,d,si,ei)
 {
 	segment = s;
