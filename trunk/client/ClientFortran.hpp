@@ -26,6 +26,14 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/FCMangle.h"
 #include "client/Client.hpp"
 
+#ifndef FC_FUNC_GLOBAL
+#define FC_FUNC_GLOBAL(name,NAME) name##_
+#endif
+
+#ifndef FC_FUNC_GLOBAL_
+#define FC_FUNC_GLOBAL_(name,NAME) name##_
+#endif
+
 extern "C" {
 /**
  * \fn df_initialize(config_file_name, core_id, ierr)

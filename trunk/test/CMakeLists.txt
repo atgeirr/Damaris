@@ -18,6 +18,6 @@ target_link_libraries (test_cpp_alloc ${CLIENT_SIDE_LIBRARIES} rt dl)
 add_executable (test_c ${DAMARIS_SOURCE_DIR}/test/test.c)
 target_link_libraries (test_c ${CLIENT_SIDE_LIBRARIES} rt dl)
 
-add_executable (test_mpi ${DAMARIS_SOURCE_DIR}/test/test_mpi.c)
-target_link_libraries (test_mpi ${EMB_SERVER_LIBRARIES} rt dl)
+#add_executable (test_mpi ${DAMARIS_SOURCE_DIR}/test/test_mpi.c)
+#target_link_libraries (test_mpi ${EMB_SERVER_LIBRARIES} rt dl)
 
