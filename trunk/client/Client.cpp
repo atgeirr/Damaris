@@ -16,7 +16,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Client.cpp
- * \date September 2011
+ * \date October 2011
  * \author Matthieu Dorier
  * \version 0.3
  * \see Client.hpp
@@ -25,6 +25,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 #include <stdlib.h>
 #include <iostream>
+#include <exception>
 
 #include "common/Debug.hpp"
 #include "common/ChunkHandle.hpp"
@@ -34,13 +35,13 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Damaris {
 	
-	Client::Client(std::string* configfile, int32_t coreID)
+	Client::Client(std::string configfile, int32_t coreID)
 	{
 		/* creates the configuration object from the configuration file */
 		std::auto_ptr<Model::simulation_mdl> 
-			mdl(Model::simulation(configfile->c_str(),xml_schema::flags::dont_validate));
+			mdl(Model::simulation(configfile.c_str(),xml_schema::flags::dont_validate));
 
-		Configuration::initialize(mdl,configfile);
+		Configuration::initialize(mdl,&configfile);
 		config = Configuration::getInstance();
 
 		Environment::initialize(mdl,coreID);
@@ -63,7 +64,7 @@ namespace Damaris {
 					config->getSegmentName()->c_str());
 #endif
 			DBG("Client initialized successfully for core " << id 
-			    << " with configuration \"" << *configfile << "\"");
+			    << " with configuration \"" << configfile << "\"");
 		}
 		catch(interprocess_exception &ex) {
 			ERROR("While initializing shared memory objects:  " << ex.what());
@@ -74,62 +75,70 @@ namespace Damaris {
 		actionsManager = config->getActionsManager();
 	}
 	
-	void* Client::alloc(std::string* varname, int32_t iteration)
+	void* Client::alloc(std::string varname, int32_t iteration)
 	{
 
-		/* check that the variable is know in the configuration */
-		std::string name(*varname);
-		Variable* variable = metadataManager->getVariable(name);
+		/* check that the variable is known in the configuration */
+		Variable* variable = metadataManager->getVariable(varname);
 
         	if(variable == NULL) {
-			ERROR("Variable \""<< varname->c_str() 
+			ERROR("Variable \""<< varname 
 				<< "\" not defined in configuration");
 			return NULL;
         	}
 
+		/* the variable is known, get its layout */
 		Layout* layout = variable->getLayout();
 
+		/* prepare variable to initialize a chunk */
 		std::vector<int> si(layout->getDimensions()),ei(layout->getDimensions());
 		for(unsigned int i=0; i < layout->getDimensions(); i++)	{
 			ei[i] = layout->getExtentAlongDimension(i)-1;
 			si[i] = 0;
 		}
 
+		/* try initializing the chunk in shared memory */
 		try {
 			ShmChunk* chunk = 
-				new ShmChunk(segment,layout->getType(),layout->getDimensions(),si,ei);
+				new ShmChunk(segment,layout->getType(),
+						layout->getDimensions(),si,ei);
 			chunk->setSource(id);
 			chunk->setIteration(iteration);
 			variable->attachChunk(chunk);
+			/* chunk initialized, returns the data! */
 			return chunk->data();
 
 		} catch (...) {
-			ERROR("While allocating \"" << varname->c_str() 
+			ERROR("While allocating \"" << varname 
 				<< "\", allocation failed");
 		}
-
+		/* on failure, returns NULL */
 		return NULL;
 	}
 	
-	int Client::commit(std::string* varname, int32_t iteration)
+	int Client::commit(std::string varname, int32_t iteration)
 	{		
-		Variable* v = metadataManager->getVariable(*varname);
+		Variable* v = metadataManager->getVariable(varname);
 		if(v == NULL)
 			return -1;
 
 		ShmChunk* chunk = NULL;
-		// get the pointer to the allocated chunk and delete it from the
-		// variable container.
-		// TODO gets only the Chunk which iteration is the right one.
-		if(v->getAllChunks().empty())
-			return -2;
+		// get the pointer to the allocated chunk
+		ChunkIndexByIteration::iterator end;
+		ChunkIndexByIteration::iterator it = v->getChunksByIteration(iteration,end);
 
+		if(it == end)
+			return -2;
 		try {
-			chunk = dynamic_cast<ShmChunk*>(v->getAllChunks().back());
-		} catch(exception &e) {
+			chunk = dynamic_cast<ShmChunk*>(it->get());
+		} catch(std::exception &e) {
 			ERROR("When doing dynamic cast: " << e.what());
-			v->getAllChunks().pop_back();
+			return -3;
 		}
+		
+		// we don't need to keep the chunk in the client now,
+		// so we erase it from the variable.
+		v->eraseChunk(it);
 
 		// create notification message
 		Message message;
@@ -142,21 +151,18 @@ namespace Damaris {
                 // send message
 		msgQueue->send(&message,sizeof(Message),0);
                 // free message
-		DBG("Variable \"" << varname->c_str() << "\" has been commited");
-		// delete the chunk
-		delete chunk;
+		DBG("Variable \"" << varname << "\" has been commited");
 
 		return 0;
 	}
 	
-	int Client::write(std::string* varname, int32_t iteration, const void* data)
+	int Client::write(std::string varname, int32_t iteration, const void* data)
 	{
 		/* check that the variable is know in the configuration */
-		std::string name(*varname);
-		Variable* variable = metadataManager->getVariable(name);
+		Variable* variable = metadataManager->getVariable(varname);
 
         	if(variable == NULL) {
-			ERROR("Variable \""<< varname->c_str() 
+			ERROR("Variable \""<< varname 
 				<< "\" not defined in configuration");
 			return -1;
         	}
@@ -176,7 +182,7 @@ namespace Damaris {
                         chunk->setSource(id);
                         chunk->setIteration(iteration);
                 } catch (...) {
-                        ERROR("While writing \"" << varname->c_str() << "\", allocation failed");
+                        ERROR("While writing \"" << varname << "\", allocation failed");
                 	return -2;
 		}
 
@@ -195,20 +201,19 @@ namespace Damaris {
 		
 		// send message
 		msgQueue->send(&message,sizeof(Message),0);
-		DBG("Variable \"" << varname->c_str() << "\" has been written");
+		DBG("Variable \"" << varname << "\" has been written");
 	
 		delete chunk;
 		return size;
 	}
 
-	int Client::write(std::string* varname, int32_t iteration, int64_t chunkh, const void* data)
+	int Client::chunk_write(int64_t chunkh, std::string varname, int32_t iteration, const void* data)
 	{
 		/* check that the variable is know in the configuration */
-		std::string name(*varname);
-		Variable* variable = metadataManager->getVariable(name);
+		Variable* variable = metadataManager->getVariable(varname);
 
         	if(variable == NULL) {
-			ERROR("Variable \""<< varname->c_str() << "\" not defined in configuration");
+			ERROR("Variable \""<< varname << "\" not defined in configuration");
 			return -1;
         	}
 
@@ -237,7 +242,7 @@ namespace Damaris {
                         chunk->setSource(id);
                         chunk->setIteration(iteration);
                 } catch (...) {
-                        ERROR("While writing \"" << varname->c_str() << "\", allocation failed");
+                        ERROR("While writing \"" << varname << "\", allocation failed");
                 	return -2;
 		}
 
@@ -256,7 +261,7 @@ namespace Damaris {
 		
 		// send message
 		msgQueue->send(&message,sizeof(Message),0);
-		DBG("Variable \"" << varname->c_str() << "\" has been written");
+		DBG("Variable \"" << varname << "\" has been written");
 	
 		// free message	
 		delete chunk;
@@ -264,37 +269,31 @@ namespace Damaris {
 		return size;
 	}
 
-	int Client::signal(std::string* signal_name, int32_t iteration)
+	int Client::signal(std::string signal_name, int32_t iteration)
 	{
+		Action* action = actionsManager->getAction(signal_name);
+		if(action == NULL) return -2;
+
 		Message sig;
 		sig.source = id;
 		sig.iteration = iteration;
 		sig.type = MSG_SIG;
 		sig.handle = 0;
-		sig.object = 0; // TODO : put the Id of the action
+		sig.object = action->getID();
 		
 		try {
 			msgQueue->send(&sig,sizeof(Message),0);
 			return 0;
 		} catch(interprocess_exception &e) {
-			ERROR("Error while sending event \"" << *signal_name << "\", " << e.what());
+			ERROR("Error while sending event \"" << signal_name << "\", " << e.what());
 			return -1;
 		}
 	}
 
-	int Client::getParameter(std::string* paramName, void* buffer)
+	int Client::getParameter(std::string paramName, void* buffer)
 	{
-		/*
-		Types::basic_type_e t;
-		if(config->getParameterType(paramName->c_str(),&t)) 
-		{
-			config->getParameterValue(paramName->c_str(),buffer);
-			return 0;
-		} else {
-			ERROR("Parameter \""<< paramName->c_str() <<"\"not found in the configuration");
-			return -1;
-		}*/
-		// TODO THIS FUNCTION HAS TO BE RE-IMPLEMENTED
+//		config->getParameterSet()
+		// TODO
 		return -1;
 	}
 		
@@ -313,6 +312,19 @@ namespace Damaris {
 			WARN("Trying to send kill signal multiple times to the server");
 			return -1;
 		}
+	}
+
+	int64_t Client::chunk_set(std::string type, unsigned int dimensions,
+			std::vector<int> & startIndices, std::vector<int> & endIndices)
+	{
+		Types::basic_type_e t = Types::getTypeFromString(&type);
+		ChunkHandle *c = new ChunkHandle(t,dimensions,startIndices,endIndices);
+		return (int64_t)c;
+	}
+
+	void Client::chunk_free(int64_t chunkh) 
+	{
+		if(chunkh != 0) delete (ChunkHandle*)chunkh;
 	}
 	
 	Client::~Client() 

@@ -49,7 +49,7 @@ void ActionsManager::addDynamicAction(std::string* eventName,
 {
 
 	// check if there is already an action with the same name recorded
-	ActionsSet::index<by_name>::type::iterator it = actions.get<by_name>().find(*eventName);
+	ActionSet::index<by_name>::type::iterator it = actions.get<by_name>().find(*eventName);
 	if(it != actions.get<by_name>().end()) {
 		WARN("Inserting an action with a name identical to a previously defined action");
 		return;
@@ -66,9 +66,10 @@ void ActionsManager::addDynamicAction(std::string* eventName,
 	actions.insert(boost::shared_ptr<Action>((Action*)a));
 }
 
-void ActionsManager::reactToUserSignal(std::string *sig, int32_t iteration, int32_t sourceID, MetadataManager* mm)
+void ActionsManager::reactToUserSignal(std::string *sig, 
+		int32_t iteration, int32_t sourceID, MetadataManager* mm)
 {
-	ActionsSet::index<by_name>::type::iterator it = actions.get<by_name>().find(*sig);
+	ActionSet::index<by_name>::type::iterator it = actions.get<by_name>().find(*sig);
 	if(it != actions.get<by_name>().end())
 	{
 		(*(it->get()))(iteration,sourceID,mm);
@@ -77,15 +78,37 @@ void ActionsManager::reactToUserSignal(std::string *sig, int32_t iteration, int3
 	}	
 }
 
-void ActionsManager::reactToUserSignal(int sigID, int32_t iteration, int32_t sourceID, MetadataManager* mm)
+void ActionsManager::reactToUserSignal(int sigID, 
+		int32_t iteration, int32_t sourceID, MetadataManager* mm)
 {
-	ActionsSet::index<by_id>::type::iterator it = actions.get<by_id>().find(sigID);
+	ActionSet::index<by_id>::type::iterator it = actions.get<by_id>().find(sigID);
 	if(it != actions.get<by_id>().end())
 	{
 		(*(it->get()))(iteration,sourceID,mm);
 	} else {
-		ERROR("Unknown action ID " << sigID <<", may come from contract inconsistency between clients and servers");
+		ERROR("Unknown action ID " << sigID 
+			<<", may come from contract inconsistency between clients and servers");
 	}
+}
+
+Action* ActionsManager::getAction(std::string name)
+{
+	ActionSet::index<by_name>::type::iterator it =
+		actions.get<by_name>().find(name);
+	if(it == actions.get<by_name>().end()) {
+		return NULL;
+	}
+	return it->get();
+}
+
+Action* ActionsManager::getAction(int id)
+{
+        ActionSet::index<by_id>::type::iterator it =
+                actions.get<by_id>().find(id);
+        if(it == actions.get<by_id>().end()) {
+                return NULL;
+        }
+        return it->get();
 }
 
 }

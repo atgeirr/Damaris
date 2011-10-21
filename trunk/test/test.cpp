@@ -14,7 +14,7 @@ int main(int argc, char** argv)
 
 	std::string config(argv[1]);
 
-	Damaris::Client* client = new Damaris::Client(&config,id);
+	Damaris::Client* client = new Damaris::Client(config,id);
 
 	int i,j,k;
 	for(i = 0; i < 64; i++) {
@@ -28,8 +28,8 @@ int main(int argc, char** argv)
 	std::string varname("my variable");
 	std::string event("my event");
 
-	client->write(&varname,0,mydata);
-	client->signal(&event,0);
+	client->write(varname,0,mydata);
+	client->signal(event,0);
 
 	delete client;
 	return 0;

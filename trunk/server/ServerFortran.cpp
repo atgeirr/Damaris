@@ -46,7 +46,7 @@ void FC_FUNC_GLOBAL(df_server,DF_SERVER)
 	(char* configFile_f, int32_t* server_id_f, int32_t* ierr_f, int32_t configFile_size)
 	{
 		std::string config_str(configFile_f,configFile_size);
-		server = new Damaris::Server(&config_str,*server_id_f);
+		server = new Damaris::Server(config_str,*server_id_f);
 		*ierr_f = server->run();
 	}
 }

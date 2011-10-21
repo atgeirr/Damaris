@@ -16,7 +16,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Options.hpp
- * \date July 2011
+ * \date October 2011
  * \author Matthieu Dorier
  * \version 0.1
  * 
@@ -43,7 +43,8 @@ class Options {
 	private:
 		std::string* configFile; /*!< Name of the configuration file. */
 		Environment* env; /*!< Pointer to the Environment object that will be filled. */
-		Configuration* config; /*!< Pointer to the Configuration that will be initialized. */
+		Configuration* config; /*!< Pointer to the Configuration 
+					 that will be initialized. */
 	public:
 		/**
 		 * The constructor takes the same parameters than a usual program. 

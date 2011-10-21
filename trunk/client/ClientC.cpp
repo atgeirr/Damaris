@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file ClientC.cpp
- * \date July 2011
+ * \date October 2011
  * \author Matthieu Dorier
- * \version 0.1
+ * \version 0.3
  * \see Client.hpp Client.h
  * Definition of the function used in the C binding.
  */
@@ -33,38 +33,57 @@ Damaris::Client *client;
 int DC_initialize(const char* configfile, int32_t core_id)
 {
 	std::string config_str(configfile);
-	client = new Damaris::Client(&config_str,core_id);
+	client = new Damaris::Client(config_str,core_id);
 	return 0;
 }
 	
 int DC_write(const char* varname, int32_t iteration, const void* data)
 {
 	std::string varname_str(varname);
-	return client->write(&varname_str,iteration,data);
+	return client->write(varname_str,iteration,data);
+}
+
+int DC_chunk_write(int64_t chunkh, const char* varname, int32_t iteration, const void* data)
+{
+	std::string varname_str(varname);
+	return client->chunk_write(chunkh,varname_str,iteration,data);
+}
+
+int64_t DC_chunk_set(const char* type, unsigned int dimensions, int* si, int* ei)
+{
+	std::string type_str(type);
+	std::vector<int> sti(si,si+dimensions);
+	std::vector<int> eni(ei,ei+dimensions);
+	return client->chunk_set(type_str,dimensions,sti,eni);
+}
+
+void DC_chunk_free(int64_t chunkh)
+{
+	client->chunk_free(chunkh);
 }
 
 void* DC_alloc(const char* varname, int32_t iteration)
 {
 	std::string varname_str(varname);
-	return client->alloc(&varname_str,iteration);
+	return client->alloc(varname_str,iteration);
 }
 
 int DC_commit(const char* varname, int32_t iteration)
 {
 	std::string varname_str(varname);
-	return client->commit(&varname_str,iteration);
+	return client->commit(varname_str,iteration);
 }
 
 int DC_signal(const char* signal_name, int32_t iteration)
 {
 	std::string signal_name_str(signal_name);
-	return client->signal(&signal_name_str,iteration);
+	return client->signal(signal_name_str,iteration);
 }
 
 int DC_get_parameter(const char* param_name, void* buffer)
 {
 	std::string paramName(param_name);
-	return client->getParameter(&paramName,buffer);
+	return client->getParameter(paramName,buffer);
 }
 
 int DC_kill_server()

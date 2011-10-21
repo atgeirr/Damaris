@@ -47,21 +47,28 @@ namespace Damaris {
 	class Configuration {
 				
 	private:
-		static Configuration* m_instance; /*!< Pointer to a unique Configuration object (singleton). */
+		static Configuration* m_instance; /*!< Pointer to a unique Configuration 
+						    object (singleton). */
 
-		std::auto_ptr<Model::simulation_mdl> baseModel; /*!< Model extracted from the XML file */
-		std::string* configFile; /*!< For information, we keep the name of the configuration file. */
+		std::auto_ptr<Model::simulation_mdl> baseModel; /*!< Model extracted from 
+								  the XML file */
+		std::string* configFile; /*!< For information, we keep the name of the 
+					   configuration file. */
 		
 		ParameterSet parameters; 		/*!< List of parameters. */
 		ActionsManager* actionsManager;		/*!< Pointer to the ActionsManager. */
 		MetadataManager* metadataManager; 	/*!< Pointer to the MetadataManager. */
 		
-		Calc<std::string::const_iterator,ParameterSet>* layoutInterp; /*!< Parser for layout interpretation. */
+		Calc<std::string::const_iterator,ParameterSet>* layoutInterp; /*!< Parser for 
+										layout interpretation. */
 		
-		void fillParameterSet(); 	/*!< Fills the set of parameters from the base model. */
-		void fillMetadataManager(); 	/*!< Fills the metadata manager with variables from the base model. */
+		void fillParameterSet(); 	/*!< Fills the set of parameters 
+						  from the base model. */
+		void fillMetadataManager(); 	/*!< Fills the metadata manager 
+						  with variables from the base model. */
 		void readVariablesInSubGroup(const Model::group_mdl* g, std::string name); 
-		void fillActionsManager(); 	/*!< Fills the ActionsManager with Actions from the base model. */
+		void fillActionsManager(); 	/*!< Fills the ActionsManager with 
+						  Actions from the base model. */
 
 	protected:
 		
@@ -80,7 +87,8 @@ namespace Damaris {
 	public:
 		/**
 		 * \brief Retrieve an instance of Configuration (singleton design pattern).
-		 * \return NULL if Configuration::initialize has never been called before, a valid pointer otherwise.
+		 * \return NULL if Configuration::initialize has never been called before, 
+		 * a valid pointer otherwise.
 		 */
 		static Configuration* getInstance();
 
@@ -89,7 +97,8 @@ namespace Damaris {
 		 * \param[in] mdl : simulation base model.
 		 * \param[in] configName : name of the configuration file to load.
 		 */
-		static void initialize(std::auto_ptr<Model::simulation_mdl> mdl, std::string* configName);
+		static void initialize(std::auto_ptr<Model::simulation_mdl> mdl, 
+				std::string* configName);
 		
 		/**
 		 * \brief Finalize (free resources) Configuration.

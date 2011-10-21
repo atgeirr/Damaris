@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Options.cpp
- * \date July 2011
+ * \date October 2011
  * \author Matthieu Dorier
- * \version 0.1
+ * \version 0.3
  */
 #include <iostream>
 #include <list>
@@ -57,8 +57,6 @@ Options::Options(int argc, char** argv)
 		("daemon,D","starts the server as a daemon process")
 		("stdout",po::value<std::string>(),"redirects stdout to a given file")
 		("stderr",po::value<std::string>(),"redirects stderr to a given file")
-		//("basename,B",po::value<std::string>(),"base name for output files")
-		//("extension,E",po::value<std::string>(),"extension for output files")
 	;
 	
 	po::variables_map vm;
@@ -104,15 +102,19 @@ Options::Options(int argc, char** argv)
 	configFile = NULL;	
 	if (vm.count("configuration")) {
 		configFile = new std::string(vm["configuration"].as<std::string>());
-		std::auto_ptr<Model::simulation_mdl> mdl(Model::simulation(configFile->c_str(),xml_schema::flags::dont_validate));
-		//Model::simulation_mdl* mdl = new simulation_mdl(configFile->c_str(),xml_schema::flags::dont_validate);
+
+		std::auto_ptr<Model::simulation_mdl> 
+			mdl(Model::simulation(configFile->c_str(),
+				xml_schema::flags::dont_validate));
+
 		Configuration::initialize(mdl,configFile);
 		config = Configuration::getInstance();
 
 		Environment::initialize(mdl,id);
 		env = Environment::getInstance();
 	} else {
-		ERROR("No configuration file provided, use --configuration=<file.xml> or -C <file.xml>");
+		ERROR("No configuration file provided," 
+			<< " use --configuration=<file.xml> or -C <file.xml>");
 		exit(-1);
 	}
 }

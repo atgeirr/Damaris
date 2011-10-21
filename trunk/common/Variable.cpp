@@ -46,11 +46,33 @@ bool Variable::operator==(const Variable &another)
 
 void Variable::attachChunk(Chunk* chunk)
 {
-	chunks.push_back(chunk);
+	chunks.insert(boost::shared_ptr<Chunk>(chunk));
 }
 
-std::list<Chunk*>& Variable::getAllChunks()
+ChunkIndexBySource::iterator Variable::getChunksBySource(int source, 
+		ChunkIndexBySource::iterator &end)
 {
-	return chunks;
+	ChunkIndexBySource::iterator it = chunks.get<by_source>().find(source);
+	end = chunks.get<by_source>().end();
+	return it;
 }
+
+ChunkIndexByIteration::iterator Variable::getChunksByIteration(int iteration,
+		ChunkIndexByIteration::iterator &end) 
+{
+        ChunkIndexByIteration::iterator it = chunks.get<by_iteration>().find(iteration);
+        end = chunks.get<by_iteration>().end();
+        return it;
+}
+
+void Variable::eraseChunk(ChunkIndexByIteration::iterator &it)
+{
+        chunks.get<by_iteration>().erase(it);
+}
+
+void Variable::eraseChunk(ChunkIndexBySource::iterator &it)
+{
+	chunks.get<by_source>().erase(it);
+}
+
 }

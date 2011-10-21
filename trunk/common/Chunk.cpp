@@ -58,24 +58,14 @@ Chunk::~Chunk()
 
 }
 
-int Chunk::getSource()
+int Chunk::getSource() const
 {
 	return source;
 }
 
-void Chunk::setSource(int s)
-{
-	source = s;
-}
-
-int Chunk::getIteration()
+int Chunk::getIteration() const
 {
 	return iteration;
-}
-
-void Chunk::setIteration(int i)
-{
-	iteration = i;
 }
 
 unsigned int Chunk::getDimensions()

@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file ClientFortran.hpp
- * \date July 2011
+ * \date October 2011
  * \author Matthieu Dorier
- * \version 0.1
+ * \version 0.3
  * \see Client.hpp
  * Definition of the Fortran functions.
  */
@@ -41,9 +41,10 @@ extern "C" {
  * \see Damaris::Client::Client
  * \param[in] config_file_name : name of the XML configuration file (character*).
  * \param[in] core_id : identifier for the client (should be unique).
- * \param[out] ierr : returned error (0 in case of success, forces the program to stop in case of failure).
+ * \param[out] ierr : returned error 
+ *	(0 in case of success, forces the program to stop in case of failure).
  */
-void FC_FUNC_GLOBAL(df_initialize,DF_INITIALIZE)
+void FC_FUNC_GLOBAL_(df_initialize,DF_INITIALIZE)
 	(char* config_file_name_f, int32_t* core_id_f, int32_t* ierr_f, int config_file_name_size);
 
 /** 
@@ -58,8 +59,19 @@ void FC_FUNC_GLOBAL(df_initialize,DF_INITIALIZE)
  *         -2 if the layout has a bad size (0 or < 0),
  *         -3 if it fails to allocate shared memory to write.
  */	
-void FC_FUNC_GLOBAL(df_write,DF_WRITE)
+void FC_FUNC_GLOBAL_(df_write,DF_WRITE)
 	(char* var_name_f, int32_t* iteration_f, void* data_f, int32_t* ierr_f, int var_name_size);
+
+void FC_FUNC_GLOBAL_(df_chunk_set,DF_CHUNK_SET)
+	(char* type_f, unsigned int* dimensions, int* si, int* ei, int64_t* chunkh,
+	 int type_size);
+
+void FC_FUNC_GLOBAL_(df_chunk_write,DF_CHUNK_WRITE)
+	(int64_t* chunkh, char* varname_f, int32_t* iteration_f, void* data_f, int32_t* ierr_f,
+	 int var_name_size);
+
+void FC_FUNC_GLOBAL_(df_chunk_free,DF_CHUNK_FREE)
+	(int64_t* chunkh);
 
 /** 
  * \fn df_alloc(var_name, iteration, ierr)

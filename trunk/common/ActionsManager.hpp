@@ -28,7 +28,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/MetadataManager.hpp"
 #include "common/Action.hpp"
 #include "common/DynamicAction.hpp"
-#include "common/ActionsSet.hpp"
+#include "common/ActionSet.hpp"
 
 namespace Damaris {
 
@@ -41,7 +41,7 @@ namespace Damaris {
 class ActionsManager {
 
 	private:
-		ActionsSet actions; /*!< Set of actions indexed by ID and name. */
+		ActionSet actions; /*!< Set of actions indexed by ID and name. */
 				
 	public:
 		/**
@@ -60,7 +60,8 @@ class ActionsManager {
 		 * have an instance of ActionsManager that just acts as a set of actions from which
 		 * they can retrieve action's IDs.
 		 */
-		void addDynamicAction(std::string* eventName, std::string* fileName, std::string* functionName);
+		void addDynamicAction(std::string* eventName, 
+				std::string* fileName, std::string* functionName);
 
 		/**
 		 * \brief Call a function, in reaction to a fired event.
@@ -70,7 +71,8 @@ class ActionsManager {
 		 * \param[in,out] mm : Pointer to the MetadataManager.
 		 * The action to be called is here characterized by its name.
 		 */
-		void reactToUserSignal(std::string* sig, int32_t iteration, int32_t sourceID, MetadataManager* mm);
+		void reactToUserSignal(std::string* sig, 
+				int32_t iteration, int32_t sourceID, MetadataManager* mm);
 
 		/**
 		 * \brief Call a function, in reaction to a fired event.
@@ -80,7 +82,20 @@ class ActionsManager {
 		 * \param[in,out] mm : pointer to the MetadataManager.
 		 * The action to be called is here characterized by its ID.
 		 */
-		void reactToUserSignal(int sigID, int32_t iteration, int32_t sourceID, MetadataManager* mm);
+		void reactToUserSignal(int sigID, 
+				int32_t iteration, int32_t sourceID, MetadataManager* mm);
+
+		/**
+		 * \brief Gets an action by name.
+		 * \param[in] name : name of the action.
+		 */ 
+		Action* getAction(std::string name);
+
+		/**
+		 * \brief Gets an action by ID.
+		 * \param[in] id : id of the action.
+		 */
+		Action* getAction(int id);
 };
 
 }

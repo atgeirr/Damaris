@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Client.h
- * \date July 2011
+ * \date October 2011
  * \author Matthieu Dorier
- * \version 0.1
+ * \version 0.3
  * Main header to include in a C client.
  */
 #ifndef __DAMARIS_CLIENT_C_H
@@ -48,12 +48,33 @@ int 	DC_initialize(const char* configfile, int32_t core_id);
 int 	DC_write(const char* varname, int32_t iteration, const void* data);
 
 /**
- * \brief THIS FUNCTION IS NOT SUPPORTED YET.
+ * \brief Writes a chunk of a variable.
+ * \see Damaris::Client::chunk_write
+ */
+int 	DC_chunk_write(int64_t chunkh, const char* varname, int32_t iteration, const void* data);
+
+/**
+ * \brief Defines a chunk.
+ * \see Damaris::Client::chunk_set
+ */
+int64_t DC_chunk_set(const char* type, unsigned int dimensions, int* si, int* ei);
+
+/**
+ * \brief Free a chunk handle.
+ * \see Damaris::Client::chunk_free
+ */
+void 	DC_chunk_free(int64_t chunkh);
+
+/**
+ * \brief Allocates the data required for a variable to be entirely written in memory.
+ * \return a pointer to the allocated region in case of success, NULL in case of failure.
+ * \see Damaris::Client::alloc
  */
 void* 	DC_alloc(const char* varname, int32_t iteration);
 
 /**
- * \brief THIS FUNCTION IS NOT SUPPORTED YET.
+ * \brief Commits an allocated variable.
+ * \see Damaris::Client::commit
  */
 int 	DC_commit(const char* varname, int32_t iteration);
 

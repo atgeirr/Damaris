@@ -37,7 +37,7 @@ extern "C" {
 	int DC_server(const char* configFile, int server_id)
 	{
 		std::string config_str(configFile);
-		server = new Damaris::Server(&config_str,server_id);
+		server = new Damaris::Server(config_str,server_id);
 		return server->run();
 	}
 }

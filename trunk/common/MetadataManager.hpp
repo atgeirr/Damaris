@@ -31,7 +31,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "common/Layout.hpp"
 #include "common/Variable.hpp"
-#include "common/VariablesSet.hpp"
+#include "common/VariableSet.hpp"
 
 namespace Damaris {
 
@@ -39,7 +39,7 @@ namespace Damaris {
 
 	private:
 		std::map<std::string,Layout> layouts; /*!< Map associating names with layouts. */
-		VariablesSet variables; /*!< Variables indexed by name and by id. */
+		VariableSet variables; /*!< Variables indexed by name and by id. */
 
 	public:
 		/**

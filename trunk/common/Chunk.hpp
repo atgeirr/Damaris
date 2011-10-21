@@ -79,22 +79,12 @@ class Chunk : public Serializable {
 		/**
 		 * \brief Gets the ID of the process that has written the chunk.
 		 */
-		int getSource();
+		int getSource() const;
 	
-		/**
-		 * \brief Sets the ID of the process that has written the chunk.
-		 */
-		void setSource(int s);
-		
 		/**
 		 * \brief Gets the iteration at which the chunk has been written.
 		 */
-		int getIteration();
-	
-		/**
-		 * \brief Sets the iteration at which the chunk has been written.
-		 */
-		void setIteration(int i);
+		int getIteration() const;
 
 		/**
 		 * \brief Gets the number of dimensions.

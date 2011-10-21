@@ -31,7 +31,7 @@ MetadataManager::MetadataManager()
 
 bool MetadataManager::addVariable(std::string varname, std::string layoutname)
 {
-	VariablesSet::index<by_name>::type::iterator it = 
+	VariableSet::index<by_name>::type::iterator it = 
 		variables.get<by_name>().find(varname);
 	
 	if(it != variables.get<by_name>().end()) {
@@ -57,7 +57,7 @@ bool MetadataManager::addVariable(std::string varname, std::string layoutname)
 
 Variable* MetadataManager::getVariable(std::string &name)
 {
-	VariablesSet::index<by_name>::type::iterator it = 
+	VariableSet::index<by_name>::type::iterator it = 
 		variables.get<by_name>().find(name);
 	if(it == variables.get<by_name>().end()) {
 		return NULL;
@@ -67,7 +67,7 @@ Variable* MetadataManager::getVariable(std::string &name)
 
 Variable* MetadataManager::getVariable(int id)
 {
-	VariablesSet::index<by_id>::type::iterator it =
+	VariableSet::index<by_id>::type::iterator it =
 		variables.get<by_id>().find(id);
 	if(it == variables.get<by_id>().end()) {
 		return NULL;

@@ -31,6 +31,8 @@ namespace Damaris {
 	 */
 	struct by_name {};
 	struct by_id {};
+	struct by_source {};
+	struct by_iteration {};
 }
 
 #endif

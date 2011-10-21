@@ -15,13 +15,13 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file ActionsSet.hpp
+ * \file ChunksSet.hpp
  * \date October 2011
  * \author Matthieu Dorier
  * \version 0.3
  */
-#ifndef __DAMARIS_ACTIONS_SET_H
-#define __DAMARIS_ACTIONS_SET_H
+#ifndef __DAMARIS_CHUNKS_SET_H
+#define __DAMARIS_CHUNKS_SET_H
 
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/member.hpp>
@@ -30,22 +30,25 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/shared_ptr.hpp>
 
 #include "Tags.hpp"
-#include "Action.hpp"
+#include "Chunk.hpp"
 
 namespace Damaris {
 /**
- * ActionsSet is a container based on Boost Multi-Index, it indexes Actions by
- * ID and by names (each ID appears only one, each name appears only once).
+ * ChunksSet is a container based on Boost Multi-Index, it indexes Chunks by
+ * source and by iteration.
  */
 typedef boost::multi_index_container<
-        boost::shared_ptr<Action>,
+        boost::shared_ptr<Chunk>,
         boost::multi_index::indexed_by<
-                boost::multi_index::ordered_unique<boost::multi_index::tag<by_id>,
-                        boost::multi_index::const_mem_fun<Action,int,&Action::getID> >,
-                boost::multi_index::ordered_unique<boost::multi_index::tag<by_name>,
-                        boost::multi_index::const_mem_fun<Action,std::string,&Action::getName> >
+                boost::multi_index::ordered_non_unique<boost::multi_index::tag<by_source>,
+                        boost::multi_index::const_mem_fun<Chunk,int,&Chunk::getSource> >,
+                boost::multi_index::ordered_non_unique<boost::multi_index::tag<by_iteration>,
+                        boost::multi_index::const_mem_fun<Chunk,int,&Chunk::getIteration> >
         >
-> ActionsSet;
+> ChunkSet;
+
+typedef ChunkSet::index<by_source>::type ChunkIndexBySource;
+typedef ChunkSet::index<by_iteration>::type ChunkIndexByIteration;
 
 }
 

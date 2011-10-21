@@ -26,7 +26,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdint.h>
 #include <list>
 #include <string>
-#include "common/Chunk.hpp"
+#include "common/ChunkSet.hpp"
 #include "common/Layout.hpp"
 
 namespace Damaris {
@@ -48,7 +48,7 @@ class Variable {
 		Layout* layout;		/*!< Layout of the data. */
 		int id;			/*!< The ID is used to avoid 
 					  passing variable's name in shared-memory. */
-		std::list<Chunk*> chunks; /*!< Chunks hold by the variable. */
+		ChunkSet chunks; 	/*!< Chunks hold by the variable. */
 
 		/**
 		 * \brief Constructor. 
@@ -97,9 +97,23 @@ class Variable {
 		bool operator==(const Variable &another);
 
 		/**
-		 * Returns the list of chunks.
+		 * Returns the list of chunks with a specified source.
 		 */
-		std::list<Chunk*>& getAllChunks();
+		ChunkIndexBySource::iterator getChunksBySource(int source, 
+				ChunkIndexBySource::iterator &end);
+
+		/**
+		 * Returns the list of chunks with a specified iteration.
+		 */
+		ChunkIndexByIteration::iterator getChunksByIteration(int iteration, 
+				ChunkIndexByIteration::iterator &end);
+
+		/**
+		 * Delete a chunk from the variable (will not free the memory
+		 * associated to the chunk).
+		 */
+		void eraseChunk(ChunkIndexBySource::iterator &it);
+		void eraseChunk(ChunkIndexByIteration::iterator &it);
 };
 
 }

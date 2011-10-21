@@ -33,8 +33,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/ActionsManager.hpp"
 #include "common/MetadataManager.hpp"
 
-//using namespace boost::interprocess;
-
 namespace Damaris {
 	
 class Server {
@@ -46,7 +44,7 @@ class Server {
 		 * \param[in] configFile : name of the configuration file.
 		 * \param[in] id : identifier for this server.
 		 */
-		Server(std::string *configFile, int id);
+		Server(std::string configFile, int id);
 
 		/**
 		 * \brief Constructor. 

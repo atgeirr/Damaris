@@ -32,19 +32,17 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/Layout.hpp"
 #include "common/SharedMemory.hpp"
 
-//using namespace boost::interprocess;
-
 Damaris::Server *server;
 
 namespace Damaris {
 
 	/* constructor for embedded mode */
-	Server::Server(std::string* cf, int id)
+	Server::Server(std::string cf, int id)
 	{
 		std::auto_ptr<Model::simulation_mdl> 
-			mdl(Model::simulation(cf->c_str(),xml_schema::flags::dont_validate));
+			mdl(Model::simulation(cf.c_str(),xml_schema::flags::dont_validate));
 
-		Configuration::initialize(mdl,cf);
+		Configuration::initialize(mdl,&cf);
 		Environment::initialize(mdl,id);
 
 		config = Configuration::getInstance();
@@ -147,7 +145,6 @@ namespace Damaris {
 	/* process a incoming message */
 	void Server::processMessage(Message* msg) 
 	{
-			
 		int32_t& iteration 	= msg->iteration;
 		int32_t& source 	= msg->source;
 		int32_t& object 	= msg->object;
@@ -159,8 +156,9 @@ namespace Damaris {
 			Variable* v = metadataManager->getVariable(object);
 			if(v != NULL) v->attachChunk(chunk);
 			else {
-				// the variable is unknow, discarde it
-				ERROR("Server received a chunk for an unknown variable, discarding");
+				// the variable is unknown, discarde it
+				ERROR("Server received a chunk " 
+					<< "for an unknown variable, discarding");
 				chunk->remove();
 				delete chunk;
 			}

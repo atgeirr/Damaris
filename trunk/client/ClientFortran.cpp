@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file ClientFortran.cpp
- * \date July 2011
+ * \date October 2011
  * \author Matthieu Dorier
- * \version 0.1
+ * \version 0.3
  * \see Client.hpp
  * Definition of the Fortran functions.
  */
@@ -36,7 +36,7 @@ void FC_FUNC_GLOBAL(df_initialize,DF_INITIALIZE)
 	(char* config_file_name_f, int32_t* core_id_f, int32_t* ierr_f, int config_file_name_size)
 	{
 		std::string config_file_name(config_file_name_f, config_file_name_size);
-		client = new Damaris::Client(&config_file_name,*core_id_f);
+		client = new Damaris::Client(config_file_name,*core_id_f);
 		*ierr_f = 0;
 	}
 
@@ -52,7 +52,50 @@ void FC_FUNC_GLOBAL(df_write,DF_WRITE)
 		varname_copy[i+1] = '\0';
 
 		std::string var_name(varname_copy);
-		*ierr_f = client->write(&var_name,*iteration_f,data_f);
+		*ierr_f = client->write(var_name,*iteration_f,data_f);
+		free(varname_copy);
+	}
+
+void FC_FUNC_GLOBAL_(df_chunk_set,DF_CHUNK_SET)
+	(char* type_f, unsigned int* dimensions, int* si, int* ei, int64_t* chunkh,
+	int type_size)
+	{
+		char* type_copy = (char*)malloc(type_size+1);
+		memset(type_copy,' ',type_size+1);
+		memcpy(type_copy,type_f,type_size);
+		int i = type_size;
+		while(type_copy[i] == ' ' && i != 0) i--;
+		type_copy[i+1] = '\0';
+
+		std::vector<int> sti(si,si+(*dimensions));
+		std::vector<int> eni(ei,ei+(*dimensions));
+
+		*chunkh = client->chunk_set(std::string(type_copy),
+						*dimensions,sti,eni);
+		free(type_copy);
+	}
+
+void FC_FUNC_GLOBAL_(df_chunk_free,DF_CHUNK_FREE)
+	(int64_t* chunkh)
+	{
+		client->chunk_free(*chunkh);
+		chunkh = NULL;
+	}
+
+void FC_FUNC_GLOBAL(df_chunk_write,DF_WRITE)
+	(int64_t* chunkh, char* var_name_f, int32_t* iteration_f, 
+	void* data_f, int32_t* ierr_f, int var_name_size)
+	{
+		// make a copy of the name and delete possible spaces at the end of the string
+		char* varname_copy = (char*)malloc(var_name_size+1);
+		memset(varname_copy,' ',var_name_size+1);
+		memcpy(varname_copy,var_name_f,var_name_size);
+		int i = var_name_size;
+		while(varname_copy[i] == ' ' && i != 0) i--;
+		varname_copy[i+1] = '\0';
+
+		std::string var_name(varname_copy);
+		*ierr_f = client->chunk_write(*chunkh,var_name,*iteration_f,data_f);
 		free(varname_copy);
 	}
 
@@ -68,9 +111,9 @@ void* FC_FUNC_GLOBAL(df_alloc,DF_ALLOC)
 		varname_copy[i+1] = '\0';
 
 		std::string var_name(varname_copy);
-		void* result = client->alloc(&var_name,*iteration_f);
+		void* result = client->alloc(var_name,*iteration_f);
 		free(varname_copy);
-		DBG("function alloc called with argument " << var_name.c_str() << ", " << *iteration_f);
+		DBG("function alloc called with argument " << var_name << ", " << *iteration_f);
 		if(result == NULL) {
 			*ierr_f = -1;
 			return NULL;
@@ -92,8 +135,8 @@ void FC_FUNC_GLOBAL(df_commit,DF_COMMIT)
 		varname_copy[i+1] = '\0';
 
 		std::string var_name(varname_copy);
-		DBG("commiting " << var_name.c_str());
-		*ierr_f = client->commit(&var_name,*iteration_f);
+		DBG("commiting " << var_name);
+		*ierr_f = client->commit(var_name,*iteration_f);
 		free(varname_copy);
 	}
 
@@ -109,7 +152,7 @@ void FC_FUNC_GLOBAL(df_signal,DF_SIGNAL)
 		eventname_copy[i+1] = '\0';
 
 		std::string event_name(eventname_copy);
-		*ierr_f = client->signal(&event_name,*iteration_f);
+		*ierr_f = client->signal(event_name,*iteration_f);
 		free(eventname_copy);
 	}
 
@@ -125,7 +168,7 @@ void FC_FUNC_GLOBAL(df_get_parameter,DF_GET_PARAMETER)
 		paramname_copy[i+1] = '\0';
 
 		std::string paramName(paramname_copy);
-		*ierr_f = client->getParameter(&paramName,buffer_f);
+		*ierr_f = client->getParameter(paramName,buffer_f);
 		free(paramname_copy);
 	}
 

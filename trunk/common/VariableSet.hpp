@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file VariablesSet.hpp
+ * \file VariableSet.hpp
  * \date October 2011
  * \author Matthieu Dorier
  * \version 0.3
@@ -45,7 +45,7 @@ typedef boost::multi_index_container<
                 boost::multi_index::ordered_unique<boost::multi_index::tag<by_name>,
                         boost::multi_index::const_mem_fun<Variable,std::string,&Variable::getName> >
         >
-> VariablesSet;
+> VariableSet;
 
 }
 

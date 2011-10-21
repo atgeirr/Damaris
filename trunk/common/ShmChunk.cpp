@@ -77,13 +77,13 @@ handle_t ShmChunk::getHandle()
 
 void ShmChunk::setSource(int s)
 {
-	Chunk::setSource(s);
+	source = s;
 	memcpy(header,&s,sizeof(s));
 }
 
 void ShmChunk::setIteration(int i)
 {
-	Chunk::setIteration(i);
+	iteration = i;
 	memcpy(((char*)header)+sizeof(source),&i,sizeof(i));
 }
 
