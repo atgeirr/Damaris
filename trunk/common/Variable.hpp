@@ -61,7 +61,7 @@ class Variable {
 		 * \param[in] id : id of the variable in the MetadataManager.
 		 * \param[in] layout : Layout that physically describe the data.
 		 */
-		Variable(int id, std::string& vname, Layout* layout);
+		Variable(int id, const std::string& vname, Layout* layout);
 
 		/**
 		 * \brief Constructor.
@@ -78,12 +78,12 @@ class Variable {
 		/**
 		 * Returns the name of the variable.
 		 */
-		std::string getName() const {return name; }
+		const std::string& getName() const { return name; }
 
 		/**
 		 * Returns the ID of the variable.
 		 */
-		int getID() const {return id; }
+		int getID() const { return id; }
 
 		/**
 		 * Attach a new chunk to the variable.

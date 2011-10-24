@@ -44,7 +44,7 @@ class Server {
 		 * \param[in] configFile : name of the configuration file.
 		 * \param[in] id : identifier for this server.
 		 */
-		Server(std::string configFile, int id);
+		Server(const std::string &configFile, int id);
 
 		/**
 		 * \brief Constructor. 

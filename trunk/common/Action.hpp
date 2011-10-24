@@ -39,9 +39,11 @@ namespace Damaris {
 class Action {
 	
 	protected:
-		bool loaded; 	  /*!< Indicates wether associated ressources are loaded and ready to call the action. */
+		bool loaded; 	  /*!< Indicates wether associated ressources 
+				    are loaded and ready to call the action. */
 		std::string name; /*!< Name of the action. */
-		int id; 	  /*!< ID given to the action when set in the ActionsManager. */
+		int id; 	  /*!< ID given to the action when set in
+				    the ActionsManager. */
 
 		/**
 		 * \brief Constructor.
@@ -77,7 +79,8 @@ class Action {
 		 * This operator simply call the virtual "call" function.
 		 * \param[in] iteration : iteration at which the action is called.
 		 * \param[in] sourceID : ID of the client that fired the action.
-		 * \param[in,out] mm : pointer to the MetadataManager that contains all recorded variables.
+		 * \param[in,out] mm : pointer to the MetadataManager that contains 
+		 *                     all recorded variables.
 		 */
 		void operator()(int32_t iteration, int32_t sourceID, MetadataManager* mm);
 		
@@ -85,7 +88,8 @@ class Action {
 		 * \brief Call the action. To be overloaded by child classes.
 		 * \param[in] iteration : iteration at which the action is called.
 		 * \param[in] sourceID : ID of the client that fired the action.
-		 * \param[in,out] mm : pointer to the MetadataManager that contains all recorded variables.
+		 * \param[in,out] mm : pointer to the MetadataManager that contains 
+		 *                     all recorded variables.
 		 * \see Damaris::Actions::operator()
 		 */
 		virtual void call(int32_t iteration, int32_t sourceID, MetadataManager* mm) = 0;
@@ -93,8 +97,8 @@ class Action {
 		/**
 		 * \brief Loads required resources for the action to be called. 
 		 * This function is virtual and has to be overloaded by child classes depending on
-		 * there needs. Only the server will load the action the first time the action is called
-		 * (lazy loading).
+		 * there needs. Only the server will load the action the first time the action 
+		 * is called (lazy loading).
 		 */
 		virtual void load() = 0;
 };

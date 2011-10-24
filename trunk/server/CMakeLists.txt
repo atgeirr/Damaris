@@ -19,12 +19,11 @@ set(DAMARIS_SERVER_PRG_SRC
 		${DAMARIS_SOURCE_DIR}/common/Configuration.cpp
 		${DAMARIS_SOURCE_DIR}/common/Types.cpp
 		${DAMARIS_SOURCE_DIR}/common/Layout.cpp
-#		${DAMARIS_SOURCE_DIR}/common/LayoutFactory.cpp
 		${DAMARIS_SOURCE_DIR}/common/MetadataManager.cpp
 		${DAMARIS_SOURCE_DIR}/common/Variable.cpp)
 
 add_library (damaris-server ${DAMARIS_SERVER_LIB_SRC})
 
-add_executable (server ${DAMARIS_SOURCE_DIR}/server/main.cpp) # ${DAMARIS_SERVER_PRG_SRC}) # ${DAMARIS_SERVER_LIB_SRC})
+add_executable (server ${DAMARIS_SOURCE_DIR}/server/main.cpp)
 
 target_link_libraries (server damaris-server damaris xerces-c ${BOOST_LIBRARIES} rt dl)#boost_filesystem boost_program_options rt dl) #hdf5 z)

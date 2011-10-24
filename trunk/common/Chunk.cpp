@@ -37,7 +37,7 @@ Chunk::Chunk()
 	dimensions = 0;
 }
 
-Chunk::Chunk(Types::basic_type_e t, unsigned int d, std::vector<int> &si, std::vector<int> &ei)
+Chunk::Chunk(Types::basic_type_e t, unsigned int d, const std::vector<int> &si, const std::vector<int> &ei)
 {
 	source = -1;
 	iteration = -1;

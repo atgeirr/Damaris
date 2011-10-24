@@ -72,7 +72,7 @@ class Client {
 		 * \param[in] config : name of an XML configuration file.
 		 * \param[in] id : id of the client (should be unique).
 		 */
-		Client(std::string config,int32_t id);
+		Client(const std::string & config,int32_t id);
 
 		/**
 		 * \brief Writes a full variable.
@@ -90,7 +90,7 @@ class Client {
 		 *         -1 if the variable has not been defined,
 		 *         -2 if the allocation of memory failed.
 		 */
-		int write(std::string varname, int32_t iteration, const void* data);
+		int write(const std::string & varname, int32_t iteration, const void* data);
 		
 		/**
 		 * \brief Writes a chunk of a variable.
@@ -106,7 +106,7 @@ class Client {
 		 *         -2 if the allocation of memory failed,
 		 *         -3 if the chunk has an inapropriate shape.
 		 */
-		int chunk_write(int64_t chunkh, std::string varname, 
+		int chunk_write(int64_t chunkh, const std::string & varname, 
 			int32_t iteration, const void* data);		
 
 		/**
@@ -124,7 +124,7 @@ class Client {
 		 *         -1 in case of failure when sending the message,
 		 *	   -2 in case the event is not defined.
 		 */
-		int signal(std::string signame, int32_t iteration);
+		int signal(const std::string & signame, int32_t iteration);
 
 		/**
 		 * \brief Allocate a buffer directly in shared memory for future writing.
@@ -139,7 +139,7 @@ class Client {
 		 * \return a pointer to the allocated memory in case of success,
 		 *         NULL in case of failure (variable not defined, allocation error).
 		 */
-		void* alloc(std::string varname, int32_t iteration);
+		void* alloc(const std::string & varname, int32_t iteration);
 
 		/** 
 		 * \brief Commit a variable.
@@ -154,7 +154,7 @@ class Client {
 		 * \return 0 in case of success,
                  *        -1 if the variable hasn't been allocated.
 		 */
-		int commit(std::string varname, int32_t iteration);
+		int commit(const std::string & varname, int32_t iteration);
 
 		/**
 		 * \brief Defines a chunk.
@@ -165,8 +165,9 @@ class Client {
 		 * \param[in] endIndices : end indices.
 		 * \return A chunk handle. Call chunk_free to free the chunk handle.
 		 */
-		int64_t chunk_set(std::string type, unsigned int dimensions,
-				std::vector<int> & startIndices, std::vector<int> & endIndices);
+		int64_t chunk_set(const std::string & type, unsigned int dimensions,
+				const std::vector<int> & startIndices, 
+				const std::vector<int> & endIndices);
 
 		/**
 		 * \brief Free a chunk handle.
@@ -181,14 +182,14 @@ class Client {
 		 *
 		 * \return 0 in case of success, -1 if the parameter is not found.
 		 */
-		int getParameter(std::string paramName, void* buffer);
+		int get_parameter(const std::string & paramName, void* buffer);
 		
 		/**
 		 * Sends a signal to the server to shut it down (all clients in node need
 		 * to call this function before the server is actually killed.
 		 * \return 0 in case of success, -1 in case of failure.
 		 */
-		int killServer();
+		int kill_server();
 				
 		/**
 		 * \brief Destructor.

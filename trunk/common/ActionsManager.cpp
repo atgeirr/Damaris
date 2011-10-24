@@ -84,6 +84,7 @@ void ActionsManager::reactToUserSignal(int sigID,
 	ActionSet::index<by_id>::type::iterator it = actions.get<by_id>().find(sigID);
 	if(it != actions.get<by_id>().end())
 	{
+		DBG("Reacting to use signal " << sigID);
 		(*(it->get()))(iteration,sourceID,mm);
 	} else {
 		ERROR("Unknown action ID " << sigID 

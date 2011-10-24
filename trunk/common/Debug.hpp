@@ -91,10 +91,14 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #endif
 
+#ifdef __DEBUG_ALL
+#define DBG(message) MESSAGE(std::cout, "DEBUG", message)
+#else
 #undef DBG
 #ifdef __DEBUG
 #define DBG(message) MESSAGE(std::cout, "DEBUG", message)
 #undef __DEBUG
 #else
 #define DBG(message)
+#endif
 #endif

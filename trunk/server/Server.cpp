@@ -37,13 +37,17 @@ Damaris::Server *server;
 namespace Damaris {
 
 	/* constructor for embedded mode */
-	Server::Server(std::string cf, int id)
+	Server::Server(const std::string &cf, int id)
 	{
 		std::auto_ptr<Model::simulation_mdl> 
 			mdl(Model::simulation(cf.c_str(),xml_schema::flags::dont_validate));
+		DBG("Model build successfuly from configuration file");		
 
-		Configuration::initialize(mdl,&cf);
+		Configuration::initialize(mdl,cf);
+		DBG("Configuration initialized successfuly");
+
 		Environment::initialize(mdl,id);
+		DBG("Environment initialized successfuly");
 
 		config = Configuration::getInstance();
 		env    = Environment::getInstance();
@@ -65,6 +69,7 @@ namespace Damaris {
 	{
 		needStop = config->getClientsPerNode();
 		/* creating shared structures */
+		DBG("Starting creation of shared structures...");
 		try {
 #ifdef __SYSV	
 			SharedMessageQueue::remove(sysv_shmem,config->getMsgQueueName()->c_str());
@@ -86,10 +91,12 @@ namespace Damaris {
 							config->getMsgQueueName()->c_str(),
 							(size_t)config->getMsgQueueSize(),
 							sizeof(Message));
+			DBG("Shared message queue created");
                         
 			segment = SharedMemorySegment::create(posix_shmem,
 							config->getSegmentName()->c_str(),
 							(size_t)config->getSegmentSize());
+			DBG("Shared Segment created");
 #endif
 		}
 		catch(interprocess_exception &ex) {
@@ -98,7 +105,12 @@ namespace Damaris {
 		}
 
 		metadataManager = config->getMetadataManager();
+		ASSERT(metadataManager != null);
+		DBG("Metadata manager created successfuly");
+
 		actionsManager = config->getActionsManager();
+		ASSERT(actionsManager != null);
+		DBG("Actions manager created successfuly");
 
 		INFO("Server successfully initialized with configuration " 
 				<< config->getFileName()->c_str());
@@ -134,6 +146,7 @@ namespace Damaris {
 		while(needStop > 0) {
 			received = msgQueue->tryReceive(msg,sizeof(Message), recvSize, priority);
 			if(received) {
+				DBG("Received a	message of type " << msg->type);
 				processMessage(msg);
 			}
 		}

@@ -168,14 +168,14 @@ void FC_FUNC_GLOBAL(df_get_parameter,DF_GET_PARAMETER)
 		paramname_copy[i+1] = '\0';
 
 		std::string paramName(paramname_copy);
-		*ierr_f = client->getParameter(paramName,buffer_f);
+		*ierr_f = client->get_parameter(paramName,buffer_f);
 		free(paramname_copy);
 	}
 
 void FC_FUNC_GLOBAL(df_kill_server,DF_KILL_SERVER)
 	(int* ierr_f)
 	{
-		*ierr_f = client->killServer();
+		*ierr_f = client->kill_server();
 	}
 
 void FC_FUNC_GLOBAL(df_finalize,DF_FINALIZE)

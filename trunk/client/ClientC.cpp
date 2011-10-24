@@ -83,12 +83,12 @@ int DC_signal(const char* signal_name, int32_t iteration)
 int DC_get_parameter(const char* param_name, void* buffer)
 {
 	std::string paramName(param_name);
-	return client->getParameter(paramName,buffer);
+	return client->get_parameter(paramName,buffer);
 }
 
 int DC_kill_server()
 {
-	return client->killServer();
+	return client->kill_server();
 }
 
 int DC_finalize()

@@ -41,6 +41,6 @@ namespace Damaris {
 	
 	void Action::operator()(int32_t iteration, int32_t sourceID, MetadataManager* mm)
 	{
-
+		call(iteration,sourceID,mm);
 	}
 }

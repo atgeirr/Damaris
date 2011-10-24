@@ -77,7 +77,7 @@ namespace Damaris {
 		 * \param[in] mdl : simulation base model from XML file.
 		 * \param[in] configName : name of the configuration file that has been loaded.
 		 */
-		Configuration(std::auto_ptr<Model::simulation_mdl> mdl, std::string* configName);
+		Configuration(std::auto_ptr<Model::simulation_mdl> mdl, const std::string& configName);
 
 		/**
 		 * \brief Destructor.
@@ -98,7 +98,7 @@ namespace Damaris {
 		 * \param[in] configName : name of the configuration file to load.
 		 */
 		static void initialize(std::auto_ptr<Model::simulation_mdl> mdl, 
-				std::string* configName);
+				const std::string & configName);
 		
 		/**
 		 * \brief Finalize (free resources) Configuration.

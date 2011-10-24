@@ -32,6 +32,7 @@ namespace Damaris {
 		fileName	= file;
 		handle 		= NULL;
 		function	= NULL;
+		loaded		= false;
 	}
 	
 	DynamicAction::DynamicAction(std::string n, int i, std::string fun, std::string file)
@@ -41,6 +42,7 @@ namespace Damaris {
 		fileName 	= file;
 		handle 		= NULL;
 		function 	= NULL;
+		loaded		= false;
 	}
 
 	DynamicAction::~DynamicAction()
@@ -65,12 +67,14 @@ namespace Damaris {
 		
 		if(!handle)
 		{
-			ERROR("While loading plugin in \"" << fileName.c_str() << "\":" << dlerror());
+			ERROR("While loading plugin in \"" << fileName.c_str() 
+					<< "\":" << dlerror());
 			return;
 		}
 
 		/* loading function */
-		function = (void (*)(std::string,int32_t, int32_t, Damaris::MetadataManager*))dlsym(handle,funName.c_str());
+		function = (void (*)(std::string,int32_t, int32_t, Damaris::MetadataManager*))
+			dlsym(handle,funName.c_str());
 
 		if ((error = dlerror()) != NULL)  {
 			ERROR("While loading function in dynamic library: " << error);

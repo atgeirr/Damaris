@@ -1,15 +1,13 @@
 CPP = g++
 CC  = gcc
 
-INCLUDE = -I/home/matthieu/deploy/include -I..
+INCLUDE = -I/home/mdorier/deploy/include -I..
 
-TARGET = persistence
-LIBDIR = -L$(HOME)/deploy/lib
-LIB = -lhdf5 -lz
+TARGET = image
 
 plugin: $(TARGET).cpp
 	$(CPP) -fPIC -c $(TARGET).cpp $(INCLUDE)
-	$(CC) -shared -Wl,-soname,$(TARGET).so -o $(TARGET).so $(TARGET).o $(LIBDIR) $(LIB)
+	$(CC) -shared -Wl,-soname,$(TARGET).so -o $(TARGET).so $(TARGET).o
 
 clean:
 	rm -rf $(TARGET).o $(TARGET).so

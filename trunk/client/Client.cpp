@@ -35,21 +35,30 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Damaris {
 	
-	Client::Client(std::string configfile, int32_t coreID)
+	Client::Client(const std::string & configfile, int32_t coreID)
 	{
 		/* creates the configuration object from the configuration file */
+		DBG("Starting Damaris client");
 		std::auto_ptr<Model::simulation_mdl> 
-			mdl(Model::simulation(configfile.c_str(),xml_schema::flags::dont_validate));
+			mdl(Model::simulation(configfile.c_str(),
+						xml_schema::flags::dont_validate));
 
-		Configuration::initialize(mdl,&configfile);
+		DBG("Model initialized successfuly");
+
+		Configuration::initialize(mdl,configfile);
 		config = Configuration::getInstance();
+		DBG("Configuration intialized successfuly");
 
 		Environment::initialize(mdl,coreID);
 		env = Environment::getInstance();
 		id = env->getID();
+		DBG("Environment initialized succesfuly");
 
 		metadataManager = config->getMetadataManager();
+		ASSERT(metadataManager != NULL);
+		
 		actionsManager = config->getActionsManager();
+		ASSERT(metadataManager != NULL);
 		/* initializes the shared structures */
 		try {
 #ifdef __SYSV
@@ -75,7 +84,7 @@ namespace Damaris {
 		actionsManager = config->getActionsManager();
 	}
 	
-	void* Client::alloc(std::string varname, int32_t iteration)
+	void* Client::alloc(const std::string & varname, int32_t iteration)
 	{
 
 		/* check that the variable is known in the configuration */
@@ -116,7 +125,7 @@ namespace Damaris {
 		return NULL;
 	}
 	
-	int Client::commit(std::string varname, int32_t iteration)
+	int Client::commit(const std::string & varname, int32_t iteration)
 	{		
 		Variable* v = metadataManager->getVariable(varname);
 		if(v == NULL)
@@ -156,7 +165,7 @@ namespace Damaris {
 		return 0;
 	}
 	
-	int Client::write(std::string varname, int32_t iteration, const void* data)
+	int Client::write(const std::string & varname, int32_t iteration, const void* data)
 	{
 		/* check that the variable is know in the configuration */
 		Variable* variable = metadataManager->getVariable(varname);
@@ -207,7 +216,8 @@ namespace Damaris {
 		return size;
 	}
 
-	int Client::chunk_write(int64_t chunkh, std::string varname, int32_t iteration, const void* data)
+	int Client::chunk_write(int64_t chunkh, const std::string & varname, 
+			int32_t iteration, const void* data)
 	{
 		/* check that the variable is know in the configuration */
 		Variable* variable = metadataManager->getVariable(varname);
@@ -269,10 +279,13 @@ namespace Damaris {
 		return size;
 	}
 
-	int Client::signal(std::string signal_name, int32_t iteration)
+	int Client::signal(const std::string & signal_name, int32_t iteration)
 	{
 		Action* action = actionsManager->getAction(signal_name);
-		if(action == NULL) return -2;
+		if(action == NULL) {
+			DBG("Undefined action \"" << signal_name << "\"");
+			return -2;
+		}
 
 		Message sig;
 		sig.source = id;
@@ -283,21 +296,22 @@ namespace Damaris {
 		
 		try {
 			msgQueue->send(&sig,sizeof(Message),0);
-			return 0;
 		} catch(interprocess_exception &e) {
 			ERROR("Error while sending event \"" << signal_name << "\", " << e.what());
 			return -1;
 		}
+		DBG("Event \""<< signal_name << "\" has been sent");
+		return 0;
 	}
 
-	int Client::getParameter(std::string paramName, void* buffer)
+	int Client::get_parameter(const std::string & paramName, void* buffer)
 	{
 //		config->getParameterSet()
 		// TODO
 		return -1;
 	}
 		
-	int Client::killServer()
+	int Client::kill_server()
 	{
 		static int killed;
 		if(!killed) {
@@ -314,8 +328,9 @@ namespace Damaris {
 		}
 	}
 
-	int64_t Client::chunk_set(std::string type, unsigned int dimensions,
-			std::vector<int> & startIndices, std::vector<int> & endIndices)
+	int64_t Client::chunk_set(const std::string & type, unsigned int dimensions,
+			const std::vector<int> & startIndices, 
+			const std::vector<int> & endIndices)
 	{
 		Types::basic_type_e t = Types::getTypeFromString(&type);
 		ChunkHandle *c = new ChunkHandle(t,dimensions,startIndices,endIndices);

@@ -68,7 +68,8 @@ class Chunk : public Serializable {
 		 * Otherwise a warning is print and the extents and dimensions are set to 0.
 		 * This constructor is protected so only child classes can call it.
 		 */
-		Chunk(Types::basic_type_e t, unsigned int d, std::vector<int> &si, std::vector<int> &ei);
+		Chunk(Types::basic_type_e t, unsigned int d, 
+				const std::vector<int> &si, const std::vector<int> &ei);
 
 	public:
 		/**

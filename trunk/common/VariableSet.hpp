@@ -43,7 +43,7 @@ typedef boost::multi_index_container<
                 boost::multi_index::ordered_unique<boost::multi_index::tag<by_id>,
                         boost::multi_index::const_mem_fun<Variable,int,&Variable::getID> >,
                 boost::multi_index::ordered_unique<boost::multi_index::tag<by_name>,
-                        boost::multi_index::const_mem_fun<Variable,std::string,&Variable::getName> >
+                        boost::multi_index::const_mem_fun<Variable,const std::string&,&Variable::getName> >
         >
 > VariableSet;
 

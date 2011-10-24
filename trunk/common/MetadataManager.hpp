@@ -47,12 +47,12 @@ namespace Damaris {
 		 * An error is printed if a variable is already defined with the same name,
 		 * or if the layout does not exist.
 		 */
-		bool addVariable(std::string varname, std::string layoutName);
+		bool addVariable(const std::string & varname, const std::string & layoutName);
 
 		/**
 		 * Retrieve a variable from its name.
 		 */
-		Variable* getVariable(std::string &name);
+		Variable* getVariable(const std::string &name);
 
 		/**
 		 * Retrieve a variable by ID.
@@ -62,12 +62,12 @@ namespace Damaris {
 		/**
 		 * Adds a layout.
 		 */
-		bool addLayout(std::string& lname, Layout &l);
+		bool addLayout(const std::string& lname, Layout &l);
 
 		/**
 		 * Retrieve a layout by name.
 		 */
-		Layout* getLayout(std::string& lname);
+		Layout* getLayout(const std::string& lname);
 
 		/**
 		 * Constructor.

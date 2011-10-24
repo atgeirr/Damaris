@@ -29,13 +29,14 @@ MetadataManager::MetadataManager()
 {
 }	
 
-bool MetadataManager::addVariable(std::string varname, std::string layoutname)
+bool MetadataManager::addVariable(const std::string & varname, const std::string & layoutname)
 {
 	VariableSet::index<by_name>::type::iterator it = 
 		variables.get<by_name>().find(varname);
 	
 	if(it != variables.get<by_name>().end()) {
-		WARN("Inserting a variable with a name identical to a previously defined variable");
+		WARN("Inserting a variable with a name"
+				<<" identical to a previously defined variable");
 		return false;
 	}
 
@@ -52,10 +53,11 @@ bool MetadataManager::addVariable(std::string varname, std::string layoutname)
 	Variable* v = new Variable(id,varname,l);
 
 	variables.insert(boost::shared_ptr<Variable>(v));
+	DBG("Variable \"" << varname << "\" now defined in the metadata manager");
 	return true;
 }
 
-Variable* MetadataManager::getVariable(std::string &name)
+Variable* MetadataManager::getVariable(const std::string &name)
 {
 	VariableSet::index<by_name>::type::iterator it = 
 		variables.get<by_name>().find(name);
@@ -75,7 +77,7 @@ Variable* MetadataManager::getVariable(int id)
 	return it->get();
 }
 
-bool MetadataManager::addLayout(std::string& lname, Layout &l)
+bool MetadataManager::addLayout(const std::string& lname, Layout &l)
 {
 	if(layouts.find(lname) != layouts.end())
 	{
@@ -83,10 +85,11 @@ bool MetadataManager::addLayout(std::string& lname, Layout &l)
 		return false;
 	}
 	layouts.insert(std::pair<std::string,Layout>(lname,l));
+	DBG("Layout \"" << lname << "\" is now defined in the metadata manager");
 	return true;
 }
 
-Layout* MetadataManager::getLayout(std::string& lname)
+Layout* MetadataManager::getLayout(const std::string& lname)
 {
 	std::map<std::string,Layout>::iterator it = layouts.find(lname);
 	if(it == layouts.end()) return NULL;

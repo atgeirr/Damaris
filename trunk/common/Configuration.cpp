@@ -37,9 +37,10 @@ namespace Damaris {
 
 	Configuration* Configuration::m_instance = NULL;
 		
-	Configuration::Configuration(std::auto_ptr<Model::simulation_mdl> mdl, std::string *cfgFile)
+	Configuration::Configuration(std::auto_ptr<Model::simulation_mdl> mdl, 
+			const std::string & cfgFile)
 	{
-		configFile = new std::string(*cfgFile);
+		configFile = new std::string(cfgFile);
 		baseModel = mdl;
 		metadataManager = NULL;
 		actionsManager = NULL;
@@ -88,7 +89,8 @@ namespace Damaris {
 				parameters.set<std::string>(name,value);
 			} else
 			{
-				ERROR("Undefined type \"" << p->type() << "\" for parameter \""<< p->name() << "\"");
+				ERROR("Undefined type \"" << p->type() 
+						<< "\" for parameter \""<< p->name() << "\"");
 			}
 		}
 	}
@@ -111,12 +113,16 @@ namespace Damaris {
 	void Configuration::fillMetadataManager()
 	{
 		// build all the layouts
+		DBG("Start filling the metadata manager");
 		Model::data_mdl::layout_const_iterator l(baseModel->data().layout().begin());
 
 		for(;l != baseModel->data().layout().end(); l++)
 		{
 			Types::basic_type_e type = Types::getTypeFromString(&(l->type()));
-			Language::language_e language = Language::getLanguageFromString(&(l->language()));
+			Language::language_e language = 
+				Language::getLanguageFromString(&(l->language()));
+			DBG("    new Layout, language = "<< l->language() << " , type = "
+				<< l->type());
 
 			if(type == Types::UNDEFINED_TYPE) {
 				ERROR("Unknown type \"" << l->type() 
@@ -207,7 +213,7 @@ namespace Damaris {
 		return m_instance;
 	}
 
-	void Configuration::initialize(std::auto_ptr<Model::simulation_mdl> mdl, std::string *cfgFile)
+	void Configuration::initialize(std::auto_ptr<Model::simulation_mdl> mdl, const std::string& cfgFile)
 	{
 		if(m_instance) {
 			WARN("Configuration already initialized.");

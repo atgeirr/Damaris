@@ -25,7 +25,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Damaris {
 	
-Variable::Variable(int i, std::string& n, Layout* l)
+Variable::Variable(int i, const std::string& n, Layout* l)
 {
 	id = i;
 	name = n;

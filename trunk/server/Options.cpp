@@ -107,7 +107,7 @@ Options::Options(int argc, char** argv)
 			mdl(Model::simulation(configFile->c_str(),
 				xml_schema::flags::dont_validate));
 
-		Configuration::initialize(mdl,configFile);
+		Configuration::initialize(mdl,*configFile);
 		config = Configuration::getInstance();
 
 		Environment::initialize(mdl,id);

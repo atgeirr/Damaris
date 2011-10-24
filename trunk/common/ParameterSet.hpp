@@ -24,6 +24,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #define __DAMARIS_PARAMETER_SET_H
 
 #include <map>
+#include "common/Debug.hpp"
 #include "common/Parameter.hpp"
 
 namespace Damaris {
@@ -50,7 +51,7 @@ class ParameterSet {
 		 * the parameter does not exist.
 		 */
 		template<typename T>
-		T* get(std::string &name);
+		T get(std::string &name);
 
 		/**
 		 * Access parameters by name, only int parameters are considered.
@@ -64,18 +65,17 @@ class ParameterSet {
 namespace Damaris {
 
 template<typename T>
-T* ParameterSet::get(std::string &name)
+T ParameterSet::get(std::string &name)
 {
-	T* result = NULL;
 	std::map<std::string,Parameter>::iterator it = paramSet.find(name);
 	for(; it != paramSet.end(); it++)
 	{
 		if(it->second.value.type() == typeid(T)) {
-			*result = boost::any_cast<T>(it->second.value);
-			break;
+			return (boost::any_cast<T>(it->second.value));
 		}
 	}
-	return result;
+	WARN("Parameter \""<< name <<"\" not defined, returned value may be inconsistant");
+	return T();
 }
 
 

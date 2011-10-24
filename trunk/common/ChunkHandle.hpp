@@ -39,7 +39,8 @@ class ChunkHandle : public Chunk {
 		/**
 		 * \brief Constructor. Simply call the parent-class constructor.
 		 */
-		ChunkHandle(Types::basic_type_e t, unsigned int d, std::vector<int> &si, std::vector<int> &ei)
+		ChunkHandle(Types::basic_type_e t, unsigned int d, 
+				const std::vector<int> &si, const std::vector<int> &ei)
 		: Chunk(t,d,si,ei) {}
 	
 		/**

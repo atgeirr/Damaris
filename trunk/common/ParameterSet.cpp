@@ -32,12 +32,7 @@ ParameterSet::ParameterSet()
 
 int ParameterSet::operator[](std::string& n)
 {
-	int* result = get<int>(n);
-	if(result == NULL) {
-		WARN("Parameter \"" << n << "\" undefined, value 0 returned instead, may lead to inconsistencies");
-		return 0;
-	}
-	return *result;
+	return get<int>(n);
 }
 	
 }
