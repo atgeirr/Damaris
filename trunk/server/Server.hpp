@@ -24,6 +24,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #define __DAMARIS_SERVER_H
 
 #include <string>
+#include <mpi.h>
 
 #include "common/Configuration.hpp"
 #include "common/SharedMessageQueue.hpp"
@@ -123,7 +124,10 @@ class Server {
 		void processInternalSignal(int32_t obj);
 
 }; // class Server
-	
+
+
+Client* start_mpi_entity(const std::string& config, MPI_Comm* newcomm, int* newrank);
+
 } // namespace Damaris
 
 #endif
