@@ -66,7 +66,8 @@ namespace Damaris {
 						  from the base model. */
 		void fillMetadataManager(); 	/*!< Fills the metadata manager 
 						  with variables from the base model. */
-		void readVariablesInSubGroup(const Model::group_mdl* g, std::string name); 
+		void readVariablesInSubGroup(const Model::group_mdl* g, 
+				const std::string &name); 
 		void fillActionsManager(); 	/*!< Fills the ActionsManager with 
 						  Actions from the base model. */
 
@@ -110,12 +111,12 @@ namespace Damaris {
 		 * \brief Get the name of the XML file.
 		 * \return Name of the XML file. Do not delete this pointer.
 		 */
-		std::string* getFileName() { return configFile; }
+		const std::string& getFileName() { return *configFile; }
 
 		/**
 		 * \brief Get the name of the simulation.
 		 */
-		std::string getSimulationName() const;
+		const std::string & getSimulationName() const;
 
 		/**
 		 * \brief Get the default language for the running simulation.
@@ -135,7 +136,7 @@ namespace Damaris {
 		/**
 		 * \brief Get the name of the shared memory segment.
 		 */
-		std::string* getSegmentName() const;
+		const std::string& getSegmentName() const;
 
 		/**
 		 * \brief Get the size (in bytes) of the shared memory segment.
@@ -145,7 +146,7 @@ namespace Damaris {
 		/**
 		 * \brief Get the name of the message queue.
 		 */
-		std::string* getMsgQueueName() const;
+		const std::string & getMsgQueueName() const;
 
 		/**
 		 * \brief Get the size (in number of messages) of the message queue.

@@ -51,8 +51,13 @@ namespace Damaris {
 
 		Environment::initialize(mdl,coreID);
 		env = Environment::getInstance();
-		id = env->getID();
 		DBG("Environment initialized succesfuly");
+		Client(config,env);
+	}
+
+	Client::Client(Configuration* config, Environment* env)
+	{
+		id = env->getID();
 
 		metadataManager = config->getMetadataManager();
 		ASSERT(metadataManager != NULL);
@@ -63,17 +68,17 @@ namespace Damaris {
 		try {
 #ifdef __SYSV
 			msgQueue = SharedMessageQueue::open(sysv_shmem,
-					config->getMsgQueueName()->c_str());
+					config->getMsgQueueName().c_str());
 			segment = SharedMemorySegment::open(sysv_shmem,
-					config->getSegmentName()->c_str());
+					config->getSegmentName().c_str());
 #else
 			msgQueue = SharedMessageQueue::open(posix_shmem,
-					config->getMsgQueueName()->c_str());
+					config->getMsgQueueName().c_str());
 			segment = SharedMemorySegment::open(posix_shmem,
-					config->getSegmentName()->c_str());
+					config->getSegmentName().c_str());
 #endif
 			DBG("Client initialized successfully for core " << id 
-			    << " with configuration \"" << configfile << "\"");
+			    << " with configuration \"" << config->getFileName() << "\"");
 		}
 		catch(interprocess_exception &ex) {
 			ERROR("While initializing shared memory objects:  " << ex.what());

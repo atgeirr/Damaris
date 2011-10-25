@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<simulation name="fractal" language="CPP" xmlns="http://damaris.gforge.inria.fr/Damaris/Model">
+	<architecture>
+		<cores  count="5">
+			<clients count="4"/>
+		</cores>
+		<buffer name="buffer" size="16777216" />
+		<queue  name="queue" size="100" />
+	</architecture>
+	<data>
+		<parameter name="w" type="int" value="640" />
+		<parameter name="h" type="int" value="480" />
+
+		<layout name="plan" type="char" dimensions="w,h" />
+		<group name="images">
+			<variable name="julia" layout="plan"> Julia set </variable>
+		</group>
+	</data>
+	<actions>
+		<event name="draw" action="draw_image" library="image.so"/>
+	</actions>
+</simulation>

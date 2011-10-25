@@ -11,7 +11,10 @@ project(DAMARIS)
 
 set(EXTERNAL_ROOT ~/deploy)
 
-add_definitions (-O2 -Wall -D__INFO -D__DEBUG_ALL -D_BENCHMARK -rdynamic)
+add_definitions (-O2 -Wall -rdynamic)
+#add_definitions (-D__INFO)
+#add_definitions (-D__DEBUG_ALL)
+#add_definitions (-D__BENCHMARK)
 #add_definitions (-D__SYSV)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${DAMARIS_SOURCE_DIR}/cmake/Modules/")

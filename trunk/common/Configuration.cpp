@@ -166,7 +166,8 @@ namespace Damaris {
 			readVariablesInSubGroup(&(*g),(std::string)(g->name()));
 	}
 
-	void Configuration::readVariablesInSubGroup(const Model::group_mdl *g, std::string groupName)
+	void Configuration::readVariablesInSubGroup(const Model::group_mdl *g, 
+			const std::string& groupName)
 	{
 		// first check if the group is enabled
 		if(!(g->enabled())) return;
@@ -231,9 +232,9 @@ namespace Damaris {
 		delete m_instance;
 	}
 
-	std::string* Configuration::getMsgQueueName() const
+	const std::string & Configuration::getMsgQueueName() const
 	{
-		return &(baseModel->architecture().queue().name());
+		return baseModel->architecture().queue().name();
 	}
 
 	size_t Configuration::getMsgQueueSize() const
@@ -241,9 +242,9 @@ namespace Damaris {
 		return (size_t)(baseModel->architecture().queue().size());
 	}
 
-	std::string* Configuration::getSegmentName() const
+	const std::string & Configuration::getSegmentName() const
 	{
-		return &(baseModel->architecture().buffer().name());
+		return baseModel->architecture().buffer().name();
 	}
 
 	size_t Configuration::getSegmentSize() const
@@ -251,12 +252,17 @@ namespace Damaris {
 		return (size_t)(baseModel->architecture().buffer().size());
 	}
 
+	int Configuration::getCoresPerNode() const 
+	{
+		return baseModel->architecture().cores().count();
+	}
+
 	int Configuration::getClientsPerNode() const
 	{
 		return baseModel->architecture().cores().clients().count();
 	}
 
-	std::string Configuration::getSimulationName() const
+	const std::string & Configuration::getSimulationName() const
 	{
 		return baseModel->name();
 	}

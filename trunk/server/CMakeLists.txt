@@ -1,4 +1,6 @@
-add_definitions(-D__INFO)
+#add_definitions(-D__INFO)
+#add_definitions(-D__DEBUG_ALL)
+#add_definitions(-D__BENCHMARKS)
 
 set(DAMARIS_SERVER_LIB_SRC
 		${DAMARIS_SOURCE_DIR}/server/Server.cpp

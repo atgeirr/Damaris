@@ -75,6 +75,16 @@ class Client {
 		Client(const std::string & config,int32_t id);
 
 		/**
+		 * \brief Constructor.
+		 * This constructor is used to start a client using
+		 * Damaris::start_mpi_entity.
+		 * 
+		 * \param[in] config : Configuration object (initialized).
+		 * \param[in] env : Environment object (initialized).
+		 */
+		Client(Configuration* config, Environment* env);
+
+		/**
 		 * \brief Writes a full variable.
 		 * Writes a variable into shared memory and sends a message 
 		 * notifying the write to the dedicated core running on the same node.
