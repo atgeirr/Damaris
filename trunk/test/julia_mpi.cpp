@@ -3,9 +3,7 @@
 #include <complex>
 #include <mpi.h>
 
-#include "common/Debug.hpp"
-#include "client/Client.hpp"
-#include "server/Server.hpp"
+#include "include/Damaris.hpp"
 
 #define PI 3.14159265358979323846
 #define ITERATIONS 100

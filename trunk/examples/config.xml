@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<simulation name="my simulation" 
+	language="fortran" xmlns="http://damaris.gforge.inria.fr/Damaris/Model">
+	<architecture>
+		<cores  count="2">
+			<clients count="1"/>
+		</cores>
+		<buffer name="buffer" size="67108864" />
+		<queue  name="queue" size="100" />
+	</architecture>
+	<data>
+		<parameter name="x" type="int" value="64" />
+		<parameter name="y" type="int" value="16" />
+		<parameter name="z" type="int" value="2"  />
+
+		<layout name="my layout" type="float" dimensions="x,y,z+2" />
+		<group name="my group" enabled="yes">
+			<variable name="my variable" layout="my layout"> 
+				this is an example of metadata 
+			</variable>
+		</group>
+	</data>
+	<actions>
+		<event name="my event" action="my_function" library="hello.so"/>
+	</actions>
+</simulation>

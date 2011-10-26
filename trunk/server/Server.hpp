@@ -24,7 +24,10 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #define __DAMARIS_SERVER_H
 
 #include <string>
-#include <mpi.h>
+
+#ifdef __ENABLE_MPI
+	#include <mpi.h>
+#endif
 
 #include "client/Client.hpp"
 #include "common/Configuration.hpp"
@@ -126,9 +129,11 @@ class Server {
 
 }; // class Server
 
-
+#ifdef __ENABLE_MPI
 Client* start_mpi_entity(const std::string& config, MPI_Comm* newcomm, int* newrank, int* newsize);
-
+#else
+Client* start_mpi_entity(const std::string& config, void*,int*,int*); 
+#endif
 } // namespace Damaris
 
 #endif

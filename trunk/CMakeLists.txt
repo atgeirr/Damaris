@@ -2,16 +2,24 @@ cmake_minimum_required (VERSION 2.8)
 
 enable_language (Fortran OPTIONAL)
 
-include(CMakeForceCompiler)
-CMAKE_FORCE_CXX_COMPILER(mpicxx "MPI C++ Compiler")
-CMAKE_FORCE_C_COMPILER(mpicc "MPI C Compiler")
-#CMAKE_FORCE_FORTRAN_COMPILER(mpif90 "MPI Fortran Compiler")
+set(HAS_MPI true)
+
+if(HAS_MPI)
+  include(CMakeForceCompiler)
+  CMAKE_FORCE_CXX_COMPILER(mpicxx "MPI C++ Compiler")
+  CMAKE_FORCE_C_COMPILER(mpicc "MPI C Compiler")
+endif(HAS_MPI)
 
 project(DAMARIS)
 
 set(EXTERNAL_ROOT ~/deploy)
 
 add_definitions (-O2 -Wall -rdynamic)
+if(HAS_MPI)
+  add_definitions (-D__ENABLE_MPI)
+  message(STATUS "MPI support is enabled")
+endif(HAS_MPI)
+
 #add_definitions (-D__INFO)
 #add_definitions (-D__DEBUG_ALL)
 #add_definitions (-D__BENCHMARK)
@@ -60,3 +68,4 @@ endif(CMAKE_Fortran_COMPILER)
 add_subdirectory (client)
 add_subdirectory (server)
 add_subdirectory (test)
+add_subdirectory (examples)

@@ -4,6 +4,7 @@ set(DAMARIS_CLIENT_SRC
 	${DAMARIS_SOURCE_DIR}/client/Client.cpp
 	${DAMARIS_SOURCE_DIR}/client/ClientC.cpp
 	${DAMARIS_SOURCE_DIR}/client/ClientFortran.cpp
+	${DAMARIS_SOURCE_DIR}/client/Client.f90
 	${DAMARIS_SOURCE_DIR}/xml/Model.cpp
 	${DAMARIS_SOURCE_DIR}/common/Parameter.cpp
 	${DAMARIS_SOURCE_DIR}/common/ParameterSet.cpp
@@ -21,5 +22,8 @@ set(DAMARIS_CLIENT_SRC
 	${DAMARIS_SOURCE_DIR}/common/Language.cpp
 	${DAMARIS_SOURCE_DIR}/common/Types.cpp 
 	${DAMARIS_SOURCE_DIR}/common/Layout.cpp)
+
+file(COPY ${DAMARIS_SOURCE_DIR}/client/damaris.mod 
+     DESTINATION ${DAMARIS_SOURCE_DIR}/include/)
 
 add_library (damaris ${DAMARIS_CLIENT_SRC})

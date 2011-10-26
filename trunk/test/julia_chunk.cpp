@@ -2,8 +2,7 @@
 #include <string>
 #include <complex>
 
-#include "common/Debug.hpp"
-#include "client/Client.hpp"
+#include "include/Damaris.hpp"
 
 #define PI 3.14159265358979323846
 #define ITERATIONS 10

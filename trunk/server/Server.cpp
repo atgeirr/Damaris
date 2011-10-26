@@ -206,7 +206,7 @@ void Server::stop()
 	needStop = 0;
 }
 
-
+#ifdef __ENABLE_MPI
 Client* start_mpi_entity(const std::string& configFile, MPI_Comm* newcomm, int* newrank, int* newsize)
 {
 	int size, rank;
@@ -245,5 +245,13 @@ Client* start_mpi_entity(const std::string& configFile, MPI_Comm* newcomm, int* 
 		return NULL;
 	}
 }	
+#else
+Client* start_mpi_entity(const std::string& config, void*,int*,int*)
+{
+        ERROR("Damaris is not compiled with MPI support. Aborting.");
+        exit(-1);
+        return NULL;
+}
+#endif
 
 }
