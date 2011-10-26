@@ -23,12 +23,29 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifndef __DAMARIS_SERVER_C_H
 #define __DAMARIS_SERVER_C_H
-
+#ifdef __ENABLE_MPI
+	#include <mpi.h>
+#endif
 /**
  * Starts a server (blocks in the server's mainloop).
  * \param[in] configFile : name of the XML configuration file.
  * \param[in] server_id : an identifier for this server.
  */
 int DC_server(const char* configFile, int server_id);
-
+#ifdef __ENABLE_MPI
+/**
+ * Start clients and servers as MPI entities.
+ * \param[in] configFile : name of the configuration file to use.
+ * \param[out] newcomm : communicator gathering clients.
+ * \param[out] newrank : rank in this communicator.
+ * \param[out] newsize : size of the new communicator.
+ * \return a positive integer for clients, 0 for servers (blocks in the function
+ * until the server is killed).
+ */
+int DC_start_mpi_entity(const char* configFile, MPI_Comm* newcomm,
+		int* newrank, int* newsize);
+#else
+int DC_start_mpi_entity(const char* configFile, void* newcomm,
+		int* newrank, int* newsize);
+#endif
 #endif

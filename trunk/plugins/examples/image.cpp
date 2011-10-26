@@ -17,13 +17,7 @@ void draw_image(const std::string* event, int32_t step, int32_t src, Damaris::Me
 	if(v != NULL) {
 		Damaris::ChunkIndexByIteration::iterator end;
 		Damaris::ChunkIndexByIteration::iterator it = v->getChunksByIteration(step,end);
-		int count = 0;
-		for(; it != end; it++) {
-			count++;
-			Damaris::Chunk* c = it->get();
-			c->remove();
-		}
-		std::cout << "At iteration: " << step << ", found " << count << " chunks\n";
+		v->eraseChunk(it);
 	}
 }
 

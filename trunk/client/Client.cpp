@@ -52,10 +52,15 @@ namespace Damaris {
 		Environment::initialize(mdl,coreID);
 		env = Environment::getInstance();
 		DBG("Environment initialized succesfuly");
-		Client(config,env);
+		init(config,env);
 	}
 
 	Client::Client(Configuration* config, Environment* env)
+	{
+		init(config,env);
+	}
+
+	void Client::init(Configuration* config, Environment* env)
 	{
 		id = env->getID();
 

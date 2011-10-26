@@ -9,7 +9,7 @@ int main(int argc, char** argv)
 	int y = 16;
 	int z = 4;
 
-	char* varname = "my variable";
+	char* varname = "my group/my variable";
 	char* event   = "my event";
 
 	if(argc != 2) {

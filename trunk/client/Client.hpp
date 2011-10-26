@@ -61,7 +61,11 @@ class Client {
 
 		SharedMessageQueue *msgQueue; /*!< pointer to the message queue. */
 		SharedMemorySegment* segment; /*!< pointer to the shared memory segment. */
-	
+
+		/**
+		 * \brief private function called by constructors.
+		 */
+		void init(Configuration* config, Environment* env);	
 	public:
 		/** 
 		 * \brief Constructor.

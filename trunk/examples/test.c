@@ -5,8 +5,8 @@
 int main(int argc, char** argv) 
 {
 	int id = 0;
-	float mydata[64][16][2];
-	char* varname = "my variable";
+	float mydata[64][16][4];
+	char* varname = "my group/my variable";
 	char* event = "my event";
 
 	if(argc != 2) {
@@ -24,10 +24,10 @@ int main(int argc, char** argv)
 	}
 	}
 	}
-
+	
 	DC_write(varname,0,mydata);
 	DC_signal(event,0);
 
-	DC_finalize();	
+	DC_finalize();
 	return 0;
 }

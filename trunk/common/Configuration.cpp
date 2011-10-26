@@ -121,8 +121,6 @@ namespace Damaris {
 			Types::basic_type_e type = Types::getTypeFromString(&(l->type()));
 			Language::language_e language = 
 				Language::getLanguageFromString(&(l->language()));
-			DBG("    new Layout, language = "<< l->language() << " , type = "
-				<< l->type());
 
 			if(type == Types::UNDEFINED_TYPE) {
 				ERROR("Unknown type \"" << l->type() 

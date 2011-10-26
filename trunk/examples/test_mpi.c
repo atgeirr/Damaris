@@ -1,50 +1,46 @@
-#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <mpi.h>
+#include "include/Damaris.h"  
 
-#include "server/Server.h"
-#include "client/Client.h"
-
-#define CORES_PER_NODE 2 
-
-void client_main_loop(MPI_Comm c, int rank);
-
-int main (int argc, char** argv)
+int client_code(int id) 
 {
-	int rank, size, is_client;
-	MPI_Comm comm;
+	float mydata[64][16][4];
+	char* varname = "my group/my variable";
+	char* event = "my event";
+
+	int i,j,k;
+	for(i = 0; i < 64; i++) {
+	for(j = 0; j < 16; j++) {
+	for(k = 0; k <  4; k++) {
+		mydata[i][j][k] = i*j*k;
+	}
+	}
+	}
+
+	DC_write(varname,0,mydata);
+	DC_signal(event,0);
+	return 0;
+}    
+
+int main(int argc, char** argv) 
+{
+	MPI_Comm clients;
+	int rank, size;
+
+	if(argc != 2) {
+		printf("Usage: mpirun -np 2 ./test_mpi_c <config.xml>\n");
+		exit(0);
+	}
 	
-	/* MPI initialization */
-	MPI_Init (&argc, &argv);
-	MPI_Comm_rank (MPI_COMM_WORLD, &rank);
-	MPI_Comm_size (MPI_COMM_WORLD, &size);
+	MPI_Init(&argc,&argv);
 
-	/* Splitting communicator between servers and clients */
-	is_client = (rank % CORES_PER_NODE) != 0;
-	MPI_Comm_split(MPI_COMM_WORLD,is_client,rank,&comm);
-
-	/* Starting servers and simulations code */
-	if(is_client) {
-		/* Entering simulation's main loop */
-		client_main_loop(comm, rank);
-	} else {
-		/* Starting server */
-		DC_server("config.xml",rank);
+	if(DC_start_mpi_entity(argv[1],&clients,&rank,&size)) {
+		client_code(rank);
+		DC_kill_server();
+		DC_finalize();
 	}
 
 	MPI_Finalize();
-  	return 0;
-}
-
-void client_main_loop(MPI_Comm c, int rank)
-{
-	sleep(5);
-	DC_initialize("config.xml",rank);
-	
-		
-	sleep(5);
-	DC_kill_server();
-
-	DC_finalize();
+	return 0;
 }

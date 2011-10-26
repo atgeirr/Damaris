@@ -17,7 +17,7 @@
       end do
  
       call df_initialize("config.xml",id,ierr)
-      call df_write("my variable",1,mydata,ierr)
+      call df_write("my group/my variable",1,mydata,ierr)
       call df_signal("my event",1,ierr)
       call df_finalize(ierr)
 

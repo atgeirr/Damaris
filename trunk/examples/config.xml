@@ -14,7 +14,7 @@
 		<parameter name="z" type="int" value="2"  />
 
 		<layout name="my layout" type="float" dimensions="x,y,z+2" />
-		<group name="my group" enabled="yes">
+		<group name="my group" enabled="true">
 			<variable name="my variable" layout="my layout"> 
 				this is an example of metadata 
 			</variable>

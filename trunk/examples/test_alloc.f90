@@ -20,7 +20,7 @@
 
       call df_initialize("config.xml",id,ierr)
 
-      cptr = df_alloc("my variable",1,ierr)
+      cptr = df_alloc("my group/my variable",1,ierr)
       call c_f_pointer(cptr,mydata,[64,16,2])
  
       do i =  1, 64
@@ -31,7 +31,7 @@
       end do
       end do 
  
-      call df_commit("my variable",1,ierr);
+      call df_commit("my group/my variable",1,ierr);
 
       call df_signal("my event",1,ierr);
  

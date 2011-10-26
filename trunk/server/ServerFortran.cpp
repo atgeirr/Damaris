@@ -50,7 +50,6 @@ void FC_FUNC_GLOBAL(df_server,DF_SERVER)
 		server = new Damaris::Server(config_str,*server_id_f);
 		*ierr_f = server->run();
 	}
-}
 
 #ifdef __ENABLE_MPI
 void FC_FUNC_GLOBAL(df_start_mpi_entity,DF_START_MPI_ENTITY)
@@ -73,5 +72,5 @@ void FC_FUNC_GLOBAL(df_start_mpi_entity,DF_START_MPI_ENTITY)
 		*result = -1;
         }
 #endif
-
+}
 #endif

@@ -110,6 +110,8 @@ void FC_FUNC_GLOBAL(df_signal,DF_SIGNAL)
 void FC_FUNC_GLOBAL(df_get_parameter,DF_GET_PARAMETER)
 	(char* param_name_f, void* buffer_f, int* ierr_f, int param_name_size);
 
+void FC_FUNC_GLOBAL(df_kill_server,DF_KILL_SERVER)
+	(int* ierr);
 /**
  * \fn df_finalize(ierr)
  * \brief Call client's destructor.
