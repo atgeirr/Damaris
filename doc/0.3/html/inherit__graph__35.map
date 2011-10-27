@@ -1,0 +1,5 @@
+<map id="G" name="G">
+<area shape="rect" href="$class_damaris_1_1_shared_message_queue.html" title="Damaris::SharedMessageQueue" alt="" coords="7,32,215,61"/>
+<area shape="rect" href="$class_damaris_1_1_shared_message_queue_1_1_p_o_s_i_x___sh_msg_queue.html" title="Damaris::SharedMessageQueue::POSIX_ShMsgQueue" alt="" coords="264,5,608,35"/>
+<area shape="rect" href="$class_damaris_1_1_shared_message_queue_1_1_s_y_s_v___sh_msg_queue.html" title="Damaris::SharedMessageQueue::SYSV_ShMsgQueue" alt="" coords="268,59,604,88"/>
+</map>
