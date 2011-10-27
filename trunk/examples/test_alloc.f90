@@ -1,14 +1,5 @@
       program test
       use Damaris
-!   use iso_c_binding
-!
-!      interface
-!        type(c_ptr) function df_alloc(varname,it,ierr)
-!          use iso_c_binding
-!          character(len=*) :: varname
-!          integer :: it, ierr
-!        end function df_alloc
-!      end interface
 
       type(c_ptr) :: cptr
       integer :: ierr,id
@@ -21,11 +12,11 @@
       call df_initialize("config.xml",id,ierr)
 
       cptr = df_alloc("my group/my variable",1,ierr)
-      call c_f_pointer(cptr,mydata,[64,16,2])
+      call c_f_pointer(cptr,mydata,[64,16,4])
  
       do i =  1, 64
       do j =  1, 16
-      do k =  1, 2
+      do k =  1, 4
          mydata(i,j,k) = i*j*k
       end do
       end do

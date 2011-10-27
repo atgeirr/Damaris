@@ -23,7 +23,4 @@ set(DAMARIS_CLIENT_SRC
 	${DAMARIS_SOURCE_DIR}/common/Types.cpp 
 	${DAMARIS_SOURCE_DIR}/common/Layout.cpp)
 
-file(COPY ${DAMARIS_SOURCE_DIR}/client/damaris.mod 
-     DESTINATION ${DAMARIS_SOURCE_DIR}/include/)
-
 add_library (damaris ${DAMARIS_CLIENT_SRC})

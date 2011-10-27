@@ -28,4 +28,4 @@ add_library (damaris-server ${DAMARIS_SERVER_LIB_SRC})
 
 add_executable (server ${DAMARIS_SOURCE_DIR}/server/main.cpp)
 
-target_link_libraries (server damaris-server damaris xerces-c ${BOOST_LIBRARIES} rt dl)#boost_filesystem boost_program_options rt dl) #hdf5 z)
+target_link_libraries (server damaris-server damaris xerces-c ${BOOST_LIBRARIES} rt dl)

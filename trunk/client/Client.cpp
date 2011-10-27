@@ -226,7 +226,7 @@ namespace Damaris {
 		return size;
 	}
 
-	int Client::chunk_write(int64_t chunkh, const std::string & varname, 
+	int Client::chunk_write(chunk_h chunkh, const std::string & varname, 
 			int32_t iteration, const void* data)
 	{
 		/* check that the variable is know in the configuration */
@@ -248,7 +248,7 @@ namespace Damaris {
 
 		ShmChunk* chunk = NULL;
                 try {
-			Types::basic_type_e t = chunkHandle->getType();
+			Types::basic_type_e t = layout->getType();
 			unsigned int d = chunkHandle->getDimensions();
 			std::vector<int> si(d);
 			std::vector<int> ei(d);
@@ -338,16 +338,16 @@ namespace Damaris {
 		}
 	}
 
-	int64_t Client::chunk_set(const std::string & type, unsigned int dimensions,
+	chunk_h Client::chunk_set(unsigned int dimensions,
 			const std::vector<int> & startIndices, 
 			const std::vector<int> & endIndices)
 	{
-		Types::basic_type_e t = Types::getTypeFromString(&type);
+		Types::basic_type_e t = Types::UNDEFINED_TYPE;
 		ChunkHandle *c = new ChunkHandle(t,dimensions,startIndices,endIndices);
-		return (int64_t)c;
+		return c;
 	}
 
-	void Client::chunk_free(int64_t chunkh) 
+	void Client::chunk_free(chunk_h chunkh) 
 	{
 		if(chunkh != 0) delete (ChunkHandle*)chunkh;
 	}

@@ -1,12 +1,10 @@
       program test
      
       integer :: ierr,id
-      integer*8 :: layout
-      real, dimension(0:63,16:31,2:3) :: mydata
+      real, dimension(0:63,16:31,0:3) :: mydata
       integer :: i,j,k
  
       id     = 42 
-      layout = 0
 
       do i =  0, 63
       do j = 16, 31

@@ -43,23 +43,23 @@ int DC_write(const char* varname, int32_t iteration, const void* data)
 	return client->write(varname_str,iteration,data);
 }
 
-int DC_chunk_write(int64_t chunkh, const char* varname, int32_t iteration, const void* data)
+int DC_chunk_write(DC_chunk_handle_t chunkh, const char* varname, 
+		int32_t iteration, const void* data)
 {
 	std::string varname_str(varname);
-	return client->chunk_write(chunkh,varname_str,iteration,data);
+	return client->chunk_write((Damaris::chunk_h)chunkh,varname_str,iteration,data);
 }
 
-int64_t DC_chunk_set(const char* type, unsigned int dimensions, int* si, int* ei)
+DC_chunk_handle_t DC_chunk_set(unsigned int dimensions, int* si, int* ei)
 {
-	std::string type_str(type);
 	std::vector<int> sti(si,si+dimensions);
 	std::vector<int> eni(ei,ei+dimensions);
-	return client->chunk_set(type_str,dimensions,sti,eni);
+	return (DC_chunk_handle_t)client->chunk_set(dimensions,sti,eni);
 }
 
-void DC_chunk_free(int64_t chunkh)
+void DC_chunk_free(DC_chunk_handle_t chunkh)
 {
-	client->chunk_free(chunkh);
+	client->chunk_free((Damaris::chunk_h)chunkh);
 }
 
 void* DC_alloc(const char* varname, int32_t iteration)

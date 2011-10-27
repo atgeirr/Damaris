@@ -25,6 +25,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #define __DAMARIS_CLIENT_C_H
 
 #include <stdlib.h>
+
+typedef int64_t DC_chunk_handle_t;
+
 /**
  * \brief Initializes the client-side C library.
  * \see Damaris::Client::Client
@@ -51,19 +54,20 @@ int 	DC_write(const char* varname, int32_t iteration, const void* data);
  * \brief Writes a chunk of a variable.
  * \see Damaris::Client::chunk_write
  */
-int 	DC_chunk_write(int64_t chunkh, const char* varname, int32_t iteration, const void* data);
+int 	DC_chunk_write(DC_chunk_handle_t chunkh, const char* varname, 
+		int32_t iteration, const void* data);
 
 /**
  * \brief Defines a chunk.
  * \see Damaris::Client::chunk_set
  */
-int64_t DC_chunk_set(const char* type, unsigned int dimensions, int* si, int* ei);
+DC_chunk_handle_t DC_chunk_set(unsigned int dimensions, int* si, int* ei);
 
 /**
  * \brief Free a chunk handle.
  * \see Damaris::Client::chunk_free
  */
-void 	DC_chunk_free(int64_t chunkh);
+void 	DC_chunk_free(DC_chunk_handle_t chunkh);
 
 /**
  * \brief Allocates the data required for a variable to be entirely written in memory.

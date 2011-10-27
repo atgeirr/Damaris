@@ -20,9 +20,10 @@ if(HAS_MPI)
   message(STATUS "MPI support is enabled")
 endif(HAS_MPI)
 
-add_definitions (-D__INFO)
-add_definitions (-D__DEBUG_ALL)
+#add_definitions (-D__INFO)
+#add_definitions (-D__DEBUG_ALL)
 #add_definitions (-D__BENCHMARK)
+
 #add_definitions (-D__SYSV)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${DAMARIS_SOURCE_DIR}/cmake/Modules/")

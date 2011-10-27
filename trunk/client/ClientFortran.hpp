@@ -63,8 +63,7 @@ void FC_FUNC_GLOBAL_(df_write,DF_WRITE)
 	(char* var_name_f, int32_t* iteration_f, void* data_f, int32_t* ierr_f, int var_name_size);
 
 void FC_FUNC_GLOBAL_(df_chunk_set,DF_CHUNK_SET)
-	(char* type_f, unsigned int* dimensions, int* si, int* ei, int64_t* chunkh,
-	 int type_size);
+	(unsigned int* dimensions, int* si, int* ei, int64_t* chunkh);
 
 void FC_FUNC_GLOBAL_(df_chunk_write,DF_CHUNK_WRITE)
 	(int64_t* chunkh, char* varname_f, int32_t* iteration_f, void* data_f, int32_t* ierr_f,

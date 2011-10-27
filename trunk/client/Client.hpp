@@ -37,6 +37,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/SharedMemorySegment.hpp"
 #include "common/ActionsManager.hpp"
 #include "common/MetadataManager.hpp"
+#include "common/ChunkHandle.hpp"
 #include "common/Layout.hpp"
 
 /**
@@ -45,6 +46,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  */
 namespace Damaris {
 
+typedef ChunkHandle* chunk_h;
 /**
  * \class Client
  * The Client object represents a single core running the
@@ -120,7 +122,7 @@ class Client {
 		 *         -2 if the allocation of memory failed,
 		 *         -3 if the chunk has an inapropriate shape.
 		 */
-		int chunk_write(int64_t chunkh, const std::string & varname, 
+		int chunk_write(chunk_h chunkh, const std::string & varname, 
 			int32_t iteration, const void* data);		
 
 		/**
@@ -179,14 +181,14 @@ class Client {
 		 * \param[in] endIndices : end indices.
 		 * \return A chunk handle. Call chunk_free to free the chunk handle.
 		 */
-		int64_t chunk_set(const std::string & type, unsigned int dimensions,
+		chunk_h chunk_set(unsigned int dimensions,
 				const std::vector<int> & startIndices, 
 				const std::vector<int> & endIndices);
 
 		/**
 		 * \brief Free a chunk handle.
 		 */
-		void chunk_free(int64_t chunkh);
+		void chunk_free(chunk_h chunkh);
 
 		/** 
 		 * \brief Retrieves a parameter's value. Not implemented yet.

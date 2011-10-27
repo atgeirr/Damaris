@@ -50,7 +50,7 @@ int main(int argc, char** argv)
 	std::vector<int> start(2); start[0] = 0; start[1] = 0;
 	std::vector<int> end(2); end[0] = WIDTH-1; end[1] = HEIGHT-1;
 
-	int64_t chunk_handle = client->chunk_set("char",2, start, end);
+	Damaris::chunk_h chunk_handle = client->chunk_set(2, start, end);
 
 	for(int i = 0; i < ITERATIONS ; i++) {
 		c = std::polar<double>(i*2.0*PI/((float)ITERATIONS)-PI/2.0,0.5);

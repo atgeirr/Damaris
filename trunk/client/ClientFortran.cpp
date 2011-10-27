@@ -57,28 +57,18 @@ void FC_FUNC_GLOBAL(df_write,DF_WRITE)
 	}
 
 void FC_FUNC_GLOBAL_(df_chunk_set,DF_CHUNK_SET)
-	(char* type_f, unsigned int* dimensions, int* si, int* ei, int64_t* chunkh,
-	int type_size)
+	(unsigned int* dimensions, int* si, int* ei, int64_t* chunkh)
 	{
-		char* type_copy = (char*)malloc(type_size+1);
-		memset(type_copy,' ',type_size+1);
-		memcpy(type_copy,type_f,type_size);
-		int i = type_size;
-		while(type_copy[i] == ' ' && i != 0) i--;
-		type_copy[i+1] = '\0';
-
 		std::vector<int> sti(si,si+(*dimensions));
 		std::vector<int> eni(ei,ei+(*dimensions));
 
-		*chunkh = client->chunk_set(std::string(type_copy),
-						*dimensions,sti,eni);
-		free(type_copy);
+		*chunkh = (int64_t)(client->chunk_set(*dimensions,sti,eni));
 	}
 
 void FC_FUNC_GLOBAL_(df_chunk_free,DF_CHUNK_FREE)
 	(int64_t* chunkh)
 	{
-		client->chunk_free(*chunkh);
+		client->chunk_free((Damaris::chunk_h)(*chunkh));
 		chunkh = NULL;
 	}
 
@@ -95,7 +85,8 @@ void FC_FUNC_GLOBAL(df_chunk_write,DF_WRITE)
 		varname_copy[i+1] = '\0';
 
 		std::string var_name(varname_copy);
-		*ierr_f = client->chunk_write(*chunkh,var_name,*iteration_f,data_f);
+		*ierr_f = client->chunk_write((Damaris::chunk_h)(*chunkh),
+				var_name,*iteration_f,data_f);
 		free(varname_copy);
 	}
 
