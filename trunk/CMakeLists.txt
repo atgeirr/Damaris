@@ -20,7 +20,7 @@ if(HAS_MPI)
   message(STATUS "MPI support is enabled")
 endif(HAS_MPI)
 
-add_definitions (-D__INFO)
+#add_definitions (-D__INFO)
 #add_definitions (-D__DEBUG_ALL)
 #add_definitions (-D__BENCHMARK)
 
@@ -29,6 +29,23 @@ add_definitions (-D__INFO)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${DAMARIS_SOURCE_DIR}/cmake/Modules/")
 
 set(BOOST_ROOT ${EXTERNAL_ROOT})
+
+set(PYTHON_ROOT ${EXTERNAL_ROOT})
+find_package(PythonLibs)
+
+if (PYTHON_INCLUDE_PATH)
+  find_package(Boost 1.47 QUIET COMPONENTS python)
+  if (Boost_PYTHON_LIBRARY)
+    message(STATUS "Building Python support. Python lib: ${Boost_PYTHON_LIBRARY}")
+    message(STATUS "Python include: ${PYTHON_INCLUDE_PATH}")
+    include_directories(${PYTHON_INCLUDE_PATH})
+    link_directories(${PYTHON_LIBRARY_DIR})
+  else (Boost_PYTHON_LIBRARY)
+    message(STATUS "Python headers not found. Python support will not be built.")
+  endif (Boost_PYTHON_LIBRARY)
+else (PYTHON_INCLUDE_PATH)
+  message(STATUS "Python headers not found. Python support will not be built.")
+endif (PYTHON_INCLUDE_PATH)
 
 #set(HDF5_INCLUDE_DIR "${EXTERNAL_ROOT}/include")
 #set(HDF5_LIBRARY_DIR "${EXTERNAL_ROOT}/lib")
@@ -42,7 +59,7 @@ set(XERCESC_INCLUDE_DIR "${EXTERNAL_ROOT}/include")
 
 find_package(Boost REQUIRED)
 #find_package(XercesC REQUIRED)
-set(BOOST_LIBRARIES boost_filesystem boost_system boost_program_options)
+set(BOOST_LIBRARIES boost_python boost_filesystem boost_system boost_program_options)
 
 include_directories(${Boost_INCLUDE_DIR})
 include_directories(${XercesC_INCLUDE_DIR})

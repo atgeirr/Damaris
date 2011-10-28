@@ -60,8 +60,11 @@ class ActionsManager {
 		 * have an instance of ActionsManager that just acts as a set of actions from which
 		 * they can retrieve action's IDs.
 		 */
-		void addDynamicAction(std::string* eventName, 
-				std::string* fileName, std::string* functionName);
+		void addDynamicAction(const std::string &eventName, 
+				const std::string &fileName, const std::string& functionName);
+
+		void addScriptAction(const std::string &scriptName,
+				const std::string &fileName, const std::string &lang);
 
 		/**
 		 * \brief Call a function, in reaction to a fired event.
@@ -71,7 +74,7 @@ class ActionsManager {
 		 * \param[in,out] mm : Pointer to the MetadataManager.
 		 * The action to be called is here characterized by its name.
 		 */
-		void reactToUserSignal(std::string* sig, 
+		void reactToUserSignal(const std::string &sig, 
 				int32_t iteration, int32_t sourceID, MetadataManager* mm);
 
 		/**
@@ -89,7 +92,7 @@ class ActionsManager {
 		 * \brief Gets an action by name.
 		 * \param[in] name : name of the action.
 		 */ 
-		Action* getAction(std::string name);
+		Action* getAction(const std::string &name);
 
 		/**
 		 * \brief Gets an action by ID.

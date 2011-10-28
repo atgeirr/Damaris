@@ -97,10 +97,18 @@
 	<xs:attribute name="library" type="xs:string" use="required"/>
 	</xs:complexType>
 
+	<!-- Script node -->
+	<xs:complexType name="script_mdl">
+	<xs:attribute name="name"     type="xs:string" use="required" />
+	<xs:attribute name="file"     type="xs:string" use="required" />
+	<xs:attribute name="language" type="xs:string" use="required" />
+	</xs:complexType>
+
 	<!-- Actions node -->
 	<xs:complexType name="actions_mdl">
 	<xs:sequence>
 		<xs:element name="event" type="mdl:event_mdl" minOccurs="0" maxOccurs="unbounded"/>
+		<xs:element name="script" type="mdl:script_mdl" minOccurs="0" maxOccurs="unbounded"/>
 	</xs:sequence>
 	</xs:complexType>
 

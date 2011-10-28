@@ -1,11 +1,17 @@
 #add_definitions(-D__DAMARIS_CLIENT -D__INFO)
 
+
+
 set(DAMARIS_CLIENT_SRC 
 	${DAMARIS_SOURCE_DIR}/client/Client.cpp
 	${DAMARIS_SOURCE_DIR}/client/ClientC.cpp
 	${DAMARIS_SOURCE_DIR}/client/ClientFortran.cpp
-	${DAMARIS_SOURCE_DIR}/client/Client.f90
-	${DAMARIS_SOURCE_DIR}/xml/Model.cpp
+	${DAMARIS_SOURCE_DIR}/client/Client.f90)
+
+set(DAMARIS_MODEL_SRC
+	${DAMARIS_SOURCE_DIR}/xml/Model.cpp)
+
+set(DAMARIS_COMMON_SRC
 	${DAMARIS_SOURCE_DIR}/common/Parameter.cpp
 	${DAMARIS_SOURCE_DIR}/common/ParameterSet.cpp
 	${DAMARIS_SOURCE_DIR}/common/SharedMessageQueue.cpp
@@ -23,4 +29,11 @@ set(DAMARIS_CLIENT_SRC
 	${DAMARIS_SOURCE_DIR}/common/Types.cpp 
 	${DAMARIS_SOURCE_DIR}/common/Layout.cpp)
 
-add_library (damaris ${DAMARIS_CLIENT_SRC})
+set(DAMARIS_SCRIPTS_SRC
+	${DAMARIS_SOURCE_DIR}/scripts/PythonInterpreter.cpp
+	${DAMARIS_SOURCE_DIR}/scripts/PythonAction.cpp)
+
+add_library (damaris ${DAMARIS_CLIENT_SRC}
+		     ${DAMARIS_MODEL_SRC}
+	             ${DAMARIS_COMMON_SRC}
+		     ${DAMARIS_SCRIPTS_SRC})

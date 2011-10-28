@@ -1,4 +1,4 @@
-set(CLIENT_SIDE_LIBRARIES damaris ${BOOST_LIBRARIES} xerces-c rt)
+set(CLIENT_SIDE_LIBRARIES damaris ${BOOST_LIBRARIES} python2.6 xerces-c rt)
 set(EMB_SERVER_LIBRARIES damaris-server ${CLIENT_SIDE_LIBRARIES} dl)
 
 if(CMAKE_Fortran_COMPILER)

@@ -198,12 +198,13 @@ namespace Damaris {
 
 	void Configuration::fillActionsManager()
 	{
-		Model::actions_mdl::event_const_iterator p(baseModel->actions().event().begin());
-		for(; p < baseModel->actions().event().end(); p++) {
-			std::string name = p->name();
-			std::string fun = p->action();
-			std::string file = p->library();
-			actionsManager->addDynamicAction(&name,&file,&fun);
+		Model::actions_mdl::event_const_iterator e(baseModel->actions().event().begin());
+		for(; e < baseModel->actions().event().end(); e++) {
+			actionsManager->addDynamicAction(e->name(),e->library(),e->action());
+		}
+		Model::actions_mdl::script_const_iterator s(baseModel->actions().script().begin());
+		for(; s < baseModel->actions().script().end(); s++) {
+			actionsManager->addScriptAction(s->name(),s->file(),s->language());
 		}
 	}
 

@@ -7,7 +7,7 @@ int main(int argc, char** argv)
 	int id = 0;
 	float mydata[64][16][4];
 	char* varname = "my group/my variable";
-	char* event = "my event";
+	char* event = "my script";
 
 	if(argc != 2) {
 		printf("Usage: ./test_c <config.xml>\n");

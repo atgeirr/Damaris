@@ -30,6 +30,8 @@ language_e getLanguageFromString(const std::string* s)
 {
 	if(*s == "Fortran" || *s == "fortran" || *s == "FORTRAN" || *s == "F90" || *s == "F77"
 		|| *s == "f90" || *s == "f77") return LG_FORTRAN;
+	else 
+	if(*s == "Python" || *s == "python" || *s == "PYTHON") return LG_PYTHON;
 	else if(*s == "?") return LG_UNKNOWN;
 	else return LG_C;
 }

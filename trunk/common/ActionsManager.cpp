@@ -27,7 +27,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 
 #include "common/Debug.hpp"
+#include "common/Language.hpp"
 #include "common/ActionsManager.hpp"
+#include "scripts/PythonAction.hpp"
 
 namespace Damaris {
 	
@@ -44,37 +46,67 @@ ActionsManager::ActionsManager()
  * Finally, if an action has already been loaded with the same event name, the function does
  * not overwrite it, it prints a warning and returns.
  */
-void ActionsManager::addDynamicAction(std::string* eventName, 
-		std::string* fileName, std::string* functionName)
+void ActionsManager::addDynamicAction(const std::string& eventName, 
+		const std::string& fileName, const std::string &functionName)
 {
 
 	// check if there is already an action with the same name recorded
-	ActionSet::index<by_name>::type::iterator it = actions.get<by_name>().find(*eventName);
+	ActionSet::index<by_name>::type::iterator it = actions.get<by_name>().find(eventName);
 	if(it != actions.get<by_name>().end()) {
-		WARN("Inserting an action with a name identical to a previously defined action");
+		WARN("Inserting an action with a name identical to a another defined action");
 		return;
 	}
 
 	// create the action
-	DynamicAction* a = new DynamicAction(*functionName,*fileName);
+	DynamicAction* a = new DynamicAction(functionName,fileName);
 
 	// attribute an ID and a name to the action
 	a->id = actions.size();
-	a->name = *eventName;
+	a->name = eventName;
 
 	// put the action into the ActionsSet
 	actions.insert(boost::shared_ptr<Action>((Action*)a));
 }
 
-void ActionsManager::reactToUserSignal(std::string *sig, 
+void ActionsManager::addScriptAction(const std::string& name,
+		const std::string& fileName, const std::string& language) 
+{
+	DBG("Adding script " << name);
+	// check if there is already an action with the same name recorded
+        ActionSet::index<by_name>::type::iterator it = actions.get<by_name>().find(name);
+        if(it != actions.get<by_name>().end()) {
+                WARN("Inserting an action with a name identical to another defined action");
+                return;
+        }
+	DBG("A");
+	Action* a = NULL;
+	// create the action
+	switch(Language::getLanguageFromString(&(language))) {
+		case (Language::LG_PYTHON):
+			a = new PythonAction(fileName); break;
+		default:
+			ERROR("Undefined scripting language \"" << language 
+					<< "\" for action \"" << name << "\"");
+			return;
+	}
+	DBG("B");
+	// attribute an ID and a name to the action
+	a->id = actions.size();
+	a->name = name;
+	DBG("C");
+	// put the action into the ActionsSet
+	actions.insert(boost::shared_ptr<Action>(a));
+}
+
+void ActionsManager::reactToUserSignal(const std::string &sig, 
 		int32_t iteration, int32_t sourceID, MetadataManager* mm)
 {
-	ActionSet::index<by_name>::type::iterator it = actions.get<by_name>().find(*sig);
+	ActionSet::index<by_name>::type::iterator it = actions.get<by_name>().find(sig);
 	if(it != actions.get<by_name>().end())
 	{
 		(*(it->get()))(iteration,sourceID,mm);
 	} else {
-		ERROR("Unable to process \""<< sig->c_str() <<"\" signal: unknown event name");
+		ERROR("Unable to process \""<< sig <<"\" signal: unknown event name");
 	}	
 }
 
@@ -92,7 +124,7 @@ void ActionsManager::reactToUserSignal(int sigID,
 	}
 }
 
-Action* ActionsManager::getAction(std::string name)
+Action* ActionsManager::getAction(const std::string &name)
 {
 	ActionSet::index<by_name>::type::iterator it =
 		actions.get<by_name>().find(name);

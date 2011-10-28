@@ -252,6 +252,7 @@ namespace Damaris
     class parameter_mdl;
     class data_mdl;
     class event_mdl;
+    class script_mdl;
     class actions_mdl;
     class simulation_mdl;
   }
@@ -1285,6 +1286,94 @@ namespace Damaris
       ::xsd::cxx::tree::one< library_type > library_;
     };
 
+    class script_mdl: public ::xml_schema::type
+    {
+      public:
+      // name
+      // 
+      typedef ::xml_schema::string name_type;
+      typedef ::xsd::cxx::tree::traits< name_type, char > name_traits;
+
+      const name_type&
+      name () const;
+
+      name_type&
+      name ();
+
+      void
+      name (const name_type& x);
+
+      void
+      name (::std::auto_ptr< name_type > p);
+
+      // file
+      // 
+      typedef ::xml_schema::string file_type;
+      typedef ::xsd::cxx::tree::traits< file_type, char > file_traits;
+
+      const file_type&
+      file () const;
+
+      file_type&
+      file ();
+
+      void
+      file (const file_type& x);
+
+      void
+      file (::std::auto_ptr< file_type > p);
+
+      // language
+      // 
+      typedef ::xml_schema::string language_type;
+      typedef ::xsd::cxx::tree::traits< language_type, char > language_traits;
+
+      const language_type&
+      language () const;
+
+      language_type&
+      language ();
+
+      void
+      language (const language_type& x);
+
+      void
+      language (::std::auto_ptr< language_type > p);
+
+      // Constructors.
+      //
+      script_mdl (const name_type&,
+                  const file_type&,
+                  const language_type&);
+
+      script_mdl (const ::xercesc::DOMElement& e,
+                  ::xml_schema::flags f = 0,
+                  ::xml_schema::container* c = 0);
+
+      script_mdl (const script_mdl& x,
+                  ::xml_schema::flags f = 0,
+                  ::xml_schema::container* c = 0);
+
+      virtual script_mdl*
+      _clone (::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0) const;
+
+      virtual 
+      ~script_mdl ();
+
+      // Implementation.
+      //
+      protected:
+      void
+      parse (::xsd::cxx::xml::dom::parser< char >&,
+             ::xml_schema::flags);
+
+      protected:
+      ::xsd::cxx::tree::one< name_type > name_;
+      ::xsd::cxx::tree::one< file_type > file_;
+      ::xsd::cxx::tree::one< language_type > language_;
+    };
+
     class actions_mdl: public ::xml_schema::type
     {
       public:
@@ -1304,6 +1393,23 @@ namespace Damaris
 
       void
       event (const event_sequence& s);
+
+      // script
+      // 
+      typedef ::Damaris::Model::script_mdl script_type;
+      typedef ::xsd::cxx::tree::sequence< script_type > script_sequence;
+      typedef script_sequence::iterator script_iterator;
+      typedef script_sequence::const_iterator script_const_iterator;
+      typedef ::xsd::cxx::tree::traits< script_type, char > script_traits;
+
+      const script_sequence&
+      script () const;
+
+      script_sequence&
+      script ();
+
+      void
+      script (const script_sequence& s);
 
       // Constructors.
       //
@@ -1333,6 +1439,7 @@ namespace Damaris
 
       protected:
       event_sequence event_;
+      script_sequence script_;
     };
 
     class simulation_mdl: public ::xml_schema::type
