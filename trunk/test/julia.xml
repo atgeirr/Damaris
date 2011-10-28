@@ -17,6 +17,6 @@
 		</group>
 	</data>
 	<actions>
-		<event name="draw" action="draw_image" library="image.so"/>
+		<event name="draw" action="draw_image" library="image.so"/> 
 	</actions>
 </simulation>

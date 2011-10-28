@@ -102,7 +102,6 @@ size_t Chunk::getDataMemoryLength()
 bool Chunk::within(Layout* enclosing)
 {
 	bool b = (enclosing->getDimensions() == dimensions);
-	b = b && (enclosing->getType() == type);
 	if(b) {
 		for(unsigned int i=0; i < dimensions;i++) {
 			b = b && (startIndices[i] >= 0);
@@ -115,8 +114,6 @@ bool Chunk::within(Layout* enclosing)
 bool Chunk::within(Chunk* enclosing)
 {
 	bool b = (enclosing->getDimensions() == dimensions);
-	b = b && (enclosing->getType() == type);
-
 	if(b) {
 		for(unsigned int i=0; i < dimensions; i++) {
 			b = b && (startIndices[i] >= enclosing->getStartIndex(i));
