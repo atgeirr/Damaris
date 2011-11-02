@@ -15,50 +15,51 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file PythonAction.cpp
+ * \file PyInterpreter.cpp
  * \date October 2011
  * \author Matthieu Dorier
  * \version 0.3
  */
-#include <exception>
 
+#include "scripts/PyInterpreter.hpp"
 #include "common/Debug.hpp"
-#include "scripts/PythonInterpreter.hpp"
-#include "scripts/PythonAction.hpp"
 
 namespace Damaris {
 
-	PythonAction::PythonAction(std::string file)
-	: Action()
-	{
-		fileName	= file;
-		loaded		= true;
-	}
-	
-	PythonAction::PythonAction(std::string n, int i, std::string file)
-	: Action(n,i)
-	{
-		fileName 	= file;
-		loaded		= true;
-	}
+bool PyInterpreter::ready = false;
+PyObject* PyInterpreter::damaris = NULL;
+PyObject* PyInterpreter::metadata = NULL;
 
-	PythonAction::~PythonAction()
-	{
-	}
-	
-	void PythonAction::call(int32_t iteration, int32_t sourceID, MetadataManager* mm)
-	{
-		if(!PythonInterpreter::isReady())
-			load();
-		try {
-			PythonInterpreter::execFile(fileName);
-		} catch(std::exception &e) {
-			ERROR("in Python action \"" << name << "\"");
-		}
-	}
+void test() {
+	std::cout << "hello from python" << std::endl;
+}
 
-	void PythonAction::load()
-	{
-		PythonInterpreter::initialize();
-	}
+void PyInterpreter::initialize()
+{
+	Py_InitializeEx(0);
+
+	PyMethodDef _damarisModuleMethods[] = {{NULL, NULL, 0, NULL}};
+	damaris = Py_InitModule("damaris",_damarisModuleMethods);
+
+	PyMethodDef _metadataModuleMethods[] = {{NULL, NULL, 0, NULL}};
+	metadata = Py_InitModule("damaris.metadata",_metadataModuleMethods);
+
+	ready = true;
+}
+		
+void PyInterpreter::finalize()
+{
+	//ready = false;
+}
+
+bool PyInterpreter::isReady()
+{
+	return ready;
+}
+
+void PyInterpreter::execFile(const std::string& file) 
+{
+	boost::python::exec_file(boost::python::str(file));
+}
+
 }

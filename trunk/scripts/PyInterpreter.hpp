@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file PythonInterpreter.hpp
+ * \file PyInterpreter.hpp
  * \date October 2011
  * \author Matthieu Dorier
  * \version 0.3
@@ -23,23 +23,27 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __DAMARIS_PYTHON_H
 #define __DAMARIS_PYTHON_H
 
+#include <boost/python.hpp>
 #include <string>
 
 namespace Damaris {
 
-	class PythonInterpreter {
+	class PyInterpreter {
 				
 	private:
 		static bool ready;
+
+		static PyObject* damaris;
+		static PyObject* metadata;
 		/**
 		 * \brief Constructor.
 		 */
-		PythonInterpreter();
+		PyInterpreter();
 
 		/**
 		 * \brief Destructor.
 		 */
-		~PythonInterpreter();
+		~PyInterpreter();
 
 	public:
 

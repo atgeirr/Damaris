@@ -30,8 +30,8 @@ set(DAMARIS_COMMON_SRC
 	${DAMARIS_SOURCE_DIR}/common/Layout.cpp)
 
 set(DAMARIS_SCRIPTS_SRC
-	${DAMARIS_SOURCE_DIR}/scripts/PythonInterpreter.cpp
-	${DAMARIS_SOURCE_DIR}/scripts/PythonAction.cpp)
+	${DAMARIS_SOURCE_DIR}/scripts/PyInterpreter.cpp
+	${DAMARIS_SOURCE_DIR}/scripts/PyAction.cpp)
 
 add_library (damaris ${DAMARIS_CLIENT_SRC}
 		     ${DAMARIS_MODEL_SRC}

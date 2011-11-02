@@ -15,39 +15,50 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file PythonInterpreter.cpp
+ * \file PyAction.cpp
  * \date October 2011
  * \author Matthieu Dorier
  * \version 0.3
  */
+#include <exception>
 
-#include <boost/python.hpp>
 #include "common/Debug.hpp"
-#include "scripts/PythonInterpreter.hpp"
+#include "scripts/PyInterpreter.hpp"
+#include "scripts/PyAction.hpp"
 
 namespace Damaris {
 
-bool PythonInterpreter::ready = false;
+	PyAction::PyAction(std::string file)
+	: Action()
+	{
+		fileName	= file;
+		loaded		= true;
+	}
+	
+	PyAction::PyAction(std::string n, int i, std::string file)
+	: Action(n,i)
+	{
+		fileName 	= file;
+		loaded		= true;
+	}
 
-void PythonInterpreter::initialize()
-{
-	Py_InitializeEx(0);
-	ready = true;
-}
-		
-void PythonInterpreter::finalize()
-{
-	//ready = false;
-}
+	PyAction::~PyAction()
+	{
+	}
+	
+	void PyAction::call(int32_t iteration, int32_t sourceID, MetadataManager* mm)
+	{
+		if(!PyInterpreter::isReady())
+			load();
+		try {
+			PyInterpreter::execFile(fileName);
+		} catch(std::exception &e) {
+			ERROR("in Python action \"" << name << "\"");
+		}
+	}
 
-bool PythonInterpreter::isReady()
-{
-	return ready;
-}
-
-void PythonInterpreter::execFile(const std::string& file) 
-{
-	boost::python::exec_file(boost::python::str(file));
-}
-
+	void PyAction::load()
+	{
+		PyInterpreter::initialize();
+	}
 }

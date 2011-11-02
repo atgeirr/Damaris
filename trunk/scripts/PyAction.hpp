@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file PythonAction.hpp
+ * \file PyAction.hpp
  * \date October 2011
  * \author Matthieu Dorier
  * \version 0.3
@@ -30,10 +30,10 @@ namespace Damaris {
 class ActionsManager;
 
 /**
- * PythonAction is a child class of Action used for actions located in
+ * PyAction is a child class of Action used for actions located in
  * a Python script.
  */
-class PythonAction : public Action {
+class PyAction : public Action {
 
 	friend class ActionsManager;
 
@@ -49,7 +49,7 @@ class PythonAction : public Action {
 		 * \param[in] file : Name of the dynamic library to load (the file must be
 		 * in a directory set in the LD_LIBRARY_PATH environment variable).
 		 */
-		PythonAction(std::string file);
+		PyAction(std::string file);
 	public:
 
 		/**
@@ -58,12 +58,12 @@ class PythonAction : public Action {
 		 * \param[in] i : ID of the action in the ActionsSet.
 		 * \param[in] file : name of the file to load.
 		 */
-		PythonAction(std::string name, int i, std::string file);
+		PyAction(std::string name, int i, std::string file);
 
 		/**
 		 * \brief Destructor.
 		 */
-		~PythonAction();
+		~PyAction();
 		
 		/**
 		 * \brief Another way of calling the inner function.
