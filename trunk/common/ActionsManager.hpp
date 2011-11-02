@@ -29,6 +29,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/Action.hpp"
 #include "common/DynamicAction.hpp"
 #include "common/ActionSet.hpp"
+#include "common/Singleton.hpp"
 
 namespace Damaris {
 
@@ -38,7 +39,7 @@ namespace Damaris {
  * from scripts, etc. and call there functions upon reception
  * of events.
  */
-class ActionsManager {
+class ActionsManager : public Singleton<ActionsManager> {
 
 	private:
 		ActionSet actions; /*!< Set of actions indexed by ID and name. */

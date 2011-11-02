@@ -32,9 +32,11 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/ParameterSet.hpp"
 #include "common/MetadataManager.hpp"
 #include "common/ActionsManager.hpp"
+#include "common/Environment.hpp"
 #include "common/Language.hpp"
 #include "common/Layout.hpp"
 #include "common/Calc.hpp"
+#include "common/Singleton.hpp"
 
 namespace Damaris {
 
@@ -44,20 +46,21 @@ namespace Damaris {
 	 * file. It is independant of the format of this configuration file
 	 * (which is loaded through the Damaris::Model::simulation_mdl object).
 	 */
-	class Configuration {
-				
+	class Configuration : public Singleton<Configuration> {
+		friend class Singleton<Configuration>;
+
 	private:
-		static Configuration* m_instance; /*!< Pointer to a unique Configuration 
-						    object (singleton). */
+		bool initialized; /*! Indicates wether the object is initialized or not */
 
 		std::auto_ptr<Model::simulation_mdl> baseModel; /*!< Model extracted from 
 								  the XML file */
 		std::string* configFile; /*!< For information, we keep the name of the 
 					   configuration file. */
 		
-		ParameterSet parameters; 		/*!< List of parameters. */
-		ActionsManager* actionsManager;		/*!< Pointer to the ActionsManager. */
-		MetadataManager* metadataManager; 	/*!< Pointer to the MetadataManager. */
+		ParameterSet* 		parameters; 		/*!< List of parameters. */
+		ActionsManager* 	actionsManager;		/*!< Pointer to the ActionsManager. */
+		MetadataManager* 	metadataManager; 	/*!< Pointer to the MetadataManager. */
+		Environment* 		environment;		/*!< Pointer to the Environment. */
 		
 		Calc<std::string::const_iterator,ParameterSet>* layoutInterp; /*!< Parser for 
 										layout interpretation. */
@@ -66,20 +69,15 @@ namespace Damaris {
 						  from the base model. */
 		void fillMetadataManager(); 	/*!< Fills the metadata manager 
 						  with variables from the base model. */
-		void readVariablesInSubGroup(const Model::group_mdl* g, 
-				const std::string &name); 
+		void readVariablesInSubGroup(const Model::group_mdl* g, const std::string &name);
 		void fillActionsManager(); 	/*!< Fills the ActionsManager with 
 						  Actions from the base model. */
 
-	protected:
-		
 		/**
-		 * \brief Constructor.
-		 * \param[in] mdl : simulation base model from XML file.
-		 * \param[in] configName : name of the configuration file that has been loaded.
+		 * \brief Constructor. Can be called only by Singleton object.
 		 */
-		Configuration(std::auto_ptr<Model::simulation_mdl> mdl, const std::string& configName);
-
+		Configuration();
+		
 		/**
 		 * \brief Destructor.
 		 */
@@ -87,71 +85,18 @@ namespace Damaris {
 
 	public:
 		/**
-		 * \brief Retrieve an instance of Configuration (singleton design pattern).
-		 * \return NULL if Configuration::initialize has never been called before, 
-		 * a valid pointer otherwise.
-		 */
-		static Configuration* getInstance();
-
-		/**
 		 * \brief Initializes Configuration with a given model and configuration file.
 		 * \param[in] mdl : simulation base model.
 		 * \param[in] configName : name of the configuration file to load.
 		 */
-		static void initialize(std::auto_ptr<Model::simulation_mdl> mdl, 
+		void initialize(std::auto_ptr<Model::simulation_mdl> mdl, 
 				const std::string & configName);
-		
-		/**
-		 * \brief Finalize (free resources) Configuration.
-		 * If Configuration::getInstance() is called after finalize, NULL is returned.
-		 */
-		static void finalize();
 		
 		/**
 		 * \brief Get the name of the XML file.
 		 * \return Name of the XML file. Do not delete this pointer.
 		 */
 		const std::string& getFileName() { return *configFile; }
-
-		/**
-		 * \brief Get the name of the simulation.
-		 */
-		const std::string & getSimulationName() const;
-
-		/**
-		 * \brief Get the default language for the running simulation.
-		 */
-		Language::language_e getDefaultLanguage() const;
-
-		/**
-		 * \brief Get the number of clients per node.
-		 */
-		int getClientsPerNode() const;
-
-		/**
-		 * \brief Get the number of cores per node.
-		 */
-		int getCoresPerNode() const;
-
-		/**
-		 * \brief Get the name of the shared memory segment.
-		 */
-		const std::string& getSegmentName() const;
-
-		/**
-		 * \brief Get the size (in bytes) of the shared memory segment.
-		 */
-		size_t getSegmentSize() const;
-		
-		/**
-		 * \brief Get the name of the message queue.
-		 */
-		const std::string & getMsgQueueName() const;
-
-		/**
-		 * \brief Get the size (in number of messages) of the message queue.
-		 */
-		size_t getMsgQueueSize() const;
 
 		/**
 		 * \brief Get the parameters set.
@@ -167,6 +112,11 @@ namespace Damaris {
 		 * \brief Get the MetadataManager.
 		 */
 		MetadataManager* getMetadataManager();
+		
+		/**
+		 * \brief Get the Environment.
+		 */
+		Environment* getEnvironment();
 };
 
 }

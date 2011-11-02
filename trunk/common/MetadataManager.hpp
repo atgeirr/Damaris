@@ -32,11 +32,12 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/Layout.hpp"
 #include "common/Variable.hpp"
 #include "common/VariableSet.hpp"
+#include "common/Singleton.hpp"
 
 namespace Damaris {
 
-	class MetadataManager {
-
+	class MetadataManager : public Singleton<MetadataManager> {
+		friend class Singleton<MetadataManager>;
 	private:
 		std::map<std::string,Layout> layouts; /*!< Map associating names with layouts. */
 		VariableSet variables; /*!< Variables indexed by name and by id. */

@@ -67,7 +67,7 @@ class Client {
 		/**
 		 * \brief private function called by constructors.
 		 */
-		void init(Configuration* config, Environment* env);	
+		void init(Configuration* config);	
 	public:
 		/** 
 		 * \brief Constructor.
@@ -88,7 +88,7 @@ class Client {
 		 * \param[in] config : Configuration object (initialized).
 		 * \param[in] env : Environment object (initialized).
 		 */
-		Client(Configuration* config, Environment* env);
+		Client(Configuration* config);
 
 		/**
 		 * \brief Writes a full variable.

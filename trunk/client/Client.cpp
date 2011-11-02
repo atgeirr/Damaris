@@ -45,23 +45,24 @@ namespace Damaris {
 
 		DBG("Model initialized successfuly");
 
-		Configuration::initialize(mdl,configfile);
 		config = Configuration::getInstance();
+		config->initialize(mdl,configfile);
 		DBG("Configuration intialized successfuly");
 
-		Environment::initialize(mdl,coreID);
-		env = Environment::getInstance();
+		env = config->getEnvironment();
+		env->setID(coreID);
 		DBG("Environment initialized succesfuly");
-		init(config,env);
+		init(config);
 	}
 
-	Client::Client(Configuration* config, Environment* env)
+	Client::Client(Configuration* config)
 	{
-		init(config,env);
+		init(config);
 	}
 
-	void Client::init(Configuration* config, Environment* env)
+	void Client::init(Configuration* config)
 	{
+		env = config->getEnvironment();
 		id = env->getID();
 
 		metadataManager = config->getMetadataManager();
@@ -73,14 +74,14 @@ namespace Damaris {
 		try {
 #ifdef __SYSV
 			msgQueue = SharedMessageQueue::open(sysv_shmem,
-					config->getMsgQueueName().c_str());
+					env->getMsgQueueName().c_str());
 			segment = SharedMemorySegment::open(sysv_shmem,
-					config->getSegmentName().c_str());
+					env->getSegmentName().c_str());
 #else
 			msgQueue = SharedMessageQueue::open(posix_shmem,
-					config->getMsgQueueName().c_str());
+					env->getMsgQueueName().c_str());
 			segment = SharedMemorySegment::open(posix_shmem,
-					config->getSegmentName().c_str());
+					env->getSegmentName().c_str());
 #endif
 			DBG("Client initialized successfully for core " << id 
 			    << " with configuration \"" << config->getFileName() << "\"");
@@ -357,8 +358,7 @@ namespace Damaris {
 		delete msgQueue;
 		delete segment;
 
-		config->finalize();
-		env->finalize();
+		config->kill();
 
 		INFO("Client destroyed successfuly");
 	}

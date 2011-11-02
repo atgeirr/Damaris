@@ -58,9 +58,8 @@ class Server {
 		 * and a pre-initialized environment 
 		 *
 		 * \param[in] config : a fully initialized Configuration object.
-		 * \param[in] env : a fully initialized Environment object.
 		 */
-		Server(Configuration* config, Environment* env);
+		Server(Configuration* config);
 
 		/**
 		 * \brief Destructor 

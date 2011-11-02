@@ -35,21 +35,21 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Damaris {
 
-	Configuration* Configuration::m_instance = NULL;
-		
-	Configuration::Configuration(std::auto_ptr<Model::simulation_mdl> mdl, 
-			const std::string & cfgFile)
+	Configuration::Configuration()
 	{
-		configFile = new std::string(cfgFile);
-		baseModel = mdl;
-		metadataManager = NULL;
+		initialized = false;
 		actionsManager = NULL;
-		fillParameterSet();
-		layoutInterp = new Calc<std::string::const_iterator,ParameterSet>(parameters);
+		metadataManager = NULL;
+		environment = NULL;
 	}
 
 	Configuration::~Configuration()
 	{
+		ActionsManager::kill();
+		MetadataManager::kill();
+		Environment::kill();
+
+		delete parameters;
 		delete configFile;
 		delete layoutInterp;
 	}
@@ -61,32 +61,32 @@ namespace Damaris {
 			std::string name(p->name());
 			if(p->type() == "short") {
 				short value = boost::lexical_cast<short>(p->value());
-				parameters.set<short>(name,value);
+				parameters->set<short>(name,value);
 			} else
 			if(p->type() == "int") {
 				std::string name(p->name());
 				int value = boost::lexical_cast<int>(p->value());
-				parameters.set<int>(name,value);
+				parameters->set<int>(name,value);
 			} else 
 			if(p->type() == "long") {
 				long value = boost::lexical_cast<long>(p->value());
-				parameters.set<long>(name,value);
+				parameters->set<long>(name,value);
 			} else
 			if(p->type() == "float") {
 				float value = boost::lexical_cast<float>(p->value());
-				parameters.set<float>(name,value);
+				parameters->set<float>(name,value);
 			} else
 			if(p->type() == "double") {
 				double value = boost::lexical_cast<double>(p->value());
-				parameters.set<double>(name,value);
+				parameters->set<double>(name,value);
 			} else
 			if(p->type() == "char") {
 				char value = boost::lexical_cast<char>(p->value());
-				parameters.set<char>(name,value);
+				parameters->set<char>(name,value);
 			} else
 			if(p->type() == "string") {
 				std::string value = boost::lexical_cast<std::string>(p->value());
-				parameters.set<std::string>(name,value);
+				parameters->set<std::string>(name,value);
 			} else
 			{
 				ERROR("Undefined type \"" << p->type() 
@@ -97,7 +97,7 @@ namespace Damaris {
 	
 	ParameterSet* Configuration::getParameterSet()
 	{
-		return &parameters;
+		return parameters;
 	}
 
 	MetadataManager* Configuration::getMetadataManager()
@@ -190,7 +190,7 @@ namespace Damaris {
 	{
 		if(actionsManager == NULL)
 		{
-			actionsManager = new ActionsManager();
+			actionsManager = ActionsManager::getInstance();
 			fillActionsManager();
 		}
 		return actionsManager;
@@ -208,67 +208,25 @@ namespace Damaris {
 		}
 	}
 
-	Configuration* Configuration::getInstance()
+	Environment* Configuration::getEnvironment()
 	{
-		return m_instance;
-	}
-
-	void Configuration::initialize(std::auto_ptr<Model::simulation_mdl> mdl, const std::string& cfgFile)
-	{
-		if(m_instance) {
-			WARN("Configuration already initialized.");
-			return;
-		}
-		m_instance = new Configuration(mdl,cfgFile);
+		return environment;
 	}
 	
-	void Configuration::finalize()
+	void Configuration::initialize(std::auto_ptr<Model::simulation_mdl> mdl, const std::string& cfgFile)
 	{
-		if(m_instance == NULL) {
-			WARN("Configuration already finalized.");
-			return;
-		}
-		delete m_instance;
-	}
+		configFile = new std::string(cfgFile);
+		baseModel = mdl;
+		Model::simulation_mdl* tmpModel = baseModel.get();
 
-	const std::string & Configuration::getMsgQueueName() const
-	{
-		return baseModel->architecture().queue().name();
-	}
+		parameters = new ParameterSet();
+		fillParameterSet();
+		
+		environment = Environment::getInstance();
+		environment->initialize(tmpModel);
 
-	size_t Configuration::getMsgQueueSize() const
-	{
-		return (size_t)(baseModel->architecture().queue().size());
-	}
-
-	const std::string & Configuration::getSegmentName() const
-	{
-		return baseModel->architecture().buffer().name();
-	}
-
-	size_t Configuration::getSegmentSize() const
-	{
-		return (size_t)(baseModel->architecture().buffer().size());
-	}
-
-	int Configuration::getCoresPerNode() const 
-	{
-		return baseModel->architecture().cores().count();
-	}
-
-	int Configuration::getClientsPerNode() const
-	{
-		return baseModel->architecture().cores().clients().count();
-	}
-
-	const std::string & Configuration::getSimulationName() const
-	{
-		return baseModel->name();
-	}
-
-	Language::language_e Configuration::getDefaultLanguage() const
-	{
-		return Language::getLanguageFromString(&(baseModel->language()));
+		layoutInterp = new Calc<std::string::const_iterator,ParameterSet>(*parameters);
+		initialized = true;
 	}
 }
 

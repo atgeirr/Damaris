@@ -1,19 +1,19 @@
 /*******************************************************************
-This file is part of Damaris.
+  This file is part of Damaris.
 
-Damaris is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+  Damaris is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
 
-Damaris is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+  Damaris is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
-********************************************************************/
+  You should have received a copy of the GNU General Public License
+  along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
+ ********************************************************************/
 /**
  * \file Environment.hpp
  * \date October 2011
@@ -26,34 +26,57 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Damaris {
 
-	Environment* Environment::m_instance = NULL;
-
-	Environment::Environment(std::auto_ptr<Model::simulation_mdl> mdl, int pid)
+	Environment::Environment()
 	{
-		model = mdl;
-		id = pid;
+		initialized = false;
 	}
 
-	Environment* Environment::getInstance()
+	Environment::~Environment() 
+	{ }
+
+	void Environment::initialize(Model::simulation_mdl* mdl)
 	{
-		return m_instance;
+		baseModel = mdl;
+		initialized = true;
 	}
 
-	void Environment::initialize(std::auto_ptr<Model::simulation_mdl> mdl, int pid)
+	const std::string & Environment::getMsgQueueName() const
 	{
-		if(m_instance) {
-			WARN("Environment already initialized.");
-			return;
-		}
-		m_instance = new Environment(mdl,pid);
+		return baseModel->architecture().queue().name();
 	}
 
-	void Environment::finalize()
+	size_t Environment::getMsgQueueSize() const
 	{
-		if(m_instance == NULL) {
-			WARN("Environment already finalized.");
-			return;
-		}
-		delete m_instance;
+		return (size_t)(baseModel->architecture().queue().size());
+	}
+
+	const std::string & Environment::getSegmentName() const
+	{
+		return baseModel->architecture().buffer().name();
+	}
+
+	size_t Environment::getSegmentSize() const
+	{
+		return (size_t)(baseModel->architecture().buffer().size());
+	}
+
+	int Environment::getCoresPerNode() const
+	{
+		return baseModel->architecture().cores().count();
+	}
+
+	int Environment::getClientsPerNode() const
+	{
+		return baseModel->architecture().cores().clients().count();
+	}
+
+	const std::string & Environment::getSimulationName() const
+	{
+		return baseModel->name();
+	}
+
+	Language::language_e Environment::getDefaultLanguage() const
+	{
+		return Language::getLanguageFromString(&(baseModel->language()));
 	}
 }

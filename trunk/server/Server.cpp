@@ -43,31 +43,29 @@ Server::Server(const std::string &cf, int id)
 		mdl(Model::simulation(cf.c_str(),xml_schema::flags::dont_validate));
 	DBG("Model build successfuly from configuration file");		
 
-	Configuration::initialize(mdl,cf);
+	config = Configuration::getInstance();
+	config->initialize(mdl,cf);
 	DBG("Configuration initialized successfuly");
 
-	Environment::initialize(mdl,id);
+	env = config->getEnvironment();
+	env->setID(id);
 	DBG("Environment initialized successfuly");
-
-	config = Configuration::getInstance();
-	env    = Environment::getInstance();
 
 	init();
 }
 
 /* constructor for standalone mode */
-Server::Server(Configuration* c, Environment *e)
+Server::Server(Configuration* c)
 {
 	config = c;
-	env    = e;
-	
+	env    = config->getEnvironment();
 	init();
 }
 
 /* initialization */
 void Server::init() 
 {
-	needStop = config->getClientsPerNode();
+	needStop = env->getClientsPerNode();
 	/* creating shared structures */
 	DBG("Starting creation of shared structures...");
 	try {
@@ -76,26 +74,26 @@ void Server::init()
 		SharedMemorySegment::remove(sysv_shmem,config->getSegmentName()->c_str());	
 		
 		msgQueue = SharedMessageQueue::create(sysv_shmem,
-					      config->getMsgQueueName().c_str(),
-					      (size_t)config->getMsgQueueSize(),
+					      env->getMsgQueueName().c_str(),
+					      (size_t)env->getMsgQueueSize(),
 					      sizeof(Message));
 		segment = SharedMemorySegment::create(sysv_shmem,
-						config->getSegmentName().c_str(),
-						(size_t)config->getSegmentSize());
+						env->getSegmentName().c_str(),
+						(size_t)entv->getSegmentSize());
 
 #else
-		SharedMessageQueue::remove(posix_shmem,config->getMsgQueueName().c_str());
-		SharedMemorySegment::remove(posix_shmem,config->getSegmentName().c_str());      
+		SharedMessageQueue::remove(posix_shmem,env->getMsgQueueName().c_str());
+		SharedMemorySegment::remove(posix_shmem,env->getSegmentName().c_str());      
 		
 		msgQueue = SharedMessageQueue::create(posix_shmem,
-						config->getMsgQueueName().c_str(),
-						(size_t)config->getMsgQueueSize(),
+						env->getMsgQueueName().c_str(),
+						(size_t)env->getMsgQueueSize(),
 						sizeof(Message));
 		DBG("Shared message queue created");
                        
 		segment = SharedMemorySegment::create(posix_shmem,
-						config->getSegmentName().c_str(),
-						(size_t)config->getSegmentSize());
+						env->getSegmentName().c_str(),
+						(size_t)env->getSegmentSize());
 		DBG("Shared Segment created");
 #endif
 	}
@@ -121,17 +119,16 @@ void Server::init()
 Server::~Server()
 {
 #ifdef __SYSV
-	SharedMessageQueue::remove(sysv_shmem,config->getMsgQueueName().c_str());
-	SharedMemorySegment::remove(sysv_shmem,config->getSegmentName().c_str());
+	SharedMessageQueue::remove(sysv_shmem,env->getMsgQueueName().c_str());
+	SharedMemorySegment::remove(sysv_shmem,env->getSegmentName().c_str());
 #else
-	SharedMessageQueue::remove(posix_shmem,config->getMsgQueueName().c_str());
-	SharedMemorySegment::remove(posix_shmem,config->getSegmentName().c_str());
+	SharedMessageQueue::remove(posix_shmem,env->getMsgQueueName().c_str());
+	SharedMemorySegment::remove(posix_shmem,env->getSegmentName().c_str());
 #endif
 	delete msgQueue;
 	delete segment;
 		
-	Configuration::finalize();
-	Environment::finalize();
+	Configuration::kill();
 }
 	
 /* starts the server and enter the main loop */
@@ -147,7 +144,7 @@ int Server::run()
 	while(needStop > 0) {
 		received = msgQueue->tryReceive(msg,sizeof(Message), recvSize, priority);
 		if(received) {
-			DBG("Received a	message of type " << msg->type);
+			DBG("Received a message of type " << msg->type);
 			processMessage(msg);
 		}
 	}
@@ -166,8 +163,9 @@ void Server::processMessage(Message* msg)
 	
 	if(msg->type == MSG_VAR)
 	{
-		ShmChunk* chunk = new ShmChunk(segment,handle); 
+		ShmChunk* chunk = new ShmChunk(segment,handle);
 		Variable* v = metadataManager->getVariable(object);
+		
 		if(v != NULL) v->attachChunk(chunk);
 		else {
 			// the variable is unknown, discarde it
@@ -179,7 +177,7 @@ void Server::processMessage(Message* msg)
 		return;
 	}
 	
-	if(msg->type == MSG_SIG) 
+	if(msg->type == MSG_SIG)
 	{
 		actionsManager->reactToUserSignal(object,
 				iteration,source,metadataManager);
@@ -216,11 +214,12 @@ Client* start_mpi_entity(const std::string& configFile, MPI_Comm* newcomm, int* 
 	std::auto_ptr<Model::simulation_mdl> 
 		mdl(Model::simulation(configFile.c_str(),xml_schema::flags::dont_validate));
 
-	Configuration::initialize(mdl,configFile);
 	Configuration* config = Configuration::getInstance();
+	config->initialize(mdl,configFile);	
 
-	int clpn = config->getClientsPerNode();
-	int copn = config->getCoresPerNode();
+	Environment* env = config->getEnvironment();
+	int clpn = env->getClientsPerNode();
+	int copn = env->getCoresPerNode();
 
 	DBG("Starting MPI instances for " << clpn << " clients per core");
 	int is_server = (rank % copn) < (copn - clpn);
@@ -230,16 +229,15 @@ Client* start_mpi_entity(const std::string& configFile, MPI_Comm* newcomm, int* 
 	MPI_Comm_rank(*newcomm,newrank);
 	MPI_Comm_size(*newcomm,newsize);
 
-	Environment::initialize(mdl,rank);
-	Environment* env = Environment::getInstance();
+	env->setID(rank);
 
 	if(is_client) {
 		DBG("Client starting, rank = " << rank);
 		MPI_Barrier(MPI_COMM_WORLD);
-		return new Client(config,env);
+		return new Client(config);
 	} else {
 		DBG("Server starting, rank = " << rank);
-		Server server(config,env);
+		Server server(config);
 		MPI_Barrier(MPI_COMM_WORLD);
 		server.run();
 		return NULL;

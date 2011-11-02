@@ -105,13 +105,16 @@ Options::Options(int argc, char** argv)
 
 		std::auto_ptr<Model::simulation_mdl> 
 			mdl(Model::simulation(configFile->c_str(),
-				xml_schema::flags::dont_validate));
+			xml_schema::flags::dont_validate));
 
-		Configuration::initialize(mdl,*configFile);
+		Model::simulation_mdl* tmp = mdl.get();
+
 		config = Configuration::getInstance();
-
-		Environment::initialize(mdl,id);
-		env = Environment::getInstance();
+		config->initialize(mdl,*configFile);
+	
+		env = config->getEnvironment();
+		env->initialize(tmp);
+		env->setID(id);
 	} else {
 		ERROR("No configuration file provided," 
 			<< " use --configuration=<file.xml> or -C <file.xml>");
