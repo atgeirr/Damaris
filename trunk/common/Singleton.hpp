@@ -40,10 +40,6 @@ template <typename T>
 				{
 					_instance = new T;
 				}
-				else
-				{
-					WARN("Singleton object already initialized");
-				}
 				return (static_cast<T*> (_instance));
 			}
 

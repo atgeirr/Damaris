@@ -49,8 +49,8 @@ void Variable::attachChunk(Chunk* chunk)
 	chunks.insert(boost::shared_ptr<Chunk>(chunk));
 }
 
-ChunkIndexBySource::iterator Variable::getChunksBySource(int source, 
-		ChunkIndexBySource::iterator &end)
+ChunkIndexBySource::iterator Variable::getChunksBySource(int source,
+	ChunkIndexBySource::iterator& end)
 {
 	ChunkIndexBySource::iterator it = chunks.get<by_source>().find(source);
 	end = chunks.get<by_source>().end();
@@ -58,11 +58,17 @@ ChunkIndexBySource::iterator Variable::getChunksBySource(int source,
 }
 
 ChunkIndexByIteration::iterator Variable::getChunksByIteration(int iteration,
-		ChunkIndexByIteration::iterator &end) 
+	ChunkIndexByIteration::iterator& end) 
 {
         ChunkIndexByIteration::iterator it = chunks.get<by_iteration>().find(iteration);
-        end = chunks.get<by_iteration>().end();
+	end = chunks.get<by_iteration>().end();
         return it;
+}
+
+ChunkIndex::iterator Variable::getChunks(ChunkIndex::iterator &end)
+{
+	end = chunks.get<by_iteration>().end();
+	return chunks.get<by_iteration>().begin();
 }
 
 void Variable::eraseChunk(ChunkIndexByIteration::iterator &it)

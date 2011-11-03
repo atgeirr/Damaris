@@ -50,6 +50,7 @@ typedef boost::multi_index_container<
 typedef ChunkSet::index<by_source>::type ChunkIndexBySource;
 typedef ChunkSet::index<by_iteration>::type ChunkIndexByIteration;
 
+typedef ChunkIndexByIteration ChunkIndex;
 }
 
 #endif

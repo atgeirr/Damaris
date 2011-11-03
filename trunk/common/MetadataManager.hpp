@@ -18,7 +18,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \file MetadataManager.hpp
  * \date July 2011
  * \author Matthieu Dorier
- * \version 0.1
+ * \version 0.3
  *
  * MetadataManager holds pointers to all Variables published.
  * These variables can be retrieved by their identifier (name,source,iteration).
