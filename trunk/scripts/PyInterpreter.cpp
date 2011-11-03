@@ -20,46 +20,75 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \author Matthieu Dorier
  * \version 0.3
  */
+#include <boost/python.hpp>
+#include <string>
 
-#include "scripts/PyInterpreter.hpp"
 #include "common/Debug.hpp"
+#include "common/MetadataManager.hpp"
+#include "scripts/PyVariable.hpp"
+#include "scripts/PyInterpreter.hpp"
+
+namespace bp = boost::python;
 
 namespace Damaris {
+namespace Python {
 
-bool PyInterpreter::ready = false;
-PyObject* PyInterpreter::damaris = NULL;
-PyObject* PyInterpreter::metadata = NULL;
+static bool ready = false;
+static bp::object dict;
 
-void test() {
-	std::cout << "hello from python" << std::endl;
+static void open(const std::string& varname)
+{
+	MetadataManager* metadata = MetadataManager::getInstance();
+	Variable* v = metadata->getVariable(varname);
+	if(v == NULL) {
+		ERROR("In damaris.open(): undefined variable \"" << varname << "\"");
+	} else {
+		INFO("Variable \"" << varname << "\" found");
+	}
 }
 
-void PyInterpreter::initialize()
+BOOST_PYTHON_MODULE(damaris)
 {
-	Py_InitializeEx(0);
+	bp::def("open",&open);
+	bp::class_<PyVariable>("Variable")
+		.def("chunks",&PyVariable::chunks);
+}
 
-	PyMethodDef _damarisModuleMethods[] = {{NULL, NULL, 0, NULL}};
-	damaris = Py_InitModule("damaris",_damarisModuleMethods);
+void initialize()
+{
+	try {
+		PyImport_AppendInittab((char*)"damaris",&initdamaris);
+		Py_InitializeEx(0);
+		bp::object main = bp::import("__main__");
+		dict = main.attr("__dict__");
 
-	PyMethodDef _metadataModuleMethods[] = {{NULL, NULL, 0, NULL}};
-	metadata = Py_InitModule("damaris.metadata",_metadataModuleMethods);
-
+	} catch(boost::python::error_already_set) {
+		PyErr_Print();
+	}
 	ready = true;
 }
 		
-void PyInterpreter::finalize()
+void finalize()
 {
-	//ready = false;
+	ready = false;
+	Py_Finalize();
 }
 
-bool PyInterpreter::isReady()
+void execFile(const std::string& file) 
 {
-	return ready;
+	if(!ready)
+		initialize();
+	if(ready) {
+		try {
+			bp::exec_file(bp::str(file),dict,dict);
+		} catch(...) {
+			ERROR("While executing file \"" << file << "\"");
+			PyErr_Print();
+		}
+	} else {
+		ERROR("Unable to initialize Python before calling \"" << file << "\"");
+	}
 }
 
-void PyInterpreter::execFile(const std::string& file) 
-{
-	boost::python::exec_file(boost::python::str(file));
 }
-
 }

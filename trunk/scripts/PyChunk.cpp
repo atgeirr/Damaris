@@ -15,47 +15,26 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file PyAction.cpp
+ * \file PyChunk.cpp
  * \date October 2011
  * \author Matthieu Dorier
  * \version 0.3
  */
-#include <exception>
-
-#include "common/Debug.hpp"
-#include "scripts/PyInterpreter.hpp"
-#include "scripts/PyAction.hpp"
+#include "scripts/PyChunk.hpp"
+#include <numpy/arrayobject.h>
 
 namespace Damaris {
 
-	PyAction::PyAction(std::string file)
-	: Action()
-	{
-		fileName	= file;
-		loaded		= true;
-	}
+namespace bp = boost::python;
 	
-	PyAction::PyAction(std::string n, int i, std::string file)
-	: Action(n,i)
-	{
-		fileName 	= file;
-		loaded		= true;
-	}
-
-	PyAction::~PyAction()
-	{
-	}
-	
-	void PyAction::call(int32_t iteration, int32_t sourceID, MetadataManager* mm)
-	{
-		try {
-			Python::execFile(fileName);
-		} catch(std::exception &e) {
-			ERROR("in Python action \"" << name << "\": "<< e.what());
-		}
-	}
-
-	void PyAction::load()
-	{
-	}
+PyChunk::PyChunk()
+{
+	throw(bp::error_already_set());
 }
+
+PyChunk::PyChunk(Chunk* c)
+{
+	inner = c;
+}
+}
+

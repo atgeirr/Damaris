@@ -15,47 +15,32 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file PyAction.cpp
+ * \file PyVariable.hpp
  * \date October 2011
  * \author Matthieu Dorier
  * \version 0.3
  */
-#include <exception>
+#ifndef __DAMARIS_PYTHON_VAR_DECO_H
+#define __DAMARIS_PYTHON_VAR_DECO_H
 
-#include "common/Debug.hpp"
-#include "scripts/PyInterpreter.hpp"
-#include "scripts/PyAction.hpp"
+#include <boost/python.hpp>
+#include "common/Variable.hpp"
 
 namespace Damaris {
 
-	PyAction::PyAction(std::string file)
-	: Action()
-	{
-		fileName	= file;
-		loaded		= true;
-	}
+namespace bp = boost::python;
 	
-	PyAction::PyAction(std::string n, int i, std::string file)
-	: Action(n,i)
-	{
-		fileName 	= file;
-		loaded		= true;
-	}
+	class PyVariable {
+	private:
+		Variable* inner;
 
-	PyAction::~PyAction()
-	{
-	}
-	
-	void PyAction::call(int32_t iteration, int32_t sourceID, MetadataManager* mm)
-	{
-		try {
-			Python::execFile(fileName);
-		} catch(std::exception &e) {
-			ERROR("in Python action \"" << name << "\": "<< e.what());
-		}
-	}
+	public:
+		PyVariable();
 
-	void PyAction::load()
-	{
-	}
+		PyVariable(Variable* v);
+
+		bp::list chunks(const bp::dict& args);
+	};
 }
+
+#endif

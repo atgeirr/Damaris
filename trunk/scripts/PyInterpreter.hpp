@@ -23,45 +23,16 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __DAMARIS_PYTHON_H
 #define __DAMARIS_PYTHON_H
 
-#include <boost/python.hpp>
 #include <string>
 
 namespace Damaris {
-
-	class PyInterpreter {
+namespace Python {
 				
-	private:
-		static bool ready;
-
-		static PyObject* damaris;
-		static PyObject* metadata;
-		/**
-		 * \brief Constructor.
-		 */
-		PyInterpreter();
-
-		/**
-		 * \brief Destructor.
-		 */
-		~PyInterpreter();
-
-	public:
-
-		/**
-		 * \brief Initializes PythonInterpreter.
-		 */
-		static void initialize();
+	void initialize();
 		
-		/**
-		 * \brief Finalize (free resources).
-		 * If Python::getInstance() is called after finalize, NULL is returned.
-		 */
-		static void finalize();
+	void finalize();
 
-		static bool isReady();
-
-		static void execFile(const std::string &filename);
-};
-
+	void execFile(const std::string &filename);
+}
 }
 #endif

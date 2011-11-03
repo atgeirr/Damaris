@@ -15,47 +15,39 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file PyAction.cpp
+ * \file PyVariable.cpp
  * \date October 2011
  * \author Matthieu Dorier
  * \version 0.3
  */
-#include <exception>
-
-#include "common/Debug.hpp"
-#include "scripts/PyInterpreter.hpp"
-#include "scripts/PyAction.hpp"
+#include "scripts/PyVariable.hpp"
+#include "scripts/PyChunk.hpp"
 
 namespace Damaris {
 
-	PyAction::PyAction(std::string file)
-	: Action()
-	{
-		fileName	= file;
-		loaded		= true;
-	}
-	
-	PyAction::PyAction(std::string n, int i, std::string file)
-	: Action(n,i)
-	{
-		fileName 	= file;
-		loaded		= true;
-	}
+namespace bp = boost::python;
 
-	PyAction::~PyAction()
-	{
-	}
-	
-	void PyAction::call(int32_t iteration, int32_t sourceID, MetadataManager* mm)
-	{
-		try {
-			Python::execFile(fileName);
-		} catch(std::exception &e) {
-			ERROR("in Python action \"" << name << "\": "<< e.what());
-		}
-	}
+PyVariable::PyVariable() 
+{
+	throw(bp::error_already_set());
+}
 
-	void PyAction::load()
-	{
+PyVariable::PyVariable(Variable* v) 
+{
+	inner = v;
+}
+
+bp::list PyVariable::chunks(const bp::dict &args)
+{
+	bp::list result;
+	if(inner == NULL) return result;
+	ChunkIndex::iterator it;
+	ChunkIndex::iterator end;
+	it = inner->getChunks(end);
+	while(it != end) {
+		result.append(PyChunk(it->get()));
 	}
+	return result;
+}
+
 }
