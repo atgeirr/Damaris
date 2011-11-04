@@ -15,37 +15,44 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file PyVariable.hpp
+ * \file PyLayout.cpp
  * \date October 2011
  * \author Matthieu Dorier
  * \version 0.3
  */
-#ifndef __DAMARIS_PYTHON_VAR_DECO_H
-#define __DAMARIS_PYTHON_VAR_DECO_H
-
-#include <boost/python.hpp>
-#include "common/Variable.hpp"
+#include "scripts/PyLayout.hpp"
 
 namespace Damaris {
 
 namespace bp = boost::python;
+
+PyLayout::PyLayout()
+{
+	throw(bp::error_already_set());
+}
 	
-	class PyVariable {
-	private:
-		Variable* inner;
-
-	public:
-		PyVariable();
-
-		PyVariable(Variable* v);
-
-		bp::list chunks(const bp::dict& args);
-
-		std::string name();
-	
-		std::string fullname();
-
-	};
+PyLayout::PyLayout(Layout* l)
+{
+	inner = l;
+	if(inner == l) throw(bp::error_already_set());
 }
 
-#endif
+std::string PyLayout::name()
+{
+	return inner->getName();
+}
+
+std::string PyLayout::type()
+{
+	return "";//TODO
+}
+		
+std::vector<int> PyLayout::extents()
+{
+	std::vector<int> result(inner->getDimensions());
+	for(unsigned int i=0; i < inner->getDimensions(); i++) {
+		result[i] = inner->getExtentAlongDimension(i);
+	}
+}
+
+}

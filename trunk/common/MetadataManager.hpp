@@ -26,6 +26,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __DAMARIS_METADATA_H
 #define __DAMARIS_METADATA_H
 
+#include <iostream>
 #include <map>
 #include <vector>
 
@@ -69,6 +70,8 @@ namespace Damaris {
 		 * Retrieve a layout by name.
 		 */
 		Layout* getLayout(const std::string& lname);
+
+		void listVariables(std::ostream &out);
 
 		/**
 		 * Constructor.

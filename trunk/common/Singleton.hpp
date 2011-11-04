@@ -57,7 +57,7 @@ template <typename T>
 	};
 
 	template <typename T>
-		T *Singleton<T>::_instance = NULL;
+		T* Singleton<T>::_instance = NULL;
 
 }
 #endif

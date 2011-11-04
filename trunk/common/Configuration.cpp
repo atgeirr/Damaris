@@ -104,7 +104,7 @@ namespace Damaris {
 	{
 		if(metadataManager == NULL)
 		{
-			metadataManager = new MetadataManager();
+			metadataManager = MetadataManager::getInstance();
 			fillMetadataManager();
 		}
 		return metadataManager;

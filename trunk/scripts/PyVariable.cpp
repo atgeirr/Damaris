@@ -41,13 +41,60 @@ bp::list PyVariable::chunks(const bp::dict &args)
 {
 	bp::list result;
 	if(inner == NULL) return result;
-	ChunkIndex::iterator it;
-	ChunkIndex::iterator end;
-	it = inner->getChunks(end);
-	while(it != end) {
-		result.append(PyChunk(it->get()));
+	// gets the iteration number
+	if(args.has_key("iteration")) {
+		int iteration = bp::extract<int>(args["iteration"]);
+		if(args.has_key("source")) {
+			int source = bp::extract<int>(args["source"]);
+			ChunkIndex::iterator it;
+			ChunkIndex::iterator end;
+			it = inner->getChunks(source,iteration,end);
+			while(it != end) {
+				result.append(PyChunk(it->get()));
+				it++;
+			}
+		} else {
+			ChunkIndexByIteration::iterator it;
+			ChunkIndexByIteration::iterator end;
+			it = inner->getChunksByIteration(iteration,end);
+			while(it != end) {
+				result.append(PyChunk(it->get()));
+				it++;
+			}
+		}
+	} else {
+		if(args.has_key("source")) {
+			int source = bp::extract<int>(args["source"]);
+			ChunkIndexBySource::iterator it;
+			ChunkIndexBySource::iterator end;
+			it = inner->getChunksBySource(source,end);
+			while(it != end) {
+				result.append(PyChunk(it->get()));
+				it++;
+			}
+		} else {
+			ChunkIndex::iterator it;
+			ChunkIndex::iterator end;
+			it = inner->getChunks(end);
+			while(it != end) {
+				result.append(PyChunk(it->get()));
+				it++;
+			}
+		}
 	}
 	return result;
+}
+
+std::string PyVariable::name()
+{
+	int last_slash = inner->getName().find_last_of('/');
+	if(last_slash == 0) last_slash = -1;
+	return inner->getName().substr(last_slash+1);
+}
+
+std::string PyVariable::fullname()
+{
+	return inner->getName();
 }
 
 }

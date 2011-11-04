@@ -67,8 +67,14 @@ ChunkIndexByIteration::iterator Variable::getChunksByIteration(int iteration,
 
 ChunkIndex::iterator Variable::getChunks(ChunkIndex::iterator &end)
 {
-	end = chunks.get<by_iteration>().end();
-	return chunks.get<by_iteration>().begin();
+	end = chunks.get<by_any>().end();
+	return chunks.get<by_any>().begin();
+}
+
+ChunkIndex::iterator Variable::getChunks(int source, int iteration, ChunkIndex::iterator &end)
+{
+	end = chunks.get<by_any>().end();
+	return chunks.get<by_any>().find(boost::make_tuple(source,iteration));
 }
 
 void Variable::eraseChunk(ChunkIndexByIteration::iterator &it)

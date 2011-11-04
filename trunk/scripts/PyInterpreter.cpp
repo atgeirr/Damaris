@@ -25,6 +25,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "common/Debug.hpp"
 #include "common/MetadataManager.hpp"
+#include "scripts/PyChunk.hpp"
+#include "scripts/PyLayout.hpp"
 #include "scripts/PyVariable.hpp"
 #include "scripts/PyInterpreter.hpp"
 
@@ -36,22 +38,29 @@ namespace Python {
 static bool ready = false;
 static bp::object dict;
 
-static void open(const std::string& varname)
+static bp::object open(const std::string& varname)
 {
 	MetadataManager* metadata = MetadataManager::getInstance();
 	Variable* v = metadata->getVariable(varname);
 	if(v == NULL) {
-		ERROR("In damaris.open(): undefined variable \"" << varname << "\"");
+		return bp::object();
 	} else {
-		INFO("Variable \"" << varname << "\" found");
+		return bp::object(PyVariable(v));
 	}
 }
 
 BOOST_PYTHON_MODULE(damaris)
 {
 	bp::def("open",&open);
+	bp::class_<PyLayout>("Layout")
+		.def("name",&PyLayout::name)
+		.def("type",&PyLayout::type)
+		.def("extents",&PyLayout::extents);
+	bp::class_<PyChunk>("Chunk");
 	bp::class_<PyVariable>("Variable")
-		.def("chunks",&PyVariable::chunks);
+		.def("chunks",&PyVariable::chunks)
+		.def("name",&PyVariable::name)
+		.def("fullname",&PyVariable::fullname);
 }
 
 void initialize()

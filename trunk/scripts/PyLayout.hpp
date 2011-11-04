@@ -15,36 +15,37 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file PyVariable.hpp
+ * \file PyLayout.hpp
  * \date October 2011
  * \author Matthieu Dorier
  * \version 0.3
  */
-#ifndef __DAMARIS_PYTHON_VAR_DECO_H
-#define __DAMARIS_PYTHON_VAR_DECO_H
+#ifndef __DAMARIS_PYTHON_LAYOUT_H
+#define __DAMARIS_PYTHON_LAYOUT_H
 
 #include <boost/python.hpp>
-#include "common/Variable.hpp"
+#include <vector>
+
+#include "common/Layout.hpp"
 
 namespace Damaris {
 
 namespace bp = boost::python;
 	
-	class PyVariable {
+	class PyLayout {
 	private:
-		Variable* inner;
+		Layout* inner;
 
 	public:
-		PyVariable();
+		PyLayout();
 
-		PyVariable(Variable* v);
-
-		bp::list chunks(const bp::dict& args);
+		PyLayout(Layout* l);
 
 		std::string name();
 	
-		std::string fullname();
-
+		std::string type();
+	
+		std::vector<int> extents();
 	};
 }
 

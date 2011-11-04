@@ -27,6 +27,7 @@ namespace Damaris {
 
 MetadataManager::MetadataManager()
 {
+	DBG("A MetadataManager object is created");
 }	
 
 bool MetadataManager::addVariable(const std::string & varname, const std::string & layoutname)
@@ -94,6 +95,17 @@ Layout* MetadataManager::getLayout(const std::string& lname)
 	std::map<std::string,Layout>::iterator it = layouts.find(lname);
 	if(it == layouts.end()) return NULL;
 	return &(it->second);
+}
+
+void MetadataManager::listVariables(std::ostream &out)
+{
+	VariableSet::index<by_name>::type::iterator it = variables.get<by_name>().begin();
+	const VariableSet::index<by_name>::type::iterator &end = variables.get<by_name>().end();
+	INFO("Listing all the variables defined in the Metadata Manager:");
+	while(it != end) {
+		out << it->get()->getID() << "\t:\t" << it->get()->getName() << std::endl;
+		it++;
+	}
 }
 
 MetadataManager::~MetadataManager()

@@ -32,7 +32,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "scripts/PyAction.hpp"
 
 namespace Damaris {
-	
+
 ActionsManager::ActionsManager()
 {
 }
@@ -71,14 +71,12 @@ void ActionsManager::addDynamicAction(const std::string& eventName,
 void ActionsManager::addScriptAction(const std::string& name,
 		const std::string& fileName, const std::string& language) 
 {
-	DBG("Adding script " << name);
 	// check if there is already an action with the same name recorded
         ActionSet::index<by_name>::type::iterator it = actions.get<by_name>().find(name);
         if(it != actions.get<by_name>().end()) {
                 WARN("Inserting an action with a name identical to another defined action");
                 return;
         }
-	DBG("A");
 	Action* a = NULL;
 	// create the action
 	switch(Language::getLanguageFromString(&(language))) {
@@ -89,11 +87,9 @@ void ActionsManager::addScriptAction(const std::string& name,
 					<< "\" for action \"" << name << "\"");
 			return;
 	}
-	DBG("B");
 	// attribute an ID and a name to the action
 	a->id = actions.size();
 	a->name = name;
-	DBG("C");
 	// put the action into the ActionsSet
 	actions.insert(boost::shared_ptr<Action>(a));
 }

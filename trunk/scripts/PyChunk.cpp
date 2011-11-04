@@ -35,6 +35,7 @@ PyChunk::PyChunk()
 PyChunk::PyChunk(Chunk* c)
 {
 	inner = c;
+	if(inner == NULL) throw(bp::error_already_set());
 }
 }
 

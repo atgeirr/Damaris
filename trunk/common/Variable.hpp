@@ -110,6 +110,7 @@ class Variable {
 
 		ChunkIndex::iterator getChunks(ChunkIndex::iterator &end);
 
+		ChunkIndex::iterator getChunks(int source, int iteration, ChunkIndex::iterator &end);
 		/**
 		 * Delete a chunk from the variable.
 		 */

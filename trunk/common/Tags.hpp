@@ -33,6 +33,7 @@ namespace Damaris {
 	struct by_id {};
 	struct by_source {};
 	struct by_iteration {};
+	struct by_any {};
 }
 
 #endif

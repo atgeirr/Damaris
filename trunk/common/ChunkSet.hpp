@@ -27,30 +27,40 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/multi_index/member.hpp>
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/mem_fun.hpp>
+#include <boost/multi_index/composite_key.hpp>
 #include <boost/shared_ptr.hpp>
 
 #include "Tags.hpp"
 #include "Chunk.hpp"
 
 namespace Damaris {
+
+namespace bmi = boost::multi_index;
+
 /**
  * ChunksSet is a container based on Boost Multi-Index, it indexes Chunks by
  * source and by iteration.
  */
 typedef boost::multi_index_container<
         boost::shared_ptr<Chunk>,
-        boost::multi_index::indexed_by<
-                boost::multi_index::ordered_non_unique<boost::multi_index::tag<by_source>,
-                        boost::multi_index::const_mem_fun<Chunk,int,&Chunk::getSource> >,
-                boost::multi_index::ordered_non_unique<boost::multi_index::tag<by_iteration>,
-                        boost::multi_index::const_mem_fun<Chunk,int,&Chunk::getIteration> >
+        bmi::indexed_by<
+                bmi::ordered_non_unique<bmi::tag<by_source>,
+                        bmi::const_mem_fun<Chunk,int,&Chunk::getSource> >,
+                bmi::ordered_non_unique<bmi::tag<by_iteration>,
+                        bmi::const_mem_fun<Chunk,int,&Chunk::getIteration> >,
+		bmi::ordered_non_unique<bmi::tag<by_any>,
+			bmi::composite_key<Chunk,
+				bmi::const_mem_fun<Chunk,int,&Chunk::getSource>,
+				bmi::const_mem_fun<Chunk,int,&Chunk::getIteration> 
+			> 
+		>
         >
 > ChunkSet;
 
 typedef ChunkSet::index<by_source>::type ChunkIndexBySource;
 typedef ChunkSet::index<by_iteration>::type ChunkIndexByIteration;
+typedef ChunkSet::index<by_any>::type ChunkIndex;
 
-typedef ChunkIndexByIteration ChunkIndex;
 }
 
 #endif
