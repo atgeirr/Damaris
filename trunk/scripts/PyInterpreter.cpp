@@ -53,14 +53,28 @@ BOOST_PYTHON_MODULE(damaris)
 {
 	bp::def("open",&open);
 	bp::class_<PyLayout>("Layout")
-		.def("name",&PyLayout::name)
-		.def("type",&PyLayout::type)
-		.def("extents",&PyLayout::extents);
-	bp::class_<PyChunk>("Chunk");
+		.add_property("name",bp::make_function(&PyLayout::name,
+			bp::return_value_policy<bp::copy_const_reference>()))
+		.add_property("type",bp::make_function(&PyLayout::type,
+			bp::return_value_policy<bp::copy_const_reference>()))
+		.add_property("extents",&PyLayout::extents)
+		;
+	bp::class_<PyChunk>("Chunk")
+		.add_property("source",&PyChunk::source)
+		.add_property("iteration",&PyChunk::iteration)
+		.add_property("type",bp::make_function(&PyChunk::type,
+			bp::return_value_policy<bp::copy_const_reference>()))
+		.add_property("lower_bounds",&PyChunk::lower_bounds)
+		.add_property("upper_bounds",&PyChunk::upper_bounds)
+		;
 	bp::class_<PyVariable>("Variable")
-		.def("chunks",&PyVariable::chunks)
-		.def("name",&PyVariable::name)
-		.def("fullname",&PyVariable::fullname);
+		.def("select",&PyVariable::select)
+		.add_property("chunks",&PyVariable::chunks)
+		.add_property("layout",&PyVariable::layout)
+		.add_property("name",&PyVariable::name)
+		.add_property("fullname",bp::make_function(&PyVariable::fullname,
+			bp::return_value_policy<bp::copy_const_reference>()))
+		;
 }
 
 void initialize()

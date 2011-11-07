@@ -145,7 +145,7 @@ namespace Damaris {
 				std::vector<int> rdims(dims.rbegin(),dims.rend());
 				dims = rdims;
 			}
-                 	Layout l(type,dims.size(),dims);
+                 	Layout l(name,type,dims.size(),dims);
 			metadataManager->addLayout(name,l);
 		}
 		

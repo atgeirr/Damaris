@@ -34,25 +34,26 @@ PyLayout::PyLayout()
 PyLayout::PyLayout(Layout* l)
 {
 	inner = l;
-	if(inner == l) throw(bp::error_already_set());
+	if(inner == NULL) throw(bp::error_already_set());
 }
 
-std::string PyLayout::name()
+const std::string& PyLayout::name() const
 {
 	return inner->getName();
 }
 
-std::string PyLayout::type()
+const std::string& PyLayout::type() const
 {
-	return "";//TODO
+	return Types::getStringFromType(inner->getType());
 }
 		
-std::vector<int> PyLayout::extents()
+bp::list PyLayout::extents() const
 {
-	std::vector<int> result(inner->getDimensions());
+	bp::list result;
 	for(unsigned int i=0; i < inner->getDimensions(); i++) {
-		result[i] = inner->getExtentAlongDimension(i);
+		result.append(inner->getExtentAlongDimension(i));
 	}
+	return result;
 }
 
 }

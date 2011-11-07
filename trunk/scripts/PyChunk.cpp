@@ -37,5 +37,39 @@ PyChunk::PyChunk(Chunk* c)
 	inner = c;
 	if(inner == NULL) throw(bp::error_already_set());
 }
+
+int PyChunk::source() const 
+{
+	return inner->getSource();
+}
+
+int PyChunk::iteration() const 
+{
+	return inner->getIteration();
+}
+
+const std::string& PyChunk::type() const
+{
+	return Types::getStringFromType(inner->getType());
+}
+
+bp::list PyChunk::lower_bounds() const
+{
+	bp::list result;
+	for(unsigned int i = 0; i < inner->getDimensions(); i++) {
+		result.append(inner->getStartIndex((int)i));
+	}
+	return result;
+}
+
+bp::list PyChunk::upper_bounds() const
+{
+	bp::list result;
+	for(unsigned int i = 0; i < inner->getDimensions(); i++) {
+		result.append(inner->getEndIndex((int)i));
+	}
+	return result;
+}
+
 }
 

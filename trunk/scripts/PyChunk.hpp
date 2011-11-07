@@ -38,6 +38,16 @@ namespace bp = boost::python;
 		PyChunk();
 
 		PyChunk(Chunk* c);
+
+		int iteration() const;
+
+		int source() const;
+
+		const std::string& type() const;
+
+		bp::list lower_bounds() const;
+
+		bp::list upper_bounds() const;
 	};
 }
 

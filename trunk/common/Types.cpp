@@ -49,6 +49,9 @@ namespace Types {
 		return 0;
 	}
 
+	static std::string names[] =
+		{"undefined","short","int","long","float","double","char","string"};
+
 	basic_type_e getTypeFromString(const std::string* str)
 	{
 		if(str->compare("short") == 0)  return SHORT;
@@ -59,6 +62,14 @@ namespace Types {
 		if(str->compare("char") == 0)   return CHAR;
 		if(str->compare("string") == 0) return STR;
 		return UNDEFINED_TYPE;
+	}
+
+	const std::string& getStringFromType(basic_type_e t)
+	{	
+		if(t <= 7)
+			return names[(int)t];
+		else
+			return names[0];
 	}
 }
 }

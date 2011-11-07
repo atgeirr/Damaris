@@ -37,7 +37,7 @@ PyVariable::PyVariable(Variable* v)
 	inner = v;
 }
 
-bp::list PyVariable::chunks(const bp::dict &args)
+bp::list PyVariable::select(const bp::dict &args) const
 {
 	bp::list result;
 	if(inner == NULL) return result;
@@ -85,16 +85,26 @@ bp::list PyVariable::chunks(const bp::dict &args)
 	return result;
 }
 
-std::string PyVariable::name()
+bp::list PyVariable::chunks() const 
+{
+	return select(bp::dict());
+}
+
+std::string PyVariable::name() const
 {
 	int last_slash = inner->getName().find_last_of('/');
 	if(last_slash == 0) last_slash = -1;
 	return inner->getName().substr(last_slash+1);
 }
 
-std::string PyVariable::fullname()
+const std::string& PyVariable::fullname() const
 {
 	return inner->getName();
+}
+
+PyLayout PyVariable::layout() const
+{
+	return PyLayout(inner->getLayout());
 }
 
 }

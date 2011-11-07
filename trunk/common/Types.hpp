@@ -62,6 +62,8 @@ namespace Types {
 	 *         not correspond to any known type.
 	 */
 	basic_type_e getTypeFromString(const std::string* str);
+
+	const std::string& getStringFromType(basic_type_e t);
 }
 }
 #endif

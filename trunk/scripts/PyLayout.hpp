@@ -24,7 +24,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #define __DAMARIS_PYTHON_LAYOUT_H
 
 #include <boost/python.hpp>
-#include <vector>
 
 #include "common/Layout.hpp"
 
@@ -41,11 +40,11 @@ namespace bp = boost::python;
 
 		PyLayout(Layout* l);
 
-		std::string name();
+		const std::string& name() const;
 	
-		std::string type();
+		const std::string& type() const;
 	
-		std::vector<int> extents();
+		bp::list extents() const;
 	};
 }
 

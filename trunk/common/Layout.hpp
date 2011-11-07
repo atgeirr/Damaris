@@ -43,6 +43,7 @@ namespace Damaris {
 class Layout {
 		
 	private:
+		std::string name;		/*!< Name of the layout in the configuration file. */
 		Types::basic_type_e type; 	/*!< Type of the data. */
 		unsigned int dimensions; 	/*!< Number of dimensions. */
 		std::vector<int> extents;	/*!< Extents along each dimension. */	
@@ -57,12 +58,15 @@ class Layout {
 		 * \param[in] extents : list of extents, even indices hold starting indices, 
 		 *                      non-even hold ending indices.
 		 */
-		Layout(Types::basic_type_e t, unsigned int d, std::vector<int> &ex);
+		Layout(const std::string &name, Types::basic_type_e t, 
+			unsigned int d, std::vector<int> &ex);
 		
 		/**
 		 * \brief Destructor.
 		 */
 		~Layout();
+
+		const std::string& getName() const;
 		
 		/**
 		 * \return The type of the data. 

@@ -25,6 +25,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <boost/python.hpp>
 #include "common/Variable.hpp"
+#include "scripts/PyLayout.hpp"
+
 
 namespace Damaris {
 
@@ -39,12 +41,15 @@ namespace bp = boost::python;
 
 		PyVariable(Variable* v);
 
-		bp::list chunks(const bp::dict& args);
+		bp::list select(const bp::dict& args) const;
 
-		std::string name();
+		bp::list chunks() const;
+
+		std::string name() const;
 	
-		std::string fullname();
+		const std::string& fullname() const;
 
+		PyLayout layout() const;
 	};
 }
 

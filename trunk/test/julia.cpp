@@ -53,7 +53,7 @@ int main(int argc, char** argv)
 		compute(fractal,c);
 		
 		client->write("images/julia",i,fractal);
-		client->signal("draw",i);
+		client->signal("call_python",i);
 	}
 
 	client->kill_server();

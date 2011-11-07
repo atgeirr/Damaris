@@ -18,5 +18,6 @@
 	</data>
 	<actions>
 		<event name="draw" action="draw_image" library="image.so"/> 
+		<script name="call_python" file="script.py" language="python" />
 	</actions>
 </simulation>
