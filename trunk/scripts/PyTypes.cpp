@@ -15,42 +15,24 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file PyChunk.hpp
+ * \file PyTypes.cpp
  * \date October 2011
  * \author Matthieu Dorier
  * \version 0.3
  */
-#ifndef __DAMARIS_PYTHON_CHUNK_H
-#define __DAMARIS_PYTHON_CHUNK_H
-
-#include <boost/python.hpp>
-#include "common/Chunk.hpp"
+#include "scripts/PyTypes.hpp"
 
 namespace Damaris {
+namespace PyTypes {
 
-namespace bp = boost::python;
-	
-	class PyChunk {
-	private:
-		Chunk* inner;
+static int pytypes[] =
+	{-1,NPY_SHORT,NPY_INT,NPY_LONGLONG,NPY_FLOAT,NPY_DOUBLE,NPY_BYTE,NPY_STRING};
 
-	public:
-		PyChunk();
-
-		PyChunk(Chunk* c);
-
-		int iteration() const;
-
-		int source() const;
-
-		const std::string& type() const;
-
-		bp::list lower_bounds() const;
-
-		bp::list upper_bounds() const;
-
-		bp::object data() const;
-	};
+int getPyTypeFromDamarisType(Types::basic_type_e t)
+{
+	if(t <= 0 || t > 7) return -1;
+	return pytypes[t];
 }
 
-#endif
+}
+}

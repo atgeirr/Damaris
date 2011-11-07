@@ -34,7 +34,8 @@ set(DAMARIS_SCRIPTS_SRC
 	${DAMARIS_SOURCE_DIR}/scripts/PyVariable.cpp
 	${DAMARIS_SOURCE_DIR}/scripts/PyAction.cpp
 	${DAMARIS_SOURCE_DIR}/scripts/PyChunk.cpp
-	${DAMARIS_SOURCE_DIR}/scripts/PyLayout.cpp)
+	${DAMARIS_SOURCE_DIR}/scripts/PyLayout.cpp
+	${DAMARIS_SOURCE_DIR}/scripts/PyTypes.cpp)
 
 add_library (damaris ${DAMARIS_CLIENT_SRC}
 		     ${DAMARIS_MODEL_SRC}

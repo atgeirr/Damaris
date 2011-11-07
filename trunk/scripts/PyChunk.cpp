@@ -21,7 +21,12 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \version 0.3
  */
 #include "scripts/PyChunk.hpp"
+#include "common/Debug.hpp"
+#define PY_ARRAY_UNIQUE_SYMBOL damaris_ARRAY_API
+#define NO_IMPORT_ARRAY
 #include <numpy/arrayobject.h>
+
+#include "scripts/PyTypes.hpp"
 
 namespace Damaris {
 
@@ -69,6 +74,27 @@ bp::list PyChunk::upper_bounds() const
 		result.append(inner->getEndIndex((int)i));
 	}
 	return result;
+}
+
+bp::object PyChunk::data() const
+{
+	int nd = inner->getDimensions();
+	npy_intp *dims = new npy_intp[nd];
+	for(int i = 0; i < nd; i++) {
+		dims[i] = inner->getEndIndex(i) - inner->getStartIndex(i) + 1;
+	}
+	int typenum = PyTypes::getPyTypeFromDamarisType(inner->getType());
+
+	if(typenum == -1) {
+		throw(bp::error_already_set());
+	}
+
+	void *data = inner->data();
+	if(data == NULL) return bp::object();
+
+	PyObject* arr = PyArray_SimpleNewFromData(nd, dims, typenum, data);
+	delete[] dims;
+	return bp::object(bp::handle<>(arr));
 }
 
 }

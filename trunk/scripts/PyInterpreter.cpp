@@ -21,6 +21,10 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \version 0.3
  */
 #include <boost/python.hpp>
+
+#define PY_ARRAY_UNIQUE_SYMBOL damaris_ARRAY_API
+#include <numpy/arrayobject.h>
+
 #include <string>
 
 #include "common/Debug.hpp"
@@ -66,6 +70,7 @@ BOOST_PYTHON_MODULE(damaris)
 			bp::return_value_policy<bp::copy_const_reference>()))
 		.add_property("lower_bounds",&PyChunk::lower_bounds)
 		.add_property("upper_bounds",&PyChunk::upper_bounds)
+		.add_property("data",&PyChunk::data);
 		;
 	bp::class_<PyVariable>("Variable")
 		.def("select",&PyVariable::select)
@@ -84,7 +89,7 @@ void initialize()
 		Py_InitializeEx(0);
 		bp::object main = bp::import("__main__");
 		dict = main.attr("__dict__");
-
+		import_array();
 	} catch(boost::python::error_already_set) {
 		PyErr_Print();
 	}
