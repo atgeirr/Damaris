@@ -55,7 +55,6 @@ class DynamicAction : public Action {
 		 * in a directory set in the LD_LIBRARY_PATH environment variable).
 		 */
 		DynamicAction(std::string fun, std::string file);
-	public:
 
 		/**
 		 * \brief Constructor.
@@ -66,6 +65,7 @@ class DynamicAction : public Action {
 		 */
 		DynamicAction(std::string name, int i, std::string fun, std::string file);
 
+	public:
 		/**
 		 * \brief Destructor.
 		 */

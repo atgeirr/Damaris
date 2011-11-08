@@ -20,15 +20,16 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \author Matthieu Dorier
  * \version 0.3
  */
-#include "scripts/PyChunk.hpp"
+#include "scripts/python/PyChunk.hpp"
 #include "common/Debug.hpp"
 #define PY_ARRAY_UNIQUE_SYMBOL damaris_ARRAY_API
 #define NO_IMPORT_ARRAY
 #include <numpy/arrayobject.h>
-
-#include "scripts/PyTypes.hpp"
+#include "scripts/python/PyTypes.hpp"
 
 namespace Damaris {
+
+namespace Python {
 
 namespace bp = boost::python;
 	
@@ -98,4 +99,4 @@ bp::object PyChunk::data() const
 }
 
 }
-
+}

@@ -15,42 +15,35 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file PyVariable.hpp
+ * \file PyTypes.hpp
  * \date October 2011
  * \author Matthieu Dorier
  * \version 0.3
  */
-#ifndef __DAMARIS_PYTHON_VAR_DECO_H
-#define __DAMARIS_PYTHON_VAR_DECO_H
+#ifndef __DAMARIS_PYTHON_TYPES_H
+#define __DAMARIS_PYTHON_TYPES_H
 
 #include <boost/python.hpp>
-#include "common/Variable.hpp"
-#include "scripts/PyLayout.hpp"
-
+#define PY_ARRAY_UNIQUE_SYMBOL damaris_ARRAY_API
+#define NO_IMPORT_ARRAY
+#include <numpy/arrayobject.h>
+#include "common/Types.hpp"
 
 namespace Damaris {
 
-namespace bp = boost::python;
-	
-	class PyVariable {
-	private:
-		Variable* inner;
+namespace Python {
 
-	public:
-		PyVariable();
+/**
+ * \namespace Damaris::Python::PyTypes
+ * Everything related to data types for numpy arrays.
+ */
+namespace PyTypes {
 
-		PyVariable(Variable* v);
-
-		bp::list select(const bp::dict& args) const;
-
-		bp::list chunks() const;
-
-		std::string name() const;
-	
-		const std::string& fullname() const;
-
-		PyLayout layout() const;
-	};
+	/**
+	 * Transforms a Damaris type into a NumPy type.
+	 */
+	int getPyTypeFromDamarisType(Types::basic_type_e t);
 }
-
+}
+}
 #endif

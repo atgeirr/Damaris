@@ -20,10 +20,12 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \author Matthieu Dorier
  * \version 0.3
  */
-#include "scripts/PyVariable.hpp"
-#include "scripts/PyChunk.hpp"
+#include "scripts/python/PyVariable.hpp"
+#include "scripts/python/PyChunk.hpp"
 
 namespace Damaris {
+
+namespace Python {
 
 namespace bp = boost::python;
 
@@ -107,4 +109,5 @@ PyLayout PyVariable::layout() const
 	return PyLayout(inner->getLayout());
 }
 
+}
 }

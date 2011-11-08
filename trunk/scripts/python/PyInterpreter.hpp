@@ -15,31 +15,39 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file PyTypes.hpp
+ * \file PyInterpreter.hpp
  * \date October 2011
  * \author Matthieu Dorier
  * \version 0.3
  */
-#ifndef __DAMARIS_PYTHON_TYPES_H
-#define __DAMARIS_PYTHON_TYPES_H
+#ifndef __DAMARIS_PYTHON_H
+#define __DAMARIS_PYTHON_H
 
-#include <boost/python.hpp>
-
-#define PY_ARRAY_UNIQUE_SYMBOL damaris_ARRAY_API
-#define NO_IMPORT_ARRAY
-#include <numpy/arrayobject.h>
-
-#include "common/Types.hpp"
+#include <string>
 
 namespace Damaris {
 
 /**
- * \namespace Damaris::Python::PyTypes
- * Everything related to data types for numpy arrays.
+ * The Python namespace contains everything related to loading Python
+ * scripts inside Damaris. The PyInterpreter file contains global functions
+ * to initialize Python, execute scripts, etc.
  */
-namespace PyTypes {
+namespace Python {
 
-	int getPyTypeFromDamarisType(Types::basic_type_e t);
+	/**
+	 * Initialize the Python interpreter.
+	 */				
+	void initialize();
+	
+	/**
+	 * Finalize the Python interpreter.
+	 */	
+	void finalize();
+
+	/**
+	 * Executes a given file given.
+	 */
+	void execFile(const std::string &filename);
 }
 }
 #endif

@@ -15,23 +15,50 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file PyTypes.cpp
+ * \file PyAction.cpp
  * \date October 2011
  * \author Matthieu Dorier
  * \version 0.3
  */
-#include "scripts/PyTypes.hpp"
+#include <exception>
+
+#include "common/Debug.hpp"
+#include "scripts/python/PyInterpreter.hpp"
+#include "scripts/python/PyAction.hpp"
 
 namespace Damaris {
-namespace PyTypes {
 
-static int pytypes[] =
-	{-1,NPY_SHORT,NPY_INT,NPY_LONGLONG,NPY_FLOAT,NPY_DOUBLE,NPY_BYTE,NPY_STRING};
+namespace Python {
 
-int getPyTypeFromDamarisType(Types::basic_type_e t)
+PyAction::PyAction(std::string file)
+: Action()
 {
-	if(t <= 0 || t > 7) return -1;
-	return pytypes[t];
+	fileName	= file;
+	loaded		= true;
+}
+	
+PyAction::PyAction(std::string n, int i, std::string file)
+: Action(n,i)
+{
+	fileName 	= file;
+	loaded		= true;
+}
+
+PyAction::~PyAction()
+{
+}
+	
+void PyAction::call(int32_t iteration, int32_t sourceID, MetadataManager* mm)
+{
+	try {
+		Python::execFile(fileName);
+	} catch(std::exception &e) {
+		ERROR("in Python action \"" << name << "\": "<< e.what());
+	}
+}
+
+void PyAction::load()
+{
 }
 
 }

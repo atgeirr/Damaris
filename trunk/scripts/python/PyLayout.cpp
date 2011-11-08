@@ -15,24 +15,47 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file PyInterpreter.hpp
+ * \file PyLayout.cpp
  * \date October 2011
  * \author Matthieu Dorier
  * \version 0.3
  */
-#ifndef __DAMARIS_PYTHON_H
-#define __DAMARIS_PYTHON_H
-
-#include <string>
+#include "scripts/python/PyLayout.hpp"
 
 namespace Damaris {
 namespace Python {
-				
-	void initialize();
-		
-	void finalize();
 
-	void execFile(const std::string &filename);
+namespace bp = boost::python;
+
+PyLayout::PyLayout()
+{
+	throw(bp::error_already_set());
+}
+	
+PyLayout::PyLayout(Layout* l)
+{
+	inner = l;
+	if(inner == NULL) throw(bp::error_already_set());
+}
+
+const std::string& PyLayout::name() const
+{
+	return inner->getName();
+}
+
+const std::string& PyLayout::type() const
+{
+	return Types::getStringFromType(inner->getType());
+}
+		
+bp::list PyLayout::extents() const
+{
+	bp::list result;
+	for(unsigned int i=0; i < inner->getDimensions(); i++) {
+		result.append(inner->getExtentAlongDimension(i));
+	}
+	return result;
+}
+
 }
 }
-#endif

@@ -29,7 +29,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/Debug.hpp"
 #include "common/Language.hpp"
 #include "common/ActionsManager.hpp"
-#include "scripts/PyAction.hpp"
+#include "scripts/python/PyAction.hpp"
 
 namespace Damaris {
 
@@ -81,7 +81,7 @@ void ActionsManager::addScriptAction(const std::string& name,
 	// create the action
 	switch(Language::getLanguageFromString(&(language))) {
 		case (Language::LG_PYTHON):
-			a = new PyAction(fileName); break;
+			a = new Python::PyAction(fileName); break;
 		default:
 			ERROR("Undefined scripting language \"" << language 
 					<< "\" for action \"" << name << "\"");

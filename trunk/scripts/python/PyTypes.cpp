@@ -15,47 +15,27 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file PyAction.cpp
+ * \file PyTypes.cpp
  * \date October 2011
  * \author Matthieu Dorier
  * \version 0.3
  */
-#include <exception>
-
-#include "common/Debug.hpp"
-#include "scripts/PyInterpreter.hpp"
-#include "scripts/PyAction.hpp"
+#include "scripts/python/PyTypes.hpp"
 
 namespace Damaris {
+namespace Python {
 
-	PyAction::PyAction(std::string file)
-	: Action()
-	{
-		fileName	= file;
-		loaded		= true;
-	}
-	
-	PyAction::PyAction(std::string n, int i, std::string file)
-	: Action(n,i)
-	{
-		fileName 	= file;
-		loaded		= true;
-	}
+namespace PyTypes {
 
-	PyAction::~PyAction()
-	{
-	}
-	
-	void PyAction::call(int32_t iteration, int32_t sourceID, MetadataManager* mm)
-	{
-		try {
-			Python::execFile(fileName);
-		} catch(std::exception &e) {
-			ERROR("in Python action \"" << name << "\": "<< e.what());
-		}
-	}
+static int pytypes[] =
+	{-1,NPY_SHORT,NPY_INT,NPY_LONGLONG,NPY_FLOAT,NPY_DOUBLE,NPY_BYTE,NPY_STRING};
 
-	void PyAction::load()
-	{
-	}
+int getPyTypeFromDamarisType(Types::basic_type_e t)
+{
+	if(t <= 0 || t > 7) return -1;
+	return pytypes[t];
+}
+
+}
+}
 }

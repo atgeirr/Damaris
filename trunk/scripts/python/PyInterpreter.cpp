@@ -29,10 +29,10 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "common/Debug.hpp"
 #include "common/MetadataManager.hpp"
-#include "scripts/PyChunk.hpp"
-#include "scripts/PyLayout.hpp"
-#include "scripts/PyVariable.hpp"
-#include "scripts/PyInterpreter.hpp"
+#include "scripts/python/PyChunk.hpp"
+#include "scripts/python/PyLayout.hpp"
+#include "scripts/python/PyVariable.hpp"
+#include "scripts/python/PyInterpreter.hpp"
 
 namespace bp = boost::python;
 
