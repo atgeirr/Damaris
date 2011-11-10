@@ -52,16 +52,20 @@ void Variable::attachChunk(Chunk* chunk)
 ChunkIndexBySource::iterator Variable::getChunksBySource(int source,
 	ChunkIndexBySource::iterator& end)
 {
-	ChunkIndexBySource::iterator it = chunks.get<by_source>().find(source);
-	end = chunks.get<by_source>().end();
+//	ChunkIndexBySource::iterator it = chunks.get<by_source>().find(source);
+//	end = chunks.get<by_source>().end();
+	ChunkIndexBySource::iterator it = chunks.get<by_source>().lower_bound(source);
+	end = chunks.get<by_source>().upper_bound(source);
 	return it;
 }
 
 ChunkIndexByIteration::iterator Variable::getChunksByIteration(int iteration,
 	ChunkIndexByIteration::iterator& end) 
 {
-        ChunkIndexByIteration::iterator it = chunks.get<by_iteration>().find(iteration);
-	end = chunks.get<by_iteration>().end();
+        ChunkIndexByIteration::iterator it = chunks.get<by_iteration>().lower_bound(iteration);
+		//.find(iteration);
+	end = chunks.get<by_iteration>().upper_bound(iteration);
+	//.end();
         return it;
 }
 

@@ -40,16 +40,16 @@ namespace Damaris {
  * of events.
  */
 class ActionsManager : public Singleton<ActionsManager> {
+	friend class Singleton<ActionsManager>;
 
 	private:
 		ActionSet actions; /*!< Set of actions indexed by ID and name. */
-				
-	public:
+
 		/**
 		 * \brief Constructor.
 		 */
-		ActionsManager();
-		
+		ActionsManager();				
+	public:
 		/** 
 		 * \brief Adds an action defined through a dynamic library.
 		 * \param[in] eventName : Name of the event taken as a key for this action.

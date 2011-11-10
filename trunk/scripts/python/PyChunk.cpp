@@ -98,5 +98,10 @@ bp::object PyChunk::data() const
 	return bp::object(bp::handle<>(arr));
 }
 
+void PyChunk::remove() 
+{
+	inner->remove();	
+}
+
 }
 }

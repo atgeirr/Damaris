@@ -28,7 +28,7 @@ namespace Python {
 namespace PyTypes {
 
 static int pytypes[] =
-	{-1,NPY_SHORT,NPY_INT,NPY_LONGLONG,NPY_FLOAT,NPY_DOUBLE,NPY_BYTE,NPY_STRING};
+	{-1,NPY_SHORT,NPY_INT,NPY_LONGLONG,NPY_FLOAT,NPY_DOUBLE,NPY_UINT8,NPY_STRING};
 
 int getPyTypeFromDamarisType(Types::basic_type_e t)
 {

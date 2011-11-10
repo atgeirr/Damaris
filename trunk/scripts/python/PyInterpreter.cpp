@@ -70,7 +70,8 @@ BOOST_PYTHON_MODULE(damaris)
 			bp::return_value_policy<bp::copy_const_reference>()))
 		.add_property("lower_bounds",&PyChunk::lower_bounds)
 		.add_property("upper_bounds",&PyChunk::upper_bounds)
-		.add_property("data",&PyChunk::data);
+		.add_property("data",&PyChunk::data)
+		.def("remove",&PyChunk::remove)
 		;
 	bp::class_<PyVariable>("Variable")
 		.def("select",&PyVariable::select)

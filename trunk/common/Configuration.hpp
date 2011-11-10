@@ -77,7 +77,7 @@ namespace Damaris {
 		 * \brief Constructor. Can be called only by Singleton object.
 		 */
 		Configuration();
-		
+
 		/**
 		 * \brief Destructor.
 		 */

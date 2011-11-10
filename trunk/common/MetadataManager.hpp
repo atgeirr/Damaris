@@ -43,6 +43,11 @@ namespace Damaris {
 		std::map<std::string,Layout> layouts; /*!< Map associating names with layouts. */
 		VariableSet variables; /*!< Variables indexed by name and by id. */
 
+		/**
+		 * Constructor.
+		 */
+		MetadataManager();
+
 	public:
 		/**
 		 * Add a new variable entry within the metadata manager.
@@ -72,11 +77,6 @@ namespace Damaris {
 		Layout* getLayout(const std::string& lname);
 
 		void listVariables(std::ostream &out);
-
-		/**
-		 * Constructor.
-		 */
-		MetadataManager();
 
 		/**
 		 * \brief Destructor.
