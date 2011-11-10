@@ -41,6 +41,7 @@ namespace Python {
 
 static bool ready = false;
 static bp::object dict;
+static bp::object damaris_dict;
 
 static bp::object open(const std::string& varname)
 {
@@ -90,6 +91,8 @@ void initialize()
 		Py_InitializeEx(0);
 		bp::object main = bp::import("__main__");
 		dict = main.attr("__dict__");
+		bp::object damaris =  bp::import("damaris");
+		damaris_dict = damaris.attr("__dict__");
 		import_array();
 	} catch(boost::python::error_already_set) {
 		PyErr_Print();
@@ -103,12 +106,14 @@ void finalize()
 	Py_Finalize();
 }
 
-void execFile(const std::string& file) 
+void execFile(const std::string& file, int source, int iteration) 
 {
 	if(!ready)
 		initialize();
 	if(ready) {
 		try {
+			damaris_dict["source"] = source;
+			damaris_dict["iteration"] = iteration;
 			bp::exec_file(bp::str(file),dict,dict);
 		} catch(...) {
 			ERROR("While executing file \"" << file << "\"");

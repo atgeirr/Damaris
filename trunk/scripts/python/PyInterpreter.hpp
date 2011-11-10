@@ -47,7 +47,7 @@ namespace Python {
 	/**
 	 * Executes a given file given.
 	 */
-	void execFile(const std::string &filename);
+	void execFile(const std::string &filename, int source, int iteration);
 }
 }
 #endif

@@ -51,7 +51,7 @@ PyAction::~PyAction()
 void PyAction::call(int32_t iteration, int32_t sourceID, MetadataManager* mm)
 {
 	try {
-		Python::execFile(fileName);
+		Python::execFile(fileName,sourceID,iteration);
 	} catch(std::exception &e) {
 		ERROR("in Python action \"" << name << "\": "<< e.what());
 	}
