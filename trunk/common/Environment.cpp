@@ -38,6 +38,10 @@ namespace Damaris {
 	{
 		baseModel = mdl;
 		initialized = true;
+#ifdef __ENABLE_MPI
+		entityComm = NULL;
+		globalComm = NULL;
+#endif
 	}
 
 	const std::string & Environment::getMsgQueueName() const
@@ -79,4 +83,16 @@ namespace Damaris {
 	{
 		return Language::getLanguageFromString(&(baseModel->language()));
 	}
+
+#ifdef __ENABLE_MPI
+	void Environment::setEntityComm(MPI_Comm* comm)
+	{
+		entityComm = comm;
+	}
+
+	void Environment::setGlobalComm(MPI_Comm* comm)
+	{
+		globalComm = comm;
+	}
+#endif
 }

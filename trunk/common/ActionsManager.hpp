@@ -76,7 +76,7 @@ class ActionsManager : public Singleton<ActionsManager> {
 		 * The action to be called is here characterized by its name.
 		 */
 		void reactToUserSignal(const std::string &sig, 
-				int32_t iteration, int32_t sourceID, MetadataManager* mm);
+				int32_t iteration, int32_t sourceID);
 
 		/**
 		 * \brief Call a function, in reaction to a fired event.
@@ -87,7 +87,7 @@ class ActionsManager : public Singleton<ActionsManager> {
 		 * The action to be called is here characterized by its ID.
 		 */
 		void reactToUserSignal(int sigID, 
-				int32_t iteration, int32_t sourceID, MetadataManager* mm);
+				int32_t iteration, int32_t sourceID);
 
 		/**
 		 * \brief Gets an action by name.

@@ -95,25 +95,25 @@ void ActionsManager::addScriptAction(const std::string& name,
 }
 
 void ActionsManager::reactToUserSignal(const std::string &sig, 
-		int32_t iteration, int32_t sourceID, MetadataManager* mm)
+		int32_t iteration, int32_t sourceID)
 {
 	ActionSet::index<by_name>::type::iterator it = actions.get<by_name>().find(sig);
 	if(it != actions.get<by_name>().end())
 	{
-		(*(it->get()))(iteration,sourceID,mm);
+		(*(it->get()))(iteration,sourceID);
 	} else {
 		ERROR("Unable to process \""<< sig <<"\" signal: unknown event name");
 	}	
 }
 
 void ActionsManager::reactToUserSignal(int sigID, 
-		int32_t iteration, int32_t sourceID, MetadataManager* mm)
+		int32_t iteration, int32_t sourceID)
 {
 	ActionSet::index<by_id>::type::iterator it = actions.get<by_id>().find(sigID);
 	if(it != actions.get<by_id>().end())
 	{
 		DBG("Reacting to use signal " << sigID);
-		(*(it->get()))(iteration,sourceID,mm);
+		(*(it->get()))(iteration,sourceID);
 	} else {
 		ERROR("Unknown action ID " << sigID 
 			<<", may come from contract inconsistency between clients and servers");

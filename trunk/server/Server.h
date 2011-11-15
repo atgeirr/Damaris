@@ -36,16 +36,14 @@ int DC_server(const char* configFile, int server_id);
 /**
  * Start clients and servers as MPI entities.
  * \param[in] configFile : name of the configuration file to use.
+ * \param[in] oldcomm : communicator to split.
  * \param[out] newcomm : communicator gathering clients.
- * \param[out] newrank : rank in this communicator.
- * \param[out] newsize : size of the new communicator.
  * \return a positive integer for clients, 0 for servers (blocks in the function
  * until the server is killed).
  */
-int DC_start_mpi_entity(const char* configFile, MPI_Comm* newcomm,
-		int* newrank, int* newsize);
-#else
-int DC_start_mpi_entity(const char* configFile, void* newcomm,
-		int* newrank, int* newsize);
+int DC_start_mpi_entity(const char* configFile, MPI_Comm* oldcomm, MPI_Comm* newcomm);
+//#else
+//int DC_start_mpi_entity(const char* configFile, void* newcomm,
+//		int* newrank, int* newsize);
 #endif
 #endif

@@ -25,6 +25,7 @@ int client_code(int id)
 
 int main(int argc, char** argv) 
 {
+	MPI_Comm all = MPI_COMM_WORLD;
 	MPI_Comm clients;
 	int rank, size;
 
@@ -35,7 +36,9 @@ int main(int argc, char** argv)
 	
 	MPI_Init(&argc,&argv);
 
-	if(DC_start_mpi_entity(argv[1],&clients,&rank,&size)) {
+	if(DC_start_mpi_entity(argv[1],&all,&clients)) {
+		MPI_Comm_rank(clients,&rank);
+		MPI_Comm_size(clients,&size);
 		client_code(rank);
 		DC_kill_server();
 		DC_finalize();

@@ -40,7 +40,7 @@ class DynamicAction : public Action {
 	friend class ActionsManager;
 
 	private:
-		void (*function)(std::string,int32_t,int32_t,MetadataManager*); /*!< Pointer to the loaded function */
+		void (*function)(std::string,int32_t,int32_t); /*!< Pointer to the loaded function */
 		std::string funName; /*!< Name of the function in the dynamic library. */
 		std::string fileName; /*!< Name of the dynamic library. */
 		void* handle; /*!< Handle for the opened dynamic library. */
@@ -75,7 +75,7 @@ class DynamicAction : public Action {
 		 * \brief Another way of calling the inner function.
 		 * \see Damaris::Action::operator()
 		 */
-		void call(int32_t iteration, int32_t sourceID, MetadataManager* mm);
+		void call(int32_t iteration, int32_t sourceID);
 
 		/**
 		 * \brief Loads the shared library.

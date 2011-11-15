@@ -179,8 +179,7 @@ void Server::processMessage(Message* msg)
 	
 	if(msg->type == MSG_SIG)
 	{
-		actionsManager->reactToUserSignal(object,
-				iteration,source,metadataManager);
+		actionsManager->reactToUserSignal(object,iteration,source);
 		return;
 	}
 
@@ -205,11 +204,11 @@ void Server::stop()
 }
 
 #ifdef __ENABLE_MPI
-Client* start_mpi_entity(const std::string& configFile, MPI_Comm* newcomm, int* newrank, int* newsize)
+Client* start_mpi_entity(const std::string& configFile, MPI_Comm* oldcomm, MPI_Comm* newcomm)
 {
 	int size, rank;
-	MPI_Comm_size(MPI_COMM_WORLD,&size);
-	MPI_Comm_rank(MPI_COMM_WORLD,&rank);
+	MPI_Comm_size(*oldcomm,&size);
+	MPI_Comm_rank(*oldcomm,&rank);
 
 	std::auto_ptr<Model::simulation_mdl> 
 		mdl(Model::simulation(configFile.c_str(),xml_schema::flags::dont_validate));
@@ -225,31 +224,31 @@ Client* start_mpi_entity(const std::string& configFile, MPI_Comm* newcomm, int* 
 	int is_server = (rank % copn) < (copn - clpn);
 	int is_client = not is_server;
 
-	MPI_Comm_split(MPI_COMM_WORLD,is_client,rank,newcomm);
-	MPI_Comm_rank(*newcomm,newrank);
-	MPI_Comm_size(*newcomm,newsize);
+	MPI_Comm_split(*oldcomm,is_client,rank,newcomm);
 
 	env->setID(rank);
+	env->setEntityComm(newcomm);
+	env->setGlobalComm(oldcomm);
 
 	if(is_client) {
 		DBG("Client starting, rank = " << rank);
-		MPI_Barrier(MPI_COMM_WORLD);
+		MPI_Barrier(*oldcomm);
 		return new Client(config);
 	} else {
 		DBG("Server starting, rank = " << rank);
 		Server server(config);
-		MPI_Barrier(MPI_COMM_WORLD);
+		MPI_Barrier(*oldcomm);
 		server.run();
 		return NULL;
 	}
 }	
-#else
-Client* start_mpi_entity(const std::string& config, void*,int*,int*)
-{
-        ERROR("Damaris is not compiled with MPI support. Aborting.");
-        exit(-1);
-        return NULL;
-}
+//#else
+//Client* start_mpi_entity(const std::string& config, void*,int*,int*)
+//{
+//        ERROR("Damaris is not compiled with MPI support. Aborting.");
+//        exit(-1);
+//        return NULL;
+//}
 #endif
 
 }

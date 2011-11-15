@@ -48,7 +48,7 @@ PyAction::~PyAction()
 {
 }
 	
-void PyAction::call(int32_t iteration, int32_t sourceID, MetadataManager* mm)
+void PyAction::call(int32_t iteration, int32_t sourceID)
 {
 	try {
 		Python::execFile(fileName,sourceID,iteration);

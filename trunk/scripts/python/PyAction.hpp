@@ -70,7 +70,7 @@ class PyAction : public Action {
 		 * \brief Calls the script.
 		 * \see Damaris::Action::operator()
 		 */
-		void call(int32_t iteration, int32_t sourceID, MetadataManager* mm);
+		void call(int32_t iteration, int32_t sourceID);
 
 		/**
 		 * \brief Loads the necessary resources.

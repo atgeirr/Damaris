@@ -39,18 +39,17 @@ extern "C" {
 	}
 
 #ifdef __ENABLE_MPI
-	int DC_start_mpi_entity(const char* configFile, MPI_Comm* newcomm, 
-		int* newrank, int* newsize)
+	int DC_start_mpi_entity(const char* configFile, MPI_Comm* oldcomm, MPI_Comm* newcomm)
 	{
-		client = Damaris::start_mpi_entity(std::string(configFile),newcomm,newrank,newsize);
+		client = Damaris::start_mpi_entity(std::string(configFile),oldcomm,newcomm);
 		return (client != NULL);
 	}
-#else
-	int DC_start_mpi_entity(const char* configFile, MPI_Comm* newcomm,
-		int* newrank, int* newsize)
-	{
-		client = Damaris::start_mpi_entity(std::string(configFile),newcomm,newrank,newsize);
-                return (client != NULL);
-	}
+//#else
+//	int DC_start_mpi_entity(const char* configFile, MPI_Comm* newcomm,
+//		int* newrank, int* newsize)
+//	{
+//		client = Damaris::start_mpi_entity(std::string(configFile),newcomm,newrank,newsize);
+//                return (client != NULL);
+//	}
 #endif
 }

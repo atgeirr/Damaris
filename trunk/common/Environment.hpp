@@ -25,7 +25,9 @@
 #define __DAMARIS_ENVIRONMENT_H
 
 #include <iostream>
-
+#ifdef __ENABLE_MPI
+	#include <mpi.h>
+#endif
 #include "xml/Model.hpp"
 #include "common/Language.hpp"
 #include "common/Singleton.hpp"
@@ -40,39 +42,32 @@ namespace Damaris {
 		friend class Singleton<Environment>;
 	private:
 		bool initialized;
-//		static Environment* m_instance; /*!< Pointer to the singleton instance. */
 
 		Model::simulation_mdl* baseModel; /*! Pointer to the base model. */
 		int id; /*!< ID of the process. */
-
-		Environment();
-		~Environment();
-	protected:
-
+#ifdef __ENABLE_MPI
+		MPI_Comm* entityComm;
+		MPI_Comm* globalComm;
+#endif		
 		/**
 		 * \brief Constructor taking a base model and an ID. 
 		 * \param[in] mdl : base model from the configuration file.
 		 * \param[in] i : id of the process.
 		 */
-		//Environment(std::auto_ptr<Model::simulation_mdl> mdl, int i);
-	public:
+		Environment();
 		/**
-		 * \brief Returns the singleton instance for the Environment object.
-		 * \return NULL if Configuration::initialize has never 
-		 *   been called before, a valid pointer otherwise.
+		 * Destructor.
 		 */
-		//static Environment* getInstance();
+		~Environment();
+	protected:
+
+	public:
 		/**
 		 * \brief Initialize the Environment singleton object.
 		 * \param[in] mdl : base model from the configuration file.
 		 * \param[in] i : id of the process.
 		 */
 		void initialize(Model::simulation_mdl* mdl);
-
-		/**
-		 * \brief Destroy the singleton object. 
-		 */
-		//static void finalize();
 
 		/**
 		 * \brief Get the ID of the server.
@@ -125,6 +120,19 @@ namespace Damaris {
 		 * \brief Get the size (in number of messages) of the message queue.
 		 */
 		size_t getMsgQueueSize() const;
+
+#ifdef __ENABLE_MPI
+		/**
+		 * \brief Set the communicator gathering processes of the same kind (client or server.
+		 */
+		void setEntityComm(MPI_Comm* comm);
+
+		/**
+		 * \brief Set the global communicator (usually MPI_COMM_WORLD).
+		 */
+		void setGlobalComm(MPI_Comm *comm);
+#endif
+		
 	};
 
 }

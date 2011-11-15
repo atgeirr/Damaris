@@ -18,7 +18,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \file ServerFortran.cpp
  * \date July 2011
  * \author Matthieu Dorier
- * \version 0.1
+ * \version 0.3
  * Contains the definition of functions for the Server in Fortran.
  */
 #ifdef __ENABLE_FORTRAN
@@ -53,24 +53,24 @@ void FC_FUNC_GLOBAL(df_server,DF_SERVER)
 
 #ifdef __ENABLE_MPI
 void FC_FUNC_GLOBAL(df_start_mpi_entity,DF_START_MPI_ENTITY)
-	(char* configFile_f, MPI_Fint* newcomm,	int* newrank, 
-	 int* newsize, int* result, int configsize)
+	(char* configFile_f, MPI_Fint* oldcomm,	MPI_Fint* newcomm, int* result, int configsize)
 	{
-		MPI_Comm c = MPI_Comm_f2c(*newcomm);
+		MPI_Comm nc;
+		MPI_Comm oc = MPI_Comm_f2c(*oldcomm);
 		client = Damaris::start_mpi_entity(std::string(configFile_f,configsize), 
-				newcomm, newrank, newsize);
-		*newcomm = MPI_Comm_c2f(c);
+				&oc,&nc);
+		*newcomm = MPI_Comm_c2f(nc);
 		*result = (client != NULL) ? 1 : 0;
 	}
-#else
-void FC_FUNC_GLOBAL(df_start_mpi_entity,DF_START_MPI_ENTITY)
-        (char* configFile_f, void* newcomm, int* newrank,
-	 int* newsize, int* result, int configsize)
-        {
-                Damaris::start_mpi_entity(std::string(configFile_f,configsize),
-                                newcomm, newrank, newsize);
-		*result = -1;
-        }
+//#else
+//void FC_FUNC_GLOBAL(df_start_mpi_entity,DF_START_MPI_ENTITY)
+//        (char* configFile_f, void* newcomm, int* newrank,
+//	 int* newsize, int* result, int configsize)
+//        {
+//                Damaris::start_mpi_entity(std::string(configFile_f,configsize),
+//                                newcomm, newrank, newsize);
+//		*result = -1;
+//        }
 #endif
 }
 #endif

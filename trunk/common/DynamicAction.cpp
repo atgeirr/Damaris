@@ -50,12 +50,12 @@ namespace Damaris {
 		dlclose(handle);
 	}
 	
-	void DynamicAction::call(int32_t iteration, int32_t sourceID, MetadataManager* mm)
+	void DynamicAction::call(int32_t iteration, int32_t sourceID)
 	{
 		if(!loaded)
 			load();
 		if(function != NULL)
-			(*function)(name,iteration,sourceID,mm);
+			(*function)(name,iteration,sourceID);
 	}
 
 	void DynamicAction::load()
@@ -73,7 +73,7 @@ namespace Damaris {
 		}
 
 		/* loading function */
-		function = (void (*)(std::string,int32_t, int32_t, Damaris::MetadataManager*))
+		function = (void (*)(std::string,int32_t, int32_t))
 			dlsym(handle,funName.c_str());
 
 		if ((error = dlerror()) != NULL)  {

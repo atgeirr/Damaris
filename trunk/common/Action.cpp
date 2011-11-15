@@ -39,8 +39,8 @@ namespace Damaris {
 	Action::~Action()
 	{}
 	
-	void Action::operator()(int32_t iteration, int32_t sourceID, MetadataManager* mm)
+	void Action::operator()(int32_t iteration, int32_t sourceID)
 	{
-		call(iteration,sourceID,mm);
+		call(iteration,sourceID);
 	}
 }
