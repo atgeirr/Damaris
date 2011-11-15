@@ -1,9 +1,0 @@
-<map id="G" name="G">
-<area shape="rect" href="$main_8cpp.html" title="server/main.cpp" alt="" coords="5,83,120,112"/>
-<area shape="rect" href="$_options_8hpp.html" title="server/Options.hpp" alt="" coords="168,83,299,112"/>
-<area shape="rect" href="$_server_8cpp.html" title="server/Server.cpp" alt="" coords="299,160,421,189"/>
-<area shape="rect" href="$_server_8hpp.html" title="server/Server.hpp" alt="" coords="373,83,496,112"/>
-<area shape="rect" href="$_server_configuration_8cpp.html" title="server/ServerConfiguration.cpp" alt="" coords="520,83,720,112"/>
-<area shape="rect" href="$_options_8cpp.html" title="server/Options.cpp" alt="" coords="144,160,275,189"/>
-<area shape="rect" href="$_server_c_8cpp.html" title="server/ServerC.cpp" alt="" coords="445,160,579,189"/>
-</map>

@@ -1,8 +1,0 @@
-<map id="G" name="G">
-<area shape="rect" href="$_types_8hpp.html" title="common/Types.hpp" alt="" coords="913,315,1049,344"/>
-<area shape="rect" href="$_layout_8hpp.html" title="common/Layout.hpp" alt="" coords="805,237,944,267"/>
-<area shape="rect" href="$_client_configuration_8hpp.html" title="client/ClientConfiguration.hpp" alt="" coords="1069,83,1259,112"/>
-<area shape="rect" href="$_configuration_8hpp.html" title="common/Configuration.hpp" alt="" coords="1120,160,1296,189"/>
-<area shape="rect" href="$_language_8hpp.html" title="common/Language.hpp" alt="" coords="1272,237,1427,267"/>
-<area shape="rect" href="$_parameter_8hpp.html" title="common/Parameter.hpp" alt="" coords="1088,237,1248,267"/>
-</map>

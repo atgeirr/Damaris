@@ -1,6 +1,0 @@
-<map id="G" name="G">
-<area shape="rect" href="$class_damaris_1_1_serializable.html" title="Damaris::Serializable" alt="" coords="5,32,149,61"/>
-<area shape="rect" href="$class_damaris_1_1_chunk.html" title="Damaris::Chunk" alt="" coords="197,32,312,61"/>
-<area shape="rect" href="$class_damaris_1_1_chunk_handle.html" title="Damaris::ChunkHandle" alt="" coords="360,5,515,35"/>
-<area shape="rect" href="$class_damaris_1_1_shm_chunk.html" title="Damaris::ShmChunk" alt="" coords="367,59,508,88"/>
-</map>
