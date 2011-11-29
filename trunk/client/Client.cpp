@@ -360,7 +360,7 @@ namespace Damaris {
 
 		config->kill();
 
-		INFO("Client destroyed successfuly");
+		DBG("Client destroyed successfuly");
 	}
 	
 }

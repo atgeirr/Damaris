@@ -84,7 +84,17 @@ BOOST_PYTHON_MODULE(damaris)
 		;
 }
 
-void initialize()
+PyInterpreter::PyInterpreter()
+{
+	initialize();
+}
+
+PyInterpreter::~PyInterpreter()
+{
+	finalize();
+}
+
+void PyInterpreter::initialize()
 {
 	try {
 		PyImport_AppendInittab((char*)"damaris",&initdamaris);
@@ -100,13 +110,13 @@ void initialize()
 	ready = true;
 }
 		
-void finalize()
+void PyInterpreter::finalize()
 {
 	ready = false;
 	Py_Finalize();
 }
 
-void execFile(const std::string& file, int source, int iteration) 
+void PyInterpreter::execFile(const std::string& file, int source, int iteration) 
 {
 	if(!ready)
 		initialize();

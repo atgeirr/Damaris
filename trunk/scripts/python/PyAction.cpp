@@ -51,7 +51,12 @@ PyAction::~PyAction()
 void PyAction::call(int32_t iteration, int32_t sourceID)
 {
 	try {
-		Python::execFile(fileName,sourceID,iteration);
+		PyInterpreter* p = Python::PyInterpreter::getInstance();
+		if(p != NULL) {
+			p->execFile(fileName,sourceID,iteration);
+		} else { 
+			throw(std::runtime_error("Unable to get a pointer to a Python interpreter."));
+		}
 	} catch(std::exception &e) {
 		ERROR("in Python action \"" << name << "\": "<< e.what());
 	}

@@ -25,6 +25,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <string>
 
+#include "common/Singleton.hpp"
+
 namespace Damaris {
 
 /**
@@ -34,6 +36,11 @@ namespace Damaris {
  */
 namespace Python {
 
+	class PyInterpreter : public Singleton<PyInterpreter> {
+		friend class Singleton<PyInterpreter>;		
+	private:
+		PyInterpreter();
+		~PyInterpreter();
 	/**
 	 * Initialize the Python interpreter.
 	 */				
@@ -44,10 +51,12 @@ namespace Python {
 	 */	
 	void finalize();
 
+	public:
 	/**
 	 * Executes a given file given.
 	 */
 	void execFile(const std::string &filename, int source, int iteration);
+	};
 }
 }
 #endif
