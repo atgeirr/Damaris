@@ -46,8 +46,9 @@ namespace Damaris {
 		Model::simulation_mdl* baseModel; /*! Pointer to the base model. */
 		int id; /*!< ID of the process. */
 #ifdef __ENABLE_MPI
-		MPI_Comm* entityComm;
-		MPI_Comm* globalComm;
+		MPI_Comm entityComm;
+		MPI_Comm globalComm;
+		MPI_Comm nodeComm;
 #endif		
 		/**
 		 * \brief Constructor taking a base model and an ID. 
@@ -125,12 +126,22 @@ namespace Damaris {
 		/**
 		 * \brief Set the communicator gathering processes of the same kind (client or server.
 		 */
-		void setEntityComm(MPI_Comm* comm);
+		void setEntityComm(MPI_Comm comm) { entityComm = comm; }
 
+		MPI_Comm getEntityComm() { return entityComm; }
 		/**
 		 * \brief Set the global communicator (usually MPI_COMM_WORLD).
 		 */
-		void setGlobalComm(MPI_Comm *comm);
+		void setGlobalComm(MPI_Comm comm) { globalComm = comm; }
+
+		MPI_Comm getGlobalComm() { return globalComm; }
+
+		/**
+		 * \brief Set the communicator gathering processes of the same node.
+		 */
+		void setNodeComm(MPI_Comm comm) { nodeComm = comm; }
+		
+		MPI_Comm getNodeComm() { return nodeComm; }
 #endif
 		
 	};

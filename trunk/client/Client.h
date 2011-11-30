@@ -25,6 +25,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #define __DAMARIS_CLIENT_C_H
 
 #include <stdlib.h>
+#include <mpi.h>
 
 typedef int64_t DC_chunk_handle_t;
 
@@ -99,6 +100,8 @@ int 	DC_signal(const char* signal_name, int32_t iteration);
  * \return 0 in case of success, -1 if the parameter does not exist.
  */
 int 	DC_get_parameter(const char* param_name, void* buffer);
+
+int	DC_get_clients_communicator(MPI_Comm* comm);
 
 /**
  * \brief Send a kill signal to the server.

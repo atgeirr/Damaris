@@ -206,7 +206,13 @@ class Client {
 		 * \return 0 in case of success, -1 in case of failure.
 		 */
 		int kill_server();
-				
+
+#ifdef __ENABLE_MPI
+		/**
+		 * Gets the communicator gathering clients.
+		 */
+		MPI_Comm get_clients_communicator();
+#endif		
 		/**
 		 * \brief Destructor.
 		 * To be called at the end of the before stopping the client program.

@@ -36,7 +36,8 @@ int main(int argc, char** argv)
 	
 	MPI_Init(&argc,&argv);
 
-	if(DC_start_mpi_entity(argv[1],&all,&clients)) {
+	if(DC_start_mpi_entity(argv[1],all)) {
+		DC_get_clients_communicator(&clients);
 		MPI_Comm_rank(clients,&rank);
 		MPI_Comm_size(clients,&size);
 		client_code(rank);

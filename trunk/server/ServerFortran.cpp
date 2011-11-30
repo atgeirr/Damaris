@@ -53,24 +53,12 @@ void FC_FUNC_GLOBAL(df_server,DF_SERVER)
 
 #ifdef __ENABLE_MPI
 void FC_FUNC_GLOBAL(df_start_mpi_entity,DF_START_MPI_ENTITY)
-	(char* configFile_f, MPI_Fint* oldcomm,	MPI_Fint* newcomm, int* result, int configsize)
+	(char* configFile_f, MPI_Fint* globalcomm, int* result, int configsize)
 	{
-		MPI_Comm nc;
-		MPI_Comm oc = MPI_Comm_f2c(*oldcomm);
-		client = Damaris::start_mpi_entity(std::string(configFile_f,configsize), 
-				&oc,&nc);
-		*newcomm = MPI_Comm_c2f(nc);
+		MPI_Comm oc = MPI_Comm_f2c(globalcomm);
+		client = Damaris::start_mpi_entity(std::string(configFile_f,configsize),oc);
 		*result = (client != NULL) ? 1 : 0;
 	}
-//#else
-//void FC_FUNC_GLOBAL(df_start_mpi_entity,DF_START_MPI_ENTITY)
-//        (char* configFile_f, void* newcomm, int* newrank,
-//	 int* newsize, int* result, int configsize)
-//        {
-//                Damaris::start_mpi_entity(std::string(configFile_f,configsize),
-//                                newcomm, newrank, newsize);
-//		*result = -1;
-//        }
 #endif
 }
 #endif

@@ -129,9 +129,7 @@ class Server {
 }; // class Server
 
 #ifdef __ENABLE_MPI
-Client* start_mpi_entity(const std::string& config, MPI_Comm* oldcomm, MPI_Comm* newcomm);
-//#else
-//Client* start_mpi_entity(const std::string& config, void*,int*,int*); 
+Client* start_mpi_entity(const std::string& config, MPI_Comm globalcomm);
 #endif
 } // namespace Damaris
 

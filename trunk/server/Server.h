@@ -41,9 +41,6 @@ int DC_server(const char* configFile, int server_id);
  * \return a positive integer for clients, 0 for servers (blocks in the function
  * until the server is killed).
  */
-int DC_start_mpi_entity(const char* configFile, MPI_Comm* oldcomm, MPI_Comm* newcomm);
-//#else
-//int DC_start_mpi_entity(const char* configFile, void* newcomm,
-//		int* newrank, int* newsize);
+int DC_start_mpi_entity(const char* configFile, MPI_Comm globalcomm);
 #endif
 #endif

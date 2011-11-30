@@ -204,11 +204,12 @@ void Server::stop()
 }
 
 #ifdef __ENABLE_MPI
-Client* start_mpi_entity(const std::string& configFile, MPI_Comm* oldcomm, MPI_Comm* newcomm)
+Client* start_mpi_entity(const std::string& configFile, MPI_Comm globalcomm)
 {
+	/* Global rank and size in the passed communicator */
 	int size, rank;
-	MPI_Comm_size(*oldcomm,&size);
-	MPI_Comm_rank(*oldcomm,&rank);
+	MPI_Comm_size(globalcomm,&size);
+	MPI_Comm_rank(globalcomm,&rank);
 
 	std::auto_ptr<Model::simulation_mdl> 
 		mdl(Model::simulation(configFile.c_str(),xml_schema::flags::dont_validate));
@@ -217,38 +218,75 @@ Client* start_mpi_entity(const std::string& configFile, MPI_Comm* oldcomm, MPI_C
 	config->initialize(mdl,configFile);	
 
 	Environment* env = config->getEnvironment();
+	env->setGlobalComm(globalcomm);
+
+	/* The name of the processor is used to compute communicators */
+	char procname[MPI_MAX_PROCESSOR_NAME];
+	int len;
+	MPI_Get_processor_name(procname,&len);
+
+	/* Compute the node identifier from the name */
+	uint64_t nhash = (uint64_t)(14695981039346656037ULL);
+	uint64_t fnv =  ((uint64_t)1 << 40) + (1 << 8) + 0xb3;
+	for(int i=0; i < len; i++) {
+		uint64_t c = (uint64_t)(procname[i]);
+		nhash = nhash xor c;
+		nhash *= fnv;
+	}
+
+	/* Create a new communicator gathering processes of the same node */
+	int color = ((int)nhash >= 0) ? (int)nhash : - ((int)nhash);
+	MPI_Comm nodecomm;
+	MPI_Comm_split(globalcomm,color,rank,&nodecomm);
+	env->setNodeComm(nodecomm);
+	
+	/* Get the size and rank in the node */
+	int rankInNode;
+	int sizeInNode;
+	MPI_Comm_rank(nodecomm,&rankInNode);
+	MPI_Comm_size(nodecomm,&sizeInNode);
+
+	/* Get the number of clients and cores provided in configuration */
 	int clpn = env->getClientsPerNode();
 	int copn = env->getCoresPerNode();
 
-	DBG("Starting MPI instances for " << clpn << " clients per core");
-	int is_server = (rank % copn) < (copn - clpn);
-	int is_client = not is_server;
+	/* Check that the values match */
+	if(not (sizeInNode != copn)) {
+		ERROR("The number of cores detected in node does not match the number" 
+			<< " provided in configuration."
+			<< " This may be due to a configuration error or a (unprobable)"
+			<< " hash colision in the algorithm. Aborting...");
+		MPI_Abort(MPI_COMM_WORLD,-1);
+	}
 
-	MPI_Comm_split(*oldcomm,is_client,rank,newcomm);
+	/* Compute the communcator for clients and servers */
+	int is_client = (rankInNode > clpn) ? 0 : 1;
+	MPI_Comm entitycomm;
+	MPI_Comm_split(globalcomm,is_client,rank,&entitycomm);
+	env->setEntityComm(entitycomm);
+	
+	/* Get rank and size in the entity communicator */
+	int rankInEnComm, sizeOfEnComm;
+	MPI_Comm_rank(entitycomm,&rankInEnComm);
+	MPI_Comm_size(entitycomm,&sizeOfEnComm);
 
-	env->setID(rank);
-	env->setEntityComm(newcomm);
-	env->setGlobalComm(oldcomm);
+	/* Set the rank of the entity */
+	env->setID(rankInEnComm);
 
 	if(is_client) {
 		DBG("Client starting, rank = " << rank);
-		MPI_Barrier(*oldcomm);
+		// the following barrier ensures that the client
+		// won't be created before the servers are started.
+		MPI_Barrier(globalcomm);
 		return new Client(config);
 	} else {
 		DBG("Server starting, rank = " << rank);
 		Server server(config);
-		MPI_Barrier(*oldcomm);
+		MPI_Barrier(globalcomm);
 		server.run();
 		return NULL;
 	}
 }	
-//#else
-//Client* start_mpi_entity(const std::string& config, void*,int*,int*)
-//{
-//        ERROR("Damaris is not compiled with MPI support. Aborting.");
-//        exit(-1);
-//        return NULL;
-//}
 #endif
 
 }
