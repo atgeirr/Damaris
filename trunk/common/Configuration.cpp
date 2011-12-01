@@ -200,11 +200,11 @@ namespace Damaris {
 	{
 		Model::actions_mdl::event_const_iterator e(baseModel->actions().event().begin());
 		for(; e < baseModel->actions().event().end(); e++) {
-			actionsManager->addDynamicAction(e->name(),e->library(),e->action());
+			actionsManager->addDynamicAction(e->name(),e->library(),e->action(),e->scope());
 		}
 		Model::actions_mdl::script_const_iterator s(baseModel->actions().script().begin());
 		for(; s < baseModel->actions().script().end(); s++) {
-			actionsManager->addScriptAction(s->name(),s->file(),s->language());
+			actionsManager->addScriptAction(s->name(),s->file(),s->language(),e->scope());
 		}
 	}
 

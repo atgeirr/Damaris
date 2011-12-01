@@ -55,6 +55,7 @@ class ActionsManager : public Singleton<ActionsManager> {
 		 * \param[in] eventName : Name of the event taken as a key for this action.
 		 * \param[in] fileName : Name of the dynamic library (.so, .dylib...)
 		 * \param[in] functionName : Name of the function to load in this dynamic library.
+		 * \param[in] scope : Scope of the event (core, node, global).
 	 	 * 
 		 * The action is defined but the dynamic library is not loaded. It will be loaded
 		 * by the action the first time the action is called. This way the clients can
@@ -62,10 +63,22 @@ class ActionsManager : public Singleton<ActionsManager> {
 		 * they can retrieve action's IDs.
 		 */
 		void addDynamicAction(const std::string &eventName, 
-				const std::string &fileName, const std::string& functionName);
+				const std::string &fileName, const std::string& functionName,
+				const std::string &scope);
 
+		/** 
+                 * \brief Adds an action defined through a script.
+                 * \param[in] eventName : Name of the event taken as a key for this action.
+                 * \param[in] fileName : Name of the dynamic library (.so, .dylib...)
+                 * \param[in] functionName : Name of the function to load in this dynamic library.
+                 * \param[in] scope : Scope of the event (core, node, global).
+                 * 
+		 * The interpreter for the language in which the script is writen is loaded only
+		 * if the action is eventually called.
+                 */
 		void addScriptAction(const std::string &scriptName,
-				const std::string &fileName, const std::string &lang);
+				const std::string &fileName, const std::string &lang,
+				const std::string &scope);
 
 		/**
 		 * \brief Call a function, in reaction to a fired event.

@@ -95,6 +95,7 @@
 	<xs:attribute name="name"    type="xs:string" use="required"/>
 	<xs:attribute name="action"  type="xs:string" use="required"/>
 	<xs:attribute name="library" type="xs:string" use="required"/>
+	<xs:attribute name="scope"   type="xs:string" use="optional" default="core" />
 	</xs:complexType>
 
 	<!-- Script node -->
@@ -102,6 +103,7 @@
 	<xs:attribute name="name"     type="xs:string" use="required" />
 	<xs:attribute name="file"     type="xs:string" use="required" />
 	<xs:attribute name="language" type="xs:string" use="required" />
+	<xs:attribute name="scope"    type="xs:string" use="optional" default="core" />
 	</xs:complexType>
 
 	<!-- Actions node -->

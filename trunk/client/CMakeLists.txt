@@ -18,6 +18,7 @@ set(DAMARIS_COMMON_SRC
 	${DAMARIS_SOURCE_DIR}/common/MetadataManager.cpp
 	${DAMARIS_SOURCE_DIR}/common/Action.cpp
 	${DAMARIS_SOURCE_DIR}/common/DynamicAction.cpp
+	${DAMARIS_SOURCE_DIR}/common/NodeAction.cpp
 	${DAMARIS_SOURCE_DIR}/common/ActionsManager.cpp
 	${DAMARIS_SOURCE_DIR}/common/Chunk.cpp
 	${DAMARIS_SOURCE_DIR}/common/ShmChunk.cpp

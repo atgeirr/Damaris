@@ -15,7 +15,7 @@
   along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  ********************************************************************/
 /**
- * \file Environment.cpp
+ * \file Environment.hpp
  * \date October 2011
  * \author Matthieu Dorier
  * \version 0.3
@@ -46,9 +46,9 @@ namespace Damaris {
 		Model::simulation_mdl* baseModel; /*! Pointer to the base model. */
 		int id; /*!< ID of the process. */
 #ifdef __ENABLE_MPI
-		MPI_Comm entityComm;
-		MPI_Comm globalComm;
-		MPI_Comm nodeComm;
+		MPI_Comm entityComm; /*!< clients or servers communicator (depending on the entity). */
+		MPI_Comm globalComm; /*!< global communicator. */
+		MPI_Comm nodeComm;   /*!< communicator for the processors in the node. */
 #endif		
 		/**
 		 * \brief Constructor taking a base model and an ID. 
@@ -128,12 +128,19 @@ namespace Damaris {
 		 */
 		void setEntityComm(MPI_Comm comm) { entityComm = comm; }
 
+		/**
+		 * \brief gets the communicator gathering processes of the same kind.
+		 */
 		MPI_Comm getEntityComm() { return entityComm; }
+
 		/**
 		 * \brief Set the global communicator (usually MPI_COMM_WORLD).
 		 */
 		void setGlobalComm(MPI_Comm comm) { globalComm = comm; }
 
+		/**
+		 * \brief Gets the global communicator passed at start time.
+		 */
 		MPI_Comm getGlobalComm() { return globalComm; }
 
 		/**
@@ -141,6 +148,9 @@ namespace Damaris {
 		 */
 		void setNodeComm(MPI_Comm comm) { nodeComm = comm; }
 		
+		/**
+		 * \brief Get the communicator gathering processes of the same node.
+		 */
 		MPI_Comm getNodeComm() { return nodeComm; }
 #endif
 		

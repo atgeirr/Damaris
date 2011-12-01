@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file ActionsManager.cpp
- * \date July 2011
+ * \date October 2011
  * \author Matthieu Dorier
- * \version 0.1
+ * \version 0.3
  */
 #include <dlfcn.h>
 #include <stdint.h>
@@ -28,7 +28,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "common/Debug.hpp"
 #include "common/Language.hpp"
+#include "common/Environment.hpp"
 #include "common/ActionsManager.hpp"
+#include "common/NodeAction.hpp"
 #include "scripts/python/PyAction.hpp"
 
 namespace Damaris {
@@ -47,7 +49,8 @@ ActionsManager::ActionsManager()
  * not overwrite it, it prints a warning and returns.
  */
 void ActionsManager::addDynamicAction(const std::string& eventName, 
-		const std::string& fileName, const std::string &functionName)
+		const std::string& fileName, const std::string &functionName,
+		const std::string& scope)
 {
 
 	// check if there is already an action with the same name recorded
@@ -57,8 +60,19 @@ void ActionsManager::addDynamicAction(const std::string& eventName,
 		return;
 	}
 
+	Action* a = NULL;
+
 	// create the action
-	DynamicAction* a = new DynamicAction(functionName,fileName);
+	a = new DynamicAction(functionName,fileName);
+	if(scope == "core") { }
+	else if(scope == "node") {
+		Environment* env = Environment::getInstance();
+		a = new NodeAction(a,env->getClientsPerNode());
+	} else {
+		ERROR("Undefined event scope \"" << scope << "\" (must be \"core\" or \"node\")");
+		delete a;
+		return;
+	}
 
 	// attribute an ID and a name to the action
 	a->id = actions.size();
@@ -69,7 +83,8 @@ void ActionsManager::addDynamicAction(const std::string& eventName,
 }
 
 void ActionsManager::addScriptAction(const std::string& name,
-		const std::string& fileName, const std::string& language) 
+		const std::string& fileName, const std::string& language,
+		const std::string& scope) 
 {
 	// check if there is already an action with the same name recorded
         ActionSet::index<by_name>::type::iterator it = actions.get<by_name>().find(name);
@@ -86,6 +101,15 @@ void ActionsManager::addScriptAction(const std::string& name,
 			ERROR("Undefined scripting language \"" << language 
 					<< "\" for action \"" << name << "\"");
 			return;
+	}
+	
+	if(scope == "core") { }
+	else if (scope == "node") {
+		Environment* env = Environment::getInstance();
+		a = new NodeAction(a,env->getClientsPerNode());
+	} else {
+		ERROR("Undefined event scope \"" << scope << "\" (must be \"core\" or \"node\")");
+		delete a;
 	}
 	// attribute an ID and a name to the action
 	a->id = actions.size();

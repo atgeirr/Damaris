@@ -1252,6 +1252,26 @@ namespace Damaris
       void
       library (::std::auto_ptr< library_type > p);
 
+      // scope
+      // 
+      typedef ::xml_schema::string scope_type;
+      typedef ::xsd::cxx::tree::traits< scope_type, char > scope_traits;
+
+      const scope_type&
+      scope () const;
+
+      scope_type&
+      scope ();
+
+      void
+      scope (const scope_type& x);
+
+      void
+      scope (::std::auto_ptr< scope_type > p);
+
+      static const scope_type&
+      scope_default_value ();
+
       // Constructors.
       //
       event_mdl (const name_type&,
@@ -1284,6 +1304,8 @@ namespace Damaris
       ::xsd::cxx::tree::one< name_type > name_;
       ::xsd::cxx::tree::one< action_type > action_;
       ::xsd::cxx::tree::one< library_type > library_;
+      ::xsd::cxx::tree::one< scope_type > scope_;
+      static const scope_type scope_default_value_;
     };
 
     class script_mdl: public ::xml_schema::type
@@ -1340,6 +1362,26 @@ namespace Damaris
       void
       language (::std::auto_ptr< language_type > p);
 
+      // scope
+      // 
+      typedef ::xml_schema::string scope_type;
+      typedef ::xsd::cxx::tree::traits< scope_type, char > scope_traits;
+
+      const scope_type&
+      scope () const;
+
+      scope_type&
+      scope ();
+
+      void
+      scope (const scope_type& x);
+
+      void
+      scope (::std::auto_ptr< scope_type > p);
+
+      static const scope_type&
+      scope_default_value ();
+
       // Constructors.
       //
       script_mdl (const name_type&,
@@ -1372,6 +1414,8 @@ namespace Damaris
       ::xsd::cxx::tree::one< name_type > name_;
       ::xsd::cxx::tree::one< file_type > file_;
       ::xsd::cxx::tree::one< language_type > language_;
+      ::xsd::cxx::tree::one< scope_type > scope_;
+      static const scope_type scope_default_value_;
     };
 
     class actions_mdl: public ::xml_schema::type

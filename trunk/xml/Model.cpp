@@ -913,6 +913,36 @@ namespace Damaris
       this->library_.set (x);
     }
 
+    const event_mdl::scope_type& event_mdl::
+    scope () const
+    {
+      return this->scope_.get ();
+    }
+
+    event_mdl::scope_type& event_mdl::
+    scope ()
+    {
+      return this->scope_.get ();
+    }
+
+    void event_mdl::
+    scope (const scope_type& x)
+    {
+      this->scope_.set (x);
+    }
+
+    void event_mdl::
+    scope (::std::auto_ptr< scope_type > x)
+    {
+      this->scope_.set (x);
+    }
+
+    const event_mdl::scope_type& event_mdl::
+    scope_default_value ()
+    {
+      return scope_default_value_;
+    }
+
 
     // script_mdl
     // 
@@ -987,6 +1017,36 @@ namespace Damaris
     language (::std::auto_ptr< language_type > x)
     {
       this->language_.set (x);
+    }
+
+    const script_mdl::scope_type& script_mdl::
+    scope () const
+    {
+      return this->scope_.get ();
+    }
+
+    script_mdl::scope_type& script_mdl::
+    scope ()
+    {
+      return this->scope_.get ();
+    }
+
+    void script_mdl::
+    scope (const scope_type& x)
+    {
+      this->scope_.set (x);
+    }
+
+    void script_mdl::
+    scope (::std::auto_ptr< scope_type > x)
+    {
+      this->scope_.set (x);
+    }
+
+    const script_mdl::scope_type& script_mdl::
+    scope_default_value ()
+    {
+      return scope_default_value_;
     }
 
 
@@ -2356,6 +2416,9 @@ namespace Damaris
     // event_mdl
     //
 
+    const event_mdl::scope_type event_mdl::scope_default_value_ (
+      "core");
+
     event_mdl::
     event_mdl (const name_type& name,
                const action_type& action,
@@ -2363,7 +2426,8 @@ namespace Damaris
     : ::xml_schema::type (),
       name_ (name, ::xml_schema::flags (), this),
       action_ (action, ::xml_schema::flags (), this),
-      library_ (library, ::xml_schema::flags (), this)
+      library_ (library, ::xml_schema::flags (), this),
+      scope_ (scope_default_value (), ::xml_schema::flags (), this)
     {
     }
 
@@ -2374,7 +2438,8 @@ namespace Damaris
     : ::xml_schema::type (x, f, c),
       name_ (x.name_, f, this),
       action_ (x.action_, f, this),
-      library_ (x.library_, f, this)
+      library_ (x.library_, f, this),
+      scope_ (x.scope_, f, this)
     {
     }
 
@@ -2385,7 +2450,8 @@ namespace Damaris
     : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
       name_ (f, this),
       action_ (f, this),
-      library_ (f, this)
+      library_ (f, this),
+      scope_ (f, this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
       {
@@ -2430,6 +2496,15 @@ namespace Damaris
           this->library_.set (r);
           continue;
         }
+
+        if (n.name () == "scope" && n.namespace_ ().empty ())
+        {
+          ::std::auto_ptr< scope_type > r (
+            scope_traits::create (i, f, this));
+
+          this->scope_.set (r);
+          continue;
+        }
       }
 
       if (!name_.present ())
@@ -2452,6 +2527,11 @@ namespace Damaris
           "library",
           "");
       }
+
+      if (!scope_.present ())
+      {
+        this->scope_.set (scope_default_value ());
+      }
     }
 
     event_mdl* event_mdl::
@@ -2469,6 +2549,9 @@ namespace Damaris
     // script_mdl
     //
 
+    const script_mdl::scope_type script_mdl::scope_default_value_ (
+      "core");
+
     script_mdl::
     script_mdl (const name_type& name,
                 const file_type& file,
@@ -2476,7 +2559,8 @@ namespace Damaris
     : ::xml_schema::type (),
       name_ (name, ::xml_schema::flags (), this),
       file_ (file, ::xml_schema::flags (), this),
-      language_ (language, ::xml_schema::flags (), this)
+      language_ (language, ::xml_schema::flags (), this),
+      scope_ (scope_default_value (), ::xml_schema::flags (), this)
     {
     }
 
@@ -2487,7 +2571,8 @@ namespace Damaris
     : ::xml_schema::type (x, f, c),
       name_ (x.name_, f, this),
       file_ (x.file_, f, this),
-      language_ (x.language_, f, this)
+      language_ (x.language_, f, this),
+      scope_ (x.scope_, f, this)
     {
     }
 
@@ -2498,7 +2583,8 @@ namespace Damaris
     : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
       name_ (f, this),
       file_ (f, this),
-      language_ (f, this)
+      language_ (f, this),
+      scope_ (f, this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
       {
@@ -2543,6 +2629,15 @@ namespace Damaris
           this->language_.set (r);
           continue;
         }
+
+        if (n.name () == "scope" && n.namespace_ ().empty ())
+        {
+          ::std::auto_ptr< scope_type > r (
+            scope_traits::create (i, f, this));
+
+          this->scope_.set (r);
+          continue;
+        }
       }
 
       if (!name_.present ())
@@ -2564,6 +2659,11 @@ namespace Damaris
         throw ::xsd::cxx::tree::expected_attribute< char > (
           "language",
           "");
+      }
+
+      if (!scope_.present ())
+      {
+        this->scope_.set (scope_default_value ());
       }
     }
 
