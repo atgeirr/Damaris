@@ -242,16 +242,16 @@ Client* start_mpi_entity(const std::string& configFile, MPI_Comm globalcomm)
 	
 	/* Get the size and rank in the node */
 	int rankInNode;
-	int sizeInNode;
+	int sizeOfNode;
 	MPI_Comm_rank(nodecomm,&rankInNode);
-	MPI_Comm_size(nodecomm,&sizeInNode);
-
+	MPI_Comm_size(nodecomm,&sizeOfNode);
+	
 	/* Get the number of clients and cores provided in configuration */
 	int clpn = env->getClientsPerNode();
 	int copn = env->getCoresPerNode();
 
 	/* Check that the values match */
-	if(not (sizeInNode != copn)) {
+	if(sizeOfNode != copn) {
 		ERROR("The number of cores detected in node does not match the number" 
 			<< " provided in configuration."
 			<< " This may be due to a configuration error or a (unprobable)"
@@ -260,7 +260,7 @@ Client* start_mpi_entity(const std::string& configFile, MPI_Comm globalcomm)
 	}
 
 	/* Compute the communcator for clients and servers */
-	int is_client = (rankInNode > clpn) ? 0 : 1;
+	int is_client = (rankInNode >= clpn) ? 0 : 1;
 	MPI_Comm entitycomm;
 	MPI_Comm_split(globalcomm,is_client,rank,&entitycomm);
 	env->setEntityComm(entitycomm);
