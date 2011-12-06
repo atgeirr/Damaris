@@ -193,7 +193,9 @@ void Server::processInternalSignal(int32_t object)
 {
 	switch(object) {
 	case KILL_SERVER:
-		needStop--; break;
+		needStop--; 
+		INFO("Server received a \"kill\" internal signal.");
+		break;
 	}
 }
 

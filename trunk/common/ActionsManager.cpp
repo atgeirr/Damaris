@@ -61,7 +61,7 @@ void ActionsManager::addDynamicAction(const std::string& eventName,
 	}
 
 	Action* a = NULL;
-
+	DBG("scope = " << scope);
 	// create the action
 	a = new DynamicAction(functionName,fileName);
 	if(scope == "core") { }
@@ -73,7 +73,7 @@ void ActionsManager::addDynamicAction(const std::string& eventName,
 		delete a;
 		return;
 	}
-
+	
 	// attribute an ID and a name to the action
 	a->id = actions.size();
 	a->name = eventName;
@@ -93,6 +93,7 @@ void ActionsManager::addScriptAction(const std::string& name,
                 return;
         }
 	Action* a = NULL;
+	DBG("scope = " << scope);
 	// create the action
 	switch(Language::getLanguageFromString(&(language))) {
 		case (Language::LG_PYTHON):

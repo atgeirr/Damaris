@@ -7,7 +7,7 @@ int client_code(int id)
 {
 	float mydata[64][16][4];
 	char* varname = "my group/my variable";
-	char* event = "my event";
+	char* event = "my script";
 
 	int i,j,k;
 	for(i = 0; i < 64; i++) {

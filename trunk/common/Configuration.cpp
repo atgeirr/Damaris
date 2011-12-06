@@ -204,7 +204,7 @@ namespace Damaris {
 		}
 		Model::actions_mdl::script_const_iterator s(baseModel->actions().script().begin());
 		for(; s < baseModel->actions().script().end(); s++) {
-			actionsManager->addScriptAction(s->name(),s->file(),s->language(),e->scope());
+			actionsManager->addScriptAction(s->name(),s->file(),s->language(),s->scope());
 		}
 	}
 

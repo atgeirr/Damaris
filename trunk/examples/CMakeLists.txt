@@ -25,6 +25,9 @@ target_link_libraries (test_alloc_c ${CLIENT_SIDE_LIBRARIES} rt dl)
 add_executable (test_c ${DAMARIS_SOURCE_DIR}/examples/test.c)
 target_link_libraries (test_c ${CLIENT_SIDE_LIBRARIES} rt dl)
 
+add_executable (test_event_c ${DAMARIS_SOURCE_DIR}/examples/test_event.c)
+target_link_libraries (test_event_c ${CLIENT_SIDE_LIBRARIES} rt dl)
+
 add_executable (test_chunk_c ${DAMARIS_SOURCE_DIR}/examples/test_chunk.c)
 target_link_libraries (test_chunk_c ${CLIENT_SIDE_LIBRARIES} rt dl)
 
