@@ -121,6 +121,8 @@ namespace Damaris {
 			Types::basic_type_e type = Types::getTypeFromString(&(l->type()));
 			Language::language_e language = 
 				Language::getLanguageFromString(&(l->language()));
+			if(language == Language::LG_UNKNOWN)
+				language = environment->getDefaultLanguage();
 
 			if(type == Types::UNDEFINED_TYPE) {
 				ERROR("Unknown type \"" << l->type() 

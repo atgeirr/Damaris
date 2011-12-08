@@ -194,7 +194,6 @@ void Server::processInternalSignal(int32_t object)
 	switch(object) {
 	case KILL_SERVER:
 		needStop--; 
-		INFO("Server received a \"kill\" internal signal.");
 		break;
 	}
 }
@@ -251,6 +250,12 @@ Client* start_mpi_entity(const std::string& configFile, MPI_Comm globalcomm)
 	/* Get the number of clients and cores provided in configuration */
 	int clpn = env->getClientsPerNode();
 	int copn = env->getCoresPerNode();
+
+	if(copn != (clpn+1)) {
+		ERROR("The current version of Damaris is only working with exactly one server"
+			<< " per node. Abortingi...");
+		MPI_Abort(MPI_COMM_WORLD,-1);
+	}
 
 	/* Check that the values match */
 	if(sizeOfNode != copn) {

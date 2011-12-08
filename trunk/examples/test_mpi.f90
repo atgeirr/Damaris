@@ -1,12 +1,12 @@
       program test
       include 'mpif.h'
       integer :: ierr
-      integer :: rank, s
       integer :: comm
       integer :: is_client
 
       call MPI_INIT(ierr)
-      call df_start_mpi_entity("config.xml",comm,rank,s,is_client)
+      comm = MPI_COMM_WORLD
+      call df_start_mpi_entity("config.xml",comm,is_client)
       if(is_client.GT.0) then
          call client_code()
          call df_kill_server(ierr)

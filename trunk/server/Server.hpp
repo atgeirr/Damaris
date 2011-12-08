@@ -24,10 +24,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #define __DAMARIS_SERVER_H
 
 #include <string>
-
-#ifdef __ENABLE_MPI
-	#include <mpi.h>
-#endif
+#include <mpi.h>
 
 #include "client/Client.hpp"
 #include "common/Configuration.hpp"
@@ -128,9 +125,16 @@ class Server {
 
 }; // class Server
 
-#ifdef __ENABLE_MPI
+/**
+ * \brief Starts the entities according to the configuration file.
+ * If the process is a client, a valid pointer over a Client object is returned.
+ * If the process is a server, this function starts the server loop and
+ * blocks, returning only when the server is kill through the kill_server function
+ * of clients, and the returned value is a NULL pointer.
+ * If a problem occurs in this function, the program will abort.
+ */
 Client* start_mpi_entity(const std::string& config, MPI_Comm globalcomm);
-#endif
+
 } // namespace Damaris
 
 #endif

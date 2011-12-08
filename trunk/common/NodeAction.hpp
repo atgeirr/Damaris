@@ -43,9 +43,10 @@ class NodeAction : public Action {
 	friend class ActionsManager;
 
 	private:
-		Action* base;
-		std::map<int,int> locks;
-		int clientsPerNode;
+		Action* base; /*!< base action to call */
+		std::map<int,int> locks; /*!< This map associates an iteration with the number of
+					      clients that have fired the event for this iteration. */
+		int clientsPerNode; /*!< Number of clients in each node (to know who to wait for) */
 
 	public:
 		/**

@@ -101,7 +101,12 @@ int 	DC_signal(const char* signal_name, int32_t iteration);
  */
 int 	DC_get_parameter(const char* param_name, void* buffer);
 
-int	DC_get_clients_communicator(MPI_Comm* comm);
+/**
+ * \brief Get the communicator gathering all clients.
+ * The program must have been started through the start_mpi_entity function.
+ * \return the communicator.
+ */
+MPI_Comm DC_get_clients_communicator();
 
 /**
  * \brief Send a kill signal to the server.

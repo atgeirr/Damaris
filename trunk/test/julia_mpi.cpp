@@ -47,9 +47,9 @@ int main(int argc, char** argv)
 	std::string config(argv[1]);
 
 	Damaris::Client* client = Damaris::start_mpi_entity(config,global);
-	comm = client->get_clients_communicator();
 
 	if(client != NULL) {
+		comm = client->get_clients_communicator();
 		MPI_Comm_rank(comm,&rank);
 		MPI_Comm_size(comm,&size);
 

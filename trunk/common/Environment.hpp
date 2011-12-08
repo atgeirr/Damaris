@@ -25,9 +25,8 @@
 #define __DAMARIS_ENVIRONMENT_H
 
 #include <iostream>
-#ifdef __ENABLE_MPI
-	#include <mpi.h>
-#endif
+#include <mpi.h>
+
 #include "xml/Model.hpp"
 #include "common/Language.hpp"
 #include "common/Singleton.hpp"
@@ -45,11 +44,10 @@ namespace Damaris {
 
 		Model::simulation_mdl* baseModel; /*! Pointer to the base model. */
 		int id; /*!< ID of the process. */
-#ifdef __ENABLE_MPI
+	
 		MPI_Comm entityComm; /*!< clients or servers communicator (depending on the entity). */
 		MPI_Comm globalComm; /*!< global communicator. */
 		MPI_Comm nodeComm;   /*!< communicator for the processors in the node. */
-#endif		
 		/**
 		 * \brief Constructor taking a base model and an ID. 
 		 * \param[in] mdl : base model from the configuration file.
@@ -60,7 +58,6 @@ namespace Damaris {
 		 * Destructor.
 		 */
 		~Environment();
-	protected:
 
 	public:
 		/**
@@ -122,7 +119,6 @@ namespace Damaris {
 		 */
 		size_t getMsgQueueSize() const;
 
-#ifdef __ENABLE_MPI
 		/**
 		 * \brief Set the communicator gathering processes of the same kind (client or server.
 		 */
@@ -152,8 +148,6 @@ namespace Damaris {
 		 * \brief Get the communicator gathering processes of the same node.
 		 */
 		MPI_Comm getNodeComm() { return nodeComm; }
-#endif
-		
 	};
 
 }

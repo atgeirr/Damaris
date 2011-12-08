@@ -2,16 +2,16 @@
      
       integer :: ierr,id
       integer*8 :: chunk_handle
-      real, dimension(0:31,16:23,0:3) :: mydata      
+      real, dimension(0:31,8:15,0:3) :: mydata      
       integer, dimension(3) :: istart, iend
       integer :: i,j,k
  
       id     = 42
-      istart = (/0,16,0/)
-      iend   = (/31,23,3/)
+      istart = (/0,8,0/)
+      iend   = (/31,15,3/)
 
       do i =  0, 31
-      do j = 16, 23
+      do j =  8, 15
       do k =  0,  3
           mydata(i,j,k) = i*j*k
       end do

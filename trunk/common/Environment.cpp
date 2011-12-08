@@ -38,11 +38,9 @@ namespace Damaris {
 	{
 		baseModel = mdl;
 		initialized = true;
-#ifdef __ENABLE_MPI
 		entityComm = MPI_COMM_NULL;
 		globalComm = MPI_COMM_NULL;
 		nodeComm   = MPI_COMM_NULL;
-#endif
 	}
 
 	const std::string & Environment::getMsgQueueName() const

@@ -61,7 +61,9 @@ void FC_FUNC_GLOBAL_(df_chunk_set,DF_CHUNK_SET)
 	{
 		std::vector<int> sti(si,si+(*dimensions));
 		std::vector<int> eni(ei,ei+(*dimensions));
-
+		// arrays in Fortran must be reversed
+		std::reverse(sti.begin(),sti.end());
+		std::reverse(eni.begin(),eni.end());
 		*chunkh = (int64_t)(client->chunk_set(*dimensions,sti,eni));
 	}
 

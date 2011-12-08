@@ -32,9 +32,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #define FC_FUNC_GLOBAL_(name,NAME) name##_
 #endif
 
-#ifdef __ENABLE_MPI
-	#include <mpi.h>
-#endif
+#include <mpi.h>
 
 #include "server/Server.hpp"
 
@@ -51,7 +49,6 @@ void FC_FUNC_GLOBAL(df_server,DF_SERVER)
 		*ierr_f = server->run();
 	}
 
-#ifdef __ENABLE_MPI
 void FC_FUNC_GLOBAL(df_start_mpi_entity,DF_START_MPI_ENTITY)
 	(char* configFile_f, MPI_Fint* globalcomm, int* result, int configsize)
 	{
@@ -59,6 +56,5 @@ void FC_FUNC_GLOBAL(df_start_mpi_entity,DF_START_MPI_ENTITY)
 		client = Damaris::start_mpi_entity(std::string(configFile_f,configsize),oc);
 		*result = (client != NULL) ? 1 : 0;
 	}
-#endif
 }
 #endif
