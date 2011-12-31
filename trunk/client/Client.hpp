@@ -54,20 +54,21 @@ typedef ChunkHandle* chunk_h;
  * with the name of an XML configuration file.
  */
 class Client {
-	private:
+	protected:
 		Environment *env; /*!< environment object. */
 		Configuration *config; /*!< configuration object. */
 		MetadataManager *metadataManager; /*! metadata manager object. */
 		ActionsManager *actionsManager; /*! keeps actions. */
-		int id; /*!< ID of the process as set in Environment. */
-
 		SharedMessageQueue *msgQueue; /*!< pointer to the message queue. */
 		SharedMemorySegment* segment; /*!< pointer to the shared memory segment. */
 
+		Client();
+
+	private:
 		/**
 		 * \brief private function called by constructors.
 		 */
-		void init(Configuration* config);	
+		void init(Configuration* config);
 	public:
 		/** 
 		 * \brief Constructor.
@@ -106,7 +107,7 @@ class Client {
 		 *         -1 if the variable has not been defined,
 		 *         -2 if the allocation of memory failed.
 		 */
-		int write(const std::string & varname, int32_t iteration, const void* data);
+		virtual int write(const std::string & varname, int32_t iteration, const void* data);
 		
 		/**
 		 * \brief Writes a chunk of a variable.
@@ -122,7 +123,7 @@ class Client {
 		 *         -2 if the allocation of memory failed,
 		 *         -3 if the chunk has an inapropriate shape.
 		 */
-		int chunk_write(chunk_h chunkh, const std::string & varname, 
+		virtual int chunk_write(chunk_h chunkh, const std::string & varname, 
 			int32_t iteration, const void* data);		
 
 		/**
@@ -140,7 +141,7 @@ class Client {
 		 *         -1 in case of failure when sending the message,
 		 *	   -2 in case the event is not defined.
 		 */
-		int signal(const std::string & signame, int32_t iteration);
+		virtual int signal(const std::string & signame, int32_t iteration);
 
 		/**
 		 * \brief Allocate a buffer directly in shared memory for future writing.
@@ -155,7 +156,7 @@ class Client {
 		 * \return a pointer to the allocated memory in case of success,
 		 *         NULL in case of failure (variable not defined, allocation error).
 		 */
-		void* alloc(const std::string & varname, int32_t iteration);
+		virtual void* alloc(const std::string & varname, int32_t iteration);
 
 		/** 
 		 * \brief Commit a variable.
@@ -170,7 +171,7 @@ class Client {
 		 * \return 0 in case of success,
                  *        -1 if the variable hasn't been allocated.
 		 */
-		int commit(const std::string & varname, int32_t iteration);
+		virtual int commit(const std::string & varname, int32_t iteration);
 
 		/**
 		 * \brief Defines a chunk.
@@ -181,14 +182,14 @@ class Client {
 		 * \param[in] endIndices : end indices.
 		 * \return A chunk handle. Call chunk_free to free the chunk handle.
 		 */
-		chunk_h chunk_set(unsigned int dimensions,
-				const std::vector<int> & startIndices, 
-				const std::vector<int> & endIndices);
+		virtual chunk_h chunk_set(unsigned int dimensions,
+					const std::vector<int> & startIndices, 
+					const std::vector<int> & endIndices);
 
 		/**
 		 * \brief Free a chunk handle.
 		 */
-		void chunk_free(chunk_h chunkh);
+		virtual void chunk_free(chunk_h chunkh);
 
 		/** 
 		 * \brief Retrieves a parameter's value. Not implemented yet.
@@ -198,25 +199,25 @@ class Client {
 		 *
 		 * \return 0 in case of success, -1 if the parameter is not found.
 		 */
-		int get_parameter(const std::string & paramName, void* buffer);
+		virtual int get_parameter(const std::string & paramName, void* buffer);
 		
 		/**
 		 * Sends a signal to the server to shut it down (all clients in node need
 		 * to call this function before the server is actually killed.
 		 * \return 0 in case of success, -1 in case of failure.
 		 */
-		int kill_server();
+		virtual int kill_server();
 
 		/**
 		 * Gets the communicator gathering clients.
 		 */
-		MPI_Comm get_clients_communicator();
+		virtual MPI_Comm get_clients_communicator();
 		
 		/**
 		 * \brief Destructor.
 		 * To be called at the end of the before stopping the client program.
 		 */
-		~Client();
+		virtual ~Client();
 }; // class Client
 
 } // namespace Damaris

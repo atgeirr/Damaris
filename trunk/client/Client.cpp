@@ -35,6 +35,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Damaris {
 	
+	Client::Client()
+	{ }
+	
 	Client::Client(const std::string & configfile, int32_t coreID)
 	{
 		/* creates the configuration object from the configuration file */
@@ -63,7 +66,6 @@ namespace Damaris {
 	void Client::init(Configuration* config)
 	{
 		env = config->getEnvironment();
-		id = env->getID();
 
 		metadataManager = config->getMetadataManager();
 		ASSERT(metadataManager != NULL);
@@ -83,7 +85,7 @@ namespace Damaris {
 			segment = SharedMemorySegment::open(posix_shmem,
 					env->getSegmentName().c_str());
 #endif
-			DBG("Client initialized successfully for core " << id 
+			DBG("Client initialized successfully for core " << env->getID() 
 			    << " with configuration \"" << config->getFileName() << "\"");
 		}
 		catch(interprocess_exception &ex) {
@@ -122,7 +124,7 @@ namespace Damaris {
 			ShmChunk* chunk = 
 				new ShmChunk(segment,layout->getType(),
 						layout->getDimensions(),si,ei);
-			chunk->setSource(id);
+			chunk->setSource(env->getID());
 			chunk->setIteration(iteration);
 			variable->attachChunk(chunk);
 			/* chunk initialized, returns the data! */
@@ -162,7 +164,7 @@ namespace Damaris {
 
 		// create notification message
 		Message message;
-		message.source = id;
+		message.source = env->getID();
 
 		message.iteration = iteration;
 		message.type = MSG_VAR;
@@ -199,7 +201,7 @@ namespace Damaris {
                 try {
                         chunk = new ShmChunk(segment,layout->getType(),
 						layout->getDimensions(),si,ei);
-                        chunk->setSource(id);
+                        chunk->setSource(env->getID());
                         chunk->setIteration(iteration);
                 } catch (...) {
                         ERROR("While writing \"" << varname << "\", allocation failed");
@@ -213,7 +215,7 @@ namespace Damaris {
 		// create message
 		Message message;
 		
-		message.source = id;
+		message.source = env->getID();
 		message.iteration = iteration;
 		message.object = variable->getID();
 		message.type = MSG_VAR;
@@ -260,7 +262,7 @@ namespace Damaris {
 			}
 
                         chunk = new ShmChunk(segment,t,d,si,ei);
-                        chunk->setSource(id);
+                        chunk->setSource(env->getID());
                         chunk->setIteration(iteration);
                 } catch (...) {
                         ERROR("While writing \"" << varname << "\", allocation failed");
@@ -274,7 +276,7 @@ namespace Damaris {
 		// create message
 		Message message;
 		
-		message.source = id;
+		message.source = env->getID();
 		message.iteration = iteration;
 		message.object = variable->getID();
 		message.type = MSG_VAR;
@@ -299,7 +301,7 @@ namespace Damaris {
 		}
 
 		Message sig;
-		sig.source = id;
+		sig.source = env->getID();
 		sig.iteration = iteration;
 		sig.type = MSG_SIG;
 		sig.handle = 0;
@@ -328,7 +330,7 @@ namespace Damaris {
 		if(!killed) {
 			Message kill;
 			kill.type = MSG_INT;
-			kill.source = id;
+			kill.source = env->getID();
 			kill.iteration = -1;
 			kill.object = KILL_SERVER;
 			msgQueue->send(&kill,sizeof(Message),0);

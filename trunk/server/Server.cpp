@@ -27,6 +27,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/SharedMemorySegment.hpp"
 #include "common/Configuration.hpp"
 #include "server/Server.hpp"
+#include "server/SecondaryServer.hpp"
 #include "common/Message.hpp"
 #include "common/ShmChunk.hpp"
 #include "common/Layout.hpp"
@@ -204,6 +205,189 @@ void Server::stop()
 	needStop = 0;
 }
 
+void* Server::alloc(const std::string & varname, int32_t iteration)
+	{
+		/* this is basically the same code than in Client, we copy it here
+		   to be sure that any modification on Client won't affect it. */
+
+		/* check that the variable is known in the configuration */
+		Variable* variable = metadataManager->getVariable(varname);
+
+        	if(variable == NULL) {
+			ERROR("Variable \""<< varname 
+				<< "\" not defined in configuration");
+			return NULL;
+        	}
+
+		/* the variable is known, get its layout */
+		Layout* layout = variable->getLayout();
+
+		/* prepare variable to initialize a chunk */
+		std::vector<int> si(layout->getDimensions()),ei(layout->getDimensions());
+		for(unsigned int i=0; i < layout->getDimensions(); i++)	{
+			ei[i] = layout->getExtentAlongDimension(i)-1;
+			si[i] = 0;
+		}
+
+		/* try initializing the chunk in shared memory */
+		try {
+			ShmChunk* chunk = 
+				new ShmChunk(segment,layout->getType(),
+						layout->getDimensions(),si,ei);
+			chunk->setSource(env->getID());
+			chunk->setIteration(iteration);
+			variable->attachChunk(chunk);
+			/* chunk initialized, returns the data! */
+			return chunk->data();
+
+		} catch (...) {
+			ERROR("While allocating \"" << varname 
+				<< "\", allocation failed");
+		}
+		/* on failure, returns NULL */
+		return NULL;
+	}
+	
+	int Server::commit(const std::string & varname, int32_t iteration)
+	{		
+		Variable* v = metadataManager->getVariable(varname);
+		if(v == NULL)
+			return -1;
+
+		ShmChunk* chunk = NULL;
+		// get the pointer to the allocated chunk
+		ChunkIndexByIteration::iterator end;
+		ChunkIndexByIteration::iterator it = v->getChunksByIteration(iteration,end);
+
+		if(it == end)
+			return -2;
+		try {
+			chunk = dynamic_cast<ShmChunk*>(it->get());
+		} catch(std::exception &e) {
+			ERROR("When doing dynamic cast: " << e.what());
+			return -3;
+		}
+	
+		// nothing to do actually, the server already knows the variable
+			
+                // free message
+		DBG("Variable \"" << varname << "\" has been commited");
+
+		return 0;
+	}
+	
+	int Server::write(const std::string & varname, int32_t iteration, const void* data)
+	{
+		/* check that the variable is known in the configuration */
+		Variable* variable = metadataManager->getVariable(varname);
+
+        	if(variable == NULL) {
+			ERROR("Variable \""<< varname 
+				<< "\" not defined in configuration");
+			return -1;
+        	}
+
+		Layout* layout = variable->getLayout();
+
+		std::vector<int> si(layout->getDimensions()),ei(layout->getDimensions());
+                for(unsigned int i=0; i < layout->getDimensions(); i++) {
+                        ei[i] = layout->getExtentAlongDimension(i)-1;
+                        si[i] = 0;
+                }
+
+		ShmChunk* chunk = NULL;
+                try {
+                        chunk = new ShmChunk(segment,layout->getType(),
+						layout->getDimensions(),si,ei);
+                        chunk->setSource(env->getID());
+                        chunk->setIteration(iteration);
+                } catch (...) {
+                        ERROR("While writing \"" << varname << "\", allocation failed");
+                	return -2;
+		}
+
+		// copy data
+		size_t size = chunk->getDataMemoryLength();
+		memcpy(chunk->data(),data,size);
+	
+		variable->attachChunk(chunk);	
+		
+		// send message
+		DBG("Variable \"" << varname << "\" has been written");
+	
+		return size;
+	}
+
+	int Server::chunk_write(chunk_h chunkh, const std::string & varname, 
+			int32_t iteration, const void* data)
+	{
+		/* check that the variable is know in the configuration */
+		Variable* variable = metadataManager->getVariable(varname);
+
+        	if(variable == NULL) {
+			ERROR("Variable \""<< varname << "\" not defined in configuration");
+			return -1;
+        	}
+
+		ChunkHandle* chunkHandle = (ChunkHandle*)chunkh;
+
+		/* check if the chunk matches the layout boundaries */
+		Layout* layout = variable->getLayout();
+		if(not chunkHandle->within(layout)) {
+			ERROR("Chunk boundaries do not match variable's layout");
+			return -3;
+		}
+
+		ShmChunk* chunk = NULL;
+                try {
+			Types::basic_type_e t = layout->getType();
+			unsigned int d = chunkHandle->getDimensions();
+			std::vector<int> si(d);
+			std::vector<int> ei(d);
+
+			for(unsigned int i=0;i<d; i++) {
+				si[i] = chunkHandle->getStartIndex(i);
+				ei[i] = chunkHandle->getEndIndex(i);
+			}
+
+                        chunk = new ShmChunk(segment,t,d,si,ei);
+                        chunk->setSource(env->getID());
+                        chunk->setIteration(iteration);
+                } catch (...) {
+                        ERROR("While writing \"" << varname << "\", allocation failed");
+                	return -2;
+		}
+
+		// copy data
+		size_t size = chunk->getDataMemoryLength();
+		memcpy(chunk->data(),data,size);
+		
+		variable->attachChunk(chunk);	
+		DBG("Variable \"" << varname << "\" has been written");
+	
+		return size;
+	}
+
+	int Server::signal(const std::string & signal_name, int32_t iteration)
+	{
+		Action* action = actionsManager->getAction(signal_name);
+		if(action == NULL) {
+			DBG("Undefined action \"" << signal_name << "\"");
+			return -2;
+		}
+
+		action->call(iteration,env->getID());
+
+		DBG("Event \""<< signal_name << "\" has been sent");
+		return 0;
+	}
+
+	int Server::kill_server()
+	{
+		ERROR("Synchronous server cannot be killed (you own your process, man!)");
+		return -1;
+	}
+
 #ifdef __ENABLE_MPI
 Client* start_mpi_entity(const std::string& configFile, MPI_Comm globalcomm)
 {
@@ -251,12 +435,6 @@ Client* start_mpi_entity(const std::string& configFile, MPI_Comm globalcomm)
 	int clpn = env->getClientsPerNode();
 	int copn = env->getCoresPerNode();
 
-	if(copn != (clpn+1)) {
-		ERROR("The current version of Damaris is only working with exactly one server"
-			<< " per node. Abortingi...");
-		MPI_Abort(MPI_COMM_WORLD,-1);
-	}
-
 	/* Check that the values match */
 	if(sizeOfNode != copn) {
 		ERROR("The number of cores detected in node does not match the number" 
@@ -280,18 +458,31 @@ Client* start_mpi_entity(const std::string& configFile, MPI_Comm globalcomm)
 	/* Set the rank of the entity */
 	env->setID(rankInEnComm);
 
-	if(is_client) {
-		DBG("Client starting, rank = " << rank);
-		// the following barrier ensures that the client
-		// won't be created before the servers are started.
-		MPI_Barrier(globalcomm);
-		return new Client(config);
+	if(not (copn == clpn)) {
+		// dedicated core mode : the number of servers to create is strictly positive
+		if(is_client) {
+			DBG("Client starting, rank = " << rank);
+			// the following barrier ensures that the client
+			// won't be created before the servers are started.
+			MPI_Barrier(globalcomm);
+			return new Client(config);
+		} else {
+			DBG("Server starting, rank = " << rank);
+			Server server(config);
+			MPI_Barrier(globalcomm);
+			server.run();
+			return NULL;
+		}
 	} else {
-		DBG("Server starting, rank = " << rank);
-		Server server(config);
-		MPI_Barrier(globalcomm);
-		server.run();
-		return NULL;
+		// synchronous mode : the servers are attached to each client
+		if(rankInNode != 0) {
+			MPI_Barrier(globalcomm);
+			return new SecondaryServer(config);
+		} else {
+			Server* s = new Server(config);
+			MPI_Barrier(globalcomm);
+			return s;
+		}
 	}
 }	
 #endif
