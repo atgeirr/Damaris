@@ -87,10 +87,6 @@ void SecondaryServer::init()
 /* destructor */
 SecondaryServer::~SecondaryServer()
 {
-	delete msgQueue;
-	delete segment;
-		
-	Configuration::kill();
 }
 
 }

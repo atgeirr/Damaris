@@ -42,6 +42,7 @@ int main(int argc, char** argv)
 		MPI_Comm_size(clients,&size);
 		client_code(rank);
 		DC_kill_server();
+		MPI_Barrier(clients);
 		DC_finalize();
 	}
 

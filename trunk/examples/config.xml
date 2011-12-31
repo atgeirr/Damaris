@@ -3,7 +3,7 @@
 	language="fortran" xmlns="http://damaris.gforge.inria.fr/Damaris/Model">
 	<architecture>
 		<cores  count="2">
-			<clients count="1"/>
+			<clients count="2"/>
 		</cores>
 		<buffer name="buffer" size="67108864" />
 		<queue  name="queue" size="100" />

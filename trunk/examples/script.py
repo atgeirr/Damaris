@@ -1,3 +1,5 @@
+import damaris
+
 print "Hello, World!\n"
-#damaris.open("my group/my variable")
+print damaris.open("my group/my variable").chunks
 #damaris.open("test")

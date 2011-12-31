@@ -126,10 +126,6 @@ Server::~Server()
 	SharedMessageQueue::remove(posix_shmem,env->getMsgQueueName().c_str());
 	SharedMemorySegment::remove(posix_shmem,env->getSegmentName().c_str());
 #endif
-	delete msgQueue;
-	delete segment;
-		
-	Configuration::kill();
 }
 	
 /* starts the server and enter the main loop */
@@ -384,7 +380,7 @@ void* Server::alloc(const std::string & varname, int32_t iteration)
 
 	int Server::kill_server()
 	{
-		ERROR("Synchronous server cannot be killed (you own your process, man!)");
+		WARN("Synchronous server cannot be killed (you own your process, man!)");
 		return -1;
 	}
 
