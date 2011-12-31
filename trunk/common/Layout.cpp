@@ -65,4 +65,9 @@ namespace Damaris {
 		else
 			return 0;
 	}
+
+	bool Layout::isUnlimited() const
+	{
+		return (dimensions == 1) && (extents[0] == -1);
+	}
 }

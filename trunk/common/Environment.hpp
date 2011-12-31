@@ -148,6 +148,11 @@ namespace Damaris {
 		 * \brief Get the communicator gathering processes of the same node.
 		 */
 		MPI_Comm getNodeComm() { return nodeComm; }
+
+		/**
+		 * \brief Tell if a dedicated core is present.
+		 */
+		bool hasServer() { return (getCoresPerNode() != getClientsPerNode()); }
 	};
 
 }

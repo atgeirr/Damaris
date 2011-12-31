@@ -50,6 +50,7 @@ struct Calc : qi::grammar<Iterator, std::vector<int>(), ascii::space_type>
 {
 	qi::rule<Iterator, std::vector<int>(), ascii::space_type> start;
 	qi::rule<Iterator, int(), ascii::space_type> expr;
+	qi::rule<Iterator, int(), ascii::space_type> qmark;
 	qi::rule<Iterator, int(), ascii::space_type> factor;
 	qi::rule<Iterator, int(), ascii::space_type> simple;
 	qi::rule<Iterator, std::string(), ascii::space_type> identifier;
@@ -78,7 +79,10 @@ struct Calc : qi::grammar<Iterator, std::vector<int>(), ascii::space_type>
 			|  (factor >> '-' >> expr)[qi::_val = qi::_1 - qi::_2]
 			|   factor;
 
-		start = (expr % ',');
+		qmark   = qi::char_('?')[qi::_val = -1];
+		
+		start   = qmark
+			| (expr % ',');
 	}
 };
 

@@ -101,6 +101,8 @@ size_t Chunk::getDataMemoryLength()
 
 bool Chunk::within(Layout* enclosing)
 {
+	if(enclosing->isUnlimited()) return true;
+
 	bool b = (enclosing->getDimensions() == dimensions);
 	if(b) {
 		for(unsigned int i=0; i < dimensions;i++) {

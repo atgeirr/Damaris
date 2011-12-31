@@ -431,6 +431,11 @@ Client* start_mpi_entity(const std::string& configFile, MPI_Comm globalcomm)
 	int clpn = env->getClientsPerNode();
 	int copn = env->getCoresPerNode();
 
+	if(copn - clpn > 1) {
+		ERROR("The number of dedicated cores per node must be either 0 or 1 in this version. Aborting...");
+		MPI_Abort(MPI_COMM_WORLD,-1);
+	}
+
 	/* Check that the values match */
 	if(sizeOfNode != copn) {
 		ERROR("The number of cores detected in node does not match the number" 

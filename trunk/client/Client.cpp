@@ -111,6 +111,11 @@ namespace Damaris {
 
 		/* the variable is known, get its layout */
 		Layout* layout = variable->getLayout();
+	
+		if(layout->isUnlimited()) {
+			ERROR("Trying to allocate memory for an unlimited layout");
+			return NULL;
+		}
 
 		/* prepare variable to initialize a chunk */
 		std::vector<int> si(layout->getDimensions()),ei(layout->getDimensions());
@@ -190,6 +195,11 @@ namespace Damaris {
         	}
 
 		Layout* layout = variable->getLayout();
+
+		if(layout->isUnlimited()) {
+			ERROR("Trying to write a variable with an unlimited layout (use chunk_write instead)");
+			return -3;
+		}
 
 		std::vector<int> si(layout->getDimensions()),ei(layout->getDimensions());
                 for(unsigned int i=0; i < layout->getDimensions(); i++) {
