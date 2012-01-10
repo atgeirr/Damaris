@@ -89,11 +89,6 @@ namespace bp = boost::python;
 		 * None is returned if the data is NULL.
 		 */
 		bp::object data() const;
-
-		/**
-		 * \brief Removes the data if it's in local memory.
-		 */
-		void remove();
 	};
 }
 

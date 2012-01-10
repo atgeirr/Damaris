@@ -115,6 +115,7 @@ class Variable {
 		 * Delete a chunk from the variable.
 		 */
 		void eraseChunk(ChunkIndexBySource::iterator &it);
+
 		void eraseChunk(ChunkIndexByIteration::iterator &it);
 };
 

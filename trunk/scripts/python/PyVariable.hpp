@@ -25,6 +25,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <boost/python.hpp>
 #include "common/Variable.hpp"
+#include "scripts/python/PyChunk.hpp"
 #include "scripts/python/PyLayout.hpp"
 
 
@@ -84,6 +85,11 @@ namespace bp = boost::python;
 		 * Return a PyLayout wrapping the wrapped Variable's Layout.
 		 */
 		PyLayout layout() const;
+
+		/**
+		 * Remove a chunk from the variable, free the memory of the chunk
+		 */
+		bool remove(PyChunk& pc);
 	};
 }
 }

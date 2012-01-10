@@ -22,6 +22,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "scripts/python/PyVariable.hpp"
 #include "scripts/python/PyChunk.hpp"
+#include "common/Debug.hpp"
 
 namespace Damaris {
 
@@ -107,6 +108,13 @@ const std::string& PyVariable::fullname() const
 PyLayout PyVariable::layout() const
 {
 	return PyLayout(inner->getLayout());
+}
+
+bool PyVariable::remove(PyChunk& pc)
+{
+	return false;
+	WARN("This function is not implemented");
+//	return inner->eraseChunk(pc.inner);
 }
 
 }

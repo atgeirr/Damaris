@@ -83,24 +83,22 @@ ChunkIndex::iterator Variable::getChunks(int source, int iteration, ChunkIndex::
 
 void Variable::eraseChunk(ChunkIndexByIteration::iterator &it)
 {
-	ChunkIndexByIteration::iterator end = chunks.get<by_iteration>().end();
+	const ChunkIndexByIteration::iterator &end = chunks.get<by_iteration>().end();
 	ChunkIndexByIteration::iterator j(it);
-	while(j != end) {
+	if(j != end) {
 		j->get()->remove();
-		j++;
+		chunks.get<by_iteration>().erase(it);
 	}
-        chunks.get<by_iteration>().erase(it);
 }
 
 void Variable::eraseChunk(ChunkIndexBySource::iterator &it)
 {
-	ChunkIndexBySource::iterator end = chunks.get<by_source>().end();
         ChunkIndexBySource::iterator j(it);
-        while(j != end) {
+	const ChunkIndexBySource::iterator &end = chunks.get<by_source>().end();
+        if(j != end) {
                 j->get()->remove();
-                j++;
-        }
-	chunks.get<by_source>().erase(it);
+		chunks.get<by_source>().erase(it);
+	}
 }
 
 }
