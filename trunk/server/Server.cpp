@@ -40,19 +40,26 @@ namespace Damaris {
 	/* constructor for embedded mode */
 Server::Server(const std::string &cf, int id)
 {
-	std::auto_ptr<Model::simulation_mdl> 
-		mdl(Model::simulation(cf.c_str(),xml_schema::flags::dont_validate));
-	DBG("Model build successfuly from configuration file");		
+	try {
+		std::auto_ptr<Model::simulation_mdl> 
+			mdl(Model::simulation(cf.c_str(),xml_schema::flags::dont_validate));
 
-	config = Configuration::getInstance();
-	config->initialize(mdl,cf);
-	DBG("Configuration initialized successfuly");
+		DBG("Model build successfuly from configuration file");		
 
-	env = config->getEnvironment();
-	env->setID(id);
-	DBG("Environment initialized successfuly");
+		config = Configuration::getInstance();
+		config->initialize(mdl,cf);
+		DBG("Configuration initialized successfuly");
 
-	init();
+		env = config->getEnvironment();
+		env->setID(id);
+		DBG("Environment initialized successfuly");
+	
+		init();
+
+	} catch(xml_schema::exception &e) {
+                ERROR(e.what());
+                exit(-1);
+        }
 }
 
 /* constructor for standalone mode */
@@ -392,11 +399,17 @@ Client* start_mpi_entity(const std::string& configFile, MPI_Comm globalcomm)
 	MPI_Comm_size(globalcomm,&size);
 	MPI_Comm_rank(globalcomm,&rank);
 
-	std::auto_ptr<Model::simulation_mdl> 
-		mdl(Model::simulation(configFile.c_str(),xml_schema::flags::dont_validate));
-
 	Configuration* config = Configuration::getInstance();
-	config->initialize(mdl,configFile);	
+	
+	try {
+		std::auto_ptr<Model::simulation_mdl> 
+			mdl(Model::simulation(configFile.c_str(),xml_schema::flags::dont_validate));
+
+		config->initialize(mdl,configFile);	
+	} catch (xml_schema::exception &e) {
+		ERROR(e.what());
+		MPI_Abort(MPI_COMM_WORLD,-1);
+	}
 
 	Environment* env = config->getEnvironment();
 	env->setGlobalComm(globalcomm);

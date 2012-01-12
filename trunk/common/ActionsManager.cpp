@@ -61,9 +61,9 @@ void ActionsManager::addDynamicAction(const std::string& eventName,
 	}
 
 	Action* a = NULL;
-	DBG("scope = " << scope)
+	DBG("scope = " << scope);
 
-	Environment* env = Environment::getInstance();;
+	Environment* env = Environment::getInstance();
 	// create the action
 	a = new DynamicAction(functionName,fileName);
 	if(scope == "core" || (not env->hasServer())) { }

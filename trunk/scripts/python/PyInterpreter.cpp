@@ -54,9 +54,24 @@ static bp::object open(const std::string& varname)
 	}
 }
 
+static bp::object clear()
+{
+	MetadataManager* metadata = MetadataManager::getInstance();
+	VariableSet& varset = metadata->getVariableSet();
+	VariableSet::index<by_id>::type::iterator it, end;
+	it = varset.get<by_id>().begin();
+	end = varset.get<by_id>().end();
+	while(it != end) {
+		it->get()->clear();
+		it++;
+	}
+	return bp::object();
+}
+
 BOOST_PYTHON_MODULE(damaris)
 {
 	bp::def("open",&open);
+	bp::def("clear",&clear);
 	bp::class_<PyLayout>("Layout")
 		.add_property("name",bp::make_function(&PyLayout::name,
 			bp::return_value_policy<bp::copy_const_reference>()))
@@ -76,6 +91,7 @@ BOOST_PYTHON_MODULE(damaris)
 	bp::class_<PyVariable>("Variable")
 		.def("select",&PyVariable::select)
 		.def("remove",&PyVariable::remove)
+		.def("clear",&PyVariable::clear)
 		.add_property("chunks",&PyVariable::chunks)
 		.add_property("layout",&PyVariable::layout)
 		.add_property("name",&PyVariable::name)

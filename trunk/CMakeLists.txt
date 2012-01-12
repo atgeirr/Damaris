@@ -21,7 +21,7 @@ if(HAS_MPI)
 endif(HAS_MPI)
 
 add_definitions (-D__INFO)
-#add_definitions (-D__DEBUG_ALL)
+add_definitions (-D__DEBUG_ALL)
 #add_definitions (-D__BENCHMARK)
 
 #add_definitions (-D__SYSV)

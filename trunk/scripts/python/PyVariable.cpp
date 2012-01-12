@@ -117,5 +117,10 @@ bool PyVariable::remove(PyChunk& pc)
 //	return inner->eraseChunk(pc.inner);
 }
 
+void PyVariable::clear()
+{
+	inner->clear();
+}
+
 }
 }

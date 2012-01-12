@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <mpi.h>
@@ -9,6 +10,10 @@ int client_code(int id)
 	char* varname = "my group/my variable";
 	char* event = "my script";
 
+	int step;
+	for(step = 0; step < 10; step++) {
+	
+	sleep(2);
 	int i,j,k;
 	for(i = 0; i < 64; i++) {
 	for(j = 0; j < 16; j++) {
@@ -18,8 +23,11 @@ int client_code(int id)
 	}
 	}
 
-	DC_write(varname,0,mydata);
-	DC_signal(event,0);
+	DC_write(varname,step,mydata);
+	DC_signal(event,step);
+
+	}
+
 	return 0;
 }    
 

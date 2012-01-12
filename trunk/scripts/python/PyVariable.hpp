@@ -90,6 +90,8 @@ namespace bp = boost::python;
 		 * Remove a chunk from the variable, free the memory of the chunk
 		 */
 		bool remove(PyChunk& pc);
+
+		void clear();
 	};
 }
 }

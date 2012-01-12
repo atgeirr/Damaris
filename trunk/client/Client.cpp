@@ -42,20 +42,24 @@ namespace Damaris {
 	{
 		/* creates the configuration object from the configuration file */
 		DBG("Starting Damaris client");
-		std::auto_ptr<Model::simulation_mdl> 
-			mdl(Model::simulation(configfile.c_str(),
+		try {
+			std::auto_ptr<Model::simulation_mdl> 
+				mdl(Model::simulation(configfile.c_str(),
 						xml_schema::flags::dont_validate));
+			DBG("Model initialized successfuly");
 
-		DBG("Model initialized successfuly");
+			config = Configuration::getInstance();
+			config->initialize(mdl,configfile);
+			DBG("Configuration intialized successfuly");
 
-		config = Configuration::getInstance();
-		config->initialize(mdl,configfile);
-		DBG("Configuration intialized successfuly");
-
-		env = config->getEnvironment();
-		env->setID(coreID);
-		DBG("Environment initialized succesfuly");
-		init(config);
+			env = config->getEnvironment();
+			env->setID(coreID);
+			DBG("Environment initialized succesfuly");
+			init(config);
+		} catch(xml_schema::exception &e) {
+			ERROR(e.what());
+			exit(-1);
+		}
 	}
 
 	Client::Client(Configuration* config)
@@ -189,15 +193,14 @@ namespace Damaris {
 		Variable* variable = metadataManager->getVariable(varname);
 
         	if(variable == NULL) {
-			ERROR("Variable \""<< varname 
-				<< "\" not defined in configuration");
 			return -1;
         	}
 
 		Layout* layout = variable->getLayout();
 
 		if(layout->isUnlimited()) {
-			ERROR("Trying to write a variable with an unlimited layout (use chunk_write instead)");
+			ERROR("Trying to write a variable" 
+				<< " with an unlimited layout (use chunk_write instead)");
 			return -3;
 		}
 

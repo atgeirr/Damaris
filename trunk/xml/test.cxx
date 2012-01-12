@@ -1,10 +1,11 @@
 #include <iostream>
-#include "model.hpp"
+#include "Model.hpp"
 
 using namespace std;
 using namespace Damaris::Model;
-int
-main (int argc, char* argv[])
+
+
+int main (int argc, char* argv[])
 {
   try
   {

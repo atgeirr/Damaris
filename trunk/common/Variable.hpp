@@ -117,6 +117,8 @@ class Variable {
 		void eraseChunk(ChunkIndexBySource::iterator &it);
 
 		void eraseChunk(ChunkIndexByIteration::iterator &it);
+
+		void clear();
 };
 
 }

@@ -49,6 +49,8 @@ namespace Damaris {
 		MetadataManager();
 
 	public:
+		VariableSet& getVariableSet() { return variables;}
+
 		/**
 		 * Add a new variable entry within the metadata manager.
 		 * An error is printed if a variable is already defined with the same name,
