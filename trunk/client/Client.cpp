@@ -307,6 +307,7 @@ namespace Damaris {
 
 	int Client::signal(const std::string & signal_name, int32_t iteration)
 	{
+		try {
 		Action* action = actionsManager->getAction(signal_name);
 		if(action == NULL) {
 			DBG("Undefined action \"" << signal_name << "\"");
@@ -328,6 +329,10 @@ namespace Damaris {
 		}
 		DBG("Event \""<< signal_name << "\" has been sent");
 		return 0;
+		} catch (std::exception &e) {
+			ERROR(e.what());
+			return -3;
+		}
 	}
 
 	int Client::get_parameter(const std::string & paramName, void* buffer)

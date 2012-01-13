@@ -52,7 +52,6 @@ ShmChunk::ShmChunk(SharedMemorySegment* s, handle_t h)
 
 ShmChunk::~ShmChunk()
 {
-	remove();
 }
 
 void* ShmChunk::data()

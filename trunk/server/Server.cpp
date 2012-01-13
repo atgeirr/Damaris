@@ -167,16 +167,22 @@ void Server::processMessage(Message* msg)
 	
 	if(msg->type == MSG_VAR)
 	{
+		try {
 		ShmChunk* chunk = new ShmChunk(segment,handle);
 		Variable* v = metadataManager->getVariable(object);
-		
-		if(v != NULL) v->attachChunk(chunk);
-		else {
+		if(v != NULL) {
+			INFO("A");
+			v->attachChunk(chunk);
+			INFO("B");
+		} else {
 			// the variable is unknown, discarde it
 			ERROR("Server received a chunk " 
 				<< "for an unknown variable, discarding");
 			chunk->remove();
 			delete chunk;
+		}
+		} catch(std::exception &e) {
+			ERROR(e.what());
 		}
 		return;
 	}
