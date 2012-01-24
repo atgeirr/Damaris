@@ -1,10 +1,11 @@
-#include <stdio.h>
+#include "common/MetadataManager.hpp"
 
 extern "C" {
 
 void visit(const std::string event, int32_t step, int32_t src)
 {
-	printf("--- hello world from Damaris ---\n");
+	Damaris::MetadataManager* mm = Damaris::MetadataManager::getInstance();
+	// ...
 }
 
 }
