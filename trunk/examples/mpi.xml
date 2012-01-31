@@ -5,7 +5,7 @@
 		<cores  count="5">
 			<clients count="4"/>
 		</cores>
-		<buffer name="buffer" size="655" />
+		<buffer name="buffer" size="80000" />
 		<queue  name="queue" size="100" />
 	</architecture>
 	<data>

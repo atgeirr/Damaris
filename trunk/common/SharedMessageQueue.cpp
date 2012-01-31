@@ -21,33 +21,68 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \version 0.3
  *
  */
+#include <boost/interprocess/mapped_region.hpp>
 #include <boost/interprocess/xsi_shared_memory.hpp>
+#include "common/Debug.hpp"
 #include "common/SharedMessageQueue.hpp"
 
 namespace Damaris {
 
+SharedMessageQueue::SharedMessageQueue(mapped_region* mem)
+{
+	region = mem;
+	shmq_hdr = (struct shm_queue_hdr*)(mem->get_address());
+	data = ((char*)shmq_hdr) + sizeof(struct shm_queue_hdr);
+}
+
+SharedMessageQueue::~SharedMessageQueue()
+{
+	delete region;
+}
+
 SharedMessageQueue* SharedMessageQueue::create(posix_shmem_t posix_shmem, 
 		const char* name, size_t num_msg, size_t size_msg)
 {
-	return new POSIX_ShMsgQueue(name,num_msg,size_msg);
+	shared_memory_object base(create_only,name,read_write);
+	size_t size = num_msg*size_msg + sizeof(struct shm_queue_hdr);
+	base.truncate(size);
+
+	mapped_region *region = new mapped_region(base,read_write);
+	void* addr = region->get_address();
+	new (addr) shm_queue_hdr(num_msg,size_msg);
+	
+	return new SharedMessageQueue(region);
 }
 
 SharedMessageQueue* SharedMessageQueue::create(sysv_shmem_t sysv_shmem, 
 		const char* name, size_t num_msg, size_t size_msg)
 {
-	return new SYSV_ShMsgQueue(name,num_msg,size_msg);
+	size_t size = num_msg*size_msg + sizeof(struct shm_queue_hdr);
+	xsi_shared_memory base(create_only,xsi_key(name,1),size,read_write);
+	
+	mapped_region *region = new mapped_region(base,read_write);
+	void* addr = region->get_address();
+	new (addr) shm_queue_hdr(num_msg,size_msg);
+
+	return new SharedMessageQueue(region);
 }
 
 SharedMessageQueue* SharedMessageQueue::open(posix_shmem_t posix_shmem, 
 		const char* name)
 {
-	return new POSIX_ShMsgQueue(name);
+	shared_memory_object base(open_only,name,read_write);
+	mapped_region *region = new mapped_region(base,read_write);
+
+	return new SharedMessageQueue(region);
 }
 
 SharedMessageQueue* SharedMessageQueue::open(sysv_shmem_t sysv_shmem, 
 		const char* name)
 {
-	return new SYSV_ShMsgQueue(name);
+	xsi_shared_memory base(open_only,xsi_key(name,1));
+	mapped_region *region = new mapped_region(base,read_write);
+
+	return new SharedMessageQueue(region);
 }
 
 bool SharedMessageQueue::remove(posix_shmem_t posix_shmem, const char* name)
@@ -57,110 +92,87 @@ bool SharedMessageQueue::remove(posix_shmem_t posix_shmem, const char* name)
 
 bool SharedMessageQueue::remove(sysv_shmem_t sysv_shmem, const char* name)
 {
-	xsi_key key(name,1);
-	return xsi_message_queue::remove(key);
+	int id = xsi_shared_memory(open_only,xsi_key(name,1)).get_shmid();
+	return xsi_shared_memory::remove(id);
 }
 
-SharedMessageQueue::POSIX_ShMsgQueue::POSIX_ShMsgQueue(const char* name, 
-		size_t num_msg, size_t size_msg)
+void SharedMessageQueue::send(const void* buffer)
 {
-	impl = new message_queue(create_only,name,num_msg,size_msg);
+	scoped_lock<interprocess_mutex> lock(shmq_hdr->main_lock);
+	while(shmq_hdr->current_num_msg() == shmq_hdr->maxMsg) {
+		INFO(shmq_hdr->current_num_msg());
+		shmq_hdr->cond_send.wait(lock);
+	}
+
+	char* dst = data + (shmq_hdr->tail * shmq_hdr->sizeMsg);
+	std::memcpy(dst,buffer,shmq_hdr->sizeMsg);
+	shmq_hdr->tail += 1;
+	shmq_hdr->tail %= shmq_hdr->maxMsg;
+
+	shmq_hdr->cond_recv.notify_one();
 }
 
-SharedMessageQueue::POSIX_ShMsgQueue::POSIX_ShMsgQueue(const char* name)
+bool SharedMessageQueue::trySend(const void* buffer)
 {
-	impl = new message_queue(open_only,name);
+	scoped_lock<interprocess_mutex> lock(shmq_hdr->main_lock);
+
+	if(shmq_hdr->current_num_msg() == shmq_hdr->maxMsg) return false;
+
+	char* dst = data + (shmq_hdr->tail * shmq_hdr->sizeMsg);
+	std::memcpy(dst,buffer,shmq_hdr->sizeMsg);
+	shmq_hdr->tail += 1;
+	shmq_hdr->tail %= shmq_hdr->maxMsg;
+
+	shmq_hdr->cond_recv.notify_one();
+
+	return true;
 }
 
-void SharedMessageQueue::POSIX_ShMsgQueue::send(const void* buffer, 
-		size_t size, unsigned int priority)
+void SharedMessageQueue::receive(void* buffer, size_t buffer_size)
 {
-	impl->send(buffer,size,priority);
+	scoped_lock<interprocess_mutex> lock(shmq_hdr->main_lock);
+	while(shmq_hdr->current_num_msg() == 0) {
+		shmq_hdr->cond_recv.wait(lock);
+	}
+	char* src = data + (shmq_hdr->head * shmq_hdr->sizeMsg);
+	std::memcpy(buffer,src,std::min((int)buffer_size,shmq_hdr->sizeMsg));
+	shmq_hdr->head += 1;
+	shmq_hdr->head %= shmq_hdr->maxMsg;
+
+	shmq_hdr->cond_send.notify_one();	
 }
 
-bool SharedMessageQueue::POSIX_ShMsgQueue::trySend(const void* buffer, 
-		size_t size, unsigned int priority)
+bool SharedMessageQueue::tryReceive(void* buffer, 
+		size_t buffer_size)
 {
-	return impl->try_send(buffer,size,priority);
+	scoped_lock<interprocess_mutex> lock(shmq_hdr->main_lock);
+
+	if(shmq_hdr->current_num_msg() == 0) return false;
+	char* src = data + (shmq_hdr->head * shmq_hdr->sizeMsg);
+	int s = std::min((int)buffer_size,shmq_hdr->sizeMsg);
+	std::memcpy(buffer,src,s);
+	shmq_hdr->head += 1;
+	shmq_hdr->head %= shmq_hdr->maxMsg;
+	
+	shmq_hdr->cond_send.notify_one();
+
+	return true;
 }
 
-void SharedMessageQueue::POSIX_ShMsgQueue::receive(void* buffer, 
-		size_t buffer_size, size_t &recv_size, unsigned int &priority)
+size_t SharedMessageQueue::getMaxMsg() const
 {
-	impl->receive(buffer,buffer_size,recv_size,priority);
+	return shmq_hdr->maxMsg;
 }
 
-bool SharedMessageQueue::POSIX_ShMsgQueue::tryReceive(void* buffer, 
-		size_t buffer_size, size_t &recv_size, unsigned int &priority)
+size_t SharedMessageQueue::getMaxMsgSize() const
 {
-	return impl->try_receive(buffer,buffer_size,recv_size,priority);
+	return shmq_hdr->sizeMsg;
 }
 
-size_t SharedMessageQueue::POSIX_ShMsgQueue::getMaxMsg() const
+size_t SharedMessageQueue::getNumMsg()
 {
-	return impl->get_max_msg();
-}
-
-size_t SharedMessageQueue::POSIX_ShMsgQueue::getMaxMsgSize() const
-{
-	return impl->get_max_msg_size();
-}
-
-size_t SharedMessageQueue::POSIX_ShMsgQueue::getNumMsg()
-{
-	return impl->get_num_msg();
-}
-
-
-SharedMessageQueue::SYSV_ShMsgQueue::SYSV_ShMsgQueue(const char* name, size_t num_msg, size_t size_msg)
-{
-	xsi_key key(name,1);
-	impl = new xsi_message_queue(create_only,key,num_msg,size_msg);
-}
-
-SharedMessageQueue::SYSV_ShMsgQueue::SYSV_ShMsgQueue(const char* name)
-{
-	xsi_key key(name,1);
-	impl = new xsi_message_queue(open_only,key);
-}
-
-void SharedMessageQueue::SYSV_ShMsgQueue::send(const void* buffer, size_t size, 
-		unsigned int priority)
-{
-	impl->send(buffer,size,priority);
-}
-
-bool SharedMessageQueue::SYSV_ShMsgQueue::trySend(const void* buffer, size_t size, 
-		unsigned int priority)
-{
-	return impl->try_send(buffer,size,priority);
-}
-
-void SharedMessageQueue::SYSV_ShMsgQueue::receive(void* buffer, 
-		size_t buffer_size, size_t &recv_size, unsigned int &priority)
-{
-	impl->receive(buffer,buffer_size,recv_size,priority);
-}
-
-bool SharedMessageQueue::SYSV_ShMsgQueue::tryReceive(void *buffer, 
-		size_t buffer_size, size_t &recv_size, unsigned int &priority)
-{
-	return impl->try_receive(buffer,buffer_size,recv_size,priority);
-}
-
-size_t SharedMessageQueue::SYSV_ShMsgQueue::getMaxMsg() const
-{
-	return impl->get_max_msg();
-}
-
-size_t SharedMessageQueue::SYSV_ShMsgQueue::getMaxMsgSize() const
-{
-	return impl->get_max_msg_size();
-}
-
-size_t SharedMessageQueue::SYSV_ShMsgQueue::getNumMsg()
-{
-	return impl->get_num_msg();
+	scoped_lock<interprocess_mutex> lock(shmq_hdr->main_lock);
+	return shmq_hdr->current_num_msg();
 }
 
 }

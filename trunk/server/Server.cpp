@@ -141,14 +141,13 @@ int Server::run()
 	INFO("Successfully entered in \"run\" mode");
 	
 	Message *msg = new Message();
-	unsigned int priority;
-	size_t  recvSize;
 	bool received;
 	
 	while(needStop > 0) {
-		received = msgQueue->tryReceive(msg,sizeof(Message), recvSize, priority);
+		received = true;
+		 msgQueue->receive(msg,sizeof(Message));
 		if(received) {
-			DBG("Received a message of type " << msg->type);
+			INFO("Received a message of type " << msg->type);
 			processMessage(msg);
 		}
 	}

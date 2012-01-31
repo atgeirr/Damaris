@@ -23,11 +23,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __DAMARIS_SH_MSG_QUEUE_H
 #define __DAMARIS_SH_MSG_QUEUE_H
 
-#include <boost/interprocess/sync/interprocess_mutex.hpp>
-#include <boost/interprocess/sync/interprocess_condition.hpp>
-#include <boost/interprocess/xsi_shared_memory.hpp>
-#include <boost/interprocess/mapped_region.hpp>
-#include "common/Debug.hpp"
+#include <boost/interprocess/ipc/message_queue.hpp>
+#include "common/xsi_msg_queue.hpp"
 #include "common/SharedMemory.hpp"
 
 using namespace boost::interprocess;
@@ -41,37 +38,9 @@ namespace Damaris {
 	 */
 	class SharedMessageQueue {
 		private:
-			struct shm_queue_hdr {
+			class POSIX_ShMsgQueue;
+			class SYSV_ShMsgQueue;
 
-				interprocess_mutex main_lock;
-				interprocess_condition cond_recv;
-				interprocess_condition cond_send;
-				int maxMsg;
-				int sizeMsg;
-				int head;
-				int tail;
-
-				shm_queue_hdr(int numItems, int sizeItems) : 
-					main_lock(), cond_recv(), cond_send(),
-					maxMsg(numItems), sizeMsg(sizeItems), head(0), tail(0)
-				{
-				};
-
-				int current_num_msg()
-				{
-					if(tail >= head)
-						return (tail - head);
-					else
-						return (tail + maxMsg - head);
-				}
-
-			} *shmq_hdr;
-
-			char* data;
-			mapped_region *region;
-
-			SharedMessageQueue(mapped_region *mem);
-		
 		public:
 			/**
 			 * Creates a POSIX shared message queue.
@@ -99,50 +68,94 @@ namespace Damaris {
 			/**
 			 * Removes a POSIX shared message queue.
 			 */
-			static bool remove(posix_shmem_t posix_shmem, const char* name);
+			static bool remove(posix_shmem_t posix_shmem, 
+				const char* name);
 
 			/**
 			 * Removes an XSI shared message queue.
 			 */
-			static bool remove(sysv_shmem_t sysv_shmem, const char* name);
+			static bool remove(sysv_shmem_t sysv_shmem, 
+				const char* name);
 	
 			/**
 			 * Sends a message. Blocks if the queue is full.
 			 */
-			virtual void send(const void* buffer);
+			virtual void send(const void* buffer, size_t size, 
+					unsigned int priority) = 0;
 
 			/**
 			 * Try to send a message. Return false without blocking
 			 * if the queue is full.
 			 */
-			virtual bool trySend(const void* buffer);
+			virtual bool trySend(const void* buffer, size_t size, 
+					unsigned int priority) = 0;
 			/**
 			 * Receives a message from the queue. Block if the queue
 			 * is empty.
 			 */
-  			virtual void receive(void* buffer, size_t buffer_size);
+  			virtual void receive(void* buffer, size_t buffer_size, 
+					size_t &recv_size, unsigned int &priority) = 0;
   
 			/**
 			 * Try getting a message. Return false if the message queue is empty.
 			 */
-			virtual bool tryReceive(void *buffer, size_t buffer_size);
+			virtual bool tryReceive(void *, size_t buffer_size, 
+					size_t &recv_size, unsigned int &priority) = 0;
   			
 			/**
 			 * Get the maximum number of messages that que queue can hold.
 			 */
-			virtual size_t getMaxMsg() const;
+			virtual size_t getMaxMsg() const = 0;
 
 			/**
 			 * Get the size of the messages that the queue holds.
 			 */
-  			virtual size_t getMaxMsgSize() const;
+  			virtual size_t getMaxMsgSize() const = 0;
 
 			/**
 			 * Get the current number of messages in the message queue.
 			 */
-  			virtual size_t getNumMsg();
+  			virtual size_t getNumMsg() = 0;
+	};
 
-			~SharedMessageQueue();
+	class SharedMessageQueue::POSIX_ShMsgQueue : public SharedMessageQueue {
+		private:
+			message_queue* impl;
+		public:
+			POSIX_ShMsgQueue(const char* name);
+			POSIX_ShMsgQueue(const char* name, size_t num_msg, size_t msg_size);
+	
+			void send(const void* buffer, size_t size, 
+					unsigned int priority);
+			bool trySend(const void* buffer, size_t size, 
+					unsigned int priority);
+			void receive(void* buffer, size_t buffer_size, size_t &recv_size, 
+					unsigned int &priority);
+			bool tryReceive(void *, size_t buffer_size, size_t &recv_size, 
+					unsigned int &priority);
+			size_t getMaxMsg() const;
+			size_t getMaxMsgSize() const;
+			size_t getNumMsg();
+	};
+
+	class SharedMessageQueue::SYSV_ShMsgQueue : public SharedMessageQueue {
+		private:
+			xsi_message_queue* impl;	
+		public:
+			SYSV_ShMsgQueue(const char* name);
+			SYSV_ShMsgQueue(const char* name, size_t num_msg, size_t msg_size);
+
+			void send(const void* buffer, size_t size, 
+					unsigned int priority);
+			bool trySend(const void* buffer, size_t size, 
+					unsigned int priority);
+			void receive(void* buffer, size_t buffer_size, size_t &recv_size, 
+					unsigned int &priority);
+			bool tryReceive(void *, size_t buffer_size, size_t &recv_size, 
+					unsigned int &priority);
+			size_t getMaxMsg() const;
+			size_t getMaxMsgSize() const;
+			size_t getNumMsg();
 	};
 }
 #endif

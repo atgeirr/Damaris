@@ -180,7 +180,7 @@ namespace Damaris {
 		message.handle = chunk->getHandle();
 		message.object = v->getID();
                 // send message
-		msgQueue->send(&message,sizeof(Message),0);
+		msgQueue->send(&message);
                 // free message
 		DBG("Variable \"" << varname << "\" has been commited");
 
@@ -235,7 +235,7 @@ namespace Damaris {
 		message.handle = chunk->getHandle();
 		
 		// send message
-		msgQueue->send(&message,sizeof(Message),0);
+		msgQueue->send(&message);
 		DBG("Variable \"" << varname << "\" has been written");
 	
 		delete chunk;
@@ -296,7 +296,7 @@ namespace Damaris {
 		message.handle = chunk->getHandle();
 		
 		// send message
-		msgQueue->send(&message,sizeof(Message),0);
+		msgQueue->send(&message);
 		DBG("Variable \"" << varname << "\" has been written");
 	
 		// free message	
@@ -322,7 +322,7 @@ namespace Damaris {
 		sig.object = action->getID();
 		
 		try {
-			msgQueue->send(&sig,sizeof(Message),0);
+			msgQueue->send(&sig);
 		} catch(interprocess_exception &e) {
 			ERROR("Error while sending event \"" << signal_name << "\", " << e.what());
 			return -1;
@@ -351,7 +351,7 @@ namespace Damaris {
 			kill.source = env->getID();
 			kill.iteration = -1;
 			kill.object = KILL_SERVER;
-			msgQueue->send(&kill,sizeof(Message),0);
+			msgQueue->send(&kill);
 			return 0;
 		} else {
 			WARN("Trying to send kill signal multiple times to the server");
