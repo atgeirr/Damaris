@@ -40,7 +40,7 @@ int main(int argc, char** argv)
         MPI_Init (&argc, &argv);
 
 	if(argc != 2) {
-		std::cout << "Usage: ./test <config.xml>" << std::endl;
+		std::cout << "Usage: mpirun -np <np> ./test <config.xml>" << std::endl;
 		exit(0);
 	}
 

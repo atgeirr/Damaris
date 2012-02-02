@@ -37,7 +37,7 @@ namespace Damaris {
 	
 	void Process::init(const std::string &configfile, int32_t id)
 	{
-		DBG("Starting Damaris client");
+		DBG("Starting process initialization");
 		try {
 			model = Model::simulation(configfile.c_str(),
 						xml_schema::flags::dont_validate);
@@ -52,10 +52,16 @@ namespace Damaris {
                 _instanciated = true;
                 _instance = this;
 
+		DBG("Configuration file succefuly read");
 		environment     = new Environment(model.get());
 		environment->setID(id);
+		DBG("Environment initialized");
 		metadataManager = new MetadataManager(&(model->data()),environment);
+		DBG("MetadataManager initialized");
 		actionsManager  = new ActionsManager(&(model->actions()),environment);
+		DBG("ActionsManager initialized");
+		
+		DBG("Process initialized");
 	}
 
 /*

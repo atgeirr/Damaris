@@ -42,6 +42,7 @@ void MetadataManager::init()
 void MetadataManager::initParameters()
 {
 	parameters = new ParameterSet(model);
+	layoutInterp = new Calc<std::string::const_iterator,ParameterSet>(*parameters);
 }
 
 void MetadataManager::initLayouts()
@@ -54,7 +55,6 @@ void MetadataManager::initLayouts()
 			Language::getLanguageFromString(&(l->language()));
 		if(language == Language::LG_UNKNOWN)
 			language = environment->getDefaultLanguage();
-
 		if(type == Types::UNDEFINED_TYPE) {
 			ERROR("Unknown type \"" << l->type()
 					<< "\" for layout \"" << l->name() << "\"");
@@ -66,7 +66,6 @@ void MetadataManager::initLayouts()
 		std::string str = (std::string)(l->dimensions());
 		std::string::const_iterator iter = str.begin();
 		std::string::const_iterator end = str.end();
-
 		bool r = boost::spirit::qi::phrase_parse(iter, end, *layoutInterp,
 				boost::spirit::ascii::space, dims);
 		if((!r) || (iter != str.end())) {
