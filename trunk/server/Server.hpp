@@ -35,6 +35,9 @@ namespace Damaris {
 		private:
 			Process* process;
 		public:
+
+			static Server* New(const std::string& cfgfile, int32_t id);
+
 			/**
 			 * \brief Constructor.
 			 * Used when starting a server from an external program

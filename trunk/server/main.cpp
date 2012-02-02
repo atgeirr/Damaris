@@ -63,8 +63,7 @@ int main(int argc, char** argv)
 	INFO("Initializing server");
 	/* Initializing the server with a Configuration object 
 	   pre-initialized by the Options object */
-	Damaris::Process* process = new Damaris::Process(opt.getConfigFile(),opt.getID());
-	server = new Damaris::Server(process);
+	server = Damaris::Server::New(opt.getConfigFile(),opt.getID());
 	INFO("Starting server");
 
 	/* Starts the server */
@@ -80,6 +79,6 @@ int main(int argc, char** argv)
 
 static void sighandler(int sig)
 {
-		INFO("Kill signal caught, server will terminate");
+	INFO("Kill signal caught, server will terminate");
 	if(server != NULL) server->stop();
 }

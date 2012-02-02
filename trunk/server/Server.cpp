@@ -36,7 +36,14 @@ Damaris::Server *server;
 
 namespace Damaris {
 
-	/* constructor for embedded mode */
+Server* Server::New(const std::string& cfgfile, int32_t id)
+{
+	Process* p = new Process(cfgfile,id);
+	p->createSharedStructures();
+	return new Server(p);
+}
+
+/* constructor for embedded mode */
 Server::Server(Process* p)
 {
 	process = p;
