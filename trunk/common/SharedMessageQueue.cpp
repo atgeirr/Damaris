@@ -24,6 +24,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/interprocess/xsi_shared_memory.hpp>
 #include "common/Debug.hpp"
+#include "common/Message.hpp"
 #include "common/SharedMessageQueue.hpp"
 
 namespace Damaris {
@@ -40,10 +41,25 @@ SharedMessageQueue::~SharedMessageQueue()
 	delete region;
 }
 
-SharedMessageQueue* SharedMessageQueue::create(posix_shmem_t posix_shmem, 
-		const char* name, size_t num_msg, size_t size_msg)
+SharedMessageQueue* SharedMessageQueue::create(Model::QueueModel* mdl)
 {
-	shared_memory_object base(create_only,name,read_write);
+	std::string& name = mdl->name();
+	size_t num_msg = mdl->size();
+	size_t size_msg = sizeof(Message);
+	std::string& type = mdl->type();
+
+	if(type == "posix") return create(posix_shmem_t(),name,num_msg,size_msg);
+	else if(type == "sysv") return create(sysv_shmem_t(),name,num_msg,size_msg);
+	else {
+		ERROR("Unknown shared memory type \"" << type << "\"");
+		return NULL;
+	}
+}
+
+SharedMessageQueue* SharedMessageQueue::create(posix_shmem_t posix_shmem, 
+		const std::string& name, size_t num_msg, size_t size_msg)
+{
+	shared_memory_object base(create_only,name.c_str(),read_write);
 	size_t size = num_msg*size_msg + sizeof(struct shm_queue_hdr);
 	base.truncate(size);
 
@@ -55,10 +71,10 @@ SharedMessageQueue* SharedMessageQueue::create(posix_shmem_t posix_shmem,
 }
 
 SharedMessageQueue* SharedMessageQueue::create(sysv_shmem_t sysv_shmem, 
-		const char* name, size_t num_msg, size_t size_msg)
+		const std::string& name, size_t num_msg, size_t size_msg)
 {
 	size_t size = num_msg*size_msg + sizeof(struct shm_queue_hdr);
-	xsi_shared_memory base(create_only,xsi_key(name,1),size,read_write);
+	xsi_shared_memory base(create_only,xsi_key(name.c_str(),1),size,read_write);
 	
 	mapped_region *region = new mapped_region(base,read_write);
 	void* addr = region->get_address();
@@ -67,32 +83,57 @@ SharedMessageQueue* SharedMessageQueue::create(sysv_shmem_t sysv_shmem,
 	return new SharedMessageQueue(region);
 }
 
-SharedMessageQueue* SharedMessageQueue::open(posix_shmem_t posix_shmem, 
-		const char* name)
+SharedMessageQueue* SharedMessageQueue::open(Model::QueueModel* mdl)
 {
-	shared_memory_object base(open_only,name,read_write);
+	std::string& name = mdl->name();
+	std::string& type = mdl->type();
+
+	if(type == "posix") return open(posix_shmem_t(),name);
+	else if(type == "sysv") return open(sysv_shmem_t(),name);
+	else {
+		ERROR("Unknown shared memory type \"" << type << "\"");
+		return NULL;
+	}
+}
+
+SharedMessageQueue* SharedMessageQueue::open(posix_shmem_t posix_shmem, 
+		const std::string& name)
+{
+	shared_memory_object base(open_only,name.c_str(),read_write);
 	mapped_region *region = new mapped_region(base,read_write);
 
 	return new SharedMessageQueue(region);
 }
 
 SharedMessageQueue* SharedMessageQueue::open(sysv_shmem_t sysv_shmem, 
-		const char* name)
+		const std::string& name)
 {
-	xsi_shared_memory base(open_only,xsi_key(name,1));
+	xsi_shared_memory base(open_only,xsi_key(name.c_str(),1));
 	mapped_region *region = new mapped_region(base,read_write);
 
 	return new SharedMessageQueue(region);
 }
 
-bool SharedMessageQueue::remove(posix_shmem_t posix_shmem, const char* name)
+bool SharedMessageQueue::remove(Model::QueueModel* mdl)
 {
-	return shared_memory_object::remove(name);
+        std::string& name = mdl->name();
+        std::string& type = mdl->type();
+
+        if(type == "posix") return remove(posix_shmem_t(),name);
+        else if(type == "sysv") return remove(sysv_shmem_t(),name);
+        else {
+                return false;
+        }
 }
 
-bool SharedMessageQueue::remove(sysv_shmem_t sysv_shmem, const char* name)
+bool SharedMessageQueue::remove(posix_shmem_t posix_shmem, const std::string& name)
 {
-	int id = xsi_shared_memory(open_only,xsi_key(name,1)).get_shmid();
+	return shared_memory_object::remove(name.c_str());
+}
+
+bool SharedMessageQueue::remove(sysv_shmem_t sysv_shmem, const std::string& name)
+{
+	int id = xsi_shared_memory(open_only,xsi_key(name.c_str(),1)).get_shmid();
 	return xsi_shared_memory::remove(id);
 }
 

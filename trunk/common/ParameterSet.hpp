@@ -24,20 +24,23 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #define __DAMARIS_PARAMETER_SET_H
 
 #include <map>
+#include "xml/Model.hpp"
 #include "common/Debug.hpp"
+#include "common/Configurable.hpp"
 #include "common/Parameter.hpp"
 
 namespace Damaris {
 
-class ParameterSet {
+class ParameterSet : public Configurable<ParameterSet,Model::DataModel> {
 	private:
 		std::map<std::string,Parameter> paramSet; /*!< Enclosed map. */
-	
+		
+		void init();
 	public:
 		/**
 		 * Constructor.
 		 */
-		ParameterSet();
+		ParameterSet(Model::DataModel* mdl);
 	
 		/**
 		 * Sets a parameter. Does not modify an existing parameter.
@@ -58,11 +61,6 @@ class ParameterSet {
 		 */
 		int operator[](std::string& n);
 };
-
-}
-#endif
-
-namespace Damaris {
 
 template<typename T>
 T ParameterSet::get(std::string &name)
@@ -90,4 +88,4 @@ bool ParameterSet::set(std::string &name, T& value)
 }
 
 }
-
+#endif

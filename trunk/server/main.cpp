@@ -44,7 +44,6 @@ static void sighandler(int sig);
  * in Server.cpp)
  */
 extern Damaris::Server *server;
-
 /**
  * Main function for the standalone mode server.
  * \param[in] argc : argc
@@ -54,7 +53,7 @@ int main(int argc, char** argv)
 {
 	INFO("Parsing program options");
 	/* The Options object is used to parse the command line arguments */
-	Damaris::Options* opt = new Damaris::Options(argc,argv);
+	Damaris::Options opt(argc,argv);
 
 	/* Attaching sighandler to signals */
 	signal(SIGABRT, &sighandler);
@@ -64,8 +63,8 @@ int main(int argc, char** argv)
 	INFO("Initializing server");
 	/* Initializing the server with a Configuration object 
 	   pre-initialized by the Options object */
-	server = new Damaris::Server(opt->getConfiguration());
-	delete opt;
+	Damaris::Process* process = new Damaris::Process(opt.getConfigFile(),opt.getID());
+	server = new Damaris::Server(process);
 	INFO("Starting server");
 
 	/* Starts the server */

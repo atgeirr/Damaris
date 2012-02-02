@@ -36,7 +36,7 @@ void FC_FUNC_GLOBAL(df_initialize,DF_INITIALIZE)
 	(char* config_file_name_f, int32_t* core_id_f, int32_t* ierr_f, int config_file_name_size)
 	{
 		std::string config_file_name(config_file_name_f, config_file_name_size);
-		client = new Damaris::Client(config_file_name,*core_id_f);
+		client = Damaris::Client::New(config_file_name,*core_id_f);
 		*ierr_f = 0;
 	}
 

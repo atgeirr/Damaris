@@ -25,17 +25,111 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Damaris {
 
-MetadataManager::MetadataManager()
+MetadataManager::MetadataManager(Model::DataModel* mdl, Environment* env)
+: Configurable<MetadataManager,Model::DataModel>(mdl)
 {
-	DBG("A MetadataManager object is created");
-}	
+	environment = env;
+	init();
+}
+
+void MetadataManager::init()
+{
+	initParameters();
+	initLayouts();
+	initVariables();	
+}
+
+void MetadataManager::initParameters()
+{
+	parameters = new ParameterSet(model);
+}
+
+void MetadataManager::initLayouts()
+{
+	Model::DataModel::layout_const_iterator l(model->layout().begin());
+	for(;l != model->layout().end(); l++)
+	{
+		Types::basic_type_e type = Types::getTypeFromString(&(l->type()));
+		Language::language_e language =
+			Language::getLanguageFromString(&(l->language()));
+		if(language == Language::LG_UNKNOWN)
+			language = environment->getDefaultLanguage();
+
+		if(type == Types::UNDEFINED_TYPE) {
+			ERROR("Unknown type \"" << l->type()
+					<< "\" for layout \"" << l->name() << "\"");
+			continue;
+		}
+
+		std::vector<int> dims;
+		std::string name = (std::string)(l->name());
+		std::string str = (std::string)(l->dimensions());
+		std::string::const_iterator iter = str.begin();
+		std::string::const_iterator end = str.end();
+
+		bool r = boost::spirit::qi::phrase_parse(iter, end, *layoutInterp,
+				boost::spirit::ascii::space, dims);
+		if((!r) || (iter != str.end())) {
+			ERROR("While parsing dimension descriptor for layout \""
+					<< l->name() << "\"");
+			continue;
+		}
+		if(language == Language::LG_FORTRAN) {
+			std::vector<int> rdims(dims.rbegin(),dims.rend());
+			dims = rdims;
+		}
+		Layout l(name,type,dims.size(),dims);
+		addLayout(name,l);
+	}
+}
+
+void MetadataManager::initVariables()
+{
+	variables = new VariableSet();
+
+	// build all the variables in root group
+	Model::DataModel::variable_const_iterator v(model->variable().begin());
+	for(; v != model->variable().end(); v++)
+	{
+		std::string name = (std::string)(v->name());
+		std::string layoutName = (std::string)(v->layout());
+		addVariable(name,layoutName);
+	}
+
+	// build all variables in sub-groups
+	Model::DataModel::group_const_iterator g(model->group().begin());
+	for(; g != model->group().end(); g++)
+		readVariablesInSubGroup(&(*g),(std::string)(g->name()));
+}
+
+void MetadataManager::readVariablesInSubGroup(const Model::GroupModel *g,
+                        const std::string& groupName)
+{
+	// first check if the group is enabled
+	if(!(g->enabled())) return;
+	// build recursively all variable in the subgroup
+	Model::DataModel::variable_const_iterator v(g->variable().begin());
+	for(; v != g->variable().end(); v++)
+	{
+		std::string name = (std::string)(v->name());
+		std::string layoutName = (std::string)(v->layout());
+		std::string varName = groupName+"/"+name;
+		addVariable(varName,layoutName);
+	}
+
+	// build recursively all the subgroups
+	Model::DataModel::group_const_iterator subg(g->group().begin());
+	for(; subg != g->group().end(); subg++)
+		readVariablesInSubGroup(&(*subg),groupName
+				+ "/" + (std::string)(subg->name()));
+}
 
 bool MetadataManager::addVariable(const std::string & varname, const std::string & layoutname)
 {
 	VariableSet::index<by_name>::type::iterator it = 
-		variables.get<by_name>().find(varname);
+		variables->get<by_name>().find(varname);
 	
-	if(it != variables.get<by_name>().end()) {
+	if(it != variables->get<by_name>().end()) {
 		WARN("Inserting a variable with a name"
 				<<" identical to a previously defined variable");
 		return false;
@@ -50,10 +144,10 @@ bool MetadataManager::addVariable(const std::string & varname, const std::string
 	}
 
 	// allocate the variable
-	int id = variables.size();
+	int id = variables->size();
 	Variable* v = new Variable(id,varname,l);
 
-	variables.insert(boost::shared_ptr<Variable>(v));
+	variables->insert(boost::shared_ptr<Variable>(v));
 	DBG("Variable \"" << varname << "\" now defined in the metadata manager");
 	return true;
 }
@@ -61,8 +155,8 @@ bool MetadataManager::addVariable(const std::string & varname, const std::string
 Variable* MetadataManager::getVariable(const std::string &name)
 {
 	VariableSet::index<by_name>::type::iterator it = 
-		variables.get<by_name>().find(name);
-	if(it == variables.get<by_name>().end()) {
+		variables->get<by_name>().find(name);
+	if(it == variables->get<by_name>().end()) {
 		return NULL;
 	}
 	return it->get();
@@ -71,8 +165,8 @@ Variable* MetadataManager::getVariable(const std::string &name)
 Variable* MetadataManager::getVariable(int id)
 {
 	VariableSet::index<by_id>::type::iterator it =
-		variables.get<by_id>().find(id);
-	if(it == variables.get<by_id>().end()) {
+		variables->get<by_id>().find(id);
+	if(it == variables->get<by_id>().end()) {
 		return NULL;
 	}
 	return it->get();
@@ -99,8 +193,8 @@ Layout* MetadataManager::getLayout(const std::string& lname)
 
 void MetadataManager::listVariables(std::ostream &out)
 {
-	VariableSet::index<by_name>::type::iterator it = variables.get<by_name>().begin();
-	const VariableSet::index<by_name>::type::iterator &end = variables.get<by_name>().end();
+	VariableSet::index<by_name>::type::iterator it = variables->get<by_name>().begin();
+	const VariableSet::index<by_name>::type::iterator &end = variables->get<by_name>().end();
 	INFO("Listing all the variables defined in the Metadata Manager:");
 	while(it != end) {
 		out << it->get()->getID() << "\t:\t" << it->get()->getName() << std::endl;
@@ -110,6 +204,8 @@ void MetadataManager::listVariables(std::ostream &out)
 
 MetadataManager::~MetadataManager()
 {
+	delete variables;
+	delete parameters;
 }
 
 }

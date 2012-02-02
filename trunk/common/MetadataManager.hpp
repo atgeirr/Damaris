@@ -28,28 +28,47 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <iostream>
 #include <map>
+#include <string>
 #include <vector>
 
+#include "xml/Model.hpp"
+#include "common/Calc.hpp"
 #include "common/Layout.hpp"
 #include "common/Variable.hpp"
+#include "common/Environment.hpp"
+#include "common/ParameterSet.hpp"
 #include "common/VariableSet.hpp"
-#include "common/Singleton.hpp"
+#include "common/Configurable.hpp"
 
 namespace Damaris {
 
-	class MetadataManager : public Singleton<MetadataManager> {
-		friend class Singleton<MetadataManager>;
+	class MetadataManager : public Configurable<MetadataManager,Model::DataModel> {
 	private:
 		std::map<std::string,Layout> layouts; /*!< Map associating names with layouts. */
-		VariableSet variables; /*!< Variables indexed by name and by id. */
 
+		VariableSet* variables; /*!< Variables indexed by name and by id. */
+		ParameterSet* parameters;
+		Environment* environment;
+
+		Calc<std::string::const_iterator,ParameterSet>* layoutInterp;
+
+		void init();
+
+		void readVariablesInSubGroup(const Model::GroupModel *g,
+                        const std::string& groupName);
+
+		void initParameters();
+
+		void initVariables();
+
+		void initLayouts();
+	public:
 		/**
 		 * Constructor.
 		 */
-		MetadataManager();
+		MetadataManager(Model::DataModel* mdl, Environment* env);
 
-	public:
-		VariableSet& getVariableSet() { return variables;}
+		VariableSet& getVariableSet() { return *variables;}
 
 		/**
 		 * Add a new variable entry within the metadata manager.

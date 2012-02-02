@@ -34,8 +34,12 @@ extern "C" {
 	int DC_server(const char* configFile, int server_id)
 	{
 		std::string config_str(configFile);
-		server = new Damaris::Server(config_str,server_id);
-		return server->run();
+		Damaris::Process* process = new Damaris::Process(config_str,server_id);
+		process->createSharedStructures();
+		server = new Damaris::Server(process);
+		server->run();
+		delete server;
+		return 0;
 	}
 
 #ifdef __ENABLE_MPI

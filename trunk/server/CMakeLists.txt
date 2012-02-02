@@ -4,7 +4,6 @@
 
 set(DAMARIS_SERVER_LIB_SRC
 		${DAMARIS_SOURCE_DIR}/server/Server.cpp
-		${DAMARIS_SOURCE_DIR}/server/SecondaryServer.cpp
 		${DAMARIS_SOURCE_DIR}/server/ServerC.cpp
 		${DAMARIS_SOURCE_DIR}/server/ServerFortran.cpp
 		${DAMARIS_SOURCE_DIR}/server/Options.cpp)

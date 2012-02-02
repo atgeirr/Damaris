@@ -31,6 +31,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 #include <stdint.h>
 
+#include "common/Process.hpp"
 #include "common/Environment.hpp"
 #include "common/Configuration.hpp"
 #include "common/SharedMessageQueue.hpp"
@@ -53,22 +54,24 @@ typedef ChunkHandle* chunk_h;
  * simulation. It is characterized by an ID and is initialized
  * with the name of an XML configuration file.
  */
-class Client {
+class Client  {
 	protected:
-		Environment *env; /*!< environment object. */
-		Configuration *config; /*!< configuration object. */
-		MetadataManager *metadataManager; /*! metadata manager object. */
-		ActionsManager *actionsManager; /*! keeps actions. */
-		SharedMessageQueue *msgQueue; /*!< pointer to the message queue. */
-		SharedMemorySegment* segment; /*!< pointer to the shared memory segment. */
+//		Environment *env; /*!< environment object. */
+//		Configuration *config; /*!< configuration object. */
+//		MetadataManager *metadataManager; /*! metadata manager object. */
+//		ActionsManager *actionsManager; /*! keeps actions. */
+//		SharedMessageQueue *msgQueue; /*!< pointer to the message queue. */
+//		SharedMemorySegment* segment; /*!< pointer to the shared memory segment. */
 
-		Client();
+//		Client();
 
 	private:
+		Process* process;
 		/**
 		 * \brief private function called by constructors.
 		 */
-		void init(Configuration* config);
+//		void init(Configuration* config);
+
 	public:
 		/** 
 		 * \brief Constructor.
@@ -79,8 +82,9 @@ class Client {
 		 * \param[in] config : name of an XML configuration file.
 		 * \param[in] id : id of the client (should be unique).
 		 */
-		Client(const std::string & config,int32_t id);
+		Client(Process* p);
 
+		static Client* New(const std::string& file, int32_t id);
 		/**
 		 * \brief Constructor.
 		 * This constructor is used to start a client using
@@ -89,7 +93,7 @@ class Client {
 		 * \param[in] config : Configuration object (initialized).
 		 * \param[in] env : Environment object (initialized).
 		 */
-		Client(Configuration* config);
+//		Client(Configuration* config);
 
 		/**
 		 * \brief Writes a full variable.

@@ -22,12 +22,57 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/interprocess/xsi_shared_memory.hpp>
+#include "common/Debug.hpp"
 #include "common/SharedMemorySegment.hpp"
 
 namespace Damaris {
 
 SharedMemorySegment::SharedMemorySegment() {}
-	
+
+SharedMemorySegment* SharedMemorySegment::create(Model::BufferModel* model)
+{
+	std::string& name = model->name();
+	std::string& type = model->type();
+	size_t size = model->size();
+	if(type == "posix") 	return new SharedMemorySegment::POSIX_ShMem(name,size);
+	else if(type == "sysv") return new SharedMemorySegment::SYSV_ShMem(name,size);
+	else {
+		ERROR("Unknown shared memory type \"" << type << "\"");
+		return NULL;
+	}
+}
+
+SharedMemorySegment* SharedMemorySegment::open(Model::BufferModel* model)
+{
+        std::string& name = model->name();
+        std::string& type = model->type();
+        if(type == "posix")     return new SharedMemorySegment::POSIX_ShMem(name);
+        else if(type == "sysv") return new SharedMemorySegment::SYSV_ShMem(name);
+        else {
+                ERROR("Unknown shared memory type \"" << type << "\"");
+                return NULL;
+        }
+}
+
+bool SharedMemorySegment::remove(Model::BufferModel* model)
+{
+        std::string& name = model->name();
+        std::string& type = model->type();
+        if(type == "posix") {
+		return shared_memory_object::remove(name.c_str());
+	}
+        else if(type == "sysv") 
+	{
+		xsi_key key(name.c_str(),0);
+		int id = shmget(key.get_key(),0,0600);
+		return xsi_shared_memory::remove(id);
+	}
+        else {
+                return false;
+        }
+}
+
+/*
 SharedMemorySegment* SharedMemorySegment::create(posix_shmem_t posix_shmem, 
 	const char* name, int64_t size)
 {
@@ -65,27 +110,27 @@ bool SharedMemorySegment::remove(sysv_shmem_t sysv_shmem,
 	int id = shmget(key.get_key(),0,0600);
         return xsi_shared_memory::remove(id);
 }
+*/
 
-
-SharedMemorySegment::POSIX_ShMem::POSIX_ShMem(const char* name, int64_t size)
+SharedMemorySegment::POSIX_ShMem::POSIX_ShMem(const std::string &name, int64_t size)
 {
-	impl = new managed_shared_memory(create_only,name,size);
+	impl = new managed_shared_memory(create_only,name.c_str(),size);
 }
 
-SharedMemorySegment::POSIX_ShMem::POSIX_ShMem(const char* name)
+SharedMemorySegment::POSIX_ShMem::POSIX_ShMem(const std::string &name)
 {
-	impl = new managed_shared_memory(open_only,name);
+	impl = new managed_shared_memory(open_only,name.c_str());
 }
 
-SharedMemorySegment::SYSV_ShMem::SYSV_ShMem(const char* name, int64_t size)
+SharedMemorySegment::SYSV_ShMem::SYSV_ShMem(const std::string &name, int64_t size)
 {
-	key = xsi_key(name,0);
+	key = xsi_key(name.c_str(),0);
 	impl = new managed_xsi_shared_memory(create_only,key,size);
 }
 
-SharedMemorySegment::SYSV_ShMem::SYSV_ShMem(const char* name)
+SharedMemorySegment::SYSV_ShMem::SYSV_ShMem(const std::string &name)
 {
-	key = xsi_key(name,0);
+	key = xsi_key(name.c_str(),0);
 	impl = new managed_xsi_shared_memory(open_only,key);
 }
 

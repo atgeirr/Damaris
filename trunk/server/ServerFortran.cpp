@@ -45,8 +45,11 @@ void FC_FUNC_GLOBAL(df_server,DF_SERVER)
 	(char* configFile_f, int32_t* server_id_f, int32_t* ierr_f, int32_t configFile_size)
 	{
 		std::string config_str(configFile_f,configFile_size);
-		server = new Damaris::Server(config_str,*server_id_f);
+		Damaris::Process* process = new Damaris::Process(config_str,*server_id_f);
+		process->createSharedStructures();
+		server = new Damaris::Server(process);
 		*ierr_f = server->run();
+		delete server;
 	}
 
 void FC_FUNC_GLOBAL(df_start_mpi_entity,DF_START_MPI_ENTITY)

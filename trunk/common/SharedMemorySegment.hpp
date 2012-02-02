@@ -26,6 +26,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 #include <boost/interprocess/managed_shared_memory.hpp>
 #include <boost/interprocess/managed_xsi_shared_memory.hpp>
+#include "xml/Model.hpp"
 #include "common/SharedMemory.hpp"
 
 namespace Damaris {
@@ -37,8 +38,6 @@ namespace Damaris {
  */
 class SharedMemorySegment {
 	private:
-		std::string* name;	/*!< Name of the shared memory segment. */
-
 		class POSIX_ShMem;
 		class SYSV_ShMem;
 
@@ -47,6 +46,8 @@ class SharedMemorySegment {
 		 */
 		SharedMemorySegment();
 	public:
+
+		static SharedMemorySegment* create(Model::BufferModel* model);
 	
 		/**
 		 * Creates a shared memory segment based on POSIX functions.
@@ -60,6 +61,7 @@ class SharedMemorySegment {
 		static SharedMemorySegment* create(sysv_shmem_t shmem, 
 				const char* name, int64_t size);
 
+		static SharedMemorySegment* open(Model::BufferModel* model);
 		/**
 		 * Opens an existing shared memory segment based on POSIX functions.
 		 */
@@ -70,6 +72,7 @@ class SharedMemorySegment {
 		 */
 		static SharedMemorySegment* open(sysv_shmem_t shmem, const char* name);
 
+		static bool remove(Model::BufferModel* model);
 		/**
 		 * Removes an existing shared memory segment based on POSIX.
 		 */
@@ -114,8 +117,8 @@ class SharedMemorySegment::POSIX_ShMem : public SharedMemorySegment {
 	private:
 		managed_shared_memory* impl;
 	public:
-		POSIX_ShMem(const char* name, int64_t size);
-		POSIX_ShMem(const char* name);
+		POSIX_ShMem(const std::string &name, int64_t size);
+		POSIX_ShMem(const std::string &name);
 
 		SharedMemorySegment::ptr getAddressFromHandle(handle_t h);
                 handle_t getHandleFromAddress(SharedMemorySegment::ptr p);
@@ -129,8 +132,8 @@ class SharedMemorySegment::SYSV_ShMem : public SharedMemorySegment {
 		managed_xsi_shared_memory* impl;
 		xsi_key key;
 	public:
-		SYSV_ShMem(const char* name, int64_t size);
-		SYSV_ShMem(const char* name);
+		SYSV_ShMem(const std::string &name, int64_t size);
+		SYSV_ShMem(const std::string &name);
 
 		SharedMemorySegment::ptr getAddressFromHandle(handle_t h);
                 handle_t getHandleFromAddress(SharedMemorySegment::ptr p);

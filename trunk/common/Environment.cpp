@@ -26,60 +26,63 @@
 
 namespace Damaris {
 
-	Environment::Environment()
+	Environment::Environment(Model::SimulationModel* mdl)
+	: Configurable<Environment,Model::SimulationModel>(mdl)
 	{
-		initialized = false;
+		init();
 	}
 
 	Environment::~Environment() 
 	{ }
 
-	void Environment::initialize(Model::simulation_mdl* mdl)
+	void Environment::init()
 	{
-		baseModel = mdl;
-		initialized = true;
 		entityComm = MPI_COMM_NULL;
 		globalComm = MPI_COMM_NULL;
 		nodeComm   = MPI_COMM_NULL;
 	}
 
+/*
 	const std::string & Environment::getMsgQueueName() const
 	{
-		return baseModel->architecture().queue().name();
+		return model->queue().name();
 	}
-
+*/
+/*
 	size_t Environment::getMsgQueueSize() const
 	{
 		return (size_t)(baseModel->architecture().queue().size());
 	}
-
+*/
+/*
 	const std::string & Environment::getSegmentName() const
 	{
 		return baseModel->architecture().buffer().name();
 	}
-
+*/
+/*
 	size_t Environment::getSegmentSize() const
 	{
 		return (size_t)(baseModel->architecture().buffer().size());
 	}
-
+*/
 	int Environment::getCoresPerNode() const
 	{
-		return baseModel->architecture().cores().count();
+		return model->architecture().cores().count();
 	}
 
 	int Environment::getClientsPerNode() const
 	{
-		return baseModel->architecture().cores().clients().count();
+		return model->architecture().cores().clients().count();
 	}
 
 	const std::string & Environment::getSimulationName() const
 	{
-		return baseModel->name();
+		return model->name();
 	}
 
 	Language::language_e Environment::getDefaultLanguage() const
 	{
-		return Language::getLanguageFromString(&(baseModel->language()));
+		return Language::getLanguageFromString(&(model->language()));
 	}
 }

@@ -5,42 +5,44 @@
 	xmlns:mdl="http://damaris.gforge.inria.fr/Damaris/Model">
 
 	<!-- Client node -->
-	<xs:complexType name="clients_mdl">
+	<xs:complexType name="ClientsModel">
 	<xs:attribute name="count" type="xs:unsignedInt" use="required"/>	
 	</xs:complexType>
 
 	<!-- Cores node -->
-	<xs:complexType name="cores_mdl">
+	<xs:complexType name="CoresModel">
 	<xs:sequence>
-		<xs:element name="clients" type="mdl:clients_mdl"/>
+		<xs:element name="clients" type="mdl:ClientsModel"/>
 	</xs:sequence>
 	<xs:attribute name="count" type="xs:unsignedInt" use="required"/>
 	</xs:complexType>
 
 	<!-- Buffer node -->
-	<xs:complexType name="buffer_mdl">
+	<xs:complexType name="BufferModel">
 	<xs:attribute name="name" type="xs:string"      use="required"/>
 	<xs:attribute name="size" type="xs:unsignedInt" use="required"/>
+	<xs:attribute name="type" type="xs:string"	use="optional" default="posix"/>
 	</xs:complexType>	
 
 	<!-- Queue node -->
-	<xs:complexType name="queue_mdl">
+	<xs:complexType name="QueueModel">
 	<xs:attribute name="name" type="xs:string"      use="required"/>
 	<xs:attribute name="size" type="xs:unsignedInt" use="required"/>
+	<xs:attribute name="type" type="xs:string"	use="optional" default="posix"/>
 	</xs:complexType>
 
 	<!-- Architecture node -->
-	<xs:complexType name="architecture_mdl">
+	<xs:complexType name="ArchitectureModel">
 	<xs:sequence>
-		<xs:element name="cores"  type="mdl:cores_mdl" />
-		<xs:element name="buffer" type="mdl:buffer_mdl"/>
-		<xs:element name="queue"  type="mdl:queue_mdl" />
+		<xs:element name="cores"  type="mdl:CoresModel" />
+		<xs:element name="buffer" type="mdl:BufferModel"/>
+		<xs:element name="queue"  type="mdl:QueueModel" />
 	</xs:sequence>
 	<xs:attribute name="name" type="xs:string" use="optional"/>
 	</xs:complexType>
 
 	<!-- Layout node -->
-	<xs:complexType name="layout_mdl">
+	<xs:complexType name="LayoutModel">
 	<xs:sequence>
 		<xs:element name="description" type="xs:string" minOccurs="0"/>
 	</xs:sequence>
@@ -51,7 +53,7 @@
 	</xs:complexType>
 
 	<!-- Variable node -->
-	<xs:complexType name="variable_mdl" mixed="true">
+	<xs:complexType name="VariableModel" mixed="true">
 	<xs:sequence>
 		<xs:element name="description" type="xs:string" minOccurs="0"/>
 	</xs:sequence>
@@ -61,17 +63,19 @@
 	</xs:complexType>
 
 	<!-- Group node -->
-	<xs:complexType name="group_mdl">
+	<xs:complexType name="GroupModel">
 	<xs:sequence>
-		<xs:element name="variable" type="mdl:variable_mdl" minOccurs="0" maxOccurs="unbounded"/>
-		<xs:element name="group"    type="mdl:group_mdl"    minOccurs="0" maxOccurs="unbounded"/>
+		<xs:element name="variable" 
+			type="mdl:VariableModel" minOccurs="0" maxOccurs="unbounded"/>
+		<xs:element name="group"    
+			type="mdl:GroupModel"    minOccurs="0" maxOccurs="unbounded"/>
 	</xs:sequence>
 	<xs:attribute name="name"    type="xs:string"  use="required"/>
 	<xs:attribute name="enabled" type="xs:boolean" use="optional" default="true"/>
 	</xs:complexType>
 
 	<!-- Parameter node -->
-	<xs:complexType name="parameter_mdl">
+	<xs:complexType name="ParameterModel">
 	<xs:sequence>
 		<xs:element name="description" type="xs:string" minOccurs="0"/>
 	</xs:sequence>
@@ -81,17 +85,21 @@
 	</xs:complexType>
 
 	<!-- Data node -->
-	<xs:complexType name="data_mdl">
+	<xs:complexType name="DataModel">
 	<xs:sequence>
-		<xs:element name="parameter" type="mdl:parameter_mdl" minOccurs="0" maxOccurs="unbounded"/>
-		<xs:element name="layout"    type="mdl:layout_mdl"    minOccurs="0" maxOccurs="unbounded"/>
-		<xs:element name="variable"  type="mdl:variable_mdl"  minOccurs="0" maxOccurs="unbounded"/>
-		<xs:element name="group"     type="mdl:group_mdl"     minOccurs="0" maxOccurs="unbounded"/>
+		<xs:element name="parameter" type="mdl:ParameterModel" 
+			minOccurs="0" maxOccurs="unbounded"/>
+		<xs:element name="layout"    type="mdl:LayoutModel"    
+			minOccurs="0" maxOccurs="unbounded"/>
+		<xs:element name="variable"  type="mdl:VariableModel"  
+			minOccurs="0" maxOccurs="unbounded"/>
+		<xs:element name="group"     type="mdl:GroupModel"     
+			minOccurs="0" maxOccurs="unbounded"/>
 	</xs:sequence>
 	</xs:complexType>
 
 	<!-- Event node -->
-	<xs:complexType name="event_mdl">
+	<xs:complexType name="EventModel">
 	<xs:attribute name="name"    type="xs:string" use="required"/>
 	<xs:attribute name="action"  type="xs:string" use="required"/>
 	<xs:attribute name="library" type="xs:string" use="required"/>
@@ -99,7 +107,7 @@
 	</xs:complexType>
 
 	<!-- Script node -->
-	<xs:complexType name="script_mdl">
+	<xs:complexType name="ScriptModel">
 	<xs:attribute name="name"     type="xs:string" use="required" />
 	<xs:attribute name="file"     type="xs:string" use="required" />
 	<xs:attribute name="language" type="xs:string" use="required" />
@@ -107,24 +115,29 @@
 	</xs:complexType>
 
 	<!-- Actions node -->
-	<xs:complexType name="actions_mdl">
+	<xs:complexType name="ActionsModel">
 	<xs:sequence>
-		<xs:element name="event" type="mdl:event_mdl" minOccurs="0" maxOccurs="unbounded"/>
-		<xs:element name="script" type="mdl:script_mdl" minOccurs="0" maxOccurs="unbounded"/>
+		<xs:element name="event" type="mdl:EventModel" 
+			minOccurs="0" maxOccurs="unbounded"/>
+		<xs:element name="script" type="mdl:ScriptModel" 
+			minOccurs="0" maxOccurs="unbounded"/>
 	</xs:sequence>
 	</xs:complexType>
 
 	<!-- Simulation node -->
-	<xs:complexType name="simulation_mdl">
+	<xs:complexType name="SimulationModel">
 	<xs:sequence>
-		<xs:element name="architecture" type="mdl:architecture_mdl" minOccurs="1" maxOccurs="1"/>
-		<xs:element name="data"         type="mdl:data_mdl"         maxOccurs="1"/>
-		<xs:element name="actions"      type="mdl:actions_mdl"      maxOccurs="1"/>
+		<xs:element name="architecture" type="mdl:ArchitectureModel" 
+			minOccurs="1" maxOccurs="1"/>
+		<xs:element name="data"         type="mdl:DataModel"         
+			maxOccurs="1"/>
+		<xs:element name="actions"      type="mdl:ActionsModel"
+			maxOccurs="1"/>
 	</xs:sequence>
 	<xs:attribute name="name"     type="xs:string" use="required"/>
 	<xs:attribute name="language" type="xs:string" use="optional" default="C"/>
 	</xs:complexType>
 
 	<!-- Root element -->
-	<xs:element name="simulation" type="mdl:simulation_mdl"/>
+	<xs:element name="simulation" type="mdl:SimulationModel"/>
 </xs:schema>

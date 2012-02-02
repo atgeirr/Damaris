@@ -36,6 +36,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/Language.hpp"
 #include "common/Layout.hpp"
 #include "common/Calc.hpp"
+#include "common/Configurable.hpp"
 #include "common/Singleton.hpp"
 
 namespace Damaris {
@@ -44,20 +45,21 @@ namespace Damaris {
 	 * The class Configuration holds all informations extrated from
 	 * both the command lines (for the server) and the external configuration
 	 * file. It is independant of the format of this configuration file
-	 * (which is loaded through the Damaris::Model::simulation_mdl object).
+	 * (which is loaded through the Damaris::Model::simulation object).
 	 */
-	class Configuration : public Singleton<Configuration> {
+	class Configuration : public Singleton<Configuration>,
+			      public Configurable<Configuration,Model::SimulationModel> {
 		friend class Singleton<Configuration>;
 
 	private:
 		bool initialized; /*! Indicates wether the object is initialized or not */
 
-		std::auto_ptr<Model::simulation_mdl> baseModel; /*!< Model extracted from 
+		std::auto_ptr<Model::SimulationModel> baseModel; /*!< Model extracted from 
 								  the XML file */
 		std::string* configFile; /*!< For information, we keep the name of the 
 					   configuration file. */
 		
-		ParameterSet* 		parameters; 		/*!< List of parameters. */
+//		ParameterSet* 		parameters; 		/*!< List of parameters. */
 		ActionsManager* 	actionsManager;		/*!< Pointer to the ActionsManager. */
 		MetadataManager* 	metadataManager; 	/*!< Pointer to the MetadataManager. */
 		Environment* 		environment;		/*!< Pointer to the Environment. */
@@ -65,11 +67,11 @@ namespace Damaris {
 		Calc<std::string::const_iterator,ParameterSet>* layoutInterp; /*!< Parser for 
 										layout interpretation. */
 		
-		void fillParameterSet(); 	/*!< Fills the set of parameters 
-						  from the base model. */
+//		void fillParameterSet(); 	/*!< Fills the set of parameters 
+						  //from the base model. */
 		void fillMetadataManager(); 	/*!< Fills the metadata manager 
 						  with variables from the base model. */
-		void readVariablesInSubGroup(const Model::group_mdl* g, const std::string &name);
+		void readVariablesInSubGroup(const Model::GroupModel* g, const std::string &name);
 		void fillActionsManager(); 	/*!< Fills the ActionsManager with 
 						  Actions from the base model. */
 
@@ -89,7 +91,7 @@ namespace Damaris {
 		 * \param[in] mdl : simulation base model.
 		 * \param[in] configName : name of the configuration file to load.
 		 */
-		void initialize(std::auto_ptr<Model::simulation_mdl> mdl, 
+		void initialize(std::auto_ptr<Model::SimulationModel> mdl, 
 				const std::string & configName);
 		
 		/**
@@ -101,7 +103,7 @@ namespace Damaris {
 		/**
 		 * \brief Get the parameters set.
 		 */
-		ParameterSet* getParameterSet();
+//		ParameterSet* getParameterSet();
 		
 		/**
 		 * \brief Get the ActionsManager.

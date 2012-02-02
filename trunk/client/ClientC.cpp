@@ -33,7 +33,7 @@ Damaris::Client *client;
 int DC_initialize(const char* configfile, int32_t core_id)
 {
 	std::string config_str(configfile);
-	client = new Damaris::Client(config_str,core_id);
+	client = Damaris::Client::New(config_str,core_id);
 	return 0;
 }
 	

@@ -31,7 +31,9 @@
 
 namespace Damaris {
 
-	class Server : public Client {
+	class Server {
+		private:
+			Process* process;
 		public:
 			/**
 			 * \brief Constructor.
@@ -40,7 +42,7 @@ namespace Damaris {
 			 * \param[in] configFile : name of the configuration file.
 			 * \param[in] id : identifier for this server.
 			 */
-			Server(const std::string &configFile, int id);
+			Server(Process* p);
 
 			/**
 			 * \brief Constructor. 
@@ -50,7 +52,7 @@ namespace Damaris {
 			 *
 			 * \param[in] config : a fully initialized Configuration object.
 			 */
-			Server(Configuration* config);
+//			Server(Configuration* config);
 
 			/**
 			 * \brief Destructor 
@@ -76,7 +78,7 @@ namespace Damaris {
 			/** 
 			 * Initializes everything (called by constructors).
 			 */
-			virtual void init();
+//			virtual void init();
 
 			/** 
 			 * This function processes an incoming message (no way?!).
@@ -95,37 +97,37 @@ namespace Damaris {
 			 * \brief Writes a full variable.
 			 * \see Client::write
 			 */
-			int write(const std::string & varname, int32_t iteration, const void* data);
+//			int write(const std::string & varname, int32_t iteration, const void* data);
 
 			/**
 			 * \brief Writes a chunk of a variable.
 			 * \see Client::chunk_write
 			 */
-			int chunk_write(chunk_h chunkh, const std::string & varname,
-					int32_t iteration, const void* data);
+//			int chunk_write(chunk_h chunkh, const std::string & varname,
+//					int32_t iteration, const void* data);
 
 			/**
 			 * \brief Sends an event.
 			 * \see Client::signal
 			 */
-			int signal(const std::string & signame, int32_t iteration);
+//			int signal(const std::string & signame, int32_t iteration);
 
 			/**
 			 * \brief Allocate a buffer directly in shared memory for future writing.
 			 * \see Client::alloc
 			 */
-			void* alloc(const std::string & varname, int32_t iteration);
+//			void* alloc(const std::string & varname, int32_t iteration);
 
 			/** 
 			 * \brief Commit a variable.
 			 * \see Client::commit
 			 */
-			int commit(const std::string & varname, int32_t iteration);
+//			int commit(const std::string & varname, int32_t iteration);
 
 			/**
 			 * \see Client::kill_server().
 			 */
-			int kill_server();
+//			int kill_server();
 	}; // class Server
 
 	/**

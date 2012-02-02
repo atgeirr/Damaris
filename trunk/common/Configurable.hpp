@@ -15,32 +15,26 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file Tags.hpp
- * \date October 2011
+ * \file Configurable.hpp
+ * \date February 2012
  * \author Matthieu Dorier
  * \version 0.3
  */
-
-#ifndef __DAMARIS_TAGS_H
-#define __DAMARIS_TAGS_H
+#ifndef __DAMARIS_CONFIGURABLE_H
+#define __DAMARIS_CONFIGURABLE_H
 
 namespace Damaris {
-	/**
-	 * The following structures are used as template arguments
-	 * for multi indexes.
-	 */
-	struct by_name {};
-	struct by_id {};
-	struct by_source {};
-	struct by_iteration {};
-	struct by_any {};
 
-	/**
-	 * The followin structures are used as template arguments
-	 * for opening and creating structures.
-	 */
-	struct open {};
-	struct create {};
+template<typename ChildClass, typename ModelClass>
+	class Configurable {
+		protected:
+			ModelClass* model;
+		public:
+			Configurable(ModelClass* mdl) {
+				model = mdl;
+			}
+	};
+
 }
 
 #endif

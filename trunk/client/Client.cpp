@@ -34,16 +34,27 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "client/Client.hpp"
 
 namespace Damaris {
-	
+/*	
 	Client::Client()
 	{ }
-	
-	Client::Client(const std::string & configfile, int32_t coreID)
+*/
+	Client* Client::New(const std::string &cfg, int32_t id)
 	{
-		/* creates the configuration object from the configuration file */
+		Process* p = new Process(cfg,id);
+		p->openSharedStructures();
+		return new Client(p);
+	}
+
+	Client::Client(Process* p)
+	{
+		process = p;
+	}	
+/*	Client::Client(const std::string & configfile, int32_t coreID)
+	{
+		// creates the configuration object from the configuration file 
 		DBG("Starting Damaris client");
 		try {
-			std::auto_ptr<Model::simulation_mdl> 
+			std::auto_ptr<Model::SimulationModel> 
 				mdl(Model::simulation(configfile.c_str(),
 						xml_schema::flags::dont_validate));
 			DBG("Model initialized successfuly");
@@ -76,7 +87,7 @@ namespace Damaris {
 		
 		actionsManager = config->getActionsManager();
 		ASSERT(metadataManager != NULL);
-		/* initializes the shared structures */
+		// initializes the shared structures 
 		try {
 #ifdef __SYSV
 			msgQueue = SharedMessageQueue::open(sysv_shmem,
@@ -100,12 +111,12 @@ namespace Damaris {
 		metadataManager = config->getMetadataManager();
 		actionsManager = config->getActionsManager();
 	}
-	
+	*/
 	void* Client::alloc(const std::string & varname, int32_t iteration)
 	{
 
 		/* check that the variable is known in the configuration */
-		Variable* variable = metadataManager->getVariable(varname);
+		Variable* variable = process->getMetadataManager()->getVariable(varname);
 
         	if(variable == NULL) {
 			ERROR("Variable \""<< varname 
@@ -131,9 +142,9 @@ namespace Damaris {
 		/* try initializing the chunk in shared memory */
 		try {
 			ShmChunk* chunk = 
-				new ShmChunk(segment,layout->getType(),
+				new ShmChunk(process->getSharedMemorySegment(),layout->getType(),
 						layout->getDimensions(),si,ei);
-			chunk->setSource(env->getID());
+			chunk->setSource(process->getEnvironment()->getID());
 			chunk->setIteration(iteration);
 			variable->attachChunk(chunk);
 			/* chunk initialized, returns the data! */
@@ -149,7 +160,7 @@ namespace Damaris {
 	
 	int Client::commit(const std::string & varname, int32_t iteration)
 	{		
-		Variable* v = metadataManager->getVariable(varname);
+		Variable* v = process->getMetadataManager()->getVariable(varname);
 		if(v == NULL)
 			return -1;
 
@@ -173,14 +184,14 @@ namespace Damaris {
 
 		// create notification message
 		Message message;
-		message.source = env->getID();
+		message.source = process->getEnvironment()->getID();
 
 		message.iteration = iteration;
 		message.type = MSG_VAR;
 		message.handle = chunk->getHandle();
 		message.object = v->getID();
                 // send message
-		msgQueue->send(&message);
+		process->getSharedMessageQueue()->send(&message);
                 // free message
 		DBG("Variable \"" << varname << "\" has been commited");
 
@@ -190,7 +201,7 @@ namespace Damaris {
 	int Client::write(const std::string & varname, int32_t iteration, const void* data)
 	{
 		/* check that the variable is know in the configuration */
-		Variable* variable = metadataManager->getVariable(varname);
+		Variable* variable = process->getMetadataManager()->getVariable(varname);
 
         	if(variable == NULL) {
 			return -1;
@@ -212,9 +223,9 @@ namespace Damaris {
 
 		ShmChunk* chunk = NULL;
                 try {
-                        chunk = new ShmChunk(segment,layout->getType(),
+                        chunk = new ShmChunk(process->getSharedMemorySegment(),layout->getType(),
 						layout->getDimensions(),si,ei);
-                        chunk->setSource(env->getID());
+                        chunk->setSource(process->getEnvironment()->getID());
                         chunk->setIteration(iteration);
                 } catch (...) {
                         ERROR("While writing \"" << varname << "\", allocation failed");
@@ -228,14 +239,14 @@ namespace Damaris {
 		// create message
 		Message message;
 		
-		message.source = env->getID();
+		message.source = process->getEnvironment()->getID();
 		message.iteration = iteration;
 		message.object = variable->getID();
 		message.type = MSG_VAR;
 		message.handle = chunk->getHandle();
 		
 		// send message
-		msgQueue->send(&message);
+		process->getSharedMessageQueue()->send(&message);
 		DBG("Variable \"" << varname << "\" has been written");
 	
 		delete chunk;
@@ -246,7 +257,7 @@ namespace Damaris {
 			int32_t iteration, const void* data)
 	{
 		/* check that the variable is know in the configuration */
-		Variable* variable = metadataManager->getVariable(varname);
+		Variable* variable = process->getMetadataManager()->getVariable(varname);
 
         	if(variable == NULL) {
 			ERROR("Variable \""<< varname << "\" not defined in configuration");
@@ -274,8 +285,8 @@ namespace Damaris {
 				ei[i] = chunkHandle->getEndIndex(i);
 			}
 
-                        chunk = new ShmChunk(segment,t,d,si,ei);
-                        chunk->setSource(env->getID());
+                        chunk = new ShmChunk(process->getSharedMemorySegment(),t,d,si,ei);
+                        chunk->setSource(process->getEnvironment()->getID());
                         chunk->setIteration(iteration);
                 } catch (...) {
                         ERROR("While writing \"" << varname << "\", allocation failed");
@@ -289,14 +300,14 @@ namespace Damaris {
 		// create message
 		Message message;
 		
-		message.source = env->getID();
+		message.source = process->getEnvironment()->getID();
 		message.iteration = iteration;
 		message.object = variable->getID();
 		message.type = MSG_VAR;
 		message.handle = chunk->getHandle();
 		
 		// send message
-		msgQueue->send(&message);
+		process->getSharedMessageQueue()->send(&message);
 		DBG("Variable \"" << varname << "\" has been written");
 	
 		// free message	
@@ -308,21 +319,21 @@ namespace Damaris {
 	int Client::signal(const std::string & signal_name, int32_t iteration)
 	{
 		try {
-		Action* action = actionsManager->getAction(signal_name);
+		Action* action = process->getActionsManager()->getAction(signal_name);
 		if(action == NULL) {
 			DBG("Undefined action \"" << signal_name << "\"");
 			return -2;
 		}
 
 		Message sig;
-		sig.source = env->getID();
+		sig.source = process->getEnvironment()->getID();
 		sig.iteration = iteration;
 		sig.type = MSG_SIG;
 		sig.handle = 0;
 		sig.object = action->getID();
 		
 		try {
-			msgQueue->send(&sig);
+			process->getSharedMessageQueue()->send(&sig);
 		} catch(interprocess_exception &e) {
 			ERROR("Error while sending event \"" << signal_name << "\", " << e.what());
 			return -1;
@@ -348,10 +359,10 @@ namespace Damaris {
 		if(!killed) {
 			Message kill;
 			kill.type = MSG_INT;
-			kill.source = env->getID();
+			kill.source = process->getEnvironment()->getID();
 			kill.iteration = -1;
 			kill.object = KILL_SERVER;
-			msgQueue->send(&kill);
+			process->getSharedMessageQueue()->send(&kill);
 			return 0;
 		} else {
 			WARN("Trying to send kill signal multiple times to the server");
@@ -375,16 +386,12 @@ namespace Damaris {
 
 	MPI_Comm Client::get_clients_communicator()
 	{
-		return env->getEntityComm();
+		return process->getEnvironment()->getEntityComm();
 	}
 	
 	Client::~Client() 
 	{
-		delete msgQueue;
-		delete segment;
-
-		config->kill();
-
+		delete process;
 		DBG("Client destroyed successfuly");
 	}
 	

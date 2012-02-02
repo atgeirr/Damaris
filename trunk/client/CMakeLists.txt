@@ -8,6 +8,7 @@ set(DAMARIS_MODEL_SRC
 	${DAMARIS_SOURCE_DIR}/xml/Model.cpp)
 
 set(DAMARIS_COMMON_SRC
+	${DAMARIS_SOURCE_DIR}/common/Process.cpp
 	${DAMARIS_SOURCE_DIR}/common/Parameter.cpp
 	${DAMARIS_SOURCE_DIR}/common/ParameterSet.cpp
 	${DAMARIS_SOURCE_DIR}/common/SharedMessageQueue.cpp

@@ -46,13 +46,12 @@ namespace Damaris {
 Options::Options(int argc, char** argv)
 {
 	
-	int id; /* id of the server */
-
 	/* initializing the options descriptions */
 	po::options_description desc("Allowed options");
 	desc.add_options()
 		("help", "produces help message")
-		("configuration,C", po::value<std::string>(), "name of the configuration file")
+		("configuration,C", po::value<std::string>(&configFile), 
+				"name of the configuration file")
 		("id",po::value<int>(&id),"id of the server")
 		("daemon,D","starts the server as a daemon process")
 		("stdout",po::value<std::string>(),"redirects stdout to a given file")
@@ -82,14 +81,22 @@ Options::Options(int argc, char** argv)
 
 	/* checking if we have to redirect stdout to a file */
 	if(vm.count("stdout")) {
-		int fd = open((vm["stdout"].as<std::string>()).c_str(),O_RDWR|O_CREAT,0644);
-		dup2(fd,1);
+//		int fd = open((vm["stdout"].as<std::string>()).c_str(),O_RDWR|O_CREAT,0644);
+//		dup2(fd,1);
+		if(not freopen((vm["stdout"].as<std::string>()).c_str(),"w",stdout))
+		{
+			ERROR("Unable to redirect stdout");
+		}
 	}
 	
 	/* checking if we have to redirect stderr to a file */
 	if(vm.count("stderr")) {
-                int fd = open((vm["stderr"].as<std::string>()).c_str(),O_RDWR|O_CREAT,0644);
-                dup2(fd,2);
+                //int fd = open((vm["stderr"].as<std::string>()).c_str(),O_RDWR|O_CREAT,0644);
+                //dup2(fd,2);
+		if(not freopen((vm["stderr"].as<std::string>()).c_str(),"w",stderr))
+		{
+			ERROR("Unable to redirect stderr");
+		}
         }
 
 	/* check that we provide an id for the server */
@@ -99,42 +106,21 @@ Options::Options(int argc, char** argv)
         }
 	
 	/* now reading the configuration file and preparing the Configuration object */
-	configFile = NULL;	
-	if (vm.count("configuration")) {
-		configFile = new std::string(vm["configuration"].as<std::string>());
-
-		std::auto_ptr<Model::simulation_mdl> 
-			mdl(Model::simulation(configFile->c_str(),
-			xml_schema::flags::dont_validate));
-
-		Model::simulation_mdl* tmp = mdl.get();
-
-		config = Configuration::getInstance();
-		config->initialize(mdl,*configFile);
-	
-		env = config->getEnvironment();
-		env->initialize(tmp);
-		env->setID(id);
-	} else {
+	if (vm.count("configuration") == 0) {
 		ERROR("No configuration file provided," 
 			<< " use --configuration=<file.xml> or -C <file.xml>");
 		exit(-1);
 	}
 }
 
-std::string* Options::getConfigFile()
+const std::string& Options::getConfigFile()
 {
 	return configFile;
 }
 
-Configuration* Options::getConfiguration()
+int Options::getID()
 {
-	return config;
-}
-
-Environment* Options::getEnvironment()
-{
-	return env;
+	return id;
 }
 
 }

@@ -241,20 +241,20 @@ namespace Damaris
 {
   namespace Model
   {
-    class clients_mdl;
-    class cores_mdl;
-    class buffer_mdl;
-    class queue_mdl;
-    class architecture_mdl;
-    class layout_mdl;
-    class variable_mdl;
-    class group_mdl;
-    class parameter_mdl;
-    class data_mdl;
-    class event_mdl;
-    class script_mdl;
-    class actions_mdl;
-    class simulation_mdl;
+    class ClientsModel;
+    class CoresModel;
+    class BufferModel;
+    class QueueModel;
+    class ArchitectureModel;
+    class LayoutModel;
+    class VariableModel;
+    class GroupModel;
+    class ParameterModel;
+    class DataModel;
+    class EventModel;
+    class ScriptModel;
+    class ActionsModel;
+    class SimulationModel;
   }
 }
 
@@ -276,7 +276,7 @@ namespace Damaris
 {
   namespace Model
   {
-    class clients_mdl: public ::xml_schema::type
+    class ClientsModel: public ::xml_schema::type
     {
       public:
       // count
@@ -295,22 +295,22 @@ namespace Damaris
 
       // Constructors.
       //
-      clients_mdl (const count_type&);
+      ClientsModel (const count_type&);
 
-      clients_mdl (const ::xercesc::DOMElement& e,
-                   ::xml_schema::flags f = 0,
-                   ::xml_schema::container* c = 0);
+      ClientsModel (const ::xercesc::DOMElement& e,
+                    ::xml_schema::flags f = 0,
+                    ::xml_schema::container* c = 0);
 
-      clients_mdl (const clients_mdl& x,
-                   ::xml_schema::flags f = 0,
-                   ::xml_schema::container* c = 0);
+      ClientsModel (const ClientsModel& x,
+                    ::xml_schema::flags f = 0,
+                    ::xml_schema::container* c = 0);
 
-      virtual clients_mdl*
+      virtual ClientsModel*
       _clone (::xml_schema::flags f = 0,
               ::xml_schema::container* c = 0) const;
 
       virtual 
-      ~clients_mdl ();
+      ~ClientsModel ();
 
       // Implementation.
       //
@@ -323,12 +323,12 @@ namespace Damaris
       ::xsd::cxx::tree::one< count_type > count_;
     };
 
-    class cores_mdl: public ::xml_schema::type
+    class CoresModel: public ::xml_schema::type
     {
       public:
       // clients
       // 
-      typedef ::Damaris::Model::clients_mdl clients_type;
+      typedef ::Damaris::Model::ClientsModel clients_type;
       typedef ::xsd::cxx::tree::traits< clients_type, char > clients_traits;
 
       const clients_type&
@@ -359,26 +359,26 @@ namespace Damaris
 
       // Constructors.
       //
-      cores_mdl (const clients_type&,
-                 const count_type&);
+      CoresModel (const clients_type&,
+                  const count_type&);
 
-      cores_mdl (::std::auto_ptr< clients_type >&,
-                 const count_type&);
+      CoresModel (::std::auto_ptr< clients_type >&,
+                  const count_type&);
 
-      cores_mdl (const ::xercesc::DOMElement& e,
-                 ::xml_schema::flags f = 0,
-                 ::xml_schema::container* c = 0);
+      CoresModel (const ::xercesc::DOMElement& e,
+                  ::xml_schema::flags f = 0,
+                  ::xml_schema::container* c = 0);
 
-      cores_mdl (const cores_mdl& x,
-                 ::xml_schema::flags f = 0,
-                 ::xml_schema::container* c = 0);
+      CoresModel (const CoresModel& x,
+                  ::xml_schema::flags f = 0,
+                  ::xml_schema::container* c = 0);
 
-      virtual cores_mdl*
+      virtual CoresModel*
       _clone (::xml_schema::flags f = 0,
               ::xml_schema::container* c = 0) const;
 
       virtual 
-      ~cores_mdl ();
+      ~CoresModel ();
 
       // Implementation.
       //
@@ -392,7 +392,7 @@ namespace Damaris
       ::xsd::cxx::tree::one< count_type > count_;
     };
 
-    class buffer_mdl: public ::xml_schema::type
+    class BufferModel: public ::xml_schema::type
     {
       public:
       // name
@@ -426,25 +426,133 @@ namespace Damaris
       void
       size (const size_type& x);
 
+      // type
+      // 
+      typedef ::xml_schema::string type_type;
+      typedef ::xsd::cxx::tree::traits< type_type, char > type_traits;
+
+      const type_type&
+      type () const;
+
+      type_type&
+      type ();
+
+      void
+      type (const type_type& x);
+
+      void
+      type (::std::auto_ptr< type_type > p);
+
+      static const type_type&
+      type_default_value ();
+
       // Constructors.
       //
-      buffer_mdl (const name_type&,
+      BufferModel (const name_type&,
+                   const size_type&);
+
+      BufferModel (const ::xercesc::DOMElement& e,
+                   ::xml_schema::flags f = 0,
+                   ::xml_schema::container* c = 0);
+
+      BufferModel (const BufferModel& x,
+                   ::xml_schema::flags f = 0,
+                   ::xml_schema::container* c = 0);
+
+      virtual BufferModel*
+      _clone (::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0) const;
+
+      virtual 
+      ~BufferModel ();
+
+      // Implementation.
+      //
+      protected:
+      void
+      parse (::xsd::cxx::xml::dom::parser< char >&,
+             ::xml_schema::flags);
+
+      protected:
+      ::xsd::cxx::tree::one< name_type > name_;
+      ::xsd::cxx::tree::one< size_type > size_;
+      ::xsd::cxx::tree::one< type_type > type_;
+      static const type_type type_default_value_;
+    };
+
+    class QueueModel: public ::xml_schema::type
+    {
+      public:
+      // name
+      // 
+      typedef ::xml_schema::string name_type;
+      typedef ::xsd::cxx::tree::traits< name_type, char > name_traits;
+
+      const name_type&
+      name () const;
+
+      name_type&
+      name ();
+
+      void
+      name (const name_type& x);
+
+      void
+      name (::std::auto_ptr< name_type > p);
+
+      // size
+      // 
+      typedef ::xml_schema::unsigned_int size_type;
+      typedef ::xsd::cxx::tree::traits< size_type, char > size_traits;
+
+      const size_type&
+      size () const;
+
+      size_type&
+      size ();
+
+      void
+      size (const size_type& x);
+
+      // type
+      // 
+      typedef ::xml_schema::string type_type;
+      typedef ::xsd::cxx::tree::traits< type_type, char > type_traits;
+
+      const type_type&
+      type () const;
+
+      type_type&
+      type ();
+
+      void
+      type (const type_type& x);
+
+      void
+      type (::std::auto_ptr< type_type > p);
+
+      static const type_type&
+      type_default_value ();
+
+      // Constructors.
+      //
+      QueueModel (const name_type&,
                   const size_type&);
 
-      buffer_mdl (const ::xercesc::DOMElement& e,
+      QueueModel (const ::xercesc::DOMElement& e,
                   ::xml_schema::flags f = 0,
                   ::xml_schema::container* c = 0);
 
-      buffer_mdl (const buffer_mdl& x,
+      QueueModel (const QueueModel& x,
                   ::xml_schema::flags f = 0,
                   ::xml_schema::container* c = 0);
 
-      virtual buffer_mdl*
+      virtual QueueModel*
       _clone (::xml_schema::flags f = 0,
               ::xml_schema::container* c = 0) const;
 
       virtual 
-      ~buffer_mdl ();
+      ~QueueModel ();
 
       // Implementation.
       //
@@ -456,80 +564,16 @@ namespace Damaris
       protected:
       ::xsd::cxx::tree::one< name_type > name_;
       ::xsd::cxx::tree::one< size_type > size_;
+      ::xsd::cxx::tree::one< type_type > type_;
+      static const type_type type_default_value_;
     };
 
-    class queue_mdl: public ::xml_schema::type
-    {
-      public:
-      // name
-      // 
-      typedef ::xml_schema::string name_type;
-      typedef ::xsd::cxx::tree::traits< name_type, char > name_traits;
-
-      const name_type&
-      name () const;
-
-      name_type&
-      name ();
-
-      void
-      name (const name_type& x);
-
-      void
-      name (::std::auto_ptr< name_type > p);
-
-      // size
-      // 
-      typedef ::xml_schema::unsigned_int size_type;
-      typedef ::xsd::cxx::tree::traits< size_type, char > size_traits;
-
-      const size_type&
-      size () const;
-
-      size_type&
-      size ();
-
-      void
-      size (const size_type& x);
-
-      // Constructors.
-      //
-      queue_mdl (const name_type&,
-                 const size_type&);
-
-      queue_mdl (const ::xercesc::DOMElement& e,
-                 ::xml_schema::flags f = 0,
-                 ::xml_schema::container* c = 0);
-
-      queue_mdl (const queue_mdl& x,
-                 ::xml_schema::flags f = 0,
-                 ::xml_schema::container* c = 0);
-
-      virtual queue_mdl*
-      _clone (::xml_schema::flags f = 0,
-              ::xml_schema::container* c = 0) const;
-
-      virtual 
-      ~queue_mdl ();
-
-      // Implementation.
-      //
-      protected:
-      void
-      parse (::xsd::cxx::xml::dom::parser< char >&,
-             ::xml_schema::flags);
-
-      protected:
-      ::xsd::cxx::tree::one< name_type > name_;
-      ::xsd::cxx::tree::one< size_type > size_;
-    };
-
-    class architecture_mdl: public ::xml_schema::type
+    class ArchitectureModel: public ::xml_schema::type
     {
       public:
       // cores
       // 
-      typedef ::Damaris::Model::cores_mdl cores_type;
+      typedef ::Damaris::Model::CoresModel cores_type;
       typedef ::xsd::cxx::tree::traits< cores_type, char > cores_traits;
 
       const cores_type&
@@ -546,7 +590,7 @@ namespace Damaris
 
       // buffer
       // 
-      typedef ::Damaris::Model::buffer_mdl buffer_type;
+      typedef ::Damaris::Model::BufferModel buffer_type;
       typedef ::xsd::cxx::tree::traits< buffer_type, char > buffer_traits;
 
       const buffer_type&
@@ -563,7 +607,7 @@ namespace Damaris
 
       // queue
       // 
-      typedef ::Damaris::Model::queue_mdl queue_type;
+      typedef ::Damaris::Model::QueueModel queue_type;
       typedef ::xsd::cxx::tree::traits< queue_type, char > queue_traits;
 
       const queue_type&
@@ -601,28 +645,28 @@ namespace Damaris
 
       // Constructors.
       //
-      architecture_mdl (const cores_type&,
-                        const buffer_type&,
-                        const queue_type&);
+      ArchitectureModel (const cores_type&,
+                         const buffer_type&,
+                         const queue_type&);
 
-      architecture_mdl (::std::auto_ptr< cores_type >&,
-                        ::std::auto_ptr< buffer_type >&,
-                        ::std::auto_ptr< queue_type >&);
+      ArchitectureModel (::std::auto_ptr< cores_type >&,
+                         ::std::auto_ptr< buffer_type >&,
+                         ::std::auto_ptr< queue_type >&);
 
-      architecture_mdl (const ::xercesc::DOMElement& e,
-                        ::xml_schema::flags f = 0,
-                        ::xml_schema::container* c = 0);
+      ArchitectureModel (const ::xercesc::DOMElement& e,
+                         ::xml_schema::flags f = 0,
+                         ::xml_schema::container* c = 0);
 
-      architecture_mdl (const architecture_mdl& x,
-                        ::xml_schema::flags f = 0,
-                        ::xml_schema::container* c = 0);
+      ArchitectureModel (const ArchitectureModel& x,
+                         ::xml_schema::flags f = 0,
+                         ::xml_schema::container* c = 0);
 
-      virtual architecture_mdl*
+      virtual ArchitectureModel*
       _clone (::xml_schema::flags f = 0,
               ::xml_schema::container* c = 0) const;
 
       virtual 
-      ~architecture_mdl ();
+      ~ArchitectureModel ();
 
       // Implementation.
       //
@@ -638,7 +682,7 @@ namespace Damaris
       name_optional name_;
     };
 
-    class layout_mdl: public ::xml_schema::type
+    class LayoutModel: public ::xml_schema::type
     {
       public:
       // description
@@ -735,24 +779,24 @@ namespace Damaris
 
       // Constructors.
       //
-      layout_mdl (const name_type&,
-                  const type_type&,
-                  const dimensions_type&);
+      LayoutModel (const name_type&,
+                   const type_type&,
+                   const dimensions_type&);
 
-      layout_mdl (const ::xercesc::DOMElement& e,
-                  ::xml_schema::flags f = 0,
-                  ::xml_schema::container* c = 0);
+      LayoutModel (const ::xercesc::DOMElement& e,
+                   ::xml_schema::flags f = 0,
+                   ::xml_schema::container* c = 0);
 
-      layout_mdl (const layout_mdl& x,
-                  ::xml_schema::flags f = 0,
-                  ::xml_schema::container* c = 0);
+      LayoutModel (const LayoutModel& x,
+                   ::xml_schema::flags f = 0,
+                   ::xml_schema::container* c = 0);
 
-      virtual layout_mdl*
+      virtual LayoutModel*
       _clone (::xml_schema::flags f = 0,
               ::xml_schema::container* c = 0) const;
 
       virtual 
-      ~layout_mdl ();
+      ~LayoutModel ();
 
       // Implementation.
       //
@@ -770,7 +814,7 @@ namespace Damaris
       static const language_type language_default_value_;
     };
 
-    class variable_mdl: public ::xml_schema::type
+    class VariableModel: public ::xml_schema::type
     {
       public:
       // description
@@ -848,23 +892,23 @@ namespace Damaris
 
       // Constructors.
       //
-      variable_mdl (const name_type&,
-                    const layout_type&);
+      VariableModel (const name_type&,
+                     const layout_type&);
 
-      variable_mdl (const ::xercesc::DOMElement& e,
-                    ::xml_schema::flags f = 0,
-                    ::xml_schema::container* c = 0);
+      VariableModel (const ::xercesc::DOMElement& e,
+                     ::xml_schema::flags f = 0,
+                     ::xml_schema::container* c = 0);
 
-      variable_mdl (const variable_mdl& x,
-                    ::xml_schema::flags f = 0,
-                    ::xml_schema::container* c = 0);
+      VariableModel (const VariableModel& x,
+                     ::xml_schema::flags f = 0,
+                     ::xml_schema::container* c = 0);
 
-      virtual variable_mdl*
+      virtual VariableModel*
       _clone (::xml_schema::flags f = 0,
               ::xml_schema::container* c = 0) const;
 
       virtual 
-      ~variable_mdl ();
+      ~VariableModel ();
 
       // Implementation.
       //
@@ -880,12 +924,12 @@ namespace Damaris
       enabled_optional enabled_;
     };
 
-    class group_mdl: public ::xml_schema::type
+    class GroupModel: public ::xml_schema::type
     {
       public:
       // variable
       // 
-      typedef ::Damaris::Model::variable_mdl variable_type;
+      typedef ::Damaris::Model::VariableModel variable_type;
       typedef ::xsd::cxx::tree::sequence< variable_type > variable_sequence;
       typedef variable_sequence::iterator variable_iterator;
       typedef variable_sequence::const_iterator variable_const_iterator;
@@ -902,7 +946,7 @@ namespace Damaris
 
       // group
       // 
-      typedef ::Damaris::Model::group_mdl group_type;
+      typedef ::Damaris::Model::GroupModel group_type;
       typedef ::xsd::cxx::tree::sequence< group_type > group_sequence;
       typedef group_sequence::iterator group_iterator;
       typedef group_sequence::const_iterator group_const_iterator;
@@ -953,22 +997,22 @@ namespace Damaris
 
       // Constructors.
       //
-      group_mdl (const name_type&);
+      GroupModel (const name_type&);
 
-      group_mdl (const ::xercesc::DOMElement& e,
-                 ::xml_schema::flags f = 0,
-                 ::xml_schema::container* c = 0);
+      GroupModel (const ::xercesc::DOMElement& e,
+                  ::xml_schema::flags f = 0,
+                  ::xml_schema::container* c = 0);
 
-      group_mdl (const group_mdl& x,
-                 ::xml_schema::flags f = 0,
-                 ::xml_schema::container* c = 0);
+      GroupModel (const GroupModel& x,
+                  ::xml_schema::flags f = 0,
+                  ::xml_schema::container* c = 0);
 
-      virtual group_mdl*
+      virtual GroupModel*
       _clone (::xml_schema::flags f = 0,
               ::xml_schema::container* c = 0) const;
 
       virtual 
-      ~group_mdl ();
+      ~GroupModel ();
 
       // Implementation.
       //
@@ -984,7 +1028,7 @@ namespace Damaris
       ::xsd::cxx::tree::one< enabled_type > enabled_;
     };
 
-    class parameter_mdl: public ::xml_schema::type
+    class ParameterModel: public ::xml_schema::type
     {
       public:
       // description
@@ -1061,24 +1105,24 @@ namespace Damaris
 
       // Constructors.
       //
-      parameter_mdl (const name_type&,
-                     const type_type&,
-                     const value_type&);
+      ParameterModel (const name_type&,
+                      const type_type&,
+                      const value_type&);
 
-      parameter_mdl (const ::xercesc::DOMElement& e,
-                     ::xml_schema::flags f = 0,
-                     ::xml_schema::container* c = 0);
+      ParameterModel (const ::xercesc::DOMElement& e,
+                      ::xml_schema::flags f = 0,
+                      ::xml_schema::container* c = 0);
 
-      parameter_mdl (const parameter_mdl& x,
-                     ::xml_schema::flags f = 0,
-                     ::xml_schema::container* c = 0);
+      ParameterModel (const ParameterModel& x,
+                      ::xml_schema::flags f = 0,
+                      ::xml_schema::container* c = 0);
 
-      virtual parameter_mdl*
+      virtual ParameterModel*
       _clone (::xml_schema::flags f = 0,
               ::xml_schema::container* c = 0) const;
 
       virtual 
-      ~parameter_mdl ();
+      ~ParameterModel ();
 
       // Implementation.
       //
@@ -1094,12 +1138,12 @@ namespace Damaris
       ::xsd::cxx::tree::one< value_type > value_;
     };
 
-    class data_mdl: public ::xml_schema::type
+    class DataModel: public ::xml_schema::type
     {
       public:
       // parameter
       // 
-      typedef ::Damaris::Model::parameter_mdl parameter_type;
+      typedef ::Damaris::Model::ParameterModel parameter_type;
       typedef ::xsd::cxx::tree::sequence< parameter_type > parameter_sequence;
       typedef parameter_sequence::iterator parameter_iterator;
       typedef parameter_sequence::const_iterator parameter_const_iterator;
@@ -1116,7 +1160,7 @@ namespace Damaris
 
       // layout
       // 
-      typedef ::Damaris::Model::layout_mdl layout_type;
+      typedef ::Damaris::Model::LayoutModel layout_type;
       typedef ::xsd::cxx::tree::sequence< layout_type > layout_sequence;
       typedef layout_sequence::iterator layout_iterator;
       typedef layout_sequence::const_iterator layout_const_iterator;
@@ -1133,7 +1177,7 @@ namespace Damaris
 
       // variable
       // 
-      typedef ::Damaris::Model::variable_mdl variable_type;
+      typedef ::Damaris::Model::VariableModel variable_type;
       typedef ::xsd::cxx::tree::sequence< variable_type > variable_sequence;
       typedef variable_sequence::iterator variable_iterator;
       typedef variable_sequence::const_iterator variable_const_iterator;
@@ -1150,7 +1194,7 @@ namespace Damaris
 
       // group
       // 
-      typedef ::Damaris::Model::group_mdl group_type;
+      typedef ::Damaris::Model::GroupModel group_type;
       typedef ::xsd::cxx::tree::sequence< group_type > group_sequence;
       typedef group_sequence::iterator group_iterator;
       typedef group_sequence::const_iterator group_const_iterator;
@@ -1167,22 +1211,22 @@ namespace Damaris
 
       // Constructors.
       //
-      data_mdl ();
+      DataModel ();
 
-      data_mdl (const ::xercesc::DOMElement& e,
-                ::xml_schema::flags f = 0,
-                ::xml_schema::container* c = 0);
+      DataModel (const ::xercesc::DOMElement& e,
+                 ::xml_schema::flags f = 0,
+                 ::xml_schema::container* c = 0);
 
-      data_mdl (const data_mdl& x,
-                ::xml_schema::flags f = 0,
-                ::xml_schema::container* c = 0);
+      DataModel (const DataModel& x,
+                 ::xml_schema::flags f = 0,
+                 ::xml_schema::container* c = 0);
 
-      virtual data_mdl*
+      virtual DataModel*
       _clone (::xml_schema::flags f = 0,
               ::xml_schema::container* c = 0) const;
 
       virtual 
-      ~data_mdl ();
+      ~DataModel ();
 
       // Implementation.
       //
@@ -1198,7 +1242,7 @@ namespace Damaris
       group_sequence group_;
     };
 
-    class event_mdl: public ::xml_schema::type
+    class EventModel: public ::xml_schema::type
     {
       public:
       // name
@@ -1274,24 +1318,24 @@ namespace Damaris
 
       // Constructors.
       //
-      event_mdl (const name_type&,
-                 const action_type&,
-                 const library_type&);
+      EventModel (const name_type&,
+                  const action_type&,
+                  const library_type&);
 
-      event_mdl (const ::xercesc::DOMElement& e,
-                 ::xml_schema::flags f = 0,
-                 ::xml_schema::container* c = 0);
+      EventModel (const ::xercesc::DOMElement& e,
+                  ::xml_schema::flags f = 0,
+                  ::xml_schema::container* c = 0);
 
-      event_mdl (const event_mdl& x,
-                 ::xml_schema::flags f = 0,
-                 ::xml_schema::container* c = 0);
+      EventModel (const EventModel& x,
+                  ::xml_schema::flags f = 0,
+                  ::xml_schema::container* c = 0);
 
-      virtual event_mdl*
+      virtual EventModel*
       _clone (::xml_schema::flags f = 0,
               ::xml_schema::container* c = 0) const;
 
       virtual 
-      ~event_mdl ();
+      ~EventModel ();
 
       // Implementation.
       //
@@ -1308,7 +1352,7 @@ namespace Damaris
       static const scope_type scope_default_value_;
     };
 
-    class script_mdl: public ::xml_schema::type
+    class ScriptModel: public ::xml_schema::type
     {
       public:
       // name
@@ -1384,24 +1428,24 @@ namespace Damaris
 
       // Constructors.
       //
-      script_mdl (const name_type&,
-                  const file_type&,
-                  const language_type&);
+      ScriptModel (const name_type&,
+                   const file_type&,
+                   const language_type&);
 
-      script_mdl (const ::xercesc::DOMElement& e,
-                  ::xml_schema::flags f = 0,
-                  ::xml_schema::container* c = 0);
+      ScriptModel (const ::xercesc::DOMElement& e,
+                   ::xml_schema::flags f = 0,
+                   ::xml_schema::container* c = 0);
 
-      script_mdl (const script_mdl& x,
-                  ::xml_schema::flags f = 0,
-                  ::xml_schema::container* c = 0);
+      ScriptModel (const ScriptModel& x,
+                   ::xml_schema::flags f = 0,
+                   ::xml_schema::container* c = 0);
 
-      virtual script_mdl*
+      virtual ScriptModel*
       _clone (::xml_schema::flags f = 0,
               ::xml_schema::container* c = 0) const;
 
       virtual 
-      ~script_mdl ();
+      ~ScriptModel ();
 
       // Implementation.
       //
@@ -1418,12 +1462,12 @@ namespace Damaris
       static const scope_type scope_default_value_;
     };
 
-    class actions_mdl: public ::xml_schema::type
+    class ActionsModel: public ::xml_schema::type
     {
       public:
       // event
       // 
-      typedef ::Damaris::Model::event_mdl event_type;
+      typedef ::Damaris::Model::EventModel event_type;
       typedef ::xsd::cxx::tree::sequence< event_type > event_sequence;
       typedef event_sequence::iterator event_iterator;
       typedef event_sequence::const_iterator event_const_iterator;
@@ -1440,7 +1484,7 @@ namespace Damaris
 
       // script
       // 
-      typedef ::Damaris::Model::script_mdl script_type;
+      typedef ::Damaris::Model::ScriptModel script_type;
       typedef ::xsd::cxx::tree::sequence< script_type > script_sequence;
       typedef script_sequence::iterator script_iterator;
       typedef script_sequence::const_iterator script_const_iterator;
@@ -1457,22 +1501,22 @@ namespace Damaris
 
       // Constructors.
       //
-      actions_mdl ();
+      ActionsModel ();
 
-      actions_mdl (const ::xercesc::DOMElement& e,
-                   ::xml_schema::flags f = 0,
-                   ::xml_schema::container* c = 0);
+      ActionsModel (const ::xercesc::DOMElement& e,
+                    ::xml_schema::flags f = 0,
+                    ::xml_schema::container* c = 0);
 
-      actions_mdl (const actions_mdl& x,
-                   ::xml_schema::flags f = 0,
-                   ::xml_schema::container* c = 0);
+      ActionsModel (const ActionsModel& x,
+                    ::xml_schema::flags f = 0,
+                    ::xml_schema::container* c = 0);
 
-      virtual actions_mdl*
+      virtual ActionsModel*
       _clone (::xml_schema::flags f = 0,
               ::xml_schema::container* c = 0) const;
 
       virtual 
-      ~actions_mdl ();
+      ~ActionsModel ();
 
       // Implementation.
       //
@@ -1486,12 +1530,12 @@ namespace Damaris
       script_sequence script_;
     };
 
-    class simulation_mdl: public ::xml_schema::type
+    class SimulationModel: public ::xml_schema::type
     {
       public:
       // architecture
       // 
-      typedef ::Damaris::Model::architecture_mdl architecture_type;
+      typedef ::Damaris::Model::ArchitectureModel architecture_type;
       typedef ::xsd::cxx::tree::traits< architecture_type, char > architecture_traits;
 
       const architecture_type&
@@ -1508,7 +1552,7 @@ namespace Damaris
 
       // data
       // 
-      typedef ::Damaris::Model::data_mdl data_type;
+      typedef ::Damaris::Model::DataModel data_type;
       typedef ::xsd::cxx::tree::traits< data_type, char > data_traits;
 
       const data_type&
@@ -1525,7 +1569,7 @@ namespace Damaris
 
       // actions
       // 
-      typedef ::Damaris::Model::actions_mdl actions_type;
+      typedef ::Damaris::Model::ActionsModel actions_type;
       typedef ::xsd::cxx::tree::traits< actions_type, char > actions_traits;
 
       const actions_type&
@@ -1579,30 +1623,30 @@ namespace Damaris
 
       // Constructors.
       //
-      simulation_mdl (const architecture_type&,
-                      const data_type&,
-                      const actions_type&,
-                      const name_type&);
+      SimulationModel (const architecture_type&,
+                       const data_type&,
+                       const actions_type&,
+                       const name_type&);
 
-      simulation_mdl (::std::auto_ptr< architecture_type >&,
-                      ::std::auto_ptr< data_type >&,
-                      ::std::auto_ptr< actions_type >&,
-                      const name_type&);
+      SimulationModel (::std::auto_ptr< architecture_type >&,
+                       ::std::auto_ptr< data_type >&,
+                       ::std::auto_ptr< actions_type >&,
+                       const name_type&);
 
-      simulation_mdl (const ::xercesc::DOMElement& e,
-                      ::xml_schema::flags f = 0,
-                      ::xml_schema::container* c = 0);
+      SimulationModel (const ::xercesc::DOMElement& e,
+                       ::xml_schema::flags f = 0,
+                       ::xml_schema::container* c = 0);
 
-      simulation_mdl (const simulation_mdl& x,
-                      ::xml_schema::flags f = 0,
-                      ::xml_schema::container* c = 0);
+      SimulationModel (const SimulationModel& x,
+                       ::xml_schema::flags f = 0,
+                       ::xml_schema::container* c = 0);
 
-      virtual simulation_mdl*
+      virtual SimulationModel*
       _clone (::xml_schema::flags f = 0,
               ::xml_schema::container* c = 0) const;
 
       virtual 
-      ~simulation_mdl ();
+      ~SimulationModel ();
 
       // Implementation.
       //
@@ -1635,18 +1679,18 @@ namespace Damaris
     // Parse a URI or a local file.
     //
 
-    ::std::auto_ptr< ::Damaris::Model::simulation_mdl >
+    ::std::auto_ptr< ::Damaris::Model::SimulationModel >
     simulation (const ::std::string& uri,
                 ::xml_schema::flags f = 0,
                 const ::xml_schema::properties& p = ::xml_schema::properties ());
 
-    ::std::auto_ptr< ::Damaris::Model::simulation_mdl >
+    ::std::auto_ptr< ::Damaris::Model::SimulationModel >
     simulation (const ::std::string& uri,
                 ::xml_schema::error_handler& eh,
                 ::xml_schema::flags f = 0,
                 const ::xml_schema::properties& p = ::xml_schema::properties ());
 
-    ::std::auto_ptr< ::Damaris::Model::simulation_mdl >
+    ::std::auto_ptr< ::Damaris::Model::SimulationModel >
     simulation (const ::std::string& uri,
                 ::xercesc::DOMErrorHandler& eh,
                 ::xml_schema::flags f = 0,
@@ -1655,37 +1699,37 @@ namespace Damaris
     // Parse std::istream.
     //
 
-    ::std::auto_ptr< ::Damaris::Model::simulation_mdl >
+    ::std::auto_ptr< ::Damaris::Model::SimulationModel >
     simulation (::std::istream& is,
                 ::xml_schema::flags f = 0,
                 const ::xml_schema::properties& p = ::xml_schema::properties ());
 
-    ::std::auto_ptr< ::Damaris::Model::simulation_mdl >
+    ::std::auto_ptr< ::Damaris::Model::SimulationModel >
     simulation (::std::istream& is,
                 ::xml_schema::error_handler& eh,
                 ::xml_schema::flags f = 0,
                 const ::xml_schema::properties& p = ::xml_schema::properties ());
 
-    ::std::auto_ptr< ::Damaris::Model::simulation_mdl >
+    ::std::auto_ptr< ::Damaris::Model::SimulationModel >
     simulation (::std::istream& is,
                 ::xercesc::DOMErrorHandler& eh,
                 ::xml_schema::flags f = 0,
                 const ::xml_schema::properties& p = ::xml_schema::properties ());
 
-    ::std::auto_ptr< ::Damaris::Model::simulation_mdl >
+    ::std::auto_ptr< ::Damaris::Model::SimulationModel >
     simulation (::std::istream& is,
                 const ::std::string& id,
                 ::xml_schema::flags f = 0,
                 const ::xml_schema::properties& p = ::xml_schema::properties ());
 
-    ::std::auto_ptr< ::Damaris::Model::simulation_mdl >
+    ::std::auto_ptr< ::Damaris::Model::SimulationModel >
     simulation (::std::istream& is,
                 const ::std::string& id,
                 ::xml_schema::error_handler& eh,
                 ::xml_schema::flags f = 0,
                 const ::xml_schema::properties& p = ::xml_schema::properties ());
 
-    ::std::auto_ptr< ::Damaris::Model::simulation_mdl >
+    ::std::auto_ptr< ::Damaris::Model::SimulationModel >
     simulation (::std::istream& is,
                 const ::std::string& id,
                 ::xercesc::DOMErrorHandler& eh,
@@ -1695,18 +1739,18 @@ namespace Damaris
     // Parse xercesc::InputSource.
     //
 
-    ::std::auto_ptr< ::Damaris::Model::simulation_mdl >
+    ::std::auto_ptr< ::Damaris::Model::SimulationModel >
     simulation (::xercesc::InputSource& is,
                 ::xml_schema::flags f = 0,
                 const ::xml_schema::properties& p = ::xml_schema::properties ());
 
-    ::std::auto_ptr< ::Damaris::Model::simulation_mdl >
+    ::std::auto_ptr< ::Damaris::Model::SimulationModel >
     simulation (::xercesc::InputSource& is,
                 ::xml_schema::error_handler& eh,
                 ::xml_schema::flags f = 0,
                 const ::xml_schema::properties& p = ::xml_schema::properties ());
 
-    ::std::auto_ptr< ::Damaris::Model::simulation_mdl >
+    ::std::auto_ptr< ::Damaris::Model::SimulationModel >
     simulation (::xercesc::InputSource& is,
                 ::xercesc::DOMErrorHandler& eh,
                 ::xml_schema::flags f = 0,
@@ -1715,12 +1759,12 @@ namespace Damaris
     // Parse xercesc::DOMDocument.
     //
 
-    ::std::auto_ptr< ::Damaris::Model::simulation_mdl >
+    ::std::auto_ptr< ::Damaris::Model::SimulationModel >
     simulation (const ::xercesc::DOMDocument& d,
                 ::xml_schema::flags f = 0,
                 const ::xml_schema::properties& p = ::xml_schema::properties ());
 
-    ::std::auto_ptr< ::Damaris::Model::simulation_mdl >
+    ::std::auto_ptr< ::Damaris::Model::SimulationModel >
     simulation (::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument >& d,
                 ::xml_schema::flags f = 0,
                 const ::xml_schema::properties& p = ::xml_schema::properties ());

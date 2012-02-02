@@ -41,10 +41,9 @@ namespace Damaris {
  */
 class Options {
 	private:
-		std::string* configFile; /*!< Name of the configuration file. */
-		Environment* env; /*!< Pointer to the Environment object that will be filled. */
-		Configuration* config; /*!< Pointer to the Configuration 
-					 that will be initialized. */
+		std::string configFile; /*!< Name of the configuration file. */
+		int id;
+
 	public:
 		/**
 		 * The constructor takes the same parameters than a usual program. 
@@ -53,15 +52,12 @@ class Options {
 		/**
 		 * Get the name of the configuration file.
 		 */
-		std::string* getConfigFile();
+		const std::string& getConfigFile();
+		
 		/**
-		 * Get the prepared configuration.
+		 * Get the id of the server
 		 */
-		Configuration* getConfiguration();
-		/**
-		 * Get the prepared environment.
-		 */
-		Environment* getEnvironment();
+		int getID();
 };
 }
 

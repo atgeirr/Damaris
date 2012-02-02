@@ -25,11 +25,13 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <string>
 
+#include "xml/Model.hpp"
 #include "common/MetadataManager.hpp"
 #include "common/Action.hpp"
 #include "common/DynamicAction.hpp"
 #include "common/ActionSet.hpp"
-#include "common/Singleton.hpp"
+#include "common/Configurable.hpp"
+#include "common/Environment.hpp"
 
 namespace Damaris {
 
@@ -39,17 +41,21 @@ namespace Damaris {
  * from scripts, etc. and call there functions upon reception
  * of events.
  */
-class ActionsManager : public Singleton<ActionsManager> {
-	friend class Singleton<ActionsManager>;
+class ActionsManager : //public Singleton<ActionsManager> {
+	//friend class Singleton<ActionsManager>;
+	public Configurable<ActionsManager,Model::ActionsModel> {
 
 	private:
 		ActionSet actions; /*!< Set of actions indexed by ID and name. */
-
+		Environment* environment;
 		/**
 		 * \brief Constructor.
 		 */
-		ActionsManager();				
 	public:
+		ActionsManager(Model::ActionsModel* mdl, Environment* env);
+	private:
+		void init();
+//	public:
 		/** 
 		 * \brief Adds an action defined through a dynamic library.
 		 * \param[in] eventName : Name of the event taken as a key for this action.
@@ -88,7 +94,7 @@ class ActionsManager : public Singleton<ActionsManager> {
 		 * \param[in,out] mm : Pointer to the MetadataManager.
 		 * The action to be called is here characterized by its name.
 		 */
-		void reactToUserSignal(const std::string &sig, 
+		public: void reactToUserSignal(const std::string &sig, 
 				int32_t iteration, int32_t sourceID);
 
 		/**
@@ -101,6 +107,7 @@ class ActionsManager : public Singleton<ActionsManager> {
 		 */
 		void reactToUserSignal(int sigID, 
 				int32_t iteration, int32_t sourceID);
+
 
 		/**
 		 * \brief Gets an action by name.

@@ -27,6 +27,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/interprocess/sync/interprocess_condition.hpp>
 #include <boost/interprocess/xsi_shared_memory.hpp>
 #include <boost/interprocess/mapped_region.hpp>
+#include "xml/Model.hpp"
 #include "common/Debug.hpp"
 #include "common/SharedMemory.hpp"
 
@@ -73,38 +74,41 @@ namespace Damaris {
 			SharedMessageQueue(mapped_region *mem);
 		
 		public:
+			static SharedMessageQueue* create(Model::QueueModel* mdl);
 			/**
 			 * Creates a POSIX shared message queue.
 			 */
 			static SharedMessageQueue* create(posix_shmem_t posix_shmem, 
-				const char* name, size_t num_msg, size_t size_msg);
+				const std::string& name, size_t num_msg, size_t size_msg);
 			/**
 			 * Creates an XSI shared messahe queue.
 			 */
 			static SharedMessageQueue* create(sysv_shmem_t sysv_shmem, 
-				const char* name, size_t num_msg, size_t size_msg);
+				const std::string& name, size_t num_msg, size_t size_msg);
 	
+			static SharedMessageQueue* open(Model::QueueModel* mdl);
 			/**
 			 * Opens an existing POSIX shared message queue.
 			 */
 			static SharedMessageQueue* open(posix_shmem_t posix_shmem, 
-				const char* name);
+				const std::string& name);
 
 			/**
 			 * Opens an existing XSI shared message queue.
 			 */
 			static SharedMessageQueue* open(sysv_shmem_t sysv_shmem, 
-				const char* name);
+				const std::string& name);
 	
+			static bool remove(Model::QueueModel* mdl);
 			/**
 			 * Removes a POSIX shared message queue.
 			 */
-			static bool remove(posix_shmem_t posix_shmem, const char* name);
+			static bool remove(posix_shmem_t posix_shmem, const std::string& name);
 
 			/**
 			 * Removes an XSI shared message queue.
 			 */
-			static bool remove(sysv_shmem_t sysv_shmem, const char* name);
+			static bool remove(sysv_shmem_t sysv_shmem, const std::string& name);
 	
 			/**
 			 * Sends a message. Blocks if the queue is full.

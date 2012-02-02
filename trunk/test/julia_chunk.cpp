@@ -43,7 +43,7 @@ int main(int argc, char** argv)
 	}
 
 	std::string config(argv[1]);
-	client = new Damaris::Client(config,id);
+	client = Damaris::Client::New(config,id);
 
 	std::complex<double> c(0.0,0.0);
 

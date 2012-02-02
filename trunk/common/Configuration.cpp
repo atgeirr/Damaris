@@ -36,27 +36,28 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 namespace Damaris {
 
 	Configuration::Configuration()
+	: Configurable<Configuration,Model::SimulationModel>(NULL)
 	{
 		initialized = false;
 		actionsManager = NULL;
 		metadataManager = NULL;
-		environment = NULL;
+//		environment = NULL;
 	}
 
 	Configuration::~Configuration()
 	{
-		ActionsManager::kill();
-		MetadataManager::kill();
-		Environment::kill();
+		//ActionsManager::kill();
+		//MetadataManager::kill();
+//		Environment::kill();
 
-		delete parameters;
+		//delete parameters;
 		delete configFile;
 		delete layoutInterp;
 	}
-
+/*
 	void Configuration::fillParameterSet()
 	{
-		Model::data_mdl::parameter_const_iterator p(baseModel->data().parameter().begin());
+		Model::DataModel::parameter_const_iterator p(baseModel->data().parameter().begin());
 		for(; p < baseModel->data().parameter().end(); p++) {
 			std::string name(p->name());
 			if(p->type() == "short") {
@@ -94,12 +95,13 @@ namespace Damaris {
 			}
 		}
 	}
-	
-	ParameterSet* Configuration::getParameterSet()
+*/	
+/*	ParameterSet* Configuration::getParameterSet()
 	{
 		return parameters;
 	}
-
+*/
+/*
 	MetadataManager* Configuration::getMetadataManager()
 	{
 		if(metadataManager == NULL)
@@ -114,7 +116,7 @@ namespace Damaris {
 	{
 		// build all the layouts
 		DBG("Start filling the metadata manager");
-		Model::data_mdl::layout_const_iterator l(baseModel->data().layout().begin());
+		Model::DataModel::layout_const_iterator l(baseModel->data().layout().begin());
 
 		for(;l != baseModel->data().layout().end(); l++)
 		{
@@ -152,7 +154,7 @@ namespace Damaris {
 		}
 		
 		// build all the variables in root group
-		Model::data_mdl::variable_const_iterator v(baseModel->data().variable().begin());
+		Model::DataModel::variable_const_iterator v(baseModel->data().variable().begin());
 		for(; v != baseModel->data().variable().end(); v++)
 		{
 			std::string name = (std::string)(v->name());
@@ -161,18 +163,18 @@ namespace Damaris {
 		}		
 
 		// build all variables in sub-groups
-		Model::data_mdl::group_const_iterator g(baseModel->data().group().begin());
+		Model::DataModel::group_const_iterator g(baseModel->data().group().begin());
 		for(; g != baseModel->data().group().end(); g++)
 			readVariablesInSubGroup(&(*g),(std::string)(g->name()));
 	}
 
-	void Configuration::readVariablesInSubGroup(const Model::group_mdl *g, 
+	void Configuration::readVariablesInSubGroup(const Model::GroupModel *g, 
 			const std::string& groupName)
 	{
 		// first check if the group is enabled
 		if(!(g->enabled())) return;
 		// build recursively all variable in the subgroup
-		Model::data_mdl::variable_const_iterator v(g->variable().begin());
+		Model::DataModel::variable_const_iterator v(g->variable().begin());
                 for(; v != g->variable().end(); v++)
                 {
 			std::string name = (std::string)(v->name());
@@ -182,17 +184,18 @@ namespace Damaris {
                 }
 
 		// build recursively all the subgroups
-		Model::data_mdl::group_const_iterator subg(g->group().begin());
+		Model::DataModel::group_const_iterator subg(g->group().begin());
 		for(; subg != g->group().end(); subg++)
 			readVariablesInSubGroup(&(*subg),groupName 
 							 + "/" + (std::string)(subg->name()));
 	}
-
+*/
+/*
 	ActionsManager* Configuration::getActionsManager()
 	{
 		if(actionsManager == NULL)
 		{
-			actionsManager = ActionsManager::getInstance();
+//			actionsManager = ActionsManager::getInstance();
 			fillActionsManager();
 		}
 		return actionsManager;
@@ -200,34 +203,36 @@ namespace Damaris {
 
 	void Configuration::fillActionsManager()
 	{
-		Model::actions_mdl::event_const_iterator e(baseModel->actions().event().begin());
+		Model::ActionsModel::event_const_iterator e(baseModel->actions().event().begin());
 		for(; e < baseModel->actions().event().end(); e++) {
 			actionsManager->addDynamicAction(e->name(),e->library(),e->action(),e->scope());
 		}
-		Model::actions_mdl::script_const_iterator s(baseModel->actions().script().begin());
+		Model::ActionsModel::script_const_iterator s(baseModel->actions().script().begin());
 		for(; s < baseModel->actions().script().end(); s++) {
 			actionsManager->addScriptAction(s->name(),s->file(),s->language(),s->scope());
 		}
 	}
-
+*/
+/*
 	Environment* Configuration::getEnvironment()
 	{
 		return environment;
 	}
-	
-	void Configuration::initialize(std::auto_ptr<Model::simulation_mdl> mdl, const std::string& cfgFile)
+*/	
+	void Configuration::initialize(std::auto_ptr<Model::SimulationModel> mdl, 
+			const std::string& cfgFile)
 	{
 		configFile = new std::string(cfgFile);
 		baseModel = mdl;
-		Model::simulation_mdl* tmpModel = baseModel.get();
-
+//		Model::SimulationModel* tmpModel = baseModel.get();
+/*
 		parameters = new ParameterSet();
 		fillParameterSet();
-		
-		environment = Environment::getInstance();
+*/		
+/*		environment = Environment::getInstance();
 		environment->initialize(tmpModel);
-
-		layoutInterp = new Calc<std::string::const_iterator,ParameterSet>(*parameters);
+*/
+//		layoutInterp = new Calc<std::string::const_iterator,ParameterSet>(*parameters);
 		initialized = true;
 	}
 }

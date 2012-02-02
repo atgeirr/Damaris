@@ -29,7 +29,7 @@
 
 #include "xml/Model.hpp"
 #include "common/Language.hpp"
-#include "common/Singleton.hpp"
+#include "common/Configurable.hpp"
 
 namespace Damaris {
 
@@ -37,12 +37,10 @@ namespace Damaris {
 	 * The class Environment holds all local informations
 	 * such as the id of the enclosing process.
 	 */
-	class Environment : public Singleton<Environment> {
-		friend class Singleton<Environment>;
+	class Environment : public Configurable<Environment,Model::SimulationModel> { // : public Singleton<Environment> {
+//		friend class Singleton<Environment>;
 	private:
-		bool initialized;
-
-		Model::simulation_mdl* baseModel; /*! Pointer to the base model. */
+//		Model::SimulationModel* baseModel; /*! Pointer to the base model. */
 		int id; /*!< ID of the process. */
 	
 		MPI_Comm entityComm; /*!< clients or servers communicator (depending on the entity). */
@@ -53,20 +51,16 @@ namespace Damaris {
 		 * \param[in] mdl : base model from the configuration file.
 		 * \param[in] i : id of the process.
 		 */
-		Environment();
+	public:
+		Environment(Model::SimulationModel* mdl);
 		/**
 		 * Destructor.
 		 */
 		~Environment();
+	private:
+		void init();
 
 	public:
-		/**
-		 * \brief Initialize the Environment singleton object.
-		 * \param[in] mdl : base model from the configuration file.
-		 * \param[in] i : id of the process.
-		 */
-		void initialize(Model::simulation_mdl* mdl);
-
 		/**
 		 * \brief Get the ID of the server.
 		 * \return ID of the server.

@@ -35,8 +35,23 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Damaris {
 
-ActionsManager::ActionsManager()
+ActionsManager::ActionsManager(Model::ActionsModel* mdl, Environment* env)
+: Configurable<ActionsManager,Model::ActionsModel>(mdl)
 {
+	environment = env;
+	init();
+}
+
+void ActionsManager::init()
+{
+	Model::ActionsModel::event_const_iterator e(model->event().begin());
+	for(; e < model->event().end(); e++) {
+		addDynamicAction(e->name(),e->library(),e->action(),e->scope());
+	}
+	Model::ActionsModel::script_const_iterator s(model->script().begin());
+	for(; s < model->script().end(); s++) {
+		addScriptAction(s->name(),s->file(),s->language(),s->scope());
+	}
 }
 
 /* This function load an action from a dynamic library. 
@@ -63,12 +78,11 @@ void ActionsManager::addDynamicAction(const std::string& eventName,
 	Action* a = NULL;
 	DBG("scope = " << scope);
 
-	Environment* env = Environment::getInstance();
 	// create the action
 	a = new DynamicAction(functionName,fileName);
-	if(scope == "core" || (not env->hasServer())) { }
+	if(scope == "core" || (not environment->hasServer())) { }
 	else if(scope == "node") {
-		a = new NodeAction(a,env->getClientsPerNode());
+		a = new NodeAction(a,environment->getClientsPerNode());
 	} else {
 		ERROR("Undefined event scope \"" << scope << "\" (must be \"core\" or \"node\")");
 		delete a;
@@ -107,8 +121,7 @@ void ActionsManager::addScriptAction(const std::string& name,
 	
 	if(scope == "core") { }
 	else if (scope == "node") {
-		Environment* env = Environment::getInstance();
-		a = new NodeAction(a,env->getClientsPerNode());
+		a = new NodeAction(a,environment->getClientsPerNode());
 	} else {
 		ERROR("Undefined event scope \"" << scope << "\" (must be \"core\" or \"node\")");
 		delete a;
