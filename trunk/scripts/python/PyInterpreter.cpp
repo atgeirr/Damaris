@@ -46,7 +46,7 @@ static bp::object damaris_dict;
 
 static bp::object open(const std::string& varname)
 {
-	MetadataManager* metadata = Process::getInstance()->getMetadataManager();
+	MetadataManager* metadata = Process::get()->getMetadataManager();
 	Variable* v = metadata->getVariable(varname);
 	if(v == NULL) {
 		return bp::object();
@@ -57,7 +57,7 @@ static bp::object open(const std::string& varname)
 
 static bp::object clear()
 {
-	MetadataManager* metadata = Process::getInstance()->getMetadataManager();
+	MetadataManager* metadata = Process::get()->getMetadataManager();
 	VariableSet& varset = metadata->getVariableSet();
 	VariableSet::index<by_id>::type::iterator it, end;
 	it = varset.get<by_id>().begin();

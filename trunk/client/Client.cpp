@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Client.cpp
- * \date October 2011
+ * \date February 2012 
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  * \see Client.hpp
  */
 #include <string.h>
@@ -28,90 +28,26 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <exception>
 
 #include "common/Debug.hpp"
-#include "common/ChunkHandle.hpp"
 #include "common/ShmChunk.hpp"
 #include "common/Message.hpp"
 #include "client/Client.hpp"
 
 namespace Damaris {
-/*	
-	Client::Client()
-	{ }
-*/
+	
 	Client* Client::New(const std::string &cfg, int32_t id)
 	{
-		Process* p = new Process(cfg,id);
+		Process::initialize(cfg,id);
+		Process* p = Process::get();
 		p->openSharedStructures();
 		return new Client(p);
 	}
 
 	Client::Client(Process* p)
 	{
+		FATAL((p == NULL),"Fatal error in Client constructor, Process pointer is NULL");
 		process = p;
 	}	
-/*	Client::Client(const std::string & configfile, int32_t coreID)
-	{
-		// creates the configuration object from the configuration file 
-		DBG("Starting Damaris client");
-		try {
-			std::auto_ptr<Model::SimulationModel> 
-				mdl(Model::simulation(configfile.c_str(),
-						xml_schema::flags::dont_validate));
-			DBG("Model initialized successfuly");
 
-			config = Configuration::getInstance();
-			config->initialize(mdl,configfile);
-			DBG("Configuration intialized successfuly");
-
-			env = config->getEnvironment();
-			env->setID(coreID);
-			DBG("Environment initialized succesfuly");
-			init(config);
-		} catch(xml_schema::exception &e) {
-			ERROR(e.what());
-			exit(-1);
-		}
-	}
-
-	Client::Client(Configuration* config)
-	{
-		init(config);
-	}
-
-	void Client::init(Configuration* config)
-	{
-		env = config->getEnvironment();
-
-		metadataManager = config->getMetadataManager();
-		ASSERT(metadataManager != NULL);
-		
-		actionsManager = config->getActionsManager();
-		ASSERT(metadataManager != NULL);
-		// initializes the shared structures 
-		try {
-#ifdef __SYSV
-			msgQueue = SharedMessageQueue::open(sysv_shmem,
-					env->getMsgQueueName().c_str());
-			segment = SharedMemorySegment::open(sysv_shmem,
-					env->getSegmentName().c_str());
-#else
-			msgQueue = SharedMessageQueue::open(posix_shmem,
-					env->getMsgQueueName().c_str());
-			segment = SharedMemorySegment::open(posix_shmem,
-					env->getSegmentName().c_str());
-#endif
-			DBG("Client initialized successfully for core " << env->getID() 
-			    << " with configuration \"" << config->getFileName() << "\"");
-		}
-		catch(interprocess_exception &ex) {
-			ERROR("While initializing shared memory objects:  " << ex.what());
-			exit(-1);
-		}
-
-		metadataManager = config->getMetadataManager();
-		actionsManager = config->getActionsManager();
-	}
-	*/
 	void* Client::alloc(const std::string & varname, int32_t iteration)
 	{
 
@@ -348,7 +284,6 @@ namespace Damaris {
 
 	int Client::get_parameter(const std::string & paramName, void* buffer)
 	{
-//		config->getParameterSet()
 		// TODO
 		return -1;
 	}
@@ -391,7 +326,7 @@ namespace Damaris {
 	
 	Client::~Client() 
 	{
-		delete process;
+		Process::kill();
 		DBG("Client destroyed successfuly");
 	}
 	

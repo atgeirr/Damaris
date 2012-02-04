@@ -16,10 +16,11 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file DynamicAction.cpp
- * \date October 2011
+ * \date February 2012
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  */
+#include <dlfcn.h>
 #include "common/Debug.hpp"
 #include "common/DynamicAction.hpp"
 

@@ -16,11 +16,11 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file ClientC.cpp
- * \date October 2011
+ * \date February 2012
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  * \see Client.hpp Client.h
- * Definition of the function used in the C binding.
+ * Definition of the client function used in the C binding.
  */
 #include "client/Client.hpp"
 

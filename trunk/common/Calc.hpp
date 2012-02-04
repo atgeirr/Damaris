@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Calc.hpp
- * \date September 2011
+ * \date February 2012 
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  * 
  * This file defines the Calc structure, which is used to
  * compute list of values from a string representation of a Layout
@@ -44,6 +44,7 @@ namespace Damaris {
  * representation of a Layout. The input is a comma-separated
  * list of arythmetic expressions using +, -, *, /, % and
  * identifier whose value is defined in a SymTable mapping.
+ * The "?" string can also be parser and returns the array [-1].
  */
 template <typename Iterator, typename SymTable>
 struct Calc : qi::grammar<Iterator, std::vector<int>(), ascii::space_type>

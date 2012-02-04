@@ -46,7 +46,7 @@ int main(int argc, char** argv)
 
 	std::string config(argv[1]);
 
-	Damaris::Client* client = Damaris::start_mpi_entity(config,global);
+	Damaris::Client* client = Damaris::Initiator::start(config,global);
 
 	if(client != NULL) {
 		comm = client->get_clients_communicator();

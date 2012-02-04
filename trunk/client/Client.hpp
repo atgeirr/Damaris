@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Client.hpp
- * \date October 2011
+ * \date February 2012
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  * 
  * Client.hpp is the main file to be included in a C++ 
  * client in order to access the main client-side functions
@@ -33,12 +33,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "common/Writer.hpp"
 #include "common/Process.hpp"
-#include "common/Environment.hpp"
-#include "common/Configuration.hpp"
-#include "common/SharedMessageQueue.hpp"
-#include "common/SharedMemorySegment.hpp"
-#include "common/ActionsManager.hpp"
-#include "common/MetadataManager.hpp"
 #include "common/ChunkHandle.hpp"
 #include "common/Layout.hpp"
 
@@ -48,6 +42,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  */
 namespace Damaris {
 
+class Initiator;
 /**
  * \class Client
  * The Client object represents a single core running the
@@ -56,21 +51,22 @@ namespace Damaris {
  */
 class Client : public Writer {
 
-	private:
-		Process* process;
+	friend class Initiator;
 
-	public:
+	private:
+		Process* process; /*!< The Process object holding the ActionsManager,
+				    MetadataManager, SharedMessageQueue, SharedMemorySegment */
+
 		/** 
 		 * \brief Constructor.
-		 * Initializes the client given the name of a configuration file and an ID. 
-		 * Damaris won't check if two clients have the same ID so the user shoud be
-		 * careful with that.
+		 * Initializes the client given an already built Process object.
+		 * This constructor is private, only the Initiator class can access it.
 		 *
-		 * \param[in] config : name of an XML configuration file.
-		 * \param[in] id : id of the client (should be unique).
+		 * \param[in] p : pointer to a initialized Process object, required to be not-null.
 		 */
 		Client(Process* p);
 
+	public:
 		static Client* New(const std::string& file, int32_t id);
 
 		/**

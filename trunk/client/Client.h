@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Client.h
- * \date October 2011
+ * \date February 2012 
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  * Main header to include in a C client.
  */
 #ifndef __DAMARIS_CLIENT_C_H
@@ -94,7 +94,7 @@ int 	DC_signal(const char* signal_name, int32_t iteration);
 
 /**
  * \brief Retrieve the value associated to a parameter.
- * \see Damaris::Client::getParameter
+ * \see Damaris::Client::get_parameter
  * \param[in] param_name : name of the parameter.
  * \param[out] buffer : pointer to the buffer to hold the value.
  * \return 0 in case of success, -1 if the parameter does not exist.

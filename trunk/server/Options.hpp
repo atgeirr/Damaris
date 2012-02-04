@@ -28,7 +28,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <string>
 
-#include "common/Configuration.hpp"
 #include "common/Environment.hpp"
 
 namespace Damaris {

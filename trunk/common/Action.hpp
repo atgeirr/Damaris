@@ -16,14 +16,13 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Action.hpp
- * \date October 2011
+ * \date February 2012
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  */
 #ifndef __DAMARIS_ACTION_H
 #define __DAMARIS_ACTION_H
 
-#include <dlfcn.h>
 #include <stdint.h>
 #include <string>
 
@@ -31,12 +30,14 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Damaris {
 
+class Action;
 class ActionsManager;
+
 /**
  * The Action object is an interface to a user-defined action.
- * It is an abstract class that.
+ * It is an abstract class, child classes must overwrite the Action::call 
+ * and Action::load functions.
  */
-
 class Action {
 	friend class ActionsManager;
 
@@ -50,7 +51,7 @@ class Action {
 		/**
 		 * \brief Constructor.
 		 * Builds an anonymous action without name of ID. 
-		 * Accessible only to friend classes who will set the name and ID themselves.
+		 * Accessible only to the ActionsManager class which can set the name and ID itself.
 		 */
 		Action();
 	public:
@@ -103,8 +104,23 @@ class Action {
 		 * is called (lazy loading).
 		 */
 		virtual void load() = 0;
+
+		
+		class EmptyAction; 
 };
 
+/**
+ * The EmptyAction class inherites from the Action class and
+ * defines an action that does nothing. It is loaded when an error occured
+ * and the system is unable to create a regular Action (e.g. the configuration
+ * defines a Python action but Python has not been enabled in Damaris at compile time).
+ */
+class Action::EmptyAction : public Action {
+
+	void call(int32_t iteration, int32_t sourceID) { }
+
+	void load() {}
+};
 }
 
 #endif

@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Debug.hpp
- * \date October 2011
+ * \date February 2012 
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  *
  * Debug.hpp contains all macros to print informations, error messages, etc.
  */
@@ -89,7 +89,13 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #define ASSERT(expression)
 #endif
 
-#endif
+#define FATAL(expression,msg) {\
+	if(expression) {\
+		std::ostringstream out; \
+		MESSAGE(out, "FATAL", msg);\
+		throw std::runtime_error(out.str()); \
+	}\
+	}
 
 #ifdef __DEBUG_ALL
 #define DBG(message) MESSAGE(std::cout, "DEBUG", message)
@@ -101,4 +107,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #else
 #define DBG(message)
 #endif
+#endif
+
 #endif

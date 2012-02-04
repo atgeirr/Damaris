@@ -23,14 +23,14 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 #include <list>
 #include "common/Debug.hpp"
-#include "common/Environment.hpp"
-#include "common/SharedMemorySegment.hpp"
-#include "common/Configuration.hpp"
+//#include "common/Environment.hpp"
+//#include "common/SharedMemorySegment.hpp"
+//#include "common/Configuration.hpp"
 #include "server/Server.hpp"
 #include "common/Message.hpp"
 #include "common/ShmChunk.hpp"
 #include "common/Layout.hpp"
-#include "common/SharedMemory.hpp"
+//#include "common/SharedMemory.hpp"
 
 Damaris::Server *server;
 
@@ -38,7 +38,8 @@ namespace Damaris {
 
 Server* Server::New(const std::string& cfgfile, int32_t id)
 {
-	Process* p = new Process(cfgfile,id);
+	Process::initialize(cfgfile,id);
+	Process* p = Process::get();
 	p->createSharedStructures();
 	return new Server(p);
 }
@@ -137,16 +138,7 @@ Server::Server(Process* p)
 /* destructor */
 Server::~Server()
 {
-	delete process;
-/*
-#ifdef __SYSV
-	SharedMessageQueue::remove(sysv_shmem,env->getMsgQueueName().c_str());
-	SharedMemorySegment::remove(sysv_shmem,env->getSegmentName().c_str());
-#else
-	SharedMessageQueue::remove(posix_shmem,env->getMsgQueueName().c_str());
-	SharedMemorySegment::remove(posix_shmem,env->getSegmentName().c_str());
-#endif
-*/
+	Process::kill();
 }
 	
 /* starts the server and enter the main loop */
@@ -412,117 +404,5 @@ void* Server::alloc(const std::string & varname, int32_t iteration)
 		return -1;
 	}
 */
-
-#ifdef __ENABLE_MPI
-Client* start_mpi_entity(const std::string& configFile, MPI_Comm globalcomm)
-{
-	/* Global rank and size in the passed communicator */
-	int size, rank;
-	MPI_Comm_size(globalcomm,&size);
-	MPI_Comm_rank(globalcomm,&rank);
-
-/*
-	std::auto_ptr<Model::SimulationModel> mdl;
-	try { 
-		mdl(Model::simulation(configFile.c_str(),xml_schema::flags::dont_validate));
-	} catch (xml_schema::exception &e) {
-		ERROR(e.what());
-		MPI_Abort(MPI_COMM_WORLD,-1);
-	}
-	int clpn = mdl->architecture().cores().clients().count();
-        int copn = mdl->architecture().cores().count();
-*/
-	Process* p = new Process(configFile,rank);
-	
-	Environment* env = p->getEnvironment();
-	env->setGlobalComm(globalcomm);
-	int clpn = env->getClientsPerNode();
-	int copn = env->getCoresPerNode();
-
-	/* The name of the processor is used to compute communicators */
-	char procname[MPI_MAX_PROCESSOR_NAME];
-	int len;
-	MPI_Get_processor_name(procname,&len);
-
-	/* Compute the node identifier from the name */
-	uint64_t nhash = (uint64_t)(14695981039346656037ULL);
-	uint64_t fnv =  ((uint64_t)1 << 40) + (1 << 8) + 0xb3;
-	for(int i=0; i < len; i++) {
-		uint64_t c = (uint64_t)(procname[i]);
-		nhash = nhash xor c;
-		nhash *= fnv;
-	}
-
-	/* Create a new communicator gathering processes of the same node */
-	int color = ((int)nhash >= 0) ? (int)nhash : - ((int)nhash);
-	MPI_Comm nodecomm;
-	MPI_Comm_split(globalcomm,color,rank,&nodecomm);
-	env->setNodeComm(nodecomm);
-	
-	/* Get the size and rank in the node */
-	int rankInNode;
-	int sizeOfNode;
-	MPI_Comm_rank(nodecomm,&rankInNode);
-	MPI_Comm_size(nodecomm,&sizeOfNode);
-	
-	if(copn - clpn > 1) {
-		ERROR("The number of dedicated cores per node"
-			<< " must be either 0 or 1 in this version. Aborting...");
-		MPI_Abort(MPI_COMM_WORLD,-1);
-	}
-
-	/* Check that the values match */
-	if(sizeOfNode != copn) {
-		ERROR("The number of cores detected in node does not match the number" 
-			<< " provided in configuration."
-			<< " This may be due to a configuration error or a (unprobable)"
-			<< " hash colision in the algorithm. Aborting...");
-		MPI_Abort(MPI_COMM_WORLD,-1);
-	}
-
-	/* Compute the communcator for clients and servers */
-	int is_client = (rankInNode >= clpn) ? 0 : 1;
-	MPI_Comm entitycomm;
-	MPI_Comm_split(globalcomm,is_client,rank,&entitycomm);
-	env->setEntityComm(entitycomm);
-	
-	/* Get rank and size in the entity communicator */
-	int rankInEnComm, sizeOfEnComm;
-	MPI_Comm_rank(entitycomm,&rankInEnComm);
-	MPI_Comm_size(entitycomm,&sizeOfEnComm);
-
-	if(not (copn == clpn)) {
-		// dedicated core mode : the number of servers to create is strictly positive
-		if(is_client) {
-			DBG("Client starting, rank = " << rank);
-			// the following barrier ensures that the client
-			// won't be created before the servers are started.
-			MPI_Barrier(globalcomm);
-			p->openSharedStructures();
-			return new Client(p);
-		} else {
-			DBG("Server starting, rank = " << rank);
-			p->createSharedStructures();
-			Server server(p);
-			MPI_Barrier(globalcomm);
-			server.run();
-			return NULL;
-		}
-	} else {
-		// synchronous mode : the servers are attached to each client
-/*
-		if(rankInNode != 0) {
-			MPI_Barrier(globalcomm);
-			return new SecondaryServer(p);
-		} else {
-			Server* s = new Server(p);
-			MPI_Barrier(globalcomm);
-			return s;
-		}
-*/
-		return NULL;
-	}
-}	
-#endif
 
 }

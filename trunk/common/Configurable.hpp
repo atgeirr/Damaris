@@ -18,23 +18,32 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \file Configurable.hpp
  * \date February 2012
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  */
 #ifndef __DAMARIS_CONFIGURABLE_H
 #define __DAMARIS_CONFIGURABLE_H
 
 namespace Damaris {
 
+/**
+ * Configurable is an abstract class for any object that is
+ * build uppon a model (instance of ModelClass) and keeps a
+ * pointer over this model.
+ */
 template<typename ChildClass, typename ModelClass>
 	class Configurable {
+	
 		protected:
-			ModelClass* model;
+			ModelClass* model; /*!< Pointer to the base model. */
+
 		public:
+			/**
+			 * The constructor takes a model as a parameter.
+			 */
 			Configurable(ModelClass* mdl) {
 				model = mdl;
 			}
 	};
-
 }
 
 #endif

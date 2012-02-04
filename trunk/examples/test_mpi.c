@@ -44,7 +44,7 @@ int main(int argc, char** argv)
 	
 	MPI_Init(&argc,&argv);
 
-	if(DC_start_mpi_entity(argv[1],all)) {
+	if(DC_mpi_start(argv[1],all)) {
 		clients = DC_get_clients_communicator();
 		MPI_Comm_rank(clients,&rank);
 		MPI_Comm_size(clients,&size);

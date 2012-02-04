@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file ActionsSet.hpp
- * \date October 2011
+ * \date February 2012 
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  */
 #ifndef __DAMARIS_ACTIONS_SET_H
 #define __DAMARIS_ACTIONS_SET_H
@@ -35,7 +35,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 namespace Damaris {
 /**
  * ActionsSet is a container based on Boost Multi-Index, it indexes Actions by
- * ID and by names (each ID appears only one, each name appears only once).
+ * ID and by names (each ID appears only once, each name appears only once).
  */
 typedef boost::multi_index_container<
         boost::shared_ptr<Action>,

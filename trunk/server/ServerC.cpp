@@ -22,6 +22,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <mpi.h>
 
+#include "server/Initiator.hpp"
 #include "server/Server.hpp"
 
 extern Damaris::Server* server; // defined in Server.cpp
@@ -34,19 +35,15 @@ extern "C" {
 	int DC_server(const char* configFile, int server_id)
 	{
 		std::string config_str(configFile);
-		Damaris::Process* process = new Damaris::Process(config_str,server_id);
-		process->createSharedStructures();
-		server = new Damaris::Server(process);
+		server = Damaris::Server::New(config_str,server_id);
 		server->run();
 		delete server;
 		return 0;
 	}
 
-#ifdef __ENABLE_MPI
-	int DC_start_mpi_entity(const char* configFile, MPI_Comm globalcomm)
+	int DC_mpi_start(const char* configFile, MPI_Comm globalcomm)
 	{
-		client = Damaris::start_mpi_entity(std::string(configFile),globalcomm);
+		client = Damaris::Initiator::start(std::string(configFile),globalcomm);
 		return (client != NULL);
 	}
-#endif
 }

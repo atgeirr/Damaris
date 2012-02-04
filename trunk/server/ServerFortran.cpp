@@ -34,6 +34,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <mpi.h>
 
+#include "server/Initiator.hpp"
 #include "server/Server.hpp"
 
 extern Damaris::Server *server;
@@ -45,18 +46,16 @@ void FC_FUNC_GLOBAL(df_server,DF_SERVER)
 	(char* configFile_f, int32_t* server_id_f, int32_t* ierr_f, int32_t configFile_size)
 	{
 		std::string config_str(configFile_f,configFile_size);
-		Damaris::Process* process = new Damaris::Process(config_str,*server_id_f);
-		process->createSharedStructures();
-		server = new Damaris::Server(process);
+		server = Damaris::Server::New(config_str,*server_id_f);
 		*ierr_f = server->run();
 		delete server;
 	}
 
-void FC_FUNC_GLOBAL(df_start_mpi_entity,DF_START_MPI_ENTITY)
+void FC_FUNC_GLOBAL(df_mpi_start,DF_START_MPI_ENTITY)
 	(char* configFile_f, MPI_Fint* globalcomm, int* result, int configsize)
 	{
 		MPI_Comm oc = MPI_Comm_f2c(*globalcomm);
-		client = Damaris::start_mpi_entity(std::string(configFile_f,configsize),oc);
+		client = Damaris::Initiator::start(std::string(configFile_f,configsize),oc);
 		*result = (client != NULL) ? 1 : 0;
 	}
 }

@@ -26,17 +26,17 @@
 #include <string>
 #include <mpi.h>
 
-#include "client/Client.hpp"
 #include "common/Message.hpp"
+#include "common/Process.hpp"
+#include "server/Initiator.hpp"
 
 namespace Damaris {
 
 	class Server {
+		friend class Initiator;
+
 		private:
 			Process* process;
-		public:
-
-			static Server* New(const std::string& cfgfile, int32_t id);
 
 			/**
 			 * \brief Constructor.
@@ -47,15 +47,9 @@ namespace Damaris {
 			 */
 			Server(Process* p);
 
-			/**
-			 * \brief Constructor. 
-			 * Used by the standalone server program, which pre-initializes 
-			 * a configuration through command line arguments, 
-			 * and a pre-initialized environment 
-			 *
-			 * \param[in] config : a fully initialized Configuration object.
-			 */
-//			Server(Configuration* config);
+		public:
+
+			static Server* New(const std::string& cfgfile, int32_t id);
 
 			/**
 			 * \brief Destructor 
@@ -77,11 +71,6 @@ namespace Damaris {
 
 			int needStop; /*!< indicates wether the server has to 
 					exit the main loop at the next iteration. */
-
-			/** 
-			 * Initializes everything (called by constructors).
-			 */
-//			virtual void init();
 
 			/** 
 			 * This function processes an incoming message (no way?!).
@@ -132,16 +121,6 @@ namespace Damaris {
 			 */
 //			int kill_server();
 	}; // class Server
-
-	/**
-	 * \brief Starts the entities according to the configuration file.
-	 * If the process is a client, a valid pointer over a Client object is returned.
-	 * If the process is a server, this function starts the server loop and
-	 * blocks, returning only when the server is kill through the kill_server function
-	 * of clients, and the returned value is a NULL pointer.
-	 * If a problem occurs in this function, the program will abort.
-	 */
-	Client* start_mpi_entity(const std::string& config, MPI_Comm globalcomm);
 
 } // namespace Damaris
 

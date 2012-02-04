@@ -16,11 +16,10 @@
  ********************************************************************/
 /**
  * \file Environment.hpp
- * \date October 2011
+ * \date February 2012
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  */
-
 #include "common/Debug.hpp"
 #include "common/Environment.hpp"
 
@@ -42,30 +41,6 @@ namespace Damaris {
 		nodeComm   = MPI_COMM_NULL;
 	}
 
-/*
-	const std::string & Environment::getMsgQueueName() const
-	{
-		return model->queue().name();
-	}
-*/
-/*
-	size_t Environment::getMsgQueueSize() const
-	{
-		return (size_t)(baseModel->architecture().queue().size());
-	}
-*/
-/*
-	const std::string & Environment::getSegmentName() const
-	{
-		return baseModel->architecture().buffer().name();
-	}
-*/
-/*
-	size_t Environment::getSegmentSize() const
-	{
-		return (size_t)(baseModel->architecture().buffer().size());
-	}
-*/
 	int Environment::getCoresPerNode() const
 	{
 		return model->architecture().cores().count();

@@ -15,17 +15,40 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file Damaris.hpp
- * \date October 2011
+ * \file Initiator.hpp
+ * \date February 2012
  * \author Matthieu Dorier
- * \version 0.3
- * Main file to be included in simulations.
+ * \version 0.4
  */
-#ifndef __DAMARIS_H
-#define __DAMARIS_H
+#ifndef __DAMARIS_INITIATOR_H
+#define __DAMARIS_INITIATOR_H
 
-#include "server/Initiator.hpp"
-#include "client/Client.hpp"
+#include <string>
+#include <vector>
+#include <stdint.h>
+#include <mpi.h>
+
 #include "server/Server.hpp"
+#include "client/Client.hpp"
+
+namespace Damaris {
+
+class Client;
+
+/**
+ * \class Initiator
+ * This class is here so we can set the Client and Server constructors as private,
+ * forcing the user to use the Client::New() and Server::New() functions.
+ * It also provides the necessary tools for communicator splitting and process
+ * creation.
+ */
+class Initiator {
+
+	public:
+		static Client* start(const std::string& configFile, MPI_Comm globalcomm);
+
+}; // class Initiator
+
+} // namespace Damaris
 
 #endif

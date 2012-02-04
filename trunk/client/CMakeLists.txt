@@ -14,7 +14,6 @@ set(DAMARIS_COMMON_SRC
 	${DAMARIS_SOURCE_DIR}/common/SharedMessageQueue.cpp
 	${DAMARIS_SOURCE_DIR}/common/SharedMemorySegment.cpp
 	${DAMARIS_SOURCE_DIR}/common/Environment.cpp
-	${DAMARIS_SOURCE_DIR}/common/Configuration.cpp
 	${DAMARIS_SOURCE_DIR}/common/Variable.cpp
 	${DAMARIS_SOURCE_DIR}/common/MetadataManager.cpp
 	${DAMARIS_SOURCE_DIR}/common/Action.cpp
@@ -27,13 +26,17 @@ set(DAMARIS_COMMON_SRC
 	${DAMARIS_SOURCE_DIR}/common/Types.cpp 
 	${DAMARIS_SOURCE_DIR}/common/Layout.cpp)
 
-set(DAMARIS_SCRIPTS_SRC
+
+if(PYTHON_LIB)
+  set(DAMARIS_SCRIPTS_SRC
+	${DAMARIS_SCRIPTS_SRC}
 	${DAMARIS_SOURCE_DIR}/scripts/python/PyInterpreter.cpp
 	${DAMARIS_SOURCE_DIR}/scripts/python/PyVariable.cpp
 	${DAMARIS_SOURCE_DIR}/scripts/python/PyAction.cpp
 	${DAMARIS_SOURCE_DIR}/scripts/python/PyChunk.cpp
 	${DAMARIS_SOURCE_DIR}/scripts/python/PyLayout.cpp
 	${DAMARIS_SOURCE_DIR}/scripts/python/PyTypes.cpp)
+endif(PYTHON_LIB)
 
 add_library (damaris ${DAMARIS_CLIENT_SRC}
 		     ${DAMARIS_MODEL_SRC}

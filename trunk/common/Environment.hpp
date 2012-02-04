@@ -16,9 +16,9 @@
  ********************************************************************/
 /**
  * \file Environment.hpp
- * \date October 2011
+ * \date February 2012 
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  */
 
 #ifndef __DAMARIS_ENVIRONMENT_H
@@ -37,28 +37,32 @@ namespace Damaris {
 	 * The class Environment holds all local informations
 	 * such as the id of the enclosing process.
 	 */
-	class Environment : public Configurable<Environment,Model::SimulationModel> { // : public Singleton<Environment> {
-//		friend class Singleton<Environment>;
+	class Environment : public Configurable<Environment,Model::SimulationModel> { 
+
 	private:
-//		Model::SimulationModel* baseModel; /*! Pointer to the base model. */
 		int id; /*!< ID of the process. */
 	
 		MPI_Comm entityComm; /*!< clients or servers communicator (depending on the entity). */
 		MPI_Comm globalComm; /*!< global communicator. */
 		MPI_Comm nodeComm;   /*!< communicator for the processors in the node. */
+
 		/**
-		 * \brief Constructor taking a base model and an ID. 
-		 * \param[in] mdl : base model from the configuration file.
-		 * \param[in] i : id of the process.
+		 * This function is called by the constructor to help initializing from
+		 * the input model.
 		 */
+		void init();	
+
 	public:
+		/**
+		 * \brief Constructor taking a base model. 
+		 * \param[in] mdl : base model from the configuration file.
+		 */
 		Environment(Model::SimulationModel* mdl);
+	
 		/**
 		 * Destructor.
 		 */
 		~Environment();
-	private:
-		void init();
 
 	public:
 		/**

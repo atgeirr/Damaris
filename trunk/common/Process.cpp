@@ -15,11 +15,11 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file Client.cpp
- * \date October 2011
+ * \file Process.cpp
+ * \date February 2012
  * \author Matthieu Dorier
  * \version 0.3
- * \see Client.hpp
+ * \see Process.hpp
  */
 #include <string.h>
 #include <string>
@@ -33,7 +33,35 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 namespace Damaris {
 
 	Process* Process::_instance = NULL;
-	bool Process::_instanciated = false;
+
+	void Process::initialize(const std::string &configfile, int32_t id)
+	{
+		if(_instance != NULL) {
+			ERROR("Calling Process:initialize() twice");
+			return;
+		}
+		_instance = new Process(configfile,id);
+	}
+
+	Process* Process::get()
+	{
+		if(_instance == NULL) {
+			ERROR("Calling Process::get() before Process::initialize()");
+			return NULL;
+		}
+		return _instance;
+	}
+
+	bool Process::kill()
+	{
+		if(_instance == NULL) {
+			ERROR("Calling Process::kill() twice or on an empty instance");
+			return false;
+		}
+		delete _instance;
+		_instance = NULL;
+		return true;
+	}
 	
 	void Process::init(const std::string &configfile, int32_t id)
 	{
@@ -46,12 +74,6 @@ namespace Damaris {
 			exit(-1);
 		}
 		
-		if(_instanciated) {
-                        ERROR("Double instanciation of a Process object");
-                }
-                _instanciated = true;
-                _instance = this;
-
 		DBG("Configuration file succefuly read");
 		environment     = new Environment(model.get());
 		environment->setID(id);
@@ -64,13 +86,6 @@ namespace Damaris {
 		DBG("Process initialized");
 	}
 
-/*
-	void Process::init(std::auto_ptr<Damaris::Model::SimulationModel> mdl)
-	{
-		model = mdl;
-		init();
-	}
-*/
 	void Process::openSharedStructures()
 	{
 		sharedStructuresOwner = false;
@@ -108,39 +123,20 @@ namespace Damaris {
 		}
 	}
 
-/*
 	Process::Process(const std::string & configfile, int32_t id)
-	{
-		init(configfile);
-		openSharedStructures();
-	}
-*/
-/*
-	Process::Process(std::auto_ptr<Damaris::Model::SimulationModel> mdl, int32_t id, struct open o)
-	{
-		init(mdl);
-		openSharedStructures();
-	}
-	
-	Process::Process(std::auto_ptr<Damaris::Model::SimulationModel> mdl, int32_t id, struct create o)
-        {
-		init(mdl);
-		createSharedStructures();
-        }
-*/	
-	Process::Process(const std::string & configfile, int32_t id)//, struct create c)
 	{
 		init(configfile, id);
 	}
 
 	Process::~Process()
 	{
-		_instance = NULL;
-		_instanciated = false;
 		if(sharedStructuresOwner) {
 			SharedMessageQueue::remove(&(model->architecture().queue()));
 			SharedMemorySegment::remove(&(model->architecture().buffer()));	
 		}
+		delete environment;
+		delete metadataManager;
+		delete actionsManager;
 	}
 }
 

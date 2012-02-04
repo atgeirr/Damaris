@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file ActionsManager.cpp
- * \date October 2011
+ * \date February 2012 
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  */
 #include <dlfcn.h>
 #include <stdint.h>
@@ -31,7 +31,10 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/Environment.hpp"
 #include "common/ActionsManager.hpp"
 #include "common/NodeAction.hpp"
-#include "scripts/python/PyAction.hpp"
+#include "common/DynamicAction.hpp"
+#ifdef __ENABLE_PYTHON
+	#include "scripts/python/PyAction.hpp"
+#endif
 
 namespace Damaris {
 
@@ -112,7 +115,12 @@ void ActionsManager::addScriptAction(const std::string& name,
 	// create the action
 	switch(Language::getLanguageFromString(&(language))) {
 		case (Language::LG_PYTHON):
+#ifdef __ENABLE_PYTHON
 			a = new Python::PyAction(fileName); break;
+#else
+			ERROR("Damaris has been compiled without Python support, Python actions will be ignored");
+			a = new Action::EmptyAction(); break;
+#endif
 		default:
 			ERROR("Undefined scripting language \"" << language 
 					<< "\" for action \"" << name << "\"");

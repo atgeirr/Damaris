@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file ActionsManager.hpp
- * \date October 2011
+ * \date February 2012 
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  */
 #ifndef __DAMARIS_ACTIONS_MANAGER_H
 #define __DAMARIS_ACTIONS_MANAGER_H
@@ -26,9 +26,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 
 #include "xml/Model.hpp"
-#include "common/MetadataManager.hpp"
 #include "common/Action.hpp"
-#include "common/DynamicAction.hpp"
 #include "common/ActionSet.hpp"
 #include "common/Configurable.hpp"
 #include "common/Environment.hpp"
@@ -41,21 +39,25 @@ namespace Damaris {
  * from scripts, etc. and call there functions upon reception
  * of events.
  */
-class ActionsManager : //public Singleton<ActionsManager> {
-	//friend class Singleton<ActionsManager>;
-	public Configurable<ActionsManager,Model::ActionsModel> {
+class ActionsManager : public Configurable<ActionsManager,Model::ActionsModel> {
 
 	private:
 		ActionSet actions; /*!< Set of actions indexed by ID and name. */
 		Environment* environment;
+
+	public:
 		/**
 		 * \brief Constructor.
+		 * Takes a model and an environment as parameters.
 		 */
-	public:
 		ActionsManager(Model::ActionsModel* mdl, Environment* env);
+
 	private:
+		/**
+		 * \brief This function is called by the constructor to initialize everything.
+		 */
 		void init();
-//	public:
+
 		/** 
 		 * \brief Adds an action defined through a dynamic library.
 		 * \param[in] eventName : Name of the event taken as a key for this action.
@@ -91,7 +93,6 @@ class ActionsManager : //public Singleton<ActionsManager> {
 		 * \param[in] sig : name of the event.
 		 * \param[in] iteration : iteration at which the event is sent.
 		 * \param[in] sourceID : source that fired the event.
-		 * \param[in,out] mm : Pointer to the MetadataManager.
 		 * The action to be called is here characterized by its name.
 		 */
 		public: void reactToUserSignal(const std::string &sig, 
@@ -102,7 +103,6 @@ class ActionsManager : //public Singleton<ActionsManager> {
 		 * \param[in] sigID : identifier of the event.
 		 * \param[in] iteration : iteration at which the event is sent.
 		 * \param[in] sourceID : source that fired the event.
-		 * \param[in,out] mm : pointer to the MetadataManager.
 		 * The action to be called is here characterized by its ID.
 		 */
 		void reactToUserSignal(int sigID, 
