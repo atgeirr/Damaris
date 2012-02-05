@@ -2,7 +2,8 @@ set(DAMARIS_CLIENT_SRC
 	${DAMARIS_SOURCE_DIR}/client/Client.cpp
 	${DAMARIS_SOURCE_DIR}/client/ClientC.cpp
 	${DAMARIS_SOURCE_DIR}/client/ClientFortran.cpp
-	${DAMARIS_SOURCE_DIR}/client/Client.f90)
+	${DAMARIS_SOURCE_DIR}/client/Client.f90
+	${DAMARIS_SOURCE_DIR}/client/StdAloneClient.cpp)
 
 set(DAMARIS_MODEL_SRC
 	${DAMARIS_SOURCE_DIR}/xml/Model.cpp)

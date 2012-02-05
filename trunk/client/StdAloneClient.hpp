@@ -15,61 +15,42 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file Client.hpp
+ * \file StdAloneClient.hpp
  * \date February 2012
  * \author Matthieu Dorier
  * \version 0.4
- * 
- * Client.hpp is the main file to be included in a C++ 
- * client in order to access the main client-side functions
- * of Damaris.
  */
-#ifndef __DAMARIS_CLIENT_H
-#define __DAMARIS_CLIENT_H
+#ifndef __DAMARIS_STDALONE_CLIENT_H
+#define __DAMARIS_STDALONE_CLIENT_H
 
 #include <string>
 #include <vector>
 #include <stdint.h>
 
-#include "common/Writer.hpp"
-#include "common/Process.hpp"
-#include "common/ChunkHandle.hpp"
-#include "common/Layout.hpp"
+#include "client/Client.hpp"
 
-/**
- * \namespace Damaris
- * All classes related to Damaris are defined under the Damaris namespace.
- */
 namespace Damaris {
 
 class Initiator;
 /**
- * \class Client
- * The Client object represents a single core running the
- * simulation. It is characterized by an ID and is initialized
- * with the name of an XML configuration file.
+ * The StdAloneClient object represents a single core running the
+ * simulation when no dedicated core is present. In this case the
+ * client runs the plugins by itself.
  */
-class Client : public Writer {
+class StdAloneClient : public Client {
 
 	friend class Initiator;
-
-	protected:
-		Process* process; /*!< The Process object holding the ActionsManager,
-				    MetadataManager, SharedMessageQueue, SharedMemorySegment */
 
 		/** 
 		 * \brief Constructor.
 		 * Initializes the client given an already built Process object.
-		 * This constructor is private, only the Initiator class can access it,
-		 * as well as child classes.
+		 * This constructor is private, only the Initiator class can access it.
 		 *
 		 * \param[in] p : pointer to a initialized Process object, required to be not-null.
 		 */
-		Client(Process* p);
+		StdAloneClient(Process* p);
 
 	public:
-		static Client* New(const std::string& file, int32_t id);
-
 		/**
 		 * \see Writer::write
 		 */
@@ -97,28 +78,6 @@ class Client : public Writer {
 		virtual int commit(const std::string & varname, int32_t iteration);
 
 		/**
-		 * \see Writer::chunk_set
-		 */
-		virtual chunk_h chunk_set(unsigned int dimensions,
-					const std::vector<int> & startIndices, 
-					const std::vector<int> & endIndices);
-
-		/**
-		 * \see Writer::chunk_free
-		 */
-		virtual void chunk_free(chunk_h chunkh);
-
-		/** 
-		 * \brief Retrieves a parameter's value. Not implemented yet.
-		 * 
-		 * \param[in] paramName : name of the parameter to retrieve.
-		 * \param[out] buffer : pointer to the memory where to copy the parameter's value.
-		 *
-		 * \return 0 in case of success, -1 if the parameter is not found.
-		 */
-		virtual int get_parameter(const std::string & paramName, void* buffer);
-		
-		/**
 		 * Sends a signal to the server to shut it down (all clients in node need
 		 * to call this function before the server is actually killed.
 		 * \return 0 in case of success, -1 in case of failure.
@@ -126,16 +85,11 @@ class Client : public Writer {
 		virtual int kill_server();
 
 		/**
-		 * Gets the communicator gathering clients.
-		 */
-		virtual MPI_Comm get_clients_communicator();
-		
-		/**
 		 * \brief Destructor.
 		 * To be called at the end of the before stopping the client program.
 		 */
-		virtual ~Client();
-}; // class Client
+		virtual ~StdAloneClient();
+}; // class StdAloneClient
 
 } // namespace Damaris
 

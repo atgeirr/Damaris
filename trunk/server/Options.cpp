@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Options.cpp
- * \date October 2011
+ * \date February 2012
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  */
 #include <iostream>
 #include <list>
@@ -27,6 +27,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <mpi.h>
 #include <boost/program_options.hpp>
 
 #include "xml/Model.hpp"
@@ -34,12 +35,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/Debug.hpp"
 
 namespace po = boost::program_options;
-
-/**
- * Creates a daemon process so the server can run in background 
- * (when used in standalone mode).
- */
-static void daemon();
 
 namespace Damaris {
 
@@ -49,11 +44,8 @@ Options::Options(int argc, char** argv)
 	/* initializing the options descriptions */
 	po::options_description desc("Allowed options");
 	desc.add_options()
-		("help", "produces help message")
 		("configuration,C", po::value<std::string>(&configFile), 
 				"name of the configuration file")
-		("id",po::value<int>(&id),"id of the server")
-		("daemon,D","starts the server as a daemon process")
 		("stdout",po::value<std::string>(),"redirects stdout to a given file")
 		("stderr",po::value<std::string>(),"redirects stderr to a given file")
 	;
@@ -62,50 +54,23 @@ Options::Options(int argc, char** argv)
 	po::store(po::parse_command_line(argc, argv, desc), vm);
 	po::notify(vm);
 
-	/* checking the "help" command */
-	if (vm.count("help")) {
-		std::cout << desc << "\n";
-		exit(-1);
-	}
-
-	/* checking the "daemon" command */
-	if(vm.count("daemon")) {
-		/* the two std streams have to be redirected in that case,
-		   in order for the daemon to start properly */
-		if(!(vm.count("stdout") && vm.count("stderr"))) {
-			ERROR("Daemon mode used, stdout and stderr must be defined");
-			exit(-1);
-		}
-		daemon();
-	}
-
-	/* checking if we have to redirect stdout to a file */
+	// checking if we have to redirect stdout to a file 
 	if(vm.count("stdout")) {
-//		int fd = open((vm["stdout"].as<std::string>()).c_str(),O_RDWR|O_CREAT,0644);
-//		dup2(fd,1);
 		if(not freopen((vm["stdout"].as<std::string>()).c_str(),"w",stdout))
 		{
 			ERROR("Unable to redirect stdout");
 		}
 	}
 	
-	/* checking if we have to redirect stderr to a file */
+	// checking if we have to redirect stderr to a file 
 	if(vm.count("stderr")) {
-                //int fd = open((vm["stderr"].as<std::string>()).c_str(),O_RDWR|O_CREAT,0644);
-                //dup2(fd,2);
 		if(not freopen((vm["stderr"].as<std::string>()).c_str(),"w",stderr))
 		{
 			ERROR("Unable to redirect stderr");
 		}
         }
 
-	/* check that we provide an id for the server */
-        if (vm.count("id") == 0) {
-                ERROR("Must provide a server id using --id");
-                exit(-1);
-        }
-	
-	/* now reading the configuration file and preparing the Configuration object */
+	// now reading the configuration file and preparing the Configuration object 
 	if (vm.count("configuration") == 0) {
 		ERROR("No configuration file provided," 
 			<< " use --configuration=<file.xml> or -C <file.xml>");
@@ -118,22 +83,5 @@ const std::string& Options::getConfigFile()
 	return configFile;
 }
 
-int Options::getID()
-{
-	return id;
 }
 
-}
-
-static void daemon()
-{
-	int i;
-	if(getppid()==1)
-		return;
-
-	i=fork();
-	if (i<0) exit(1);
-	if (i>0) exit(0);
-
-	setsid();
-}

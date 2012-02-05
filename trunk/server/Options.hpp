@@ -16,12 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Options.hpp
- * \date October 2011
+ * \date February 2012
  * \author Matthieu Dorier
- * \version 0.1
- * 
- * The Options object parses the command line, creates an Environment
- * and a Configuration object that will be passed to the Server object.
+ * \version 0.4
  */
 #ifndef __DAMARIS_OPTIONS_H
 #define __DAMARIS_OPTIONS_H
@@ -33,15 +30,11 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 namespace Damaris {
 
 /**
- * The Options object can be used to parse the command line,
- * it will prepare the Configuration and the Environment
- * objects. This object is used only with a standalone server,
- * not with an embedded one.
+ * The Options object can be used to parse the command line.
  */
 class Options {
 	private:
 		std::string configFile; /*!< Name of the configuration file. */
-		int id;
 
 	public:
 		/**
@@ -52,11 +45,6 @@ class Options {
 		 * Get the name of the configuration file.
 		 */
 		const std::string& getConfigFile();
-		
-		/**
-		 * Get the id of the server
-		 */
-		int getID();
 };
 }
 

@@ -45,6 +45,18 @@ class Client;
 class Initiator {
 
 	public:
+		/**
+		 * The start function loads the configuration file, then splits the
+		 * communicator in a client part and a server part.
+		 * If the calling process is a client, a Client object will be returned
+		 * for the simulation to write in Damaris. If the calling process is
+		 * server, a Server object will be created and the function won't return
+		 * until the server has been killed. When it does return, the returned
+		 * value is a NULL pointer.
+		 *
+		 * \param[in] configFile : name of the configuration file.
+		 * \param[in] globalcomm : the MPI communicator to split.
+		 */
 		static Client* start(const std::string& configFile, MPI_Comm globalcomm);
 
 }; // class Initiator

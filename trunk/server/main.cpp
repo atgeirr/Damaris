@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file main.cpp
- * \date October 2011
+ * \date February 2012
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  * This file contains the main function for the server in standalone mode.
  */
 
@@ -26,9 +26,11 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <list>
 #include <string>
 #include <signal.h>
+#include <mpi.h>
 
 #include "server/Options.hpp"
 #include "common/Debug.hpp"
+#include "common/Process.hpp"
 #include "server/Server.hpp"
 
 /**
@@ -51,6 +53,7 @@ extern Damaris::Server *server;
  **/
 int main(int argc, char** argv)
 {
+	MPI_Init(&argc,&argv);
 	INFO("Parsing program options");
 	/* The Options object is used to parse the command line arguments */
 	Damaris::Options opt(argc,argv);
@@ -60,12 +63,18 @@ int main(int argc, char** argv)
 	signal(SIGTERM, &sighandler);
 	signal(SIGINT,  &sighandler);
 	
+	int id;
+	MPI_Comm_rank(MPI_COMM_WORLD,&id);
+
 	INFO("Initializing server");
 	/* Initializing the server with a Configuration object 
 	   pre-initialized by the Options object */
-	server = Damaris::Server::New(opt.getConfigFile(),opt.getID());
-	INFO("Starting server");
+	server = Damaris::Server::New(opt.getConfigFile(),id);
+	Damaris::Process* p = Damaris::Process::get();
+	p->getEnvironment()->setGlobalComm(MPI_COMM_WORLD);
+	p->getEnvironment()->setEntityComm(MPI_COMM_WORLD);
 
+	INFO("Starting server");
 	/* Starts the server */
 	server->run();
 	
@@ -74,6 +83,8 @@ int main(int argc, char** argv)
 	   of doing. */
 	INFO("Correctly terminating server\n");
 	delete server;
+	
+	MPI_Finalize();
 	return 0;
 }
 

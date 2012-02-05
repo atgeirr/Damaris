@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file ServerFortran.cpp
- * \date July 2011
+ * \date February 2012
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  * Contains the definition of functions for the Server in Fortran.
  */
 #ifdef __ENABLE_FORTRAN

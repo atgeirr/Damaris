@@ -25,6 +25,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/Debug.hpp"
 #include "common/Environment.hpp"
 #include "common/Process.hpp"
+#include "client/StdAloneClient.hpp"
 #include "server/Initiator.hpp"
 
 namespace Damaris {
@@ -115,16 +116,16 @@ Client* Initiator::start(const std::string& configFile, MPI_Comm globalcomm)
 		}
 	} else {
 		// synchronous mode : the servers are attached to each client
-/*
 		if(rankInNode != 0) {
 			MPI_Barrier(globalcomm);
-			return new SecondaryServer(p);
+			p->openSharedStructures();
+			return new StdAloneClient(p);
 		} else {
-			Server* s = new Server(p);
+			p->createSharedStructures();
+			Client* c = new StdAloneClient(p);
 			MPI_Barrier(globalcomm);
-			return s;
+			return c;
 		}
-*/
 		return NULL;
 	}
 }	

@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Server.h
- * \date July 2011
+ * \date February 2012
  * \author Matthieu Dorier
- * \version 0.1
+ * \version 0.4
  * Defines the C server interface.
  */
 #ifndef __DAMARIS_SERVER_C_H
@@ -35,8 +35,7 @@ int DC_server(const char* configFile, int server_id);
 /**
  * Start clients and servers as MPI entities.
  * \param[in] configFile : name of the configuration file to use.
- * \param[in] oldcomm : communicator to split.
- * \param[out] newcomm : communicator gathering clients.
+ * \param[out] globalcomm : communicator to split.
  * \return a positive integer for clients, 0 for servers (blocks in the function
  * until the server is killed).
  */

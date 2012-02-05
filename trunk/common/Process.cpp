@@ -27,6 +27,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 #include <exception>
 
+#define __DEBUG
 #include "common/Debug.hpp"
 #include "common/Process.hpp"
 
@@ -82,12 +83,14 @@ namespace Damaris {
 		DBG("MetadataManager initialized");
 		actionsManager  = new ActionsManager(&(model->actions()),environment);
 		DBG("ActionsManager initialized");
-		
+		segment = NULL;
+		msgQueue = NULL;	
 		DBG("Process initialized");
 	}
 
 	void Process::openSharedStructures()
 	{
+		DBG("Calling Process::openSharedStructures()");
 		sharedStructuresOwner = false;
 		if(segment != NULL) {
 			ERROR("Shared structures already opened");
@@ -105,6 +108,7 @@ namespace Damaris {
 
 	void Process::createSharedStructures()
 	{
+		DBG("Calling Process::createSharedStructures()");
 		sharedStructuresOwner = true;
 		if(segment != NULL) {
 			ERROR("Shared structures already created");

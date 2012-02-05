@@ -16,9 +16,9 @@
  ********************************************************************/
 /**
  * \file Server.hpp
- * \date October 2011
+ * \date February 2012
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  */
 #ifndef __DAMARIS_SERVER_H
 #define __DAMARIS_SERVER_H
@@ -40,15 +40,21 @@ namespace Damaris {
 
 			/**
 			 * \brief Constructor.
-			 * Used when starting a server from an external program
+			 * Used when starting a server from an external program.
+			 * This constructor is private, only the Initiator can call it.
 			 * 
-			 * \param[in] configFile : name of the configuration file.
-			 * \param[in] id : identifier for this server.
+			 * \param[in] p : an initialized Process instance.
 			 */
 			Server(Process* p);
 
 		public:
 
+			/**
+			 * This static function is the normal way of retrieving
+			 * an instance over a Server object.
+			 * \param[in] cfgfile : name of the configuration file.
+			 * \param[in] id : id of the process.
+			 */
 			static Server* New(const std::string& cfgfile, int32_t id);
 
 			/**
@@ -70,7 +76,9 @@ namespace Damaris {
 		private:
 
 			int needStop; /*!< indicates wether the server has to 
-					exit the main loop at the next iteration. */
+					exit the main loop at the next iteration. 
+					This variable is initialized to the number of clients
+				 	that have to send a kill signal before exiting. */
 
 			/** 
 			 * This function processes an incoming message (no way?!).
@@ -80,46 +88,10 @@ namespace Damaris {
 
 			/**
 			 * This function is called when receiving a message of type MSG_INT;
-			 * See the #define statements in Message.hpp.
+			 * See the enumration statements in Message.hpp.
 			 */
 			void processInternalSignal(int32_t obj);
 
-		public:
-			/**
-			 * \brief Writes a full variable.
-			 * \see Client::write
-			 */
-//			int write(const std::string & varname, int32_t iteration, const void* data);
-
-			/**
-			 * \brief Writes a chunk of a variable.
-			 * \see Client::chunk_write
-			 */
-//			int chunk_write(chunk_h chunkh, const std::string & varname,
-//					int32_t iteration, const void* data);
-
-			/**
-			 * \brief Sends an event.
-			 * \see Client::signal
-			 */
-//			int signal(const std::string & signame, int32_t iteration);
-
-			/**
-			 * \brief Allocate a buffer directly in shared memory for future writing.
-			 * \see Client::alloc
-			 */
-//			void* alloc(const std::string & varname, int32_t iteration);
-
-			/** 
-			 * \brief Commit a variable.
-			 * \see Client::commit
-			 */
-//			int commit(const std::string & varname, int32_t iteration);
-
-			/**
-			 * \see Client::kill_server().
-			 */
-//			int kill_server();
 	}; // class Server
 
 } // namespace Damaris
