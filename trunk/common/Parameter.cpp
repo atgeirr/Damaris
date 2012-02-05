@@ -16,15 +16,15 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Parameter.cpp
- * \date October 2011
+ * \date February 2012
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  */
 #include "common/Parameter.hpp"
 
 namespace Damaris {
 
-std::string Parameter::getName() const
+const std::string& Parameter::getName() const
 {
 	return name;
 }

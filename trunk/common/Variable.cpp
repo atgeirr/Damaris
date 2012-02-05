@@ -16,11 +16,10 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Variable.cpp
- * \date October 2011
+ * \date February 2012
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  */
-
 #include "common/Variable.hpp"
 
 namespace Damaris {
@@ -52,8 +51,6 @@ void Variable::attachChunk(Chunk* chunk)
 ChunkIndexBySource::iterator Variable::getChunksBySource(int source,
 	ChunkIndexBySource::iterator& end)
 {
-//	ChunkIndexBySource::iterator it = chunks.get<by_source>().find(source);
-//	end = chunks.get<by_source>().end();
 	ChunkIndexBySource::iterator it = chunks.get<by_source>().lower_bound(source);
 	end = chunks.get<by_source>().upper_bound(source);
 	return it;
@@ -63,9 +60,7 @@ ChunkIndexByIteration::iterator Variable::getChunksByIteration(int iteration,
 	ChunkIndexByIteration::iterator& end) 
 {
         ChunkIndexByIteration::iterator it = chunks.get<by_iteration>().lower_bound(iteration);
-		//.find(iteration);
 	end = chunks.get<by_iteration>().upper_bound(iteration);
-	//.end();
         return it;
 }
 
@@ -83,22 +78,14 @@ ChunkIndex::iterator Variable::getChunks(int source, int iteration, ChunkIndex::
 
 void Variable::eraseChunk(ChunkIndexByIteration::iterator &it)
 {
-//	const ChunkIndexByIteration::iterator &end = chunks.get<by_iteration>().end();
-//	ChunkIndexByIteration::iterator j(it);
-//	if(j != end) {
 	it->get()->remove();
 	chunks.get<by_iteration>().erase(it);
-//	}
 }
 
 void Variable::eraseChunk(ChunkIndexBySource::iterator &it)
 {
-//	ChunkIndexBySource::iterator j(it);
-//     	const ChunkIndexBySource::iterator &end = chunks.get<by_source>().end();
-//	if(j != end) {
 	it->get()->remove();
 	chunks.get<by_source>().erase(it);
-//	}
 }
 
 void Variable::clear()

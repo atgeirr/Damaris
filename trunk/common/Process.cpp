@@ -18,7 +18,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \file Process.cpp
  * \date February 2012
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  * \see Process.hpp
  */
 #include <string.h>

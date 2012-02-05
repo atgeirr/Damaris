@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file NodeAction.cpp
- * \date October 2011
+ * \date February 2012
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  */
 #include "common/Debug.hpp"
 #include "common/NodeAction.hpp"
@@ -41,7 +41,8 @@ namespace Damaris {
 	{
 		locks[iteration] = locks[iteration] + 1;
 		if(locks[iteration] == clientsPerNode) {
-			base->call(iteration,sourceID);
+			if(base != NULL)
+				base->call(iteration,sourceID);
 			locks.erase(iteration);
 		}
 	}

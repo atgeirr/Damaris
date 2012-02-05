@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file SharedMemorySegment.hpp
- * \date September 2011
+ * \date February 2012
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  */
 #ifndef __DAMARIS_SHMEMSEGMENT_H
 #define __DAMARIS_SHMEMSEGMENT_H
@@ -32,7 +32,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 namespace Damaris {
 /*
  * Contains the definition of a shared memory segment in which
- * we can store variables. This definition is abstract.
+ * we can store chunks of variables. This definition is abstract.
  * Two internal classes are provided to implement SharedMemorySegment
  * based either on shm_open (posix) or shmget (xsi).
  */
@@ -47,42 +47,29 @@ class SharedMemorySegment {
 		SharedMemorySegment();
 	public:
 
+		/**
+		 * Returns a SharedMemorySegment implementation corresponding
+		 * to the described model.
+		 * \param[in] model : base model from configuration file.
+		 */
 		static SharedMemorySegment* create(Model::BufferModel* model);
-	
+
 		/**
-		 * Creates a shared memory segment based on POSIX functions.
+		 * Opens a SharedMemorySegment implementation corresponding
+		 * to the description in the model.
+		 * \param[in] model : base model from configuration file.
 		 */	
-		static SharedMemorySegment* create(posix_shmem_t shmem, 
-				const char* name, int64_t size);
-
-		/**
-		 * Creates a shared memory segment based on XSI functions.
-		 */
-		static SharedMemorySegment* create(sysv_shmem_t shmem, 
-				const char* name, int64_t size);
-
 		static SharedMemorySegment* open(Model::BufferModel* model);
-		/**
-		 * Opens an existing shared memory segment based on POSIX functions.
-		 */
-		static SharedMemorySegment* open(posix_shmem_t shmem, const char* name);
 
 		/**
-		 * Opens an existing shared memory segment based in XSI functions.
+		 * Removes a SharedMemorySegment described in a model.
 		 */
-		static SharedMemorySegment* open(sysv_shmem_t shmem, const char* name);
-
 		static bool remove(Model::BufferModel* model);
-		/**
-		 * Removes an existing shared memory segment based on POSIX.
-		 */
-		static bool remove(posix_shmem_t shmem, const char* name);
 
 		/**
-		 * Removes an existing shared memory segment based on XSI.
+		 * This typedef is just to prevent compilation error
+		 * when defining pur virtual function that return void* pointers.
 		 */
-		static bool remove(sysv_shmem_t shmem, const char* name);
-
 		typedef void* ptr;
 
 		/**
@@ -113,6 +100,10 @@ class SharedMemorySegment {
 
 using namespace boost::interprocess;
 
+/**
+ * The SharedMemorySegment::POSIX_ShMem class defines a
+ * SharedMemorySegment based on shm_open functions.
+ */
 class SharedMemorySegment::POSIX_ShMem : public SharedMemorySegment {
 	private:
 		managed_shared_memory* impl;
@@ -127,6 +118,10 @@ class SharedMemorySegment::POSIX_ShMem : public SharedMemorySegment {
                 size_t getFreeMemory();
 };
 
+/**
+ * The SharedMemorySegment::SYSV_ShMem class defines a
+ * SharedMemorySegment based on shmget functions.
+ */
 class SharedMemorySegment::SYSV_ShMem : public SharedMemorySegment {
 	private:
 		managed_xsi_shared_memory* impl;

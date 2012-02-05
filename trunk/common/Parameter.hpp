@@ -16,15 +16,17 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Parameter.hpp
- * \date October 2011
+ * \date February 2012
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  */
 #ifndef __DAMARIS_PARAMETER_H
 #define __DAMARIS_PARAMETER_H
 
 #include <boost/any.hpp>
 #include <string>
+
+#include "common/Debug.hpp"
 
 namespace Damaris {
 	/**
@@ -47,7 +49,13 @@ namespace Damaris {
 			/**
 			 * Gets the name of the parameter.
 			 */
-			std::string getName() const;
+			const std::string& getName() const;
+
+			/**
+			 * Gets the value of the parameter.
+			 */
+			template<typename T>
+			const T& getValue() const;
 	};
 }
 
@@ -60,6 +68,18 @@ Parameter::Parameter(const std::string& n, const T& v)
 {
         name = n;
         value = boost::any(v);
+}
+
+template<typename T>
+const T& Parameter::getValue() const 
+{
+	try {
+		return boost::any_cast<T>(value);
+	} catch(boost::bad_any_cast &e) {
+		ERROR("Bad type cast in Parameter::getValue(),"
+			<< " returning the default value for the type");
+		return T();
+	}
 }
 
 }

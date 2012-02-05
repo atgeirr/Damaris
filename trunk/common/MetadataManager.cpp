@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file MetadataManager.cpp
- * \date October 2011
+ * \date February 2012
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  */
 #include "common/Debug.hpp"
 #include "common/MetadataManager.hpp"
@@ -47,10 +47,12 @@ void MetadataManager::initParameters()
 
 void MetadataManager::initLayouts()
 {
+	if(model == NULL) return;
+
 	Model::DataModel::layout_const_iterator l(model->layout().begin());
 	for(;l != model->layout().end(); l++)
 	{
-		Types::basic_type_e type = Types::getTypeFromString(&(l->type()));
+		Types::basic_type_e type = Types::getTypeFromString(l->type());
 		Language::language_e language =
 			Language::getLanguageFromString(&(l->language()));
 		if(language == Language::LG_UNKNOWN)
@@ -86,6 +88,7 @@ void MetadataManager::initVariables()
 {
 	variables = new VariableSet();
 
+	if(model == NULL) return;
 	// build all the variables in root group
 	Model::DataModel::variable_const_iterator v(model->variable().begin());
 	for(; v != model->variable().end(); v++)
@@ -104,6 +107,7 @@ void MetadataManager::initVariables()
 void MetadataManager::readVariablesInSubGroup(const Model::GroupModel *g,
                         const std::string& groupName)
 {
+	if(g == NULL) return;
 	// first check if the group is enabled
 	if(!(g->enabled())) return;
 	// build recursively all variable in the subgroup
@@ -205,6 +209,7 @@ MetadataManager::~MetadataManager()
 {
 	delete variables;
 	delete parameters;
+	delete layoutInterp;
 }
 
 }

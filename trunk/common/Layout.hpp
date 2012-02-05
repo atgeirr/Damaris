@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Layout.hpp
- * \date October 2011
+ * \date February 2012
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  */
 
 #ifndef __DAMARIS_LAYOUT_H
@@ -34,7 +34,7 @@ namespace Damaris {
 /**
  * Layouts are objects that describe the representation of data. 
  * For example "a 3D array of integers which extents are 4,2 and 16".
- * Layouts are represented like in C, each index along each dimension
+ * Layouts are represented C-like, each index along each dimension
  * starting from 0 and going to n-1, where n is the extent of the
  * array along that dimension.
  *
@@ -53,19 +53,22 @@ class Layout {
 		 * \brief Constructor.
 		 * Initializes a Layout from the data type, the dimensions and the vector of extents. 
 		 * 
+		 * \param[in] name : name of the layout (as defined in the configuration file).
 		 * \param[in] t : basic type.
 		 * \param[in] d : number of dimensions.
-		 * \param[in] extents : list of extents, even indices hold starting indices, 
-		 *                      non-even hold ending indices.
+		 * \param[in] extents : list of extents.
 		 */
 		Layout(const std::string &name, Types::basic_type_e t, 
-			unsigned int d, std::vector<int> &ex);
+			unsigned int d, const std::vector<int> &ex);
 		
 		/**
 		 * \brief Destructor.
 		 */
 		~Layout();
 
+		/**
+		 * \brief Returns the name of the Layout.
+		 */
 		const std::string& getName() const;
 		
 		/**
@@ -79,12 +82,13 @@ class Layout {
 		unsigned int getDimensions() const;
 
 		/**
-		 * \return the extent (start-end+1) along a given dimension. 
+		 * \return the extent along a given dimension. 
 		 */
 		int getExtentAlongDimension(unsigned int dim) const;
 
 		/**
-		 * \return true if the Layout has unlimited dimension.
+		 * \return true if the Layout has unlimited dimension 
+		 *         (defined as "?" in the configuration file).
 		 */
 		bool isUnlimited() const;		
 }; // class Layout

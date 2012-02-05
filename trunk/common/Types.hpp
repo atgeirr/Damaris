@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Types.hpp
- * \date October 2011
+ * \date February 2012
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  */
 #ifndef __DAMARIS_TYPES_H
 #define __DAMARIS_TYPES_H
@@ -61,8 +61,11 @@ namespace Types {
 	 * \return The associated basic type or UNDEFINED_TYPE if it does
 	 *         not correspond to any known type.
 	 */
-	basic_type_e getTypeFromString(const std::string* str);
+	basic_type_e getTypeFromString(const std::string &str);
 
+	/**
+	 * This function returns the name of a type.
+	 */
 	const std::string& getStringFromType(basic_type_e t);
 }
 }

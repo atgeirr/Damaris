@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file SharedMessageQueue.hpp
- * \date October 2011
+ * \date February 2O12
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  */
 #ifndef __DAMARIS_SH_MSG_QUEUE_H
 #define __DAMARIS_SH_MSG_QUEUE_H
@@ -37,27 +37,40 @@ namespace Damaris {
 	/**
 	 * The SharedMessageQueue builds a message queue on top
 	 * of a shared memory segment. Access to the queue is handled by
-	 * posix mutexes. This class is abstract and has two main implementations
-	 * using either posix or xsi shared memory.
+	 * posix mutexes.
 	 */
 	class SharedMessageQueue {
 		private:
+			/**
+			 * The SharedMessageQueue::shm_queue_hdr is a header
+			 * to be stored in shared memory for the processes to access it.
+			 */
 			struct shm_queue_hdr {
 
-				interprocess_mutex main_lock;
-				interprocess_condition cond_recv;
-				interprocess_condition cond_send;
-				int maxMsg;
-				int sizeMsg;
-				int head;
-				int tail;
+				interprocess_mutex main_lock; /*!< To fully lock the queue. */
+				interprocess_condition cond_recv; /*!< Condition for blocked receivers to wait. */
+				interprocess_condition cond_send; /*!< Condition for blocked senders to wait. */
+				int maxMsg; /*!< Maximum number of messages in the queue. */
+				int sizeMsg; /*!< Size of each message. */
+				int head; /*!< Index of the head. */
+				int tail; /*!< Index of the tail. */
 
+				/**
+				 * Constructor.
+				 * \param[in] numItems : size of the queue in number of messages.
+				 * \param[in] sizeItems : size of each message.
+				 */
 				shm_queue_hdr(int numItems, int sizeItems) : 
 					main_lock(), cond_recv(), cond_send(),
 					maxMsg(numItems), sizeMsg(sizeItems), head(0), tail(0)
 				{
 				};
 
+				/**
+				 * Gets the current number of stored messages.
+				 * This function doesn't lock the queue so it has to be called
+				 * from another function that first lock it.
+				 */
 				int current_num_msg()
 				{
 					if(tail >= head)
@@ -66,27 +79,42 @@ namespace Damaris {
 						return (tail + maxMsg - head);
 				}
 
-			} *shmq_hdr;
+			} *shmq_hdr; /*!< Pointer to the header of the queue in shared memory. */
+			char* data; /*!< Pointer to the data region in shared memory. */
+			mapped_region *region; /*!< Pointer to the mapped region (so we can remove it). */
 
-			char* data;
-			mapped_region *region;
-
+			/**
+			 * Constructor for SharedMessageQueue. This constructor is private,
+			 * use create and open functions to retrieve an instance.
+			 * \param[in] mem : an implementation of a mapped_region on which to store the queue.
+			 */
 			SharedMessageQueue(mapped_region *mem);
 		
 		public:
-			static SharedMessageQueue* create(Model::QueueModel* mdl);
 			/**
-			 * Creates a POSIX shared message queue.
+			 * Creates a SharedMessageQueue based on a model.
+			 * \param[in] mdl : base model from which to create the SharedMessageQueue.
+			 */
+			static SharedMessageQueue* create(Model::QueueModel* mdl);
+
+			/**
+			 * Helper function to create a POSIX shared message queue.
 			 */
 			static SharedMessageQueue* create(posix_shmem_t posix_shmem, 
 				const std::string& name, size_t num_msg, size_t size_msg);
+
 			/**
-			 * Creates an XSI shared messahe queue.
+			 * Helper function to creates an XSI shared messahe queue.
 			 */
 			static SharedMessageQueue* create(sysv_shmem_t sysv_shmem, 
 				const std::string& name, size_t num_msg, size_t size_msg);
-	
+
+			/**
+			 * Opens a SharedMessageQueue based on a model.
+			 * \param[in] mdl : base model from which to create the SharedMessageQueue.
+			 */
 			static SharedMessageQueue* open(Model::QueueModel* mdl);
+	
 			/**
 			 * Opens an existing POSIX shared message queue.
 			 */
@@ -99,7 +127,11 @@ namespace Damaris {
 			static SharedMessageQueue* open(sysv_shmem_t sysv_shmem, 
 				const std::string& name);
 	
+			/**
+			 * Removes a SharedMessageQueue described by a model.
+			 */
 			static bool remove(Model::QueueModel* mdl);
+	
 			/**
 			 * Removes a POSIX shared message queue.
 			 */
@@ -120,6 +152,7 @@ namespace Damaris {
 			 * if the queue is full.
 			 */
 			virtual bool trySend(const void* buffer);
+
 			/**
 			 * Receives a message from the queue. Block if the queue
 			 * is empty.
@@ -145,7 +178,10 @@ namespace Damaris {
 			 * Get the current number of messages in the message queue.
 			 */
   			virtual size_t getNumMsg();
-
+			
+			/**
+			 * Destructor. Will not remove the shared structures.
+			 */
 			~SharedMessageQueue();
 	};
 }

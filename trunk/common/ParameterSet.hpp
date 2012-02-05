@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file ParameterSet.hpp
- * \date October 2011
+ * \date February 2012 
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  */
 #ifndef __DAMARIS_PARAMETER_SET_H
 #define __DAMARIS_PARAMETER_SET_H
@@ -31,14 +31,24 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Damaris {
 
+/**
+ * The ParameterSet class describes an object that holds
+ * the parameters and offers an access by name.
+ */
 class ParameterSet : public Configurable<ParameterSet,Model::DataModel> {
 	private:
 		std::map<std::string,Parameter> paramSet; /*!< Enclosed map. */
-		
+	
+		/**
+		 * This function is called by the constructor
+		 * to help initializing everything.
+		 */	
 		void init();
+
 	public:
 		/**
 		 * Constructor.
+		 * \param[in] mdl : base model to initialize from.
 		 */
 		ParameterSet(Model::DataModel* mdl);
 	
@@ -47,17 +57,18 @@ class ParameterSet : public Configurable<ParameterSet,Model::DataModel> {
 		 * \return true in case of success, false if the parameter already exists.
 		 */
 		template<typename T>
-		bool set(std::string &name, T& value);
+		bool set(std::string &name, const T& value);
 		
 		/**
-		 * Gets a pointer to an existing parameter, return NULL if
-		 * the parameter does not exist.
+		 * Gets a pointer to an existing parameter, return the default T() value 
+		 * if the parameter does not exist.
 		 */
 		template<typename T>
 		T get(std::string &name);
 
 		/**
 		 * Access parameters by name, only int parameters are considered.
+		 * This operator is here to help accing the int parameters from a Calc object.
 		 */
 		int operator[](std::string& n);
 };
@@ -78,7 +89,7 @@ T ParameterSet::get(std::string &name)
 
 
 template<typename T>
-bool ParameterSet::set(std::string &name, T& value)
+bool ParameterSet::set(std::string &name, const T& value)
 {
 	if(paramSet.find(name) != paramSet.end())
 		return false;

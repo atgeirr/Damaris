@@ -16,12 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file MetadataManager.hpp
- * \date July 2011
+ * \date February 2012
  * \author Matthieu Dorier
- * \version 0.3
- *
- * MetadataManager holds pointers to all Variables published.
- * These variables can be retrieved by their identifier (name,source,iteration).
+ * \version 0.4
  */
 #ifndef __DAMARIS_METADATA_H
 #define __DAMARIS_METADATA_H
@@ -42,32 +39,60 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Damaris {
 
+	/**
+	 * MetadataManager holds pointers to all Variables.
+	 * These variables can be retrieved by their name or by a unique ID.
+	 */
 	class MetadataManager : public Configurable<MetadataManager,Model::DataModel> {
+
 	private:
 		std::map<std::string,Layout> layouts; /*!< Map associating names with layouts. */
 
-		VariableSet* variables; /*!< Variables indexed by name and by id. */
-		ParameterSet* parameters;
-		Environment* environment;
+		VariableSet* variables;   /*!< Variables indexed by name and by id. */
+		ParameterSet* parameters; /*!< Set of parameters defined in the configuration. */
+		Environment* environment; /*!< A pointer to the Environment object hold by the Process. */
 
-		Calc<std::string::const_iterator,ParameterSet>* layoutInterp;
+		Calc<std::string::const_iterator,ParameterSet>* layoutInterp; /*!< Calc instance to interpret a layout. */
 
+		/**
+		 * This function is called by the constructor to help initializing
+		 * everything.
+		 */
 		void init();
 
+		/**
+		 * Go through a Model::GroupModel instance and read variables recursively. 
+		 * \param[in] g : a pointer to a Model::GroupModel to parse.
+		 * \param[in] groupName : the parent group name.
+		 */
 		void readVariablesInSubGroup(const Model::GroupModel *g,
                         const std::string& groupName);
 
+		/**
+		 * Initialize the ParameterSet.
+		 */
 		void initParameters();
 
+		/**
+		 * Initialize the VariableSet.
+		 */
 		void initVariables();
 
+		/**
+		 * Initialize the set of Layout.
+		 */
 		void initLayouts();
 	public:
 		/**
-		 * Constructor.
+		 * MetadataManager Constructor.
+		 * \param[in] mdl : the base model to initialize everything.
+		 * \param[in] env : the Environment object initialized by the Process.
 		 */
 		MetadataManager(Model::DataModel* mdl, Environment* env);
 
+		/**
+		 * Returns a reference to the inner VariableSet.
+		 */
 		VariableSet& getVariableSet() { return *variables;}
 
 		/**
@@ -89,6 +114,8 @@ namespace Damaris {
 
 		/**
 		 * Adds a layout.
+		 * \param[in] lname : name of the Layout as defined in the configuration file.
+		 * \param[in] l : reference to an initialized Layout.
 		 */
 		bool addLayout(const std::string& lname, Layout &l);
 
@@ -97,12 +124,14 @@ namespace Damaris {
 		 */
 		Layout* getLayout(const std::string& lname);
 
+		/**
+		 * Print the list of defined variables in an outputstream.
+		 * This function is for debugging.
+		 */
 		void listVariables(std::ostream &out);
 
 		/**
 		 * \brief Destructor.
-		 * \warning The destructor does not free the
-		 * variables or their associated chunks.
 		 */
 		~MetadataManager();
 	};

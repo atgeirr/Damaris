@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Message.hpp
- * \date October 2011
+ * \date February 2012 
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  */
 #ifndef __DAMARIS_MESSAGE_H
 #define __DAMARIS_MESSAGE_H
@@ -39,16 +39,18 @@ namespace Damaris {
 	};
 
 /*
- * The internal_event naming.
+ * The internal events naming.
  */
-#define KILL_SERVER 0
+	enum int_msg_e {
+		KILL_SERVER = 0
+	};
 
 /**
  * The Message structure describes a message, used to communicate
  * from simulation's cores to dedicated cores.
  */
 	struct Message {
-		msg_type_e 	type;		/*!< The type of message (MSG_VAR, MSG_SIG). */
+		msg_type_e 	type;		/*!< The type of message (MSG_VAR, MSG_SIG, MSG_INT). */
 		int32_t 	source;		/*!< The id of the source sending the message. */
 		int32_t 	iteration;	/*!< The iteration number in the simulation. */
 		int32_t		object;		/*!< An identifier to an object defined in 

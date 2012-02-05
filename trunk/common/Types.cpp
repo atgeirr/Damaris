@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Types.cpp
- * \date July 2011
+ * \date February 2012
  * \author Matthieu Dorier
- * \version 0.1
+ * \version 0.4
  */
 #include <string>
 
@@ -52,15 +52,15 @@ namespace Types {
 	static std::string names[] =
 		{"undefined","short","int","long","float","double","char","string"};
 
-	basic_type_e getTypeFromString(const std::string* str)
+	basic_type_e getTypeFromString(const std::string& str)
 	{
-		if(str->compare("short") == 0)  return SHORT;
-		if(str->compare("int") == 0)    return INT;
-		if(str->compare("long") == 0)   return LONG;
-		if(str->compare("float") == 0)  return FLOAT;
-		if(str->compare("double") == 0) return DOUBLE;
-		if(str->compare("char") == 0)   return CHAR;
-		if(str->compare("string") == 0) return STR;
+		if(str.compare("short") == 0)  return SHORT;
+		if(str.compare("int") == 0)    return INT;
+		if(str.compare("long") == 0)   return LONG;
+		if(str.compare("float") == 0)  return FLOAT;
+		if(str.compare("double") == 0) return DOUBLE;
+		if(str.compare("char") == 0)   return CHAR;
+		if(str.compare("string") == 0) return STR;
 		return UNDEFINED_TYPE;
 	}
 

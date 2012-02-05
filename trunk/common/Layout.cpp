@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Layout.cpp
- * \date October 2011
+ * \date February 2012
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  */
 
 #include <cstring>
@@ -28,7 +28,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 namespace Damaris {
 	
 	Layout::Layout(const std::string &n, Types::basic_type_e t, 
-			unsigned int d, std::vector<int> &ex)
+			unsigned int d, const std::vector<int> &ex)
 	{
 		name = n;
 		type = t;

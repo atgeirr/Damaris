@@ -16,14 +16,13 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file NodeAction.hpp
- * \date October 2011
+ * \date February 2012
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  */
 #ifndef __DAMARIS_NODE_ACTION_H
 #define __DAMARIS_NODE_ACTION_H
 
-#include <dlfcn.h>
 #include <stdint.h>
 #include <string>
 #include <map>
@@ -34,11 +33,11 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 namespace Damaris {
 
 class ActionsManager;
+
 /**
  * The NodeAction object is a wrapper for an action that has to wait for
  * each core of a node to call it before actually firing the action.
  */
-
 class NodeAction : public Action {
 	friend class ActionsManager;
 
@@ -65,9 +64,7 @@ class NodeAction : public Action {
 		 * \brief Call the action.
 		 * \param[in] iteration : iteration at which the action is called.
 		 * \param[in] sourceID : ID of the client that fired the action.
-		 * \param[in,out] mm : pointer to the MetadataManager that contains 
-		 *                     all recorded variables.
-		 * \see Damaris::Actions::operator()
+		 * \see Damaris::Action::operator()
 		 */
 		void call(int32_t iteration, int32_t sourceID);
 

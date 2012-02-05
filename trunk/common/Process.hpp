@@ -41,66 +41,115 @@ namespace Damaris {
  * The Process object represents a single core either dedicated or running the
  * simulation. It is characterized by an ID and is initialized
  * with the name of an XML configuration file.
+ * Process is a singleton object that has to be initialized using Process:initialize.
  */
 class Process {
 
 	private:
-		static Process* _instance;
+		static Process* _instance; /*!< The singleton instance of Process. */
 
+		/**
+		 * Helper function called by the constructor to initialize everything.
+		 * \param[in] conf : name of the configuration file to load.
+		 * \param[in] id : id of the process.
+		 */
 		void init(const std::string& conf, int32_t id);
 
-		bool sharedStructuresOwner;
+		bool sharedStructuresOwner; /*!< This variable indicates wether the process
+						 has created the shared structures of not.
+						 If it did, it will have to remove them at the end. */
 
 
 		/** 
 		 * \brief Constructor.
-		 * Initializes the client given the name of a configuration file and an ID. 
-		 * Damaris won't check if two clients have the same ID so the user shoud be
-		 * careful with that.
+		 * Initializes the process given the name of a configuration file and an ID. 
+		 * Damaris won't check if two process have the same ID so the user shoud be
+		 * careful with that. This constructor is private: use Process::initialize.
 		 *
 		 * \param[in] config : name of an XML configuration file.
-		 * \param[in] id : id of the client (should be unique).
+		 * \param[in] id : id of the process (should be unique).
 		 */
                 Process(const std::string & config, int32_t id);
 
+		/**
+		 * Destructor. This function is private, use Process:kill instead.
+		 */
 		~Process();	
+
 	protected:
-		std::auto_ptr<Damaris::Model::SimulationModel> model;
+		std::auto_ptr<Damaris::Model::SimulationModel> model; /*!< base model initialized from the configuration file. */
 		Environment 	*environment; /*!< environment object. */
 		MetadataManager *metadataManager; /*! metadata manager object. */
-		ActionsManager 	*actionsManager; /*! keeps actions. */
+		ActionsManager 	*actionsManager; /*! actions manager object. */
 		SharedMessageQueue 	*msgQueue; /*!< pointer to the message queue. */
 		SharedMemorySegment 	*segment; /*!< pointer to the shared memory segment. */
 
 	public:
+		/**
+		 * Get the singleton instance of the Process object. NULL is returned if
+		 * Process has not been initialized, and an error message is printed.
+		 */
 		static Process* get();
+	
+		/**
+		 * Initializes the singleton instance of Process.
+		 * \param[in] config : name of the configuration file.
+		 * \param[in] id : id of the process.
+		 */	
 		static void initialize(const std::string &config, int32_t id);		
+
+		/**
+		 * Kill the singleton instance of Process.
+		 */
 		static bool kill();
 
+		/**
+		 * Opens the shared message queue and shared memory segment
+		 * if they haven't been opened yet.
+		 */
 		void openSharedStructures();
 
+		/**
+		 * Creates the shared message queue and shared memory segment.
+		 * Removes previously opened shared structures with the same name.
+		 */
 		void createSharedStructures();
 
+		/**
+		 * Get the initialized Environment instance attached to the Process.
+		 */
 		Environment* getEnvironment() 
 		{
 			return environment;
 		}
 
+		/**
+		 * Get the initialized MetadataManager instance attached to the Process.
+		 */
 		MetadataManager* getMetadataManager()
 		{
 			return metadataManager;
 		}
 
+		/**
+		 * Get the initialized ActionsManager instance attached to the Process.
+		 */
 		ActionsManager* getActionsManager()
 		{
 			return actionsManager;
 		}
 
+		/**
+		 * Get the SharedMessageQueue instance attached to the Process.
+		 */
 		SharedMessageQueue* getSharedMessageQueue()
 		{
 			return msgQueue;
 		}
 
+		/**
+		 * Get the SharedMemorySegment instance attached to the Process.
+		 */
 		SharedMemorySegment* getSharedMemorySegment()
 		{
 			return segment;

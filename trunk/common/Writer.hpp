@@ -15,14 +15,10 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file Client.hpp
- * \date October 2011
+ * \file Writer.hpp
+ * \date February 2012
  * \author Matthieu Dorier
- * \version 0.3
- * 
- * Client.hpp is the main file to be included in a C++ 
- * client in order to access the main client-side functions
- * of Damaris.
+ * \version 0.4
  */
 #ifndef __DAMARIS_WRITER_H
 #define __DAMARIS_WRITER_H
@@ -35,11 +31,10 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 namespace Damaris {
 
 typedef ChunkHandle* chunk_h;
+
 /**
- * \class Client
- * The Client object represents a single core running the
- * simulation. It is characterized by an ID and is initialized
- * with the name of an XML configuration file.
+ * The Writer class is an abstraction for a class that
+ * can write data (typically a Client).
  */
 class Writer  {
 	public:

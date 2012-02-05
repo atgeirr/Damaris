@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Variable.hpp
- * \date October 2011
+ * \date February 2012
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  */
 #ifndef __DAMARIS_VARIABLE_H
 #define __DAMARIS_VARIABLE_H
@@ -38,7 +38,7 @@ class MetadataManager;
  * a metadata structure. It holds an index of chunks and additional
  * informations. A Variable record is identified by a name and an ID.
  * A Variable cannot be created in a vacuum, only the MetadataManager
- * has the permission to create instance of them.
+ * has the permission to create instances of them.
  */
 class Variable {
 	friend class MetadataManager;
@@ -108,16 +108,34 @@ class Variable {
 		ChunkIndexByIteration::iterator getChunksByIteration(int iteration,
 			ChunkIndexByIteration::iterator& end);
 
+		/**
+		 * Returns an iterator over all the chunks.
+		 * \param[out] end : a reference that will hold the end of the iterator.
+		 */
 		ChunkIndex::iterator getChunks(ChunkIndex::iterator &end);
 
+		/**
+		 * Returns an iterator over all the chunks that correspond to a given
+		 * source and iteration.
+		 * \param[in] source : source wanted.
+		 * \param[in] iteration : iteration wanted.
+		 * \param[out] end : a reference that will hold the end of the iterator.
+		 */
 		ChunkIndex::iterator getChunks(int source, int iteration, ChunkIndex::iterator &end);
+
 		/**
 		 * Delete a chunk from the variable.
 		 */
 		void eraseChunk(ChunkIndexBySource::iterator &it);
 
+		/**
+		 * Delete a chunk from the variable.
+		 */
 		void eraseChunk(ChunkIndexByIteration::iterator &it);
 
+		/**
+		 * Delete all the chunks held by a Variable.
+		 */
 		void clear();
 };
 

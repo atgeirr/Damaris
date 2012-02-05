@@ -16,13 +16,12 @@
  ********************************************************************/
 /**
  * \file ParameterSet.cpp
- * \date October 2011
+ * \date February 2012
  * \author Matthieu Dorier
- * \version 0.3
- *
- * ParameterSet.cpp defines the holder of a set of parameters.
+ * \version 0.4
  */
 #include "common/ParameterSet.hpp"
+#include "common/Types.hpp"
 #include "common/Debug.hpp"
 
 namespace Damaris {
@@ -35,39 +34,34 @@ namespace Damaris {
 
 	void ParameterSet::init() 
 	{
+		if(model == NULL) return;
+
 		Model::DataModel::parameter_const_iterator p(model->parameter().begin());
 		for(; p < model->parameter().end(); p++) {
 			std::string name(p->name());
-			if(p->type() == "short") {
-				short value = boost::lexical_cast<short>(p->value());
-				set<short>(name,value);
-			} else
-			if(p->type() == "int") {
-				std::string name(p->name());
-				int value = boost::lexical_cast<int>(p->value());
-				set<int>(name,value);
-			} else
-			if(p->type() == "long") {
-				long value = boost::lexical_cast<long>(p->value());
-				set<long>(name,value);
-			} else
-			if(p->type() == "float") {
-				float value = boost::lexical_cast<float>(p->value());
-				set<float>(name,value);
-			} else
-			if(p->type() == "double") {
-				double value = boost::lexical_cast<double>(p->value());
-				set<double>(name,value);
-			} else
-			if(p->type() == "char") {
-				char value = boost::lexical_cast<char>(p->value());
-				set<char>(name,value);
-			} else
-			if(p->type() == "string") {
-				std::string value = boost::lexical_cast<std::string>(p->value());
-				set<std::string>(name,value);
-			} else
-			{
+			switch(Types::getTypeFromString(p->type())) {
+			case Types::SHORT:
+				set<short>(name,boost::lexical_cast<short>(p->value()));
+				break;
+			case Types::INT:
+				set<int>(name,boost::lexical_cast<int>(p->value()));
+				break;
+			case Types::LONG:
+				set<long>(name,boost::lexical_cast<long>(p->value()));
+				break;
+			case Types::FLOAT:
+				set<float>(name,boost::lexical_cast<float>(p->value()));
+				break;
+			case Types::DOUBLE:
+				set<double>(name,boost::lexical_cast<double>(p->value()));
+				break;
+			case Types::CHAR:
+				set<char>(name,boost::lexical_cast<char>(p->value()));
+				break;
+			case Types::STR:
+				set<std::string>(name,boost::lexical_cast<std::string>(p->value()));
+				break;
+			default:
 				ERROR("Undefined type \"" << p->type()
 					<< "\" for parameter \""<< p->name() << "\"");
 			}

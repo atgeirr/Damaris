@@ -16,9 +16,9 @@
  ********************************************************************/
 /**
  * \file Singleton.hpp
- * \date October 2011
+ * \date February 2012
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  */
 #ifndef __DAMARIS_SINGLETON_H
 #define __DAMARIS_SINGLETON_H

@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file SharedMemorySegment.cpp
- * \date October 2011
+ * \date February 2012
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  */
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/interprocess/xsi_shared_memory.hpp>
@@ -71,46 +71,6 @@ bool SharedMemorySegment::remove(Model::BufferModel* model)
                 return false;
         }
 }
-
-/*
-SharedMemorySegment* SharedMemorySegment::create(posix_shmem_t posix_shmem, 
-	const char* name, int64_t size)
-{
-	return new SharedMemorySegment::POSIX_ShMem(name,size);
-}
-
-SharedMemorySegment* SharedMemorySegment::create(sysv_shmem_t sysv_shmem, 
-	const char* name, int64_t size)
-{
-	return new SharedMemorySegment::SYSV_ShMem(name,size);
-}
-
-SharedMemorySegment* SharedMemorySegment::open(posix_shmem_t posix_shmem, 
-	const char* name)
-{
-	return new SharedMemorySegment::POSIX_ShMem(name);
-}
-
-SharedMemorySegment* SharedMemorySegment::open(sysv_shmem_t sysv_shmem, 
-	const char* name)
-{
-	return new SharedMemorySegment::SYSV_ShMem(name);
-}
-
-bool SharedMemorySegment::remove(posix_shmem_t posix_shmem, 
-	const char* name)
-{
-        return shared_memory_object::remove(name);
-}
-
-bool SharedMemorySegment::remove(sysv_shmem_t sysv_shmem, 
-	const char* name)
-{
-        xsi_key key(name,0);
-	int id = shmget(key.get_key(),0,0600);
-        return xsi_shared_memory::remove(id);
-}
-*/
 
 SharedMemorySegment::POSIX_ShMem::POSIX_ShMem(const std::string &name, int64_t size)
 {
