@@ -95,7 +95,9 @@ void MetadataManager::initVariables()
 	{
 		std::string name = (std::string)(v->name());
 		std::string layoutName = (std::string)(v->layout());
-		addVariable(name,layoutName);
+		std::string desc(*v);
+		std::string unit = (std::string)(v->unit());
+		addVariable(name,layoutName,desc,unit);
 	}
 
 	// build all variables in sub-groups
@@ -117,6 +119,9 @@ void MetadataManager::readVariablesInSubGroup(const Model::GroupModel *g,
 		std::string name = (std::string)(v->name());
 		std::string layoutName = (std::string)(v->layout());
 		std::string varName = groupName+"/"+name;
+		std::string desc(*v);
+		std::string unit = (std::string)(v->unit());
+                addVariable(name,layoutName,desc,unit);
 		addVariable(varName,layoutName);
 	}
 
@@ -127,7 +132,13 @@ void MetadataManager::readVariablesInSubGroup(const Model::GroupModel *g,
 				+ "/" + (std::string)(subg->name()));
 }
 
-bool MetadataManager::addVariable(const std::string & varname, const std::string & layoutname)
+bool MetadataManager::addVariable(const std::string &varname, const std::string & layoutname)
+{
+	return addVariable(varname,layoutname,"","");
+}
+
+bool MetadataManager::addVariable(const std::string & varname, const std::string & layoutname,
+				  const std::string & description, const std::string & unit)
 {
 	VariableSet::index<by_name>::type::iterator it = 
 		variables->get<by_name>().find(varname);
@@ -149,6 +160,8 @@ bool MetadataManager::addVariable(const std::string & varname, const std::string
 	// allocate the variable
 	int id = variables->size();
 	Variable* v = new Variable(id,varname,l);
+	v->setDescription(description);
+	v->setUnit(unit);
 
 	variables->insert(boost::shared_ptr<Variable>(v));
 	DBG("Variable \"" << varname << "\" now defined in the metadata manager");

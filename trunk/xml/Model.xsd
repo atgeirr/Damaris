@@ -53,13 +53,15 @@
 	</xs:complexType>
 
 	<!-- Variable node -->
-	<xs:complexType name="VariableModel" mixed="true">
-	<xs:sequence>
-		<xs:element name="description" type="xs:string" minOccurs="0"/>
-	</xs:sequence>
+	<xs:complexType name="VariableModel">
+	<xs:simpleContent>
+	<xs:extension base="xs:string">
 	<xs:attribute name="name"    type="xs:string"  use="required"/>
+	<xs:attribute name="unit"    type="xs:string"  use="optional" default=""/>
 	<xs:attribute name="layout"  type="xs:string"  use="required"/>
 	<xs:attribute name="enabled" type="xs:boolean" use="optional"/>
+	</xs:extension>
+	</xs:simpleContent>
 	</xs:complexType>
 
 	<!-- Group node -->

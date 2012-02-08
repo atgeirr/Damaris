@@ -525,36 +525,6 @@ namespace Damaris
     // VariableModel
     // 
 
-    const VariableModel::description_optional& VariableModel::
-    description () const
-    {
-      return this->description_;
-    }
-
-    VariableModel::description_optional& VariableModel::
-    description ()
-    {
-      return this->description_;
-    }
-
-    void VariableModel::
-    description (const description_type& x)
-    {
-      this->description_.set (x);
-    }
-
-    void VariableModel::
-    description (const description_optional& x)
-    {
-      this->description_ = x;
-    }
-
-    void VariableModel::
-    description (::std::auto_ptr< description_type > x)
-    {
-      this->description_.set (x);
-    }
-
     const VariableModel::name_type& VariableModel::
     name () const
     {
@@ -577,6 +547,36 @@ namespace Damaris
     name (::std::auto_ptr< name_type > x)
     {
       this->name_.set (x);
+    }
+
+    const VariableModel::unit_type& VariableModel::
+    unit () const
+    {
+      return this->unit_.get ();
+    }
+
+    VariableModel::unit_type& VariableModel::
+    unit ()
+    {
+      return this->unit_.get ();
+    }
+
+    void VariableModel::
+    unit (const unit_type& x)
+    {
+      this->unit_.set (x);
+    }
+
+    void VariableModel::
+    unit (::std::auto_ptr< unit_type > x)
+    {
+      this->unit_.set (x);
+    }
+
+    const VariableModel::unit_type& VariableModel::
+    unit_default_value ()
+    {
+      return unit_default_value_;
     }
 
     const VariableModel::layout_type& VariableModel::
@@ -2013,12 +2013,51 @@ namespace Damaris
     // VariableModel
     //
 
+    const VariableModel::unit_type VariableModel::unit_default_value_ (
+      "");
+
     VariableModel::
     VariableModel (const name_type& name,
                    const layout_type& layout)
-    : ::xml_schema::type (),
-      description_ (::xml_schema::flags (), this),
+    : ::xml_schema::string (),
       name_ (name, ::xml_schema::flags (), this),
+      unit_ (unit_default_value (), ::xml_schema::flags (), this),
+      layout_ (layout, ::xml_schema::flags (), this),
+      enabled_ (::xml_schema::flags (), this)
+    {
+    }
+
+    VariableModel::
+    VariableModel (const char* _xsd_string_base,
+                   const name_type& name,
+                   const layout_type& layout)
+    : ::xml_schema::string (_xsd_string_base),
+      name_ (name, ::xml_schema::flags (), this),
+      unit_ (unit_default_value (), ::xml_schema::flags (), this),
+      layout_ (layout, ::xml_schema::flags (), this),
+      enabled_ (::xml_schema::flags (), this)
+    {
+    }
+
+    VariableModel::
+    VariableModel (const ::std::string& _xsd_string_base,
+                   const name_type& name,
+                   const layout_type& layout)
+    : ::xml_schema::string (_xsd_string_base),
+      name_ (name, ::xml_schema::flags (), this),
+      unit_ (unit_default_value (), ::xml_schema::flags (), this),
+      layout_ (layout, ::xml_schema::flags (), this),
+      enabled_ (::xml_schema::flags (), this)
+    {
+    }
+
+    VariableModel::
+    VariableModel (const ::xml_schema::string& _xsd_string_base,
+                   const name_type& name,
+                   const layout_type& layout)
+    : ::xml_schema::string (_xsd_string_base),
+      name_ (name, ::xml_schema::flags (), this),
+      unit_ (unit_default_value (), ::xml_schema::flags (), this),
       layout_ (layout, ::xml_schema::flags (), this),
       enabled_ (::xml_schema::flags (), this)
     {
@@ -2028,9 +2067,9 @@ namespace Damaris
     VariableModel (const VariableModel& x,
                    ::xml_schema::flags f,
                    ::xml_schema::container* c)
-    : ::xml_schema::type (x, f, c),
-      description_ (x.description_, f, this),
+    : ::xml_schema::string (x, f, c),
       name_ (x.name_, f, this),
+      unit_ (x.unit_, f, this),
       layout_ (x.layout_, f, this),
       enabled_ (x.enabled_, f, this)
     {
@@ -2040,15 +2079,15 @@ namespace Damaris
     VariableModel (const ::xercesc::DOMElement& e,
                    ::xml_schema::flags f,
                    ::xml_schema::container* c)
-    : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
-      description_ (f, this),
+    : ::xml_schema::string (e, f | ::xml_schema::flags::base, c),
       name_ (f, this),
+      unit_ (f, this),
       layout_ (f, this),
       enabled_ (f, this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
       {
-        ::xsd::cxx::xml::dom::parser< char > p (e, true, true);
+        ::xsd::cxx::xml::dom::parser< char > p (e, false, true);
         this->parse (p, f);
       }
     }
@@ -2057,29 +2096,6 @@ namespace Damaris
     parse (::xsd::cxx::xml::dom::parser< char >& p,
            ::xml_schema::flags f)
     {
-      for (; p.more_elements (); p.next_element ())
-      {
-        const ::xercesc::DOMElement& i (p.cur_element ());
-        const ::xsd::cxx::xml::qualified_name< char > n (
-          ::xsd::cxx::xml::dom::name< char > (i));
-
-        // description
-        //
-        if (n.name () == "description" && n.namespace_ () == "http://damaris.gforge.inria.fr/Damaris/Model")
-        {
-          ::std::auto_ptr< description_type > r (
-            description_traits::create (i, f, this));
-
-          if (!this->description_)
-          {
-            this->description_.set (r);
-            continue;
-          }
-        }
-
-        break;
-      }
-
       while (p.more_attributes ())
       {
         const ::xercesc::DOMAttr& i (p.next_attribute ());
@@ -2092,6 +2108,15 @@ namespace Damaris
             name_traits::create (i, f, this));
 
           this->name_.set (r);
+          continue;
+        }
+
+        if (n.name () == "unit" && n.namespace_ ().empty ())
+        {
+          ::std::auto_ptr< unit_type > r (
+            unit_traits::create (i, f, this));
+
+          this->unit_.set (r);
           continue;
         }
 
@@ -2116,6 +2141,11 @@ namespace Damaris
         throw ::xsd::cxx::tree::expected_attribute< char > (
           "name",
           "");
+      }
+
+      if (!unit_.present ())
+      {
+        this->unit_.set (unit_default_value ());
       }
 
       if (!layout_.present ())

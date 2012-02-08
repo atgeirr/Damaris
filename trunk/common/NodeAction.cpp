@@ -30,6 +30,7 @@ namespace Damaris {
 	{
 		base = a;
 		clientsPerNode = clpn;
+		DBG("Clients per node = " << clpn);
 	}
 	
 	NodeAction::~NodeAction()
@@ -39,10 +40,13 @@ namespace Damaris {
 	
 	void NodeAction::call(int32_t iteration, int32_t sourceID)
 	{
+		DBG("Node action called iteration is "<<iteration<<" and source is "<<sourceID);
 		locks[iteration] = locks[iteration] + 1;
 		if(locks[iteration] == clientsPerNode) {
-			if(base != NULL)
+			if(base != NULL) {
+				DBG("calling base action");
 				base->call(iteration,sourceID);
+			}
 			locks.erase(iteration);
 		}
 	}

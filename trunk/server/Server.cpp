@@ -51,13 +51,15 @@ Server::Server(Process* p)
 /* destructor */
 Server::~Server()
 {
+	DBG("In ~Server()");
 	Process::kill();
+	DBG("After Process killed");
 }
 	
 /* starts the server and enter the main loop */
 int Server::run()
 {
-	INFO("Successfully entered in \"run\" mode");
+	DBG("Successfully entered in \"run\" mode");
 	
 	Message *msg = new Message();
 	bool received;
@@ -66,7 +68,9 @@ int Server::run()
 		received = true;
 		process->getSharedMessageQueue()->receive(msg,sizeof(Message));
 		if(received) {
-			INFO("Received a message of type " << msg->type);
+			DBG("Received a message of type " << msg->type
+				<< " iteration is "<<msg->iteration
+				<< " source is " <<msg->source);
 			processMessage(msg);
 		}
 	}
@@ -89,9 +93,7 @@ void Server::processMessage(Message* msg)
 		ShmChunk* chunk = new ShmChunk(process->getSharedMemorySegment(),handle);
 		Variable* v = process->getMetadataManager()->getVariable(object);
 		if(v != NULL) {
-			INFO("A");
 			v->attachChunk(chunk);
-			INFO("B");
 		} else {
 			// the variable is unknown, discarde it
 			ERROR("Server received a chunk " 

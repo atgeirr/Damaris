@@ -106,7 +106,7 @@ int 	DC_get_parameter(const char* param_name, void* buffer);
  * The program must have been started through the start_mpi_entity function.
  * \return the communicator.
  */
-MPI_Comm DC_get_clients_communicator();
+MPI_Comm DC_mpi_get_client_comm();
 
 /**
  * \brief Send a kill signal to the server.

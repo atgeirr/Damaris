@@ -814,30 +814,9 @@ namespace Damaris
       static const language_type language_default_value_;
     };
 
-    class VariableModel: public ::xml_schema::type
+    class VariableModel: public ::xml_schema::string
     {
       public:
-      // description
-      // 
-      typedef ::xml_schema::string description_type;
-      typedef ::xsd::cxx::tree::optional< description_type > description_optional;
-      typedef ::xsd::cxx::tree::traits< description_type, char > description_traits;
-
-      const description_optional&
-      description () const;
-
-      description_optional&
-      description ();
-
-      void
-      description (const description_type& x);
-
-      void
-      description (const description_optional& x);
-
-      void
-      description (::std::auto_ptr< description_type > p);
-
       // name
       // 
       typedef ::xml_schema::string name_type;
@@ -854,6 +833,26 @@ namespace Damaris
 
       void
       name (::std::auto_ptr< name_type > p);
+
+      // unit
+      // 
+      typedef ::xml_schema::string unit_type;
+      typedef ::xsd::cxx::tree::traits< unit_type, char > unit_traits;
+
+      const unit_type&
+      unit () const;
+
+      unit_type&
+      unit ();
+
+      void
+      unit (const unit_type& x);
+
+      void
+      unit (::std::auto_ptr< unit_type > p);
+
+      static const unit_type&
+      unit_default_value ();
 
       // layout
       // 
@@ -895,6 +894,18 @@ namespace Damaris
       VariableModel (const name_type&,
                      const layout_type&);
 
+      VariableModel (const char*,
+                     const name_type&,
+                     const layout_type&);
+
+      VariableModel (const ::std::string&,
+                     const name_type&,
+                     const layout_type&);
+
+      VariableModel (const ::xml_schema::string&,
+                     const name_type&,
+                     const layout_type&);
+
       VariableModel (const ::xercesc::DOMElement& e,
                      ::xml_schema::flags f = 0,
                      ::xml_schema::container* c = 0);
@@ -918,8 +929,9 @@ namespace Damaris
              ::xml_schema::flags);
 
       protected:
-      description_optional description_;
       ::xsd::cxx::tree::one< name_type > name_;
+      ::xsd::cxx::tree::one< unit_type > unit_;
+      static const unit_type unit_default_value_;
       ::xsd::cxx::tree::one< layout_type > layout_;
       enabled_optional enabled_;
     };

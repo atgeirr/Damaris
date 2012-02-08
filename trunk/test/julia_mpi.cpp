@@ -49,7 +49,7 @@ int main(int argc, char** argv)
 	Damaris::Client* client = Damaris::Initiator::start(config,global);
 
 	if(client != NULL) {
-		comm = client->get_clients_communicator();
+		comm = client->mpi_get_client_comm();
 		MPI_Comm_rank(comm,&rank);
 		MPI_Comm_size(comm,&size);
 

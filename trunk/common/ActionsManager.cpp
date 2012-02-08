@@ -25,7 +25,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 #include <list>
 #include <iostream>
-
 #include "common/Debug.hpp"
 #include "common/Language.hpp"
 #include "common/Environment.hpp"
@@ -119,6 +118,7 @@ void ActionsManager::addScriptAction(const std::string& name,
 			a = new Python::PyAction(fileName); break;
 #else
 			ERROR("Damaris has been compiled without Python support, Python actions will be ignored");
+			DBG("Ahahaha");
 			a = new Action::EmptyAction(); break;
 #endif
 		default:

@@ -128,7 +128,7 @@ class Client : public Writer {
 		/**
 		 * Gets the communicator gathering clients.
 		 */
-		virtual MPI_Comm get_clients_communicator();
+		virtual MPI_Comm mpi_get_client_comm();
 		
 		/**
 		 * \brief Destructor.

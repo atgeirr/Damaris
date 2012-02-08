@@ -319,7 +319,7 @@ namespace Damaris {
 		if(chunkh != 0) delete (ChunkHandle*)chunkh;
 	}
 
-	MPI_Comm Client::get_clients_communicator()
+	MPI_Comm Client::mpi_get_client_comm()
 	{
 		return process->getEnvironment()->getEntityComm();
 	}

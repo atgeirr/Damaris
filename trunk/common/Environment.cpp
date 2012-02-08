@@ -48,6 +48,7 @@ namespace Damaris {
 
 	int Environment::getClientsPerNode() const
 	{
+		DBG("In getClientsPerNode() : " << model->architecture().cores().clients().count());
 		return model->architecture().cores().clients().count();
 	}
 

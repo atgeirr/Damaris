@@ -103,6 +103,11 @@ namespace Damaris {
 		bool addVariable(const std::string & varname, const std::string & layoutName);
 
 		/**
+		 * Add a new variable entry within the metadata manager.
+		 */
+		bool addVariable(const std::string & varname, const std::string & layoutName,
+				 const std::string & description, const std::string & unit);
+		/**
 		 * Retrieve a variable from its name.
 		 */
 		Variable* getVariable(const std::string &name);

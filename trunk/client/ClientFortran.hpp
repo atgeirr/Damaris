@@ -113,6 +113,13 @@ void FC_FUNC_GLOBAL(df_get_parameter,DF_GET_PARAMETER)
 	(char* param_name_f, void* buffer_f, int* ierr_f, int param_name_size);
 
 /**
+ * \fn df_mpi_get_client_comm
+ * \brief Retrieves the MPI communicator gathering clients.
+ * \see Damaris::Client::get_client_communicator
+ */
+void FC_FUNC_GLOBAL(df_mpi_get_client_comm,DF_GET_MPI_CLIENT_COMM)
+	(MPI_Fint* fcomm);
+/**
  * \fn df_kill_server
  * \brief Sends a "kill" signal to the server.
  * \see Damaris::Client::kill_server

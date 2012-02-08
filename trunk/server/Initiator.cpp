@@ -112,6 +112,7 @@ Client* Initiator::start(const std::string& configFile, MPI_Comm globalcomm)
 			Server server(p);
 			MPI_Barrier(globalcomm);
 			server.run();
+			DBG("After Server.run");
 			return NULL;
 		}
 	} else {

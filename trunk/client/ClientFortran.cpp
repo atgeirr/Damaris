@@ -43,6 +43,7 @@ void FC_FUNC_GLOBAL(df_initialize,DF_INITIALIZE)
 void FC_FUNC_GLOBAL(df_write,DF_WRITE)
 	(char* var_name_f, int32_t* iteration_f, void* data_f, int32_t* ierr_f, int var_name_size)
 	{
+		DBG("iteration = " << *iteration_f);
 		// make a copy of the name and delete possible spaces at the end of the string
 		char* varname_copy = (char*)malloc(var_name_size+1);
 		memset(varname_copy,' ',var_name_size+1);
@@ -165,6 +166,12 @@ void FC_FUNC_GLOBAL(df_get_parameter,DF_GET_PARAMETER)
 		free(paramname_copy);
 	}
 
+void FC_FUNC_GLOBAL(df_mpi_get_client_comm,DF_GET_MPI_CLIENT_COMM)
+        (MPI_Fint* fcomm)
+	{
+		*fcomm = MPI_Comm_c2f(client->mpi_get_client_comm());
+	}
+
 void FC_FUNC_GLOBAL(df_kill_server,DF_KILL_SERVER)
 	(int* ierr_f)
 	{
@@ -175,7 +182,8 @@ void FC_FUNC_GLOBAL(df_finalize,DF_FINALIZE)
 	(int* ierr_f)
 	{
 		delete client;
-		*ierr_f = 0;
+		if(ierr_f != NULL)
+			*ierr_f = 0;
 	}
 }
 #endif

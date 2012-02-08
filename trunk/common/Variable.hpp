@@ -45,6 +45,8 @@ class Variable {
 	
 	private:	
 		std::string name;	/*!< Name of the variable. */
+		std::string description; /*!< Description of the variable. */
+		std::string unit;	 /*!< Unit of the variable. */
 		Layout* layout;		/*!< Layout of the data. */
 		int id;			/*!< The ID is used to avoid 
 					  passing variable's name in shared-memory. */
@@ -137,6 +139,26 @@ class Variable {
 		 * Delete all the chunks held by a Variable.
 		 */
 		void clear();
+
+		/**
+		 * Returns a reference to the variabls description.
+		 */
+		const std::string& getDescription() const { return description; }
+
+		/**
+		 * Set the description of the variable.
+		 */
+		void setDescription(const std::string& desc) { description = desc; }
+
+		/**
+		 * Returns the unit of the variable.
+		 */
+		const std::string& getUnit() const { return unit; }
+
+		/**
+		 * Set the unit of the variable.
+		 */
+		void setUnit(const std::string& u) { unit = u; }
 };
 
 }
