@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file PyChunk.hpp
- * \date October 2011
+ * \date February 2012 
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  */
 #ifndef __DAMARIS_PYTHON_CHUNK_H
 #define __DAMARIS_PYTHON_CHUNK_H

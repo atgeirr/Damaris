@@ -104,7 +104,7 @@
 	<xs:complexType name="EventModel">
 	<xs:attribute name="name"    type="xs:string" use="required"/>
 	<xs:attribute name="action"  type="xs:string" use="required"/>
-	<xs:attribute name="library" type="xs:string" use="required"/>
+	<xs:attribute name="library" type="xs:string" use="optional" default="" />
 	<xs:attribute name="scope"   type="xs:string" use="optional" default="core" />
 	</xs:complexType>
 

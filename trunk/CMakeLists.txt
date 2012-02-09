@@ -99,6 +99,20 @@ else (PYTHON_INCLUDE_PATH)
 endif (PYTHON_INCLUDE_PATH)
 
 #-----------------------------------------------------------#
+# Set everything related to the HDF5 library 
+# Just comment the first line if you don't want HDF5 support
+#-----------------------------------------------------------#
+set(HDF5_ROOT ${EXTERNAL_ROOT})
+set(HDF5_LIBRARY_DIR "${HDF5_ROOT}/lib")
+set(HDF5_INCLUDE_DIR "${HDF5_ROOT}/include")
+set(HDF5_LIB hdf5)
+if(HDF5_ROOT)
+  include_directories(${HDF5_INCLUDE_DIR})
+  link_directories(${HDF5_LIBRARY_DIR})
+  add_definitions(-D__ENABLE_HDF5)
+endif(HDF5_ROOT)
+
+#-----------------------------------------------------------#
 # Set everything related to Fortran
 #-----------------------------------------------------------#
 if(CMAKE_Fortran_COMPILER)

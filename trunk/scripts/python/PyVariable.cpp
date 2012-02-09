@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file PyVariable.cpp
- * \date October 2011
+ * \date February 2012
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  */
 #include "scripts/python/PyVariable.hpp"
 #include "scripts/python/PyChunk.hpp"
@@ -32,6 +32,7 @@ namespace bp = boost::python;
 
 PyVariable::PyVariable() 
 {
+	INFO("Trying to create a PyVariable with the wrong constructor");
 	throw(bp::error_already_set());
 }
 
@@ -100,6 +101,16 @@ std::string PyVariable::name() const
 	return inner->getName().substr(last_slash+1);
 }
 
+std::string PyVariable::description() const
+{
+	return inner->getDescription();
+}
+
+std::string PyVariable::unit() const
+{
+	return inner->getUnit();
+}
+
 const std::string& PyVariable::fullname() const
 {
 	return inner->getName();
@@ -114,7 +125,6 @@ bool PyVariable::remove(PyChunk& pc)
 {
 	return false;
 	WARN("This function is not implemented");
-//	return inner->eraseChunk(pc.inner);
 }
 
 void PyVariable::clear()

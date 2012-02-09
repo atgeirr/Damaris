@@ -1308,6 +1308,9 @@ namespace Damaris
       void
       library (::std::auto_ptr< library_type > p);
 
+      static const library_type&
+      library_default_value ();
+
       // scope
       // 
       typedef ::xml_schema::string scope_type;
@@ -1331,8 +1334,7 @@ namespace Damaris
       // Constructors.
       //
       EventModel (const name_type&,
-                  const action_type&,
-                  const library_type&);
+                  const action_type&);
 
       EventModel (const ::xercesc::DOMElement& e,
                   ::xml_schema::flags f = 0,
@@ -1360,6 +1362,7 @@ namespace Damaris
       ::xsd::cxx::tree::one< name_type > name_;
       ::xsd::cxx::tree::one< action_type > action_;
       ::xsd::cxx::tree::one< library_type > library_;
+      static const library_type library_default_value_;
       ::xsd::cxx::tree::one< scope_type > scope_;
       static const scope_type scope_default_value_;
     };

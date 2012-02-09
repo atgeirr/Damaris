@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file PyInterpreter.cpp
- * \date October 2011
+ * \date February 2012 
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  */
 #include <boost/python.hpp>
 
@@ -44,6 +44,9 @@ static bool ready = false;
 static bp::object dict;
 static bp::object damaris_dict;
 
+/**
+ * Opens a variable by its name, returns a Variable object.
+ */
 static bp::object open(const std::string& varname)
 {
 	MetadataManager* metadata = Process::get()->getMetadataManager();
@@ -55,6 +58,9 @@ static bp::object open(const std::string& varname)
 	}
 }
 
+/**
+ * Clears all chunks from all variables stored in Damaris.
+ */
 static bp::object clear()
 {
 	MetadataManager* metadata = Process::get()->getMetadataManager();
@@ -98,6 +104,8 @@ BOOST_PYTHON_MODULE(damaris)
 		.add_property("name",&PyVariable::name)
 		.add_property("fullname",bp::make_function(&PyVariable::fullname,
 			bp::return_value_policy<bp::copy_const_reference>()))
+		.add_property("description",&PyVariable::description)
+		.add_property("unit",&PyVariable::unit)
 		;
 }
 

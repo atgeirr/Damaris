@@ -47,6 +47,10 @@ typedef boost::multi_index_container<
         >
 > VariableSet;
 
+typedef VariableSet::index<by_name>::type VariableIndexByName;
+typedef VariableSet::index<by_id>::type VariableIndexById;
+//typedef VariableSet::index<by_any>::type VariableIndex;
+
 }
 
 #endif

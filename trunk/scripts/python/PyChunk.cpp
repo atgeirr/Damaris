@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file PyChunk.cpp
- * \date October 2011
+ * \date February 2012
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  */
 #include "scripts/python/PyChunk.hpp"
 #include "common/Debug.hpp"
@@ -35,6 +35,7 @@ namespace bp = boost::python;
 	
 PyChunk::PyChunk()
 {
+	ERROR("Trying to initialize a PyChunk");
 	throw(bp::error_already_set());
 }
 

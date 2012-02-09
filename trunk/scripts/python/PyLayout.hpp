@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file PyLayout.hpp
- * \date October 2011
+ * \date February 2012
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  */
 #ifndef __DAMARIS_PYTHON_LAYOUT_H
 #define __DAMARIS_PYTHON_LAYOUT_H
@@ -33,13 +33,13 @@ namespace Python {
 
 namespace bp = boost::python;
 
-
 	/**
 	 * PyLayout is a decorator class for a Layout object to
 	 * be exposed as a Python object.
 	 */	
 	class PyLayout {
 		friend class PyVariable;
+
 	private:
 		Layout* inner; /*!< Wrapped Layout object. */
 

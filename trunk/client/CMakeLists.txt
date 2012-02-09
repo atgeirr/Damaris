@@ -39,7 +39,15 @@ if(PYTHON_LIB)
 	${DAMARIS_SOURCE_DIR}/scripts/python/PyTypes.cpp)
 endif(PYTHON_LIB)
 
+if(HDF5_ROOT)
+  set(DAMARIS_PERSISTENCY_SRC
+	${DAMARIS_PERSISTENCY_SRC}
+	${DAMARIS_SOURCE_DIR}/hdf5/HDF5Writer.cpp)
+endif(HDF5_ROOT)
+
 add_library (damaris ${DAMARIS_CLIENT_SRC}
 		     ${DAMARIS_MODEL_SRC}
 	             ${DAMARIS_COMMON_SRC}
-		     ${DAMARIS_SCRIPTS_SRC})
+		     ${DAMARIS_SCRIPTS_SRC}
+		     ${DAMARIS_PERSISTENCY_SRC})
+

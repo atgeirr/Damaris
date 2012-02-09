@@ -64,13 +64,17 @@ namespace Damaris {
 		if(loaded) return;
 
 		char* error;
-		void* handle = dlopen(fileName.c_str(),RTLD_NOW | RTLD_GLOBAL);
-		
-		if(!handle)
-		{
-			ERROR("While loading plugin in \"" << fileName.c_str() 
-					<< "\":" << dlerror());
-			return;
+		void* handle = NULL;
+		if(fileName == "") {
+			handle = dlopen(NULL,RTLD_NOW | RTLD_GLOBAL);
+		} else {
+			handle = dlopen(fileName.c_str(),RTLD_NOW | RTLD_GLOBAL);
+			if(!handle)
+			{
+				ERROR("While loading plugin in \"" << fileName.c_str() 
+						<< "\":" << dlerror());
+				return;
+			}
 		}
 
 		/* loading function */

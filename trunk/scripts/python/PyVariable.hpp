@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file PyVariable.hpp
- * \date October 2011
+ * \date February 2012 
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  */
 #ifndef __DAMARIS_PYTHON_VARIABLE_H
 #define __DAMARIS_PYTHON_VARIABLE_H
@@ -75,6 +75,16 @@ namespace bp = boost::python;
 		 * Return the name of the variable (not the full path).
 		 */
 		std::string name() const;
+
+		/**
+		 * Return the description of the variable.
+		 */
+		std::string description() const;
+
+		/**
+		 * Return the unit of the variable.
+		 */
+		std::string unit() const;
 	
 		/**
 		 * Return the full path (groups/sugroups/.../varname).
@@ -86,11 +96,14 @@ namespace bp = boost::python;
 		 */
 		PyLayout layout() const;
 
-		/**
+		/**	
 		 * Remove a chunk from the variable, free the memory of the chunk
 		 */
 		bool remove(PyChunk& pc);
 
+		/**
+		 * Delete all the chunks in a variable. Also free the memory.
+		 */
 		void clear();
 	};
 }

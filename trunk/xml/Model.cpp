@@ -973,6 +973,12 @@ namespace Damaris
       this->library_.set (x);
     }
 
+    const EventModel::library_type& EventModel::
+    library_default_value ()
+    {
+      return library_default_value_;
+    }
+
     const EventModel::scope_type& EventModel::
     scope () const
     {
@@ -2546,17 +2552,19 @@ namespace Damaris
     // EventModel
     //
 
+    const EventModel::library_type EventModel::library_default_value_ (
+      "");
+
     const EventModel::scope_type EventModel::scope_default_value_ (
       "core");
 
     EventModel::
     EventModel (const name_type& name,
-                const action_type& action,
-                const library_type& library)
+                const action_type& action)
     : ::xml_schema::type (),
       name_ (name, ::xml_schema::flags (), this),
       action_ (action, ::xml_schema::flags (), this),
-      library_ (library, ::xml_schema::flags (), this),
+      library_ (library_default_value (), ::xml_schema::flags (), this),
       scope_ (scope_default_value (), ::xml_schema::flags (), this)
     {
     }
@@ -2653,9 +2661,7 @@ namespace Damaris
 
       if (!library_.present ())
       {
-        throw ::xsd::cxx::tree::expected_attribute< char > (
-          "library",
-          "");
+        this->library_.set (library_default_value ());
       }
 
       if (!scope_.present ())

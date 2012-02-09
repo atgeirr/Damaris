@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file PyInterpreter.hpp
- * \date October 2011
+ * \date February 2012 
  * \author Matthieu Dorier
- * \version 0.3
+ * \version 0.4
  */
 #ifndef __DAMARIS_PYTHON_H
 #define __DAMARIS_PYTHON_H
@@ -39,23 +39,30 @@ namespace Python {
 	class PyInterpreter : public Singleton<PyInterpreter> {
 		friend class Singleton<PyInterpreter>;		
 	private:
+		/**
+		 * Constructor, can only be called by the getInstance() method.
+		 */
 		PyInterpreter();
+		/**
+		 * Destructor.
+		 */
 		~PyInterpreter();
-	/**
-	 * Initialize the Python interpreter.
-	 */				
-	void initialize();
+		/**
+		 * Initialize the Python interpreter.
+		 */				
+		void initialize();
 	
-	/**
-	 * Finalize the Python interpreter.
-	 */	
-	void finalize();
+		/**
+		 * Finalize the Python interpreter.
+		 */	
+		void finalize();
 
 	public:
-	/**
-	 * Executes a given file given.
-	 */
-	void execFile(const std::string &filename, int source, int iteration);
+		/**
+		 * Executes a given file given as a response to an event sent
+		 * by source at a given iteration.
+		 */
+		void execFile(const std::string &filename, int source, int iteration);
 	};
 }
 }
