@@ -27,6 +27,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/multi_index/member.hpp>
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/mem_fun.hpp>
+#include <boost/multi_index/composite_key.hpp>
 #include <boost/shared_ptr.hpp>
 
 #include "Tags.hpp"
@@ -43,13 +44,19 @@ typedef boost::multi_index_container<
                 boost::multi_index::ordered_unique<boost::multi_index::tag<by_id>,
                         boost::multi_index::const_mem_fun<Variable,int,&Variable::getID> >,
                 boost::multi_index::ordered_unique<boost::multi_index::tag<by_name>,
-                        boost::multi_index::const_mem_fun<Variable,const std::string&,&Variable::getName> >
+                        boost::multi_index::const_mem_fun<Variable,const std::string&,&Variable::getName> >,
+		bmi::ordered_non_unique<bmi::tag<by_any>,
+			bmi::composite_key<Variable,
+				bmi::const_mem_fun<Variable,const std::string&, &Variable::getName>,
+				bmi::const_mem_fun<Variable,int, &Variable::getID>
+			>
+		>
         >
 > VariableSet;
 
 typedef VariableSet::index<by_name>::type VariableIndexByName;
 typedef VariableSet::index<by_id>::type VariableIndexById;
-//typedef VariableSet::index<by_any>::type VariableIndex;
+typedef VariableSet::index<by_any>::type VariableIndex;
 
 }
 

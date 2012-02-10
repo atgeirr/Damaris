@@ -82,7 +82,7 @@ namespace Damaris {
 			dlsym(handle,funName.c_str());
 
 		if ((error = dlerror()) != NULL)  {
-			ERROR("While loading function in dynamic library: " << error);
+			ERROR("While loading function in " << error);
 			return;
 		}
 	}

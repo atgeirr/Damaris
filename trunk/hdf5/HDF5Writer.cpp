@@ -48,12 +48,13 @@ void hdf5_dump(const std::string& event, int32_t step, int32_t src)
 	// create the file
 	std::string basename = "";
         sprintf(filename,"%s.%d.%d.h5",basename.c_str(),(int)step,serverID);
-	file_id = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+//	file_id = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
 	// create group
 	sprintf(groupname,"/proc");
-	group_id = H5Gcreate(file_id, groupname, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+//	group_id = H5Gcreate(file_id, groupname, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
+printf("Coucou from inside an inner function!");
 //	Damaris::VariableSet &vset = p->getMetadataManager()->getVariableSet();
 //	Damaris::VariableIndex it = vset;
         
@@ -96,8 +97,8 @@ void hdf5_dump(const std::string& event, int32_t step, int32_t src)
 	} // if
 	} // for 
 */
-	H5Fclose(file_id);
-	H5close();
+	//H5Fclose(file_id);
+	//H5close();
 	TIMER_STOP(write_time,"end writing")
 
 }
