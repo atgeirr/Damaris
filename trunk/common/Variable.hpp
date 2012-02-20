@@ -126,14 +126,24 @@ class Variable {
 		ChunkIndex::iterator getChunks(int source, int iteration, ChunkIndex::iterator &end);
 
 		/**
-		 * Delete a chunk from the variable.
+		 * Delete a chunk from the variable, free its memory.
 		 */
 		void eraseChunk(ChunkIndexBySource::iterator &it);
+
+		/**
+		 * Detach a chunk from a variable (don't free the memory).
+		 */
+		void detachChunk(ChunkIndexBySource::iterator &it);
 
 		/**
 		 * Delete a chunk from the variable.
 		 */
 		void eraseChunk(ChunkIndexByIteration::iterator &it);
+
+		/**
+         * Detach a chunk from a variable (don't free the memory).
+         */
+        void detachChunk(ChunkIndexByIteration::iterator &it);
 
 		/**
 		 * Delete all the chunks held by a Variable.

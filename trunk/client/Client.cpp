@@ -114,10 +114,6 @@ namespace Damaris {
 			return -3;
 		}
 		
-		// we don't need to keep the chunk in the client now,
-		// so we erase it from the variable.
-		v->eraseChunk(it);
-
 		// create notification message
 		Message message;
 		message.source = process->getEnvironment()->getID();
@@ -126,10 +122,14 @@ namespace Damaris {
 		message.type = MSG_VAR;
 		message.handle = chunk->getHandle();
 		message.object = v->getID();
-                // send message
+		// send message
 		process->getSharedMessageQueue()->send(&message);
-                // free message
+		// free message
 		DBG("Variable \"" << varname << "\" has been commited");
+
+		// we don't need to keep the chunk in the client now,
+        // so we erase it from the variable.
+        v->detachChunk(it);
 
 		return 0;
 	}

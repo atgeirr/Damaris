@@ -11,8 +11,8 @@ if(CMAKE_Fortran_COMPILER)
 #  in the examples directory before uncommenting these lines and running
 #  "make" again.
 
-#  add_executable (test_alloc_fortran ${DAMARIS_SOURCE_DIR}/examples/test_alloc.f90)
-#  target_link_libraries (test_alloc_fortran ${CLIENT_SIDE_LIBRARIES})
+  add_executable (test_alloc_fortran ${DAMARIS_SOURCE_DIR}/examples/test_alloc.f90)
+  target_link_libraries (test_alloc_fortran ${CLIENT_SIDE_LIBRARIES})
 
   add_executable (test_chunk_fortran ${DAMARIS_SOURCE_DIR}/examples/test_chunk.f90)
   target_link_libraries (test_chunk_fortran ${CLIENT_SIDE_LIBRARIES})

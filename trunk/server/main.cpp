@@ -92,4 +92,5 @@ static void sighandler(int sig)
 {
 	INFO("Kill signal caught, server will terminate");
 	if(server != NULL) server->stop();
+	exit(0);
 }
