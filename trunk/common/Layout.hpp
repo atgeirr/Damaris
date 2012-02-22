@@ -84,13 +84,14 @@ class Layout {
 		/**
 		 * \return the extent along a given dimension. 
 		 */
-		int getExtentAlongDimension(unsigned int dim) const;
+		size_t getExtentAlongDimension(unsigned int dim) const;
 
 		/**
 		 * \return true if the Layout has unlimited dimension 
 		 *         (defined as "?" in the configuration file).
 		 */
-		bool isUnlimited() const;		
+		bool isUnlimited() const;
+
 }; // class Layout
 	
 } // namespace Damaris

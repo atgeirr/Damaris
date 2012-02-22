@@ -48,19 +48,19 @@ namespace Damaris {
 		process = p;
 	}	
 
-	void* Client::alloc(const std::string & varname, int32_t iteration)
+	void* Client::alloc(const std::string & varname, int32_t iteration, bool blocking)
 	{
 
-		/* check that the variable is known in the configuration */
+		// check that the variable is known in the configuration
 		Variable* variable = process->getMetadataManager()->getVariable(varname);
 
-        	if(variable == NULL) {
+        if(variable == NULL) {
 			ERROR("Variable \""<< varname 
 				<< "\" not defined in configuration");
 			return NULL;
-        	}
+        }
 
-		/* the variable is known, get its layout */
+		// the variable is known, get its layout
 		Layout* layout = variable->getLayout();
 	
 		if(layout->isUnlimited()) {
@@ -68,30 +68,27 @@ namespace Damaris {
 			return NULL;
 		}
 
-		/* prepare variable to initialize a chunk */
-		std::vector<int> si(layout->getDimensions()),ei(layout->getDimensions());
-		for(unsigned int i=0; i < layout->getDimensions(); i++)	{
-			ei[i] = layout->getExtentAlongDimension(i)-1;
-			si[i] = 0;
-		}
+		// initialize the chunk descriptor
+		ChunkDescriptor cd(*layout);
 
-		/* try initializing the chunk in shared memory */
-		try {
-			ShmChunk* chunk = 
-				new ShmChunk(process->getSharedMemorySegment(),layout->getType(),
-						layout->getDimensions(),si,ei);
-			chunk->setSource(process->getEnvironment()->getID());
-			chunk->setIteration(iteration);
-			variable->attachChunk(chunk);
-			/* chunk initialized, returns the data! */
-			return chunk->data();
+		// try allocating the required memory
+		size_t size = sizeof(ChunkHeader)+cd.getDataMemoryLength();			
+		void* location = process->getSharedMemorySegment()->allocate(size);	
 
-		} catch (...) {
-			ERROR("While allocating \"" << varname 
-				<< "\", allocation failed");
+		if(location == NULL) {
+			ERROR("Could not allocate memory");
+			return NULL;
 		}
-		/* on failure, returns NULL */
-		return NULL;
+		// create the chunk header in memory
+		int source = process->getEnvironment()->getID();
+		ChunkHeader* ch = new(location) ChunkHeader(cd,iteration,source);
+
+		// create the ShmChunk and attach it to the variable
+		ShmChunk* chunk = new ShmChunk(process->getSharedMemorySegment(),ch);
+		variable->attachChunk(chunk);	
+
+		// return the pointer to data
+		return chunk->data();
 	}
 	
 	int Client::commit(const std::string & varname, int32_t iteration)
@@ -134,14 +131,14 @@ namespace Damaris {
 		return 0;
 	}
 	
-	int Client::write(const std::string & varname, int32_t iteration, const void* data)
+	int Client::write(const std::string & varname, int32_t iteration, const void* data, bool blocking)
 	{
 		/* check that the variable is know in the configuration */
 		Variable* variable = process->getMetadataManager()->getVariable(varname);
 
-        	if(variable == NULL) {
+        if(variable == NULL) {
 			return -1;
-        	}
+        }
 
 		Layout* layout = variable->getLayout();
 
@@ -151,41 +148,41 @@ namespace Damaris {
 			return -3;
 		}
 
-		std::vector<int> si(layout->getDimensions()),ei(layout->getDimensions());
-                for(unsigned int i=0; i < layout->getDimensions(); i++) {
-                        ei[i] = layout->getExtentAlongDimension(i)-1;
-                        si[i] = 0;
-                }
+		// initialize the chunk descriptor
+        ChunkDescriptor cd(*layout);
 
-		ShmChunk* chunk = NULL;
-                try {
-                        chunk = new ShmChunk(process->getSharedMemorySegment(),layout->getType(),
-						layout->getDimensions(),si,ei);
-                        chunk->setSource(process->getEnvironment()->getID());
-                        chunk->setIteration(iteration);
-                } catch (...) {
-                        ERROR("While writing \"" << varname << "\", allocation failed");
-                	return -2;
-		}
+        // try allocating the required memory
+        size_t size = sizeof(ChunkHeader)+cd.getDataMemoryLength();
+        void* location = process->getSharedMemorySegment()->allocate(size);
+
+        if(location == NULL) {
+            ERROR("Could not allocate memory");
+            return -2;
+        }
+        // create the chunk header in memory
+        int source = process->getEnvironment()->getID();
+        ChunkHeader* ch = new(location) ChunkHeader(cd,iteration,source);
+
+        // create the ShmChunk and attach it to the variable
+        ShmChunk chunk(process->getSharedMemorySegment(),ch);
 
 		// copy data
-		size_t size = chunk->getDataMemoryLength();
-		memcpy(chunk->data(),data,size);
+		size = cd.getDataMemoryLength();
+		memcpy(chunk.data(),data,size);
 		
 		// create message
 		Message message;
 		
-		message.source = process->getEnvironment()->getID();
+		message.source = source;
 		message.iteration = iteration;
 		message.object = variable->getID();
 		message.type = MSG_VAR;
-		message.handle = chunk->getHandle();
+		message.handle = chunk.getHandle();
 		
 		// send message
 		process->getSharedMessageQueue()->send(&message);
 		DBG("Variable \"" << varname << "\" has been written");
 	
-		delete chunk;
 		return size;
 	}
 
@@ -195,60 +192,52 @@ namespace Damaris {
 		/* check that the variable is know in the configuration */
 		Variable* variable = process->getMetadataManager()->getVariable(varname);
 
-        	if(variable == NULL) {
+        if(variable == NULL) {
 			ERROR("Variable \""<< varname << "\" not defined in configuration");
 			return -1;
-        	}
+        }
 
-		ChunkHandle* chunkHandle = (ChunkHandle*)chunkh;
+		ChunkDescriptor* cd = (ChunkDescriptor*)chunkh;
 
-		/* check if the chunk matches the layout boundaries */
+		// check if the chunk matches the layout boundaries
 		Layout* layout = variable->getLayout();
-		if(not chunkHandle->within(layout)) {
+		if(not cd->within(*layout)) {
 			ERROR("Chunk boundaries do not match variable's layout");
 			return -3;
 		}
-
-		ShmChunk* chunk = NULL;
-                try {
-			Types::basic_type_e t = layout->getType();
-			unsigned int d = chunkHandle->getDimensions();
-			std::vector<int> si(d);
-			std::vector<int> ei(d);
-
-			for(unsigned int i=0;i<d; i++) {
-				si[i] = chunkHandle->getStartIndex(i);
-				ei[i] = chunkHandle->getEndIndex(i);
-			}
-
-                        chunk = new ShmChunk(process->getSharedMemorySegment(),t,d,si,ei);
-                        chunk->setSource(process->getEnvironment()->getID());
-                        chunk->setIteration(iteration);
-                } catch (...) {
-                        ERROR("While writing \"" << varname << "\", allocation failed");
-                	return -2;
+	
+		// allocate memory
+		size_t size = sizeof(ChunkHeader)+cd->getDataMemoryLength();
+		void* location = process->getSharedMemorySegment()->allocate(size);
+		if(location == NULL) {
+			ERROR("Allocation error");
+			return -2;
 		}
 
+		// create the ChunkHeader
+		int source = process->getEnvironment()->getID();
+		ChunkHeader* ch = new(location) ChunkHeader(*cd,iteration,source);
+
+		// create the ShmChunk object		
+		ShmChunk chunk(process->getSharedMemorySegment(),ch);
+
 		// copy data
-		size_t size = chunk->getDataMemoryLength();
-		memcpy(chunk->data(),data,size);
+		size = cd->getDataMemoryLength();
+		memcpy(chunk.data(),data,size);
 		
 		// create message
 		Message message;
 		
-		message.source = process->getEnvironment()->getID();
+		message.source = source;
 		message.iteration = iteration;
 		message.object = variable->getID();
 		message.type = MSG_VAR;
-		message.handle = chunk->getHandle();
+		message.handle = chunk.getHandle();
 		
 		// send message
 		process->getSharedMessageQueue()->send(&message);
 		DBG("Variable \"" << varname << "\" has been written");
 	
-		// free message	
-		delete chunk;
-		
 		return size;
 	}
 
@@ -321,13 +310,13 @@ namespace Damaris {
 			const std::vector<int> & endIndices)
 	{
 		Types::basic_type_e t = Types::UNDEFINED_TYPE;
-		ChunkHandle *c = new ChunkHandle(t,dimensions,startIndices,endIndices);
+		ChunkDescriptor *c = new ChunkDescriptor(t,dimensions,&startIndices[0],&endIndices[0]);
 		return c;
 	}
 
 	void Client::chunk_free(chunk_h chunkh) 
 	{
-		if(chunkh != 0) delete (ChunkHandle*)chunkh;
+		if(chunkh != 0) delete (ChunkDescriptor*)chunkh;
 	}
 
 	MPI_Comm Client::mpi_get_client_comm()

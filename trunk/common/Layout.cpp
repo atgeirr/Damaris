@@ -58,10 +58,10 @@ namespace Damaris {
 		return dimensions;
 	}
 	
-	int Layout::getExtentAlongDimension(unsigned int dim) const
+	size_t Layout::getExtentAlongDimension(unsigned int dim) const
 	{
 		if(dim < dimensions)
-			return extents[dim];
+			return (size_t)(extents[dim]);
 		else
 			return 0;
 	}
@@ -70,4 +70,5 @@ namespace Damaris {
 	{
 		return (dimensions == 1) && (extents[0] == -1);
 	}
+
 }

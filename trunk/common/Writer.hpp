@@ -24,13 +24,12 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #define __DAMARIS_WRITER_H
 
 #include <string>
-
-#include "common/ChunkHandle.hpp"
+#include "common/ChunkDescriptor.hpp"
 #include "common/Layout.hpp"
 
 namespace Damaris {
 
-typedef ChunkHandle* chunk_h;
+typedef ChunkDescriptor* chunk_h;
 
 /**
  * The Writer class is an abstraction for a class that
@@ -49,13 +48,15 @@ class Writer  {
 		 *                      be defined in the XML configuration.
 		 * \param[in] iteration : iteration number for this write.
 		 * \param[in] data : pointer to the data to be copied to the shared memory buffer.
-		 * 
+		 *
+		 * \param[in] blocking : if true, waits for enough memory to be available.
+		 *  
 		 * \return the amount of bytes written in case of success,
 		 *         -1 if the variable has not been defined,
 		 *         -2 if the allocation of memory failed.
 		 */
 		virtual int write(const std::string & varname, 
-			int32_t iteration, const void* data) = 0;
+			int32_t iteration, const void* data, bool blocking = true) = 0;
 		
 		/**
 		 * \brief Writes a chunk of a variable.
@@ -100,11 +101,12 @@ class Writer  {
 		 * \param[in] varname : name of the variable to write 
 		 *		        (must be defined in the configuration file).
 		 * \param[in] iteration : iteration at which the variable is written.
+		 * \param[in] blocking : blocks until enough memory is available, if true.
 		 *
 		 * \return a pointer to the allocated memory in case of success,
 		 *         NULL in case of failure (variable not defined, allocation error).
 		 */
-		virtual void* alloc(const std::string & varname, int32_t iteration) = 0;
+		virtual void* alloc(const std::string & varname, int32_t iteration, bool blocking = true) = 0;
 
 		/** 
 		 * \brief Commit a variable.

@@ -40,49 +40,10 @@ StdAloneClient::~StdAloneClient()
 {
 	Process::kill();
 }
-	
 
 void* StdAloneClient::alloc(const std::string & varname, int32_t iteration)
 {
-	// this is basically the same code than in Client, we copy it here
-	//  to be sure that any modification on Client won't affect it. 
-
-	// check that the variable is known in the configuration 
-	Variable* variable = process->getMetadataManager()->getVariable(varname);
-
-	if(variable == NULL) {
-		ERROR("Variable \""<< varname 
-				<< "\" not defined in configuration");
-		return NULL;
-	}
-
-	// the variable is known, get its layout
-	Layout* layout = variable->getLayout();
-
-	// prepare variable to initialize a chunk
-	std::vector<int> si(layout->getDimensions()),ei(layout->getDimensions());
-	for(unsigned int i=0; i < layout->getDimensions(); i++)	{
-		ei[i] = layout->getExtentAlongDimension(i)-1;
-		si[i] = 0;
-	}
-
-	// try initializing the chunk in shared memory
-	try {
-		ShmChunk* chunk = 
-			new ShmChunk(process->getSharedMemorySegment(),layout->getType(),
-					layout->getDimensions(),si,ei);
-		chunk->setSource(process->getEnvironment()->getID());
-		chunk->setIteration(iteration);
-		variable->attachChunk(chunk);
-		// chunk initialized, returns the data! 
-		return chunk->data();
-
-	} catch (...) {
-		ERROR("While allocating \"" << varname 
-				<< "\", allocation failed");
-	}
-	// on failure, returns NULL 
-	return NULL;
+	return Client::alloc(varname,iteration);
 }
 
 int StdAloneClient::commit(const std::string & varname, int32_t iteration)
@@ -113,94 +74,93 @@ int StdAloneClient::commit(const std::string & varname, int32_t iteration)
 
 int StdAloneClient::write(const std::string & varname, int32_t iteration, const void* data)
 {
-	// check that the variable is known in the configuration 
-	Variable* variable = process->getMetadataManager()->getVariable(varname);
+		/* check that the variable is know in the configuration */
+		Variable* variable = process->getMetadataManager()->getVariable(varname);
 
-	if(variable == NULL) {
-		ERROR("Variable \""<< varname 
-				<< "\" not defined in configuration");
-		return -1;
-	}
+		if(variable == NULL) {
+            return -1;
+		}
 
-	Layout* layout = variable->getLayout();
+		Layout* layout = variable->getLayout();
 
-	std::vector<int> si(layout->getDimensions()),ei(layout->getDimensions());
-	for(unsigned int i=0; i < layout->getDimensions(); i++) {
-		ei[i] = layout->getExtentAlongDimension(i)-1;
-		si[i] = 0;
-	}
+		if(layout->isUnlimited()) {
+				ERROR("Trying to write a variable"
+								<< " with an unlimited layout (use chunk_write instead)");
+				return -3;
+		}
 
-	ShmChunk* chunk = NULL;
-	try {
-		chunk = new ShmChunk(process->getSharedMemorySegment(),layout->getType(),
-				layout->getDimensions(),si,ei);
-		chunk->setSource(process->getEnvironment()->getID());
-		chunk->setIteration(iteration);
-	} catch (...) {
-		ERROR("While writing \"" << varname << "\", allocation failed");
-		return -2;
-	}
+		// initialize the chunk descriptor
+		ChunkDescriptor cd(*layout);
 
-	// copy data
-	size_t size = chunk->getDataMemoryLength();
-	memcpy(chunk->data(),data,size);
+		// try allocating the required memory
+		size_t size = sizeof(ChunkHeader)+cd.getDataMemoryLength();
+		void* location = process->getSharedMemorySegment()->allocate(size);
 
-	variable->attachChunk(chunk);	
-		
-	// send message
-	DBG("Variable \"" << varname << "\" has been written");
+		if(location == NULL) {
+				ERROR("Could not allocate memory");
+				return -2;
+		}
+		// create the chunk header in memory
+		int source = process->getEnvironment()->getID();
+		ChunkHeader* ch = new(location) ChunkHeader(cd,iteration,source);
 
-	return size;
+		// create the ShmChunk and attach it to the variable
+		ShmChunk* chunk = new ShmChunk(process->getSharedMemorySegment(),ch);
+
+		// copy data
+		size = cd.getDataMemoryLength();
+		memcpy(chunk->data(),data,size);
+
+		variable->attachChunk(chunk);	
+
+		DBG("Variable \"" << varname << "\" has been written");
+
+		return size;
 }
 
 int StdAloneClient::chunk_write(chunk_h chunkh, const std::string & varname, 
 		int32_t iteration, const void* data)
 {
-	// check that the variable is know in the configuration 
-	Variable* variable = process->getMetadataManager()->getVariable(varname);
+	/* check that the variable is know in the configuration */
+        Variable* variable = process->getMetadataManager()->getVariable(varname);
 
-	if(variable == NULL) {
-		ERROR("Variable \""<< varname << "\" not defined in configuration");
-		return -1;
-	}
+        if(variable == NULL) {
+            ERROR("Variable \""<< varname << "\" not defined in configuration");
+            return -1;
+        }
 
-	ChunkHandle* chunkHandle = (ChunkHandle*)chunkh;
+        ChunkDescriptor* cd = (ChunkDescriptor*)chunkh;
 
-	// check if the chunk matches the layout boundaries 
-	Layout* layout = variable->getLayout();
-	if(not chunkHandle->within(layout)) {
-		ERROR("Chunk boundaries do not match variable's layout");
-		return -3;
-	}
+        // check if the chunk matches the layout boundaries
+        Layout* layout = variable->getLayout();
+        if(not cd->within(*layout)) {
+            ERROR("Chunk boundaries do not match variable's layout");
+            return -3;
+        }
 
-	ShmChunk* chunk = NULL;
-	try {
-		Types::basic_type_e t = layout->getType();
-		unsigned int d = chunkHandle->getDimensions();
-		std::vector<int> si(d);
-		std::vector<int> ei(d);
+        // allocate memory
+        size_t size = sizeof(ChunkHeader)+cd->getDataMemoryLength();
+        void* location = process->getSharedMemorySegment()->allocate(size);
+        if(location == NULL) {
+            ERROR("Allocation error");
+            return -2;
+        }
 
-		for(unsigned int i=0;i<d; i++) {
-			si[i] = chunkHandle->getStartIndex(i);
-			ei[i] = chunkHandle->getEndIndex(i);
-		}
+        // create the ChunkHeader
+        int source = process->getEnvironment()->getID();
+        ChunkHeader* ch = new(location) ChunkHeader(*cd,iteration,source);
 
-		chunk = new ShmChunk(process->getSharedMemorySegment(),t,d,si,ei);
-		chunk->setSource(process->getEnvironment()->getID());
-		chunk->setIteration(iteration);
-	} catch (...) {
-		ERROR("While writing \"" << varname << "\", allocation failed");
-		return -2;
-	}
+        // create the ShmChunk object       
+        ShmChunk* chunk = new ShmChunk(process->getSharedMemorySegment(),ch);
 
-	// copy data
-	size_t size = chunk->getDataMemoryLength();
-	memcpy(chunk->data(),data,size);
+		// copy data
+        size = cd->getDataMemoryLength();
+        memcpy(chunk->data(),data,size);
+		
+		variable->attachChunk(chunk);	
+		DBG("Variable \"" << varname << "\" has been written");
 
-	variable->attachChunk(chunk);	
-	DBG("Variable \"" << varname << "\" has been written");
-
-	return size;
+		return size;
 }
 
 int StdAloneClient::signal(const std::string & signal_name, int32_t iteration)

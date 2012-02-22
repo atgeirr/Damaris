@@ -21,6 +21,7 @@ set(DAMARIS_COMMON_SRC
 	${DAMARIS_SOURCE_DIR}/common/DynamicAction.cpp
 	${DAMARIS_SOURCE_DIR}/common/NodeAction.cpp
 	${DAMARIS_SOURCE_DIR}/common/ActionsManager.cpp
+	${DAMARIS_SOURCE_DIR}/common/ChunkDescriptor.cpp
 	${DAMARIS_SOURCE_DIR}/common/Chunk.cpp
 	${DAMARIS_SOURCE_DIR}/common/ShmChunk.cpp
 	${DAMARIS_SOURCE_DIR}/common/Language.cpp
@@ -45,9 +46,9 @@ if(HDF5_ROOT)
 	${DAMARIS_SOURCE_DIR}/hdf5/HDF5Writer.cpp)
 endif(HDF5_ROOT)
 
-add_library (damaris ${DAMARIS_CLIENT_SRC}
+add_library (damaris ${DAMARIS_COMMON_SRC}
+			 ${DAMARIS_CLIENT_SRC}
 		     ${DAMARIS_MODEL_SRC}
-	             ${DAMARIS_COMMON_SRC}
 		     ${DAMARIS_SCRIPTS_SRC}
 		     ${DAMARIS_PERSISTENCY_SRC})
 

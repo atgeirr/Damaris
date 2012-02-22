@@ -24,7 +24,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #define __DAMARIS_SHMCHUNK_H
 
 #include <stdlib.h>
+
 #include "common/Chunk.hpp"
+#include "common/ChunkHeader.hpp"
 #include "common/SharedMemorySegment.hpp"
 
 namespace Damaris {
@@ -37,40 +39,67 @@ class ShmChunk : public Chunk {
 
 	private:
 		SharedMemorySegment* segment; /*!< Pointer to the shared memory 
-						segment containing the data. */
-		void* header; /*!< Pointer to the header 
-				in the shared segment (where the layout is described. */
-		void* buffer; /*!< Pointer to the actual data in shared memory. */
-
+										segment containing the data. */
+		ChunkHeader* header; /*!< Pointer to header. */
+		void* buffer; /*!< Pointer to the actual data. */
 	public:
 		/**
-		 * \brief Constructor.
-		 * \param[in] s  : Pointer to the associated shared memory segment.
-		 * \param[in] t  : Type of data to be handled.
-		 * \param[in] d  : number of dimensions.
-		 * \param[in] si : starting indices along each dimension.
-		 * \param[in] ei : ending indices along each dimension.
-		 * This function also allocate the required memory in the shared memory segment.
-		 * This function may throw an exception if it doesn't manage to open the memory region
-		 * or if a wrong shared memory segment argument (for instance "NULL") is passed.
+		 * Initialize a ShmChunk from a SharedMemorySegment and
+		 * a pointer to an existing header in the process's memory.
 		 */
-		ShmChunk(SharedMemorySegment* s, Types::basic_type_e t, 
-				unsigned int d, std::vector<int> &si, std::vector<int> &ei);
-		
-		/**
-		 * \brief Constructor from an existing chunk placed in shared memory.
-		 * \param[in] s : Pointer to the associated shared memory segment.
-		 * \param[in] header : Pointer (handle) to the header in shared memory.
-		 * This function builds the ShmChunk from an already existing representation
-		 * in shared memory. The required memory is not allocated.
-		 */
-		ShmChunk(SharedMemorySegment* s, handle_t header);
+		ShmChunk(SharedMemorySegment* s, ChunkHeader* ch);
 
 		/**
+		 * Initialize a ShmChunk from a SharedMemorySegment and
+         * a pointer to an existing header in the process's memory,
+		 * given as a handle.
+         */
+		ShmChunk(SharedMemorySegment* s, handle_t ch);
+		/**
 		 * \brief Destructor.
+		 * Does not free the associated header.
 		 */
 		~ShmChunk();
-		
+		/**
+         * \brief Gets the ID of the process that has written the chunk.
+         */
+        virtual int getSource() const { return header->getSource(); }
+
+        /**
+         * \brief Set the ID of the process that has written the chunk.
+         */
+        virtual void setSource(int src) { header->setSource(src); }
+
+        /**
+         * \brief Gets the iteration at which the chunk has been written.
+         */
+        virtual int getIteration() const { return header->getIteration(); }
+
+        /**
+         * \brief Set the iteration number.
+         */
+        virtual void setIteration(int i) { header->setIteration(i); }
+
+		/**
+         * \brief Gets the number of dimensions.
+         */
+        virtual unsigned int getDimensions() const { return header->getDimensions(); }
+
+        /**
+         * \brief Gets the type of data.
+         */
+        virtual Types::basic_type_e getType() const { return header->getType(); }
+
+        /**
+         * \brief Gets a start index.
+         */
+        virtual int getStartIndex(int i) const { return header->getStartIndex(i); }
+
+        /**
+         * \brief Gets an end index.
+         */
+        virtual int getEndIndex(int i) const { return header->getEndIndex(i); }
+
 		/**
 		 * \brief Retrieves a pointer to the data.
 		 * \return A pointer to where the data is stored, or NULL if the data
@@ -97,15 +126,6 @@ class ShmChunk : public Chunk {
 		 */
 		handle_t getHandle();
 
-		/**
-		 * Set the iteration number of the chunk.
-		 */
-		void setIteration(int i);
-		
-		/**
-		 * Set the source of the chunk.
-		 */
-		void setSource(int s);
 }; // class ShmChunk
 	
 } // namespace Damaris

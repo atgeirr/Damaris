@@ -33,7 +33,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "common/Writer.hpp"
 #include "common/Process.hpp"
-#include "common/ChunkHandle.hpp"
+//#include "common/ChunkHandle.hpp"
 #include "common/Layout.hpp"
 
 /**
@@ -73,7 +73,7 @@ class Client : public Writer {
 		/**
 		 * \see Writer::write
 		 */
-		virtual int write(const std::string & varname, int32_t iteration, const void* data);
+		virtual int write(const std::string & varname, int32_t iteration, const void* data, bool blocking = true);
 		
 		/**
 		 * \see Writer::chunk_write
@@ -89,7 +89,7 @@ class Client : public Writer {
 		/**
 		 * \see Writer::alloc
 		 */
-		virtual void* alloc(const std::string & varname, int32_t iteration);
+		virtual void* alloc(const std::string & varname, int32_t iteration, bool blocking = true);
 
 		/** 
 		 * \see Writer::commit

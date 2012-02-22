@@ -24,30 +24,29 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Damaris {
 
-ShmChunk::ShmChunk(SharedMemorySegment* s, Types::basic_type_e t, 
-		unsigned int d, std::vector<int> &si, std::vector<int> &ei)
-: Chunk(t,d,si,ei)
+ShmChunk::ShmChunk(SharedMemorySegment* s, ChunkHeader* ch) 
 {
 	segment = s;
-	header = NULL;
-	buffer = NULL;
-
+	header = ch;
+	buffer = ((char*)header)+sizeof(ChunkHeader);
+/*
 	size_t sizeOfHeader = size();
 	size_t sizeOfData = getDataMemoryLength();
 	size_t totalSize = sizeOfHeader + sizeOfData;
 
 	header = static_cast<void*>(segment->allocate(totalSize));
+	if(header == NULL) throw(std::exception()); // TODO: use another exception type
 	buffer = ((char*)header)+sizeOfHeader;
 
 	toBuffer(header);
+*/
 }
 
 ShmChunk::ShmChunk(SharedMemorySegment* s, handle_t h)
 {
 	segment = s;
-	header = segment->getAddressFromHandle(h);
-	fromBuffer(header);
-	buffer = ((char*)header)+size();
+	header = (ChunkHeader*)segment->getAddressFromHandle(h);
+	buffer = ((char*)header)+sizeof(ChunkHeader);
 }
 
 ShmChunk::~ShmChunk()
@@ -72,18 +71,6 @@ bool ShmChunk::remove()
 handle_t ShmChunk::getHandle()
 {
 	return segment->getHandleFromAddress(header);
-}
-
-void ShmChunk::setSource(int s)
-{
-	source = s;
-	memcpy(header,&s,sizeof(s));
-}
-
-void ShmChunk::setIteration(int i)
-{
-	iteration = i;
-	memcpy(((char*)header)+sizeof(source),&i,sizeof(i));
 }
 
 } // namespace Damaris
