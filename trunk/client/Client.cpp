@@ -305,6 +305,17 @@ namespace Damaris {
 		}
 	}
 
+	int Client::clean(int iteration)
+    {
+		Message kill;
+		kill.type = MSG_INT;
+		kill.source = process->getEnvironment()->getID();
+		kill.iteration = iteration;
+		kill.object = URGENT_CLEAN;
+		process->getSharedMessageQueue()->send(&kill);
+		return 0;
+    }
+
 	chunk_h Client::chunk_set(unsigned int dimensions,
 			const std::vector<int> & startIndices, 
 			const std::vector<int> & endIndices)

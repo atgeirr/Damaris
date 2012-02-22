@@ -126,6 +126,11 @@ class Client : public Writer {
 		virtual int kill_server();
 
 		/**
+		 * Sends a signal to the server to try free the shared memory.
+		 */
+		virtual int clean(int iteration);
+
+		/**
 		 * Gets the communicator gathering clients.
 		 */
 		virtual MPI_Comm mpi_get_client_comm();

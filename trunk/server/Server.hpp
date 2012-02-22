@@ -90,7 +90,7 @@ namespace Damaris {
 			 * This function is called when receiving a message of type MSG_INT;
 			 * See the enumration statements in Message.hpp.
 			 */
-			void processInternalSignal(int32_t obj);
+			void processInternalSignal(int32_t obj, int iteration, int source);
 
 	}; // class Server
 

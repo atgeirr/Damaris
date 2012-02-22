@@ -115,16 +115,18 @@ void Server::processMessage(Message* msg)
 
 	if(msg->type == MSG_INT)
 	{
-		processInternalSignal(object);
+		processInternalSignal(object,iteration,source);
 	}
 }
 
-void Server::processInternalSignal(int32_t object)
+void Server::processInternalSignal(int32_t object, int iteration, int source)
 {
 	switch(object) {
 	case KILL_SERVER:
-		needStop--; 
+		needStop--; // TODO: check that each client has sent the event instead of checking the number
 		break;
+	case URGENT_CLEAN:
+		process->getActionsManager()->reactToUserSignal("clean",iteration,source);
 	}
 }
 

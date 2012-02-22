@@ -56,42 +56,54 @@ SharedMemorySegment* SharedMemorySegment::open(Model::BufferModel* model)
 
 bool SharedMemorySegment::remove(Model::BufferModel* model)
 {
-        std::string& name = model->name();
-        std::string& type = model->type();
-        if(type == "posix") {
+	std::string& name = model->name();
+	std::string& type = model->type();
+	if(type == "posix") {
 		return shared_memory_object::remove(name.c_str());
 	}
-        else if(type == "sysv") 
+	else if(type == "sysv") 
 	{
 		xsi_key key(name.c_str(),0);
 		int id = shmget(key.get_key(),0,0600);
 		return xsi_shared_memory::remove(id);
 	}
-        else {
-                return false;
-        }
+	else {
+			return false;
+	}
 }
 
 SharedMemorySegment::POSIX_ShMem::POSIX_ShMem(const std::string &name, int64_t size)
 {
 	impl = new managed_shared_memory(create_only,name.c_str(),size);
+	// shared memory created, now create the size manager
+	size_manager = impl->construct<SharedMemorySegment::size_manager_s>("size_manager",std::nothrow)[1](getFreeMemory());
+	FATAL((size_manager == 0), "Unable to create the size manager");
 }
 
 SharedMemorySegment::POSIX_ShMem::POSIX_ShMem(const std::string &name)
 {
 	impl = new managed_shared_memory(open_only,name.c_str());
+	std::pair<SharedMemorySegment::size_manager_s*,size_t> ret = impl->find<SharedMemorySegment::size_manager_s>("size_manager");
+	FATAL(((ret.second != sizeof(SharedMemorySegment::size_manager_s))),"Unmatched size for size manager");
+	size_manager = ret.first;
 }
 
 SharedMemorySegment::SYSV_ShMem::SYSV_ShMem(const std::string &name, int64_t size)
 {
 	key = xsi_key(name.c_str(),0);
 	impl = new managed_xsi_shared_memory(create_only,key,size);
+	// shared memory created, now create the size manager
+	size_manager = impl->construct<SharedMemorySegment::size_manager_s>("size_manager",std::nothrow)[1](getFreeMemory());
+	FATAL((size_manager == 0),"Unable to create the size manager");
 }
 
 SharedMemorySegment::SYSV_ShMem::SYSV_ShMem(const std::string &name)
 {
 	key = xsi_key(name.c_str(),0);
 	impl = new managed_xsi_shared_memory(open_only,key);
+	std::pair<SharedMemorySegment::size_manager_s*,size_t> ret = impl->find<SharedMemorySegment::size_manager_s>("size_manager");
+	FATAL((ret.second != sizeof(SharedMemorySegment::size_manager_s)),"Unmatched size for size manager");
+	size_manager = ret.first;
 }
 
 SharedMemorySegment::ptr SharedMemorySegment::POSIX_ShMem::getAddressFromHandle(handle_t h)
@@ -106,12 +118,15 @@ handle_t SharedMemorySegment::POSIX_ShMem::getHandleFromAddress(SharedMemorySegm
 
 SharedMemorySegment::ptr SharedMemorySegment::POSIX_ShMem::allocate(size_t size)
 {
-	return impl->allocate(size);
+	return impl->allocate(size,std::nothrow);
 }
 
 void SharedMemorySegment::POSIX_ShMem::deallocate(void* addr)
 {
+	scoped_lock<interprocess_mutex> lock(size_manager->lock);
 	impl->deallocate(addr);
+	size_manager->size = getFreeMemory();
+	size_manager->cond_size.notify_all();
 }
 
 size_t SharedMemorySegment::POSIX_ShMem::getFreeMemory()
@@ -131,7 +146,7 @@ handle_t SharedMemorySegment::SYSV_ShMem::getHandleFromAddress(SharedMemorySegme
 
 SharedMemorySegment::ptr SharedMemorySegment::SYSV_ShMem::allocate(size_t size)
 {
-	return impl->allocate(size);
+	return impl->allocate(size,std::nothrow);
 }
 
 void SharedMemorySegment::SYSV_ShMem::deallocate(void* addr) 
@@ -144,5 +159,15 @@ size_t SharedMemorySegment::SYSV_ShMem::getFreeMemory()
 	return impl->get_free_memory();
 }
 
+bool SharedMemorySegment::waitAvailable(size_t size)
+{
+	if(size > size_manager->max) return false;
+
+	scoped_lock<interprocess_mutex> lock(size_manager->lock);
+    while(size > size_manager->size) {
+        size_manager->cond_size.wait(lock);
+    }
+	return true;
+}
 }
 

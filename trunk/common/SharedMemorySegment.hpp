@@ -26,6 +26,10 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 #include <boost/interprocess/managed_shared_memory.hpp>
 #include <boost/interprocess/managed_xsi_shared_memory.hpp>
+#include <boost/interprocess/xsi_shared_memory.hpp>
+#include <boost/interprocess/mapped_region.hpp>
+#include <boost/interprocess/sync/interprocess_mutex.hpp>
+#include <boost/interprocess/sync/interprocess_condition.hpp>
 #include "xml/Model.hpp"
 #include "common/SharedMemory.hpp"
 
@@ -36,11 +40,23 @@ namespace Damaris {
  * Two internal classes are provided to implement SharedMemorySegment
  * based either on shm_open (posix) or shmget (xsi).
  */
+using namespace boost::interprocess;
+
 class SharedMemorySegment {
 	private:
 		class POSIX_ShMem;
 		class SYSV_ShMem;
-
+	
+	protected:	
+		struct size_manager_s {
+			interprocess_condition cond_size; /*!< Condition to block processes attempting 
+												to allocate more than available size. */
+			interprocess_mutex lock; /*!< To lock the size manager when accessing the size. */
+			size_t size; /*!< Current available size (in bytes). */
+			const size_t max; /*!< Maximum size (in bytes). */
+			size_manager_s(size_t initSize): cond_size(), lock(), size(initSize), max(initSize) {};
+		} *size_manager;
+		
 		/**
 		 * Constructor.
 		 */
@@ -96,6 +112,14 @@ class SharedMemorySegment {
 		 * Gets the amount of free memory left.
 		 */
 		virtual size_t getFreeMemory() = 0;
+
+		/**
+		 * Waits until enough free memory is available.
+		 * This function does not reserve the memory and thus
+		 * does not ensure that the next call to allocate will work.
+		 * Return false if the size will never be satisfied, true otherwise.
+		 */
+		virtual bool waitAvailable(size_t size);
 };
 
 using namespace boost::interprocess;
@@ -112,10 +136,10 @@ class SharedMemorySegment::POSIX_ShMem : public SharedMemorySegment {
 		POSIX_ShMem(const std::string &name);
 
 		SharedMemorySegment::ptr getAddressFromHandle(handle_t h);
-                handle_t getHandleFromAddress(SharedMemorySegment::ptr p);
-                ptr allocate(size_t size);
-                void deallocate(void* addr);
-                size_t getFreeMemory();
+		handle_t getHandleFromAddress(SharedMemorySegment::ptr p);
+		ptr allocate(size_t size);
+		void deallocate(void* addr);
+		size_t getFreeMemory();
 };
 
 /**
@@ -131,10 +155,10 @@ class SharedMemorySegment::SYSV_ShMem : public SharedMemorySegment {
 		SYSV_ShMem(const std::string &name);
 
 		SharedMemorySegment::ptr getAddressFromHandle(handle_t h);
-                handle_t getHandleFromAddress(SharedMemorySegment::ptr p);
-                ptr allocate(size_t size);
-                void deallocate(void* addr);
-                size_t getFreeMemory();
+		handle_t getHandleFromAddress(SharedMemorySegment::ptr p);
+		ptr allocate(size_t size);
+		void deallocate(void* addr);
+		size_t getFreeMemory();
 };
 
 }

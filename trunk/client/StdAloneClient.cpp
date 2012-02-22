@@ -91,7 +91,6 @@ int StdAloneClient::commit(const std::string & varname, int32_t iteration)
 	if(v == NULL)
 		return -1;
 
-	ShmChunk* chunk = NULL;
 	// get the pointer to the allocated chunk
 	ChunkIndexByIteration::iterator end;
 	ChunkIndexByIteration::iterator it = v->getChunksByIteration(iteration,end);
@@ -99,7 +98,7 @@ int StdAloneClient::commit(const std::string & varname, int32_t iteration)
 	if(it == end)
 		return -2;
 	try {
-		chunk = dynamic_cast<ShmChunk*>(it->get());
+		dynamic_cast<ShmChunk*>(it->get());
 	} catch(std::exception &e) {
 		ERROR("When doing dynamic cast: " << e.what());
 		return -3;
@@ -107,7 +106,6 @@ int StdAloneClient::commit(const std::string & varname, int32_t iteration)
 
 	// nothing to do actually, the server already knows the variable
 
-	// free message
 	DBG("Variable \"" << varname << "\" has been commited");
 
 	return 0;
@@ -225,4 +223,8 @@ int StdAloneClient::kill_server()
 	return -1;
 }
 
+int StdAloneClient::clean(int iteration)
+{
+	return signal("clean",iteration);
+}
 }

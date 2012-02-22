@@ -85,6 +85,11 @@ class StdAloneClient : public Client {
 		virtual int kill_server();
 
 		/**
+		 * \see Client::clean
+		 */
+		virtual int clean(int iteration);
+
+		/**
 		 * \brief Destructor.
 		 * To be called at the end of the before stopping the client program.
 		 */
