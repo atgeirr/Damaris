@@ -126,6 +126,7 @@ void Server::processInternalSignal(int32_t object, int iteration, int source)
 		needStop--; // TODO: check that each client has sent the event instead of checking the number
 		break;
 	case URGENT_CLEAN:
+		DBG("Received a \"clean\" message");
 		process->getActionsManager()->reactToUserSignal("clean",iteration,source);
 	}
 }

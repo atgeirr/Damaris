@@ -75,9 +75,19 @@ namespace Damaris {
 		size_t size = sizeof(ChunkHeader)+cd.getDataMemoryLength();			
 		void* location = process->getSharedMemorySegment()->allocate(size);	
 
-		if(location == NULL) {
-			ERROR("Could not allocate memory");
+		if(location == NULL && not blocking) {
+			ERROR("Could not allocate memory: not enough available memory");
 			return NULL;
+		} else if(location == NULL && blocking) {
+			while(location == NULL) {
+				clean(iteration);
+				if(process->getSharedMemorySegment()->waitAvailable(size)) {
+					location = process->getSharedMemorySegment()->allocate(size);
+				} else {
+					ERROR("Could not allocate memory: not enough total memory");
+					return NULL;
+				}
+			}
 		}
 		// create the chunk header in memory
 		int source = process->getEnvironment()->getID();
@@ -155,10 +165,21 @@ namespace Damaris {
         size_t size = sizeof(ChunkHeader)+cd.getDataMemoryLength();
         void* location = process->getSharedMemorySegment()->allocate(size);
 
-        if(location == NULL) {
-            ERROR("Could not allocate memory");
+		if(location == NULL && not blocking) {
+            ERROR("Could not allocate memory: not enough available memory");
             return -2;
+        } else if(location == NULL && blocking) {
+            while(location == NULL) {
+				clean(iteration);
+                if(process->getSharedMemorySegment()->waitAvailable(size)) {
+                    location = process->getSharedMemorySegment()->allocate(size);
+                } else {
+                    ERROR("Could not allocate memory: not enough total memory");
+                    return -2;
+                }
+            }
         }
+
         // create the chunk header in memory
         int source = process->getEnvironment()->getID();
         ChunkHeader* ch = new(location) ChunkHeader(cd,iteration,source);
@@ -187,7 +208,7 @@ namespace Damaris {
 	}
 
 	int Client::chunk_write(chunk_h chunkh, const std::string & varname, 
-			int32_t iteration, const void* data)
+			int32_t iteration, const void* data, bool blocking)
 	{
 		/* check that the variable is know in the configuration */
 		Variable* variable = process->getMetadataManager()->getVariable(varname);
@@ -209,10 +230,21 @@ namespace Damaris {
 		// allocate memory
 		size_t size = sizeof(ChunkHeader)+cd->getDataMemoryLength();
 		void* location = process->getSharedMemorySegment()->allocate(size);
-		if(location == NULL) {
-			ERROR("Allocation error");
-			return -2;
-		}
+
+		if(location == NULL && not blocking) {
+            ERROR("Could not allocate memory: not enough available memory");
+            return -2;
+        } else if(location == NULL && blocking) {
+            while(location == NULL) {
+				clean(iteration);
+                if(process->getSharedMemorySegment()->waitAvailable(size)) {
+                    location = process->getSharedMemorySegment()->allocate(size);
+                } else {
+                    ERROR("Could not allocate memory: not enough total memory");
+                    return -2;
+                }
+            }
+        }
 
 		// create the ChunkHeader
 		int source = process->getEnvironment()->getID();

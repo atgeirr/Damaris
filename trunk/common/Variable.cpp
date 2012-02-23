@@ -59,9 +59,15 @@ ChunkIndexBySource::iterator Variable::getChunksBySource(int source,
 ChunkIndexByIteration::iterator Variable::getChunksByIteration(int iteration,
 	ChunkIndexByIteration::iterator& end) 
 {
-        ChunkIndexByIteration::iterator it = chunks.get<by_iteration>().lower_bound(iteration);
-	end = chunks.get<by_iteration>().upper_bound(iteration);
-        return it;
+	return getChunksByIterationsRange(iteration,iteration,end);
+}
+
+ChunkIndexByIteration::iterator Variable::getChunksByIterationsRange(int itstart, int itend,
+            ChunkIndexByIteration::iterator& end)
+{
+	ChunkIndexByIteration::iterator it = chunks.get<by_iteration>().lower_bound(itstart);
+    end = chunks.get<by_iteration>().upper_bound(itend);
+    return it;
 }
 
 ChunkIndex::iterator Variable::getChunks(ChunkIndex::iterator &end)

@@ -111,6 +111,12 @@ class Variable {
 			ChunkIndexByIteration::iterator& end);
 
 		/**
+		 * Returns an iterator of chunks with an iteration within a given range.
+		 */
+		ChunkIndexByIteration::iterator getChunksByIterationsRange(int itstart, int itend,
+			ChunkIndexByIteration::iterator& end);
+
+		/**
 		 * Returns an iterator over all the chunks.
 		 * \param[out] end : a reference that will hold the end of the iterator.
 		 */

@@ -67,13 +67,15 @@ class Writer  {
 		 * \param[in] iteration : iteration number for this write.
 		 * \param[in] chunkh : handle of a pre-defined chunk.
 		 * \param[in] data : pointer to the data to be written in the shared memory buffer.
+		 * \param[in] blocking : indicates wether the function should block when there is not
+		 *                       enough memory, or if it should return an error code.
 		 * \return the amount of bytes written in case of success,
 		 *         -1 if the variable has not been defined,
 		 *         -2 if the allocation of memory failed,
 		 *         -3 if the chunk has an inapropriate shape.
 		 */
 		virtual int chunk_write(chunk_h chunkh, const std::string & varname, 
-			int32_t iteration, const void* data) = 0;
+			int32_t iteration, const void* data, bool blocking = true) = 0;
 
 		/**
 		 * \brief Sends an event.

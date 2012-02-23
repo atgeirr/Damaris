@@ -79,7 +79,7 @@ class Client : public Writer {
 		 * \see Writer::chunk_write
 		 */
 		virtual int chunk_write(chunk_h chunkh, const std::string & varname, 
-			int32_t iteration, const void* data);		
+			int32_t iteration, const void* data, bool blocking = true);		
 
 		/**
 		 * \see Writer::signal
