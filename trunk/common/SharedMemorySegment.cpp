@@ -76,15 +76,18 @@ SharedMemorySegment::POSIX_ShMem::POSIX_ShMem(const std::string &name, int64_t s
 {
 	impl = new managed_shared_memory(create_only,name.c_str(),size);
 	// shared memory created, now create the size manager
-	size_manager = impl->construct<SharedMemorySegment::size_manager_s>("size_manager",std::nothrow)[1](getFreeMemory());
-	FATAL((size_manager == 0), "Unable to create the size manager");
+	size_manager = 
+		impl->construct<SharedMemorySegment::size_manager_s>("size_manager",std::nothrow)[1](getFreeMemory());
+	FATAL((size_manager == NULL), "Unable to create the size manager");
 }
 
 SharedMemorySegment::POSIX_ShMem::POSIX_ShMem(const std::string &name)
 {
 	impl = new managed_shared_memory(open_only,name.c_str());
-	std::pair<SharedMemorySegment::size_manager_s*,size_t> ret = impl->find<SharedMemorySegment::size_manager_s>("size_manager");
-	FATAL(((ret.second != sizeof(SharedMemorySegment::size_manager_s))),"Unmatched size for size manager");
+	std::pair<SharedMemorySegment::size_manager_s*,size_t> ret 
+		= impl->find<SharedMemorySegment::size_manager_s>("size_manager");
+	FATAL((ret.second != 1),
+			"Size manager not found or multiple initializations");
 	size_manager = ret.first;
 }
 
@@ -93,16 +96,18 @@ SharedMemorySegment::SYSV_ShMem::SYSV_ShMem(const std::string &name, int64_t siz
 	key = xsi_key(name.c_str(),0);
 	impl = new managed_xsi_shared_memory(create_only,key,size);
 	// shared memory created, now create the size manager
-	size_manager = impl->construct<SharedMemorySegment::size_manager_s>("size_manager",std::nothrow)[1](getFreeMemory());
-	FATAL((size_manager == 0),"Unable to create the size manager");
+	size_manager = 
+		impl->construct<SharedMemorySegment::size_manager_s>("size_manager",std::nothrow)[1](getFreeMemory());
+	FATAL((size_manager == NULL),"Unable to create the size manager");
 }
 
 SharedMemorySegment::SYSV_ShMem::SYSV_ShMem(const std::string &name)
 {
 	key = xsi_key(name.c_str(),0);
 	impl = new managed_xsi_shared_memory(open_only,key);
-	std::pair<SharedMemorySegment::size_manager_s*,size_t> ret = impl->find<SharedMemorySegment::size_manager_s>("size_manager");
-	FATAL((ret.second != sizeof(SharedMemorySegment::size_manager_s)),"Unmatched size for size manager");
+	std::pair<SharedMemorySegment::size_manager_s*,size_t> ret 
+		= impl->find<SharedMemorySegment::size_manager_s>("size_manager");
+	FATAL((ret.second != 1), "Size manager not found of multiple initializations");
 	size_manager = ret.first;
 }
 
