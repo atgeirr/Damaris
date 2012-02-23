@@ -54,13 +54,14 @@ class StdAloneClient : public Client {
 		/**
 		 * \see Writer::write
 		 */
-		virtual int write(const std::string & varname, int32_t iteration, const void* data);
+		virtual int write(const std::string & varname, int32_t iteration, 
+						const void* data, bool blocking = true);
 		
 		/**
 		 * \see Writer::chunk_write
 		 */
 		virtual int chunk_write(chunk_h chunkh, const std::string & varname, 
-			int32_t iteration, const void* data);		
+						int32_t iteration, const void* data, bool blocking = true);		
 
 		/**
 		 * \see Writer::signal
@@ -70,7 +71,7 @@ class StdAloneClient : public Client {
 		/**
 		 * \see Writer::alloc
 		 */
-		virtual void* alloc(const std::string & varname, int32_t iteration);
+		virtual void* alloc(const std::string & varname, int32_t iteration, bool blocking = true);
 
 		/** 
 		 * \see Writer::commit

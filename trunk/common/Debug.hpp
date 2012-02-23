@@ -28,6 +28,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
     - ERROR is controled externally: -D__ERROR
     - INFO assumes ERROR, define only -D__INFO
     - ASSERT is controled externally: -D__ASSERT
+	- FATAL is not controled, it takes a condition and throws a runtime_error if the exception 
+		is not satisfied.
+	- TRACE is controled externally: -D__TRACE
     - DEBUG is controled locally (to allow selective debugging). Define __DEBUG before including 'Debug.hpp'.
 */
 
@@ -63,6 +66,12 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #define INFO(message) MESSAGE(std::cout, "INFO", message)
 #else
 #define INFO(message)
+#endif
+
+#ifdef __TRACE
+#define TRACE(message) MESSAGE(std::cout, "TRACE", message)
+#else
+#define TRACE(message)
 #endif
 
 #ifdef __ERROR

@@ -38,12 +38,55 @@ StdAloneClient::StdAloneClient(Process* p)
 /* destructor */
 StdAloneClient::~StdAloneClient()
 {
-	Process::kill();
 }
 
-void* StdAloneClient::alloc(const std::string & varname, int32_t iteration)
+void* StdAloneClient::alloc(const std::string & varname, int32_t iteration, bool blocking)
 {
-	return Client::alloc(varname,iteration);
+	// check that the variable is known in the configuration
+        Variable* variable = process->getMetadataManager()->getVariable(varname);
+
+        if(variable == NULL) {
+            ERROR("Variable \""<< varname
+                << "\" not defined in configuration");
+            return NULL;
+        }
+
+        // the variable is known, get its layout
+        Layout* layout = variable->getLayout();
+
+        if(layout->isUnlimited()) {
+            ERROR("Trying to allocate memory for an unlimited layout");
+            return NULL;
+        }
+
+        // initialize the chunk descriptor
+        ChunkDescriptor cd(*layout);
+
+        // try allocating the required memory
+        size_t size = sizeof(ChunkHeader)+cd.getDataMemoryLength();
+        void* location = process->getSharedMemorySegment()->allocate(size);
+
+		// This piece of code changes from Client.cpp: we don't want to block
+		// if there is no way to get more memory.
+        if(location == NULL && blocking) {
+                clean(iteration);
+                location = process->getSharedMemorySegment()->allocate(size);
+        }
+		if(location == NULL) {
+            ERROR("Could not allocate memory: not enough available memory");
+            return NULL;
+		}
+
+        // create the chunk header in memory
+        int source = process->getEnvironment()->getID();
+        ChunkHeader* ch = new(location) ChunkHeader(cd,iteration,source);
+
+        // create the ShmChunk and attach it to the variable
+        ShmChunk* chunk = new ShmChunk(process->getSharedMemorySegment(),ch);
+        variable->attachChunk(chunk);
+
+        // return the pointer to data
+        return chunk->data();
 }
 
 int StdAloneClient::commit(const std::string & varname, int32_t iteration)
@@ -72,7 +115,7 @@ int StdAloneClient::commit(const std::string & varname, int32_t iteration)
 	return 0;
 }
 
-int StdAloneClient::write(const std::string & varname, int32_t iteration, const void* data)
+int StdAloneClient::write(const std::string & varname, int32_t iteration, const void* data, bool blocking)
 {
 		/* check that the variable is know in the configuration */
 		Variable* variable = process->getMetadataManager()->getVariable(varname);
@@ -96,10 +139,16 @@ int StdAloneClient::write(const std::string & varname, int32_t iteration, const 
 		size_t size = sizeof(ChunkHeader)+cd.getDataMemoryLength();
 		void* location = process->getSharedMemorySegment()->allocate(size);
 
-		if(location == NULL) {
-				ERROR("Could not allocate memory");
-				return -2;
-		}
+		// This piece of code changes from Client.cpp: we don't want to block
+        // if there is no way to get more memory.
+        if(location == NULL && blocking) {
+                clean(iteration);
+                location = process->getSharedMemorySegment()->allocate(size);
+        }
+        if(location == NULL) {
+            ERROR("Could not allocate memory: not enough available memory");
+            return -2;
+        }
 		// create the chunk header in memory
 		int source = process->getEnvironment()->getID();
 		ChunkHeader* ch = new(location) ChunkHeader(cd,iteration,source);
@@ -119,7 +168,7 @@ int StdAloneClient::write(const std::string & varname, int32_t iteration, const 
 }
 
 int StdAloneClient::chunk_write(chunk_h chunkh, const std::string & varname, 
-		int32_t iteration, const void* data)
+		int32_t iteration, const void* data, bool blocking)
 {
 	/* check that the variable is know in the configuration */
         Variable* variable = process->getMetadataManager()->getVariable(varname);
@@ -141,8 +190,15 @@ int StdAloneClient::chunk_write(chunk_h chunkh, const std::string & varname,
         // allocate memory
         size_t size = sizeof(ChunkHeader)+cd->getDataMemoryLength();
         void* location = process->getSharedMemorySegment()->allocate(size);
+
+		        // This piece of code changes from Client.cpp: we don't want to block
+        // if there is no way to get more memory.
+        if(location == NULL && blocking) {
+                clean(iteration);
+                location = process->getSharedMemorySegment()->allocate(size);
+        }
         if(location == NULL) {
-            ERROR("Allocation error");
+            ERROR("Could not allocate memory: not enough available memory");
             return -2;
         }
 

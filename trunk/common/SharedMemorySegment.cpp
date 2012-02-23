@@ -123,13 +123,18 @@ handle_t SharedMemorySegment::POSIX_ShMem::getHandleFromAddress(SharedMemorySegm
 
 SharedMemorySegment::ptr SharedMemorySegment::POSIX_ShMem::allocate(size_t size)
 {
-	return impl->allocate(size,std::nothrow);
+	TRACE("Shared memory space = " << getFreeMemory());
+	SharedMemorySegment::ptr t = impl->allocate(size,std::nothrow);
+	TRACE("Shared memory space = " << getFreeMemory());
+	return t;
 }
 
 void SharedMemorySegment::POSIX_ShMem::deallocate(void* addr)
 {
 	scoped_lock<interprocess_mutex> lock(size_manager->lock);
+	TRACE("Shared memory space = " << getFreeMemory());
 	impl->deallocate(addr);
+	TRACE("Shared memory space = " << getFreeMemory());
 	size_manager->size = getFreeMemory();
 	size_manager->cond_size.notify_all();
 }
