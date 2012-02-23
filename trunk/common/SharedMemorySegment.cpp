@@ -22,7 +22,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/interprocess/xsi_shared_memory.hpp>
+#define __DEBUG
 #include "common/Debug.hpp"
+#include "common/Trace.hpp"
 #include "common/SharedMemorySegment.hpp"
 
 namespace Damaris {
@@ -123,19 +125,25 @@ handle_t SharedMemorySegment::POSIX_ShMem::getHandleFromAddress(SharedMemorySegm
 
 SharedMemorySegment::ptr SharedMemorySegment::POSIX_ShMem::allocate(size_t size)
 {
-	TRACE("Shared memory space = " << getFreeMemory());
+	size_t oldsize = getFreeMemory();
 	SharedMemorySegment::ptr t = impl->allocate(size,std::nothrow);
-	TRACE("Shared memory space = " << getFreeMemory());
+	size_t newsize = getFreeMemory();
+	
+	if(not t) {
+		TRACE(Trace::file(),"shmsize " << oldsize << " -> " << newsize);
+	}
+		
 	return t;
 }
 
 void SharedMemorySegment::POSIX_ShMem::deallocate(void* addr)
 {
 	scoped_lock<interprocess_mutex> lock(size_manager->lock);
-	TRACE("Shared memory space = " << getFreeMemory());
+	size_t oldsize = getFreeMemory();
 	impl->deallocate(addr);
-	TRACE("Shared memory space = " << getFreeMemory());
-	size_manager->size = getFreeMemory();
+	size_t newsize = getFreeMemory();
+	TRACE(Trace::file(),"shmsize " << oldsize << " -> " << newsize);
+	size_manager->size = newsize;
 	size_manager->cond_size.notify_all();
 }
 

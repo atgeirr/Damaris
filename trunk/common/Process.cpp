@@ -27,6 +27,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 #include <exception>
 
+#include "common/Trace.hpp"
 #include "common/Debug.hpp"
 #include "common/Process.hpp"
 
@@ -85,6 +86,7 @@ namespace Damaris {
 		segment = NULL;
 		msgQueue = NULL;	
 		DBG("Process initialized");
+		Trace::open("trace.log");
 	}
 
 	void Process::openSharedStructures()
@@ -140,6 +142,7 @@ namespace Damaris {
 		delete environment;
 		delete metadataManager;
 		delete actionsManager;
+		Trace::close();
 	}
 }
 

@@ -35,9 +35,9 @@ add_definitions (-D__ENABLE_MPI) # this line to be deleted
 # Recommanded : -D__INFO
 #-----------------------------------------------------------#
 #add_definitions (-D__INFO)
-add_definitions (-D__TRACE)
+#add_definitions (-D__TRACE)
 #add_definitions (-D__DEBUG_ALL)
-add_definitions (-D__BENCHMARK)
+#add_definitions (-D__BENCHMARK)
 
 #-----------------------------------------------------------#
 # Set the location of CMake Modules

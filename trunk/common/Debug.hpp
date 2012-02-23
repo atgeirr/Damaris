@@ -60,6 +60,10 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
     out << "[" << level << " " << boost::posix_time::microsec_clock::local_time() << "] [" \
     << __RFILE__ << ":" << __LINE__ << ":" << __FUNCTION__ << "] " << message << std::endl
 
+#define SIMPLE(out,level, message)\
+	out << "[" << level << " " << boost::posix_time::microsec_clock::local_time() << "] "\
+	<< message << std::endl
+
 #ifdef __INFO
 #define __ERROR
 #define __WARN
@@ -69,9 +73,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 #ifdef __TRACE
-#define TRACE(message) MESSAGE(std::cout, "TRACE", message)
+#define TRACE(out,message) SIMPLE(out, "TRACE", message)
 #else
-#define TRACE(message)
+#define TRACE(out,message)
 #endif
 
 #ifdef __ERROR
