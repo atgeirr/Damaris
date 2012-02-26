@@ -142,7 +142,7 @@ void SharedMemorySegment::POSIX_ShMem::deallocate(void* addr)
 	size_t oldsize = getFreeMemory();
 	impl->deallocate(addr);
 	size_t newsize = getFreeMemory();
-	TRACE(Trace::file(),"shmsize " << oldsize << " -> " << newsize);
+	TRACE(Trace::file(),"shmsize " << oldsize << " <- " << newsize);
 	size_manager->size = newsize;
 	size_manager->cond_size.notify_all();
 }

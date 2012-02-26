@@ -49,42 +49,53 @@ namespace Damaris {
 template <typename Iterator, typename SymTable>
 struct Calc : qi::grammar<Iterator, std::vector<int>(), ascii::space_type>
 {
-	qi::rule<Iterator, std::vector<int>(), ascii::space_type> start;
-	qi::rule<Iterator, int(), ascii::space_type> expr;
-	qi::rule<Iterator, int(), ascii::space_type> qmark;
-	qi::rule<Iterator, int(), ascii::space_type> factor;
-	qi::rule<Iterator, int(), ascii::space_type> simple;
-	qi::rule<Iterator, std::string(), ascii::space_type> identifier;
-	qi::rule<Iterator, int(SymTable), ascii::space_type> value;
-	
 	/**
 	 * \brief Constructor.
 	 * \param[in] sym : table of symboles.
 	 */
-	Calc(SymTable &sym) : Calc::base_type(start)
+	Calc(SymTable &sym) : Calc::base_type(list_expr)
 	{
-		identifier = qi::lexeme[( qi::alpha | '_') >> *( qi::alnum | '_')];
-		
-		value 	= identifier[qi::_val = qi::labels::_r1[qi::_1]];
-		
-		simple 	= ('(' >> expr >> ')')
-			| qi::int_
-			| value(boost::phoenix::ref(sym));
+			qi::_val_type _val;
+			qi::_1_type _1;
+			qi::uint_type uint_;
 
-		factor 	%= (simple >> '*' >> factor)[qi::_val = qi::_1 * qi::_2]
-			|  (simple >> '/' >> factor)[qi::_val = qi::_1 / qi::_2]
-			|  (simple >> '%' >> factor)[qi::_val = qi::_1 % qi::_2]
-			|   simple;
+			qmark   = qi::char_('?')[qi::_val = -1];
 
-		expr 	%= (factor >> '+' >> expr)[qi::_val = qi::_1 + qi::_2]
-			|  (factor >> '-' >> expr)[qi::_val = qi::_1 - qi::_2]
-			|   factor;
+			list_expr = qmark 
+						| (expression % ',');
 
-		qmark   = qi::char_('?')[qi::_val = -1];
-		
-		start   = qmark
-			| (expr % ',');
-	}
+			expression =
+					term                            [_val = _1]
+					>> *(   ('+' >> term            [_val += _1])
+						|   ('-' >> term            [_val -= _1])
+						)
+			;
+
+			term =
+					factor                          [_val = _1]
+					>> *(   ('*' >> factor          [_val *= _1])
+						|   ('/' >> factor          [_val /= _1])
+					)
+			;
+
+			factor =
+					value(boost::phoenix::ref(sym)) [_val = _1]
+					|   uint_                       [_val = _1]
+					|   '(' >> expression           [_val = _1] >> ')'
+					|   ('-' >> factor              [_val = -_1])
+					|   ('+' >> factor              [_val = _1])
+			;
+
+			identifier = qi::lexeme[( qi::alpha | '_') >> *( qi::alnum | '_')];
+
+			value   = identifier[_val = qi::labels::_r1[_1]];
+        }
+
+		qi::rule<Iterator, std::string(), ascii::space_type> identifier;
+		qi::rule<Iterator, int(), ascii::space_type> expression, term, factor;
+		qi::rule<Iterator, int(SymTable), ascii::space_type> value;
+		qi::rule<Iterator, std::vector<int>(), ascii::space_type> list_expr;
+		qi::rule<Iterator, int(), ascii::space_type> qmark;
 };
 
 }
