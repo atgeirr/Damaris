@@ -446,6 +446,23 @@ namespace Damaris
       static const type_type&
       type_default_value ();
 
+      // blocks
+      // 
+      typedef ::xml_schema::unsigned_int blocks_type;
+      typedef ::xsd::cxx::tree::traits< blocks_type, char > blocks_traits;
+
+      const blocks_type&
+      blocks () const;
+
+      blocks_type&
+      blocks ();
+
+      void
+      blocks (const blocks_type& x);
+
+      static blocks_type
+      blocks_default_value ();
+
       // Constructors.
       //
       BufferModel (const name_type&,
@@ -478,6 +495,7 @@ namespace Damaris
       ::xsd::cxx::tree::one< size_type > size_;
       ::xsd::cxx::tree::one< type_type > type_;
       static const type_type type_default_value_;
+      ::xsd::cxx::tree::one< blocks_type > blocks_;
     };
 
     class QueueModel: public ::xml_schema::type

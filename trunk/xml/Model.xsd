@@ -19,9 +19,10 @@
 
 	<!-- Buffer node -->
 	<xs:complexType name="BufferModel">
-	<xs:attribute name="name" type="xs:string"      use="required"/>
-	<xs:attribute name="size" type="xs:unsignedInt" use="required"/>
-	<xs:attribute name="type" type="xs:string"	use="optional" default="posix"/>
+	<xs:attribute name="name"   type="xs:string"      use="required"/>
+	<xs:attribute name="size"   type="xs:unsignedInt" use="required"/>
+	<xs:attribute name="type"   type="xs:string"      use="optional" default="posix"/>
+	<xs:attribute name="blocks" type="xs:unsignedInt" use="optional" default="0"/>
 	</xs:complexType>	
 
 	<!-- Queue node -->

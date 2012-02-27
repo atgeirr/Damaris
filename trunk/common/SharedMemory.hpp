@@ -43,7 +43,22 @@ namespace Damaris {
 	 * A handle_t is an object that can be converted into pointers
 	 * even in different process memory spaces.
 	 */
-	typedef boost::interprocess::managed_shared_memory::handle_t handle_t;
+	struct handle_t {
+		boost::interprocess::managed_shared_memory::handle_t value;
+		int objid;
+		handle_t(boost::interprocess::managed_shared_memory::handle_t ph, int id)
+		: value(ph), objid(id) {}
+		handle_t(boost::interprocess::managed_shared_memory::handle_t ph)
+		: value(ph), objid(0) {}
+		handle_t() {}
+		handle_t& operator=(const boost::interprocess::managed_shared_memory::handle_t& hdl)
+		{
+			value = hdl;
+			objid = 0;
+			return *this;
+		}
+	};
+	// typedef boost::interprocess::managed_shared_memory::handle_t handle_t;
 }
 
 #endif

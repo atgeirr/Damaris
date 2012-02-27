@@ -203,6 +203,30 @@ namespace Damaris
       return type_default_value_;
     }
 
+    const BufferModel::blocks_type& BufferModel::
+    blocks () const
+    {
+      return this->blocks_.get ();
+    }
+
+    BufferModel::blocks_type& BufferModel::
+    blocks ()
+    {
+      return this->blocks_.get ();
+    }
+
+    void BufferModel::
+    blocks (const blocks_type& x)
+    {
+      this->blocks_.set (x);
+    }
+
+    BufferModel::blocks_type BufferModel::
+    blocks_default_value ()
+    {
+      return blocks_type (0);
+    }
+
 
     // QueueModel
     // 
@@ -1488,7 +1512,8 @@ namespace Damaris
     : ::xml_schema::type (),
       name_ (name, ::xml_schema::flags (), this),
       size_ (size, ::xml_schema::flags (), this),
-      type_ (type_default_value (), ::xml_schema::flags (), this)
+      type_ (type_default_value (), ::xml_schema::flags (), this),
+      blocks_ (blocks_default_value (), ::xml_schema::flags (), this)
     {
     }
 
@@ -1499,7 +1524,8 @@ namespace Damaris
     : ::xml_schema::type (x, f, c),
       name_ (x.name_, f, this),
       size_ (x.size_, f, this),
-      type_ (x.type_, f, this)
+      type_ (x.type_, f, this),
+      blocks_ (x.blocks_, f, this)
     {
     }
 
@@ -1510,7 +1536,8 @@ namespace Damaris
     : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
       name_ (f, this),
       size_ (f, this),
-      type_ (f, this)
+      type_ (f, this),
+      blocks_ (f, this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
       {
@@ -1552,6 +1579,12 @@ namespace Damaris
           this->type_.set (r);
           continue;
         }
+
+        if (n.name () == "blocks" && n.namespace_ ().empty ())
+        {
+          this->blocks_.set (blocks_traits::create (i, f, this));
+          continue;
+        }
       }
 
       if (!name_.present ())
@@ -1571,6 +1604,11 @@ namespace Damaris
       if (!type_.present ())
       {
         this->type_.set (type_default_value ());
+      }
+
+      if (!blocks_.present ())
+      {
+        this->blocks_.set (blocks_default_value ());
       }
     }
 

@@ -1,0 +1,70 @@
+#!/bin/sh
+
+if [ $# -ne 1 ] 
+then
+	echo "Usage: ./build-damaris <location>"
+	exit 65
+fi
+LOC=$1
+
+echo "Getting Python..."
+wget http://www.python.org/ftp/python/2.6.7/Python-2.6.7.tgz
+tar xvf Python-2.6.7.tgz
+cd Python-2.6.7
+echo "Compiling Python..."
+./configure --prefix=$LOC
+make
+make install
+cd ..
+echo "Done"
+
+echo "Getting NumPy..."
+wget http://sourceforge.net/projects/numpy/files/NumPy/1.6.1/numpy-1.6.1.tar.gz/download
+tar xvf numpy-1.6.1.tar.gz
+echo "Compiling NumPy..."
+cd numpy-1.6.1
+$LOC/bin/python setup.py build
+$LOC/bin/python setup.py install --prefix=$LOC
+cd ..
+echo "Done"
+
+echo "Getting Xerces-C..."
+wget http://mirror.mkhelif.fr/apache//xerces/c/3/sources/xerces-c-3.1.1.tar.gz
+tar xvf xerces-c-3.1.1.tar.gz
+cd xerces-c-3.1.1
+echo "Compiling Xerces-C..."
+./configure --prefix=$LOC --disable-network --disable-threads
+make
+make install
+cd ..
+echo "Done"
+
+echo "Getting Boost..."
+wget http://sourceforge.net/projects/boost/files/boost/1.49.0/boost_1_49_0.tar.gz/download
+tar xvf boost_1_49_0.tar.gz
+echo "Compiling Boost..."
+cd boost_1_49_0
+./bootstrap.sh --prefix=$LOC --with-libraries=date_time,program_options,system,filesystem,python --with-python-root=$LOC
+./b2
+./b2 install
+cd ..
+echo "Done"
+
+echo "Getting XSD..."
+wget http://www.codesynthesis.com/download/xsd/3.3/linux-gnu/x86_64/xsd-3.3.0-x86_64-linux-gnu.tar.bz2
+tar xvf xsd-3.3.0-x86_64-linux-gnu.tar.bz2
+:tex
+cd xsd-3.3.0-x86_64-linux-gnu
+echo "Copying XSD headers..."
+cp -r libxsd/xsd $LOC/include/
+cd ..
+echo "Done"
+
+echo "Getting CMake..."
+wget http://www.cmake.org/files/v2.8/cmake-2.8.7-Linux-i386.tar.gz
+tar xvf cmake-2.8.7-Linux-i386.tar.gz
+echo "Copying CMake binaries..."
+cd cmake-2.8.7-Linux-i386
+cp -r bin/* $LOC/bin/
+cp -r share $LOC/
+echo "Done"

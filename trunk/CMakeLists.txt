@@ -12,6 +12,7 @@ enable_language (Fortran OPTIONAL)
 include(CMakeForceCompiler)
 CMAKE_FORCE_CXX_COMPILER(mpicxx "MPI C++ Compiler")
 CMAKE_FORCE_C_COMPILER(mpicc "MPI C Compiler")
+#CMAKE_FORCE_FORTRAN_COMPILER(mpif90 "Fortran Compiler")
 
 #-----------------------------------------------------------#
 # Starting project definition
@@ -37,7 +38,7 @@ add_definitions (-D__ENABLE_MPI) # this line to be deleted
 #add_definitions (-D__INFO)
 #add_definitions (-D__TRACE)
 #add_definitions (-D__DEBUG_ALL)
-#add_definitions (-D__BENCHMARK)
+add_definitions (-D__BENCHMARK)
 
 #-----------------------------------------------------------#
 # Set the location of CMake Modules
@@ -79,6 +80,7 @@ link_directories(${XERCESC_LIBRARY_DIR})
 # Set everything related to Python
 #-----------------------------------------------------------#
 set(PYTHON_ROOT ${EXTERNAL_ROOT})
+set(NUMPY_INCLUDE_DIR ${EXTERNAL_ROOT}/lib/python2.6/site-packages/numpy/core/include)
 find_package(PythonLibs)
 
 if (PYTHON_INCLUDE_PATH)
@@ -87,11 +89,12 @@ if (PYTHON_INCLUDE_PATH)
 	message(STATUS "Building Python support. Python lib: ${Boost_PYTHON_LIBRARY}")
 	message(STATUS "Python include: ${PYTHON_INCLUDE_PATH}")
     include_directories(${PYTHON_INCLUDE_PATH})
+	include_directories(${NUMPY_INCLUDE_DIR})
     link_directories(${PYTHON_LIBRARY_DIR})
     add_definitions(-D__ENABLE_PYTHON)
     # add the Boost Python library to the current Boost libraries
     set(BOOST_LIB ${BOOST_LIB} boost_python)
-    set(PYTHON_LIB python2.6)
+    set(PYTHON_LIB python2.6 util)
   else (Boost_PYTHON_LIBRARY)
     message(STATUS "Boost Python not found. Python support will not be built.")
   endif (Boost_PYTHON_LIBRARY)
@@ -103,7 +106,7 @@ endif (PYTHON_INCLUDE_PATH)
 # Set everything related to the HDF5 library 
 # Just comment the first line if you don't want HDF5 support
 #-----------------------------------------------------------#
-set(HDF5_ROOT ${EXTERNAL_ROOT})
+#set(HDF5_ROOT ${EXTERNAL_ROOT})
 set(HDF5_LIBRARY_DIR "${HDF5_ROOT}/lib")
 set(HDF5_INCLUDE_DIR "${HDF5_ROOT}/include")
 set(HDF5_LIB hdf5)

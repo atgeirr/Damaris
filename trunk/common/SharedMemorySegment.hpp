@@ -46,6 +46,7 @@ class SharedMemorySegment {
 	private:
 		class POSIX_ShMem;
 		class SYSV_ShMem;
+		class CompositeShMem;
 	
 	protected:	
 		struct size_manager_s {
@@ -161,5 +162,24 @@ class SharedMemorySegment::SYSV_ShMem : public SharedMemorySegment {
 		size_t getFreeMemory();
 };
 
+class SharedMemorySegment::CompositeShMem : public SharedMemorySegment {
+	private:
+		std::vector<SharedMemorySegment*> segments;
+		std::vector<int64_t> ptr_start, ptr_end;
+		int nbseg;
+
+	public:
+		CompositeShMem(const std::string &name, int64_t size);
+		CompositeShMem(const std::string &name);
+
+		SharedMemorySegment::ptr getAddressFromHandle(handle_t h);
+		handle_t getHandleFromAddress(SharedMemorySegment::ptr p);
+		ptr allocate(size_t size);
+		void deallocate(void* addr);
+		size_t getFreeMemory();	
+};
+
 }
+
+
 #endif

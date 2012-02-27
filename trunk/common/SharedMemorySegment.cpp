@@ -115,7 +115,7 @@ SharedMemorySegment::SYSV_ShMem::SYSV_ShMem(const std::string &name)
 
 SharedMemorySegment::ptr SharedMemorySegment::POSIX_ShMem::getAddressFromHandle(handle_t h)
 {
-	return impl->get_address_from_handle(h);;
+	return impl->get_address_from_handle(h.value);;
 }
 
 handle_t SharedMemorySegment::POSIX_ShMem::getHandleFromAddress(SharedMemorySegment::ptr p)
@@ -154,7 +154,7 @@ size_t SharedMemorySegment::POSIX_ShMem::getFreeMemory()
 
 SharedMemorySegment::ptr SharedMemorySegment::SYSV_ShMem::getAddressFromHandle(handle_t h)
 {
-	return impl->get_address_from_handle(h);
+	return impl->get_address_from_handle(h.value);
 }
 
 handle_t SharedMemorySegment::SYSV_ShMem::getHandleFromAddress(SharedMemorySegment::ptr p) 
@@ -187,5 +187,61 @@ bool SharedMemorySegment::waitAvailable(size_t size)
     }
 	return true;
 }
+
+SharedMemorySegment::CompositeShMem::CompositeShMem(const std::string &name, int64_t size)
+{
+	// TODO
+}
+
+SharedMemorySegment::CompositeShMem::CompositeShMem(const std::string &name)
+{
+	// TODO	
+}
+
+SharedMemorySegment::ptr SharedMemorySegment::CompositeShMem::getAddressFromHandle(handle_t h)
+{
+	if(h.objid < 0 or h.objid >= nbseg) {
+		ERROR("Invalid object id");
+		return NULL;
+	}
+	return segments[h.objid]->getAddressFromHandle(h);
+}
+
+handle_t SharedMemorySegment::CompositeShMem::getHandleFromAddress(SharedMemorySegment::ptr p)
+{
+	int id = 0;
+	bool found = false;
+	for(int i=0;i<nbseg;i++) {
+		if((int64_t)p >= ptr_start[i] && (int64_t)p < ptr_end[i]) {
+			id = i;
+			found = true;
+			break;
+		}
+	}
+	if(not found) {
+		ERROR("Pointer does not belong to any segment");
+		return handle_t();
+	}
+	return segments[id]->getHandleFromAddress(p);
+}
+
+SharedMemorySegment::ptr SharedMemorySegment::CompositeShMem::allocate(size_t size)
+{
+	// TODO
+	return NULL;
+}
+
+void SharedMemorySegment::CompositeShMem::deallocate(void* addr)
+{
+	// TODO
+	return;
+}
+
+size_t SharedMemorySegment::CompositeShMem::getFreeMemory()
+{
+	// TODO
+	return 0;
+}
+
 }
 
