@@ -78,6 +78,7 @@ namespace Damaris {
 
 		if(location == NULL && not blocking) {
 			ERROR("Could not allocate memory: not enough available memory");
+			lost(iteration);
 			return NULL;
 		} else if(location == NULL && blocking) {
 			while(location == NULL) {
@@ -168,6 +169,7 @@ namespace Damaris {
 
 		if(location == NULL && not blocking) {
             ERROR("Could not allocate memory: not enough available memory");
+			lost(iteration);
             return -2;
         } else if(location == NULL && blocking) {
             while(location == NULL) {
@@ -234,6 +236,7 @@ namespace Damaris {
 
 		if(location == NULL && not blocking) {
             ERROR("Could not allocate memory: not enough available memory");
+			lost(iteration);
             return -2;
         } else if(location == NULL && blocking) {
             while(location == NULL) {
@@ -329,14 +332,25 @@ namespace Damaris {
 
 	int Client::clean(int iteration)
     {
-		Message kill;
-		kill.type = MSG_INT;
-		kill.source = process->getEnvironment()->getID();
-		kill.iteration = iteration;
-		kill.object = URGENT_CLEAN;
-		process->getSharedMessageQueue()->send(&kill);
+		Message msg;
+		msg.type = MSG_INT;
+		msg.source = process->getEnvironment()->getID();
+		msg.iteration = iteration;
+		msg.object = URGENT_CLEAN;
+		process->getSharedMessageQueue()->send(&msg);
 		return 0;
     }
+
+	int Client::lost(int iteration)
+	{
+		Message msg;
+		msg.type = MSG_INT;
+        msg.source = process->getEnvironment()->getID();
+        msg.iteration = iteration;
+        msg.object = LOST_DATA;
+        process->getSharedMessageQueue()->send(&msg);
+		return 0;	
+	}
 
 	chunk_h Client::chunk_set(unsigned int dimensions,
 			const std::vector<int> & startIndices, 

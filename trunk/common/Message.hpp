@@ -43,7 +43,8 @@ namespace Damaris {
  */
 	enum int_msg_e {
 		KILL_SERVER = 0,
-		URGENT_CLEAN = 1
+		URGENT_CLEAN = 1,
+		LOST_DATA = 2
 	};
 
 /**

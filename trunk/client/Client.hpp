@@ -73,13 +73,13 @@ class Client : public Writer {
 		/**
 		 * \see Writer::write
 		 */
-		virtual int write(const std::string & varname, int32_t iteration, const void* data, bool blocking = true);
+		virtual int write(const std::string & varname, int32_t iteration, const void* data, bool blocking = false);
 		
 		/**
 		 * \see Writer::chunk_write
 		 */
 		virtual int chunk_write(chunk_h chunkh, const std::string & varname, 
-			int32_t iteration, const void* data, bool blocking = true);		
+			int32_t iteration, const void* data, bool blocking = false);
 
 		/**
 		 * \see Writer::signal
@@ -89,7 +89,7 @@ class Client : public Writer {
 		/**
 		 * \see Writer::alloc
 		 */
-		virtual void* alloc(const std::string & varname, int32_t iteration, bool blocking = true);
+		virtual void* alloc(const std::string & varname, int32_t iteration, bool blocking = false);
 
 		/** 
 		 * \see Writer::commit
@@ -129,6 +129,12 @@ class Client : public Writer {
 		 * Sends a signal to the server to try free the shared memory.
 		 */
 		virtual int clean(int iteration);
+
+		/**
+		 * Sends a signal to the server to notify that a client was
+		 * unable to write some expected data.
+		 */
+		virtual int lost(int iteration);
 
 		/**
 		 * Gets the communicator gathering clients.
