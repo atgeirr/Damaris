@@ -43,7 +43,7 @@ namespace Damaris {
 using namespace boost::interprocess;
 
 class SharedMemorySegment {
-	private:
+	protected:
 		class POSIX_ShMem;
 		class SYSV_ShMem;
 		class CompositeShMem;
@@ -121,6 +121,18 @@ class SharedMemorySegment {
 		 * Return false if the size will never be satisfied, true otherwise.
 		 */
 		virtual bool waitAvailable(size_t size);
+
+	protected:
+		/**
+		 * Returns the first address mapped to the local process's address space
+		 * for this shared memory segment.
+		 */
+		virtual ptr getStartAddress() = 0;
+
+		/**
+		 * Returns the last address + 1 of this shared memory segment.
+		 */
+		virtual ptr getEndAddress() = 0;
 };
 
 using namespace boost::interprocess;
@@ -141,6 +153,10 @@ class SharedMemorySegment::POSIX_ShMem : public SharedMemorySegment {
 		ptr allocate(size_t size);
 		void deallocate(void* addr);
 		size_t getFreeMemory();
+	
+	protected:
+		SharedMemorySegment::ptr getStartAddress();
+		SharedMemorySegment::ptr getEndAddress();
 };
 
 /**
@@ -152,6 +168,8 @@ class SharedMemorySegment::SYSV_ShMem : public SharedMemorySegment {
 		managed_xsi_shared_memory* impl;
 		xsi_key key;
 	public:
+		SYSV_ShMem(const xsi_key& k, int64_t size);
+		SYSV_ShMem(const xsi_key& k);
 		SYSV_ShMem(const std::string &name, int64_t size);
 		SYSV_ShMem(const std::string &name);
 
@@ -160,23 +178,33 @@ class SharedMemorySegment::SYSV_ShMem : public SharedMemorySegment {
 		ptr allocate(size_t size);
 		void deallocate(void* addr);
 		size_t getFreeMemory();
+
+	protected:
+        SharedMemorySegment::ptr getStartAddress();
+        SharedMemorySegment::ptr getEndAddress();
 };
 
 class SharedMemorySegment::CompositeShMem : public SharedMemorySegment {
 	private:
-		std::vector<SharedMemorySegment*> segments;
+		std::vector<SharedMemorySegment*> blocks;
 		std::vector<int64_t> ptr_start, ptr_end;
 		int nbseg;
 
 	public:
-		CompositeShMem(const std::string &name, int64_t size);
-		CompositeShMem(const std::string &name);
+		CompositeShMem(const std::string &name, int64_t size, int count, posix_shmem_t);
+        CompositeShMem(const std::string &name, int count, posix_shmem_t);
+		CompositeShMem(const std::string &name, int64_t size, int count, sysv_shmem_t);
+		CompositeShMem(const std::string &name, int count, sysv_shmem_t);
 
 		SharedMemorySegment::ptr getAddressFromHandle(handle_t h);
 		handle_t getHandleFromAddress(SharedMemorySegment::ptr p);
 		ptr allocate(size_t size);
 		void deallocate(void* addr);
-		size_t getFreeMemory();	
+		size_t getFreeMemory();
+	
+	protected:
+        SharedMemorySegment::ptr getStartAddress();
+        SharedMemorySegment::ptr getEndAddress();
 };
 
 }
