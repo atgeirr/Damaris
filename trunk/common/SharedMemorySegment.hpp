@@ -122,17 +122,7 @@ class SharedMemorySegment {
 		 */
 		virtual bool waitAvailable(size_t size);
 
-	protected:
-		/**
-		 * Returns the first address mapped to the local process's address space
-		 * for this shared memory segment.
-		 */
-		virtual ptr getStartAddress() = 0;
-
-		/**
-		 * Returns the last address + 1 of this shared memory segment.
-		 */
-		virtual ptr getEndAddress() = 0;
+		virtual bool pointerBelongsToSegment(void* p) = 0;
 };
 
 using namespace boost::interprocess;
@@ -153,10 +143,7 @@ class SharedMemorySegment::POSIX_ShMem : public SharedMemorySegment {
 		ptr allocate(size_t size);
 		void deallocate(void* addr);
 		size_t getFreeMemory();
-	
-	protected:
-		SharedMemorySegment::ptr getStartAddress();
-		SharedMemorySegment::ptr getEndAddress();
+		bool pointerBelongsToSegment(void* p);	
 };
 
 /**
@@ -178,16 +165,12 @@ class SharedMemorySegment::SYSV_ShMem : public SharedMemorySegment {
 		ptr allocate(size_t size);
 		void deallocate(void* addr);
 		size_t getFreeMemory();
-
-	protected:
-        SharedMemorySegment::ptr getStartAddress();
-        SharedMemorySegment::ptr getEndAddress();
+		bool pointerBelongsToSegment(void* p);
 };
 
 class SharedMemorySegment::CompositeShMem : public SharedMemorySegment {
 	private:
 		std::vector<SharedMemorySegment*> blocks;
-		std::vector<int64_t> ptr_start, ptr_end;
 		int nbseg;
 
 	public:
@@ -201,10 +184,7 @@ class SharedMemorySegment::CompositeShMem : public SharedMemorySegment {
 		ptr allocate(size_t size);
 		void deallocate(void* addr);
 		size_t getFreeMemory();
-	
-	protected:
-        SharedMemorySegment::ptr getStartAddress();
-        SharedMemorySegment::ptr getEndAddress();
+		bool pointerBelongsToSegment(void* p);
 };
 
 }

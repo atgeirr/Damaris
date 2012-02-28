@@ -35,10 +35,20 @@ SharedMemorySegment* SharedMemorySegment::create(Model::BufferModel* model)
 {
 	std::string& name = model->name();
 	std::string& type = model->type();
+	unsigned int& count = model->blocks();
 	size_t size = model->size();
-	if(type == "posix") 	return new SharedMemorySegment::POSIX_ShMem(name,size);
-	else if(type == "sysv") return new SharedMemorySegment::SYSV_ShMem(name,size);
-	else {
+	if(type == "posix") {
+		if(count > 1)
+			return new SharedMemorySegment::CompositeShMem(name,size,count,posix_shmem);
+		else
+	 		return new SharedMemorySegment::POSIX_ShMem(name,size);
+	 } else 
+	if(type == "sysv") {
+		if(count > 1)
+			return new SharedMemorySegment::CompositeShMem(name,size,count,sysv_shmem);
+		else
+			return new SharedMemorySegment::SYSV_ShMem(name,size);
+	} else {
 		ERROR("Unknown shared memory type \"" << type << "\"");
 		return NULL;
 	}
@@ -48,9 +58,19 @@ SharedMemorySegment* SharedMemorySegment::open(Model::BufferModel* model)
 {
         std::string& name = model->name();
         std::string& type = model->type();
-        if(type == "posix")     return new SharedMemorySegment::POSIX_ShMem(name);
-        else if(type == "sysv") return new SharedMemorySegment::SYSV_ShMem(name);
-        else {
+		unsigned int& count = model->blocks();
+        if(type == "posix") {
+			if(count > 1)
+		    	return new SharedMemorySegment::CompositeShMem(name,count,posix_shmem);
+        	else
+				return new SharedMemorySegment::POSIX_ShMem(name);
+		} else 
+		if(type == "sysv") {
+			if(count > 1)
+				return new SharedMemorySegment::CompositeShMem(name,count,sysv_shmem);
+			else
+				return new SharedMemorySegment::SYSV_ShMem(name);
+        } else {
                 ERROR("Unknown shared memory type \"" << type << "\"");
                 return NULL;
         }
@@ -60,14 +80,36 @@ bool SharedMemorySegment::remove(Model::BufferModel* model)
 {
 	std::string& name = model->name();
 	std::string& type = model->type();
+	unsigned int& count = model->blocks();
+
 	if(type == "posix") {
-		return shared_memory_object::remove(name.c_str());
+		if(count > 1) {
+			bool res = false;
+			for(int k = 0; k < (int)count; k++) {
+				std::stringstream ss;
+				ss << name << "_" << k;
+				res = res || shared_memory_object::remove(ss.str().c_str());
+			}	
+			return res;
+		} else {	
+			return shared_memory_object::remove(name.c_str());
+		}
 	}
 	else if(type == "sysv") 
 	{
-		xsi_key key(name.c_str(),0);
-		int id = shmget(key.get_key(),0,0600);
-		return xsi_shared_memory::remove(id);
+		if(count > 1) {
+			bool res = false;
+			for(int k = 0; k < (int)count; k++) {
+				xsi_key key(name.c_str(),k);
+            	int id = shmget(key.get_key(),0,0600);
+            	res = res || xsi_shared_memory::remove(id);
+			}
+			return res;
+		} else {
+			xsi_key key(name.c_str(),0);
+			int id = shmget(key.get_key(),0,0600);
+			return xsi_shared_memory::remove(id);
+		}	
 	}
 	else {
 			return false;
@@ -163,14 +205,11 @@ size_t SharedMemorySegment::POSIX_ShMem::getFreeMemory()
 	return impl->get_free_memory();
 }
 
-SharedMemorySegment::ptr SharedMemorySegment::POSIX_ShMem::getStartAddress()
+bool SharedMemorySegment::POSIX_ShMem::pointerBelongsToSegment(void* p)
 {
-	return impl->get_address();
-}
-
-SharedMemorySegment::ptr SharedMemorySegment::POSIX_ShMem::getEndAddress()
-{
-	return (void*)((char*)(impl->get_address()) + impl->get_size());
+	bool res = (int64_t)impl->get_address() <= (int64_t)p;
+	res = res && (int64_t)p < (int64_t)((char*)impl->get_address() + impl->get_size());
+	return res;
 }
 
 SharedMemorySegment::ptr SharedMemorySegment::SYSV_ShMem::getAddressFromHandle(handle_t h)
@@ -198,6 +237,13 @@ size_t SharedMemorySegment::SYSV_ShMem::getFreeMemory()
 	return impl->get_free_memory();
 }
 
+bool SharedMemorySegment::SYSV_ShMem::pointerBelongsToSegment(void* p)
+{
+    bool res = (int64_t)impl->get_address() <= (int64_t)p;
+    res = res && (int64_t)p < (int64_t)((char*)impl->get_address() + impl->get_size());
+    return res; 
+}
+
 bool SharedMemorySegment::waitAvailable(size_t size)
 {
 	if(size > size_manager->max) return false;
@@ -209,30 +255,16 @@ bool SharedMemorySegment::waitAvailable(size_t size)
 	return true;
 }
 
-SharedMemorySegment::ptr SharedMemorySegment::SYSV_ShMem::getStartAddress()
-{
-	return impl->get_address();
-}
-
-SharedMemorySegment::ptr SharedMemorySegment::SYSV_ShMem::getEndAddress()
-{
-	return (void*)((char*)impl->get_address() + impl->get_size());
-}
-
 SharedMemorySegment::CompositeShMem::CompositeShMem(const std::string &name, int64_t size, 
 													int count, posix_shmem_t p)
 {
 	nbseg = count;
 	blocks.resize(count,NULL);
-	ptr_start.resize(count,0);
-	ptr_end.resize(count,0);
 
 	for(int i=0; i<nbseg; i++) {
 		std::stringstream ss;
 		ss << name << "_" << i;
-		blocks.push_back(new SharedMemorySegment::POSIX_ShMem(ss.str(),size));
-		ptr_start.push_back((int64_t)blocks[i]->getStartAddress());
-		ptr_end.push_back((int64_t)blocks[i]->getEndAddress());
+		blocks[i] = new SharedMemorySegment::POSIX_ShMem(ss.str(),size);
 	}
 
 	size_manager = blocks[0]->size_manager;
@@ -243,14 +275,10 @@ SharedMemorySegment::CompositeShMem::CompositeShMem(const std::string &name, int
 {
 	nbseg = count;
     blocks.resize(count,NULL);
-    ptr_start.resize(count,0);
-    ptr_end.resize(count,0);
 	
 	for(int i=0; i<nbseg; i++) {
 		xsi_key k(name.c_str(),i);
-		blocks.push_back(new SharedMemorySegment::SYSV_ShMem(k,size));
-		ptr_start.push_back((int64_t)blocks[i]->getStartAddress());
-		ptr_end.push_back((int64_t)blocks[i]->getEndAddress());
+		blocks[i] = new SharedMemorySegment::SYSV_ShMem(k,size);
 	}
 
 	size_manager = blocks[0]->size_manager;
@@ -261,15 +289,11 @@ SharedMemorySegment::CompositeShMem::CompositeShMem(const std::string &name, int
 {
 	nbseg = count;
     blocks.resize(count,NULL);
-    ptr_start.resize(count,0);
-    ptr_end.resize(count,0);
 	
 	for(int i=0; i<nbseg; i++) {
         std::stringstream ss;
         ss << name << "_" << i;
-        blocks.push_back(new SharedMemorySegment::POSIX_ShMem(ss.str()));
-        ptr_start.push_back((int64_t)blocks[i]->getStartAddress());
-        ptr_end.push_back((int64_t)blocks[i]->getEndAddress());
+        blocks[i] = new SharedMemorySegment::POSIX_ShMem(ss.str());
     }
 
 	size_manager = blocks[0]->size_manager;
@@ -280,14 +304,10 @@ SharedMemorySegment::CompositeShMem::CompositeShMem(const std::string &name, int
 {
 	nbseg = count;
     blocks.resize(count,NULL);
-    ptr_start.resize(count,0);
-    ptr_end.resize(count,0);
     
 	for(int i=0; i<nbseg; i++) {
         xsi_key k(name.c_str(),i);
-        blocks.push_back(new SharedMemorySegment::SYSV_ShMem(k));
-        ptr_start.push_back((int64_t)blocks[i]->getStartAddress());
-        ptr_end.push_back((int64_t)blocks[i]->getEndAddress());
+        blocks[i] = new SharedMemorySegment::SYSV_ShMem(k);
     }
 
 	size_manager = blocks[0]->size_manager;
@@ -307,7 +327,7 @@ handle_t SharedMemorySegment::CompositeShMem::getHandleFromAddress(SharedMemoryS
 	int id = 0;
 	bool found = false;
 	for(int i=0;i<nbseg;i++) {
-		if((int64_t)p >= ptr_start[i] && (int64_t)p < ptr_end[i]) {
+		if(blocks[i]->pointerBelongsToSegment(p)) {
 			id = i;
 			found = true;
 			break;
@@ -337,7 +357,7 @@ void SharedMemorySegment::CompositeShMem::deallocate(void* addr)
 {
 	// find the segment in charge of this address
 	for(int i=0; i < nbseg; i++) {
-		if(ptr_start[i] <= (int64_t)addr && ptr_end[i] > (int64_t)addr) {
+		if(blocks[i]->pointerBelongsToSegment(addr)) {
 			blocks[i]->deallocate(addr);
 			return;
 		}
@@ -354,24 +374,13 @@ size_t SharedMemorySegment::CompositeShMem::getFreeMemory()
 	return total;
 }
 
-SharedMemorySegment::ptr SharedMemorySegment::CompositeShMem::getStartAddress()
+bool SharedMemorySegment::CompositeShMem::pointerBelongsToSegment(void* p)
 {
-	void* start = NULL;
-	for(int i = 0; i<nbseg; i++) {
-		if(start == NULL or (int64_t)start > ptr_start[i]) 
-			start = (void*)ptr_start[i];
+    bool res = false;
+    for(int i = 0; i < nbseg; i++) {
+		res = res || blocks[i]->pointerBelongsToSegment(p);
 	}
-    return start;
-}
-
-SharedMemorySegment::ptr SharedMemorySegment::CompositeShMem::getEndAddress()
-{
-	void* end = NULL;
-	for(int i = 0; i<nbseg; i++) {
-        if(end == NULL or (int64_t)end < ptr_end[i])
-            end = (void*)ptr_end[i];
-    }
-	return end;
+	return res; 
 }
 
 }

@@ -53,3 +53,4 @@ add_library (damaris ${DAMARIS_COMMON_SRC}
 		     ${DAMARIS_SCRIPTS_SRC}
 		     ${DAMARIS_PERSISTENCY_SRC})
 
+file(COPY ${DAMARIS_SOURCE_DIR}/client/damaris.mod DESTINATION ${DAMARIS_SOURCE_DIR}/include/)
