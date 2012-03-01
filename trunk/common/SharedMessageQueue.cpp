@@ -73,7 +73,7 @@ SharedMessageQueue* SharedMessageQueue::create(sysv_shmem_t sysv_shmem,
 		const std::string& name, size_t num_msg, size_t size_msg)
 {
 	size_t size = num_msg*size_msg + sizeof(struct shm_queue_hdr);
-	xsi_shared_memory base(create_only,xsi_key(name.c_str(),1),size,read_write);
+	xsi_shared_memory base(create_only,xsi_key(name.c_str(),1),size);
 	
 	mapped_region *region = new mapped_region(base,read_write);
 	void* addr = region->get_address();
@@ -118,11 +118,16 @@ bool SharedMessageQueue::remove(Model::QueueModel* mdl)
         std::string& name = mdl->name();
         std::string& type = mdl->type();
 
+	try {
+
         if(type == "posix") return remove(posix_shmem_t(),name);
         else if(type == "sysv") return remove(sysv_shmem_t(),name);
         else {
                 return false;
         }
+	} catch(...) {
+		return false;
+	}
 }
 
 bool SharedMessageQueue::remove(posix_shmem_t posix_shmem, const std::string& name)

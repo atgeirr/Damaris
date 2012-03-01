@@ -82,6 +82,8 @@ bool SharedMemorySegment::remove(Model::BufferModel* model)
 	std::string& type = model->type();
 	unsigned int& count = model->blocks();
 
+	try {
+
 	if(type == "posix") {
 		if(count > 1) {
 			bool res = false;
@@ -113,6 +115,10 @@ bool SharedMemorySegment::remove(Model::BufferModel* model)
 	}
 	else {
 			return false;
+	}
+
+	} catch(...) {
+		return false;
 	}
 }
 
