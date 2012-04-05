@@ -1,70 +1,196 @@
-#!/bin/sh
+#!/bin/bash
 
-if [ $# -ne 1 ] 
-then
-	echo "Usage: ./build-damaris <location>"
-	exit 65
-fi
+DAMARIS_VERSION="0.4"
+
+DLG="dialog"
+DLG_BACKTITLE="Damaris $DAMARIS_VERSION Build Process"
+DLG_HEIGHT="5"
+DLG_HEIGHT_TALL="25"
+DLG_WIDTH="60"
+DLG_WIDTH_WIDE="80"
+
+SVN="svn"
+TAR="tar"
+WGET="wget"
+
+BOOST_LOCATION=""
+XSD_LOCATION=""
+XERCESC_LOCATION=""
+CMAKE_LOCATION=""
+PYTHON_LOCATION=""
+
+function download
+{
+	URL="$1"
+	FILE=$(basename $URL)
+	rm -f $FILE
+	length=$(wget --spider "$URL" 2>&1 |grep -i Longueur|awk '{print $2}')
+	let length=$(echo $length | sed "s///g")
+	scale=$(echo "scale=6; 100/$length" | bc)
+
+	wget $URL 2>/dev/null &
+	(
+		while ( true )
+		do
+			proc=$(ps aux | grep -v grep | grep wget | grep $FILE ) 
+			if [[ "$proc" == "" ]]; then break; fi
+			size=$(ls -l $FILE 2>/dev/null | awk '{print $5}' 2>/dev/null)
+			if [ "$size" != "" ]; then 
+			{
+				metre=$(printf "%d" $(echo "scale=0; $size*$scale" | bc) 2>/dev/null)
+			}
+			fi
+			if [[ "$metre" == "" ]]; then metre=0; fi
+			echo "XXX"
+			echo "Download Size: $length B\nDownloaded:    $size B" 
+			echo "\nFrom $1"
+			echo "XXX"
+			echo $metre
+		done
+	) | dialog --title "Downloading $2" --no-collapse --gauge "Downloading..." 10 70
+}
+
+function quit
+{
+	exit 0
+}
+
+function main 
+{
+	tmpfile="tmp$$"
+	$DLG --backtitle "$DLG_BACKTITLE" \
+		 --title "Build Options"  \
+		 --menu \
+"Welcome to the Damaris $DAMARIS_VERSION build process.\n\n"\
+"This program will build Damaris and its required "\
+"3rd party sources, downloading any missing source packages "\
+"before building.\n\n"\
+"Please select the libraries and tools that you want to configure." 0 0 0 \
+            "C/C++ MPI compilers" 	"set the MPI compilers to use"\
+            "Boost C++" 			"set the location of existing Boost libraries"\
+            "XSD" 					"set the location of existing XSD tools"\
+            "Xerces-C" 				"set the location of the Xerces-C library"\
+            "Cmake" 				"set the location of CMake"\
+            "Fortran compiler"      "set fortran-related options"\
+            "Python"				"enable Damaris python support" 2> $tmpfile
+	retval=$?
+	choice=`cat $tmpfile`
+	case $retval in
+	0)	echo "Choice: $choice ";;
+	1) 	echo "Appuyé sur Annuler.";;
+	255) quit;;
+	esac
+}
+
 LOC=$1
 
-echo "Getting Python..."
-wget http://www.python.org/ftp/python/2.6.7/Python-2.6.7.tgz
-tar xvf Python-2.6.7.tgz
-cd Python-2.6.7
-echo "Compiling Python..."
-./configure --prefix=$LOC
-make
-make install
-cd ..
-echo "Done"
+function get_python
+{
 
-echo "Getting NumPy..."
-wget http://sourceforge.net/projects/numpy/files/NumPy/1.6.1/numpy-1.6.1.tar.gz/download
-tar xvf numpy-1.6.1.tar.gz
-echo "Compiling NumPy..."
-cd numpy-1.6.1
-$LOC/bin/python setup.py build
-$LOC/bin/python setup.py install --prefix=$LOC
-cd ..
-echo "Done"
+	download http://www.python.org/ftp/python/2.6.7/Python-2.6.7.tgz Python
+	$TAR xvf Python-2.6.7.tgz
+	cd Python-2.6.7
+	./configure --prefix=$PYTHON_INSTALL_LOC
+	make
+	make install
+	cd ..
+}
 
-echo "Getting Xerces-C..."
-wget http://mirror.mkhelif.fr/apache//xerces/c/3/sources/xerces-c-3.1.1.tar.gz
-tar xvf xerces-c-3.1.1.tar.gz
-cd xerces-c-3.1.1
-echo "Compiling Xerces-C..."
-./configure --prefix=$LOC --disable-network --disable-threads
-make
-make install
-cd ..
-echo "Done"
+main
+get_python
 
-echo "Getting Boost..."
-wget http://sourceforge.net/projects/boost/files/boost/1.49.0/boost_1_49_0.tar.gz/download
-tar xvf boost_1_49_0.tar.gz
-echo "Compiling Boost..."
-cd boost_1_49_0
-./bootstrap.sh --prefix=$LOC --with-libraries=date_time,program_options,system,filesystem,python --with-python-root=$LOC
-./b2
-./b2 install
-cd ..
-echo "Done"
+function get_numpy
+{
+	download http://sourceforge.net/projects/numpy/files/NumPy/1.6.1/numpy-1.6.1.tar.gz/download NumPy
+	$TAR xvf numpy-1.6.1.tar.gz
+	cd numpy-1.6.1
+	$LOC/bin/python setup.py build
+	$LOC/bin/python setup.py install --prefix=$LOC
+	cd ..
+}
 
-echo "Getting XSD..."
-wget http://www.codesynthesis.com/download/xsd/3.3/linux-gnu/x86_64/xsd-3.3.0-x86_64-linux-gnu.tar.bz2
-tar xvf xsd-3.3.0-x86_64-linux-gnu.tar.bz2
-:tex
-cd xsd-3.3.0-x86_64-linux-gnu
-echo "Copying XSD headers..."
-cp -r libxsd/xsd $LOC/include/
-cd ..
-echo "Done"
+function get_xerces_c
+{
+	download http://mirror.mkhelif.fr/apache//xerces/c/3/sources/xerces-c-3.1.1.tar.gz Xerces-C
+	tar xvf xerces-c-3.1.1.tar.gz
+	cd xerces-c-3.1.1
+	./configure --prefix=$LOC --disable-network --disable-threads
+	make
+	make install
+	cd ..
+	echo "Done"
+}
 
-echo "Getting CMake..."
-wget http://www.cmake.org/files/v2.8/cmake-2.8.7-Linux-i386.tar.gz
-tar xvf cmake-2.8.7-Linux-i386.tar.gz
-echo "Copying CMake binaries..."
-cd cmake-2.8.7-Linux-i386
-cp -r bin/* $LOC/bin/
-cp -r share $LOC/
-echo "Done"
+function get_boost
+{
+	download http://sourceforge.net/projects/boost/files/boost/1.49.0/boost_1_49_0.tar.gz/download Boost
+	tar xvf boost_1_49_0.tar.gz
+	cd boost_1_49_0
+	./bootstrap.sh --prefix=$LOC \
+		--with-libraries=date_time,program_options,system,filesystem,python \
+		--with-python-root=$LOC
+	./b2
+	./b2 install
+	cd ..
+}
+
+function get_xsd
+{
+	download http://www.codesynthesis.com/download/xsd/3.3/linux-gnu/x86_64/xsd-3.3.0-x86_64-linux-gnu.tar.bz2 XSD 
+	tar xvf xsd-3.3.0-x86_64-linux-gnu.tar.bz2
+	cd xsd-3.3.0-x86_64-linux-gnu
+	cp -r libxsd/xsd $LOC/include/
+	cd ..
+}
+
+function get_cmake
+{
+	download http://www.cmake.org/files/v2.8/cmake-2.8.7-Linux-i386.tar.gz CMake
+	tar xvf cmake-2.8.7-Linux-i386.tar.gz
+	cd cmake-2.8.7-Linux-i386
+	cp -r bin/* $LOC/bin/
+	cp -r share $LOC/
+}
+
+function get_matplotlib
+{
+	download http://sourceforge.net/projects/matplotlib/files/matplotlib/matplotlib-1.1.0/matplotlib-1.1.0.tar.gz/download MatplotLib
+	tar xvf matplotlib-1.1.0.tar.gz
+	cd matplotlib-1.1.0
+	$LOC/bin/python setup.py build
+	$LOC/bin/python setup.py install --prefix=$LOC
+	cd ..
+}
+
+function get_freetype
+{
+	download http://sourceforge.net/projects/freetype/files/freetype2/2.4.8/freetype-2.4.8.tar.gz/download FreeType2 
+	tar xvf freetype-2.4.8.tar.gz
+	cd freetype-2.4.8
+	./configure --prefix=$LOC
+	make
+	make install
+	cd ..
+}
+
+function get_libpng
+{
+	download http://download.sourceforge.net/libpng/libpng-1.5.10.tar.gz LibPNG
+	tar xvf libpng-1.5.10.tar.gz
+	cd libpng-1.5.10
+	./configure --prefix=$LOC
+	make
+	make install
+	cd ..
+}
+
+function get_zlib
+{
+	download http://prdownloads.sourceforge.net/libpng/zlib-1.2.6.tar.gz?download Zlib
+	tar xvf zlib-1.2.6.tar.gz
+	cd zlib-1.2.6
+	./configure --prefix=$LOC
+	make
+	make install
+	cd ..
+}
