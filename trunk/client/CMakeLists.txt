@@ -26,8 +26,7 @@ set(DAMARIS_COMMON_SRC
 	${DAMARIS_SOURCE_DIR}/common/ShmChunk.cpp
 	${DAMARIS_SOURCE_DIR}/common/Language.cpp
 	${DAMARIS_SOURCE_DIR}/common/Types.cpp 
-	${DAMARIS_SOURCE_DIR}/common/Layout.cpp
-	${DAMARIS_SOURCE_DIR}/common/Trace.cpp)
+	${DAMARIS_SOURCE_DIR}/common/Layout.cpp)
 
 
 if(PYTHON_LIB)

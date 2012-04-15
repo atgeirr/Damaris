@@ -743,36 +743,6 @@ namespace Damaris
     // ParameterModel
     // 
 
-    const ParameterModel::description_optional& ParameterModel::
-    description () const
-    {
-      return this->description_;
-    }
-
-    ParameterModel::description_optional& ParameterModel::
-    description ()
-    {
-      return this->description_;
-    }
-
-    void ParameterModel::
-    description (const description_type& x)
-    {
-      this->description_.set (x);
-    }
-
-    void ParameterModel::
-    description (const description_optional& x)
-    {
-      this->description_ = x;
-    }
-
-    void ParameterModel::
-    description (::std::auto_ptr< description_type > x)
-    {
-      this->description_.set (x);
-    }
-
     const ParameterModel::name_type& ParameterModel::
     name () const
     {
@@ -843,6 +813,58 @@ namespace Damaris
     value (::std::auto_ptr< value_type > x)
     {
       this->value_.set (x);
+    }
+
+
+    // MeshModel
+    // 
+
+    const MeshModel::name_type& MeshModel::
+    name () const
+    {
+      return this->name_.get ();
+    }
+
+    MeshModel::name_type& MeshModel::
+    name ()
+    {
+      return this->name_.get ();
+    }
+
+    void MeshModel::
+    name (const name_type& x)
+    {
+      this->name_.set (x);
+    }
+
+    void MeshModel::
+    name (::std::auto_ptr< name_type > x)
+    {
+      this->name_.set (x);
+    }
+
+    const MeshModel::type_type& MeshModel::
+    type () const
+    {
+      return this->type_.get ();
+    }
+
+    MeshModel::type_type& MeshModel::
+    type ()
+    {
+      return this->type_.get ();
+    }
+
+    void MeshModel::
+    type (const type_type& x)
+    {
+      this->type_.set (x);
+    }
+
+    void MeshModel::
+    type (::std::auto_ptr< type_type > x)
+    {
+      this->type_.set (x);
     }
 
 
@@ -919,6 +941,24 @@ namespace Damaris
     group (const group_sequence& s)
     {
       this->group_ = s;
+    }
+
+    const DataModel::mesh_sequence& DataModel::
+    mesh () const
+    {
+      return this->mesh_;
+    }
+
+    DataModel::mesh_sequence& DataModel::
+    mesh ()
+    {
+      return this->mesh_;
+    }
+
+    void DataModel::
+    mesh (const mesh_sequence& s)
+    {
+      this->mesh_ = s;
     }
 
 
@@ -2343,8 +2383,43 @@ namespace Damaris
     ParameterModel (const name_type& name,
                     const type_type& type,
                     const value_type& value)
-    : ::xml_schema::type (),
-      description_ (::xml_schema::flags (), this),
+    : ::xml_schema::string (),
+      name_ (name, ::xml_schema::flags (), this),
+      type_ (type, ::xml_schema::flags (), this),
+      value_ (value, ::xml_schema::flags (), this)
+    {
+    }
+
+    ParameterModel::
+    ParameterModel (const char* _xsd_string_base,
+                    const name_type& name,
+                    const type_type& type,
+                    const value_type& value)
+    : ::xml_schema::string (_xsd_string_base),
+      name_ (name, ::xml_schema::flags (), this),
+      type_ (type, ::xml_schema::flags (), this),
+      value_ (value, ::xml_schema::flags (), this)
+    {
+    }
+
+    ParameterModel::
+    ParameterModel (const ::std::string& _xsd_string_base,
+                    const name_type& name,
+                    const type_type& type,
+                    const value_type& value)
+    : ::xml_schema::string (_xsd_string_base),
+      name_ (name, ::xml_schema::flags (), this),
+      type_ (type, ::xml_schema::flags (), this),
+      value_ (value, ::xml_schema::flags (), this)
+    {
+    }
+
+    ParameterModel::
+    ParameterModel (const ::xml_schema::string& _xsd_string_base,
+                    const name_type& name,
+                    const type_type& type,
+                    const value_type& value)
+    : ::xml_schema::string (_xsd_string_base),
       name_ (name, ::xml_schema::flags (), this),
       type_ (type, ::xml_schema::flags (), this),
       value_ (value, ::xml_schema::flags (), this)
@@ -2355,8 +2430,7 @@ namespace Damaris
     ParameterModel (const ParameterModel& x,
                     ::xml_schema::flags f,
                     ::xml_schema::container* c)
-    : ::xml_schema::type (x, f, c),
-      description_ (x.description_, f, this),
+    : ::xml_schema::string (x, f, c),
       name_ (x.name_, f, this),
       type_ (x.type_, f, this),
       value_ (x.value_, f, this)
@@ -2367,15 +2441,14 @@ namespace Damaris
     ParameterModel (const ::xercesc::DOMElement& e,
                     ::xml_schema::flags f,
                     ::xml_schema::container* c)
-    : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
-      description_ (f, this),
+    : ::xml_schema::string (e, f | ::xml_schema::flags::base, c),
       name_ (f, this),
       type_ (f, this),
       value_ (f, this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
       {
-        ::xsd::cxx::xml::dom::parser< char > p (e, true, true);
+        ::xsd::cxx::xml::dom::parser< char > p (e, false, true);
         this->parse (p, f);
       }
     }
@@ -2384,29 +2457,6 @@ namespace Damaris
     parse (::xsd::cxx::xml::dom::parser< char >& p,
            ::xml_schema::flags f)
     {
-      for (; p.more_elements (); p.next_element ())
-      {
-        const ::xercesc::DOMElement& i (p.cur_element ());
-        const ::xsd::cxx::xml::qualified_name< char > n (
-          ::xsd::cxx::xml::dom::name< char > (i));
-
-        // description
-        //
-        if (n.name () == "description" && n.namespace_ () == "http://damaris.gforge.inria.fr/Damaris/Model")
-        {
-          ::std::auto_ptr< description_type > r (
-            description_traits::create (i, f, this));
-
-          if (!this->description_)
-          {
-            this->description_.set (r);
-            continue;
-          }
-        }
-
-        break;
-      }
-
       while (p.more_attributes ())
       {
         const ::xercesc::DOMAttr& i (p.next_attribute ());
@@ -2475,6 +2525,99 @@ namespace Damaris
     {
     }
 
+    // MeshModel
+    //
+
+    MeshModel::
+    MeshModel (const name_type& name,
+               const type_type& type)
+    : ::xml_schema::type (),
+      name_ (name, ::xml_schema::flags (), this),
+      type_ (type, ::xml_schema::flags (), this)
+    {
+    }
+
+    MeshModel::
+    MeshModel (const MeshModel& x,
+               ::xml_schema::flags f,
+               ::xml_schema::container* c)
+    : ::xml_schema::type (x, f, c),
+      name_ (x.name_, f, this),
+      type_ (x.type_, f, this)
+    {
+    }
+
+    MeshModel::
+    MeshModel (const ::xercesc::DOMElement& e,
+               ::xml_schema::flags f,
+               ::xml_schema::container* c)
+    : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+      name_ (f, this),
+      type_ (f, this)
+    {
+      if ((f & ::xml_schema::flags::base) == 0)
+      {
+        ::xsd::cxx::xml::dom::parser< char > p (e, false, true);
+        this->parse (p, f);
+      }
+    }
+
+    void MeshModel::
+    parse (::xsd::cxx::xml::dom::parser< char >& p,
+           ::xml_schema::flags f)
+    {
+      while (p.more_attributes ())
+      {
+        const ::xercesc::DOMAttr& i (p.next_attribute ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        if (n.name () == "name" && n.namespace_ ().empty ())
+        {
+          ::std::auto_ptr< name_type > r (
+            name_traits::create (i, f, this));
+
+          this->name_.set (r);
+          continue;
+        }
+
+        if (n.name () == "type" && n.namespace_ ().empty ())
+        {
+          ::std::auto_ptr< type_type > r (
+            type_traits::create (i, f, this));
+
+          this->type_.set (r);
+          continue;
+        }
+      }
+
+      if (!name_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_attribute< char > (
+          "name",
+          "");
+      }
+
+      if (!type_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_attribute< char > (
+          "type",
+          "");
+      }
+    }
+
+    MeshModel* MeshModel::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class MeshModel (*this, f, c);
+    }
+
+    MeshModel::
+    ~MeshModel ()
+    {
+    }
+
     // DataModel
     //
 
@@ -2484,7 +2627,8 @@ namespace Damaris
       parameter_ (::xml_schema::flags (), this),
       layout_ (::xml_schema::flags (), this),
       variable_ (::xml_schema::flags (), this),
-      group_ (::xml_schema::flags (), this)
+      group_ (::xml_schema::flags (), this),
+      mesh_ (::xml_schema::flags (), this)
     {
     }
 
@@ -2496,7 +2640,8 @@ namespace Damaris
       parameter_ (x.parameter_, f, this),
       layout_ (x.layout_, f, this),
       variable_ (x.variable_, f, this),
-      group_ (x.group_, f, this)
+      group_ (x.group_, f, this),
+      mesh_ (x.mesh_, f, this)
     {
     }
 
@@ -2508,7 +2653,8 @@ namespace Damaris
       parameter_ (f, this),
       layout_ (f, this),
       variable_ (f, this),
-      group_ (f, this)
+      group_ (f, this),
+      mesh_ (f, this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
       {
@@ -2568,6 +2714,17 @@ namespace Damaris
             group_traits::create (i, f, this));
 
           this->group_.push_back (r);
+          continue;
+        }
+
+        // mesh
+        //
+        if (n.name () == "mesh" && n.namespace_ () == "http://damaris.gforge.inria.fr/Damaris/Model")
+        {
+          ::std::auto_ptr< mesh_type > r (
+            mesh_traits::create (i, f, this));
+
+          this->mesh_.push_back (r);
           continue;
         }
 

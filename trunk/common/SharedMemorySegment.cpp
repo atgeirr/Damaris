@@ -22,9 +22,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/interprocess/xsi_shared_memory.hpp>
-#define __DEBUG
 #include "common/Debug.hpp"
-#include "common/Trace.hpp"
 #include "common/SharedMemorySegment.hpp"
 
 namespace Damaris {

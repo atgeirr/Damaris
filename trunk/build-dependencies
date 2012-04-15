@@ -66,21 +66,45 @@ function main
 "3rd party sources, downloading any missing source packages "\
 "before building.\n\n"\
 "Please select the libraries and tools that you want to configure." 0 0 0 \
-            "C/C++ MPI compilers" 	"set the MPI compilers to use"\
+            "C/C++ MPI compilers" 	"set the MPI C/C++ compilers to use"\
             "Boost C++" 			"set the location of existing Boost libraries"\
             "XSD" 					"set the location of existing XSD tools"\
             "Xerces-C" 				"set the location of the Xerces-C library"\
-            "Cmake" 				"set the location of CMake"\
+            "CMake" 				"set the location of CMake"\
             "Fortran compiler"      "set fortran-related options"\
             "Python"				"enable Damaris python support" 2> $tmpfile
 	retval=$?
 	choice=`cat $tmpfile`
+	rm $tmpfile
+
 	case $retval in
-	0)	echo "Choice: $choice ";;
-	1) 	echo "Appuyé sur Annuler.";;
+	0)	( 
+			case $choice in
+			"C/C++ MPI compilers") echo AAA ;;
+			"Boost C++") echo BBB ;;
+			"XSD")  echo CCC ;;
+			"Xerces-C") echo DDD ;;
+			"CMake") echo EEE ;;
+			"Fortran compiler") echo FFF ;;
+			"Python") echo GGG ;;
+			esac
+		);;
+
+	1) 	clear ; 
+		echo "Exiting installation\n";
+		quit ;;
+
 	255) quit;;
+
 	esac
+	quit
 }
+
+function python_support
+{
+	quit
+}
+
 
 LOC=$1
 
@@ -97,7 +121,6 @@ function get_python
 }
 
 main
-get_python
 
 function get_numpy
 {

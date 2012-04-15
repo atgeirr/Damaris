@@ -27,7 +27,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 #include <exception>
 
-#include "common/Trace.hpp"
 #include "common/Debug.hpp"
 #include "common/ShmChunk.hpp"
 #include "common/Message.hpp"
