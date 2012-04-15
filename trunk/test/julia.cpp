@@ -16,7 +16,7 @@ char julia(std::complex<double> c, std::complex<double> z0) {
 	std::complex<double> zi = z0;
 	for(int i = 0; i < 256; i++) {
 		zi = (zi*zi) + c;
-		if(std::abs<double>(zi) >= 4.0) return (char)i;
+		if(std::abs<double>(zi) >= 2.0) return (char)i;
 	}
 	return 255;
 }
@@ -24,8 +24,8 @@ char julia(std::complex<double> c, std::complex<double> z0) {
 int compute(char* data, std::complex<double> c) {
 	for(int i=0; i < WIDTH; i++) {
 	for(int j=0; j < HEIGHT; j++) {
-		float x = ((float)(i-WIDTH/2))/((float)WIDTH);
-		float y = ((float)(j-HEIGHT/2))/((float)HEIGHT);
+		float x = ((float)(i-WIDTH/2)*2.2)/((float)WIDTH);
+		float y = ((float)(j-HEIGHT/2)*2.2)/((float)HEIGHT);
 		data[i*HEIGHT+j] = julia(c,std::complex<double>(x,y));
 	}
 	}
@@ -35,10 +35,10 @@ int compute(char* data, std::complex<double> c) {
 int main(int argc, char** argv) 
 {
 	int id = 0;
-	char* fractal = new char[640*480];
+	char* fractal = new char[WIDTH*HEIGHT];
 
 	if(argc != 2) {
-		std::cout << "Usage: ./test <config.xml>" << std::endl;
+		std::cout << "Usage: " << argv[0] << " <config.xml>" << std::endl;
 		exit(0);
 	}
 
@@ -48,12 +48,13 @@ int main(int argc, char** argv)
 	std::complex<double> c(0.0,0.0);
 
 	for(int i = 0; i < ITERATIONS ; i++) {
-		c = std::polar<double>(i*2.0*PI/((float)ITERATIONS)-PI/2.0,0.5);
-		c += std::complex<double>(0.0,0.5);
+		c = std::polar<double>(0.3,i*2.0*PI/((float)ITERATIONS)-PI/2.0);
+		c += std::complex<double>(0.0,-0.3);
 		compute(fractal,c);
 		
 		client->write("images/julia",i,fractal);
-		client->signal("call_python",i);
+		client->signal("draw_from_python",i);
+		client->signal("clean_from_python",i);
 	}
 
 	client->kill_server();

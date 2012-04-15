@@ -18,6 +18,7 @@
 	</data>
 	<actions>
 		<event name="draw" action="draw_image" library="image.so"/> 
-		<script name="call_python" file="script.py" language="python" />
+		<script name="draw_from_python" file="draw.py" language="python" />
+		<script name="clean_from_python" file="clean.py" language="python" />
 	</actions>
 </simulation>
