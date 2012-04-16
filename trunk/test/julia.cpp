@@ -1,3 +1,17 @@
+/* ================================================================================
+ * This test is part of the Damaris program.
+ * Usage with a dedicated core (space-partitioning):
+ * 1) Start the server using
+ * 		export LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH
+ *		../server/server --configuration=julia.xml &> server_log.txt &
+ * 2) Start the program using
+ *		./julia julia.xml
+ * This program should generate 100 png images of Julia sets, then exit.
+ * The server is killed automatically by the client, except if you kill the client
+ * before it ends. In this case, find the pid of the server using ps aux then kill
+ * it manually.
+ * ================================================================================ */
+
 #include <iostream>
 #include <string>
 #include <complex>
@@ -12,6 +26,9 @@
 
 Damaris::Client* client;
 
+// Main function that checks for convergence of the series
+// given an initial term z0 and a parameter c.
+// The series is defined by z(n+1) <-- z(n)^2 + c
 char julia(std::complex<double> c, std::complex<double> z0) {
 	std::complex<double> zi = z0;
 	for(int i = 0; i < 256; i++) {
@@ -21,6 +38,7 @@ char julia(std::complex<double> c, std::complex<double> z0) {
 	return 255;
 }
 
+// This function call the julia function for all pixels in the image.
 int compute(char* data, std::complex<double> c) {
 	for(int i=0; i < WIDTH; i++) {
 	for(int j=0; j < HEIGHT; j++) {
@@ -32,6 +50,7 @@ int compute(char* data, std::complex<double> c) {
 	return 0;
 }
 
+// Main function
 int main(int argc, char** argv) 
 {
 	int id = 0;
@@ -42,6 +61,7 @@ int main(int argc, char** argv)
 		exit(0);
 	}
 
+	// Initializes the client
 	std::string config(argv[1]);
 	client = Damaris::Client::New(config,id);
 
@@ -53,6 +73,7 @@ int main(int argc, char** argv)
 		compute(fractal,c);
 		
 		client->write("images/julia",i,fractal);
+		client->signal("say_hello_from_cpp",i);
 		client->signal("draw_from_python",i);
 		client->signal("clean_from_python",i);
 	}
@@ -63,5 +84,3 @@ int main(int argc, char** argv)
 
 	return 0;
 }
-
-
