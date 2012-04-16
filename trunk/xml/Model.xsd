@@ -44,13 +44,14 @@
 
 	<!-- Layout node -->
 	<xs:complexType name="LayoutModel">
-	<xs:sequence>
-		<xs:element name="description" type="xs:string" minOccurs="0"/>
-	</xs:sequence>
+	<xs:simpleContent>
+	<xs:extension base="xs:string">
 	<xs:attribute name="name"       type="xs:string" use="required"/>
 	<xs:attribute name="type"       type="xs:string" use="required"/>
 	<xs:attribute name="dimensions" type="xs:string" use="required"/>
 	<xs:attribute name="language"   type="xs:string" use="optional" default="?"/>
+	</xs:extension>
+	</xs:simpleContent>
 	</xs:complexType>
 
 	<!-- Variable node -->
@@ -67,22 +68,20 @@
 
 	<!-- Group node -->
 	<xs:complexType name="GroupModel">
-	<xs:sequence><xs:choice maxOccurs="unbounded" minOccurs="0">
-		<xs:element name="variable" 
-			type="mdl:VariableModel"/>
-		<xs:element name="group"    
-			type="mdl:GroupModel"/>
-	</xs:choice></xs:sequence>
+	<xs:sequence>
+		<xs:choice maxOccurs="unbounded" minOccurs="0">
+			<xs:element name="variable" 
+				type="mdl:VariableModel"/>
+			<xs:element name="group"    
+				type="mdl:GroupModel"/>
+		</xs:choice>
+	</xs:sequence>
 	<xs:attribute name="name"    type="xs:string"  use="required"/>
 	<xs:attribute name="enabled" type="xs:boolean" use="optional" default="true"/>
 	</xs:complexType>
 
 	<!-- Parameter node -->
 	<xs:complexType name="ParameterModel">
-<!--	<xs:sequence>
-		<xs:element name="description" type="xs:string" minOccurs="0"/>
-	</xs:sequence>
--->
 	<xs:simpleContent>
 	<xs:extension base="xs:string">
 	<xs:attribute name="name"  type="xs:string" use="required"/>
@@ -93,20 +92,22 @@
 	</xs:complexType>
 
 	<!-- Mesh node -->
-	<xs:complexType name="MeshModel">
+<!--	<xs:complexType name="MeshModel">
 	<xs:attribute name="name" type="xs:string" use="required"/>
 	<xs:attribute name="type" type="xs:string" use="required"/>
-	</xs:complexType>
+	</xs:complexType> -->
 
 	<!-- Data node -->
 	<xs:complexType name="DataModel">
-	<xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded">
-		<xs:element name="parameter" type="mdl:ParameterModel" />
-		<xs:element name="layout"    type="mdl:LayoutModel" />
-		<xs:element name="variable"  type="mdl:VariableModel" />
-		<xs:element name="group"     type="mdl:GroupModel" />
-		<xs:element name="mesh"		 type="mdl:MeshModel" />
-	</xs:choice></xs:sequence>
+		<xs:sequence>
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="parameter" type="mdl:ParameterModel" />
+			<xs:element name="layout"    type="mdl:LayoutModel" />
+			<xs:element name="variable"  type="mdl:VariableModel" />
+			<xs:element name="group"     type="mdl:GroupModel" />
+	<!--		<xs:element name="mesh"		 type="mdl:MeshModel"/> -->
+		</xs:choice>
+		</xs:sequence>
 	</xs:complexType>
 
 	<!-- Event node -->
@@ -127,10 +128,12 @@
 
 	<!-- Actions node -->
 	<xs:complexType name="ActionsModel">
-	<xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded">
+	<xs:sequence>
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
 		<xs:element name="event" type="mdl:EventModel"/>
 		<xs:element name="script" type="mdl:ScriptModel"/>
-	</xs:choice></xs:sequence>
+		</xs:choice>
+	</xs:sequence>
 	</xs:complexType>
 
 	<!-- Simulation node -->

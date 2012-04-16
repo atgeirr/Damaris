@@ -1,6 +1,7 @@
 set(CLIENT_SIDE_LIBRARIES damaris ${BOOST_LIB} ${PYTHON_LIB} ${XERCESC_LIB} rt dl)
 set(EMB_SERVER_LIBRARIES damaris-server ${CLIENT_SIDE_LIBRARIES})
 
+include_directories(${DAMARIS_SOURCE_DIR}/client)
 include_directories(${DAMARIS_SOURCE_DIR}/include)
 
 if(CMAKE_Fortran_COMPILER)

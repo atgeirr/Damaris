@@ -39,16 +39,15 @@ class ChunkDescriptor {
 		static const int MAX_DIM = 32; /*!< The maximum number of dimensions is fixed to 32. */
 
 	protected:
-		Types::basic_type_e type; /*!< Type of the data. */
+//		Types::basic_type_e type; /*!< Type of the data. */
 		unsigned int dimensions;  /*!< Number of dimensions. */
 		int lbounds[MAX_DIM];  /*!< Lower bounds of the chunk. */
 		int ubounds[MAX_DIM];  /*!< Upper bounds of the chunk. */
 
-	public:
 		/**
-		 * Constructor taking the type, number of dimensions, lower and upper bounds.
+		 * Constructor taking the number of dimensions, lower and upper bounds.
 		 */
-		ChunkDescriptor(Types::basic_type_e t, unsigned int d, const int* lb, const int* ub);
+		ChunkDescriptor(unsigned int d, const int* lb, const int* ub);
 
 		/**
 		 * Constructor from a Layout.
@@ -60,10 +59,32 @@ class ChunkDescriptor {
 		 */
 		ChunkDescriptor(const ChunkDescriptor& ch);
 
+	public:
+		/**
+		 * External Constructor.
+		 */
+//		static ChunkDescriptor* New(Types::basic_type_e t, 
+//				unsigned int d, const int* lb, const int* ub);
+
+		/**
+		 * External Constructor.
+		 */
+		static ChunkDescriptor* New(unsigned int d, const int* lb, const int* ub);
+
+		/**
+		 * External Constructor.
+		 */
+		static ChunkDescriptor* New(const Layout& l);
+
+		/**
+		 * External Destructor.
+		 */
+		static void Delete(ChunkDescriptor* cd);
+
 		/**
          * \brief Computes the required number of bytes to allocate for the data.
          */
-        size_t getDataMemoryLength() const;
+        size_t getDataMemoryLength(const Types::basic_type_e t) const;
 
 		/**
          * \brief Gets the number of dimensions.
@@ -73,7 +94,7 @@ class ChunkDescriptor {
         /**
          * \brief Gets the type of data.
          */
-        Types::basic_type_e getType() const { return type; }
+  //      Types::basic_type_e getType() const { return type; }
 
         /**
          * \brief Gets a start index.

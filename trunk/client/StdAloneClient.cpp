@@ -60,10 +60,10 @@ void* StdAloneClient::alloc(const std::string & varname, int32_t iteration, bool
         }
 
         // initialize the chunk descriptor
-        ChunkDescriptor cd(*layout);
+        ChunkDescriptor* cd = ChunkDescriptor::New(*layout);
 
         // try allocating the required memory
-        size_t size = sizeof(ChunkHeader)+cd.getDataMemoryLength();
+        size_t size = sizeof(ChunkHeader)+cd->getDataMemoryLength(layout->getType());
         void* location = process->getSharedMemorySegment()->allocate(size);
 
 		// This piece of code changes from Client.cpp: we don't want to block
@@ -74,16 +74,19 @@ void* StdAloneClient::alloc(const std::string & varname, int32_t iteration, bool
         }
 		if(location == NULL) {
             ERROR("Could not allocate memory: not enough available memory");
+			ChunkDescriptor::Delete(cd);
             return NULL;
 		}
 
         // create the chunk header in memory
         int source = process->getEnvironment()->getID();
-        ChunkHeader* ch = new(location) ChunkHeader(cd,iteration,source);
+        ChunkHeader* ch = new(location) ChunkHeader(cd,layout->getType(),iteration,source);
 
         // create the ShmChunk and attach it to the variable
         ShmChunk* chunk = new ShmChunk(process->getSharedMemorySegment(),ch);
         variable->attachChunk(chunk);
+
+		ChunkDescriptor::Delete(cd);
 
         // return the pointer to data
         return chunk->data();
@@ -133,10 +136,10 @@ int StdAloneClient::write(const std::string & varname, int32_t iteration, const 
 		}
 
 		// initialize the chunk descriptor
-		ChunkDescriptor cd(*layout);
+		ChunkDescriptor* cd = ChunkDescriptor::New(*layout);
 
 		// try allocating the required memory
-		size_t size = sizeof(ChunkHeader)+cd.getDataMemoryLength();
+		size_t size = sizeof(ChunkHeader)+cd->getDataMemoryLength(layout->getType());
 		void* location = process->getSharedMemorySegment()->allocate(size);
 
 		// This piece of code changes from Client.cpp: we don't want to block
@@ -147,22 +150,25 @@ int StdAloneClient::write(const std::string & varname, int32_t iteration, const 
         }
         if(location == NULL) {
             ERROR("Could not allocate memory: not enough available memory");
+			ChunkDescriptor::Delete(cd);
             return -2;
         }
 		// create the chunk header in memory
 		int source = process->getEnvironment()->getID();
-		ChunkHeader* ch = new(location) ChunkHeader(cd,iteration,source);
+		ChunkHeader* ch = new(location) ChunkHeader(cd,layout->getType(),iteration,source);
 
 		// create the ShmChunk and attach it to the variable
 		ShmChunk* chunk = new ShmChunk(process->getSharedMemorySegment(),ch);
 
 		// copy data
-		size = cd.getDataMemoryLength();
+		size = cd->getDataMemoryLength(layout->getType());
 		memcpy(chunk->data(),data,size);
 
 		variable->attachChunk(chunk);	
 
 		DBG("Variable \"" << varname << "\" has been written");
+
+		ChunkDescriptor::Delete(cd);
 
 		return size;
 }
@@ -188,7 +194,7 @@ int StdAloneClient::chunk_write(chunk_h chunkh, const std::string & varname,
         }
 
         // allocate memory
-        size_t size = sizeof(ChunkHeader)+cd->getDataMemoryLength();
+        size_t size = sizeof(ChunkHeader)+cd->getDataMemoryLength(layout->getType());
         void* location = process->getSharedMemorySegment()->allocate(size);
 
 		        // This piece of code changes from Client.cpp: we don't want to block
@@ -204,13 +210,13 @@ int StdAloneClient::chunk_write(chunk_h chunkh, const std::string & varname,
 
         // create the ChunkHeader
         int source = process->getEnvironment()->getID();
-        ChunkHeader* ch = new(location) ChunkHeader(*cd,iteration,source);
+        ChunkHeader* ch = new(location) ChunkHeader(cd,layout->getType(),iteration,source);
 
         // create the ShmChunk object       
         ShmChunk* chunk = new ShmChunk(process->getSharedMemorySegment(),ch);
 
 		// copy data
-        size = cd->getDataMemoryLength();
+        size = cd->getDataMemoryLength(layout->getType());
         memcpy(chunk->data(),data,size);
 		
 		variable->attachChunk(chunk);	

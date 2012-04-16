@@ -35,7 +35,7 @@ add_definitions (-D__ENABLE_MPI) # this line to be deleted
 # Some variables to set the level of debugging informations.
 # Recommanded : -D__INFO
 #-----------------------------------------------------------#
-#add_definitions (-D__INFO)
+add_definitions (-D__INFO)
 #add_definitions (-D__TRACE)
 #add_definitions (-D__DEBUG_ALL)
 add_definitions (-D__BENCHMARK)

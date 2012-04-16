@@ -147,9 +147,9 @@ void ActionsManager::reactToUserSignal(const std::string &sig,
 	ActionSet::index<by_name>::type::iterator it = actions.get<by_name>().find(sig);
 	if(it != actions.get<by_name>().end())
 	{
-		TIMER_START(timer);
+//		TIMER_START(timer);
 		(*(it->get()))(iteration,sourceID);
-		TIMER_STOP(timer,"Signal = " << sig);
+//		TIMER_STOP(timer,"Signal = " << sig);
 	} else {
 		ERROR("Unable to process \""<< sig <<"\" signal: unknown event name");
 	}	
@@ -161,9 +161,9 @@ void ActionsManager::reactToUserSignal(int sigID,
 	ActionSet::index<by_id>::type::iterator it = actions.get<by_id>().find(sigID);
 	if(it != actions.get<by_id>().end())
 	{
-		TIMER_START(timer);
+//		TIMER_START(timer);
 		(*(it->get()))(iteration,sourceID);
-		TIMER_STOP(timer,"Signal = " << it->get()->getName());
+//		TIMER_STOP(timer,"Signal = " << it->get()->getName());
 	} else {
 		ERROR("Unknown action ID " << sigID 
 			<<", may come from contract inconsistency between clients and servers");

@@ -250,7 +250,6 @@ namespace Damaris
     class VariableModel;
     class GroupModel;
     class ParameterModel;
-    class MeshModel;
     class DataModel;
     class EventModel;
     class ScriptModel;
@@ -701,30 +700,9 @@ namespace Damaris
       name_optional name_;
     };
 
-    class LayoutModel: public ::xml_schema::type
+    class LayoutModel: public ::xml_schema::string
     {
       public:
-      // description
-      // 
-      typedef ::xml_schema::string description_type;
-      typedef ::xsd::cxx::tree::optional< description_type > description_optional;
-      typedef ::xsd::cxx::tree::traits< description_type, char > description_traits;
-
-      const description_optional&
-      description () const;
-
-      description_optional&
-      description ();
-
-      void
-      description (const description_type& x);
-
-      void
-      description (const description_optional& x);
-
-      void
-      description (::std::auto_ptr< description_type > p);
-
       // name
       // 
       typedef ::xml_schema::string name_type;
@@ -802,6 +780,21 @@ namespace Damaris
                    const type_type&,
                    const dimensions_type&);
 
+      LayoutModel (const char*,
+                   const name_type&,
+                   const type_type&,
+                   const dimensions_type&);
+
+      LayoutModel (const ::std::string&,
+                   const name_type&,
+                   const type_type&,
+                   const dimensions_type&);
+
+      LayoutModel (const ::xml_schema::string&,
+                   const name_type&,
+                   const type_type&,
+                   const dimensions_type&);
+
       LayoutModel (const ::xercesc::DOMElement& e,
                    ::xml_schema::flags f = 0,
                    ::xml_schema::container* c = 0);
@@ -825,7 +818,6 @@ namespace Damaris
              ::xml_schema::flags);
 
       protected:
-      description_optional description_;
       ::xsd::cxx::tree::one< name_type > name_;
       ::xsd::cxx::tree::one< type_type > type_;
       ::xsd::cxx::tree::one< dimensions_type > dimensions_;
@@ -1162,75 +1154,6 @@ namespace Damaris
       ::xsd::cxx::tree::one< value_type > value_;
     };
 
-    class MeshModel: public ::xml_schema::type
-    {
-      public:
-      // name
-      // 
-      typedef ::xml_schema::string name_type;
-      typedef ::xsd::cxx::tree::traits< name_type, char > name_traits;
-
-      const name_type&
-      name () const;
-
-      name_type&
-      name ();
-
-      void
-      name (const name_type& x);
-
-      void
-      name (::std::auto_ptr< name_type > p);
-
-      // type
-      // 
-      typedef ::xml_schema::string type_type;
-      typedef ::xsd::cxx::tree::traits< type_type, char > type_traits;
-
-      const type_type&
-      type () const;
-
-      type_type&
-      type ();
-
-      void
-      type (const type_type& x);
-
-      void
-      type (::std::auto_ptr< type_type > p);
-
-      // Constructors.
-      //
-      MeshModel (const name_type&,
-                 const type_type&);
-
-      MeshModel (const ::xercesc::DOMElement& e,
-                 ::xml_schema::flags f = 0,
-                 ::xml_schema::container* c = 0);
-
-      MeshModel (const MeshModel& x,
-                 ::xml_schema::flags f = 0,
-                 ::xml_schema::container* c = 0);
-
-      virtual MeshModel*
-      _clone (::xml_schema::flags f = 0,
-              ::xml_schema::container* c = 0) const;
-
-      virtual 
-      ~MeshModel ();
-
-      // Implementation.
-      //
-      protected:
-      void
-      parse (::xsd::cxx::xml::dom::parser< char >&,
-             ::xml_schema::flags);
-
-      protected:
-      ::xsd::cxx::tree::one< name_type > name_;
-      ::xsd::cxx::tree::one< type_type > type_;
-    };
-
     class DataModel: public ::xml_schema::type
     {
       public:
@@ -1302,23 +1225,6 @@ namespace Damaris
       void
       group (const group_sequence& s);
 
-      // mesh
-      // 
-      typedef ::Damaris::Model::MeshModel mesh_type;
-      typedef ::xsd::cxx::tree::sequence< mesh_type > mesh_sequence;
-      typedef mesh_sequence::iterator mesh_iterator;
-      typedef mesh_sequence::const_iterator mesh_const_iterator;
-      typedef ::xsd::cxx::tree::traits< mesh_type, char > mesh_traits;
-
-      const mesh_sequence&
-      mesh () const;
-
-      mesh_sequence&
-      mesh ();
-
-      void
-      mesh (const mesh_sequence& s);
-
       // Constructors.
       //
       DataModel ();
@@ -1350,7 +1256,6 @@ namespace Damaris
       layout_sequence layout_;
       variable_sequence variable_;
       group_sequence group_;
-      mesh_sequence mesh_;
     };
 
     class EventModel: public ::xml_schema::type

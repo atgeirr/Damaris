@@ -37,10 +37,11 @@ class ChunkHeader : public ChunkDescriptor {
 	private:
 		int source;     /*!< ID of the process that generated the chunk.*/
 		int iteration;  /*!< iteration at which the chunk has been generated. */
+		Types::basic_type_e type;
 	
 	public:
-		ChunkHeader(const ChunkDescriptor& ch, int it, int src) 
-		: ChunkDescriptor(ch), source(src), iteration(it) {};
+		ChunkHeader(const ChunkDescriptor* ch, Types::basic_type_e t, int it, int src) 
+		: ChunkDescriptor(*ch), source(src), iteration(it), type(t) {};
 
     	/**
          * \brief Gets the ID of the process that has written the chunk.
@@ -62,6 +63,15 @@ class ChunkHeader : public ChunkDescriptor {
          */
         void setIteration(int i) { iteration = i; }
 
+		/**
+		 * \brief Get the type of the chunk
+		 */
+		Types::basic_type_e getType() const { return type; }
+
+		/**
+		 * \brief Set the type.
+		 */
+		void setType(Types::basic_type_e t) { type = t; }
 };
 
 } // namespace Damaris

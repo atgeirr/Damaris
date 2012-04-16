@@ -69,15 +69,16 @@ namespace Damaris {
 		}
 
 		// initialize the chunk descriptor
-		ChunkDescriptor cd(*layout);
+		ChunkDescriptor* cd = ChunkDescriptor::New(*layout);
 
 		// try allocating the required memory
-		size_t size = sizeof(ChunkHeader)+cd.getDataMemoryLength();			
+		size_t size = sizeof(ChunkHeader)+cd->getDataMemoryLength(layout->getType());			
 		void* location = process->getSharedMemorySegment()->allocate(size);	
 
 		if(location == NULL && not blocking) {
 			ERROR("Could not allocate memory: not enough available memory");
 			lost(iteration);
+			ChunkDescriptor::Delete(cd);
 			return NULL;
 		} else if(location == NULL && blocking) {
 			while(location == NULL) {
@@ -86,18 +87,20 @@ namespace Damaris {
 					location = process->getSharedMemorySegment()->allocate(size);
 				} else {
 					ERROR("Could not allocate memory: not enough total memory");
+					ChunkDescriptor::Delete(cd);
 					return NULL;
 				}
 			}
 		}
 		// create the chunk header in memory
 		int source = process->getEnvironment()->getID();
-		ChunkHeader* ch = new(location) ChunkHeader(cd,iteration,source);
+		ChunkHeader* ch = new(location) ChunkHeader(cd,layout->getType(),iteration,source);
 
 		// create the ShmChunk and attach it to the variable
 		ShmChunk* chunk = new ShmChunk(process->getSharedMemorySegment(),ch);
 		variable->attachChunk(chunk);	
 
+		ChunkDescriptor::Delete(cd);
 		// return the pointer to data
 		return chunk->data();
 	}
@@ -160,15 +163,16 @@ namespace Damaris {
 		}
 
 		// initialize the chunk descriptor
-        ChunkDescriptor cd(*layout);
+        ChunkDescriptor* cd = ChunkDescriptor::New(*layout);
 
         // try allocating the required memory
-        size_t size = sizeof(ChunkHeader)+cd.getDataMemoryLength();
+        size_t size = sizeof(ChunkHeader)+cd->getDataMemoryLength(layout->getType());
         void* location = process->getSharedMemorySegment()->allocate(size);
 
 		if(location == NULL && not blocking) {
             ERROR("Could not allocate memory: not enough available memory");
 			lost(iteration);
+			ChunkDescriptor::Delete(cd);
             return -2;
         } else if(location == NULL && blocking) {
             while(location == NULL) {
@@ -177,6 +181,7 @@ namespace Damaris {
                     location = process->getSharedMemorySegment()->allocate(size);
                 } else {
                     ERROR("Could not allocate memory: not enough total memory");
+					ChunkDescriptor::Delete(cd);
                     return -2;
                 }
             }
@@ -184,13 +189,13 @@ namespace Damaris {
 
         // create the chunk header in memory
         int source = process->getEnvironment()->getID();
-        ChunkHeader* ch = new(location) ChunkHeader(cd,iteration,source);
+        ChunkHeader* ch = new(location) ChunkHeader(cd,layout->getType(),iteration,source);
 
         // create the ShmChunk and attach it to the variable
         ShmChunk chunk(process->getSharedMemorySegment(),ch);
 
 		// copy data
-		size = cd.getDataMemoryLength();
+		size = cd->getDataMemoryLength(layout->getType());
 		memcpy(chunk.data(),data,size);
 		
 		// create message
@@ -206,6 +211,8 @@ namespace Damaris {
 		process->getSharedMessageQueue()->send(&message);
 		DBG("Variable \"" << varname << "\" has been written");
 	
+		ChunkDescriptor::Delete(cd);
+
 		return size;
 	}
 
@@ -221,7 +228,6 @@ namespace Damaris {
         }
 
 		ChunkDescriptor* cd = (ChunkDescriptor*)chunkh;
-
 		// check if the chunk matches the layout boundaries
 		Layout* layout = variable->getLayout();
 		if(not cd->within(*layout)) {
@@ -230,7 +236,7 @@ namespace Damaris {
 		}
 	
 		// allocate memory
-		size_t size = sizeof(ChunkHeader)+cd->getDataMemoryLength();
+		size_t size = sizeof(ChunkHeader)+cd->getDataMemoryLength(layout->getType());
 		void* location = process->getSharedMemorySegment()->allocate(size);
 
 		if(location == NULL && not blocking) {
@@ -251,13 +257,13 @@ namespace Damaris {
 
 		// create the ChunkHeader
 		int source = process->getEnvironment()->getID();
-		ChunkHeader* ch = new(location) ChunkHeader(*cd,iteration,source);
+		ChunkHeader* ch = new(location) ChunkHeader(cd,layout->getType(),iteration,source);
 
 		// create the ShmChunk object		
 		ShmChunk chunk(process->getSharedMemorySegment(),ch);
 
 		// copy data
-		size = cd->getDataMemoryLength();
+		size = cd->getDataMemoryLength(layout->getType());
 		memcpy(chunk.data(),data,size);
 		
 		// create message
@@ -355,14 +361,13 @@ namespace Damaris {
 			const std::vector<int> & startIndices, 
 			const std::vector<int> & endIndices)
 	{
-		Types::basic_type_e t = Types::UNDEFINED_TYPE;
-		ChunkDescriptor *c = new ChunkDescriptor(t,dimensions,&startIndices[0],&endIndices[0]);
+		ChunkDescriptor *c = ChunkDescriptor::New(dimensions,&startIndices[0],&endIndices[0]);
 		return c;
 	}
 
 	void Client::chunk_free(chunk_h chunkh) 
 	{
-		if(chunkh != 0) delete (ChunkDescriptor*)chunkh;
+		ChunkDescriptor::Delete(chunkh);
 	}
 
 	MPI_Comm Client::mpi_get_client_comm()

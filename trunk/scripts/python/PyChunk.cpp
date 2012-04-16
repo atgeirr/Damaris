@@ -86,14 +86,11 @@ bp::object PyChunk::data() const
 		dims[i] = inner->getEndIndex(i) - inner->getStartIndex(i) + 1;
 	}
 	int typenum = PyTypes::getPyTypeFromDamarisType(inner->getType());
-
 	if(typenum == -1) {
 		throw(bp::error_already_set());
 	}
-
 	void *data = inner->data();
 	if(data == NULL) return bp::object();
-
 	PyObject* arr = PyArray_SimpleNewFromData(nd, dims, typenum, data);
 	delete[] dims;
 	return bp::object(bp::handle<>(arr));

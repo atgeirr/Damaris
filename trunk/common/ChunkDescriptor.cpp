@@ -24,10 +24,33 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/ChunkDescriptor.hpp"
 
 namespace Damaris {
-
-ChunkDescriptor::ChunkDescriptor(Types::basic_type_e t, unsigned int d, const int* lb, const int* ub)
+/*
+ChunkDescriptor* ChunkDescriptor::New(Types::basic_type_e t, 
+		unsigned int d, const int* lb, const int* ub)
 {
-	type = t;
+	return new ChunkDescriptor(t,d,lb,ub);
+}
+*/
+ChunkDescriptor* ChunkDescriptor::New(unsigned int d, const int* lb, const int* ub)
+{
+	return new ChunkDescriptor(d,lb,ub);
+}
+
+ChunkDescriptor* ChunkDescriptor::New(const Layout& l)
+{
+	return new ChunkDescriptor(l);
+}
+
+void ChunkDescriptor::Delete(ChunkDescriptor* cd)
+{
+	if(cd != NULL) {
+		delete cd;
+	}
+}
+
+ChunkDescriptor::ChunkDescriptor(unsigned int d, const int* lb, const int* ub)
+{
+//	type = t;
 	dimensions = d;
 	memset(lbounds,0,d*sizeof(int));
 	memcpy(lbounds,lb,d*sizeof(int));
@@ -37,7 +60,7 @@ ChunkDescriptor::ChunkDescriptor(Types::basic_type_e t, unsigned int d, const in
 
 ChunkDescriptor::ChunkDescriptor(const Layout& l)
 {
-    type = l.getType();
+  //  type = l.getType();
     dimensions = l.getDimensions();
 	for(int i = 0; i < (int)dimensions; i++ ) {
 		lbounds[i] = 0;
@@ -47,7 +70,7 @@ ChunkDescriptor::ChunkDescriptor(const Layout& l)
 
 ChunkDescriptor::ChunkDescriptor(const ChunkDescriptor& ch)
 {
-	type = ch.type;
+//	type = ch.type;
 	dimensions = ch.dimensions;
 	memset(lbounds,0,dimensions*sizeof(int));
 	memcpy(lbounds,ch.lbounds,dimensions*sizeof(int));
@@ -55,7 +78,7 @@ ChunkDescriptor::ChunkDescriptor(const ChunkDescriptor& ch)
 	memcpy(ubounds,ch.ubounds,dimensions*sizeof(int));
 }
 
-size_t ChunkDescriptor::getDataMemoryLength() const
+size_t ChunkDescriptor::getDataMemoryLength(const Types::basic_type_e type) const
 {
     size_t result = 1;
     result *= Types::basicTypeSize(type);
