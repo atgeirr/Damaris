@@ -3,6 +3,9 @@
  * Usage: (it only works with 5 processes, including 1 dedicated core)
  *		export LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH
  * 		mpirun -np 5 ./julia_mpi julia_mpi.xml
+ * Usage without dedicated core (4 processes only):
+ *		export LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH
+ *		mpirun -np 4 ./julia_mpi julia_mpi_no_server.xml
  * This program should generate 100 png images of Julia sets, then exit.
  * The server is killed automatically by the client, except if you kill the client
  * before it ends. In this case, find the pid of the server using ps aux then kill
