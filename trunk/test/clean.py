@@ -1,9 +1,7 @@
 import damaris
-i = damaris.iteration - 1
+i = damaris.iteration
 print "----------------------"
-print "Cleaning iteration "+str(i)
+print "Cleaning variable"
 print "----------------------"
-var = damaris.open("images/julia")
-for c in var.select({"iteration":i}):
-	var.remove(c)
+var = damaris.open("images/julia").clear()
 

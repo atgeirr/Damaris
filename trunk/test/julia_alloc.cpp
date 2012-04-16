@@ -1,3 +1,17 @@
+/* ================================================================================
+ * This test is part of the Damaris program.
+ * Usage with a dedicated core (space-partitioning):
+ * 1) Start the server using
+ *      export LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH
+ *      ../server/server --configuration=julia.xml &> server_log.txt &
+ * 2) Start the program using
+ *      ./julia julia.xml
+ * This program should generate 100 png images of Julia sets, then exit.
+ * The server is killed automatically by the client, except if you kill the client
+ * before it ends. In this case, find the pid of the server using ps aux then kill
+ * it manually.
+ * ================================================================================ */
+
 #include <iostream>
 #include <string>
 #include <complex>
@@ -5,13 +19,16 @@
 #include "include/Damaris.hpp"
 
 #define PI 3.14159265358979323846
-#define ITERATIONS 10
+#define ITERATIONS 100
 
 #define WIDTH  640
 #define HEIGHT 480
 
 Damaris::Client* client;
 
+// Main function that checks for convergence of the series
+// given an initial term z0 and a parameter c.
+// The series is defined by z(n+1) <-- z(n)^2 + c
 char julia(std::complex<double> c, std::complex<double> z0) {
 	std::complex<double> zi = z0;
 	for(int i = 0; i < 256; i++) {
@@ -21,47 +38,57 @@ char julia(std::complex<double> c, std::complex<double> z0) {
 	return 255;
 }
 
+// This function call the julia function for all pixels in the image.
 int compute(char* data, std::complex<double> c) {
 	for(int i=0; i < WIDTH; i++) {
 	for(int j=0; j < HEIGHT; j++) {
-		float x = ((float)(i-WIDTH/2))/((float)WIDTH);
-		float y = ((float)(j-HEIGHT/2))/((float)HEIGHT);
+		float x = ((float)(i-WIDTH/2)*2.2)/((float)WIDTH);
+		float y = ((float)(j-HEIGHT/2)*2.2)/((float)HEIGHT);
 		data[i*HEIGHT+j] = julia(c,std::complex<double>(x,y));
 	}
 	}
 	return 0;
 }
 
+// Main function
 int main(int argc, char** argv) 
 {
 	int id = 0;
+	// This time we don't allocate the array
 	char* fractal = NULL;
 
 	if(argc != 2) {
-		std::cout << "Usage: ./test <config.xml>" << std::endl;
+		std::cout << "Usage: " << argv[0] << " <config.xml>" << std::endl;
 		exit(0);
 	}
 
+	// Initializes the client
 	std::string config(argv[1]);
 	client = Damaris::Client::New(config,id);
 	
 	std::complex<double> c(0.0,0.0);
 
 	for(int i = 0; i < ITERATIONS ; i++) {
+		// The array is allocated through Damaris' alloc function
 		fractal = (char*)client->alloc("images/julia",i);
 		if(fractal == NULL) {
-			std::cout << "An error occured while allocating buffer\n";
+			std::cerr << "An error occured while allocating buffer\n";
 			break;
 		}
 
-		c = std::polar<double>(i*2.0*PI/((float)ITERATIONS)-PI/2.0,0.5);
-		c += std::complex<double>(0.0,0.5);
+		c = std::polar<double>(0.3,i*2.0*PI/((float)ITERATIONS)-PI/2.0);
+		c += std::complex<double>(0.0,-0.3);
 		compute(fractal,c);
 		
+		// Commit the data: the client is not supposed to touch it anymore
 		client->commit("images/julia",i);
-		client->signal("draw",i);
+		// Sends some events
+		client->signal("say_hello_from_cpp",i);
+		client->signal("draw_from_python",i);
+		client->signal("clean_from_python",i);
 	}
 
+	// Request the server to exit in a clean way
 	client->kill_server();
 	delete client;
 

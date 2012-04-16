@@ -64,6 +64,10 @@ int main(int argc, char** argv)
 	// Initializes the client
 	std::string config(argv[1]);
 	client = Damaris::Client::New(config,id);
+	// Note: the use of Client::New assumes that a server is already running.
+	// Thus it cannot work in a time-partitioning mode. You may take a look at
+	// the MPI version of this program to see how to properly integrate a client
+	// in a MPI application and allow time-partitioning.
 
 	std::complex<double> c(0.0,0.0);
 
@@ -71,13 +75,16 @@ int main(int argc, char** argv)
 		c = std::polar<double>(0.3,i*2.0*PI/((float)ITERATIONS)-PI/2.0);
 		c += std::complex<double>(0.0,-0.3);
 		compute(fractal,c);
-		
+
+		// Writes the array in shared memory and notifies Damaris		
 		client->write("images/julia",i,fractal);
+		// Sends some events
 		client->signal("say_hello_from_cpp",i);
 		client->signal("draw_from_python",i);
 		client->signal("clean_from_python",i);
 	}
 
+	// Request the server to exit in a clean way
 	client->kill_server();
 	delete fractal;
 	delete client;
