@@ -243,6 +243,7 @@ namespace Damaris
   {
     class ClientsModel;
     class CoresModel;
+    class ShmType;
     class BufferModel;
     class QueueModel;
     class ArchitectureModel;
@@ -392,6 +393,62 @@ namespace Damaris
       ::xsd::cxx::tree::one< count_type > count_;
     };
 
+    class ShmType: public ::xml_schema::string
+    {
+      public:
+      enum value
+      {
+        posix,
+        sysv
+      };
+
+      ShmType (value v);
+
+      ShmType (const char* v);
+
+      ShmType (const ::std::string& v);
+
+      ShmType (const ::xml_schema::string& v);
+
+      ShmType (const ::xercesc::DOMElement& e,
+               ::xml_schema::flags f = 0,
+               ::xml_schema::container* c = 0);
+
+      ShmType (const ::xercesc::DOMAttr& a,
+               ::xml_schema::flags f = 0,
+               ::xml_schema::container* c = 0);
+
+      ShmType (const ::std::string& s,
+               const ::xercesc::DOMElement* e,
+               ::xml_schema::flags f = 0,
+               ::xml_schema::container* c = 0);
+
+      ShmType (const ShmType& x,
+               ::xml_schema::flags f = 0,
+               ::xml_schema::container* c = 0);
+
+      virtual ShmType*
+      _clone (::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0) const;
+
+      ShmType&
+      operator= (value v);
+
+      virtual
+      operator value () const
+      {
+        return _xsd_ShmType_convert ();
+      }
+
+      protected:
+      value
+      _xsd_ShmType_convert () const;
+
+      public:
+      static const char* const _xsd_ShmType_literals_[2];
+      static const value _xsd_ShmType_indexes_[2];
+    };
+
     class BufferModel: public ::xml_schema::type
     {
       public:
@@ -428,7 +485,7 @@ namespace Damaris
 
       // type
       // 
-      typedef ::xml_schema::string type_type;
+      typedef ::Damaris::Model::ShmType type_type;
       typedef ::xsd::cxx::tree::traits< type_type, char > type_traits;
 
       const type_type&
@@ -534,7 +591,7 @@ namespace Damaris
 
       // type
       // 
-      typedef ::xml_schema::string type_type;
+      typedef ::Damaris::Model::ShmType type_type;
       typedef ::xsd::cxx::tree::traits< type_type, char > type_traits;
 
       const type_type&

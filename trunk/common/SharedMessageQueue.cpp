@@ -45,10 +45,11 @@ SharedMessageQueue* SharedMessageQueue::create(Model::QueueModel* mdl)
 	std::string& name = mdl->name();
 	size_t num_msg = mdl->size();
 	size_t size_msg = sizeof(Message);
-	std::string& type = mdl->type();
+	//std::string& type = mdl->type();
+	Model::ShmType& type = mdl->type();
 
-	if(type == "posix") return create(posix_shmem_t(),name,num_msg,size_msg);
-	else if(type == "sysv") return create(sysv_shmem_t(),name,num_msg,size_msg);
+	if(type == Model::ShmType::posix) return create(posix_shmem_t(),name,num_msg,size_msg);
+	else if(type == Model::ShmType::sysv) return create(sysv_shmem_t(),name,num_msg,size_msg);
 	else {
 		ERROR("Unknown shared memory type \"" << type << "\"");
 		return NULL;

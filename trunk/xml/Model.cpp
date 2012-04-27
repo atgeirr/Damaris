@@ -128,6 +128,51 @@ namespace Damaris
     }
 
 
+    // ShmType
+    // 
+
+    ShmType::
+    ShmType (value v)
+    : ::xml_schema::string (_xsd_ShmType_literals_[v])
+    {
+    }
+
+    ShmType::
+    ShmType (const char* v)
+    : ::xml_schema::string (v)
+    {
+    }
+
+    ShmType::
+    ShmType (const ::std::string& v)
+    : ::xml_schema::string (v)
+    {
+    }
+
+    ShmType::
+    ShmType (const ::xml_schema::string& v)
+    : ::xml_schema::string (v)
+    {
+    }
+
+    ShmType::
+    ShmType (const ShmType& v,
+             ::xml_schema::flags f,
+             ::xml_schema::container* c)
+    : ::xml_schema::string (v, f, c)
+    {
+    }
+
+    ShmType& ShmType::
+    operator= (value v)
+    {
+      static_cast< ::xml_schema::string& > (*this) = 
+      ::xml_schema::string (_xsd_ShmType_literals_[v]);
+
+      return *this;
+    }
+
+
     // BufferModel
     // 
 
@@ -1439,6 +1484,76 @@ namespace Damaris
     ~CoresModel ()
     {
     }
+
+    // ShmType
+    //
+
+    ShmType::
+    ShmType (const ::xercesc::DOMElement& e,
+             ::xml_schema::flags f,
+             ::xml_schema::container* c)
+    : ::xml_schema::string (e, f, c)
+    {
+      _xsd_ShmType_convert ();
+    }
+
+    ShmType::
+    ShmType (const ::xercesc::DOMAttr& a,
+             ::xml_schema::flags f,
+             ::xml_schema::container* c)
+    : ::xml_schema::string (a, f, c)
+    {
+      _xsd_ShmType_convert ();
+    }
+
+    ShmType::
+    ShmType (const ::std::string& s,
+             const ::xercesc::DOMElement* e,
+             ::xml_schema::flags f,
+             ::xml_schema::container* c)
+    : ::xml_schema::string (s, e, f, c)
+    {
+      _xsd_ShmType_convert ();
+    }
+
+    ShmType* ShmType::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class ShmType (*this, f, c);
+    }
+
+    ShmType::value ShmType::
+    _xsd_ShmType_convert () const
+    {
+      ::xsd::cxx::tree::enum_comparator< char > c (_xsd_ShmType_literals_);
+      const value* i (::std::lower_bound (
+                        _xsd_ShmType_indexes_,
+                        _xsd_ShmType_indexes_ + 2,
+                        *this,
+                        c));
+
+      if (i == _xsd_ShmType_indexes_ + 2 || _xsd_ShmType_literals_[*i] != *this)
+      {
+        throw ::xsd::cxx::tree::unexpected_enumerator < char > (*this);
+      }
+
+      return *i;
+    }
+
+    const char* const ShmType::
+    _xsd_ShmType_literals_[2] =
+    {
+      "posix",
+      "sysv"
+    };
+
+    const ShmType::value ShmType::
+    _xsd_ShmType_indexes_[2] =
+    {
+      ::Damaris::Model::ShmType::posix,
+      ::Damaris::Model::ShmType::sysv
+    };
 
     // BufferModel
     //

@@ -17,11 +17,19 @@
 	<xs:attribute name="count" type="xs:unsignedInt" use="required"/>
 	</xs:complexType>
 
+	<!-- Type of shared memory (POSIX or System-V) -->
+	<xs:simpleType name="ShmType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="posix"/>
+			<xs:enumeration value="sysv"/>
+		</xs:restriction>
+	</xs:simpleType>
+
 	<!-- Buffer node -->
 	<xs:complexType name="BufferModel">
 	<xs:attribute name="name"   type="xs:string"      use="required"/>
 	<xs:attribute name="size"   type="xs:unsignedInt" use="required"/>
-	<xs:attribute name="type"   type="xs:string"      use="optional" default="posix"/>
+	<xs:attribute name="type"   type="mdl:ShmType"      use="optional" default="posix"/>
 	<xs:attribute name="blocks" type="xs:unsignedInt" use="optional" default="0"/>
 	</xs:complexType>	
 
@@ -29,7 +37,7 @@
 	<xs:complexType name="QueueModel">
 	<xs:attribute name="name" type="xs:string"      use="required"/>
 	<xs:attribute name="size" type="xs:unsignedInt" use="required"/>
-	<xs:attribute name="type" type="xs:string"	use="optional" default="posix"/>
+	<xs:attribute name="type" type="mdl:ShmType" use="optional" default="posix"/>
 	</xs:complexType>
 
 	<!-- Architecture node -->

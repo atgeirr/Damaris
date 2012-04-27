@@ -32,61 +32,73 @@ SharedMemorySegment::SharedMemorySegment() {}
 SharedMemorySegment* SharedMemorySegment::create(Model::BufferModel* model)
 {
 	std::string& name = model->name();
-	std::string& type = model->type();
+	Model::ShmType& type = model->type();
 	unsigned int& count = model->blocks();
 	size_t size = model->size();
-	if(type == "posix") {
+
+	switch(type) {
+
+	case Model::ShmType::posix :
 		if(count > 1)
 			return new SharedMemorySegment::CompositeShMem(name,size,count,posix_shmem);
 		else
-	 		return new SharedMemorySegment::POSIX_ShMem(name,size);
-	 } else 
-	if(type == "sysv") {
+			return new SharedMemorySegment::POSIX_ShMem(name,size);
+		break;
+
+	case Model::ShmType::sysv :
 		if(count > 1)
 			return new SharedMemorySegment::CompositeShMem(name,size,count,sysv_shmem);
 		else
 			return new SharedMemorySegment::SYSV_ShMem(name,size);
-	} else {
-		ERROR("Unknown shared memory type \"" << type << "\"");
-		return NULL;
 	}
+
+	ERROR("Unknown shared memory type \"" << type << "\"");
+	return NULL;
 }
 
 SharedMemorySegment* SharedMemorySegment::open(Model::BufferModel* model)
 {
-        std::string& name = model->name();
-        std::string& type = model->type();
-		unsigned int& count = model->blocks();
-        if(type == "posix") {
-			if(count > 1)
-		    	return new SharedMemorySegment::CompositeShMem(name,count,posix_shmem);
-        	else
-				return new SharedMemorySegment::POSIX_ShMem(name);
-		} else 
-		if(type == "sysv") {
+	std::string& name = model->name();
+	Model::ShmType& type = model->type();
+	unsigned int& count = model->blocks();
+
+	switch(type) {
+
+	case Model::ShmType::posix :
+		if(count > 1)
+			return new SharedMemorySegment::CompositeShMem(name,count,posix_shmem);
+		else
+			return new SharedMemorySegment::POSIX_ShMem(name);
+	break; 
+
+	case Model::ShmType::sysv :
 			if(count > 1)
 				return new SharedMemorySegment::CompositeShMem(name,count,sysv_shmem);
 			else
 				return new SharedMemorySegment::SYSV_ShMem(name);
-        } else {
-                ERROR("Unknown shared memory type \"" << type << "\"");
-                return NULL;
-        }
+	}
+
+	ERROR("Unknown shared memory type \"" << type << "\"");
+	return NULL;
 }
 
 bool SharedMemorySegment::remove(Model::BufferModel* model)
 {
 	std::string& name = model->name();
-	std::string& type = model->type();
+	Model::ShmType& type = model->type();
 	unsigned int& count = model->blocks();
 
 	try {
 
-	if(type == "posix") {
+	bool res = false;
+	std::stringstream ss;	
+	int id;
+
+	switch(type) {
+	
+	case Model::ShmType::posix :
 		if(count > 1) {
-			bool res = false;
 			for(int k = 0; k < (int)count; k++) {
-				std::stringstream ss;
 				ss << name << "_" << k;
 				res = res || shared_memory_object::remove(ss.str().c_str());
 			}	
@@ -94,30 +106,24 @@ bool SharedMemorySegment::remove(Model::BufferModel* model)
 		} else {	
 			return shared_memory_object::remove(name.c_str());
 		}
-	}
-	else if(type == "sysv") 
-	{
+	break;
+
+	case Model::ShmType::sysv :
 		if(count > 1) {
-			bool res = false;
 			for(int k = 0; k < (int)count; k++) {
 				xsi_key key(name.c_str(),k);
-            	int id = shmget(key.get_key(),0,0600);
+            	id = shmget(key.get_key(),0,0600);
             	res = res || xsi_shared_memory::remove(id);
 			}
 			return res;
 		} else {
-			xsi_key key(name.c_str(),0);
-			int id = shmget(key.get_key(),0,0600);
+			id = shmget(xsi_key(name.c_str(),0).get_key(),0,0600);
 			return xsi_shared_memory::remove(id);
 		}	
 	}
-	else {
-			return false;
-	}
-
 	} catch(...) {
-		return false;
 	}
+	return false;
 }
 
 SharedMemorySegment::POSIX_ShMem::POSIX_ShMem(const std::string &name, int64_t size)
