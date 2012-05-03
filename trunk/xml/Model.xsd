@@ -50,6 +50,21 @@
 	<xs:attribute name="name" type="xs:string" use="optional"/>
 	</xs:complexType>
 
+	<!-- Languages -->
+	<xs:simpleType name="Language">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="unknown" />
+			<xs:enumeration value="fortran"/>
+			<xs:enumeration value="Fortran"/>
+			<xs:enumeration value="C" />
+			<xs:enumeration value="c" />
+			<xs:enumeration value="cpp" />
+			<xs:enumeration value="CPP" />
+			<xs:enumeration value="python" />
+			<xs:enumeration value="Python" />
+		</xs:restriction>
+	</xs:simpleType>
+
 	<!-- Layout node -->
 	<xs:complexType name="LayoutModel">
 	<xs:simpleContent>
@@ -57,7 +72,7 @@
 	<xs:attribute name="name"       type="xs:string" use="required"/>
 	<xs:attribute name="type"       type="xs:string" use="required"/>
 	<xs:attribute name="dimensions" type="xs:string" use="required"/>
-	<xs:attribute name="language"   type="xs:string" use="optional" default="?"/>
+	<xs:attribute name="language"   type="mdl:Language" use="optional" default="unknown"/>
 	</xs:extension>
 	</xs:simpleContent>
 	</xs:complexType>

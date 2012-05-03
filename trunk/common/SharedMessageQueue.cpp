@@ -45,15 +45,18 @@ SharedMessageQueue* SharedMessageQueue::create(Model::QueueModel* mdl)
 	std::string& name = mdl->name();
 	size_t num_msg = mdl->size();
 	size_t size_msg = sizeof(Message);
-	//std::string& type = mdl->type();
 	Model::ShmType& type = mdl->type();
 
-	if(type == Model::ShmType::posix) return create(posix_shmem_t(),name,num_msg,size_msg);
-	else if(type == Model::ShmType::sysv) return create(sysv_shmem_t(),name,num_msg,size_msg);
-	else {
+	switch(type) {
+
+	case Model::ShmType::posix : 
+		return create(posix_shmem_t(),name,num_msg,size_msg);
+	case Model::ShmType::sysv : 
+		return create(sysv_shmem_t(),name,num_msg,size_msg);
+	default :
 		ERROR("Unknown shared memory type \"" << type << "\"");
-		return NULL;
 	}
+	return NULL;
 }
 
 SharedMessageQueue* SharedMessageQueue::create(posix_shmem_t posix_shmem, 
@@ -86,14 +89,19 @@ SharedMessageQueue* SharedMessageQueue::create(sysv_shmem_t sysv_shmem,
 SharedMessageQueue* SharedMessageQueue::open(Model::QueueModel* mdl)
 {
 	std::string& name = mdl->name();
-	std::string& type = mdl->type();
+	Model::ShmType& type = mdl->type();
 
-	if(type == "posix") return open(posix_shmem_t(),name);
-	else if(type == "sysv") return open(sysv_shmem_t(),name);
-	else {
+	switch(type) {
+	
+	case Model::ShmType::posix : 
+		return open(posix_shmem_t(),name);
+	case Model::ShmType::sysv :
+		return open(sysv_shmem_t(),name);
+	default : 
 		ERROR("Unknown shared memory type \"" << type << "\"");
-		return NULL;
 	}
+
+	return NULL;
 }
 
 SharedMessageQueue* SharedMessageQueue::open(posix_shmem_t posix_shmem, 
@@ -116,19 +124,22 @@ SharedMessageQueue* SharedMessageQueue::open(sysv_shmem_t sysv_shmem,
 
 bool SharedMessageQueue::remove(Model::QueueModel* mdl)
 {
-        std::string& name = mdl->name();
-        std::string& type = mdl->type();
+	std::string& name = mdl->name();
+	Model::ShmType& type = mdl->type();
 
 	try {
+        switch(type) {
 
-        if(type == "posix") return remove(posix_shmem_t(),name);
-        else if(type == "sysv") return remove(sysv_shmem_t(),name);
-        else {
-                return false;
+		case Model::ShmType::posix :
+			return remove(posix_shmem_t(),name);
+        case Model::ShmType::sysv :
+			return remove(sysv_shmem_t(),name);
+     	default: 
+			return false;
         }
 	} catch(...) {
-		return false;
 	}
+	return false;
 }
 
 bool SharedMessageQueue::remove(posix_shmem_t posix_shmem, const std::string& name)

@@ -131,7 +131,8 @@ SharedMemorySegment::POSIX_ShMem::POSIX_ShMem(const std::string &name, int64_t s
 	impl = new managed_shared_memory(create_only,name.c_str(),size);
 	// shared memory created, now create the size manager
 	size_manager = 
-		impl->construct<SharedMemorySegment::size_manager_s>("size_manager",std::nothrow)[1](getFreeMemory());
+		impl->construct<SharedMemorySegment::size_manager_s>
+			("size_manager",std::nothrow)[1](getFreeMemory());
 	FATAL((size_manager == NULL), "Unable to create the size manager");
 }
 
