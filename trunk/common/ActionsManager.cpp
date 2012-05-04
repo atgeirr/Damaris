@@ -67,7 +67,7 @@ void ActionsManager::init()
  */
 void ActionsManager::addDynamicAction(const std::string& eventName, 
 		const std::string& fileName, const std::string &functionName,
-		const std::string& scope)
+		const Model::ScopeModel& scope)
 {
 
 	// check if there is already an action with the same name recorded
@@ -82,9 +82,15 @@ void ActionsManager::addDynamicAction(const std::string& eventName,
 
 	// create the action
 	a = new DynamicAction(functionName,fileName);
-	if(scope == "core" || (not environment->hasServer())) { }
-	else if(scope == "node") {
+
+	if(scope == Model::ScopeModel::core || (not environment->hasServer())) 
+	{ }
+	else if(scope == Model::ScopeModel::node) {
 		a = new NodeAction(a,environment->getClientsPerNode());
+	} else if(scope == Model::ScopeModel::global) {
+		ERROR("Global actions are not yet implemented");
+		delete a;
+		return;
 	} else {
 		ERROR("Undefined event scope \"" << scope << "\" (must be \"core\" or \"node\")");
 		delete a;
@@ -100,25 +106,24 @@ void ActionsManager::addDynamicAction(const std::string& eventName,
 }
 
 void ActionsManager::addScriptAction(const std::string& name,
-		const std::string& fileName, const std::string& language,
-		const std::string& scope) 
+		const std::string& fileName, const Model::Language& language,
+		const Model::ScopeModel& scope) 
 {
 	// check if there is already an action with the same name recorded
-        ActionSet::index<by_name>::type::iterator it = actions.get<by_name>().find(name);
-        if(it != actions.get<by_name>().end()) {
-                WARN("Inserting an action with a name identical to another defined action");
-                return;
-        }
+	ActionSet::index<by_name>::type::iterator it = actions.get<by_name>().find(name);
+	if(it != actions.get<by_name>().end()) {
+		WARN("Inserting an action with a name identical to another defined action");
+		return;
+	}
 	Action* a = NULL;
 	DBG("scope = " << scope);
 	// create the action
-	switch(Language::getLanguageFromString(&(language))) {
-		case (Language::LG_PYTHON):
+	switch(language) {
+		case (Model::Language::python):
 #ifdef __ENABLE_PYTHON
 			a = new Python::PyAction(fileName); break;
 #else
 			ERROR("Damaris has been compiled without Python support, Python actions will be ignored");
-			DBG("Ahahaha");
 			a = new Action::EmptyAction(); break;
 #endif
 		default:
@@ -127,12 +132,18 @@ void ActionsManager::addScriptAction(const std::string& name,
 			return;
 	}
 	
-	if(scope == "core") { }
-	else if (scope == "node") {
+	if(scope == Model::ScopeModel::core || (not environment->hasServer())) 
+	{ }
+	else if (scope == Model::ScopeModel::node) {
 		a = new NodeAction(a,environment->getClientsPerNode());
-	} else {
-		ERROR("Undefined event scope \"" << scope << "\" (must be \"core\" or \"node\")");
+	} else if(scope == Model::ScopeModel::global) {
+		ERROR("Global script scope is not yet implemented");
 		delete a;
+		return;
+	} else {
+		ERROR("Undefined script scope \"" << scope << "\" (must be \"core\" or \"node\")");
+		delete a;
+		return;
 	}
 	// attribute an ID and a name to the action
 	a->id = actions.size();

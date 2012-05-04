@@ -52,12 +52,7 @@ void MetadataManager::initLayouts()
 	Model::DataModel::layout_const_iterator l(model->layout().begin());
 	for(;l != model->layout().end(); l++)
 	{
-		Types::basic_type_e type = Types::getTypeFromString(l->type());
-		Language::language_e language =
-			Language::getLanguageFromString(&(l->language()));
-		if(language == Language::LG_UNKNOWN)
-			language = environment->getDefaultLanguage();
-		if(type == Types::UNDEFINED_TYPE) {
+		if(l->type() == Model::TypeModel::undefined) {
 			ERROR("Unknown type \"" << l->type()
 					<< "\" for layout \"" << l->name() << "\"");
 			continue;
@@ -75,12 +70,14 @@ void MetadataManager::initLayouts()
 					<< l->name() << "\"");
 			continue;
 		}
-		if(language == Language::LG_FORTRAN) {
+		if((l->language() == Model::Language::fortran)
+			|| (l->language() == Model::Language::unknown 
+				&& environment->getDefaultLanguage() == Model::Language::fortran)) {
 			std::vector<int> rdims(dims.rbegin(),dims.rend());
 			dims = rdims;
 		}
-		Layout l(name,type,dims.size(),dims);
-		addLayout(name,l);
+		Layout result(name,l->type(),dims.size(),dims);
+		addLayout(name,result);
 	}
 }
 

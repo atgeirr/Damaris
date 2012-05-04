@@ -57,8 +57,8 @@ namespace Damaris {
 		return model->name();
 	}
 
-	Language::language_e Environment::getDefaultLanguage() const
+	const Model::Language& Environment::getDefaultLanguage() const
 	{
-		return Language::getLanguageFromString(&(model->language()));
+		return model->language();
 	}
 }

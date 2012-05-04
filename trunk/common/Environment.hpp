@@ -85,7 +85,7 @@ namespace Damaris {
 		/**
 		 * \brief Get the default language for the running simulation.
 		 */
-		Language::language_e getDefaultLanguage() const;
+		const Model::Language& getDefaultLanguage() const;
 
 		/**
 		 * \brief Get the number of clients per node.

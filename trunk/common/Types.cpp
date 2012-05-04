@@ -28,33 +28,48 @@ namespace Damaris {
 
 namespace Types {
 
-	int basicTypeSize(basic_type_e t)
+	int basicTypeSize(const Model::TypeModel &t)
 	{
 		switch(t) {
-			case SHORT :
+			case Model::TypeModel::short_ :
 				return sizeof(short int);
-			case INT :
+				break;
+			case Model::TypeModel::int_ :
 				return sizeof(int);
-			case LONG :
+				break;
+			case Model::TypeModel::integer :
+				return sizeof(int);
+				break;
+			case Model::TypeModel::long_ :
 				return sizeof(long int);
-			case FLOAT :
+				break;
+			case Model::TypeModel::float_ :
 				return sizeof(float);
-			case DOUBLE :
+				break;
+			case Model::TypeModel::real :
+				return sizeof(float);
+				break;
+			case Model::TypeModel::double_ :
 				return sizeof(double);
-			case CHAR :
+				break;
+			case Model::TypeModel::char_ :
 				return sizeof(char);
+				break;
+			case Model::TypeModel::character :
+				return sizeof(char);
+				break;
 			default:
 				return 0;
 		}
 		return 0;
 	}
 
-	static std::string names[] =
-		{"undefined","short","int","long","float","double","char","string"};
+//	static std::string names[] =
+//		{"undefined","short","int","long","float","double","char","string"};
 
-	basic_type_e getTypeFromString(const std::string& str)
+	Model::TypeModel getTypeFromString(const std::string& str)
 	{
-		if(str.compare("short") == 0)  return SHORT;
+/*		if(str.compare("short") == 0)  return SHORT;
 		if(str.compare("int") == 0)    return INT;
 		if(str.compare("long") == 0)   return LONG;
 		if(str.compare("float") == 0)  return FLOAT;
@@ -62,8 +77,10 @@ namespace Types {
 		if(str.compare("char") == 0)   return CHAR;
 		if(str.compare("string") == 0) return STR;
 		return UNDEFINED_TYPE;
+*/
+	return Model::TypeModel::undefined;
 	}
-
+/*
 	const std::string& getStringFromType(basic_type_e t)
 	{	
 		if(t <= 7)
@@ -71,5 +88,6 @@ namespace Types {
 		else
 			return names[0];
 	}
+*/
 }
 }

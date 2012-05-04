@@ -24,6 +24,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #define __DAMARIS_TYPES_H
 
 #include <string>
+#include "xml/Model.hpp"
 
 namespace Damaris {
 
@@ -36,24 +37,24 @@ namespace Types {
 	/**
 	 * The basic_type_e enumeration defines all basic types.
 	 */
-	enum basic_type_e {
-		SHORT  = 1,     /*!< short int, integer*2 */
-		INT    = 2,     /*!< int, integer*4 */
-		LONG   = 3,     /*!< long int, integer*8 */
-		FLOAT  = 4,     /*!< float, real */
-		DOUBLE = 5,     /*!< double, real*8 */
-		CHAR   = 6,     /*!< char, character */
-		STR    = 7,	/*!< string */
+//	enum basic_type_e {
+//		SHORT  = 1,     /*!< short int, integer*2 */
+//		INT    = 2,     /*!< int, integer*4 */
+//		LONG   = 3,     /*!< long int, integer*8 */
+//		FLOAT  = 4,     /*!< float, real */
+//		DOUBLE = 5,     /*!< double, real*8 */
+//		CHAR   = 6,     /*!< char, character */
+//		STR    = 7,	/*!< string */
 
-		UNDEFINED_TYPE = 0  /*!< don't know the type  (bad...) */
-	}; // enum basic_type_e
+//		UNDEFINED_TYPE = 0  /*!< don't know the type  (bad...) */
+//	}; // enum basic_type_e
 
 	/**
 	 * This function gives the size (in bytes) of each type. 
 	 * \param[in] t : Basic type from which you want the size.
 	 * \return The size (in bytes) of the data type.
 	 */
-	int basicTypeSize(basic_type_e t);
+	int basicTypeSize(const Model::TypeModel& t);
 	
 	/**
 	 * This function returns a basic type from a string.
@@ -61,12 +62,12 @@ namespace Types {
 	 * \return The associated basic type or UNDEFINED_TYPE if it does
 	 *         not correspond to any known type.
 	 */
-	basic_type_e getTypeFromString(const std::string &str);
+	Model::TypeModel getTypeFromString(const std::string &str);
 
 	/**
 	 * This function returns the name of a type.
 	 */
-	const std::string& getStringFromType(basic_type_e t);
+	//const std::string& getStringFromType(basic_type_e t);
 }
 }
 #endif

@@ -45,7 +45,7 @@ const std::string& PyLayout::name() const
 
 const std::string& PyLayout::type() const
 {
-	return Types::getStringFromType(inner->getType());
+	return inner->getType();
 }
 		
 bp::list PyLayout::extents() const

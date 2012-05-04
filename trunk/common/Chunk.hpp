@@ -24,6 +24,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #define __DAMARIS_CHUNK_H
 
 #include <stdlib.h>
+#include "xml/Model.hpp"
 #include "common/Types.hpp"
 #include "common/Layout.hpp"
 
@@ -76,7 +77,7 @@ class Chunk {
         /**
          * \brief Gets the type of data.
          */
-        virtual Types::basic_type_e getType() const = 0;
+        virtual Model::TypeModel getType() const = 0;
 
         /**
          * \brief Gets a start index.

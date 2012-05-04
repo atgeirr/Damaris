@@ -57,7 +57,7 @@ int PyChunk::iteration() const
 
 const std::string& PyChunk::type() const
 {
-	return Types::getStringFromType(inner->getType());
+	return inner->getType();
 }
 
 bp::list PyChunk::lower_bounds() const

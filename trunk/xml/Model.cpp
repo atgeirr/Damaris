@@ -455,6 +455,96 @@ namespace Damaris
     }
 
 
+    // Language
+    // 
+
+    Language::
+    Language (value v)
+    : ::xml_schema::string (_xsd_Language_literals_[v])
+    {
+    }
+
+    Language::
+    Language (const char* v)
+    : ::xml_schema::string (v)
+    {
+    }
+
+    Language::
+    Language (const ::std::string& v)
+    : ::xml_schema::string (v)
+    {
+    }
+
+    Language::
+    Language (const ::xml_schema::string& v)
+    : ::xml_schema::string (v)
+    {
+    }
+
+    Language::
+    Language (const Language& v,
+              ::xml_schema::flags f,
+              ::xml_schema::container* c)
+    : ::xml_schema::string (v, f, c)
+    {
+    }
+
+    Language& Language::
+    operator= (value v)
+    {
+      static_cast< ::xml_schema::string& > (*this) = 
+      ::xml_schema::string (_xsd_Language_literals_[v]);
+
+      return *this;
+    }
+
+
+    // TypeModel
+    // 
+
+    TypeModel::
+    TypeModel (value v)
+    : ::xml_schema::string (_xsd_TypeModel_literals_[v])
+    {
+    }
+
+    TypeModel::
+    TypeModel (const char* v)
+    : ::xml_schema::string (v)
+    {
+    }
+
+    TypeModel::
+    TypeModel (const ::std::string& v)
+    : ::xml_schema::string (v)
+    {
+    }
+
+    TypeModel::
+    TypeModel (const ::xml_schema::string& v)
+    : ::xml_schema::string (v)
+    {
+    }
+
+    TypeModel::
+    TypeModel (const TypeModel& v,
+               ::xml_schema::flags f,
+               ::xml_schema::container* c)
+    : ::xml_schema::string (v, f, c)
+    {
+    }
+
+    TypeModel& TypeModel::
+    operator= (value v)
+    {
+      static_cast< ::xml_schema::string& > (*this) = 
+      ::xml_schema::string (_xsd_TypeModel_literals_[v]);
+
+      return *this;
+    }
+
+
     // LayoutModel
     // 
 
@@ -904,6 +994,51 @@ namespace Damaris
     group (const group_sequence& s)
     {
       this->group_ = s;
+    }
+
+
+    // ScopeModel
+    // 
+
+    ScopeModel::
+    ScopeModel (value v)
+    : ::xml_schema::string (_xsd_ScopeModel_literals_[v])
+    {
+    }
+
+    ScopeModel::
+    ScopeModel (const char* v)
+    : ::xml_schema::string (v)
+    {
+    }
+
+    ScopeModel::
+    ScopeModel (const ::std::string& v)
+    : ::xml_schema::string (v)
+    {
+    }
+
+    ScopeModel::
+    ScopeModel (const ::xml_schema::string& v)
+    : ::xml_schema::string (v)
+    {
+    }
+
+    ScopeModel::
+    ScopeModel (const ScopeModel& v,
+                ::xml_schema::flags f,
+                ::xml_schema::container* c)
+    : ::xml_schema::string (v, f, c)
+    {
+    }
+
+    ScopeModel& ScopeModel::
+    operator= (value v)
+    {
+      static_cast< ::xml_schema::string& > (*this) = 
+      ::xml_schema::string (_xsd_ScopeModel_literals_[v]);
+
+      return *this;
     }
 
 
@@ -1950,11 +2085,175 @@ namespace Damaris
     {
     }
 
+    // Language
+    //
+
+    Language::
+    Language (const ::xercesc::DOMElement& e,
+              ::xml_schema::flags f,
+              ::xml_schema::container* c)
+    : ::xml_schema::string (e, f, c)
+    {
+      _xsd_Language_convert ();
+    }
+
+    Language::
+    Language (const ::xercesc::DOMAttr& a,
+              ::xml_schema::flags f,
+              ::xml_schema::container* c)
+    : ::xml_schema::string (a, f, c)
+    {
+      _xsd_Language_convert ();
+    }
+
+    Language::
+    Language (const ::std::string& s,
+              const ::xercesc::DOMElement* e,
+              ::xml_schema::flags f,
+              ::xml_schema::container* c)
+    : ::xml_schema::string (s, e, f, c)
+    {
+      _xsd_Language_convert ();
+    }
+
+    Language* Language::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class Language (*this, f, c);
+    }
+
+    Language::value Language::
+    _xsd_Language_convert () const
+    {
+      ::xsd::cxx::tree::enum_comparator< char > c (_xsd_Language_literals_);
+      const value* i (::std::lower_bound (
+                        _xsd_Language_indexes_,
+                        _xsd_Language_indexes_ + 5,
+                        *this,
+                        c));
+
+      if (i == _xsd_Language_indexes_ + 5 || _xsd_Language_literals_[*i] != *this)
+      {
+        throw ::xsd::cxx::tree::unexpected_enumerator < char > (*this);
+      }
+
+      return *i;
+    }
+
+    const char* const Language::
+    _xsd_Language_literals_[5] =
+    {
+      "unknown",
+      "fortran",
+      "c",
+      "cpp",
+      "python"
+    };
+
+    const Language::value Language::
+    _xsd_Language_indexes_[5] =
+    {
+      ::Damaris::Model::Language::c,
+      ::Damaris::Model::Language::cpp,
+      ::Damaris::Model::Language::fortran,
+      ::Damaris::Model::Language::python,
+      ::Damaris::Model::Language::unknown
+    };
+
+    // TypeModel
+    //
+
+    TypeModel::
+    TypeModel (const ::xercesc::DOMElement& e,
+               ::xml_schema::flags f,
+               ::xml_schema::container* c)
+    : ::xml_schema::string (e, f, c)
+    {
+      _xsd_TypeModel_convert ();
+    }
+
+    TypeModel::
+    TypeModel (const ::xercesc::DOMAttr& a,
+               ::xml_schema::flags f,
+               ::xml_schema::container* c)
+    : ::xml_schema::string (a, f, c)
+    {
+      _xsd_TypeModel_convert ();
+    }
+
+    TypeModel::
+    TypeModel (const ::std::string& s,
+               const ::xercesc::DOMElement* e,
+               ::xml_schema::flags f,
+               ::xml_schema::container* c)
+    : ::xml_schema::string (s, e, f, c)
+    {
+      _xsd_TypeModel_convert ();
+    }
+
+    TypeModel* TypeModel::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class TypeModel (*this, f, c);
+    }
+
+    TypeModel::value TypeModel::
+    _xsd_TypeModel_convert () const
+    {
+      ::xsd::cxx::tree::enum_comparator< char > c (_xsd_TypeModel_literals_);
+      const value* i (::std::lower_bound (
+                        _xsd_TypeModel_indexes_,
+                        _xsd_TypeModel_indexes_ + 11,
+                        *this,
+                        c));
+
+      if (i == _xsd_TypeModel_indexes_ + 11 || _xsd_TypeModel_literals_[*i] != *this)
+      {
+        throw ::xsd::cxx::tree::unexpected_enumerator < char > (*this);
+      }
+
+      return *i;
+    }
+
+    const char* const TypeModel::
+    _xsd_TypeModel_literals_[11] =
+    {
+      "short",
+      "int",
+      "integer",
+      "long",
+      "float",
+      "real",
+      "double",
+      "char",
+      "character",
+      "string",
+      "undefined"
+    };
+
+    const TypeModel::value TypeModel::
+    _xsd_TypeModel_indexes_[11] =
+    {
+      ::Damaris::Model::TypeModel::char_,
+      ::Damaris::Model::TypeModel::character,
+      ::Damaris::Model::TypeModel::double_,
+      ::Damaris::Model::TypeModel::float_,
+      ::Damaris::Model::TypeModel::int_,
+      ::Damaris::Model::TypeModel::integer,
+      ::Damaris::Model::TypeModel::long_,
+      ::Damaris::Model::TypeModel::real,
+      ::Damaris::Model::TypeModel::short_,
+      ::Damaris::Model::TypeModel::string,
+      ::Damaris::Model::TypeModel::undefined
+    };
+
     // LayoutModel
     //
 
     const LayoutModel::language_type LayoutModel::language_default_value_ (
-      "?");
+      "unknown");
 
     LayoutModel::
     LayoutModel (const name_type& name,
@@ -2665,6 +2964,78 @@ namespace Damaris
     {
     }
 
+    // ScopeModel
+    //
+
+    ScopeModel::
+    ScopeModel (const ::xercesc::DOMElement& e,
+                ::xml_schema::flags f,
+                ::xml_schema::container* c)
+    : ::xml_schema::string (e, f, c)
+    {
+      _xsd_ScopeModel_convert ();
+    }
+
+    ScopeModel::
+    ScopeModel (const ::xercesc::DOMAttr& a,
+                ::xml_schema::flags f,
+                ::xml_schema::container* c)
+    : ::xml_schema::string (a, f, c)
+    {
+      _xsd_ScopeModel_convert ();
+    }
+
+    ScopeModel::
+    ScopeModel (const ::std::string& s,
+                const ::xercesc::DOMElement* e,
+                ::xml_schema::flags f,
+                ::xml_schema::container* c)
+    : ::xml_schema::string (s, e, f, c)
+    {
+      _xsd_ScopeModel_convert ();
+    }
+
+    ScopeModel* ScopeModel::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class ScopeModel (*this, f, c);
+    }
+
+    ScopeModel::value ScopeModel::
+    _xsd_ScopeModel_convert () const
+    {
+      ::xsd::cxx::tree::enum_comparator< char > c (_xsd_ScopeModel_literals_);
+      const value* i (::std::lower_bound (
+                        _xsd_ScopeModel_indexes_,
+                        _xsd_ScopeModel_indexes_ + 3,
+                        *this,
+                        c));
+
+      if (i == _xsd_ScopeModel_indexes_ + 3 || _xsd_ScopeModel_literals_[*i] != *this)
+      {
+        throw ::xsd::cxx::tree::unexpected_enumerator < char > (*this);
+      }
+
+      return *i;
+    }
+
+    const char* const ScopeModel::
+    _xsd_ScopeModel_literals_[3] =
+    {
+      "core",
+      "node",
+      "global"
+    };
+
+    const ScopeModel::value ScopeModel::
+    _xsd_ScopeModel_indexes_[3] =
+    {
+      ::Damaris::Model::ScopeModel::core,
+      ::Damaris::Model::ScopeModel::global,
+      ::Damaris::Model::ScopeModel::node
+    };
+
     // EventModel
     //
 
@@ -3019,7 +3390,7 @@ namespace Damaris
     //
 
     const SimulationModel::language_type SimulationModel::language_default_value_ (
-      "C");
+      "unknown");
 
     SimulationModel::
     SimulationModel (const architecture_type& architecture,

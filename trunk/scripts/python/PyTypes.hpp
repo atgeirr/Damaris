@@ -42,7 +42,7 @@ namespace PyTypes {
 	/**
 	 * Transforms a Damaris type into a NumPy type.
 	 */
-	int getPyTypeFromDamarisType(Types::basic_type_e t);
+	int getPyTypeFromDamarisType(const Model::TypeModel& t);
 }
 }
 }

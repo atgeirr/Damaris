@@ -39,26 +39,35 @@ namespace Damaris {
 		Model::DataModel::parameter_const_iterator p(model->parameter().begin());
 		for(; p < model->parameter().end(); p++) {
 			std::string name(p->name());
-			switch(Types::getTypeFromString(p->type())) {
-			case Types::SHORT:
+			switch(p->type()) {
+			case Model::TypeModel::short_:
 				set<short>(name,boost::lexical_cast<short>(p->value()));
 				break;
-			case Types::INT:
+			case Model::TypeModel::int_:
 				set<int>(name,boost::lexical_cast<int>(p->value()));
 				break;
-			case Types::LONG:
+			case Model::TypeModel::integer:
+				set<int>(name,boost::lexical_cast<int>(p->value()));
+				break;
+			case Model::TypeModel::long_:
 				set<long>(name,boost::lexical_cast<long>(p->value()));
 				break;
-			case Types::FLOAT:
+			case Model::TypeModel::float_:
 				set<float>(name,boost::lexical_cast<float>(p->value()));
 				break;
-			case Types::DOUBLE:
+			case Model::TypeModel::real :
+				set<float>(name,boost::lexical_cast<float>(p->value()));
+				break;
+			case Model::TypeModel::double_:
 				set<double>(name,boost::lexical_cast<double>(p->value()));
 				break;
-			case Types::CHAR:
+			case Model::TypeModel::char_:
 				set<char>(name,boost::lexical_cast<char>(p->value()));
 				break;
-			case Types::STR:
+			case Model::TypeModel::character:
+				set<char>(name,boost::lexical_cast<char>(p->value()));
+				break;
+			case Model::TypeModel::string:
 				set<std::string>(name,boost::lexical_cast<std::string>(p->value()));
 				break;
 			default:

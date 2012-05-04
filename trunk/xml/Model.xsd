@@ -55,13 +55,26 @@
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="unknown" />
 			<xs:enumeration value="fortran"/>
-			<xs:enumeration value="Fortran"/>
-			<xs:enumeration value="C" />
 			<xs:enumeration value="c" />
 			<xs:enumeration value="cpp" />
-			<xs:enumeration value="CPP" />
 			<xs:enumeration value="python" />
-			<xs:enumeration value="Python" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<!-- Type Model -->
+	<xs:simpleType name="TypeModel">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="short"/>
+			<xs:enumeration value="int" />
+			<xs:enumeration value="integer" />
+			<xs:enumeration value="long" />
+			<xs:enumeration value="float" />
+			<xs:enumeration value="real" />
+			<xs:enumeration value="double" />
+			<xs:enumeration value="char" />
+			<xs:enumeration value="character" />
+			<xs:enumeration value="string" />
+			<xs:enumeration value="undefined" />
 		</xs:restriction>
 	</xs:simpleType>
 
@@ -70,7 +83,7 @@
 	<xs:simpleContent>
 	<xs:extension base="xs:string">
 	<xs:attribute name="name"       type="xs:string" use="required"/>
-	<xs:attribute name="type"       type="xs:string" use="required"/>
+	<xs:attribute name="type"       type="mdl:TypeModel" use="required"/>
 	<xs:attribute name="dimensions" type="xs:string" use="required"/>
 	<xs:attribute name="language"   type="mdl:Language" use="optional" default="unknown"/>
 	</xs:extension>
@@ -108,7 +121,7 @@
 	<xs:simpleContent>
 	<xs:extension base="xs:string">
 	<xs:attribute name="name"  type="xs:string" use="required"/>
-	<xs:attribute name="type"  type="xs:string" use="required"/>
+	<xs:attribute name="type"  type="mdl:TypeModel" use="required"/>
 	<xs:attribute name="value" type="xs:string" use="required"/>
 	</xs:extension>
 	</xs:simpleContent>
@@ -133,12 +146,21 @@
 		</xs:sequence>
 	</xs:complexType>
 
+    <!-- Scope node  -->
+	<xs:simpleType name="ScopeModel">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="core" />
+			<xs:enumeration value="node" />
+			<xs:enumeration value="global" />
+		</xs:restriction>
+	</xs:simpleType>
+
 	<!-- Event node -->
 	<xs:complexType name="EventModel">
 	<xs:attribute name="name"    type="xs:string" use="required"/>
 	<xs:attribute name="action"  type="xs:string" use="required"/>
 	<xs:attribute name="library" type="xs:string" use="optional" default="" />
-	<xs:attribute name="scope"   type="xs:string" use="optional" default="core" />
+	<xs:attribute name="scope"   type="mdl:ScopeModel" use="optional" default="core" />
 	</xs:complexType>
 
 	<!-- Script node -->
@@ -146,7 +168,7 @@
 	<xs:attribute name="name"     type="xs:string" use="required" />
 	<xs:attribute name="file"     type="xs:string" use="required" />
 	<xs:attribute name="language" type="xs:string" use="required" />
-	<xs:attribute name="scope"    type="xs:string" use="optional" default="core" />
+	<xs:attribute name="scope"    type="mdl:ScopeModel" use="optional" default="core" />
 	</xs:complexType>
 
 	<!-- Actions node -->
@@ -170,7 +192,7 @@
 			maxOccurs="1"/>
 	</xs:sequence>
 	<xs:attribute name="name"     type="xs:string" use="required"/>
-	<xs:attribute name="language" type="xs:string" use="optional" default="C"/>
+	<xs:attribute name="language" type="mdl:Language" use="optional" default="unknown"/>
 	</xs:complexType>
 
 	<!-- Root element -->

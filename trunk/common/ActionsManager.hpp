@@ -72,21 +72,21 @@ class ActionsManager : public Configurable<ActionsManager,Model::ActionsModel> {
 		 */
 		void addDynamicAction(const std::string &eventName, 
 				const std::string &fileName, const std::string& functionName,
-				const std::string &scope);
+				const Model::ScopeModel &scope);
 
 		/** 
-                 * \brief Adds an action defined through a script.
-                 * \param[in] eventName : Name of the event taken as a key for this action.
-                 * \param[in] fileName : Name of the dynamic library (.so, .dylib...)
-                 * \param[in] functionName : Name of the function to load in this dynamic library.
-                 * \param[in] scope : Scope of the event (core, node, global).
-                 * 
+		 * \brief Adds an action defined through a script.
+		 * \param[in] eventName : Name of the event taken as a key for this action.
+		 * \param[in] fileName : Name of the dynamic library (.so, .dylib...)
+		 * \param[in] functionName : Name of the function to load in this dynamic library.
+		 * \param[in] scope : Scope of the event (core, node, global).
+		 * 
 		 * The interpreter for the language in which the script is writen is loaded only
 		 * if the action is eventually called.
-                 */
+		 */
 		void addScriptAction(const std::string &scriptName,
-				const std::string &fileName, const std::string &lang,
-				const std::string &scope);
+				const std::string &fileName, const Model::Language &lang,
+				const Model::ScopeModel &scope);
 
 		/**
 		 * \brief Call a function, in reaction to a fired event.

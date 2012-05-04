@@ -247,11 +247,14 @@ namespace Damaris
     class BufferModel;
     class QueueModel;
     class ArchitectureModel;
+    class Language;
+    class TypeModel;
     class LayoutModel;
     class VariableModel;
     class GroupModel;
     class ParameterModel;
     class DataModel;
+    class ScopeModel;
     class EventModel;
     class ScriptModel;
     class ActionsModel;
@@ -757,6 +760,130 @@ namespace Damaris
       name_optional name_;
     };
 
+    class Language: public ::xml_schema::string
+    {
+      public:
+      enum value
+      {
+        unknown,
+        fortran,
+        c,
+        cpp,
+        python
+      };
+
+      Language (value v);
+
+      Language (const char* v);
+
+      Language (const ::std::string& v);
+
+      Language (const ::xml_schema::string& v);
+
+      Language (const ::xercesc::DOMElement& e,
+                ::xml_schema::flags f = 0,
+                ::xml_schema::container* c = 0);
+
+      Language (const ::xercesc::DOMAttr& a,
+                ::xml_schema::flags f = 0,
+                ::xml_schema::container* c = 0);
+
+      Language (const ::std::string& s,
+                const ::xercesc::DOMElement* e,
+                ::xml_schema::flags f = 0,
+                ::xml_schema::container* c = 0);
+
+      Language (const Language& x,
+                ::xml_schema::flags f = 0,
+                ::xml_schema::container* c = 0);
+
+      virtual Language*
+      _clone (::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0) const;
+
+      Language&
+      operator= (value v);
+
+      virtual
+      operator value () const
+      {
+        return _xsd_Language_convert ();
+      }
+
+      protected:
+      value
+      _xsd_Language_convert () const;
+
+      public:
+      static const char* const _xsd_Language_literals_[5];
+      static const value _xsd_Language_indexes_[5];
+    };
+
+    class TypeModel: public ::xml_schema::string
+    {
+      public:
+      enum value
+      {
+        short_,
+        int_,
+        integer,
+        long_,
+        float_,
+        real,
+        double_,
+        char_,
+        character,
+        string,
+        undefined
+      };
+
+      TypeModel (value v);
+
+      TypeModel (const char* v);
+
+      TypeModel (const ::std::string& v);
+
+      TypeModel (const ::xml_schema::string& v);
+
+      TypeModel (const ::xercesc::DOMElement& e,
+                 ::xml_schema::flags f = 0,
+                 ::xml_schema::container* c = 0);
+
+      TypeModel (const ::xercesc::DOMAttr& a,
+                 ::xml_schema::flags f = 0,
+                 ::xml_schema::container* c = 0);
+
+      TypeModel (const ::std::string& s,
+                 const ::xercesc::DOMElement* e,
+                 ::xml_schema::flags f = 0,
+                 ::xml_schema::container* c = 0);
+
+      TypeModel (const TypeModel& x,
+                 ::xml_schema::flags f = 0,
+                 ::xml_schema::container* c = 0);
+
+      virtual TypeModel*
+      _clone (::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0) const;
+
+      TypeModel&
+      operator= (value v);
+
+      virtual
+      operator value () const
+      {
+        return _xsd_TypeModel_convert ();
+      }
+
+      protected:
+      value
+      _xsd_TypeModel_convert () const;
+
+      public:
+      static const char* const _xsd_TypeModel_literals_[11];
+      static const value _xsd_TypeModel_indexes_[11];
+    };
+
     class LayoutModel: public ::xml_schema::string
     {
       public:
@@ -779,7 +906,7 @@ namespace Damaris
 
       // type
       // 
-      typedef ::xml_schema::string type_type;
+      typedef ::Damaris::Model::TypeModel type_type;
       typedef ::xsd::cxx::tree::traits< type_type, char > type_traits;
 
       const type_type&
@@ -813,7 +940,7 @@ namespace Damaris
 
       // language
       // 
-      typedef ::xml_schema::string language_type;
+      typedef ::Damaris::Model::Language language_type;
       typedef ::xsd::cxx::tree::traits< language_type, char > language_traits;
 
       const language_type&
@@ -1130,7 +1257,7 @@ namespace Damaris
 
       // type
       // 
-      typedef ::xml_schema::string type_type;
+      typedef ::Damaris::Model::TypeModel type_type;
       typedef ::xsd::cxx::tree::traits< type_type, char > type_traits;
 
       const type_type&
@@ -1315,6 +1442,63 @@ namespace Damaris
       group_sequence group_;
     };
 
+    class ScopeModel: public ::xml_schema::string
+    {
+      public:
+      enum value
+      {
+        core,
+        node,
+        global
+      };
+
+      ScopeModel (value v);
+
+      ScopeModel (const char* v);
+
+      ScopeModel (const ::std::string& v);
+
+      ScopeModel (const ::xml_schema::string& v);
+
+      ScopeModel (const ::xercesc::DOMElement& e,
+                  ::xml_schema::flags f = 0,
+                  ::xml_schema::container* c = 0);
+
+      ScopeModel (const ::xercesc::DOMAttr& a,
+                  ::xml_schema::flags f = 0,
+                  ::xml_schema::container* c = 0);
+
+      ScopeModel (const ::std::string& s,
+                  const ::xercesc::DOMElement* e,
+                  ::xml_schema::flags f = 0,
+                  ::xml_schema::container* c = 0);
+
+      ScopeModel (const ScopeModel& x,
+                  ::xml_schema::flags f = 0,
+                  ::xml_schema::container* c = 0);
+
+      virtual ScopeModel*
+      _clone (::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0) const;
+
+      ScopeModel&
+      operator= (value v);
+
+      virtual
+      operator value () const
+      {
+        return _xsd_ScopeModel_convert ();
+      }
+
+      protected:
+      value
+      _xsd_ScopeModel_convert () const;
+
+      public:
+      static const char* const _xsd_ScopeModel_literals_[3];
+      static const value _xsd_ScopeModel_indexes_[3];
+    };
+
     class EventModel: public ::xml_schema::type
     {
       public:
@@ -1374,7 +1558,7 @@ namespace Damaris
 
       // scope
       // 
-      typedef ::xml_schema::string scope_type;
+      typedef ::Damaris::Model::ScopeModel scope_type;
       typedef ::xsd::cxx::tree::traits< scope_type, char > scope_traits;
 
       const scope_type&
@@ -1484,7 +1668,7 @@ namespace Damaris
 
       // scope
       // 
-      typedef ::xml_schema::string scope_type;
+      typedef ::Damaris::Model::ScopeModel scope_type;
       typedef ::xsd::cxx::tree::traits< scope_type, char > scope_traits;
 
       const scope_type&
@@ -1679,7 +1863,7 @@ namespace Damaris
 
       // language
       // 
-      typedef ::xml_schema::string language_type;
+      typedef ::Damaris::Model::Language language_type;
       typedef ::xsd::cxx::tree::traits< language_type, char > language_traits;
 
       const language_type&

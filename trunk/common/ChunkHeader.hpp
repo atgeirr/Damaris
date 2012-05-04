@@ -24,6 +24,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #define __DAMARIS_CHUNK_HEADER_H
 
 #include <stdlib.h>
+#include "xml/Model.hpp"
 #include "common/Chunk.hpp"
 #include "common/ChunkDescriptor.hpp"
 
@@ -37,10 +38,10 @@ class ChunkHeader : public ChunkDescriptor {
 	private:
 		int source;     /*!< ID of the process that generated the chunk.*/
 		int iteration;  /*!< iteration at which the chunk has been generated. */
-		Types::basic_type_e type;
+		Model::TypeModel type;
 	
 	public:
-		ChunkHeader(const ChunkDescriptor* ch, Types::basic_type_e t, int it, int src) 
+		ChunkHeader(const ChunkDescriptor* ch, const Model::TypeModel t, int it, int src) 
 		: ChunkDescriptor(*ch), source(src), iteration(it), type(t) {};
 
     	/**
@@ -66,12 +67,12 @@ class ChunkHeader : public ChunkDescriptor {
 		/**
 		 * \brief Get the type of the chunk
 		 */
-		Types::basic_type_e getType() const { return type; }
+		Model::TypeModel getType() const { return type; }
 
 		/**
 		 * \brief Set the type.
 		 */
-		void setType(Types::basic_type_e t) { type = t; }
+		void setType(const Model::TypeModel& t) { type = t; }
 };
 
 } // namespace Damaris

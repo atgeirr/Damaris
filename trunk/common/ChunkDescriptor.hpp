@@ -24,6 +24,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #define __DAMARIS_CHUNK_DESC_H
 
 #include <stdlib.h>
+#include "xml/Model.hpp"
 #include "common/Layout.hpp"
 #include "common/Types.hpp"
 
@@ -39,7 +40,6 @@ class ChunkDescriptor {
 		static const int MAX_DIM = 32; /*!< The maximum number of dimensions is fixed to 32. */
 
 	protected:
-//		Types::basic_type_e type; /*!< Type of the data. */
 		unsigned int dimensions;  /*!< Number of dimensions. */
 		int lbounds[MAX_DIM];  /*!< Lower bounds of the chunk. */
 		int ubounds[MAX_DIM];  /*!< Upper bounds of the chunk. */
@@ -63,12 +63,6 @@ class ChunkDescriptor {
 		/**
 		 * External Constructor.
 		 */
-//		static ChunkDescriptor* New(Types::basic_type_e t, 
-//				unsigned int d, const int* lb, const int* ub);
-
-		/**
-		 * External Constructor.
-		 */
 		static ChunkDescriptor* New(unsigned int d, const int* lb, const int* ub);
 
 		/**
@@ -84,17 +78,12 @@ class ChunkDescriptor {
 		/**
          * \brief Computes the required number of bytes to allocate for the data.
          */
-        size_t getDataMemoryLength(const Types::basic_type_e t) const;
+        size_t getDataMemoryLength(const Model::TypeModel& t) const;
 
 		/**
          * \brief Gets the number of dimensions.
          */
         unsigned int getDimensions() const { return dimensions; }
-
-        /**
-         * \brief Gets the type of data.
-         */
-  //      Types::basic_type_e getType() const { return type; }
 
         /**
          * \brief Gets a start index.

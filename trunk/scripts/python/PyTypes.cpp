@@ -27,13 +27,34 @@ namespace Python {
 
 namespace PyTypes {
 
-static int pytypes[] =
-	{-1,NPY_SHORT,NPY_INT,NPY_LONGLONG,NPY_FLOAT,NPY_DOUBLE,NPY_UINT8,NPY_STRING};
-
-int getPyTypeFromDamarisType(Types::basic_type_e t)
+int getPyTypeFromDamarisType(const Model::TypeModel &t)
 {
-	if(t <= 0 || t > 7) return -1;
-	return pytypes[t];
+
+	switch(t) {
+		case Model::TypeModel::short_:
+			return NPY_SHORT;
+		case Model::TypeModel::int_:
+			return NPY_INT;
+		case Model::TypeModel::integer:
+			return NPY_INT;
+		case Model::TypeModel::long_:
+			return NPY_LONGLONG;
+		case Model::TypeModel::float_:
+			return NPY_FLOAT;
+		case Model::TypeModel::real :
+			return NPY_FLOAT;
+		case Model::TypeModel::double_:
+			return NPY_DOUBLE;
+		case Model::TypeModel::char_:
+			return NPY_UINT8;
+		case Model::TypeModel::character:
+			return NPY_UINT8;
+		case Model::TypeModel::string:
+			return NPY_STRING;
+		default:
+			return -1;
+	}
+	return -1;
 }
 
 }
