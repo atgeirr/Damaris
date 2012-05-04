@@ -88,7 +88,7 @@ class ShmChunk : public Chunk {
         /**
          * \brief Gets the type of data.
          */
-        virtual Model::TypeModel getType() const { return header->getType(); }
+        virtual Model::Type getType() const { return header->getType(); }
 
         /**
          * \brief Gets a start index.

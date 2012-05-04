@@ -37,7 +37,7 @@ namespace Damaris {
 	 * The class Environment holds all local informations
 	 * such as the id of the enclosing process.
 	 */
-	class Environment : public Configurable<Environment,Model::SimulationModel> { 
+	class Environment : public Configurable<Environment,Model::Simulation> { 
 
 	private:
 		int id; /*!< ID of the process. */
@@ -57,7 +57,7 @@ namespace Damaris {
 		 * \brief Constructor taking a base model. 
 		 * \param[in] mdl : base model from the configuration file.
 		 */
-		Environment(Model::SimulationModel* mdl);
+		Environment(Model::Simulation* mdl);
 	
 		/**
 		 * Destructor.

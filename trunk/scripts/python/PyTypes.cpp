@@ -27,29 +27,29 @@ namespace Python {
 
 namespace PyTypes {
 
-int getPyTypeFromDamarisType(const Model::TypeModel &t)
+int getPyTypeFromDamarisType(const Model::Type &t)
 {
 
 	switch(t) {
-		case Model::TypeModel::short_:
+		case Model::Type::short_:
 			return NPY_SHORT;
-		case Model::TypeModel::int_:
+		case Model::Type::int_:
 			return NPY_INT;
-		case Model::TypeModel::integer:
+		case Model::Type::integer:
 			return NPY_INT;
-		case Model::TypeModel::long_:
+		case Model::Type::long_:
 			return NPY_LONGLONG;
-		case Model::TypeModel::float_:
+		case Model::Type::float_:
 			return NPY_FLOAT;
-		case Model::TypeModel::real :
+		case Model::Type::real :
 			return NPY_FLOAT;
-		case Model::TypeModel::double_:
+		case Model::Type::double_:
 			return NPY_DOUBLE;
-		case Model::TypeModel::char_:
+		case Model::Type::char_:
 			return NPY_UINT8;
-		case Model::TypeModel::character:
+		case Model::Type::character:
 			return NPY_UINT8;
-		case Model::TypeModel::string:
+		case Model::Type::string:
 			return NPY_STRING;
 		default:
 			return -1;

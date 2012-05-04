@@ -78,7 +78,7 @@ class ChunkDescriptor {
 		/**
          * \brief Computes the required number of bytes to allocate for the data.
          */
-        size_t getDataMemoryLength(const Model::TypeModel& t) const;
+        size_t getDataMemoryLength(const Model::Type& t) const;
 
 		/**
          * \brief Gets the number of dimensions.

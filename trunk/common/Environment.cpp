@@ -25,8 +25,8 @@
 
 namespace Damaris {
 
-	Environment::Environment(Model::SimulationModel* mdl)
-	: Configurable<Environment,Model::SimulationModel>(mdl)
+	Environment::Environment(Model::Simulation* mdl)
+	: Configurable<Environment,Model::Simulation>(mdl)
 	{
 		init();
 	}

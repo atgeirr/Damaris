@@ -43,7 +43,7 @@ namespace Damaris {
 	 * MetadataManager holds pointers to all Variables.
 	 * These variables can be retrieved by their name or by a unique ID.
 	 */
-	class MetadataManager : public Configurable<MetadataManager,Model::DataModel> {
+	class MetadataManager : public Configurable<MetadataManager,Model::Data> {
 
 	private:
 		std::map<std::string,Layout> layouts; /*!< Map associating names with layouts. */
@@ -61,11 +61,11 @@ namespace Damaris {
 		void init();
 
 		/**
-		 * Go through a Model::GroupModel instance and read variables recursively. 
-		 * \param[in] g : a pointer to a Model::GroupModel to parse.
+		 * Go through a Model::Group instance and read variables recursively. 
+		 * \param[in] g : a pointer to a Model::Group to parse.
 		 * \param[in] groupName : the parent group name.
 		 */
-		void readVariablesInSubGroup(const Model::GroupModel *g,
+		void readVariablesInSubGroup(const Model::Group *g,
                         const std::string& groupName);
 
 		/**
@@ -88,7 +88,7 @@ namespace Damaris {
 		 * \param[in] mdl : the base model to initialize everything.
 		 * \param[in] env : the Environment object initialized by the Process.
 		 */
-		MetadataManager(Model::DataModel* mdl, Environment* env);
+		MetadataManager(Model::Data* mdl, Environment* env);
 
 		/**
 		 * Returns a reference to the inner VariableSet.

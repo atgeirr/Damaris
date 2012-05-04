@@ -39,7 +39,7 @@ namespace Damaris {
  * from scripts, etc. and call there functions upon reception
  * of events.
  */
-class ActionsManager : public Configurable<ActionsManager,Model::ActionsModel> {
+class ActionsManager : public Configurable<ActionsManager,Model::Actions> {
 
 	private:
 		ActionSet actions; /*!< Set of actions indexed by ID and name. */
@@ -50,7 +50,7 @@ class ActionsManager : public Configurable<ActionsManager,Model::ActionsModel> {
 		 * \brief Constructor.
 		 * Takes a model and an environment as parameters.
 		 */
-		ActionsManager(Model::ActionsModel* mdl, Environment* env);
+		ActionsManager(Model::Actions* mdl, Environment* env);
 
 	private:
 		/**
@@ -72,7 +72,7 @@ class ActionsManager : public Configurable<ActionsManager,Model::ActionsModel> {
 		 */
 		void addDynamicAction(const std::string &eventName, 
 				const std::string &fileName, const std::string& functionName,
-				const Model::ScopeModel &scope);
+				const Model::Scope &scope);
 
 		/** 
 		 * \brief Adds an action defined through a script.
@@ -86,7 +86,7 @@ class ActionsManager : public Configurable<ActionsManager,Model::ActionsModel> {
 		 */
 		void addScriptAction(const std::string &scriptName,
 				const std::string &fileName, const Model::Language &lang,
-				const Model::ScopeModel &scope);
+				const Model::Scope &scope);
 
 		/**
 		 * \brief Call a function, in reaction to a fired event.

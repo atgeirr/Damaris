@@ -69,7 +69,7 @@ ChunkDescriptor::ChunkDescriptor(const ChunkDescriptor& ch)
 	memcpy(ubounds,ch.ubounds,dimensions*sizeof(int));
 }
 
-size_t ChunkDescriptor::getDataMemoryLength(const Model::TypeModel &type) const
+size_t ChunkDescriptor::getDataMemoryLength(const Model::Type &type) const
 {
     size_t result = 1;
     result *= Types::basicTypeSize(type);

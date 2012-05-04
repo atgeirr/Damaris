@@ -25,8 +25,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Damaris {
 
-MetadataManager::MetadataManager(Model::DataModel* mdl, Environment* env)
-: Configurable<MetadataManager,Model::DataModel>(mdl)
+MetadataManager::MetadataManager(Model::Data* mdl, Environment* env)
+: Configurable<MetadataManager,Model::Data>(mdl)
 {
 	environment = env;
 	init();
@@ -49,10 +49,10 @@ void MetadataManager::initLayouts()
 {
 	if(model == NULL) return;
 
-	Model::DataModel::layout_const_iterator l(model->layout().begin());
+	Model::Data::layout_const_iterator l(model->layout().begin());
 	for(;l != model->layout().end(); l++)
 	{
-		if(l->type() == Model::TypeModel::undefined) {
+		if(l->type() == Model::Type::undefined) {
 			ERROR("Unknown type \"" << l->type()
 					<< "\" for layout \"" << l->name() << "\"");
 			continue;
@@ -87,7 +87,7 @@ void MetadataManager::initVariables()
 
 	if(model == NULL) return;
 	// build all the variables in root group
-	Model::DataModel::variable_const_iterator v(model->variable().begin());
+	Model::Data::variable_const_iterator v(model->variable().begin());
 	for(; v != model->variable().end(); v++)
 	{
 		std::string name = (std::string)(v->name());
@@ -98,19 +98,19 @@ void MetadataManager::initVariables()
 	}
 
 	// build all variables in sub-groups
-	Model::DataModel::group_const_iterator g(model->group().begin());
+	Model::Data::group_const_iterator g(model->group().begin());
 	for(; g != model->group().end(); g++)
 		readVariablesInSubGroup(&(*g),(std::string)(g->name()));
 }
 
-void MetadataManager::readVariablesInSubGroup(const Model::GroupModel *g,
+void MetadataManager::readVariablesInSubGroup(const Model::Group *g,
                         const std::string& groupName)
 {
 	if(g == NULL) return;
 	// first check if the group is enabled
 	if(!(g->enabled())) return;
 	// build recursively all variable in the subgroup
-	Model::DataModel::variable_const_iterator v(g->variable().begin());
+	Model::Data::variable_const_iterator v(g->variable().begin());
 	for(; v != g->variable().end(); v++)
 	{
 		std::string name = (std::string)(v->name());
@@ -123,7 +123,7 @@ void MetadataManager::readVariablesInSubGroup(const Model::GroupModel *g,
 	}
 
 	// build recursively all the subgroups
-	Model::DataModel::group_const_iterator subg(g->group().begin());
+	Model::Data::group_const_iterator subg(g->group().begin());
 	for(; subg != g->group().end(); subg++)
 		readVariablesInSubGroup(&(*subg),groupName
 				+ "/" + (std::string)(subg->name()));

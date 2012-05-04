@@ -44,7 +44,7 @@ class Layout {
 		
 	private:
 		std::string name;		/*!< Name of the layout in the configuration file. */
-		Model::TypeModel type; 	/*!< Type of the data. */
+		Model::Type type; 	/*!< Type of the data. */
 		unsigned int dimensions; 	/*!< Number of dimensions. */
 		std::vector<int> extents;	/*!< Extents along each dimension. */	
 
@@ -58,7 +58,7 @@ class Layout {
 		 * \param[in] d : number of dimensions.
 		 * \param[in] extents : list of extents.
 		 */
-		Layout(const std::string &name, const Model::TypeModel& t, 
+		Layout(const std::string &name, const Model::Type& t, 
 			unsigned int d, const std::vector<int> &ex);
 		
 		/**
@@ -74,7 +74,7 @@ class Layout {
 		/**
 		 * \return The type of the data. 
 		 */
-		Model::TypeModel getType() const;
+		Model::Type getType() const;
 		
 		/**
 		 * \return the number of dimensions. 

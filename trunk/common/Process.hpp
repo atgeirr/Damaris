@@ -77,7 +77,7 @@ class Process {
 		~Process();	
 
 	protected:
-		std::auto_ptr<Damaris::Model::SimulationModel> model; /*!< base model initialized from the configuration file. */
+		std::auto_ptr<Damaris::Model::Simulation> model; /*!< base model initialized from the configuration file. */
 		Environment 	*environment; /*!< environment object. */
 		MetadataManager *metadataManager; /*! metadata manager object. */
 		ActionsManager 	*actionsManager; /*! actions manager object. */

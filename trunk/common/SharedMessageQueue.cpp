@@ -40,7 +40,7 @@ SharedMessageQueue::~SharedMessageQueue()
 	delete region;
 }
 
-SharedMessageQueue* SharedMessageQueue::create(Model::QueueModel* mdl)
+SharedMessageQueue* SharedMessageQueue::create(Model::Queue* mdl)
 {
 	std::string& name = mdl->name();
 	size_t num_msg = mdl->size();
@@ -86,7 +86,7 @@ SharedMessageQueue* SharedMessageQueue::create(sysv_shmem_t sysv_shmem,
 	return new SharedMessageQueue(region);
 }
 
-SharedMessageQueue* SharedMessageQueue::open(Model::QueueModel* mdl)
+SharedMessageQueue* SharedMessageQueue::open(Model::Queue* mdl)
 {
 	std::string& name = mdl->name();
 	Model::ShmType& type = mdl->type();
@@ -122,7 +122,7 @@ SharedMessageQueue* SharedMessageQueue::open(sysv_shmem_t sysv_shmem,
 	return new SharedMessageQueue(region);
 }
 
-bool SharedMessageQueue::remove(Model::QueueModel* mdl)
+bool SharedMessageQueue::remove(Model::Queue* mdl)
 {
 	std::string& name = mdl->name();
 	Model::ShmType& type = mdl->type();

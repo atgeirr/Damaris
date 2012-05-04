@@ -28,34 +28,34 @@ namespace Damaris {
 
 namespace Types {
 
-	int basicTypeSize(const Model::TypeModel &t)
+	int basicTypeSize(const Model::Type &t)
 	{
 		switch(t) {
-			case Model::TypeModel::short_ :
+			case Model::Type::short_ :
 				return sizeof(short int);
 				break;
-			case Model::TypeModel::int_ :
+			case Model::Type::int_ :
 				return sizeof(int);
 				break;
-			case Model::TypeModel::integer :
+			case Model::Type::integer :
 				return sizeof(int);
 				break;
-			case Model::TypeModel::long_ :
+			case Model::Type::long_ :
 				return sizeof(long int);
 				break;
-			case Model::TypeModel::float_ :
+			case Model::Type::float_ :
 				return sizeof(float);
 				break;
-			case Model::TypeModel::real :
+			case Model::Type::real :
 				return sizeof(float);
 				break;
-			case Model::TypeModel::double_ :
+			case Model::Type::double_ :
 				return sizeof(double);
 				break;
-			case Model::TypeModel::char_ :
+			case Model::Type::char_ :
 				return sizeof(char);
 				break;
-			case Model::TypeModel::character :
+			case Model::Type::character :
 				return sizeof(char);
 				break;
 			default:
@@ -67,7 +67,7 @@ namespace Types {
 //	static std::string names[] =
 //		{"undefined","short","int","long","float","double","char","string"};
 
-	Model::TypeModel getTypeFromString(const std::string& str)
+	Model::Type getTypeFromString(const std::string& str)
 	{
 /*		if(str.compare("short") == 0)  return SHORT;
 		if(str.compare("int") == 0)    return INT;
@@ -78,7 +78,7 @@ namespace Types {
 		if(str.compare("string") == 0) return STR;
 		return UNDEFINED_TYPE;
 */
-	return Model::TypeModel::undefined;
+		return Model::Type(str);
 	}
 /*
 	const std::string& getStringFromType(basic_type_e t)

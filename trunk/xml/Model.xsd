@@ -5,14 +5,14 @@
 	xmlns:mdl="http://damaris.gforge.inria.fr/Damaris/Model">
 
 	<!-- Client node -->
-	<xs:complexType name="ClientsModel">
+	<xs:complexType name="Clients">
 	<xs:attribute name="count" type="xs:unsignedInt" use="required"/>	
 	</xs:complexType>
 
 	<!-- Cores node -->
-	<xs:complexType name="CoresModel">
+	<xs:complexType name="Cores">
 	<xs:sequence>
-		<xs:element name="clients" type="mdl:ClientsModel"/>
+		<xs:element name="clients" type="mdl:Clients"/>
 	</xs:sequence>
 	<xs:attribute name="count" type="xs:unsignedInt" use="required"/>
 	</xs:complexType>
@@ -26,7 +26,7 @@
 	</xs:simpleType>
 
 	<!-- Buffer node -->
-	<xs:complexType name="BufferModel">
+	<xs:complexType name="Buffer">
 	<xs:attribute name="name"   type="xs:string"      use="required"/>
 	<xs:attribute name="size"   type="xs:unsignedInt" use="required"/>
 	<xs:attribute name="type"   type="mdl:ShmType"      use="optional" default="posix"/>
@@ -34,18 +34,18 @@
 	</xs:complexType>	
 
 	<!-- Queue node -->
-	<xs:complexType name="QueueModel">
+	<xs:complexType name="Queue">
 	<xs:attribute name="name" type="xs:string"      use="required"/>
 	<xs:attribute name="size" type="xs:unsignedInt" use="required"/>
 	<xs:attribute name="type" type="mdl:ShmType" use="optional" default="posix"/>
 	</xs:complexType>
 
 	<!-- Architecture node -->
-	<xs:complexType name="ArchitectureModel">
+	<xs:complexType name="Architecture">
 	<xs:all>
-		<xs:element name="cores"  type="mdl:CoresModel" />
-		<xs:element name="buffer" type="mdl:BufferModel"/>
-		<xs:element name="queue"  type="mdl:QueueModel" />
+		<xs:element name="cores"  type="mdl:Cores" />
+		<xs:element name="buffer" type="mdl:Buffer"/>
+		<xs:element name="queue"  type="mdl:Queue" />
 	</xs:all>
 	<xs:attribute name="name" type="xs:string" use="optional"/>
 	</xs:complexType>
@@ -62,7 +62,7 @@
 	</xs:simpleType>
 
 	<!-- Type Model -->
-	<xs:simpleType name="TypeModel">
+	<xs:simpleType name="Type">
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="short"/>
 			<xs:enumeration value="int" />
@@ -79,11 +79,11 @@
 	</xs:simpleType>
 
 	<!-- Layout node -->
-	<xs:complexType name="LayoutModel">
+	<xs:complexType name="Layout">
 	<xs:simpleContent>
 	<xs:extension base="xs:string">
 	<xs:attribute name="name"       type="xs:string" use="required"/>
-	<xs:attribute name="type"       type="mdl:TypeModel" use="required"/>
+	<xs:attribute name="type"       type="mdl:Type" use="required"/>
 	<xs:attribute name="dimensions" type="xs:string" use="required"/>
 	<xs:attribute name="language"   type="mdl:Language" use="optional" default="unknown"/>
 	</xs:extension>
@@ -91,7 +91,7 @@
 	</xs:complexType>
 
 	<!-- Variable node -->
-	<xs:complexType name="VariableModel">
+	<xs:complexType name="Variable">
 	<xs:simpleContent>
 	<xs:extension base="xs:string">
 	<xs:attribute name="name"    type="xs:string"  use="required"/>
@@ -103,13 +103,13 @@
 	</xs:complexType>
 
 	<!-- Group node -->
-	<xs:complexType name="GroupModel">
+	<xs:complexType name="Group">
 	<xs:sequence>
 		<xs:choice maxOccurs="unbounded" minOccurs="0">
 			<xs:element name="variable" 
-				type="mdl:VariableModel"/>
+				type="mdl:Variable"/>
 			<xs:element name="group"    
-				type="mdl:GroupModel"/>
+				type="mdl:Group"/>
 		</xs:choice>
 	</xs:sequence>
 	<xs:attribute name="name"    type="xs:string"  use="required"/>
@@ -117,11 +117,11 @@
 	</xs:complexType>
 
 	<!-- Parameter node -->
-	<xs:complexType name="ParameterModel">
+	<xs:complexType name="Parameter">
 	<xs:simpleContent>
 	<xs:extension base="xs:string">
 	<xs:attribute name="name"  type="xs:string" use="required"/>
-	<xs:attribute name="type"  type="mdl:TypeModel" use="required"/>
+	<xs:attribute name="type"  type="mdl:Type" use="required"/>
 	<xs:attribute name="value" type="xs:string" use="required"/>
 	</xs:extension>
 	</xs:simpleContent>
@@ -134,20 +134,20 @@
 	</xs:complexType> -->
 
 	<!-- Data node -->
-	<xs:complexType name="DataModel">
+	<xs:complexType name="Data">
 		<xs:sequence>
 		<xs:choice minOccurs="0" maxOccurs="unbounded">
-			<xs:element name="parameter" type="mdl:ParameterModel" />
-			<xs:element name="layout"    type="mdl:LayoutModel" />
-			<xs:element name="variable"  type="mdl:VariableModel" />
-			<xs:element name="group"     type="mdl:GroupModel" />
-	<!--		<xs:element name="mesh"		 type="mdl:MeshModel"/> -->
+			<xs:element name="parameter" type="mdl:Parameter" />
+			<xs:element name="layout"    type="mdl:Layout" />
+			<xs:element name="variable"  type="mdl:Variable" />
+			<xs:element name="group"     type="mdl:Group" />
+	<!--		<xs:element name="mesh"		 type="mdl:Mesh"/> -->
 		</xs:choice>
 		</xs:sequence>
 	</xs:complexType>
 
     <!-- Scope node  -->
-	<xs:simpleType name="ScopeModel">
+	<xs:simpleType name="Scope">
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="core" />
 			<xs:enumeration value="node" />
@@ -156,39 +156,39 @@
 	</xs:simpleType>
 
 	<!-- Event node -->
-	<xs:complexType name="EventModel">
+	<xs:complexType name="Event">
 	<xs:attribute name="name"    type="xs:string" use="required"/>
 	<xs:attribute name="action"  type="xs:string" use="required"/>
 	<xs:attribute name="library" type="xs:string" use="optional" default="" />
-	<xs:attribute name="scope"   type="mdl:ScopeModel" use="optional" default="core" />
+	<xs:attribute name="scope"   type="mdl:Scope" use="optional" default="core" />
 	</xs:complexType>
 
 	<!-- Script node -->
-	<xs:complexType name="ScriptModel">
+	<xs:complexType name="Script">
 	<xs:attribute name="name"     type="xs:string" use="required" />
 	<xs:attribute name="file"     type="xs:string" use="required" />
 	<xs:attribute name="language" type="xs:string" use="required" />
-	<xs:attribute name="scope"    type="mdl:ScopeModel" use="optional" default="core" />
+	<xs:attribute name="scope"    type="mdl:Scope" use="optional" default="core" />
 	</xs:complexType>
 
 	<!-- Actions node -->
-	<xs:complexType name="ActionsModel">
+	<xs:complexType name="Actions">
 	<xs:sequence>
 		<xs:choice minOccurs="0" maxOccurs="unbounded">
-		<xs:element name="event" type="mdl:EventModel"/>
-		<xs:element name="script" type="mdl:ScriptModel"/>
+		<xs:element name="event" type="mdl:Event"/>
+		<xs:element name="script" type="mdl:Script"/>
 		</xs:choice>
 	</xs:sequence>
 	</xs:complexType>
 
 	<!-- Simulation node -->
-	<xs:complexType name="SimulationModel">
+	<xs:complexType name="Simulation">
 	<xs:sequence>
-		<xs:element name="architecture" type="mdl:ArchitectureModel" 
+		<xs:element name="architecture" type="mdl:Architecture" 
 			minOccurs="1" maxOccurs="1"/>
-		<xs:element name="data"         type="mdl:DataModel"         
+		<xs:element name="data"         type="mdl:Data"         
 			maxOccurs="1"/>
-		<xs:element name="actions"      type="mdl:ActionsModel"
+		<xs:element name="actions"      type="mdl:Actions"
 			maxOccurs="1"/>
 	</xs:sequence>
 	<xs:attribute name="name"     type="xs:string" use="required"/>
@@ -196,5 +196,5 @@
 	</xs:complexType>
 
 	<!-- Root element -->
-	<xs:element name="simulation" type="mdl:SimulationModel"/>
+	<xs:element name="simulation" type="mdl:Simulation"/>
 </xs:schema>

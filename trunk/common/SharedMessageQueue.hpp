@@ -95,7 +95,7 @@ namespace Damaris {
 			 * Creates a SharedMessageQueue based on a model.
 			 * \param[in] mdl : base model from which to create the SharedMessageQueue.
 			 */
-			static SharedMessageQueue* create(Model::QueueModel* mdl);
+			static SharedMessageQueue* create(Model::Queue* mdl);
 
 			/**
 			 * Helper function to create a POSIX shared message queue.
@@ -113,7 +113,7 @@ namespace Damaris {
 			 * Opens a SharedMessageQueue based on a model.
 			 * \param[in] mdl : base model from which to create the SharedMessageQueue.
 			 */
-			static SharedMessageQueue* open(Model::QueueModel* mdl);
+			static SharedMessageQueue* open(Model::Queue* mdl);
 	
 			/**
 			 * Opens an existing POSIX shared message queue.
@@ -130,7 +130,7 @@ namespace Damaris {
 			/**
 			 * Removes a SharedMessageQueue described by a model.
 			 */
-			static bool remove(Model::QueueModel* mdl);
+			static bool remove(Model::Queue* mdl);
 	
 			/**
 			 * Removes a POSIX shared message queue.

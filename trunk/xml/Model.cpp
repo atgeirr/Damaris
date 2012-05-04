@@ -60,68 +60,68 @@ namespace Damaris
 {
   namespace Model
   {
-    // ClientsModel
+    // Clients
     // 
 
-    const ClientsModel::count_type& ClientsModel::
+    const Clients::count_type& Clients::
     count () const
     {
       return this->count_.get ();
     }
 
-    ClientsModel::count_type& ClientsModel::
+    Clients::count_type& Clients::
     count ()
     {
       return this->count_.get ();
     }
 
-    void ClientsModel::
+    void Clients::
     count (const count_type& x)
     {
       this->count_.set (x);
     }
 
 
-    // CoresModel
+    // Cores
     // 
 
-    const CoresModel::clients_type& CoresModel::
+    const Cores::clients_type& Cores::
     clients () const
     {
       return this->clients_.get ();
     }
 
-    CoresModel::clients_type& CoresModel::
+    Cores::clients_type& Cores::
     clients ()
     {
       return this->clients_.get ();
     }
 
-    void CoresModel::
+    void Cores::
     clients (const clients_type& x)
     {
       this->clients_.set (x);
     }
 
-    void CoresModel::
+    void Cores::
     clients (::std::auto_ptr< clients_type > x)
     {
       this->clients_.set (x);
     }
 
-    const CoresModel::count_type& CoresModel::
+    const Cores::count_type& Cores::
     count () const
     {
       return this->count_.get ();
     }
 
-    CoresModel::count_type& CoresModel::
+    Cores::count_type& Cores::
     count ()
     {
       return this->count_.get ();
     }
 
-    void CoresModel::
+    void Cores::
     count (const count_type& x)
     {
       this->count_.set (x);
@@ -173,282 +173,282 @@ namespace Damaris
     }
 
 
-    // BufferModel
+    // Buffer
     // 
 
-    const BufferModel::name_type& BufferModel::
+    const Buffer::name_type& Buffer::
     name () const
     {
       return this->name_.get ();
     }
 
-    BufferModel::name_type& BufferModel::
+    Buffer::name_type& Buffer::
     name ()
     {
       return this->name_.get ();
     }
 
-    void BufferModel::
+    void Buffer::
     name (const name_type& x)
     {
       this->name_.set (x);
     }
 
-    void BufferModel::
+    void Buffer::
     name (::std::auto_ptr< name_type > x)
     {
       this->name_.set (x);
     }
 
-    const BufferModel::size_type& BufferModel::
+    const Buffer::size_type& Buffer::
     size () const
     {
       return this->size_.get ();
     }
 
-    BufferModel::size_type& BufferModel::
+    Buffer::size_type& Buffer::
     size ()
     {
       return this->size_.get ();
     }
 
-    void BufferModel::
+    void Buffer::
     size (const size_type& x)
     {
       this->size_.set (x);
     }
 
-    const BufferModel::type_type& BufferModel::
+    const Buffer::type_type& Buffer::
     type () const
     {
       return this->type_.get ();
     }
 
-    BufferModel::type_type& BufferModel::
+    Buffer::type_type& Buffer::
     type ()
     {
       return this->type_.get ();
     }
 
-    void BufferModel::
+    void Buffer::
     type (const type_type& x)
     {
       this->type_.set (x);
     }
 
-    void BufferModel::
+    void Buffer::
     type (::std::auto_ptr< type_type > x)
     {
       this->type_.set (x);
     }
 
-    const BufferModel::type_type& BufferModel::
+    const Buffer::type_type& Buffer::
     type_default_value ()
     {
       return type_default_value_;
     }
 
-    const BufferModel::blocks_type& BufferModel::
+    const Buffer::blocks_type& Buffer::
     blocks () const
     {
       return this->blocks_.get ();
     }
 
-    BufferModel::blocks_type& BufferModel::
+    Buffer::blocks_type& Buffer::
     blocks ()
     {
       return this->blocks_.get ();
     }
 
-    void BufferModel::
+    void Buffer::
     blocks (const blocks_type& x)
     {
       this->blocks_.set (x);
     }
 
-    BufferModel::blocks_type BufferModel::
+    Buffer::blocks_type Buffer::
     blocks_default_value ()
     {
       return blocks_type (0);
     }
 
 
-    // QueueModel
+    // Queue
     // 
 
-    const QueueModel::name_type& QueueModel::
+    const Queue::name_type& Queue::
     name () const
     {
       return this->name_.get ();
     }
 
-    QueueModel::name_type& QueueModel::
+    Queue::name_type& Queue::
     name ()
     {
       return this->name_.get ();
     }
 
-    void QueueModel::
+    void Queue::
     name (const name_type& x)
     {
       this->name_.set (x);
     }
 
-    void QueueModel::
+    void Queue::
     name (::std::auto_ptr< name_type > x)
     {
       this->name_.set (x);
     }
 
-    const QueueModel::size_type& QueueModel::
+    const Queue::size_type& Queue::
     size () const
     {
       return this->size_.get ();
     }
 
-    QueueModel::size_type& QueueModel::
+    Queue::size_type& Queue::
     size ()
     {
       return this->size_.get ();
     }
 
-    void QueueModel::
+    void Queue::
     size (const size_type& x)
     {
       this->size_.set (x);
     }
 
-    const QueueModel::type_type& QueueModel::
+    const Queue::type_type& Queue::
     type () const
     {
       return this->type_.get ();
     }
 
-    QueueModel::type_type& QueueModel::
+    Queue::type_type& Queue::
     type ()
     {
       return this->type_.get ();
     }
 
-    void QueueModel::
+    void Queue::
     type (const type_type& x)
     {
       this->type_.set (x);
     }
 
-    void QueueModel::
+    void Queue::
     type (::std::auto_ptr< type_type > x)
     {
       this->type_.set (x);
     }
 
-    const QueueModel::type_type& QueueModel::
+    const Queue::type_type& Queue::
     type_default_value ()
     {
       return type_default_value_;
     }
 
 
-    // ArchitectureModel
+    // Architecture
     // 
 
-    const ArchitectureModel::cores_type& ArchitectureModel::
+    const Architecture::cores_type& Architecture::
     cores () const
     {
       return this->cores_.get ();
     }
 
-    ArchitectureModel::cores_type& ArchitectureModel::
+    Architecture::cores_type& Architecture::
     cores ()
     {
       return this->cores_.get ();
     }
 
-    void ArchitectureModel::
+    void Architecture::
     cores (const cores_type& x)
     {
       this->cores_.set (x);
     }
 
-    void ArchitectureModel::
+    void Architecture::
     cores (::std::auto_ptr< cores_type > x)
     {
       this->cores_.set (x);
     }
 
-    const ArchitectureModel::buffer_type& ArchitectureModel::
+    const Architecture::buffer_type& Architecture::
     buffer () const
     {
       return this->buffer_.get ();
     }
 
-    ArchitectureModel::buffer_type& ArchitectureModel::
+    Architecture::buffer_type& Architecture::
     buffer ()
     {
       return this->buffer_.get ();
     }
 
-    void ArchitectureModel::
+    void Architecture::
     buffer (const buffer_type& x)
     {
       this->buffer_.set (x);
     }
 
-    void ArchitectureModel::
+    void Architecture::
     buffer (::std::auto_ptr< buffer_type > x)
     {
       this->buffer_.set (x);
     }
 
-    const ArchitectureModel::queue_type& ArchitectureModel::
+    const Architecture::queue_type& Architecture::
     queue () const
     {
       return this->queue_.get ();
     }
 
-    ArchitectureModel::queue_type& ArchitectureModel::
+    Architecture::queue_type& Architecture::
     queue ()
     {
       return this->queue_.get ();
     }
 
-    void ArchitectureModel::
+    void Architecture::
     queue (const queue_type& x)
     {
       this->queue_.set (x);
     }
 
-    void ArchitectureModel::
+    void Architecture::
     queue (::std::auto_ptr< queue_type > x)
     {
       this->queue_.set (x);
     }
 
-    const ArchitectureModel::name_optional& ArchitectureModel::
+    const Architecture::name_optional& Architecture::
     name () const
     {
       return this->name_;
     }
 
-    ArchitectureModel::name_optional& ArchitectureModel::
+    Architecture::name_optional& Architecture::
     name ()
     {
       return this->name_;
     }
 
-    void ArchitectureModel::
+    void Architecture::
     name (const name_type& x)
     {
       this->name_.set (x);
     }
 
-    void ArchitectureModel::
+    void Architecture::
     name (const name_optional& x)
     {
       this->name_ = x;
     }
 
-    void ArchitectureModel::
+    void Architecture::
     name (::std::auto_ptr< name_type > x)
     {
       this->name_.set (x);
@@ -500,930 +500,930 @@ namespace Damaris
     }
 
 
-    // TypeModel
+    // Type
     // 
 
-    TypeModel::
-    TypeModel (value v)
-    : ::xml_schema::string (_xsd_TypeModel_literals_[v])
+    Type::
+    Type (value v)
+    : ::xml_schema::string (_xsd_Type_literals_[v])
     {
     }
 
-    TypeModel::
-    TypeModel (const char* v)
+    Type::
+    Type (const char* v)
     : ::xml_schema::string (v)
     {
     }
 
-    TypeModel::
-    TypeModel (const ::std::string& v)
+    Type::
+    Type (const ::std::string& v)
     : ::xml_schema::string (v)
     {
     }
 
-    TypeModel::
-    TypeModel (const ::xml_schema::string& v)
+    Type::
+    Type (const ::xml_schema::string& v)
     : ::xml_schema::string (v)
     {
     }
 
-    TypeModel::
-    TypeModel (const TypeModel& v,
-               ::xml_schema::flags f,
-               ::xml_schema::container* c)
+    Type::
+    Type (const Type& v,
+          ::xml_schema::flags f,
+          ::xml_schema::container* c)
     : ::xml_schema::string (v, f, c)
     {
     }
 
-    TypeModel& TypeModel::
+    Type& Type::
     operator= (value v)
     {
       static_cast< ::xml_schema::string& > (*this) = 
-      ::xml_schema::string (_xsd_TypeModel_literals_[v]);
+      ::xml_schema::string (_xsd_Type_literals_[v]);
 
       return *this;
     }
 
 
-    // LayoutModel
+    // Layout
     // 
 
-    const LayoutModel::name_type& LayoutModel::
+    const Layout::name_type& Layout::
     name () const
     {
       return this->name_.get ();
     }
 
-    LayoutModel::name_type& LayoutModel::
+    Layout::name_type& Layout::
     name ()
     {
       return this->name_.get ();
     }
 
-    void LayoutModel::
+    void Layout::
     name (const name_type& x)
     {
       this->name_.set (x);
     }
 
-    void LayoutModel::
+    void Layout::
     name (::std::auto_ptr< name_type > x)
     {
       this->name_.set (x);
     }
 
-    const LayoutModel::type_type& LayoutModel::
+    const Layout::type_type& Layout::
     type () const
     {
       return this->type_.get ();
     }
 
-    LayoutModel::type_type& LayoutModel::
+    Layout::type_type& Layout::
     type ()
     {
       return this->type_.get ();
     }
 
-    void LayoutModel::
+    void Layout::
     type (const type_type& x)
     {
       this->type_.set (x);
     }
 
-    void LayoutModel::
+    void Layout::
     type (::std::auto_ptr< type_type > x)
     {
       this->type_.set (x);
     }
 
-    const LayoutModel::dimensions_type& LayoutModel::
+    const Layout::dimensions_type& Layout::
     dimensions () const
     {
       return this->dimensions_.get ();
     }
 
-    LayoutModel::dimensions_type& LayoutModel::
+    Layout::dimensions_type& Layout::
     dimensions ()
     {
       return this->dimensions_.get ();
     }
 
-    void LayoutModel::
+    void Layout::
     dimensions (const dimensions_type& x)
     {
       this->dimensions_.set (x);
     }
 
-    void LayoutModel::
+    void Layout::
     dimensions (::std::auto_ptr< dimensions_type > x)
     {
       this->dimensions_.set (x);
     }
 
-    const LayoutModel::language_type& LayoutModel::
+    const Layout::language_type& Layout::
     language () const
     {
       return this->language_.get ();
     }
 
-    LayoutModel::language_type& LayoutModel::
+    Layout::language_type& Layout::
     language ()
     {
       return this->language_.get ();
     }
 
-    void LayoutModel::
+    void Layout::
     language (const language_type& x)
     {
       this->language_.set (x);
     }
 
-    void LayoutModel::
+    void Layout::
     language (::std::auto_ptr< language_type > x)
     {
       this->language_.set (x);
     }
 
-    const LayoutModel::language_type& LayoutModel::
+    const Layout::language_type& Layout::
     language_default_value ()
     {
       return language_default_value_;
     }
 
 
-    // VariableModel
+    // Variable
     // 
 
-    const VariableModel::name_type& VariableModel::
+    const Variable::name_type& Variable::
     name () const
     {
       return this->name_.get ();
     }
 
-    VariableModel::name_type& VariableModel::
+    Variable::name_type& Variable::
     name ()
     {
       return this->name_.get ();
     }
 
-    void VariableModel::
+    void Variable::
     name (const name_type& x)
     {
       this->name_.set (x);
     }
 
-    void VariableModel::
+    void Variable::
     name (::std::auto_ptr< name_type > x)
     {
       this->name_.set (x);
     }
 
-    const VariableModel::unit_type& VariableModel::
+    const Variable::unit_type& Variable::
     unit () const
     {
       return this->unit_.get ();
     }
 
-    VariableModel::unit_type& VariableModel::
+    Variable::unit_type& Variable::
     unit ()
     {
       return this->unit_.get ();
     }
 
-    void VariableModel::
+    void Variable::
     unit (const unit_type& x)
     {
       this->unit_.set (x);
     }
 
-    void VariableModel::
+    void Variable::
     unit (::std::auto_ptr< unit_type > x)
     {
       this->unit_.set (x);
     }
 
-    const VariableModel::unit_type& VariableModel::
+    const Variable::unit_type& Variable::
     unit_default_value ()
     {
       return unit_default_value_;
     }
 
-    const VariableModel::layout_type& VariableModel::
+    const Variable::layout_type& Variable::
     layout () const
     {
       return this->layout_.get ();
     }
 
-    VariableModel::layout_type& VariableModel::
+    Variable::layout_type& Variable::
     layout ()
     {
       return this->layout_.get ();
     }
 
-    void VariableModel::
+    void Variable::
     layout (const layout_type& x)
     {
       this->layout_.set (x);
     }
 
-    void VariableModel::
+    void Variable::
     layout (::std::auto_ptr< layout_type > x)
     {
       this->layout_.set (x);
     }
 
-    const VariableModel::enabled_optional& VariableModel::
+    const Variable::enabled_optional& Variable::
     enabled () const
     {
       return this->enabled_;
     }
 
-    VariableModel::enabled_optional& VariableModel::
+    Variable::enabled_optional& Variable::
     enabled ()
     {
       return this->enabled_;
     }
 
-    void VariableModel::
+    void Variable::
     enabled (const enabled_type& x)
     {
       this->enabled_.set (x);
     }
 
-    void VariableModel::
+    void Variable::
     enabled (const enabled_optional& x)
     {
       this->enabled_ = x;
     }
 
 
-    // GroupModel
+    // Group
     // 
 
-    const GroupModel::variable_sequence& GroupModel::
+    const Group::variable_sequence& Group::
     variable () const
     {
       return this->variable_;
     }
 
-    GroupModel::variable_sequence& GroupModel::
+    Group::variable_sequence& Group::
     variable ()
     {
       return this->variable_;
     }
 
-    void GroupModel::
+    void Group::
     variable (const variable_sequence& s)
     {
       this->variable_ = s;
     }
 
-    const GroupModel::group_sequence& GroupModel::
+    const Group::group_sequence& Group::
     group () const
     {
       return this->group_;
     }
 
-    GroupModel::group_sequence& GroupModel::
+    Group::group_sequence& Group::
     group ()
     {
       return this->group_;
     }
 
-    void GroupModel::
+    void Group::
     group (const group_sequence& s)
     {
       this->group_ = s;
     }
 
-    const GroupModel::name_type& GroupModel::
+    const Group::name_type& Group::
     name () const
     {
       return this->name_.get ();
     }
 
-    GroupModel::name_type& GroupModel::
+    Group::name_type& Group::
     name ()
     {
       return this->name_.get ();
     }
 
-    void GroupModel::
+    void Group::
     name (const name_type& x)
     {
       this->name_.set (x);
     }
 
-    void GroupModel::
+    void Group::
     name (::std::auto_ptr< name_type > x)
     {
       this->name_.set (x);
     }
 
-    const GroupModel::enabled_type& GroupModel::
+    const Group::enabled_type& Group::
     enabled () const
     {
       return this->enabled_.get ();
     }
 
-    GroupModel::enabled_type& GroupModel::
+    Group::enabled_type& Group::
     enabled ()
     {
       return this->enabled_.get ();
     }
 
-    void GroupModel::
+    void Group::
     enabled (const enabled_type& x)
     {
       this->enabled_.set (x);
     }
 
-    GroupModel::enabled_type GroupModel::
+    Group::enabled_type Group::
     enabled_default_value ()
     {
       return enabled_type (true);
     }
 
 
-    // ParameterModel
+    // Parameter
     // 
 
-    const ParameterModel::name_type& ParameterModel::
+    const Parameter::name_type& Parameter::
     name () const
     {
       return this->name_.get ();
     }
 
-    ParameterModel::name_type& ParameterModel::
+    Parameter::name_type& Parameter::
     name ()
     {
       return this->name_.get ();
     }
 
-    void ParameterModel::
+    void Parameter::
     name (const name_type& x)
     {
       this->name_.set (x);
     }
 
-    void ParameterModel::
+    void Parameter::
     name (::std::auto_ptr< name_type > x)
     {
       this->name_.set (x);
     }
 
-    const ParameterModel::type_type& ParameterModel::
+    const Parameter::type_type& Parameter::
     type () const
     {
       return this->type_.get ();
     }
 
-    ParameterModel::type_type& ParameterModel::
+    Parameter::type_type& Parameter::
     type ()
     {
       return this->type_.get ();
     }
 
-    void ParameterModel::
+    void Parameter::
     type (const type_type& x)
     {
       this->type_.set (x);
     }
 
-    void ParameterModel::
+    void Parameter::
     type (::std::auto_ptr< type_type > x)
     {
       this->type_.set (x);
     }
 
-    const ParameterModel::value_type& ParameterModel::
+    const Parameter::value_type& Parameter::
     value () const
     {
       return this->value_.get ();
     }
 
-    ParameterModel::value_type& ParameterModel::
+    Parameter::value_type& Parameter::
     value ()
     {
       return this->value_.get ();
     }
 
-    void ParameterModel::
+    void Parameter::
     value (const value_type& x)
     {
       this->value_.set (x);
     }
 
-    void ParameterModel::
+    void Parameter::
     value (::std::auto_ptr< value_type > x)
     {
       this->value_.set (x);
     }
 
 
-    // DataModel
+    // Data
     // 
 
-    const DataModel::parameter_sequence& DataModel::
+    const Data::parameter_sequence& Data::
     parameter () const
     {
       return this->parameter_;
     }
 
-    DataModel::parameter_sequence& DataModel::
+    Data::parameter_sequence& Data::
     parameter ()
     {
       return this->parameter_;
     }
 
-    void DataModel::
+    void Data::
     parameter (const parameter_sequence& s)
     {
       this->parameter_ = s;
     }
 
-    const DataModel::layout_sequence& DataModel::
+    const Data::layout_sequence& Data::
     layout () const
     {
       return this->layout_;
     }
 
-    DataModel::layout_sequence& DataModel::
+    Data::layout_sequence& Data::
     layout ()
     {
       return this->layout_;
     }
 
-    void DataModel::
+    void Data::
     layout (const layout_sequence& s)
     {
       this->layout_ = s;
     }
 
-    const DataModel::variable_sequence& DataModel::
+    const Data::variable_sequence& Data::
     variable () const
     {
       return this->variable_;
     }
 
-    DataModel::variable_sequence& DataModel::
+    Data::variable_sequence& Data::
     variable ()
     {
       return this->variable_;
     }
 
-    void DataModel::
+    void Data::
     variable (const variable_sequence& s)
     {
       this->variable_ = s;
     }
 
-    const DataModel::group_sequence& DataModel::
+    const Data::group_sequence& Data::
     group () const
     {
       return this->group_;
     }
 
-    DataModel::group_sequence& DataModel::
+    Data::group_sequence& Data::
     group ()
     {
       return this->group_;
     }
 
-    void DataModel::
+    void Data::
     group (const group_sequence& s)
     {
       this->group_ = s;
     }
 
 
-    // ScopeModel
+    // Scope
     // 
 
-    ScopeModel::
-    ScopeModel (value v)
-    : ::xml_schema::string (_xsd_ScopeModel_literals_[v])
+    Scope::
+    Scope (value v)
+    : ::xml_schema::string (_xsd_Scope_literals_[v])
     {
     }
 
-    ScopeModel::
-    ScopeModel (const char* v)
+    Scope::
+    Scope (const char* v)
     : ::xml_schema::string (v)
     {
     }
 
-    ScopeModel::
-    ScopeModel (const ::std::string& v)
+    Scope::
+    Scope (const ::std::string& v)
     : ::xml_schema::string (v)
     {
     }
 
-    ScopeModel::
-    ScopeModel (const ::xml_schema::string& v)
+    Scope::
+    Scope (const ::xml_schema::string& v)
     : ::xml_schema::string (v)
     {
     }
 
-    ScopeModel::
-    ScopeModel (const ScopeModel& v,
-                ::xml_schema::flags f,
-                ::xml_schema::container* c)
+    Scope::
+    Scope (const Scope& v,
+           ::xml_schema::flags f,
+           ::xml_schema::container* c)
     : ::xml_schema::string (v, f, c)
     {
     }
 
-    ScopeModel& ScopeModel::
+    Scope& Scope::
     operator= (value v)
     {
       static_cast< ::xml_schema::string& > (*this) = 
-      ::xml_schema::string (_xsd_ScopeModel_literals_[v]);
+      ::xml_schema::string (_xsd_Scope_literals_[v]);
 
       return *this;
     }
 
 
-    // EventModel
+    // Event
     // 
 
-    const EventModel::name_type& EventModel::
+    const Event::name_type& Event::
     name () const
     {
       return this->name_.get ();
     }
 
-    EventModel::name_type& EventModel::
+    Event::name_type& Event::
     name ()
     {
       return this->name_.get ();
     }
 
-    void EventModel::
+    void Event::
     name (const name_type& x)
     {
       this->name_.set (x);
     }
 
-    void EventModel::
+    void Event::
     name (::std::auto_ptr< name_type > x)
     {
       this->name_.set (x);
     }
 
-    const EventModel::action_type& EventModel::
+    const Event::action_type& Event::
     action () const
     {
       return this->action_.get ();
     }
 
-    EventModel::action_type& EventModel::
+    Event::action_type& Event::
     action ()
     {
       return this->action_.get ();
     }
 
-    void EventModel::
+    void Event::
     action (const action_type& x)
     {
       this->action_.set (x);
     }
 
-    void EventModel::
+    void Event::
     action (::std::auto_ptr< action_type > x)
     {
       this->action_.set (x);
     }
 
-    const EventModel::library_type& EventModel::
+    const Event::library_type& Event::
     library () const
     {
       return this->library_.get ();
     }
 
-    EventModel::library_type& EventModel::
+    Event::library_type& Event::
     library ()
     {
       return this->library_.get ();
     }
 
-    void EventModel::
+    void Event::
     library (const library_type& x)
     {
       this->library_.set (x);
     }
 
-    void EventModel::
+    void Event::
     library (::std::auto_ptr< library_type > x)
     {
       this->library_.set (x);
     }
 
-    const EventModel::library_type& EventModel::
+    const Event::library_type& Event::
     library_default_value ()
     {
       return library_default_value_;
     }
 
-    const EventModel::scope_type& EventModel::
+    const Event::scope_type& Event::
     scope () const
     {
       return this->scope_.get ();
     }
 
-    EventModel::scope_type& EventModel::
+    Event::scope_type& Event::
     scope ()
     {
       return this->scope_.get ();
     }
 
-    void EventModel::
+    void Event::
     scope (const scope_type& x)
     {
       this->scope_.set (x);
     }
 
-    void EventModel::
+    void Event::
     scope (::std::auto_ptr< scope_type > x)
     {
       this->scope_.set (x);
     }
 
-    const EventModel::scope_type& EventModel::
+    const Event::scope_type& Event::
     scope_default_value ()
     {
       return scope_default_value_;
     }
 
 
-    // ScriptModel
+    // Script
     // 
 
-    const ScriptModel::name_type& ScriptModel::
+    const Script::name_type& Script::
     name () const
     {
       return this->name_.get ();
     }
 
-    ScriptModel::name_type& ScriptModel::
+    Script::name_type& Script::
     name ()
     {
       return this->name_.get ();
     }
 
-    void ScriptModel::
+    void Script::
     name (const name_type& x)
     {
       this->name_.set (x);
     }
 
-    void ScriptModel::
+    void Script::
     name (::std::auto_ptr< name_type > x)
     {
       this->name_.set (x);
     }
 
-    const ScriptModel::file_type& ScriptModel::
+    const Script::file_type& Script::
     file () const
     {
       return this->file_.get ();
     }
 
-    ScriptModel::file_type& ScriptModel::
+    Script::file_type& Script::
     file ()
     {
       return this->file_.get ();
     }
 
-    void ScriptModel::
+    void Script::
     file (const file_type& x)
     {
       this->file_.set (x);
     }
 
-    void ScriptModel::
+    void Script::
     file (::std::auto_ptr< file_type > x)
     {
       this->file_.set (x);
     }
 
-    const ScriptModel::language_type& ScriptModel::
+    const Script::language_type& Script::
     language () const
     {
       return this->language_.get ();
     }
 
-    ScriptModel::language_type& ScriptModel::
+    Script::language_type& Script::
     language ()
     {
       return this->language_.get ();
     }
 
-    void ScriptModel::
+    void Script::
     language (const language_type& x)
     {
       this->language_.set (x);
     }
 
-    void ScriptModel::
+    void Script::
     language (::std::auto_ptr< language_type > x)
     {
       this->language_.set (x);
     }
 
-    const ScriptModel::scope_type& ScriptModel::
+    const Script::scope_type& Script::
     scope () const
     {
       return this->scope_.get ();
     }
 
-    ScriptModel::scope_type& ScriptModel::
+    Script::scope_type& Script::
     scope ()
     {
       return this->scope_.get ();
     }
 
-    void ScriptModel::
+    void Script::
     scope (const scope_type& x)
     {
       this->scope_.set (x);
     }
 
-    void ScriptModel::
+    void Script::
     scope (::std::auto_ptr< scope_type > x)
     {
       this->scope_.set (x);
     }
 
-    const ScriptModel::scope_type& ScriptModel::
+    const Script::scope_type& Script::
     scope_default_value ()
     {
       return scope_default_value_;
     }
 
 
-    // ActionsModel
+    // Actions
     // 
 
-    const ActionsModel::event_sequence& ActionsModel::
+    const Actions::event_sequence& Actions::
     event () const
     {
       return this->event_;
     }
 
-    ActionsModel::event_sequence& ActionsModel::
+    Actions::event_sequence& Actions::
     event ()
     {
       return this->event_;
     }
 
-    void ActionsModel::
+    void Actions::
     event (const event_sequence& s)
     {
       this->event_ = s;
     }
 
-    const ActionsModel::script_sequence& ActionsModel::
+    const Actions::script_sequence& Actions::
     script () const
     {
       return this->script_;
     }
 
-    ActionsModel::script_sequence& ActionsModel::
+    Actions::script_sequence& Actions::
     script ()
     {
       return this->script_;
     }
 
-    void ActionsModel::
+    void Actions::
     script (const script_sequence& s)
     {
       this->script_ = s;
     }
 
 
-    // SimulationModel
+    // Simulation
     // 
 
-    const SimulationModel::architecture_type& SimulationModel::
+    const Simulation::architecture_type& Simulation::
     architecture () const
     {
       return this->architecture_.get ();
     }
 
-    SimulationModel::architecture_type& SimulationModel::
+    Simulation::architecture_type& Simulation::
     architecture ()
     {
       return this->architecture_.get ();
     }
 
-    void SimulationModel::
+    void Simulation::
     architecture (const architecture_type& x)
     {
       this->architecture_.set (x);
     }
 
-    void SimulationModel::
+    void Simulation::
     architecture (::std::auto_ptr< architecture_type > x)
     {
       this->architecture_.set (x);
     }
 
-    const SimulationModel::data_type& SimulationModel::
+    const Simulation::data_type& Simulation::
     data () const
     {
       return this->data_.get ();
     }
 
-    SimulationModel::data_type& SimulationModel::
+    Simulation::data_type& Simulation::
     data ()
     {
       return this->data_.get ();
     }
 
-    void SimulationModel::
+    void Simulation::
     data (const data_type& x)
     {
       this->data_.set (x);
     }
 
-    void SimulationModel::
+    void Simulation::
     data (::std::auto_ptr< data_type > x)
     {
       this->data_.set (x);
     }
 
-    const SimulationModel::actions_type& SimulationModel::
+    const Simulation::actions_type& Simulation::
     actions () const
     {
       return this->actions_.get ();
     }
 
-    SimulationModel::actions_type& SimulationModel::
+    Simulation::actions_type& Simulation::
     actions ()
     {
       return this->actions_.get ();
     }
 
-    void SimulationModel::
+    void Simulation::
     actions (const actions_type& x)
     {
       this->actions_.set (x);
     }
 
-    void SimulationModel::
+    void Simulation::
     actions (::std::auto_ptr< actions_type > x)
     {
       this->actions_.set (x);
     }
 
-    const SimulationModel::name_type& SimulationModel::
+    const Simulation::name_type& Simulation::
     name () const
     {
       return this->name_.get ();
     }
 
-    SimulationModel::name_type& SimulationModel::
+    Simulation::name_type& Simulation::
     name ()
     {
       return this->name_.get ();
     }
 
-    void SimulationModel::
+    void Simulation::
     name (const name_type& x)
     {
       this->name_.set (x);
     }
 
-    void SimulationModel::
+    void Simulation::
     name (::std::auto_ptr< name_type > x)
     {
       this->name_.set (x);
     }
 
-    const SimulationModel::language_type& SimulationModel::
+    const Simulation::language_type& Simulation::
     language () const
     {
       return this->language_.get ();
     }
 
-    SimulationModel::language_type& SimulationModel::
+    Simulation::language_type& Simulation::
     language ()
     {
       return this->language_.get ();
     }
 
-    void SimulationModel::
+    void Simulation::
     language (const language_type& x)
     {
       this->language_.set (x);
     }
 
-    void SimulationModel::
+    void Simulation::
     language (::std::auto_ptr< language_type > x)
     {
       this->language_.set (x);
     }
 
-    const SimulationModel::language_type& SimulationModel::
+    const Simulation::language_type& Simulation::
     language_default_value ()
     {
       return language_default_value_;
@@ -1437,29 +1437,29 @@ namespace Damaris
 {
   namespace Model
   {
-    // ClientsModel
+    // Clients
     //
 
-    ClientsModel::
-    ClientsModel (const count_type& count)
+    Clients::
+    Clients (const count_type& count)
     : ::xml_schema::type (),
       count_ (count, ::xml_schema::flags (), this)
     {
     }
 
-    ClientsModel::
-    ClientsModel (const ClientsModel& x,
-                  ::xml_schema::flags f,
-                  ::xml_schema::container* c)
+    Clients::
+    Clients (const Clients& x,
+             ::xml_schema::flags f,
+             ::xml_schema::container* c)
     : ::xml_schema::type (x, f, c),
       count_ (x.count_, f, this)
     {
     }
 
-    ClientsModel::
-    ClientsModel (const ::xercesc::DOMElement& e,
-                  ::xml_schema::flags f,
-                  ::xml_schema::container* c)
+    Clients::
+    Clients (const ::xercesc::DOMElement& e,
+             ::xml_schema::flags f,
+             ::xml_schema::container* c)
     : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
       count_ (f, this)
     {
@@ -1470,7 +1470,7 @@ namespace Damaris
       }
     }
 
-    void ClientsModel::
+    void Clients::
     parse (::xsd::cxx::xml::dom::parser< char >& p,
            ::xml_schema::flags f)
     {
@@ -1495,53 +1495,53 @@ namespace Damaris
       }
     }
 
-    ClientsModel* ClientsModel::
+    Clients* Clients::
     _clone (::xml_schema::flags f,
             ::xml_schema::container* c) const
     {
-      return new class ClientsModel (*this, f, c);
+      return new class Clients (*this, f, c);
     }
 
-    ClientsModel::
-    ~ClientsModel ()
+    Clients::
+    ~Clients ()
     {
     }
 
-    // CoresModel
+    // Cores
     //
 
-    CoresModel::
-    CoresModel (const clients_type& clients,
-                const count_type& count)
+    Cores::
+    Cores (const clients_type& clients,
+           const count_type& count)
     : ::xml_schema::type (),
       clients_ (clients, ::xml_schema::flags (), this),
       count_ (count, ::xml_schema::flags (), this)
     {
     }
 
-    CoresModel::
-    CoresModel (::std::auto_ptr< clients_type >& clients,
-                const count_type& count)
+    Cores::
+    Cores (::std::auto_ptr< clients_type >& clients,
+           const count_type& count)
     : ::xml_schema::type (),
       clients_ (clients, ::xml_schema::flags (), this),
       count_ (count, ::xml_schema::flags (), this)
     {
     }
 
-    CoresModel::
-    CoresModel (const CoresModel& x,
-                ::xml_schema::flags f,
-                ::xml_schema::container* c)
+    Cores::
+    Cores (const Cores& x,
+           ::xml_schema::flags f,
+           ::xml_schema::container* c)
     : ::xml_schema::type (x, f, c),
       clients_ (x.clients_, f, this),
       count_ (x.count_, f, this)
     {
     }
 
-    CoresModel::
-    CoresModel (const ::xercesc::DOMElement& e,
-                ::xml_schema::flags f,
-                ::xml_schema::container* c)
+    Cores::
+    Cores (const ::xercesc::DOMElement& e,
+           ::xml_schema::flags f,
+           ::xml_schema::container* c)
     : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
       clients_ (f, this),
       count_ (f, this)
@@ -1553,7 +1553,7 @@ namespace Damaris
       }
     }
 
-    void CoresModel::
+    void Cores::
     parse (::xsd::cxx::xml::dom::parser< char >& p,
            ::xml_schema::flags f)
     {
@@ -1608,15 +1608,15 @@ namespace Damaris
       }
     }
 
-    CoresModel* CoresModel::
+    Cores* Cores::
     _clone (::xml_schema::flags f,
             ::xml_schema::container* c) const
     {
-      return new class CoresModel (*this, f, c);
+      return new class Cores (*this, f, c);
     }
 
-    CoresModel::
-    ~CoresModel ()
+    Cores::
+    ~Cores ()
     {
     }
 
@@ -1690,15 +1690,15 @@ namespace Damaris
       ::Damaris::Model::ShmType::sysv
     };
 
-    // BufferModel
+    // Buffer
     //
 
-    const BufferModel::type_type BufferModel::type_default_value_ (
+    const Buffer::type_type Buffer::type_default_value_ (
       "posix");
 
-    BufferModel::
-    BufferModel (const name_type& name,
-                 const size_type& size)
+    Buffer::
+    Buffer (const name_type& name,
+            const size_type& size)
     : ::xml_schema::type (),
       name_ (name, ::xml_schema::flags (), this),
       size_ (size, ::xml_schema::flags (), this),
@@ -1707,10 +1707,10 @@ namespace Damaris
     {
     }
 
-    BufferModel::
-    BufferModel (const BufferModel& x,
-                 ::xml_schema::flags f,
-                 ::xml_schema::container* c)
+    Buffer::
+    Buffer (const Buffer& x,
+            ::xml_schema::flags f,
+            ::xml_schema::container* c)
     : ::xml_schema::type (x, f, c),
       name_ (x.name_, f, this),
       size_ (x.size_, f, this),
@@ -1719,10 +1719,10 @@ namespace Damaris
     {
     }
 
-    BufferModel::
-    BufferModel (const ::xercesc::DOMElement& e,
-                 ::xml_schema::flags f,
-                 ::xml_schema::container* c)
+    Buffer::
+    Buffer (const ::xercesc::DOMElement& e,
+            ::xml_schema::flags f,
+            ::xml_schema::container* c)
     : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
       name_ (f, this),
       size_ (f, this),
@@ -1736,7 +1736,7 @@ namespace Damaris
       }
     }
 
-    void BufferModel::
+    void Buffer::
     parse (::xsd::cxx::xml::dom::parser< char >& p,
            ::xml_schema::flags f)
     {
@@ -1802,27 +1802,27 @@ namespace Damaris
       }
     }
 
-    BufferModel* BufferModel::
+    Buffer* Buffer::
     _clone (::xml_schema::flags f,
             ::xml_schema::container* c) const
     {
-      return new class BufferModel (*this, f, c);
+      return new class Buffer (*this, f, c);
     }
 
-    BufferModel::
-    ~BufferModel ()
+    Buffer::
+    ~Buffer ()
     {
     }
 
-    // QueueModel
+    // Queue
     //
 
-    const QueueModel::type_type QueueModel::type_default_value_ (
+    const Queue::type_type Queue::type_default_value_ (
       "posix");
 
-    QueueModel::
-    QueueModel (const name_type& name,
-                const size_type& size)
+    Queue::
+    Queue (const name_type& name,
+           const size_type& size)
     : ::xml_schema::type (),
       name_ (name, ::xml_schema::flags (), this),
       size_ (size, ::xml_schema::flags (), this),
@@ -1830,10 +1830,10 @@ namespace Damaris
     {
     }
 
-    QueueModel::
-    QueueModel (const QueueModel& x,
-                ::xml_schema::flags f,
-                ::xml_schema::container* c)
+    Queue::
+    Queue (const Queue& x,
+           ::xml_schema::flags f,
+           ::xml_schema::container* c)
     : ::xml_schema::type (x, f, c),
       name_ (x.name_, f, this),
       size_ (x.size_, f, this),
@@ -1841,10 +1841,10 @@ namespace Damaris
     {
     }
 
-    QueueModel::
-    QueueModel (const ::xercesc::DOMElement& e,
-                ::xml_schema::flags f,
-                ::xml_schema::container* c)
+    Queue::
+    Queue (const ::xercesc::DOMElement& e,
+           ::xml_schema::flags f,
+           ::xml_schema::container* c)
     : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
       name_ (f, this),
       size_ (f, this),
@@ -1857,7 +1857,7 @@ namespace Damaris
       }
     }
 
-    void QueueModel::
+    void Queue::
     parse (::xsd::cxx::xml::dom::parser< char >& p,
            ::xml_schema::flags f)
     {
@@ -1912,25 +1912,25 @@ namespace Damaris
       }
     }
 
-    QueueModel* QueueModel::
+    Queue* Queue::
     _clone (::xml_schema::flags f,
             ::xml_schema::container* c) const
     {
-      return new class QueueModel (*this, f, c);
+      return new class Queue (*this, f, c);
     }
 
-    QueueModel::
-    ~QueueModel ()
+    Queue::
+    ~Queue ()
     {
     }
 
-    // ArchitectureModel
+    // Architecture
     //
 
-    ArchitectureModel::
-    ArchitectureModel (const cores_type& cores,
-                       const buffer_type& buffer,
-                       const queue_type& queue)
+    Architecture::
+    Architecture (const cores_type& cores,
+                  const buffer_type& buffer,
+                  const queue_type& queue)
     : ::xml_schema::type (),
       cores_ (cores, ::xml_schema::flags (), this),
       buffer_ (buffer, ::xml_schema::flags (), this),
@@ -1939,10 +1939,10 @@ namespace Damaris
     {
     }
 
-    ArchitectureModel::
-    ArchitectureModel (::std::auto_ptr< cores_type >& cores,
-                       ::std::auto_ptr< buffer_type >& buffer,
-                       ::std::auto_ptr< queue_type >& queue)
+    Architecture::
+    Architecture (::std::auto_ptr< cores_type >& cores,
+                  ::std::auto_ptr< buffer_type >& buffer,
+                  ::std::auto_ptr< queue_type >& queue)
     : ::xml_schema::type (),
       cores_ (cores, ::xml_schema::flags (), this),
       buffer_ (buffer, ::xml_schema::flags (), this),
@@ -1951,10 +1951,10 @@ namespace Damaris
     {
     }
 
-    ArchitectureModel::
-    ArchitectureModel (const ArchitectureModel& x,
-                       ::xml_schema::flags f,
-                       ::xml_schema::container* c)
+    Architecture::
+    Architecture (const Architecture& x,
+                  ::xml_schema::flags f,
+                  ::xml_schema::container* c)
     : ::xml_schema::type (x, f, c),
       cores_ (x.cores_, f, this),
       buffer_ (x.buffer_, f, this),
@@ -1963,10 +1963,10 @@ namespace Damaris
     {
     }
 
-    ArchitectureModel::
-    ArchitectureModel (const ::xercesc::DOMElement& e,
-                       ::xml_schema::flags f,
-                       ::xml_schema::container* c)
+    Architecture::
+    Architecture (const ::xercesc::DOMElement& e,
+                  ::xml_schema::flags f,
+                  ::xml_schema::container* c)
     : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
       cores_ (f, this),
       buffer_ (f, this),
@@ -1980,7 +1980,7 @@ namespace Damaris
       }
     }
 
-    void ArchitectureModel::
+    void Architecture::
     parse (::xsd::cxx::xml::dom::parser< char >& p,
            ::xml_schema::flags f)
     {
@@ -2073,15 +2073,15 @@ namespace Damaris
       }
     }
 
-    ArchitectureModel* ArchitectureModel::
+    Architecture* Architecture::
     _clone (::xml_schema::flags f,
             ::xml_schema::container* c) const
     {
-      return new class ArchitectureModel (*this, f, c);
+      return new class Architecture (*this, f, c);
     }
 
-    ArchitectureModel::
-    ~ArchitectureModel ()
+    Architecture::
+    ~Architecture ()
     {
     }
 
@@ -2161,55 +2161,55 @@ namespace Damaris
       ::Damaris::Model::Language::unknown
     };
 
-    // TypeModel
+    // Type
     //
 
-    TypeModel::
-    TypeModel (const ::xercesc::DOMElement& e,
-               ::xml_schema::flags f,
-               ::xml_schema::container* c)
+    Type::
+    Type (const ::xercesc::DOMElement& e,
+          ::xml_schema::flags f,
+          ::xml_schema::container* c)
     : ::xml_schema::string (e, f, c)
     {
-      _xsd_TypeModel_convert ();
+      _xsd_Type_convert ();
     }
 
-    TypeModel::
-    TypeModel (const ::xercesc::DOMAttr& a,
-               ::xml_schema::flags f,
-               ::xml_schema::container* c)
+    Type::
+    Type (const ::xercesc::DOMAttr& a,
+          ::xml_schema::flags f,
+          ::xml_schema::container* c)
     : ::xml_schema::string (a, f, c)
     {
-      _xsd_TypeModel_convert ();
+      _xsd_Type_convert ();
     }
 
-    TypeModel::
-    TypeModel (const ::std::string& s,
-               const ::xercesc::DOMElement* e,
-               ::xml_schema::flags f,
-               ::xml_schema::container* c)
+    Type::
+    Type (const ::std::string& s,
+          const ::xercesc::DOMElement* e,
+          ::xml_schema::flags f,
+          ::xml_schema::container* c)
     : ::xml_schema::string (s, e, f, c)
     {
-      _xsd_TypeModel_convert ();
+      _xsd_Type_convert ();
     }
 
-    TypeModel* TypeModel::
+    Type* Type::
     _clone (::xml_schema::flags f,
             ::xml_schema::container* c) const
     {
-      return new class TypeModel (*this, f, c);
+      return new class Type (*this, f, c);
     }
 
-    TypeModel::value TypeModel::
-    _xsd_TypeModel_convert () const
+    Type::value Type::
+    _xsd_Type_convert () const
     {
-      ::xsd::cxx::tree::enum_comparator< char > c (_xsd_TypeModel_literals_);
+      ::xsd::cxx::tree::enum_comparator< char > c (_xsd_Type_literals_);
       const value* i (::std::lower_bound (
-                        _xsd_TypeModel_indexes_,
-                        _xsd_TypeModel_indexes_ + 11,
+                        _xsd_Type_indexes_,
+                        _xsd_Type_indexes_ + 11,
                         *this,
                         c));
 
-      if (i == _xsd_TypeModel_indexes_ + 11 || _xsd_TypeModel_literals_[*i] != *this)
+      if (i == _xsd_Type_indexes_ + 11 || _xsd_Type_literals_[*i] != *this)
       {
         throw ::xsd::cxx::tree::unexpected_enumerator < char > (*this);
       }
@@ -2217,8 +2217,8 @@ namespace Damaris
       return *i;
     }
 
-    const char* const TypeModel::
-    _xsd_TypeModel_literals_[11] =
+    const char* const Type::
+    _xsd_Type_literals_[11] =
     {
       "short",
       "int",
@@ -2233,32 +2233,32 @@ namespace Damaris
       "undefined"
     };
 
-    const TypeModel::value TypeModel::
-    _xsd_TypeModel_indexes_[11] =
+    const Type::value Type::
+    _xsd_Type_indexes_[11] =
     {
-      ::Damaris::Model::TypeModel::char_,
-      ::Damaris::Model::TypeModel::character,
-      ::Damaris::Model::TypeModel::double_,
-      ::Damaris::Model::TypeModel::float_,
-      ::Damaris::Model::TypeModel::int_,
-      ::Damaris::Model::TypeModel::integer,
-      ::Damaris::Model::TypeModel::long_,
-      ::Damaris::Model::TypeModel::real,
-      ::Damaris::Model::TypeModel::short_,
-      ::Damaris::Model::TypeModel::string,
-      ::Damaris::Model::TypeModel::undefined
+      ::Damaris::Model::Type::char_,
+      ::Damaris::Model::Type::character,
+      ::Damaris::Model::Type::double_,
+      ::Damaris::Model::Type::float_,
+      ::Damaris::Model::Type::int_,
+      ::Damaris::Model::Type::integer,
+      ::Damaris::Model::Type::long_,
+      ::Damaris::Model::Type::real,
+      ::Damaris::Model::Type::short_,
+      ::Damaris::Model::Type::string,
+      ::Damaris::Model::Type::undefined
     };
 
-    // LayoutModel
+    // Layout
     //
 
-    const LayoutModel::language_type LayoutModel::language_default_value_ (
+    const Layout::language_type Layout::language_default_value_ (
       "unknown");
 
-    LayoutModel::
-    LayoutModel (const name_type& name,
-                 const type_type& type,
-                 const dimensions_type& dimensions)
+    Layout::
+    Layout (const name_type& name,
+            const type_type& type,
+            const dimensions_type& dimensions)
     : ::xml_schema::string (),
       name_ (name, ::xml_schema::flags (), this),
       type_ (type, ::xml_schema::flags (), this),
@@ -2267,11 +2267,11 @@ namespace Damaris
     {
     }
 
-    LayoutModel::
-    LayoutModel (const char* _xsd_string_base,
-                 const name_type& name,
-                 const type_type& type,
-                 const dimensions_type& dimensions)
+    Layout::
+    Layout (const char* _xsd_string_base,
+            const name_type& name,
+            const type_type& type,
+            const dimensions_type& dimensions)
     : ::xml_schema::string (_xsd_string_base),
       name_ (name, ::xml_schema::flags (), this),
       type_ (type, ::xml_schema::flags (), this),
@@ -2280,11 +2280,11 @@ namespace Damaris
     {
     }
 
-    LayoutModel::
-    LayoutModel (const ::std::string& _xsd_string_base,
-                 const name_type& name,
-                 const type_type& type,
-                 const dimensions_type& dimensions)
+    Layout::
+    Layout (const ::std::string& _xsd_string_base,
+            const name_type& name,
+            const type_type& type,
+            const dimensions_type& dimensions)
     : ::xml_schema::string (_xsd_string_base),
       name_ (name, ::xml_schema::flags (), this),
       type_ (type, ::xml_schema::flags (), this),
@@ -2293,11 +2293,11 @@ namespace Damaris
     {
     }
 
-    LayoutModel::
-    LayoutModel (const ::xml_schema::string& _xsd_string_base,
-                 const name_type& name,
-                 const type_type& type,
-                 const dimensions_type& dimensions)
+    Layout::
+    Layout (const ::xml_schema::string& _xsd_string_base,
+            const name_type& name,
+            const type_type& type,
+            const dimensions_type& dimensions)
     : ::xml_schema::string (_xsd_string_base),
       name_ (name, ::xml_schema::flags (), this),
       type_ (type, ::xml_schema::flags (), this),
@@ -2306,10 +2306,10 @@ namespace Damaris
     {
     }
 
-    LayoutModel::
-    LayoutModel (const LayoutModel& x,
-                 ::xml_schema::flags f,
-                 ::xml_schema::container* c)
+    Layout::
+    Layout (const Layout& x,
+            ::xml_schema::flags f,
+            ::xml_schema::container* c)
     : ::xml_schema::string (x, f, c),
       name_ (x.name_, f, this),
       type_ (x.type_, f, this),
@@ -2318,10 +2318,10 @@ namespace Damaris
     {
     }
 
-    LayoutModel::
-    LayoutModel (const ::xercesc::DOMElement& e,
-                 ::xml_schema::flags f,
-                 ::xml_schema::container* c)
+    Layout::
+    Layout (const ::xercesc::DOMElement& e,
+            ::xml_schema::flags f,
+            ::xml_schema::container* c)
     : ::xml_schema::string (e, f | ::xml_schema::flags::base, c),
       name_ (f, this),
       type_ (f, this),
@@ -2335,7 +2335,7 @@ namespace Damaris
       }
     }
 
-    void LayoutModel::
+    void Layout::
     parse (::xsd::cxx::xml::dom::parser< char >& p,
            ::xml_schema::flags f)
     {
@@ -2409,27 +2409,27 @@ namespace Damaris
       }
     }
 
-    LayoutModel* LayoutModel::
+    Layout* Layout::
     _clone (::xml_schema::flags f,
             ::xml_schema::container* c) const
     {
-      return new class LayoutModel (*this, f, c);
+      return new class Layout (*this, f, c);
     }
 
-    LayoutModel::
-    ~LayoutModel ()
+    Layout::
+    ~Layout ()
     {
     }
 
-    // VariableModel
+    // Variable
     //
 
-    const VariableModel::unit_type VariableModel::unit_default_value_ (
+    const Variable::unit_type Variable::unit_default_value_ (
       "");
 
-    VariableModel::
-    VariableModel (const name_type& name,
-                   const layout_type& layout)
+    Variable::
+    Variable (const name_type& name,
+              const layout_type& layout)
     : ::xml_schema::string (),
       name_ (name, ::xml_schema::flags (), this),
       unit_ (unit_default_value (), ::xml_schema::flags (), this),
@@ -2438,10 +2438,10 @@ namespace Damaris
     {
     }
 
-    VariableModel::
-    VariableModel (const char* _xsd_string_base,
-                   const name_type& name,
-                   const layout_type& layout)
+    Variable::
+    Variable (const char* _xsd_string_base,
+              const name_type& name,
+              const layout_type& layout)
     : ::xml_schema::string (_xsd_string_base),
       name_ (name, ::xml_schema::flags (), this),
       unit_ (unit_default_value (), ::xml_schema::flags (), this),
@@ -2450,10 +2450,10 @@ namespace Damaris
     {
     }
 
-    VariableModel::
-    VariableModel (const ::std::string& _xsd_string_base,
-                   const name_type& name,
-                   const layout_type& layout)
+    Variable::
+    Variable (const ::std::string& _xsd_string_base,
+              const name_type& name,
+              const layout_type& layout)
     : ::xml_schema::string (_xsd_string_base),
       name_ (name, ::xml_schema::flags (), this),
       unit_ (unit_default_value (), ::xml_schema::flags (), this),
@@ -2462,10 +2462,10 @@ namespace Damaris
     {
     }
 
-    VariableModel::
-    VariableModel (const ::xml_schema::string& _xsd_string_base,
-                   const name_type& name,
-                   const layout_type& layout)
+    Variable::
+    Variable (const ::xml_schema::string& _xsd_string_base,
+              const name_type& name,
+              const layout_type& layout)
     : ::xml_schema::string (_xsd_string_base),
       name_ (name, ::xml_schema::flags (), this),
       unit_ (unit_default_value (), ::xml_schema::flags (), this),
@@ -2474,10 +2474,10 @@ namespace Damaris
     {
     }
 
-    VariableModel::
-    VariableModel (const VariableModel& x,
-                   ::xml_schema::flags f,
-                   ::xml_schema::container* c)
+    Variable::
+    Variable (const Variable& x,
+              ::xml_schema::flags f,
+              ::xml_schema::container* c)
     : ::xml_schema::string (x, f, c),
       name_ (x.name_, f, this),
       unit_ (x.unit_, f, this),
@@ -2486,10 +2486,10 @@ namespace Damaris
     {
     }
 
-    VariableModel::
-    VariableModel (const ::xercesc::DOMElement& e,
-                   ::xml_schema::flags f,
-                   ::xml_schema::container* c)
+    Variable::
+    Variable (const ::xercesc::DOMElement& e,
+              ::xml_schema::flags f,
+              ::xml_schema::container* c)
     : ::xml_schema::string (e, f | ::xml_schema::flags::base, c),
       name_ (f, this),
       unit_ (f, this),
@@ -2503,7 +2503,7 @@ namespace Damaris
       }
     }
 
-    void VariableModel::
+    void Variable::
     parse (::xsd::cxx::xml::dom::parser< char >& p,
            ::xml_schema::flags f)
     {
@@ -2567,23 +2567,23 @@ namespace Damaris
       }
     }
 
-    VariableModel* VariableModel::
+    Variable* Variable::
     _clone (::xml_schema::flags f,
             ::xml_schema::container* c) const
     {
-      return new class VariableModel (*this, f, c);
+      return new class Variable (*this, f, c);
     }
 
-    VariableModel::
-    ~VariableModel ()
+    Variable::
+    ~Variable ()
     {
     }
 
-    // GroupModel
+    // Group
     //
 
-    GroupModel::
-    GroupModel (const name_type& name)
+    Group::
+    Group (const name_type& name)
     : ::xml_schema::type (),
       variable_ (::xml_schema::flags (), this),
       group_ (::xml_schema::flags (), this),
@@ -2592,10 +2592,10 @@ namespace Damaris
     {
     }
 
-    GroupModel::
-    GroupModel (const GroupModel& x,
-                ::xml_schema::flags f,
-                ::xml_schema::container* c)
+    Group::
+    Group (const Group& x,
+           ::xml_schema::flags f,
+           ::xml_schema::container* c)
     : ::xml_schema::type (x, f, c),
       variable_ (x.variable_, f, this),
       group_ (x.group_, f, this),
@@ -2604,10 +2604,10 @@ namespace Damaris
     {
     }
 
-    GroupModel::
-    GroupModel (const ::xercesc::DOMElement& e,
-                ::xml_schema::flags f,
-                ::xml_schema::container* c)
+    Group::
+    Group (const ::xercesc::DOMElement& e,
+           ::xml_schema::flags f,
+           ::xml_schema::container* c)
     : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
       variable_ (f, this),
       group_ (f, this),
@@ -2621,7 +2621,7 @@ namespace Damaris
       }
     }
 
-    void GroupModel::
+    void Group::
     parse (::xsd::cxx::xml::dom::parser< char >& p,
            ::xml_schema::flags f)
     {
@@ -2691,25 +2691,25 @@ namespace Damaris
       }
     }
 
-    GroupModel* GroupModel::
+    Group* Group::
     _clone (::xml_schema::flags f,
             ::xml_schema::container* c) const
     {
-      return new class GroupModel (*this, f, c);
+      return new class Group (*this, f, c);
     }
 
-    GroupModel::
-    ~GroupModel ()
+    Group::
+    ~Group ()
     {
     }
 
-    // ParameterModel
+    // Parameter
     //
 
-    ParameterModel::
-    ParameterModel (const name_type& name,
-                    const type_type& type,
-                    const value_type& value)
+    Parameter::
+    Parameter (const name_type& name,
+               const type_type& type,
+               const value_type& value)
     : ::xml_schema::string (),
       name_ (name, ::xml_schema::flags (), this),
       type_ (type, ::xml_schema::flags (), this),
@@ -2717,11 +2717,11 @@ namespace Damaris
     {
     }
 
-    ParameterModel::
-    ParameterModel (const char* _xsd_string_base,
-                    const name_type& name,
-                    const type_type& type,
-                    const value_type& value)
+    Parameter::
+    Parameter (const char* _xsd_string_base,
+               const name_type& name,
+               const type_type& type,
+               const value_type& value)
     : ::xml_schema::string (_xsd_string_base),
       name_ (name, ::xml_schema::flags (), this),
       type_ (type, ::xml_schema::flags (), this),
@@ -2729,11 +2729,11 @@ namespace Damaris
     {
     }
 
-    ParameterModel::
-    ParameterModel (const ::std::string& _xsd_string_base,
-                    const name_type& name,
-                    const type_type& type,
-                    const value_type& value)
+    Parameter::
+    Parameter (const ::std::string& _xsd_string_base,
+               const name_type& name,
+               const type_type& type,
+               const value_type& value)
     : ::xml_schema::string (_xsd_string_base),
       name_ (name, ::xml_schema::flags (), this),
       type_ (type, ::xml_schema::flags (), this),
@@ -2741,11 +2741,11 @@ namespace Damaris
     {
     }
 
-    ParameterModel::
-    ParameterModel (const ::xml_schema::string& _xsd_string_base,
-                    const name_type& name,
-                    const type_type& type,
-                    const value_type& value)
+    Parameter::
+    Parameter (const ::xml_schema::string& _xsd_string_base,
+               const name_type& name,
+               const type_type& type,
+               const value_type& value)
     : ::xml_schema::string (_xsd_string_base),
       name_ (name, ::xml_schema::flags (), this),
       type_ (type, ::xml_schema::flags (), this),
@@ -2753,10 +2753,10 @@ namespace Damaris
     {
     }
 
-    ParameterModel::
-    ParameterModel (const ParameterModel& x,
-                    ::xml_schema::flags f,
-                    ::xml_schema::container* c)
+    Parameter::
+    Parameter (const Parameter& x,
+               ::xml_schema::flags f,
+               ::xml_schema::container* c)
     : ::xml_schema::string (x, f, c),
       name_ (x.name_, f, this),
       type_ (x.type_, f, this),
@@ -2764,10 +2764,10 @@ namespace Damaris
     {
     }
 
-    ParameterModel::
-    ParameterModel (const ::xercesc::DOMElement& e,
-                    ::xml_schema::flags f,
-                    ::xml_schema::container* c)
+    Parameter::
+    Parameter (const ::xercesc::DOMElement& e,
+               ::xml_schema::flags f,
+               ::xml_schema::container* c)
     : ::xml_schema::string (e, f | ::xml_schema::flags::base, c),
       name_ (f, this),
       type_ (f, this),
@@ -2780,7 +2780,7 @@ namespace Damaris
       }
     }
 
-    void ParameterModel::
+    void Parameter::
     parse (::xsd::cxx::xml::dom::parser< char >& p,
            ::xml_schema::flags f)
     {
@@ -2840,23 +2840,23 @@ namespace Damaris
       }
     }
 
-    ParameterModel* ParameterModel::
+    Parameter* Parameter::
     _clone (::xml_schema::flags f,
             ::xml_schema::container* c) const
     {
-      return new class ParameterModel (*this, f, c);
+      return new class Parameter (*this, f, c);
     }
 
-    ParameterModel::
-    ~ParameterModel ()
+    Parameter::
+    ~Parameter ()
     {
     }
 
-    // DataModel
+    // Data
     //
 
-    DataModel::
-    DataModel ()
+    Data::
+    Data ()
     : ::xml_schema::type (),
       parameter_ (::xml_schema::flags (), this),
       layout_ (::xml_schema::flags (), this),
@@ -2865,10 +2865,10 @@ namespace Damaris
     {
     }
 
-    DataModel::
-    DataModel (const DataModel& x,
-               ::xml_schema::flags f,
-               ::xml_schema::container* c)
+    Data::
+    Data (const Data& x,
+          ::xml_schema::flags f,
+          ::xml_schema::container* c)
     : ::xml_schema::type (x, f, c),
       parameter_ (x.parameter_, f, this),
       layout_ (x.layout_, f, this),
@@ -2877,10 +2877,10 @@ namespace Damaris
     {
     }
 
-    DataModel::
-    DataModel (const ::xercesc::DOMElement& e,
-               ::xml_schema::flags f,
-               ::xml_schema::container* c)
+    Data::
+    Data (const ::xercesc::DOMElement& e,
+          ::xml_schema::flags f,
+          ::xml_schema::container* c)
     : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
       parameter_ (f, this),
       layout_ (f, this),
@@ -2894,7 +2894,7 @@ namespace Damaris
       }
     }
 
-    void DataModel::
+    void Data::
     parse (::xsd::cxx::xml::dom::parser< char >& p,
            ::xml_schema::flags f)
     {
@@ -2952,67 +2952,67 @@ namespace Damaris
       }
     }
 
-    DataModel* DataModel::
+    Data* Data::
     _clone (::xml_schema::flags f,
             ::xml_schema::container* c) const
     {
-      return new class DataModel (*this, f, c);
+      return new class Data (*this, f, c);
     }
 
-    DataModel::
-    ~DataModel ()
+    Data::
+    ~Data ()
     {
     }
 
-    // ScopeModel
+    // Scope
     //
 
-    ScopeModel::
-    ScopeModel (const ::xercesc::DOMElement& e,
-                ::xml_schema::flags f,
-                ::xml_schema::container* c)
+    Scope::
+    Scope (const ::xercesc::DOMElement& e,
+           ::xml_schema::flags f,
+           ::xml_schema::container* c)
     : ::xml_schema::string (e, f, c)
     {
-      _xsd_ScopeModel_convert ();
+      _xsd_Scope_convert ();
     }
 
-    ScopeModel::
-    ScopeModel (const ::xercesc::DOMAttr& a,
-                ::xml_schema::flags f,
-                ::xml_schema::container* c)
+    Scope::
+    Scope (const ::xercesc::DOMAttr& a,
+           ::xml_schema::flags f,
+           ::xml_schema::container* c)
     : ::xml_schema::string (a, f, c)
     {
-      _xsd_ScopeModel_convert ();
+      _xsd_Scope_convert ();
     }
 
-    ScopeModel::
-    ScopeModel (const ::std::string& s,
-                const ::xercesc::DOMElement* e,
-                ::xml_schema::flags f,
-                ::xml_schema::container* c)
+    Scope::
+    Scope (const ::std::string& s,
+           const ::xercesc::DOMElement* e,
+           ::xml_schema::flags f,
+           ::xml_schema::container* c)
     : ::xml_schema::string (s, e, f, c)
     {
-      _xsd_ScopeModel_convert ();
+      _xsd_Scope_convert ();
     }
 
-    ScopeModel* ScopeModel::
+    Scope* Scope::
     _clone (::xml_schema::flags f,
             ::xml_schema::container* c) const
     {
-      return new class ScopeModel (*this, f, c);
+      return new class Scope (*this, f, c);
     }
 
-    ScopeModel::value ScopeModel::
-    _xsd_ScopeModel_convert () const
+    Scope::value Scope::
+    _xsd_Scope_convert () const
     {
-      ::xsd::cxx::tree::enum_comparator< char > c (_xsd_ScopeModel_literals_);
+      ::xsd::cxx::tree::enum_comparator< char > c (_xsd_Scope_literals_);
       const value* i (::std::lower_bound (
-                        _xsd_ScopeModel_indexes_,
-                        _xsd_ScopeModel_indexes_ + 3,
+                        _xsd_Scope_indexes_,
+                        _xsd_Scope_indexes_ + 3,
                         *this,
                         c));
 
-      if (i == _xsd_ScopeModel_indexes_ + 3 || _xsd_ScopeModel_literals_[*i] != *this)
+      if (i == _xsd_Scope_indexes_ + 3 || _xsd_Scope_literals_[*i] != *this)
       {
         throw ::xsd::cxx::tree::unexpected_enumerator < char > (*this);
       }
@@ -3020,34 +3020,34 @@ namespace Damaris
       return *i;
     }
 
-    const char* const ScopeModel::
-    _xsd_ScopeModel_literals_[3] =
+    const char* const Scope::
+    _xsd_Scope_literals_[3] =
     {
       "core",
       "node",
       "global"
     };
 
-    const ScopeModel::value ScopeModel::
-    _xsd_ScopeModel_indexes_[3] =
+    const Scope::value Scope::
+    _xsd_Scope_indexes_[3] =
     {
-      ::Damaris::Model::ScopeModel::core,
-      ::Damaris::Model::ScopeModel::global,
-      ::Damaris::Model::ScopeModel::node
+      ::Damaris::Model::Scope::core,
+      ::Damaris::Model::Scope::global,
+      ::Damaris::Model::Scope::node
     };
 
-    // EventModel
+    // Event
     //
 
-    const EventModel::library_type EventModel::library_default_value_ (
+    const Event::library_type Event::library_default_value_ (
       "");
 
-    const EventModel::scope_type EventModel::scope_default_value_ (
+    const Event::scope_type Event::scope_default_value_ (
       "core");
 
-    EventModel::
-    EventModel (const name_type& name,
-                const action_type& action)
+    Event::
+    Event (const name_type& name,
+           const action_type& action)
     : ::xml_schema::type (),
       name_ (name, ::xml_schema::flags (), this),
       action_ (action, ::xml_schema::flags (), this),
@@ -3056,10 +3056,10 @@ namespace Damaris
     {
     }
 
-    EventModel::
-    EventModel (const EventModel& x,
-                ::xml_schema::flags f,
-                ::xml_schema::container* c)
+    Event::
+    Event (const Event& x,
+           ::xml_schema::flags f,
+           ::xml_schema::container* c)
     : ::xml_schema::type (x, f, c),
       name_ (x.name_, f, this),
       action_ (x.action_, f, this),
@@ -3068,10 +3068,10 @@ namespace Damaris
     {
     }
 
-    EventModel::
-    EventModel (const ::xercesc::DOMElement& e,
-                ::xml_schema::flags f,
-                ::xml_schema::container* c)
+    Event::
+    Event (const ::xercesc::DOMElement& e,
+           ::xml_schema::flags f,
+           ::xml_schema::container* c)
     : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
       name_ (f, this),
       action_ (f, this),
@@ -3085,7 +3085,7 @@ namespace Damaris
       }
     }
 
-    void EventModel::
+    void Event::
     parse (::xsd::cxx::xml::dom::parser< char >& p,
            ::xml_schema::flags f)
     {
@@ -3157,28 +3157,28 @@ namespace Damaris
       }
     }
 
-    EventModel* EventModel::
+    Event* Event::
     _clone (::xml_schema::flags f,
             ::xml_schema::container* c) const
     {
-      return new class EventModel (*this, f, c);
+      return new class Event (*this, f, c);
     }
 
-    EventModel::
-    ~EventModel ()
+    Event::
+    ~Event ()
     {
     }
 
-    // ScriptModel
+    // Script
     //
 
-    const ScriptModel::scope_type ScriptModel::scope_default_value_ (
+    const Script::scope_type Script::scope_default_value_ (
       "core");
 
-    ScriptModel::
-    ScriptModel (const name_type& name,
-                 const file_type& file,
-                 const language_type& language)
+    Script::
+    Script (const name_type& name,
+            const file_type& file,
+            const language_type& language)
     : ::xml_schema::type (),
       name_ (name, ::xml_schema::flags (), this),
       file_ (file, ::xml_schema::flags (), this),
@@ -3187,10 +3187,10 @@ namespace Damaris
     {
     }
 
-    ScriptModel::
-    ScriptModel (const ScriptModel& x,
-                 ::xml_schema::flags f,
-                 ::xml_schema::container* c)
+    Script::
+    Script (const Script& x,
+            ::xml_schema::flags f,
+            ::xml_schema::container* c)
     : ::xml_schema::type (x, f, c),
       name_ (x.name_, f, this),
       file_ (x.file_, f, this),
@@ -3199,10 +3199,10 @@ namespace Damaris
     {
     }
 
-    ScriptModel::
-    ScriptModel (const ::xercesc::DOMElement& e,
-                 ::xml_schema::flags f,
-                 ::xml_schema::container* c)
+    Script::
+    Script (const ::xercesc::DOMElement& e,
+            ::xml_schema::flags f,
+            ::xml_schema::container* c)
     : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
       name_ (f, this),
       file_ (f, this),
@@ -3216,7 +3216,7 @@ namespace Damaris
       }
     }
 
-    void ScriptModel::
+    void Script::
     parse (::xsd::cxx::xml::dom::parser< char >& p,
            ::xml_schema::flags f)
     {
@@ -3290,43 +3290,43 @@ namespace Damaris
       }
     }
 
-    ScriptModel* ScriptModel::
+    Script* Script::
     _clone (::xml_schema::flags f,
             ::xml_schema::container* c) const
     {
-      return new class ScriptModel (*this, f, c);
+      return new class Script (*this, f, c);
     }
 
-    ScriptModel::
-    ~ScriptModel ()
+    Script::
+    ~Script ()
     {
     }
 
-    // ActionsModel
+    // Actions
     //
 
-    ActionsModel::
-    ActionsModel ()
+    Actions::
+    Actions ()
     : ::xml_schema::type (),
       event_ (::xml_schema::flags (), this),
       script_ (::xml_schema::flags (), this)
     {
     }
 
-    ActionsModel::
-    ActionsModel (const ActionsModel& x,
-                  ::xml_schema::flags f,
-                  ::xml_schema::container* c)
+    Actions::
+    Actions (const Actions& x,
+             ::xml_schema::flags f,
+             ::xml_schema::container* c)
     : ::xml_schema::type (x, f, c),
       event_ (x.event_, f, this),
       script_ (x.script_, f, this)
     {
     }
 
-    ActionsModel::
-    ActionsModel (const ::xercesc::DOMElement& e,
-                  ::xml_schema::flags f,
-                  ::xml_schema::container* c)
+    Actions::
+    Actions (const ::xercesc::DOMElement& e,
+             ::xml_schema::flags f,
+             ::xml_schema::container* c)
     : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
       event_ (f, this),
       script_ (f, this)
@@ -3338,7 +3338,7 @@ namespace Damaris
       }
     }
 
-    void ActionsModel::
+    void Actions::
     parse (::xsd::cxx::xml::dom::parser< char >& p,
            ::xml_schema::flags f)
     {
@@ -3374,29 +3374,29 @@ namespace Damaris
       }
     }
 
-    ActionsModel* ActionsModel::
+    Actions* Actions::
     _clone (::xml_schema::flags f,
             ::xml_schema::container* c) const
     {
-      return new class ActionsModel (*this, f, c);
+      return new class Actions (*this, f, c);
     }
 
-    ActionsModel::
-    ~ActionsModel ()
+    Actions::
+    ~Actions ()
     {
     }
 
-    // SimulationModel
+    // Simulation
     //
 
-    const SimulationModel::language_type SimulationModel::language_default_value_ (
+    const Simulation::language_type Simulation::language_default_value_ (
       "unknown");
 
-    SimulationModel::
-    SimulationModel (const architecture_type& architecture,
-                     const data_type& data,
-                     const actions_type& actions,
-                     const name_type& name)
+    Simulation::
+    Simulation (const architecture_type& architecture,
+                const data_type& data,
+                const actions_type& actions,
+                const name_type& name)
     : ::xml_schema::type (),
       architecture_ (architecture, ::xml_schema::flags (), this),
       data_ (data, ::xml_schema::flags (), this),
@@ -3406,11 +3406,11 @@ namespace Damaris
     {
     }
 
-    SimulationModel::
-    SimulationModel (::std::auto_ptr< architecture_type >& architecture,
-                     ::std::auto_ptr< data_type >& data,
-                     ::std::auto_ptr< actions_type >& actions,
-                     const name_type& name)
+    Simulation::
+    Simulation (::std::auto_ptr< architecture_type >& architecture,
+                ::std::auto_ptr< data_type >& data,
+                ::std::auto_ptr< actions_type >& actions,
+                const name_type& name)
     : ::xml_schema::type (),
       architecture_ (architecture, ::xml_schema::flags (), this),
       data_ (data, ::xml_schema::flags (), this),
@@ -3420,10 +3420,10 @@ namespace Damaris
     {
     }
 
-    SimulationModel::
-    SimulationModel (const SimulationModel& x,
-                     ::xml_schema::flags f,
-                     ::xml_schema::container* c)
+    Simulation::
+    Simulation (const Simulation& x,
+                ::xml_schema::flags f,
+                ::xml_schema::container* c)
     : ::xml_schema::type (x, f, c),
       architecture_ (x.architecture_, f, this),
       data_ (x.data_, f, this),
@@ -3433,10 +3433,10 @@ namespace Damaris
     {
     }
 
-    SimulationModel::
-    SimulationModel (const ::xercesc::DOMElement& e,
-                     ::xml_schema::flags f,
-                     ::xml_schema::container* c)
+    Simulation::
+    Simulation (const ::xercesc::DOMElement& e,
+                ::xml_schema::flags f,
+                ::xml_schema::container* c)
     : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
       architecture_ (f, this),
       data_ (f, this),
@@ -3451,7 +3451,7 @@ namespace Damaris
       }
     }
 
-    void SimulationModel::
+    void Simulation::
     parse (::xsd::cxx::xml::dom::parser< char >& p,
            ::xml_schema::flags f)
     {
@@ -3565,15 +3565,15 @@ namespace Damaris
       }
     }
 
-    SimulationModel* SimulationModel::
+    Simulation* Simulation::
     _clone (::xml_schema::flags f,
             ::xml_schema::container* c) const
     {
-      return new class SimulationModel (*this, f, c);
+      return new class Simulation (*this, f, c);
     }
 
-    SimulationModel::
-    ~SimulationModel ()
+    Simulation::
+    ~Simulation ()
     {
     }
   }
@@ -3587,7 +3587,7 @@ namespace Damaris
 {
   namespace Model
   {
-    ::std::auto_ptr< ::Damaris::Model::SimulationModel >
+    ::std::auto_ptr< ::Damaris::Model::Simulation >
     simulation (const ::std::string& u,
                 ::xml_schema::flags f,
                 const ::xml_schema::properties& p)
@@ -3604,14 +3604,14 @@ namespace Damaris
 
       h.throw_if_failed< ::xsd::cxx::tree::parsing< char > > ();
 
-      ::std::auto_ptr< ::Damaris::Model::SimulationModel > r (
+      ::std::auto_ptr< ::Damaris::Model::Simulation > r (
         ::Damaris::Model::simulation (
           d, f | ::xml_schema::flags::own_dom, p));
 
       return r;
     }
 
-    ::std::auto_ptr< ::Damaris::Model::SimulationModel >
+    ::std::auto_ptr< ::Damaris::Model::Simulation >
     simulation (const ::std::string& u,
                 ::xml_schema::error_handler& h,
                 ::xml_schema::flags f,
@@ -3628,14 +3628,14 @@ namespace Damaris
       if (!d.get ())
         throw ::xsd::cxx::tree::parsing< char > ();
 
-      ::std::auto_ptr< ::Damaris::Model::SimulationModel > r (
+      ::std::auto_ptr< ::Damaris::Model::Simulation > r (
         ::Damaris::Model::simulation (
           d, f | ::xml_schema::flags::own_dom, p));
 
       return r;
     }
 
-    ::std::auto_ptr< ::Damaris::Model::SimulationModel >
+    ::std::auto_ptr< ::Damaris::Model::Simulation >
     simulation (const ::std::string& u,
                 ::xercesc::DOMErrorHandler& h,
                 ::xml_schema::flags f,
@@ -3648,14 +3648,14 @@ namespace Damaris
       if (!d.get ())
         throw ::xsd::cxx::tree::parsing< char > ();
 
-      ::std::auto_ptr< ::Damaris::Model::SimulationModel > r (
+      ::std::auto_ptr< ::Damaris::Model::Simulation > r (
         ::Damaris::Model::simulation (
           d, f | ::xml_schema::flags::own_dom, p));
 
       return r;
     }
 
-    ::std::auto_ptr< ::Damaris::Model::SimulationModel >
+    ::std::auto_ptr< ::Damaris::Model::Simulation >
     simulation (::std::istream& is,
                 ::xml_schema::flags f,
                 const ::xml_schema::properties& p)
@@ -3668,7 +3668,7 @@ namespace Damaris
       return ::Damaris::Model::simulation (isrc, f, p);
     }
 
-    ::std::auto_ptr< ::Damaris::Model::SimulationModel >
+    ::std::auto_ptr< ::Damaris::Model::Simulation >
     simulation (::std::istream& is,
                 ::xml_schema::error_handler& h,
                 ::xml_schema::flags f,
@@ -3682,7 +3682,7 @@ namespace Damaris
       return ::Damaris::Model::simulation (isrc, h, f, p);
     }
 
-    ::std::auto_ptr< ::Damaris::Model::SimulationModel >
+    ::std::auto_ptr< ::Damaris::Model::Simulation >
     simulation (::std::istream& is,
                 ::xercesc::DOMErrorHandler& h,
                 ::xml_schema::flags f,
@@ -3692,7 +3692,7 @@ namespace Damaris
       return ::Damaris::Model::simulation (isrc, h, f, p);
     }
 
-    ::std::auto_ptr< ::Damaris::Model::SimulationModel >
+    ::std::auto_ptr< ::Damaris::Model::Simulation >
     simulation (::std::istream& is,
                 const ::std::string& sid,
                 ::xml_schema::flags f,
@@ -3706,7 +3706,7 @@ namespace Damaris
       return ::Damaris::Model::simulation (isrc, f, p);
     }
 
-    ::std::auto_ptr< ::Damaris::Model::SimulationModel >
+    ::std::auto_ptr< ::Damaris::Model::Simulation >
     simulation (::std::istream& is,
                 const ::std::string& sid,
                 ::xml_schema::error_handler& h,
@@ -3721,7 +3721,7 @@ namespace Damaris
       return ::Damaris::Model::simulation (isrc, h, f, p);
     }
 
-    ::std::auto_ptr< ::Damaris::Model::SimulationModel >
+    ::std::auto_ptr< ::Damaris::Model::Simulation >
     simulation (::std::istream& is,
                 const ::std::string& sid,
                 ::xercesc::DOMErrorHandler& h,
@@ -3732,7 +3732,7 @@ namespace Damaris
       return ::Damaris::Model::simulation (isrc, h, f, p);
     }
 
-    ::std::auto_ptr< ::Damaris::Model::SimulationModel >
+    ::std::auto_ptr< ::Damaris::Model::Simulation >
     simulation (::xercesc::InputSource& i,
                 ::xml_schema::flags f,
                 const ::xml_schema::properties& p)
@@ -3745,14 +3745,14 @@ namespace Damaris
 
       h.throw_if_failed< ::xsd::cxx::tree::parsing< char > > ();
 
-      ::std::auto_ptr< ::Damaris::Model::SimulationModel > r (
+      ::std::auto_ptr< ::Damaris::Model::Simulation > r (
         ::Damaris::Model::simulation (
           d, f | ::xml_schema::flags::own_dom, p));
 
       return r;
     }
 
-    ::std::auto_ptr< ::Damaris::Model::SimulationModel >
+    ::std::auto_ptr< ::Damaris::Model::Simulation >
     simulation (::xercesc::InputSource& i,
                 ::xml_schema::error_handler& h,
                 ::xml_schema::flags f,
@@ -3765,14 +3765,14 @@ namespace Damaris
       if (!d.get ())
         throw ::xsd::cxx::tree::parsing< char > ();
 
-      ::std::auto_ptr< ::Damaris::Model::SimulationModel > r (
+      ::std::auto_ptr< ::Damaris::Model::Simulation > r (
         ::Damaris::Model::simulation (
           d, f | ::xml_schema::flags::own_dom, p));
 
       return r;
     }
 
-    ::std::auto_ptr< ::Damaris::Model::SimulationModel >
+    ::std::auto_ptr< ::Damaris::Model::Simulation >
     simulation (::xercesc::InputSource& i,
                 ::xercesc::DOMErrorHandler& h,
                 ::xml_schema::flags f,
@@ -3785,14 +3785,14 @@ namespace Damaris
       if (!d.get ())
         throw ::xsd::cxx::tree::parsing< char > ();
 
-      ::std::auto_ptr< ::Damaris::Model::SimulationModel > r (
+      ::std::auto_ptr< ::Damaris::Model::Simulation > r (
         ::Damaris::Model::simulation (
           d, f | ::xml_schema::flags::own_dom, p));
 
       return r;
     }
 
-    ::std::auto_ptr< ::Damaris::Model::SimulationModel >
+    ::std::auto_ptr< ::Damaris::Model::Simulation >
     simulation (const ::xercesc::DOMDocument& d,
                 ::xml_schema::flags f,
                 const ::xml_schema::properties& p)
@@ -3802,7 +3802,7 @@ namespace Damaris
         ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > c (
           static_cast< ::xercesc::DOMDocument* > (d.cloneNode (true)));
 
-        ::std::auto_ptr< ::Damaris::Model::SimulationModel > r (
+        ::std::auto_ptr< ::Damaris::Model::Simulation > r (
           ::Damaris::Model::simulation (
             c, f | ::xml_schema::flags::own_dom, p));
 
@@ -3816,8 +3816,8 @@ namespace Damaris
       if (n.name () == "simulation" &&
           n.namespace_ () == "http://damaris.gforge.inria.fr/Damaris/Model")
       {
-        ::std::auto_ptr< ::Damaris::Model::SimulationModel > r (
-          ::xsd::cxx::tree::traits< ::Damaris::Model::SimulationModel, char >::create (
+        ::std::auto_ptr< ::Damaris::Model::Simulation > r (
+          ::xsd::cxx::tree::traits< ::Damaris::Model::Simulation, char >::create (
             e, f, 0));
         return r;
       }
@@ -3829,7 +3829,7 @@ namespace Damaris
         "http://damaris.gforge.inria.fr/Damaris/Model");
     }
 
-    ::std::auto_ptr< ::Damaris::Model::SimulationModel >
+    ::std::auto_ptr< ::Damaris::Model::Simulation >
     simulation (::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument >& d,
                 ::xml_schema::flags f,
                 const ::xml_schema::properties&)
@@ -3854,8 +3854,8 @@ namespace Damaris
       if (n.name () == "simulation" &&
           n.namespace_ () == "http://damaris.gforge.inria.fr/Damaris/Model")
       {
-        ::std::auto_ptr< ::Damaris::Model::SimulationModel > r (
-          ::xsd::cxx::tree::traits< ::Damaris::Model::SimulationModel, char >::create (
+        ::std::auto_ptr< ::Damaris::Model::Simulation > r (
+          ::xsd::cxx::tree::traits< ::Damaris::Model::Simulation, char >::create (
             e, f, 0));
         return r;
       }

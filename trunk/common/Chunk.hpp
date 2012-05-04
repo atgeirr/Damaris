@@ -77,7 +77,7 @@ class Chunk {
         /**
          * \brief Gets the type of data.
          */
-        virtual Model::TypeModel getType() const = 0;
+        virtual Model::Type getType() const = 0;
 
         /**
          * \brief Gets a start index.

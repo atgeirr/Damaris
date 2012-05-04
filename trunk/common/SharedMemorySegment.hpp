@@ -69,19 +69,19 @@ class SharedMemorySegment {
 		 * to the described model.
 		 * \param[in] model : base model from configuration file.
 		 */
-		static SharedMemorySegment* create(Model::BufferModel* model);
+		static SharedMemorySegment* create(Model::Buffer* model);
 
 		/**
 		 * Opens a SharedMemorySegment implementation corresponding
 		 * to the description in the model.
 		 * \param[in] model : base model from configuration file.
 		 */	
-		static SharedMemorySegment* open(Model::BufferModel* model);
+		static SharedMemorySegment* open(Model::Buffer* model);
 
 		/**
 		 * Removes a SharedMemorySegment described in a model.
 		 */
-		static bool remove(Model::BufferModel* model);
+		static bool remove(Model::Buffer* model);
 
 		/**
 		 * This typedef is just to prevent compilation error

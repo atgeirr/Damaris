@@ -35,7 +35,7 @@ namespace Damaris {
  * The ParameterSet class describes an object that holds
  * the parameters and offers an access by name.
  */
-class ParameterSet : public Configurable<ParameterSet,Model::DataModel> {
+class ParameterSet : public Configurable<ParameterSet,Model::Data> {
 	private:
 		std::map<std::string,Parameter> paramSet; /*!< Enclosed map. */
 	
@@ -50,7 +50,7 @@ class ParameterSet : public Configurable<ParameterSet,Model::DataModel> {
 		 * Constructor.
 		 * \param[in] mdl : base model to initialize from.
 		 */
-		ParameterSet(Model::DataModel* mdl);
+		ParameterSet(Model::Data* mdl);
 	
 		/**
 		 * Sets a parameter. Does not modify an existing parameter.

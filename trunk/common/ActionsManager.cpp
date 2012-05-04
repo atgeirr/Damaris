@@ -37,8 +37,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Damaris {
 
-ActionsManager::ActionsManager(Model::ActionsModel* mdl, Environment* env)
-: Configurable<ActionsManager,Model::ActionsModel>(mdl)
+ActionsManager::ActionsManager(Model::Actions* mdl, Environment* env)
+: Configurable<ActionsManager,Model::Actions>(mdl)
 {
 	environment = env;
 	init();
@@ -46,11 +46,11 @@ ActionsManager::ActionsManager(Model::ActionsModel* mdl, Environment* env)
 
 void ActionsManager::init()
 {
-	Model::ActionsModel::event_const_iterator e(model->event().begin());
+	Model::Actions::event_const_iterator e(model->event().begin());
 	for(; e < model->event().end(); e++) {
 		addDynamicAction(e->name(),e->library(),e->action(),e->scope());
 	}
-	Model::ActionsModel::script_const_iterator s(model->script().begin());
+	Model::Actions::script_const_iterator s(model->script().begin());
 	for(; s < model->script().end(); s++) {
 		addScriptAction(s->name(),s->file(),s->language(),s->scope());
 	}
@@ -67,7 +67,7 @@ void ActionsManager::init()
  */
 void ActionsManager::addDynamicAction(const std::string& eventName, 
 		const std::string& fileName, const std::string &functionName,
-		const Model::ScopeModel& scope)
+		const Model::Scope& scope)
 {
 
 	// check if there is already an action with the same name recorded
@@ -83,11 +83,11 @@ void ActionsManager::addDynamicAction(const std::string& eventName,
 	// create the action
 	a = new DynamicAction(functionName,fileName);
 
-	if(scope == Model::ScopeModel::core || (not environment->hasServer())) 
+	if(scope == Model::Scope::core || (not environment->hasServer())) 
 	{ }
-	else if(scope == Model::ScopeModel::node) {
+	else if(scope == Model::Scope::node) {
 		a = new NodeAction(a,environment->getClientsPerNode());
-	} else if(scope == Model::ScopeModel::global) {
+	} else if(scope == Model::Scope::global) {
 		ERROR("Global actions are not yet implemented");
 		delete a;
 		return;
@@ -107,7 +107,7 @@ void ActionsManager::addDynamicAction(const std::string& eventName,
 
 void ActionsManager::addScriptAction(const std::string& name,
 		const std::string& fileName, const Model::Language& language,
-		const Model::ScopeModel& scope) 
+		const Model::Scope& scope) 
 {
 	// check if there is already an action with the same name recorded
 	ActionSet::index<by_name>::type::iterator it = actions.get<by_name>().find(name);
@@ -132,11 +132,11 @@ void ActionsManager::addScriptAction(const std::string& name,
 			return;
 	}
 	
-	if(scope == Model::ScopeModel::core || (not environment->hasServer())) 
+	if(scope == Model::Scope::core || (not environment->hasServer())) 
 	{ }
-	else if (scope == Model::ScopeModel::node) {
+	else if (scope == Model::Scope::node) {
 		a = new NodeAction(a,environment->getClientsPerNode());
-	} else if(scope == Model::ScopeModel::global) {
+	} else if(scope == Model::Scope::global) {
 		ERROR("Global script scope is not yet implemented");
 		delete a;
 		return;

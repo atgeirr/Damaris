@@ -29,17 +29,6 @@ ShmChunk::ShmChunk(SharedMemorySegment* s, ChunkHeader* ch)
 	segment = s;
 	header = ch;
 	buffer = ((char*)header)+sizeof(ChunkHeader);
-/*
-	size_t sizeOfHeader = size();
-	size_t sizeOfData = getDataMemoryLength();
-	size_t totalSize = sizeOfHeader + sizeOfData;
-
-	header = static_cast<void*>(segment->allocate(totalSize));
-	if(header == NULL) throw(std::exception()); // TODO: use another exception type
-	buffer = ((char*)header)+sizeOfHeader;
-
-	toBuffer(header);
-*/
 }
 
 ShmChunk::ShmChunk(SharedMemorySegment* s, handle_t h)
