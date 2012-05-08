@@ -650,6 +650,120 @@ namespace Damaris
       return language_default_value_;
     }
 
+    const Layout::visualizable_type& Layout::
+    visualizable () const
+    {
+      return this->visualizable_.get ();
+    }
+
+    Layout::visualizable_type& Layout::
+    visualizable ()
+    {
+      return this->visualizable_.get ();
+    }
+
+    void Layout::
+    visualizable (const visualizable_type& x)
+    {
+      this->visualizable_.set (x);
+    }
+
+    Layout::visualizable_type Layout::
+    visualizable_default_value ()
+    {
+      return visualizable_type (true);
+    }
+
+
+    // VarType
+    // 
+
+    VarType::
+    VarType (value v)
+    : ::xml_schema::string (_xsd_VarType_literals_[v])
+    {
+    }
+
+    VarType::
+    VarType (const char* v)
+    : ::xml_schema::string (v)
+    {
+    }
+
+    VarType::
+    VarType (const ::std::string& v)
+    : ::xml_schema::string (v)
+    {
+    }
+
+    VarType::
+    VarType (const ::xml_schema::string& v)
+    : ::xml_schema::string (v)
+    {
+    }
+
+    VarType::
+    VarType (const VarType& v,
+             ::xml_schema::flags f,
+             ::xml_schema::container* c)
+    : ::xml_schema::string (v, f, c)
+    {
+    }
+
+    VarType& VarType::
+    operator= (value v)
+    {
+      static_cast< ::xml_schema::string& > (*this) = 
+      ::xml_schema::string (_xsd_VarType_literals_[v]);
+
+      return *this;
+    }
+
+
+    // VarCentering
+    // 
+
+    VarCentering::
+    VarCentering (value v)
+    : ::xml_schema::string (_xsd_VarCentering_literals_[v])
+    {
+    }
+
+    VarCentering::
+    VarCentering (const char* v)
+    : ::xml_schema::string (v)
+    {
+    }
+
+    VarCentering::
+    VarCentering (const ::std::string& v)
+    : ::xml_schema::string (v)
+    {
+    }
+
+    VarCentering::
+    VarCentering (const ::xml_schema::string& v)
+    : ::xml_schema::string (v)
+    {
+    }
+
+    VarCentering::
+    VarCentering (const VarCentering& v,
+                  ::xml_schema::flags f,
+                  ::xml_schema::container* c)
+    : ::xml_schema::string (v, f, c)
+    {
+    }
+
+    VarCentering& VarCentering::
+    operator= (value v)
+    {
+      static_cast< ::xml_schema::string& > (*this) = 
+      ::xml_schema::string (_xsd_VarCentering_literals_[v]);
+
+      return *this;
+    }
+
 
     // Variable
     // 
@@ -732,16 +846,16 @@ namespace Damaris
       this->layout_.set (x);
     }
 
-    const Variable::enabled_optional& Variable::
+    const Variable::enabled_type& Variable::
     enabled () const
     {
-      return this->enabled_;
+      return this->enabled_.get ();
     }
 
-    Variable::enabled_optional& Variable::
+    Variable::enabled_type& Variable::
     enabled ()
     {
-      return this->enabled_;
+      return this->enabled_.get ();
     }
 
     void Variable::
@@ -750,10 +864,124 @@ namespace Damaris
       this->enabled_.set (x);
     }
 
-    void Variable::
-    enabled (const enabled_optional& x)
+    Variable::enabled_type Variable::
+    enabled_default_value ()
     {
-      this->enabled_ = x;
+      return enabled_type (true);
+    }
+
+    const Variable::mesh_type& Variable::
+    mesh () const
+    {
+      return this->mesh_.get ();
+    }
+
+    Variable::mesh_type& Variable::
+    mesh ()
+    {
+      return this->mesh_.get ();
+    }
+
+    void Variable::
+    mesh (const mesh_type& x)
+    {
+      this->mesh_.set (x);
+    }
+
+    void Variable::
+    mesh (::std::auto_ptr< mesh_type > x)
+    {
+      this->mesh_.set (x);
+    }
+
+    const Variable::mesh_type& Variable::
+    mesh_default_value ()
+    {
+      return mesh_default_value_;
+    }
+
+    const Variable::type_type& Variable::
+    type () const
+    {
+      return this->type_.get ();
+    }
+
+    Variable::type_type& Variable::
+    type ()
+    {
+      return this->type_.get ();
+    }
+
+    void Variable::
+    type (const type_type& x)
+    {
+      this->type_.set (x);
+    }
+
+    void Variable::
+    type (::std::auto_ptr< type_type > x)
+    {
+      this->type_.set (x);
+    }
+
+    const Variable::type_type& Variable::
+    type_default_value ()
+    {
+      return type_default_value_;
+    }
+
+    const Variable::centering_type& Variable::
+    centering () const
+    {
+      return this->centering_.get ();
+    }
+
+    Variable::centering_type& Variable::
+    centering ()
+    {
+      return this->centering_.get ();
+    }
+
+    void Variable::
+    centering (const centering_type& x)
+    {
+      this->centering_.set (x);
+    }
+
+    void Variable::
+    centering (::std::auto_ptr< centering_type > x)
+    {
+      this->centering_.set (x);
+    }
+
+    const Variable::centering_type& Variable::
+    centering_default_value ()
+    {
+      return centering_default_value_;
+    }
+
+    const Variable::visualizable_type& Variable::
+    visualizable () const
+    {
+      return this->visualizable_.get ();
+    }
+
+    Variable::visualizable_type& Variable::
+    visualizable ()
+    {
+      return this->visualizable_.get ();
+    }
+
+    void Variable::
+    visualizable (const visualizable_type& x)
+    {
+      this->visualizable_.set (x);
+    }
+
+    Variable::visualizable_type Variable::
+    visualizable_default_value ()
+    {
+      return visualizable_type (true);
     }
 
 
@@ -794,6 +1022,24 @@ namespace Damaris
     group (const group_sequence& s)
     {
       this->group_ = s;
+    }
+
+    const Group::mesh_sequence& Group::
+    mesh () const
+    {
+      return this->mesh_;
+    }
+
+    Group::mesh_sequence& Group::
+    mesh ()
+    {
+      return this->mesh_;
+    }
+
+    void Group::
+    mesh (const mesh_sequence& s)
+    {
+      this->mesh_ = s;
     }
 
     const Group::name_type& Group::
@@ -921,6 +1167,257 @@ namespace Damaris
     }
 
 
+    // MeshType
+    // 
+
+    MeshType::
+    MeshType (value v)
+    : ::xml_schema::string (_xsd_MeshType_literals_[v])
+    {
+    }
+
+    MeshType::
+    MeshType (const char* v)
+    : ::xml_schema::string (v)
+    {
+    }
+
+    MeshType::
+    MeshType (const ::std::string& v)
+    : ::xml_schema::string (v)
+    {
+    }
+
+    MeshType::
+    MeshType (const ::xml_schema::string& v)
+    : ::xml_schema::string (v)
+    {
+    }
+
+    MeshType::
+    MeshType (const MeshType& v,
+              ::xml_schema::flags f,
+              ::xml_schema::container* c)
+    : ::xml_schema::string (v, f, c)
+    {
+    }
+
+    MeshType& MeshType::
+    operator= (value v)
+    {
+      static_cast< ::xml_schema::string& > (*this) = 
+      ::xml_schema::string (_xsd_MeshType_literals_[v]);
+
+      return *this;
+    }
+
+
+    // MeshCoord
+    // 
+
+    const MeshCoord::name_type& MeshCoord::
+    name () const
+    {
+      return this->name_.get ();
+    }
+
+    MeshCoord::name_type& MeshCoord::
+    name ()
+    {
+      return this->name_.get ();
+    }
+
+    void MeshCoord::
+    name (const name_type& x)
+    {
+      this->name_.set (x);
+    }
+
+    void MeshCoord::
+    name (::std::auto_ptr< name_type > x)
+    {
+      this->name_.set (x);
+    }
+
+    const MeshCoord::unit_type& MeshCoord::
+    unit () const
+    {
+      return this->unit_.get ();
+    }
+
+    MeshCoord::unit_type& MeshCoord::
+    unit ()
+    {
+      return this->unit_.get ();
+    }
+
+    void MeshCoord::
+    unit (const unit_type& x)
+    {
+      this->unit_.set (x);
+    }
+
+    void MeshCoord::
+    unit (::std::auto_ptr< unit_type > x)
+    {
+      this->unit_.set (x);
+    }
+
+    const MeshCoord::unit_type& MeshCoord::
+    unit_default_value ()
+    {
+      return unit_default_value_;
+    }
+
+    const MeshCoord::label_type& MeshCoord::
+    label () const
+    {
+      return this->label_.get ();
+    }
+
+    MeshCoord::label_type& MeshCoord::
+    label ()
+    {
+      return this->label_.get ();
+    }
+
+    void MeshCoord::
+    label (const label_type& x)
+    {
+      this->label_.set (x);
+    }
+
+    void MeshCoord::
+    label (::std::auto_ptr< label_type > x)
+    {
+      this->label_.set (x);
+    }
+
+    const MeshCoord::label_type& MeshCoord::
+    label_default_value ()
+    {
+      return label_default_value_;
+    }
+
+
+    // Mesh
+    // 
+
+    const Mesh::coords_sequence& Mesh::
+    coords () const
+    {
+      return this->coords_;
+    }
+
+    Mesh::coords_sequence& Mesh::
+    coords ()
+    {
+      return this->coords_;
+    }
+
+    void Mesh::
+    coords (const coords_sequence& s)
+    {
+      this->coords_ = s;
+    }
+
+    const Mesh::name_type& Mesh::
+    name () const
+    {
+      return this->name_.get ();
+    }
+
+    Mesh::name_type& Mesh::
+    name ()
+    {
+      return this->name_.get ();
+    }
+
+    void Mesh::
+    name (const name_type& x)
+    {
+      this->name_.set (x);
+    }
+
+    void Mesh::
+    name (::std::auto_ptr< name_type > x)
+    {
+      this->name_.set (x);
+    }
+
+    const Mesh::type_type& Mesh::
+    type () const
+    {
+      return this->type_.get ();
+    }
+
+    Mesh::type_type& Mesh::
+    type ()
+    {
+      return this->type_.get ();
+    }
+
+    void Mesh::
+    type (const type_type& x)
+    {
+      this->type_.set (x);
+    }
+
+    void Mesh::
+    type (::std::auto_ptr< type_type > x)
+    {
+      this->type_.set (x);
+    }
+
+    const Mesh::dimensions_type& Mesh::
+    dimensions () const
+    {
+      return this->dimensions_.get ();
+    }
+
+    Mesh::dimensions_type& Mesh::
+    dimensions ()
+    {
+      return this->dimensions_.get ();
+    }
+
+    void Mesh::
+    dimensions (const dimensions_type& x)
+    {
+      this->dimensions_.set (x);
+    }
+
+    Mesh::dimensions_type Mesh::
+    dimensions_default_value ()
+    {
+      return dimensions_type (2);
+    }
+
+    const Mesh::topology_type& Mesh::
+    topology () const
+    {
+      return this->topology_.get ();
+    }
+
+    Mesh::topology_type& Mesh::
+    topology ()
+    {
+      return this->topology_.get ();
+    }
+
+    void Mesh::
+    topology (const topology_type& x)
+    {
+      this->topology_.set (x);
+    }
+
+    Mesh::topology_type Mesh::
+    topology_default_value ()
+    {
+      return topology_type (2);
+    }
+
+
     // Data
     // 
 
@@ -994,6 +1491,24 @@ namespace Damaris
     group (const group_sequence& s)
     {
       this->group_ = s;
+    }
+
+    const Data::mesh_sequence& Data::
+    mesh () const
+    {
+      return this->mesh_;
+    }
+
+    Data::mesh_sequence& Data::
+    mesh ()
+    {
+      return this->mesh_;
+    }
+
+    void Data::
+    mesh (const mesh_sequence& s)
+    {
+      this->mesh_ = s;
     }
 
 
@@ -1153,6 +1668,30 @@ namespace Damaris
       return scope_default_value_;
     }
 
+    const Event::external_type& Event::
+    external () const
+    {
+      return this->external_.get ();
+    }
+
+    Event::external_type& Event::
+    external ()
+    {
+      return this->external_.get ();
+    }
+
+    void Event::
+    external (const external_type& x)
+    {
+      this->external_.set (x);
+    }
+
+    Event::external_type Event::
+    external_default_value ()
+    {
+      return external_type (false);
+    }
+
 
     // Script
     // 
@@ -1257,6 +1796,30 @@ namespace Damaris
     scope_default_value ()
     {
       return scope_default_value_;
+    }
+
+    const Script::external_type& Script::
+    external () const
+    {
+      return this->external_.get ();
+    }
+
+    Script::external_type& Script::
+    external ()
+    {
+      return this->external_.get ();
+    }
+
+    void Script::
+    external (const external_type& x)
+    {
+      this->external_.set (x);
+    }
+
+    Script::external_type Script::
+    external_default_value ()
+    {
+      return external_type (false);
     }
 
 
@@ -2263,7 +2826,8 @@ namespace Damaris
       name_ (name, ::xml_schema::flags (), this),
       type_ (type, ::xml_schema::flags (), this),
       dimensions_ (dimensions, ::xml_schema::flags (), this),
-      language_ (language_default_value (), ::xml_schema::flags (), this)
+      language_ (language_default_value (), ::xml_schema::flags (), this),
+      visualizable_ (visualizable_default_value (), ::xml_schema::flags (), this)
     {
     }
 
@@ -2276,7 +2840,8 @@ namespace Damaris
       name_ (name, ::xml_schema::flags (), this),
       type_ (type, ::xml_schema::flags (), this),
       dimensions_ (dimensions, ::xml_schema::flags (), this),
-      language_ (language_default_value (), ::xml_schema::flags (), this)
+      language_ (language_default_value (), ::xml_schema::flags (), this),
+      visualizable_ (visualizable_default_value (), ::xml_schema::flags (), this)
     {
     }
 
@@ -2289,7 +2854,8 @@ namespace Damaris
       name_ (name, ::xml_schema::flags (), this),
       type_ (type, ::xml_schema::flags (), this),
       dimensions_ (dimensions, ::xml_schema::flags (), this),
-      language_ (language_default_value (), ::xml_schema::flags (), this)
+      language_ (language_default_value (), ::xml_schema::flags (), this),
+      visualizable_ (visualizable_default_value (), ::xml_schema::flags (), this)
     {
     }
 
@@ -2302,7 +2868,8 @@ namespace Damaris
       name_ (name, ::xml_schema::flags (), this),
       type_ (type, ::xml_schema::flags (), this),
       dimensions_ (dimensions, ::xml_schema::flags (), this),
-      language_ (language_default_value (), ::xml_schema::flags (), this)
+      language_ (language_default_value (), ::xml_schema::flags (), this),
+      visualizable_ (visualizable_default_value (), ::xml_schema::flags (), this)
     {
     }
 
@@ -2314,7 +2881,8 @@ namespace Damaris
       name_ (x.name_, f, this),
       type_ (x.type_, f, this),
       dimensions_ (x.dimensions_, f, this),
-      language_ (x.language_, f, this)
+      language_ (x.language_, f, this),
+      visualizable_ (x.visualizable_, f, this)
     {
     }
 
@@ -2326,7 +2894,8 @@ namespace Damaris
       name_ (f, this),
       type_ (f, this),
       dimensions_ (f, this),
-      language_ (f, this)
+      language_ (f, this),
+      visualizable_ (f, this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
       {
@@ -2380,6 +2949,12 @@ namespace Damaris
           this->language_.set (r);
           continue;
         }
+
+        if (n.name () == "visualizable" && n.namespace_ ().empty ())
+        {
+          this->visualizable_.set (visualizable_traits::create (i, f, this));
+          continue;
+        }
       }
 
       if (!name_.present ())
@@ -2407,6 +2982,11 @@ namespace Damaris
       {
         this->language_.set (language_default_value ());
       }
+
+      if (!visualizable_.present ())
+      {
+        this->visualizable_.set (visualizable_default_value ());
+      }
     }
 
     Layout* Layout::
@@ -2421,11 +3001,176 @@ namespace Damaris
     {
     }
 
+    // VarType
+    //
+
+    VarType::
+    VarType (const ::xercesc::DOMElement& e,
+             ::xml_schema::flags f,
+             ::xml_schema::container* c)
+    : ::xml_schema::string (e, f, c)
+    {
+      _xsd_VarType_convert ();
+    }
+
+    VarType::
+    VarType (const ::xercesc::DOMAttr& a,
+             ::xml_schema::flags f,
+             ::xml_schema::container* c)
+    : ::xml_schema::string (a, f, c)
+    {
+      _xsd_VarType_convert ();
+    }
+
+    VarType::
+    VarType (const ::std::string& s,
+             const ::xercesc::DOMElement* e,
+             ::xml_schema::flags f,
+             ::xml_schema::container* c)
+    : ::xml_schema::string (s, e, f, c)
+    {
+      _xsd_VarType_convert ();
+    }
+
+    VarType* VarType::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class VarType (*this, f, c);
+    }
+
+    VarType::value VarType::
+    _xsd_VarType_convert () const
+    {
+      ::xsd::cxx::tree::enum_comparator< char > c (_xsd_VarType_literals_);
+      const value* i (::std::lower_bound (
+                        _xsd_VarType_indexes_,
+                        _xsd_VarType_indexes_ + 10,
+                        *this,
+                        c));
+
+      if (i == _xsd_VarType_indexes_ + 10 || _xsd_VarType_literals_[*i] != *this)
+      {
+        throw ::xsd::cxx::tree::unexpected_enumerator < char > (*this);
+      }
+
+      return *i;
+    }
+
+    const char* const VarType::
+    _xsd_VarType_literals_[10] =
+    {
+      "scalar",
+      "vector",
+      "tensor",
+      "symmetric-tensor",
+      "material",
+      "matspecies",
+      "label",
+      "array",
+      "mesh",
+      "curve"
+    };
+
+    const VarType::value VarType::
+    _xsd_VarType_indexes_[10] =
+    {
+      ::Damaris::Model::VarType::array,
+      ::Damaris::Model::VarType::curve,
+      ::Damaris::Model::VarType::label,
+      ::Damaris::Model::VarType::material,
+      ::Damaris::Model::VarType::matspecies,
+      ::Damaris::Model::VarType::mesh,
+      ::Damaris::Model::VarType::scalar,
+      ::Damaris::Model::VarType::symmetric_tensor,
+      ::Damaris::Model::VarType::tensor,
+      ::Damaris::Model::VarType::vector
+    };
+
+    // VarCentering
+    //
+
+    VarCentering::
+    VarCentering (const ::xercesc::DOMElement& e,
+                  ::xml_schema::flags f,
+                  ::xml_schema::container* c)
+    : ::xml_schema::string (e, f, c)
+    {
+      _xsd_VarCentering_convert ();
+    }
+
+    VarCentering::
+    VarCentering (const ::xercesc::DOMAttr& a,
+                  ::xml_schema::flags f,
+                  ::xml_schema::container* c)
+    : ::xml_schema::string (a, f, c)
+    {
+      _xsd_VarCentering_convert ();
+    }
+
+    VarCentering::
+    VarCentering (const ::std::string& s,
+                  const ::xercesc::DOMElement* e,
+                  ::xml_schema::flags f,
+                  ::xml_schema::container* c)
+    : ::xml_schema::string (s, e, f, c)
+    {
+      _xsd_VarCentering_convert ();
+    }
+
+    VarCentering* VarCentering::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class VarCentering (*this, f, c);
+    }
+
+    VarCentering::value VarCentering::
+    _xsd_VarCentering_convert () const
+    {
+      ::xsd::cxx::tree::enum_comparator< char > c (_xsd_VarCentering_literals_);
+      const value* i (::std::lower_bound (
+                        _xsd_VarCentering_indexes_,
+                        _xsd_VarCentering_indexes_ + 2,
+                        *this,
+                        c));
+
+      if (i == _xsd_VarCentering_indexes_ + 2 || _xsd_VarCentering_literals_[*i] != *this)
+      {
+        throw ::xsd::cxx::tree::unexpected_enumerator < char > (*this);
+      }
+
+      return *i;
+    }
+
+    const char* const VarCentering::
+    _xsd_VarCentering_literals_[2] =
+    {
+      "nodal",
+      "zonal"
+    };
+
+    const VarCentering::value VarCentering::
+    _xsd_VarCentering_indexes_[2] =
+    {
+      ::Damaris::Model::VarCentering::nodal,
+      ::Damaris::Model::VarCentering::zonal
+    };
+
     // Variable
     //
 
     const Variable::unit_type Variable::unit_default_value_ (
       "");
+
+    const Variable::mesh_type Variable::mesh_default_value_ (
+      "#");
+
+    const Variable::type_type Variable::type_default_value_ (
+      "scalar");
+
+    const Variable::centering_type Variable::centering_default_value_ (
+      "zonal");
 
     Variable::
     Variable (const name_type& name,
@@ -2434,7 +3179,11 @@ namespace Damaris
       name_ (name, ::xml_schema::flags (), this),
       unit_ (unit_default_value (), ::xml_schema::flags (), this),
       layout_ (layout, ::xml_schema::flags (), this),
-      enabled_ (::xml_schema::flags (), this)
+      enabled_ (enabled_default_value (), ::xml_schema::flags (), this),
+      mesh_ (mesh_default_value (), ::xml_schema::flags (), this),
+      type_ (type_default_value (), ::xml_schema::flags (), this),
+      centering_ (centering_default_value (), ::xml_schema::flags (), this),
+      visualizable_ (visualizable_default_value (), ::xml_schema::flags (), this)
     {
     }
 
@@ -2446,7 +3195,11 @@ namespace Damaris
       name_ (name, ::xml_schema::flags (), this),
       unit_ (unit_default_value (), ::xml_schema::flags (), this),
       layout_ (layout, ::xml_schema::flags (), this),
-      enabled_ (::xml_schema::flags (), this)
+      enabled_ (enabled_default_value (), ::xml_schema::flags (), this),
+      mesh_ (mesh_default_value (), ::xml_schema::flags (), this),
+      type_ (type_default_value (), ::xml_schema::flags (), this),
+      centering_ (centering_default_value (), ::xml_schema::flags (), this),
+      visualizable_ (visualizable_default_value (), ::xml_schema::flags (), this)
     {
     }
 
@@ -2458,7 +3211,11 @@ namespace Damaris
       name_ (name, ::xml_schema::flags (), this),
       unit_ (unit_default_value (), ::xml_schema::flags (), this),
       layout_ (layout, ::xml_schema::flags (), this),
-      enabled_ (::xml_schema::flags (), this)
+      enabled_ (enabled_default_value (), ::xml_schema::flags (), this),
+      mesh_ (mesh_default_value (), ::xml_schema::flags (), this),
+      type_ (type_default_value (), ::xml_schema::flags (), this),
+      centering_ (centering_default_value (), ::xml_schema::flags (), this),
+      visualizable_ (visualizable_default_value (), ::xml_schema::flags (), this)
     {
     }
 
@@ -2470,7 +3227,11 @@ namespace Damaris
       name_ (name, ::xml_schema::flags (), this),
       unit_ (unit_default_value (), ::xml_schema::flags (), this),
       layout_ (layout, ::xml_schema::flags (), this),
-      enabled_ (::xml_schema::flags (), this)
+      enabled_ (enabled_default_value (), ::xml_schema::flags (), this),
+      mesh_ (mesh_default_value (), ::xml_schema::flags (), this),
+      type_ (type_default_value (), ::xml_schema::flags (), this),
+      centering_ (centering_default_value (), ::xml_schema::flags (), this),
+      visualizable_ (visualizable_default_value (), ::xml_schema::flags (), this)
     {
     }
 
@@ -2482,7 +3243,11 @@ namespace Damaris
       name_ (x.name_, f, this),
       unit_ (x.unit_, f, this),
       layout_ (x.layout_, f, this),
-      enabled_ (x.enabled_, f, this)
+      enabled_ (x.enabled_, f, this),
+      mesh_ (x.mesh_, f, this),
+      type_ (x.type_, f, this),
+      centering_ (x.centering_, f, this),
+      visualizable_ (x.visualizable_, f, this)
     {
     }
 
@@ -2494,7 +3259,11 @@ namespace Damaris
       name_ (f, this),
       unit_ (f, this),
       layout_ (f, this),
-      enabled_ (f, this)
+      enabled_ (f, this),
+      mesh_ (f, this),
+      type_ (f, this),
+      centering_ (f, this),
+      visualizable_ (f, this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
       {
@@ -2545,6 +3314,39 @@ namespace Damaris
           this->enabled_.set (enabled_traits::create (i, f, this));
           continue;
         }
+
+        if (n.name () == "mesh" && n.namespace_ ().empty ())
+        {
+          ::std::auto_ptr< mesh_type > r (
+            mesh_traits::create (i, f, this));
+
+          this->mesh_.set (r);
+          continue;
+        }
+
+        if (n.name () == "type" && n.namespace_ ().empty ())
+        {
+          ::std::auto_ptr< type_type > r (
+            type_traits::create (i, f, this));
+
+          this->type_.set (r);
+          continue;
+        }
+
+        if (n.name () == "centering" && n.namespace_ ().empty ())
+        {
+          ::std::auto_ptr< centering_type > r (
+            centering_traits::create (i, f, this));
+
+          this->centering_.set (r);
+          continue;
+        }
+
+        if (n.name () == "visualizable" && n.namespace_ ().empty ())
+        {
+          this->visualizable_.set (visualizable_traits::create (i, f, this));
+          continue;
+        }
       }
 
       if (!name_.present ())
@@ -2564,6 +3366,31 @@ namespace Damaris
         throw ::xsd::cxx::tree::expected_attribute< char > (
           "layout",
           "");
+      }
+
+      if (!enabled_.present ())
+      {
+        this->enabled_.set (enabled_default_value ());
+      }
+
+      if (!mesh_.present ())
+      {
+        this->mesh_.set (mesh_default_value ());
+      }
+
+      if (!type_.present ())
+      {
+        this->type_.set (type_default_value ());
+      }
+
+      if (!centering_.present ())
+      {
+        this->centering_.set (centering_default_value ());
+      }
+
+      if (!visualizable_.present ())
+      {
+        this->visualizable_.set (visualizable_default_value ());
       }
     }
 
@@ -2587,6 +3414,7 @@ namespace Damaris
     : ::xml_schema::type (),
       variable_ (::xml_schema::flags (), this),
       group_ (::xml_schema::flags (), this),
+      mesh_ (::xml_schema::flags (), this),
       name_ (name, ::xml_schema::flags (), this),
       enabled_ (enabled_default_value (), ::xml_schema::flags (), this)
     {
@@ -2599,6 +3427,7 @@ namespace Damaris
     : ::xml_schema::type (x, f, c),
       variable_ (x.variable_, f, this),
       group_ (x.group_, f, this),
+      mesh_ (x.mesh_, f, this),
       name_ (x.name_, f, this),
       enabled_ (x.enabled_, f, this)
     {
@@ -2611,6 +3440,7 @@ namespace Damaris
     : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
       variable_ (f, this),
       group_ (f, this),
+      mesh_ (f, this),
       name_ (f, this),
       enabled_ (f, this)
     {
@@ -2650,6 +3480,17 @@ namespace Damaris
             group_traits::create (i, f, this));
 
           this->group_.push_back (r);
+          continue;
+        }
+
+        // mesh
+        //
+        if (n.name () == "mesh" && n.namespace_ () == "http://damaris.gforge.inria.fr/Damaris/Model")
+        {
+          ::std::auto_ptr< mesh_type > r (
+            mesh_traits::create (i, f, this));
+
+          this->mesh_.push_back (r);
           continue;
         }
 
@@ -2852,6 +3693,343 @@ namespace Damaris
     {
     }
 
+    // MeshType
+    //
+
+    MeshType::
+    MeshType (const ::xercesc::DOMElement& e,
+              ::xml_schema::flags f,
+              ::xml_schema::container* c)
+    : ::xml_schema::string (e, f, c)
+    {
+      _xsd_MeshType_convert ();
+    }
+
+    MeshType::
+    MeshType (const ::xercesc::DOMAttr& a,
+              ::xml_schema::flags f,
+              ::xml_schema::container* c)
+    : ::xml_schema::string (a, f, c)
+    {
+      _xsd_MeshType_convert ();
+    }
+
+    MeshType::
+    MeshType (const ::std::string& s,
+              const ::xercesc::DOMElement* e,
+              ::xml_schema::flags f,
+              ::xml_schema::container* c)
+    : ::xml_schema::string (s, e, f, c)
+    {
+      _xsd_MeshType_convert ();
+    }
+
+    MeshType* MeshType::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class MeshType (*this, f, c);
+    }
+
+    MeshType::value MeshType::
+    _xsd_MeshType_convert () const
+    {
+      ::xsd::cxx::tree::enum_comparator< char > c (_xsd_MeshType_literals_);
+      const value* i (::std::lower_bound (
+                        _xsd_MeshType_indexes_,
+                        _xsd_MeshType_indexes_ + 7,
+                        *this,
+                        c));
+
+      if (i == _xsd_MeshType_indexes_ + 7 || _xsd_MeshType_literals_[*i] != *this)
+      {
+        throw ::xsd::cxx::tree::unexpected_enumerator < char > (*this);
+      }
+
+      return *i;
+    }
+
+    const char* const MeshType::
+    _xsd_MeshType_literals_[7] =
+    {
+      "unknown",
+      "rectilinear",
+      "curvilinear",
+      "unstructured",
+      "point",
+      "csg",
+      "amr"
+    };
+
+    const MeshType::value MeshType::
+    _xsd_MeshType_indexes_[7] =
+    {
+      ::Damaris::Model::MeshType::amr,
+      ::Damaris::Model::MeshType::csg,
+      ::Damaris::Model::MeshType::curvilinear,
+      ::Damaris::Model::MeshType::point,
+      ::Damaris::Model::MeshType::rectilinear,
+      ::Damaris::Model::MeshType::unknown,
+      ::Damaris::Model::MeshType::unstructured
+    };
+
+    // MeshCoord
+    //
+
+    const MeshCoord::unit_type MeshCoord::unit_default_value_ (
+      "#");
+
+    const MeshCoord::label_type MeshCoord::label_default_value_ (
+      "#");
+
+    MeshCoord::
+    MeshCoord (const name_type& name)
+    : ::xml_schema::type (),
+      name_ (name, ::xml_schema::flags (), this),
+      unit_ (unit_default_value (), ::xml_schema::flags (), this),
+      label_ (label_default_value (), ::xml_schema::flags (), this)
+    {
+    }
+
+    MeshCoord::
+    MeshCoord (const MeshCoord& x,
+               ::xml_schema::flags f,
+               ::xml_schema::container* c)
+    : ::xml_schema::type (x, f, c),
+      name_ (x.name_, f, this),
+      unit_ (x.unit_, f, this),
+      label_ (x.label_, f, this)
+    {
+    }
+
+    MeshCoord::
+    MeshCoord (const ::xercesc::DOMElement& e,
+               ::xml_schema::flags f,
+               ::xml_schema::container* c)
+    : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+      name_ (f, this),
+      unit_ (f, this),
+      label_ (f, this)
+    {
+      if ((f & ::xml_schema::flags::base) == 0)
+      {
+        ::xsd::cxx::xml::dom::parser< char > p (e, false, true);
+        this->parse (p, f);
+      }
+    }
+
+    void MeshCoord::
+    parse (::xsd::cxx::xml::dom::parser< char >& p,
+           ::xml_schema::flags f)
+    {
+      while (p.more_attributes ())
+      {
+        const ::xercesc::DOMAttr& i (p.next_attribute ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        if (n.name () == "name" && n.namespace_ ().empty ())
+        {
+          ::std::auto_ptr< name_type > r (
+            name_traits::create (i, f, this));
+
+          this->name_.set (r);
+          continue;
+        }
+
+        if (n.name () == "unit" && n.namespace_ ().empty ())
+        {
+          ::std::auto_ptr< unit_type > r (
+            unit_traits::create (i, f, this));
+
+          this->unit_.set (r);
+          continue;
+        }
+
+        if (n.name () == "label" && n.namespace_ ().empty ())
+        {
+          ::std::auto_ptr< label_type > r (
+            label_traits::create (i, f, this));
+
+          this->label_.set (r);
+          continue;
+        }
+      }
+
+      if (!name_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_attribute< char > (
+          "name",
+          "");
+      }
+
+      if (!unit_.present ())
+      {
+        this->unit_.set (unit_default_value ());
+      }
+
+      if (!label_.present ())
+      {
+        this->label_.set (label_default_value ());
+      }
+    }
+
+    MeshCoord* MeshCoord::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class MeshCoord (*this, f, c);
+    }
+
+    MeshCoord::
+    ~MeshCoord ()
+    {
+    }
+
+    // Mesh
+    //
+
+    Mesh::
+    Mesh (const name_type& name,
+          const type_type& type)
+    : ::xml_schema::type (),
+      coords_ (::xml_schema::flags (), this),
+      name_ (name, ::xml_schema::flags (), this),
+      type_ (type, ::xml_schema::flags (), this),
+      dimensions_ (dimensions_default_value (), ::xml_schema::flags (), this),
+      topology_ (topology_default_value (), ::xml_schema::flags (), this)
+    {
+    }
+
+    Mesh::
+    Mesh (const Mesh& x,
+          ::xml_schema::flags f,
+          ::xml_schema::container* c)
+    : ::xml_schema::type (x, f, c),
+      coords_ (x.coords_, f, this),
+      name_ (x.name_, f, this),
+      type_ (x.type_, f, this),
+      dimensions_ (x.dimensions_, f, this),
+      topology_ (x.topology_, f, this)
+    {
+    }
+
+    Mesh::
+    Mesh (const ::xercesc::DOMElement& e,
+          ::xml_schema::flags f,
+          ::xml_schema::container* c)
+    : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+      coords_ (f, this),
+      name_ (f, this),
+      type_ (f, this),
+      dimensions_ (f, this),
+      topology_ (f, this)
+    {
+      if ((f & ::xml_schema::flags::base) == 0)
+      {
+        ::xsd::cxx::xml::dom::parser< char > p (e, true, true);
+        this->parse (p, f);
+      }
+    }
+
+    void Mesh::
+    parse (::xsd::cxx::xml::dom::parser< char >& p,
+           ::xml_schema::flags f)
+    {
+      for (; p.more_elements (); p.next_element ())
+      {
+        const ::xercesc::DOMElement& i (p.cur_element ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        // coords
+        //
+        if (n.name () == "coords" && n.namespace_ () == "http://damaris.gforge.inria.fr/Damaris/Model")
+        {
+          ::std::auto_ptr< coords_type > r (
+            coords_traits::create (i, f, this));
+
+          this->coords_.push_back (r);
+          continue;
+        }
+
+        break;
+      }
+
+      while (p.more_attributes ())
+      {
+        const ::xercesc::DOMAttr& i (p.next_attribute ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        if (n.name () == "name" && n.namespace_ ().empty ())
+        {
+          ::std::auto_ptr< name_type > r (
+            name_traits::create (i, f, this));
+
+          this->name_.set (r);
+          continue;
+        }
+
+        if (n.name () == "type" && n.namespace_ ().empty ())
+        {
+          ::std::auto_ptr< type_type > r (
+            type_traits::create (i, f, this));
+
+          this->type_.set (r);
+          continue;
+        }
+
+        if (n.name () == "dimensions" && n.namespace_ ().empty ())
+        {
+          this->dimensions_.set (dimensions_traits::create (i, f, this));
+          continue;
+        }
+
+        if (n.name () == "topology" && n.namespace_ ().empty ())
+        {
+          this->topology_.set (topology_traits::create (i, f, this));
+          continue;
+        }
+      }
+
+      if (!name_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_attribute< char > (
+          "name",
+          "");
+      }
+
+      if (!type_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_attribute< char > (
+          "type",
+          "");
+      }
+
+      if (!dimensions_.present ())
+      {
+        this->dimensions_.set (dimensions_default_value ());
+      }
+
+      if (!topology_.present ())
+      {
+        this->topology_.set (topology_default_value ());
+      }
+    }
+
+    Mesh* Mesh::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class Mesh (*this, f, c);
+    }
+
+    Mesh::
+    ~Mesh ()
+    {
+    }
+
     // Data
     //
 
@@ -2861,7 +4039,8 @@ namespace Damaris
       parameter_ (::xml_schema::flags (), this),
       layout_ (::xml_schema::flags (), this),
       variable_ (::xml_schema::flags (), this),
-      group_ (::xml_schema::flags (), this)
+      group_ (::xml_schema::flags (), this),
+      mesh_ (::xml_schema::flags (), this)
     {
     }
 
@@ -2873,7 +4052,8 @@ namespace Damaris
       parameter_ (x.parameter_, f, this),
       layout_ (x.layout_, f, this),
       variable_ (x.variable_, f, this),
-      group_ (x.group_, f, this)
+      group_ (x.group_, f, this),
+      mesh_ (x.mesh_, f, this)
     {
     }
 
@@ -2885,7 +4065,8 @@ namespace Damaris
       parameter_ (f, this),
       layout_ (f, this),
       variable_ (f, this),
-      group_ (f, this)
+      group_ (f, this),
+      mesh_ (f, this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
       {
@@ -2945,6 +4126,17 @@ namespace Damaris
             group_traits::create (i, f, this));
 
           this->group_.push_back (r);
+          continue;
+        }
+
+        // mesh
+        //
+        if (n.name () == "mesh" && n.namespace_ () == "http://damaris.gforge.inria.fr/Damaris/Model")
+        {
+          ::std::auto_ptr< mesh_type > r (
+            mesh_traits::create (i, f, this));
+
+          this->mesh_.push_back (r);
           continue;
         }
 
@@ -3052,7 +4244,8 @@ namespace Damaris
       name_ (name, ::xml_schema::flags (), this),
       action_ (action, ::xml_schema::flags (), this),
       library_ (library_default_value (), ::xml_schema::flags (), this),
-      scope_ (scope_default_value (), ::xml_schema::flags (), this)
+      scope_ (scope_default_value (), ::xml_schema::flags (), this),
+      external_ (external_default_value (), ::xml_schema::flags (), this)
     {
     }
 
@@ -3064,7 +4257,8 @@ namespace Damaris
       name_ (x.name_, f, this),
       action_ (x.action_, f, this),
       library_ (x.library_, f, this),
-      scope_ (x.scope_, f, this)
+      scope_ (x.scope_, f, this),
+      external_ (x.external_, f, this)
     {
     }
 
@@ -3076,7 +4270,8 @@ namespace Damaris
       name_ (f, this),
       action_ (f, this),
       library_ (f, this),
-      scope_ (f, this)
+      scope_ (f, this),
+      external_ (f, this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
       {
@@ -3130,6 +4325,12 @@ namespace Damaris
           this->scope_.set (r);
           continue;
         }
+
+        if (n.name () == "external" && n.namespace_ ().empty ())
+        {
+          this->external_.set (external_traits::create (i, f, this));
+          continue;
+        }
       }
 
       if (!name_.present ())
@@ -3154,6 +4355,11 @@ namespace Damaris
       if (!scope_.present ())
       {
         this->scope_.set (scope_default_value ());
+      }
+
+      if (!external_.present ())
+      {
+        this->external_.set (external_default_value ());
       }
     }
 
@@ -3183,7 +4389,8 @@ namespace Damaris
       name_ (name, ::xml_schema::flags (), this),
       file_ (file, ::xml_schema::flags (), this),
       language_ (language, ::xml_schema::flags (), this),
-      scope_ (scope_default_value (), ::xml_schema::flags (), this)
+      scope_ (scope_default_value (), ::xml_schema::flags (), this),
+      external_ (external_default_value (), ::xml_schema::flags (), this)
     {
     }
 
@@ -3195,7 +4402,8 @@ namespace Damaris
       name_ (x.name_, f, this),
       file_ (x.file_, f, this),
       language_ (x.language_, f, this),
-      scope_ (x.scope_, f, this)
+      scope_ (x.scope_, f, this),
+      external_ (x.external_, f, this)
     {
     }
 
@@ -3207,7 +4415,8 @@ namespace Damaris
       name_ (f, this),
       file_ (f, this),
       language_ (f, this),
-      scope_ (f, this)
+      scope_ (f, this),
+      external_ (f, this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
       {
@@ -3261,6 +4470,12 @@ namespace Damaris
           this->scope_.set (r);
           continue;
         }
+
+        if (n.name () == "external" && n.namespace_ ().empty ())
+        {
+          this->external_.set (external_traits::create (i, f, this));
+          continue;
+        }
       }
 
       if (!name_.present ())
@@ -3287,6 +4502,11 @@ namespace Damaris
       if (!scope_.present ())
       {
         this->scope_.set (scope_default_value ());
+      }
+
+      if (!external_.present ())
+      {
+        this->external_.set (external_default_value ());
       }
     }
 

@@ -250,9 +250,14 @@ namespace Damaris
     class Language;
     class Type;
     class Layout;
+    class VarType;
+    class VarCentering;
     class Variable;
     class Group;
     class Parameter;
+    class MeshType;
+    class MeshCoord;
+    class Mesh;
     class Data;
     class Scope;
     class Event;
@@ -958,6 +963,23 @@ namespace Damaris
       static const language_type&
       language_default_value ();
 
+      // visualizable
+      // 
+      typedef ::xml_schema::boolean visualizable_type;
+      typedef ::xsd::cxx::tree::traits< visualizable_type, char > visualizable_traits;
+
+      const visualizable_type&
+      visualizable () const;
+
+      visualizable_type&
+      visualizable ();
+
+      void
+      visualizable (const visualizable_type& x);
+
+      static visualizable_type
+      visualizable_default_value ();
+
       // Constructors.
       //
       Layout (const name_type&,
@@ -1007,6 +1029,127 @@ namespace Damaris
       ::xsd::cxx::tree::one< dimensions_type > dimensions_;
       ::xsd::cxx::tree::one< language_type > language_;
       static const language_type language_default_value_;
+      ::xsd::cxx::tree::one< visualizable_type > visualizable_;
+    };
+
+    class VarType: public ::xml_schema::string
+    {
+      public:
+      enum value
+      {
+        scalar,
+        vector,
+        tensor,
+        symmetric_tensor,
+        material,
+        matspecies,
+        label,
+        array,
+        mesh,
+        curve
+      };
+
+      VarType (value v);
+
+      VarType (const char* v);
+
+      VarType (const ::std::string& v);
+
+      VarType (const ::xml_schema::string& v);
+
+      VarType (const ::xercesc::DOMElement& e,
+               ::xml_schema::flags f = 0,
+               ::xml_schema::container* c = 0);
+
+      VarType (const ::xercesc::DOMAttr& a,
+               ::xml_schema::flags f = 0,
+               ::xml_schema::container* c = 0);
+
+      VarType (const ::std::string& s,
+               const ::xercesc::DOMElement* e,
+               ::xml_schema::flags f = 0,
+               ::xml_schema::container* c = 0);
+
+      VarType (const VarType& x,
+               ::xml_schema::flags f = 0,
+               ::xml_schema::container* c = 0);
+
+      virtual VarType*
+      _clone (::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0) const;
+
+      VarType&
+      operator= (value v);
+
+      virtual
+      operator value () const
+      {
+        return _xsd_VarType_convert ();
+      }
+
+      protected:
+      value
+      _xsd_VarType_convert () const;
+
+      public:
+      static const char* const _xsd_VarType_literals_[10];
+      static const value _xsd_VarType_indexes_[10];
+    };
+
+    class VarCentering: public ::xml_schema::string
+    {
+      public:
+      enum value
+      {
+        nodal,
+        zonal
+      };
+
+      VarCentering (value v);
+
+      VarCentering (const char* v);
+
+      VarCentering (const ::std::string& v);
+
+      VarCentering (const ::xml_schema::string& v);
+
+      VarCentering (const ::xercesc::DOMElement& e,
+                    ::xml_schema::flags f = 0,
+                    ::xml_schema::container* c = 0);
+
+      VarCentering (const ::xercesc::DOMAttr& a,
+                    ::xml_schema::flags f = 0,
+                    ::xml_schema::container* c = 0);
+
+      VarCentering (const ::std::string& s,
+                    const ::xercesc::DOMElement* e,
+                    ::xml_schema::flags f = 0,
+                    ::xml_schema::container* c = 0);
+
+      VarCentering (const VarCentering& x,
+                    ::xml_schema::flags f = 0,
+                    ::xml_schema::container* c = 0);
+
+      virtual VarCentering*
+      _clone (::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0) const;
+
+      VarCentering&
+      operator= (value v);
+
+      virtual
+      operator value () const
+      {
+        return _xsd_VarCentering_convert ();
+      }
+
+      protected:
+      value
+      _xsd_VarCentering_convert () const;
+
+      public:
+      static const char* const _xsd_VarCentering_literals_[2];
+      static const value _xsd_VarCentering_indexes_[2];
     };
 
     class Variable: public ::xml_schema::string
@@ -1069,20 +1212,96 @@ namespace Damaris
       // enabled
       // 
       typedef ::xml_schema::boolean enabled_type;
-      typedef ::xsd::cxx::tree::optional< enabled_type > enabled_optional;
       typedef ::xsd::cxx::tree::traits< enabled_type, char > enabled_traits;
 
-      const enabled_optional&
+      const enabled_type&
       enabled () const;
 
-      enabled_optional&
+      enabled_type&
       enabled ();
 
       void
       enabled (const enabled_type& x);
 
+      static enabled_type
+      enabled_default_value ();
+
+      // mesh
+      // 
+      typedef ::xml_schema::string mesh_type;
+      typedef ::xsd::cxx::tree::traits< mesh_type, char > mesh_traits;
+
+      const mesh_type&
+      mesh () const;
+
+      mesh_type&
+      mesh ();
+
       void
-      enabled (const enabled_optional& x);
+      mesh (const mesh_type& x);
+
+      void
+      mesh (::std::auto_ptr< mesh_type > p);
+
+      static const mesh_type&
+      mesh_default_value ();
+
+      // type
+      // 
+      typedef ::Damaris::Model::VarType type_type;
+      typedef ::xsd::cxx::tree::traits< type_type, char > type_traits;
+
+      const type_type&
+      type () const;
+
+      type_type&
+      type ();
+
+      void
+      type (const type_type& x);
+
+      void
+      type (::std::auto_ptr< type_type > p);
+
+      static const type_type&
+      type_default_value ();
+
+      // centering
+      // 
+      typedef ::Damaris::Model::VarCentering centering_type;
+      typedef ::xsd::cxx::tree::traits< centering_type, char > centering_traits;
+
+      const centering_type&
+      centering () const;
+
+      centering_type&
+      centering ();
+
+      void
+      centering (const centering_type& x);
+
+      void
+      centering (::std::auto_ptr< centering_type > p);
+
+      static const centering_type&
+      centering_default_value ();
+
+      // visualizable
+      // 
+      typedef ::xml_schema::boolean visualizable_type;
+      typedef ::xsd::cxx::tree::traits< visualizable_type, char > visualizable_traits;
+
+      const visualizable_type&
+      visualizable () const;
+
+      visualizable_type&
+      visualizable ();
+
+      void
+      visualizable (const visualizable_type& x);
+
+      static visualizable_type
+      visualizable_default_value ();
 
       // Constructors.
       //
@@ -1128,7 +1347,14 @@ namespace Damaris
       ::xsd::cxx::tree::one< unit_type > unit_;
       static const unit_type unit_default_value_;
       ::xsd::cxx::tree::one< layout_type > layout_;
-      enabled_optional enabled_;
+      ::xsd::cxx::tree::one< enabled_type > enabled_;
+      ::xsd::cxx::tree::one< mesh_type > mesh_;
+      static const mesh_type mesh_default_value_;
+      ::xsd::cxx::tree::one< type_type > type_;
+      static const type_type type_default_value_;
+      ::xsd::cxx::tree::one< centering_type > centering_;
+      static const centering_type centering_default_value_;
+      ::xsd::cxx::tree::one< visualizable_type > visualizable_;
     };
 
     class Group: public ::xml_schema::type
@@ -1167,6 +1393,23 @@ namespace Damaris
 
       void
       group (const group_sequence& s);
+
+      // mesh
+      // 
+      typedef ::Damaris::Model::Mesh mesh_type;
+      typedef ::xsd::cxx::tree::sequence< mesh_type > mesh_sequence;
+      typedef mesh_sequence::iterator mesh_iterator;
+      typedef mesh_sequence::const_iterator mesh_const_iterator;
+      typedef ::xsd::cxx::tree::traits< mesh_type, char > mesh_traits;
+
+      const mesh_sequence&
+      mesh () const;
+
+      mesh_sequence&
+      mesh ();
+
+      void
+      mesh (const mesh_sequence& s);
 
       // name
       // 
@@ -1231,6 +1474,7 @@ namespace Damaris
       protected:
       variable_sequence variable_;
       group_sequence group_;
+      mesh_sequence mesh_;
       ::xsd::cxx::tree::one< name_type > name_;
       ::xsd::cxx::tree::one< enabled_type > enabled_;
     };
@@ -1338,6 +1582,284 @@ namespace Damaris
       ::xsd::cxx::tree::one< value_type > value_;
     };
 
+    class MeshType: public ::xml_schema::string
+    {
+      public:
+      enum value
+      {
+        unknown,
+        rectilinear,
+        curvilinear,
+        unstructured,
+        point,
+        csg,
+        amr
+      };
+
+      MeshType (value v);
+
+      MeshType (const char* v);
+
+      MeshType (const ::std::string& v);
+
+      MeshType (const ::xml_schema::string& v);
+
+      MeshType (const ::xercesc::DOMElement& e,
+                ::xml_schema::flags f = 0,
+                ::xml_schema::container* c = 0);
+
+      MeshType (const ::xercesc::DOMAttr& a,
+                ::xml_schema::flags f = 0,
+                ::xml_schema::container* c = 0);
+
+      MeshType (const ::std::string& s,
+                const ::xercesc::DOMElement* e,
+                ::xml_schema::flags f = 0,
+                ::xml_schema::container* c = 0);
+
+      MeshType (const MeshType& x,
+                ::xml_schema::flags f = 0,
+                ::xml_schema::container* c = 0);
+
+      virtual MeshType*
+      _clone (::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0) const;
+
+      MeshType&
+      operator= (value v);
+
+      virtual
+      operator value () const
+      {
+        return _xsd_MeshType_convert ();
+      }
+
+      protected:
+      value
+      _xsd_MeshType_convert () const;
+
+      public:
+      static const char* const _xsd_MeshType_literals_[7];
+      static const value _xsd_MeshType_indexes_[7];
+    };
+
+    class MeshCoord: public ::xml_schema::type
+    {
+      public:
+      // name
+      // 
+      typedef ::xml_schema::string name_type;
+      typedef ::xsd::cxx::tree::traits< name_type, char > name_traits;
+
+      const name_type&
+      name () const;
+
+      name_type&
+      name ();
+
+      void
+      name (const name_type& x);
+
+      void
+      name (::std::auto_ptr< name_type > p);
+
+      // unit
+      // 
+      typedef ::xml_schema::string unit_type;
+      typedef ::xsd::cxx::tree::traits< unit_type, char > unit_traits;
+
+      const unit_type&
+      unit () const;
+
+      unit_type&
+      unit ();
+
+      void
+      unit (const unit_type& x);
+
+      void
+      unit (::std::auto_ptr< unit_type > p);
+
+      static const unit_type&
+      unit_default_value ();
+
+      // label
+      // 
+      typedef ::xml_schema::string label_type;
+      typedef ::xsd::cxx::tree::traits< label_type, char > label_traits;
+
+      const label_type&
+      label () const;
+
+      label_type&
+      label ();
+
+      void
+      label (const label_type& x);
+
+      void
+      label (::std::auto_ptr< label_type > p);
+
+      static const label_type&
+      label_default_value ();
+
+      // Constructors.
+      //
+      MeshCoord (const name_type&);
+
+      MeshCoord (const ::xercesc::DOMElement& e,
+                 ::xml_schema::flags f = 0,
+                 ::xml_schema::container* c = 0);
+
+      MeshCoord (const MeshCoord& x,
+                 ::xml_schema::flags f = 0,
+                 ::xml_schema::container* c = 0);
+
+      virtual MeshCoord*
+      _clone (::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0) const;
+
+      virtual 
+      ~MeshCoord ();
+
+      // Implementation.
+      //
+      protected:
+      void
+      parse (::xsd::cxx::xml::dom::parser< char >&,
+             ::xml_schema::flags);
+
+      protected:
+      ::xsd::cxx::tree::one< name_type > name_;
+      ::xsd::cxx::tree::one< unit_type > unit_;
+      static const unit_type unit_default_value_;
+      ::xsd::cxx::tree::one< label_type > label_;
+      static const label_type label_default_value_;
+    };
+
+    class Mesh: public ::xml_schema::type
+    {
+      public:
+      // coords
+      // 
+      typedef ::Damaris::Model::MeshCoord coords_type;
+      typedef ::xsd::cxx::tree::sequence< coords_type > coords_sequence;
+      typedef coords_sequence::iterator coords_iterator;
+      typedef coords_sequence::const_iterator coords_const_iterator;
+      typedef ::xsd::cxx::tree::traits< coords_type, char > coords_traits;
+
+      const coords_sequence&
+      coords () const;
+
+      coords_sequence&
+      coords ();
+
+      void
+      coords (const coords_sequence& s);
+
+      // name
+      // 
+      typedef ::xml_schema::string name_type;
+      typedef ::xsd::cxx::tree::traits< name_type, char > name_traits;
+
+      const name_type&
+      name () const;
+
+      name_type&
+      name ();
+
+      void
+      name (const name_type& x);
+
+      void
+      name (::std::auto_ptr< name_type > p);
+
+      // type
+      // 
+      typedef ::Damaris::Model::MeshType type_type;
+      typedef ::xsd::cxx::tree::traits< type_type, char > type_traits;
+
+      const type_type&
+      type () const;
+
+      type_type&
+      type ();
+
+      void
+      type (const type_type& x);
+
+      void
+      type (::std::auto_ptr< type_type > p);
+
+      // dimensions
+      // 
+      typedef ::xml_schema::unsigned_int dimensions_type;
+      typedef ::xsd::cxx::tree::traits< dimensions_type, char > dimensions_traits;
+
+      const dimensions_type&
+      dimensions () const;
+
+      dimensions_type&
+      dimensions ();
+
+      void
+      dimensions (const dimensions_type& x);
+
+      static dimensions_type
+      dimensions_default_value ();
+
+      // topology
+      // 
+      typedef ::xml_schema::unsigned_int topology_type;
+      typedef ::xsd::cxx::tree::traits< topology_type, char > topology_traits;
+
+      const topology_type&
+      topology () const;
+
+      topology_type&
+      topology ();
+
+      void
+      topology (const topology_type& x);
+
+      static topology_type
+      topology_default_value ();
+
+      // Constructors.
+      //
+      Mesh (const name_type&,
+            const type_type&);
+
+      Mesh (const ::xercesc::DOMElement& e,
+            ::xml_schema::flags f = 0,
+            ::xml_schema::container* c = 0);
+
+      Mesh (const Mesh& x,
+            ::xml_schema::flags f = 0,
+            ::xml_schema::container* c = 0);
+
+      virtual Mesh*
+      _clone (::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0) const;
+
+      virtual 
+      ~Mesh ();
+
+      // Implementation.
+      //
+      protected:
+      void
+      parse (::xsd::cxx::xml::dom::parser< char >&,
+             ::xml_schema::flags);
+
+      protected:
+      coords_sequence coords_;
+      ::xsd::cxx::tree::one< name_type > name_;
+      ::xsd::cxx::tree::one< type_type > type_;
+      ::xsd::cxx::tree::one< dimensions_type > dimensions_;
+      ::xsd::cxx::tree::one< topology_type > topology_;
+    };
+
     class Data: public ::xml_schema::type
     {
       public:
@@ -1409,6 +1931,23 @@ namespace Damaris
       void
       group (const group_sequence& s);
 
+      // mesh
+      // 
+      typedef ::Damaris::Model::Mesh mesh_type;
+      typedef ::xsd::cxx::tree::sequence< mesh_type > mesh_sequence;
+      typedef mesh_sequence::iterator mesh_iterator;
+      typedef mesh_sequence::const_iterator mesh_const_iterator;
+      typedef ::xsd::cxx::tree::traits< mesh_type, char > mesh_traits;
+
+      const mesh_sequence&
+      mesh () const;
+
+      mesh_sequence&
+      mesh ();
+
+      void
+      mesh (const mesh_sequence& s);
+
       // Constructors.
       //
       Data ();
@@ -1440,6 +1979,7 @@ namespace Damaris
       layout_sequence layout_;
       variable_sequence variable_;
       group_sequence group_;
+      mesh_sequence mesh_;
     };
 
     class Scope: public ::xml_schema::string
@@ -1576,6 +2116,23 @@ namespace Damaris
       static const scope_type&
       scope_default_value ();
 
+      // external
+      // 
+      typedef ::xml_schema::boolean external_type;
+      typedef ::xsd::cxx::tree::traits< external_type, char > external_traits;
+
+      const external_type&
+      external () const;
+
+      external_type&
+      external ();
+
+      void
+      external (const external_type& x);
+
+      static external_type
+      external_default_value ();
+
       // Constructors.
       //
       Event (const name_type&,
@@ -1610,6 +2167,7 @@ namespace Damaris
       static const library_type library_default_value_;
       ::xsd::cxx::tree::one< scope_type > scope_;
       static const scope_type scope_default_value_;
+      ::xsd::cxx::tree::one< external_type > external_;
     };
 
     class Script: public ::xml_schema::type
@@ -1686,6 +2244,23 @@ namespace Damaris
       static const scope_type&
       scope_default_value ();
 
+      // external
+      // 
+      typedef ::xml_schema::boolean external_type;
+      typedef ::xsd::cxx::tree::traits< external_type, char > external_traits;
+
+      const external_type&
+      external () const;
+
+      external_type&
+      external ();
+
+      void
+      external (const external_type& x);
+
+      static external_type
+      external_default_value ();
+
       // Constructors.
       //
       Script (const name_type&,
@@ -1720,6 +2295,7 @@ namespace Damaris
       ::xsd::cxx::tree::one< language_type > language_;
       ::xsd::cxx::tree::one< scope_type > scope_;
       static const scope_type scope_default_value_;
+      ::xsd::cxx::tree::one< external_type > external_;
     };
 
     class Actions: public ::xml_schema::type
