@@ -1823,6 +1823,34 @@ namespace Damaris
     }
 
 
+    // VisitParam
+    // 
+
+    const VisitParam::path_type& VisitParam::
+    path () const
+    {
+      return this->path_.get ();
+    }
+
+    VisitParam::path_type& VisitParam::
+    path ()
+    {
+      return this->path_.get ();
+    }
+
+    void VisitParam::
+    path (const path_type& x)
+    {
+      this->path_.set (x);
+    }
+
+    void VisitParam::
+    path (::std::auto_ptr< path_type > x)
+    {
+      this->path_.set (x);
+    }
+
+
     // Actions
     // 
 
@@ -1936,6 +1964,36 @@ namespace Damaris
     actions (::std::auto_ptr< actions_type > x)
     {
       this->actions_.set (x);
+    }
+
+    const Simulation::visit_optional& Simulation::
+    visit () const
+    {
+      return this->visit_;
+    }
+
+    Simulation::visit_optional& Simulation::
+    visit ()
+    {
+      return this->visit_;
+    }
+
+    void Simulation::
+    visit (const visit_type& x)
+    {
+      this->visit_.set (x);
+    }
+
+    void Simulation::
+    visit (const visit_optional& x)
+    {
+      this->visit_ = x;
+    }
+
+    void Simulation::
+    visit (::std::auto_ptr< visit_type > x)
+    {
+      this->visit_.set (x);
     }
 
     const Simulation::name_type& Simulation::
@@ -4522,6 +4580,86 @@ namespace Damaris
     {
     }
 
+    // VisitParam
+    //
+
+    VisitParam::
+    VisitParam (const path_type& path)
+    : ::xml_schema::type (),
+      path_ (path, ::xml_schema::flags (), this)
+    {
+    }
+
+    VisitParam::
+    VisitParam (const VisitParam& x,
+                ::xml_schema::flags f,
+                ::xml_schema::container* c)
+    : ::xml_schema::type (x, f, c),
+      path_ (x.path_, f, this)
+    {
+    }
+
+    VisitParam::
+    VisitParam (const ::xercesc::DOMElement& e,
+                ::xml_schema::flags f,
+                ::xml_schema::container* c)
+    : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+      path_ (f, this)
+    {
+      if ((f & ::xml_schema::flags::base) == 0)
+      {
+        ::xsd::cxx::xml::dom::parser< char > p (e, true, false);
+        this->parse (p, f);
+      }
+    }
+
+    void VisitParam::
+    parse (::xsd::cxx::xml::dom::parser< char >& p,
+           ::xml_schema::flags f)
+    {
+      for (; p.more_elements (); p.next_element ())
+      {
+        const ::xercesc::DOMElement& i (p.cur_element ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        // path
+        //
+        if (n.name () == "path" && n.namespace_ () == "http://damaris.gforge.inria.fr/Damaris/Model")
+        {
+          ::std::auto_ptr< path_type > r (
+            path_traits::create (i, f, this));
+
+          if (!path_.present ())
+          {
+            this->path_.set (r);
+            continue;
+          }
+        }
+
+        break;
+      }
+
+      if (!path_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_element< char > (
+          "path",
+          "http://damaris.gforge.inria.fr/Damaris/Model");
+      }
+    }
+
+    VisitParam* VisitParam::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class VisitParam (*this, f, c);
+    }
+
+    VisitParam::
+    ~VisitParam ()
+    {
+    }
+
     // Actions
     //
 
@@ -4621,6 +4759,7 @@ namespace Damaris
       architecture_ (architecture, ::xml_schema::flags (), this),
       data_ (data, ::xml_schema::flags (), this),
       actions_ (actions, ::xml_schema::flags (), this),
+      visit_ (::xml_schema::flags (), this),
       name_ (name, ::xml_schema::flags (), this),
       language_ (language_default_value (), ::xml_schema::flags (), this)
     {
@@ -4635,6 +4774,7 @@ namespace Damaris
       architecture_ (architecture, ::xml_schema::flags (), this),
       data_ (data, ::xml_schema::flags (), this),
       actions_ (actions, ::xml_schema::flags (), this),
+      visit_ (::xml_schema::flags (), this),
       name_ (name, ::xml_schema::flags (), this),
       language_ (language_default_value (), ::xml_schema::flags (), this)
     {
@@ -4648,6 +4788,7 @@ namespace Damaris
       architecture_ (x.architecture_, f, this),
       data_ (x.data_, f, this),
       actions_ (x.actions_, f, this),
+      visit_ (x.visit_, f, this),
       name_ (x.name_, f, this),
       language_ (x.language_, f, this)
     {
@@ -4661,6 +4802,7 @@ namespace Damaris
       architecture_ (f, this),
       data_ (f, this),
       actions_ (f, this),
+      visit_ (f, this),
       name_ (f, this),
       language_ (f, this)
     {
@@ -4719,6 +4861,20 @@ namespace Damaris
           if (!actions_.present ())
           {
             this->actions_.set (r);
+            continue;
+          }
+        }
+
+        // visit
+        //
+        if (n.name () == "visit" && n.namespace_ () == "http://damaris.gforge.inria.fr/Damaris/Model")
+        {
+          ::std::auto_ptr< visit_type > r (
+            visit_traits::create (i, f, this));
+
+          if (!this->visit_)
+          {
+            this->visit_.set (r);
             continue;
           }
         }

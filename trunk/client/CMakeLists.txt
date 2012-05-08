@@ -31,14 +31,19 @@ set(DAMARIS_COMMON_SRC
 
 if(PYTHON_LIB)
   set(DAMARIS_SCRIPTS_SRC
-	${DAMARIS_SCRIPTS_SRC}
-	${DAMARIS_SOURCE_DIR}/scripts/python/PyInterpreter.cpp
-	${DAMARIS_SOURCE_DIR}/scripts/python/PyVariable.cpp
-	${DAMARIS_SOURCE_DIR}/scripts/python/PyAction.cpp
-	${DAMARIS_SOURCE_DIR}/scripts/python/PyChunk.cpp
-	${DAMARIS_SOURCE_DIR}/scripts/python/PyLayout.cpp
-	${DAMARIS_SOURCE_DIR}/scripts/python/PyTypes.cpp)
+		${DAMARIS_SCRIPTS_SRC}
+		${DAMARIS_SOURCE_DIR}/scripts/python/PyInterpreter.cpp
+		${DAMARIS_SOURCE_DIR}/scripts/python/PyVariable.cpp
+		${DAMARIS_SOURCE_DIR}/scripts/python/PyAction.cpp
+		${DAMARIS_SOURCE_DIR}/scripts/python/PyChunk.cpp
+		${DAMARIS_SOURCE_DIR}/scripts/python/PyLayout.cpp
+		${DAMARIS_SOURCE_DIR}/scripts/python/PyTypes.cpp)
 endif(PYTHON_LIB)
+
+if(VISIT_PATH)
+	set(DAMARIS_VISIT_SRC
+		${DAMARIS_SOURCE_DIR}/viz/VisItListener.cpp)
+endif(VISIT_PATH)
 
 if(HDF5_ROOT)
   set(DAMARIS_PERSISTENCY_SRC
@@ -50,4 +55,5 @@ add_library (damaris ${DAMARIS_COMMON_SRC}
 			 ${DAMARIS_CLIENT_SRC}
 		     ${DAMARIS_MODEL_SRC}
 		     ${DAMARIS_SCRIPTS_SRC}
-		     ${DAMARIS_PERSISTENCY_SRC})
+		     ${DAMARIS_PERSISTENCY_SRC}
+			 ${DAMARIS_VISIT_SRC})

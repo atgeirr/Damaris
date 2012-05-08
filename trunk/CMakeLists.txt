@@ -117,6 +117,13 @@ if(HDF5_ROOT)
 endif(HDF5_ROOT)
 
 #-----------------------------------------------------------#
+# Set everything related to VisIt 
+#-----------------------------------------------------------#
+set(VISIT_PATH "~/Work/Visu/visit2.4.2/src")
+set(VISIT_INCLUDE_DIR "${VISIT_PATH}/sim/V2/lib")
+set(VISIT_LIBRARY_DIR "${VISIT_PATH}/lib")
+include_directories(${VISIT_INCLUDE_DIR})
+#-----------------------------------------------------------#
 # Set everything related to Fortran
 #-----------------------------------------------------------#
 if(CMAKE_Fortran_COMPILER)

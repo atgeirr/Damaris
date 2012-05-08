@@ -262,6 +262,7 @@ namespace Damaris
     class Scope;
     class Event;
     class Script;
+    class VisitParam;
     class Actions;
     class Simulation;
   }
@@ -2298,6 +2299,56 @@ namespace Damaris
       ::xsd::cxx::tree::one< external_type > external_;
     };
 
+    class VisitParam: public ::xml_schema::type
+    {
+      public:
+      // path
+      // 
+      typedef ::xml_schema::string path_type;
+      typedef ::xsd::cxx::tree::traits< path_type, char > path_traits;
+
+      const path_type&
+      path () const;
+
+      path_type&
+      path ();
+
+      void
+      path (const path_type& x);
+
+      void
+      path (::std::auto_ptr< path_type > p);
+
+      // Constructors.
+      //
+      VisitParam (const path_type&);
+
+      VisitParam (const ::xercesc::DOMElement& e,
+                  ::xml_schema::flags f = 0,
+                  ::xml_schema::container* c = 0);
+
+      VisitParam (const VisitParam& x,
+                  ::xml_schema::flags f = 0,
+                  ::xml_schema::container* c = 0);
+
+      virtual VisitParam*
+      _clone (::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0) const;
+
+      virtual 
+      ~VisitParam ();
+
+      // Implementation.
+      //
+      protected:
+      void
+      parse (::xsd::cxx::xml::dom::parser< char >&,
+             ::xml_schema::flags);
+
+      protected:
+      ::xsd::cxx::tree::one< path_type > path_;
+    };
+
     class Actions: public ::xml_schema::type
     {
       public:
@@ -2420,6 +2471,27 @@ namespace Damaris
       void
       actions (::std::auto_ptr< actions_type > p);
 
+      // visit
+      // 
+      typedef ::Damaris::Model::VisitParam visit_type;
+      typedef ::xsd::cxx::tree::optional< visit_type > visit_optional;
+      typedef ::xsd::cxx::tree::traits< visit_type, char > visit_traits;
+
+      const visit_optional&
+      visit () const;
+
+      visit_optional&
+      visit ();
+
+      void
+      visit (const visit_type& x);
+
+      void
+      visit (const visit_optional& x);
+
+      void
+      visit (::std::auto_ptr< visit_type > p);
+
       // name
       // 
       typedef ::xml_schema::string name_type;
@@ -2495,6 +2567,7 @@ namespace Damaris
       ::xsd::cxx::tree::one< architecture_type > architecture_;
       ::xsd::cxx::tree::one< data_type > data_;
       ::xsd::cxx::tree::one< actions_type > actions_;
+      visit_optional visit_;
       ::xsd::cxx::tree::one< name_type > name_;
       ::xsd::cxx::tree::one< language_type > language_;
       static const language_type language_default_value_;
