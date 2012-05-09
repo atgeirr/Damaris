@@ -84,7 +84,7 @@ namespace Damaris {
 			 * This function processes an incoming message (no way?!).
 			 * \see Damaris::Message
 			 */
-			void processMessage(Message* msg);
+			void processMessage(const Message& msg);
 
 			/**
 			 * This function is called when receiving a message of type MSG_INT;

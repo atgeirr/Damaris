@@ -23,10 +23,11 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 #include <list>
 #include "common/Debug.hpp"
-#include "server/Server.hpp"
 #include "common/Message.hpp"
 #include "common/ShmChunk.hpp"
 #include "common/Layout.hpp"
+#include "server/Server.hpp"
+#include "viz/VisItListener.hpp"
 
 Damaris::Server *server;
 
@@ -45,6 +46,11 @@ Server::Server(Process* p)
 {
 	process = p;
 	needStop = process->getEnvironment()->getClientsPerNode();
+	if(p->getModel()->visit().present()) {
+		Viz::VisItListener::init(p->getEnvironment()->getEntityComm(),
+		p->getModel()->visit().get(),
+		p->getEnvironment()->getSimulationName());
+	}
 }
 
 
@@ -61,33 +67,36 @@ int Server::run()
 {
 	DBG("Successfully entered in \"run\" mode");
 	
-	Message *msg = new Message();
+	Message msg;
 	bool received;
-	
+	int vizstt;
+
 	while(needStop > 0) {
-		received = true;
-		process->getSharedMessageQueue()->receive(msg,sizeof(Message));
+		received = process->getSharedMessageQueue()->tryReceive(&msg,sizeof(Message));
 		if(received) {
-			DBG("Received a message of type " << msg->type
-				<< " iteration is "<<msg->iteration
-				<< " source is " <<msg->source);
+			DBG("Received a message of type " << msg.type
+				<< " iteration is "<<msg.iteration
+				<< " source is " <<msg.source);
 			processMessage(msg);
+		}
+		
+		if((vizstt = Viz::VisItListener::connected()) > 0) {
+			Viz::VisItListener::enterSyncSection(vizstt);
 		}
 	}
 	
-	delete msg;
 	return 0;
 }
 
 /* process a incoming message */
-void Server::processMessage(Message* msg) 
+void Server::processMessage(const Message& msg) 
 {
-	int32_t& iteration 	= msg->iteration;
-	int32_t& source 	= msg->source;
-	int32_t& object 	= msg->object;
-	handle_t& handle	= msg->handle;
+	const int32_t& iteration 	= msg.iteration;
+	const int32_t& source 	= msg.source;
+	const int32_t& object 	= msg.object;
+	const handle_t& handle	= msg.handle;
 	
-	if(msg->type == MSG_VAR)
+	if(msg.type == MSG_VAR)
 	{
 		try {
 		ShmChunk* chunk = new ShmChunk(process->getSharedMemorySegment(),handle);
@@ -107,13 +116,13 @@ void Server::processMessage(Message* msg)
 		return;
 	}
 	
-	if(msg->type == MSG_SIG)
+	if(msg.type == MSG_SIG)
 	{
 		process->getActionsManager()->reactToUserSignal(object,iteration,source);
 		return;
 	}
 
-	if(msg->type == MSG_INT)
+	if(msg.type == MSG_INT)
 	{
 		processInternalSignal(object,iteration,source);
 	}

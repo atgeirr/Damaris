@@ -69,7 +69,7 @@ class Process {
 		 * \param[in] config : name of an XML configuration file.
 		 * \param[in] id : id of the process (should be unique).
 		 */
-                Process(const std::string & config, int32_t id);
+		Process(const std::string & config, int32_t id);
 
 		/**
 		 * Destructor. This function is private, use Process:kill instead.
@@ -153,6 +153,11 @@ class Process {
 		SharedMemorySegment* getSharedMemorySegment()
 		{
 			return segment;
+		}
+
+		Model::Simulation* getModel()
+		{
+			return model.get();
 		}
 
 }; // class Process 

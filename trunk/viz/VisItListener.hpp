@@ -25,6 +25,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <mpi.h>
 
+#include "xml/Model.hpp"
+
 namespace Damaris {
 namespace Viz {
 
@@ -42,7 +44,7 @@ class VisItListener {
 		static bool processVisItCommand();
 
 	public:
-		static void init(MPI_Comm c);
+		static void init(MPI_Comm c, const Model::VisitParam& mdl, const std::string& simname);
 
 		static int connected();
 

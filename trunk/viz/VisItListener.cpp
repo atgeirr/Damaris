@@ -20,6 +20,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \author Matthieu Dorier
  * \version 0.5
  */
+#include <string>
+#include <string.h>
 #include <mpi.h>
 #include <VisItControlInterface_V2.h>
 #include <boost/bind.hpp>
@@ -27,11 +29,26 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/Debug.hpp"
 #include "viz/VisItListener.hpp"
 
+
+#define VISIT_COMMAND_PROCESS 0
+#define VISIT_COMMAND_SUCCESS 1
+#define VISIT_COMMAND_FAILURE 2
+
 namespace Damaris {
 namespace Viz {
 
-void VisItListener::init(MPI_Comm c)
+MPI_Comm VisItListener::comm = MPI_COMM_NULL;
+
+void VisItListener::init(MPI_Comm c, const Model::VisitParam& mdl, const std::string& simname)
 {
+	if(mdl.path() != "") {
+		char* path = (char*)malloc(sizeof(char)*(mdl.path().length()+1));
+		strcpy(path,mdl.path().c_str());
+		VisItSetDirectory(path);
+		free(path);
+	}
+	VisItSetupEnvironment();
+	VisItInitializeSocketAndDumpSimFile(simname.c_str(),"", "", NULL, NULL, NULL);
 	comm = c;
 }
 
@@ -70,13 +87,45 @@ void VisItListener::broadcastSlaveCommand(int *command)
 
 void VisItListener::slaveProcessCallback()
 {
-	int command = 0;
+	int command = VISIT_COMMAND_PROCESS;
 	broadcastSlaveCommand(&command);
 }
 
 bool VisItListener::processVisItCommand()
 {
-	return 1;
+	int command;
+	int rank;
+	MPI_Comm_size(comm,&rank);
+	if(rank == 0) {
+		int success = VisItProcessEngineCommand();
+		if(success) {
+			command = VISIT_COMMAND_SUCCESS;
+			broadcastSlaveCommand(&command);
+			return true;
+		}
+		else
+		{
+			command = VISIT_COMMAND_FAILURE;
+			broadcastSlaveCommand(&command);
+			return false;
+		}
+	} else {
+		while(true) {
+			broadcastSlaveCommand(&command);
+			switch (command)
+			{
+				case VISIT_COMMAND_PROCESS:
+					VisItProcessEngineCommand();
+					break;
+				case VISIT_COMMAND_SUCCESS:
+					return true;
+				case VISIT_COMMAND_FAILURE:
+					return false;
+			}
+		}
+	}
+	return true;
 }
+
 }
 }

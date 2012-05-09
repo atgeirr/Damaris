@@ -202,18 +202,21 @@ void SharedMessageQueue::receive(void* buffer, size_t buffer_size)
 bool SharedMessageQueue::tryReceive(void* buffer, 
 		size_t buffer_size)
 {
-	scoped_lock<interprocess_mutex> lock(shmq_hdr->main_lock);
-
 	if(shmq_hdr->current_num_msg() == 0) return false;
-	char* src = data + (shmq_hdr->head * shmq_hdr->sizeMsg);
-	int s = std::min((int)buffer_size,shmq_hdr->sizeMsg);
-	std::memcpy(buffer,src,s);
-	shmq_hdr->head += 1;
-	shmq_hdr->head %= shmq_hdr->maxMsg;
 	
-	shmq_hdr->cond_send.notify_one();
+	{
+		scoped_lock<interprocess_mutex> lock(shmq_hdr->main_lock);
 
-	return true;
+		char* src = data + (shmq_hdr->head * shmq_hdr->sizeMsg);
+		int s = std::min((int)buffer_size,shmq_hdr->sizeMsg);
+		std::memcpy(buffer,src,s);
+		shmq_hdr->head += 1;
+		shmq_hdr->head %= shmq_hdr->maxMsg;
+	
+		shmq_hdr->cond_send.notify_one();
+
+		return true;
+	}
 }
 
 size_t SharedMessageQueue::getMaxMsg() const

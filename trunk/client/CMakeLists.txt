@@ -40,10 +40,10 @@ if(PYTHON_LIB)
 		${DAMARIS_SOURCE_DIR}/scripts/python/PyTypes.cpp)
 endif(PYTHON_LIB)
 
-if(VISIT_PATH)
+if(VISIT_ROOT)
 	set(DAMARIS_VISIT_SRC
 		${DAMARIS_SOURCE_DIR}/viz/VisItListener.cpp)
-endif(VISIT_PATH)
+endif(VISIT_ROOT)
 
 if(HDF5_ROOT)
   set(DAMARIS_PERSISTENCY_SRC

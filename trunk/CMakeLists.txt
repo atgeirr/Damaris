@@ -119,10 +119,12 @@ endif(HDF5_ROOT)
 #-----------------------------------------------------------#
 # Set everything related to VisIt 
 #-----------------------------------------------------------#
-set(VISIT_PATH "~/Work/Visu/visit2.4.2/src")
-set(VISIT_INCLUDE_DIR "${VISIT_PATH}/sim/V2/lib")
-set(VISIT_LIBRARY_DIR "${VISIT_PATH}/lib")
+set(VISIT_ROOT "~/Work/Visu/visit2.4.2/src")
+set(VISIT_INCLUDE_DIR "${VISIT_ROOT}/sim/V2/lib")
+set(VISIT_LIBRARY_DIR "${VISIT_ROOT}/lib")
 include_directories(${VISIT_INCLUDE_DIR})
+link_directories(${VISIT_LIBRARY_DIR})
+set(VISIT_LIB simV2)
 #-----------------------------------------------------------#
 # Set everything related to Fortran
 #-----------------------------------------------------------#

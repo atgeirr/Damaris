@@ -9,4 +9,4 @@ add_library (damaris-server ${DAMARIS_SERVER_LIB_SRC})
 
 add_executable (server ${DAMARIS_SOURCE_DIR}/server/main.cpp)
 
-target_link_libraries (server damaris-server damaris ${XERCESC_LIB} ${BOOST_LIB} ${PYTHON_LIB} rt dl)
+target_link_libraries (server damaris-server damaris ${XERCESC_LIB} ${BOOST_LIB} ${PYTHON_LIB} ${VISIT_LIB} rt dl)
