@@ -46,11 +46,6 @@ Server::Server(Process* p)
 {
 	process = p;
 	needStop = process->getEnvironment()->getClientsPerNode();
-	if(p->getModel()->visit().present()) {
-		Viz::VisItListener::init(p->getEnvironment()->getEntityComm(),
-		p->getModel()->visit().get(),
-		p->getEnvironment()->getSimulationName());
-	}
 }
 
 
@@ -66,6 +61,12 @@ Server::~Server()
 int Server::run()
 {
 	DBG("Successfully entered in \"run\" mode");
+
+	if(process->getModel()->visit().present()) {
+		Viz::VisItListener::init(process->getEnvironment()->getEntityComm(),
+			process->getModel()->visit().get(),
+			process->getEnvironment()->getSimulationName());
+	}
 	
 	Message msg;
 	bool received;

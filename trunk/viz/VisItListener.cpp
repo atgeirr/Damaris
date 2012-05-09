@@ -50,24 +50,29 @@ void VisItListener::init(MPI_Comm c, const Model::VisitParam& mdl, const std::st
 	VisItSetupEnvironment();
 	VisItInitializeSocketAndDumpSimFile(simname.c_str(),"", "", NULL, NULL, NULL);
 	comm = c;
+	INFO("VisIt-Damaris connection initialized with visit path = " << mdl.path());
 }
 
 int VisItListener::connected()
 {
 	int visitstate = VisItDetectInput(0, -1);
 	if(visitstate >= -5 && visitstate <= -1) {
-		ERROR("uncaught error");
+		ERROR("Uncaught VisIt error");
+	} else if(visitstate == 1) {
+		INFO("VisIt first attempt to connect...");
 	}
 	return visitstate;
 }
 
 int VisItListener::enterSyncSection(int visitstate)
 {
+	INFO("Entering Sync Section");
 	switch(visitstate) {
 		case 1:
-			if(VisItAttemptToCompleteConnection()) {
+			if(VisItAttemptToCompleteConnection() == VISIT_OKAY) {
 				INFO("VisIt connected");
-				VisItSetSlaveProcessCallback(&VisItListener::slaveProcessCallback);
+				
+				//VisItSetSlaveProcessCallback(&VisItListener::slaveProcessCallback);
 			}
 			break;
 		case 2:
@@ -95,7 +100,8 @@ bool VisItListener::processVisItCommand()
 {
 	int command;
 	int rank;
-	MPI_Comm_size(comm,&rank);
+	MPI_Comm_rank(comm,&rank);
+
 	if(rank == 0) {
 		int success = VisItProcessEngineCommand();
 		if(success) {
