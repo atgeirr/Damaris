@@ -25,8 +25,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Damaris {
 
-MetadataManager::MetadataManager(Model::Data* mdl, Environment* env)
-: Configurable<MetadataManager,Model::Data>(mdl)
+MetadataManager::MetadataManager(const Model::Data& mdl, Environment* env)
+: Configurable<Model::Data>(mdl)
 {
 	environment = env;
 	init();
@@ -47,10 +47,8 @@ void MetadataManager::initParameters()
 
 void MetadataManager::initLayouts()
 {
-	if(model == NULL) return;
-
-	Model::Data::layout_const_iterator l(model->layout().begin());
-	for(;l != model->layout().end(); l++)
+	Model::Data::layout_const_iterator l(model.layout().begin());
+	for(;l != model.layout().end(); l++)
 	{
 		if(l->type() == Model::Type::undefined) {
 			ERROR("Unknown type \"" << l->type()
@@ -85,10 +83,9 @@ void MetadataManager::initVariables()
 {
 	variables = new VariableSet();
 
-	if(model == NULL) return;
 	// build all the variables in root group
-	Model::Data::variable_const_iterator v(model->variable().begin());
-	for(; v != model->variable().end(); v++)
+	Model::Data::variable_const_iterator v(model.variable().begin());
+	for(; v != model.variable().end(); v++)
 	{
 		std::string name = (std::string)(v->name());
 		std::string layoutName = (std::string)(v->layout());
@@ -98,8 +95,8 @@ void MetadataManager::initVariables()
 	}
 
 	// build all variables in sub-groups
-	Model::Data::group_const_iterator g(model->group().begin());
-	for(; g != model->group().end(); g++)
+	Model::Data::group_const_iterator g(model.group().begin());
+	for(; g != model.group().end(); g++)
 		readVariablesInSubGroup(&(*g),(std::string)(g->name()));
 }
 

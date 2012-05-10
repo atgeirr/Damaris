@@ -23,6 +23,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __DAMARIS_MESH_H
 #define __DAMARIS_MESH_H
 
+#include "common/Identified.hpp"
+#include "common/Configurable.hpp"
 #include "common/Manager.hpp"
 #include "xml/Model.hpp"
 
@@ -33,20 +35,22 @@ namespace Viz {
  * The Mesh object is used for describing a mesh within
  * a metadata structure.
  */
-class Mesh : public Identified {
+class Mesh : public Identified, public Configurable<Model::Mesh> {
+
+	friend class Manager<Mesh,Model::Mesh*>;
 	
 	private:
-		std::string name;
+		int id;
 		Mesh(const Model::Mesh& mdl);
 		
 	public:
 
 		const std::string& getName() const {
-			return name;
+			return model.name();
 		}
 
-		const int& getID() const {
-			return 0;
+		int getID() const {
+			return id;
 		}
 };
 

@@ -75,12 +75,12 @@ namespace Damaris {
 		}
 		
 		DBG("Configuration file succefuly read");
-		environment     = new Environment(model.get());
+		environment     = new Environment(*(model.get()));
 		environment->setID(id);
 		DBG("Environment initialized");
-		metadataManager = new MetadataManager(&(model->data()),environment);
+		metadataManager = new MetadataManager(model->data(),environment);
 		DBG("MetadataManager initialized");
-		actionsManager  = new ActionsManager(&(model->actions()),environment);
+		actionsManager  = new ActionsManager(model->actions(),environment);
 		DBG("ActionsManager initialized");
 		segment = NULL;
 		msgQueue = NULL;	

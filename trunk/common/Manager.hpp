@@ -89,13 +89,14 @@ class Manager {
 
 	public:	
 
+		template<typename S>
 		static T* New(const M &mdl)
 		{
 			if(objects == NULL) {
 				objects = new ObjectSet();
 			}
 
-			T* t = new T(mdl);
+			T* t = static_cast<T*>(new S(mdl));
 			std::pair<typename ObjectSet::iterator,bool> ret
 				= objects->insert(boost::shared_ptr<T>(t));
 			if(ret.second == false) {

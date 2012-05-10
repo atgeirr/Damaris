@@ -30,19 +30,17 @@ namespace Damaris {
  * build uppon a model (instance of ModelClass) and keeps a
  * pointer over this model.
  */
-template<typename ChildClass, typename ModelClass>
+template<typename ModelClass>
 	class Configurable {
 	
 		protected:
-			ModelClass* model; /*!< Pointer to the base model. */
+			const ModelClass& model; /*!< reference to the base model. */
 
 		public:
 			/**
 			 * The constructor takes a model as a parameter.
 			 */
-			Configurable(ModelClass* mdl) {
-				model = mdl;
-			}
+			Configurable(const ModelClass& mdl) : model(mdl) {	}
 	};
 }
 

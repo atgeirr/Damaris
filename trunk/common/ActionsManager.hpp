@@ -39,7 +39,7 @@ namespace Damaris {
  * from scripts, etc. and call there functions upon reception
  * of events.
  */
-class ActionsManager : public Configurable<ActionsManager,Model::Actions> {
+class ActionsManager : public Configurable<Model::Actions> {
 
 	private:
 		ActionSet actions; /*!< Set of actions indexed by ID and name. */
@@ -50,7 +50,7 @@ class ActionsManager : public Configurable<ActionsManager,Model::Actions> {
 		 * \brief Constructor.
 		 * Takes a model and an environment as parameters.
 		 */
-		ActionsManager(Model::Actions* mdl, Environment* env);
+		ActionsManager(const Model::Actions& mdl, Environment* env);
 
 	private:
 		/**

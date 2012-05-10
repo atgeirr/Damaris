@@ -23,6 +23,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __DAMARIS_IDENTIFIED_H
 #define __DAMARIS_IDENTIFIED_H
 
+#include <string>
+
 namespace Damaris {
 
 /**

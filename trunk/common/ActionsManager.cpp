@@ -37,8 +37,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Damaris {
 
-ActionsManager::ActionsManager(Model::Actions* mdl, Environment* env)
-: Configurable<ActionsManager,Model::Actions>(mdl)
+ActionsManager::ActionsManager(const Model::Actions& mdl, Environment* env)
+: Configurable<Model::Actions>(mdl)
 {
 	environment = env;
 	init();
@@ -46,12 +46,12 @@ ActionsManager::ActionsManager(Model::Actions* mdl, Environment* env)
 
 void ActionsManager::init()
 {
-	Model::Actions::event_const_iterator e(model->event().begin());
-	for(; e < model->event().end(); e++) {
+	Model::Actions::event_const_iterator e(model.event().begin());
+	for(; e < model.event().end(); e++) {
 		addDynamicAction(e->name(),e->library(),e->action(),e->scope());
 	}
-	Model::Actions::script_const_iterator s(model->script().begin());
-	for(; s < model->script().end(); s++) {
+	Model::Actions::script_const_iterator s(model.script().begin());
+	for(; s < model.script().end(); s++) {
 		addScriptAction(s->name(),s->file(),s->language(),s->scope());
 	}
 }

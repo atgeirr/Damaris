@@ -43,7 +43,7 @@ namespace Damaris {
 	 * MetadataManager holds pointers to all Variables.
 	 * These variables can be retrieved by their name or by a unique ID.
 	 */
-	class MetadataManager : public Configurable<MetadataManager,Model::Data> {
+	class MetadataManager : public Configurable<Model::Data> {
 
 	private:
 		std::map<std::string,Layout> layouts; /*!< Map associating names with layouts. */
@@ -88,7 +88,7 @@ namespace Damaris {
 		 * \param[in] mdl : the base model to initialize everything.
 		 * \param[in] env : the Environment object initialized by the Process.
 		 */
-		MetadataManager(Model::Data* mdl, Environment* env);
+		MetadataManager(const Model::Data& mdl, Environment* env);
 
 		/**
 		 * Returns a reference to the inner VariableSet.

@@ -26,18 +26,16 @@
 
 namespace Damaris {
 
-	ParameterSet::ParameterSet(Model::Data* mdl) 
-		: Configurable<ParameterSet,Model::Data>(mdl)
+	ParameterSet::ParameterSet(const Model::Data& mdl) 
+		: Configurable<Model::Data>(mdl)
 	{
 		init();
 	}
 
 	void ParameterSet::init() 
 	{
-		if(model == NULL) return;
-
-		Model::Data::parameter_const_iterator p(model->parameter().begin());
-		for(; p < model->parameter().end(); p++) {
+		Model::Data::parameter_const_iterator p(model.parameter().begin());
+		for(; p < model.parameter().end(); p++) {
 			std::string name(p->name());
 			switch(p->type()) {
 			case Model::Type::short_:

@@ -27,9 +27,8 @@ namespace Viz {
 
 	
 Mesh::Mesh(const Model::Mesh& mdl)
-{
-
-}
+: Configurable<Model::Mesh>(mdl), id(Manager<Mesh,Model::Mesh>::NumObjects())
+{ }
 
 }
 }

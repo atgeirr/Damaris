@@ -25,8 +25,8 @@
 
 namespace Damaris {
 
-	Environment::Environment(Model::Simulation* mdl)
-	: Configurable<Environment,Model::Simulation>(mdl)
+	Environment::Environment(const Model::Simulation& mdl)
+	: Configurable<Model::Simulation>(mdl)
 	{
 		init();
 	}
@@ -43,22 +43,22 @@ namespace Damaris {
 
 	int Environment::getCoresPerNode() const
 	{
-		return model->architecture().cores().count();
+		return model.architecture().cores().count();
 	}
 
 	int Environment::getClientsPerNode() const
 	{
-		DBG("In getClientsPerNode() : " << model->architecture().cores().clients().count());
-		return model->architecture().cores().clients().count();
+		DBG("In getClientsPerNode() : " << model.architecture().cores().clients().count());
+		return model.architecture().cores().clients().count();
 	}
 
 	const std::string & Environment::getSimulationName() const
 	{
-		return model->name();
+		return model.name();
 	}
 
 	const Model::Language& Environment::getDefaultLanguage() const
 	{
-		return model->language();
+		return model.language();
 	}
 }
