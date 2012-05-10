@@ -32,6 +32,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/multi_index/composite_key.hpp>
 #include <boost/shared_ptr.hpp>
 
+#include "common/Identified.hpp"
 #include "common/Debug.hpp"
 #include "common/Tags.hpp"
 
@@ -39,13 +40,11 @@ namespace Damaris {
 
 namespace bmi = boost::multi_index;
 
-class Identified
-{
-	virtual const std::string& getName() const = 0;
-
-	virtual int getID() const = 0;
-};
-
+/**
+ * This class serves as a factory the build identified (named)
+ * objects. It keeps a record of all objects created and does
+ * not create twice the same named object.
+ */
 template<typename T, typename M>
 class Manager {
 	
@@ -102,8 +101,7 @@ class Manager {
 			if(ret.second == false) {
 				WARN("Duplicate element \""<< t->getName() << "\" not created, " 
 					<< "returning previous value instead.");
-				
-				delete t;
+				// no need to delete t here, the shared_ptr does it for us
 				return ret.first->get();
 			}
 			return t;
