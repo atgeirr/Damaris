@@ -42,7 +42,8 @@ endif(PYTHON_LIB)
 
 if(VISIT_ROOT)
 	set(DAMARIS_VISIT_SRC
-		${DAMARIS_SOURCE_DIR}/viz/VisItListener.cpp)
+		${DAMARIS_SOURCE_DIR}/viz/VisItListener.cpp
+		${DAMARIS_SOURCE_DIR}/viz/Mesh.cpp)
 endif(VISIT_ROOT)
 
 if(HDF5_ROOT)
