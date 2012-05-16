@@ -49,11 +49,12 @@ namespace Damaris {
 template <typename Iterator, typename SymTable>
 struct Calc : qi::grammar<Iterator, std::vector<int>(), ascii::space_type>
 {
+	SymTable sym;
 	/**
 	 * \brief Constructor.
 	 * \param[in] sym : table of symboles.
 	 */
-	Calc(SymTable &sym) : Calc::base_type(list_expr)
+	Calc(const SymTable &s) : Calc::base_type(list_expr), sym(s)
 	{
 			qi::_val_type _val;
 			qi::_1_type _1;

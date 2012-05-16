@@ -26,7 +26,10 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <string>
 #include <vector>
-
+#include "common/Calc.hpp"
+#include "common/ParameterManager.hpp"
+#include "common/Manager.hpp"
+#include "common/Configurable.hpp"
 #include "common/Types.hpp"
 
 namespace Damaris {
@@ -40,15 +43,16 @@ namespace Damaris {
  *
  * Layouts are not used to hold data. See Chunk for that purpose.
  */	
-class Layout {
+class Layout : public Configurable<Model::Layout> {
+	friend class Manager<Layout,Model::Layout>;
 		
 	private:
-		std::string name;		/*!< Name of the layout in the configuration file. */
-		Model::Type type; 	/*!< Type of the data. */
-		unsigned int dimensions; 	/*!< Number of dimensions. */
+		int id;
+		std::string name;
 		std::vector<int> extents;	/*!< Extents along each dimension. */	
 
-	public:
+		static Calc<std::string::const_iterator,ParameterManager::ParameterMap<int> > *calc;
+
 		/**
 		 * \brief Constructor.
 		 * Initializes a Layout from the data type, the dimensions and the vector of extents. 
@@ -58,19 +62,15 @@ class Layout {
 		 * \param[in] d : number of dimensions.
 		 * \param[in] extents : list of extents.
 		 */
-		Layout(const std::string &name, const Model::Type& t, 
-			unsigned int d, const std::vector<int> &ex);
+		Layout(const Model::Layout& mdl, const std::string& name, const std::vector<int>& e);
 		
-		/**
-		 * \brief Destructor.
-		 */
-		~Layout();
-
+	public:
 		/**
 		 * \brief Returns the name of the Layout.
 		 */
 		const std::string& getName() const;
-		
+
+		int getID() const;	
 		/**
 		 * \return The type of the data. 
 		 */
@@ -92,8 +92,10 @@ class Layout {
 		 */
 		bool isUnlimited() const;
 
+		static Layout* New(const Model::Layout& mdl, const std::string &name);
+
 }; // class Layout
-	
+
 } // namespace Damaris
 
 #endif

@@ -67,6 +67,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #ifdef __INFO
 #define __ERROR
 #define __WARN
+#define __CFGERROR
+#define __CFGWARN
 #define INFO(message) MESSAGE(std::cout, "INFO", message)
 #else
 #define INFO(message)
@@ -84,10 +86,22 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #define ERROR(message)
 #endif
 
+#ifdef __CFGERROR
+#define CFGERROR(message) MESSAGE(std::cerr, "CONFIG-ERROR",message)
+#else
+#define CFGERROR(message)
+#endif
+
 #ifdef __WARN
 #define WARN(message) MESSAGE(std::cerr, "WARNING", message)
 #else
 #define WARN(message)
+#endif
+
+#ifdef __CFGWARN
+#define CFGWARN(message) MESSAGE(std::cerr, "CONFIG-WARNING", message)
+#else
+#define CFGWARN(message)
 #endif
 
 #ifdef __ASSERT

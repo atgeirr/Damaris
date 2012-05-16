@@ -29,4 +29,39 @@ const std::string& Parameter::getName() const
 	return name;
 }
 
+int Parameter::getID() const
+{
+	return id;
+}
+
+Parameter* Parameter::New(const Model::Parameter& mdl, const std::string& name)
+{
+	switch(mdl.type()) {
+		case Model::Type::short_:
+			return new Parameter(mdl,name,boost::lexical_cast<short>(mdl.value()));
+		case Model::Type::int_:
+			return new Parameter(mdl,name,boost::lexical_cast<int>(mdl.value()));
+		case Model::Type::integer:
+			return new Parameter(mdl,name,boost::lexical_cast<int>(mdl.value()));
+		case Model::Type::long_:
+			return new Parameter(mdl,name,boost::lexical_cast<long>(mdl.value()));
+		case Model::Type::float_:
+			return new Parameter(mdl,name,boost::lexical_cast<float>(mdl.value()));
+		case Model::Type::real :
+			return new Parameter(mdl,name,boost::lexical_cast<float>(mdl.value()));
+		case Model::Type::double_:
+			return new Parameter(mdl,name,boost::lexical_cast<double>(mdl.value()));
+		case Model::Type::char_:
+			return new Parameter(mdl,name,boost::lexical_cast<char>(mdl.value()));
+		case Model::Type::character:
+			return new Parameter(mdl,name,boost::lexical_cast<char>(mdl.value()));
+		case Model::Type::string:
+			return new Parameter(mdl,name,boost::lexical_cast<std::string>(mdl.value()));
+		default:
+			ERROR("Undefined type \"" << mdl.type()
+				<< "\" for parameter \""<< mdl.name() << "\"");
+	}
+	return NULL;
+}
+
 }

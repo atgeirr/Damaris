@@ -28,6 +28,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <exception>
 
 #include "common/Debug.hpp"
+#include "common/VariableManager.hpp"
+#include "common/LayoutManager.hpp"
+#include "common/ParameterManager.hpp"
 #include "common/Process.hpp"
 
 namespace Damaris {
@@ -63,7 +66,7 @@ namespace Damaris {
 		return true;
 	}
 	
-	void Process::init(const std::string &configfile, int32_t id)
+	void Process::init(const std::string &configfile, int32_t i)
 	{
 		DBG("Starting process initialization");
 		try {
@@ -73,13 +76,14 @@ namespace Damaris {
 			ERROR(e.what());
 			exit(-1);
 		}
-		
+	    id = i;	
 		DBG("Configuration file succefuly read");
-		environment     = new Environment(*(model.get()));
-		environment->setID(id);
+		Environment::Init(*(model.get()));
 		DBG("Environment initialized");
-		metadataManager = new MetadataManager(model->data(),environment);
-		DBG("MetadataManager initialized");
+		ParameterManager::Init(model->data());
+		LayoutManager::Init(model->data());
+		VariableManager::Init(model->data());
+		DBG("Data Managers initialized");
 		actionsManager  = new ActionsManager(model->actions(),environment);
 		DBG("ActionsManager initialized");
 		segment = NULL;
@@ -137,8 +141,6 @@ namespace Damaris {
 			SharedMessageQueue::remove(&(model->architecture().queue()));
 			SharedMemorySegment::remove(&(model->architecture().buffer()));	
 		}
-		delete environment;
-		delete metadataManager;
 		delete actionsManager;
 	}
 }

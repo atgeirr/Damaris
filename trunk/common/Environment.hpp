@@ -40,19 +40,12 @@ namespace Damaris {
 	class Environment : public Configurable<Model::Simulation> { 
 
 	private:
-		int id; /*!< ID of the process. */
-	
 		MPI_Comm entityComm; /*!< clients or servers communicator (depending on the entity). */
 		MPI_Comm globalComm; /*!< global communicator. */
 		MPI_Comm nodeComm;   /*!< communicator for the processors in the node. */
 
-		/**
-		 * This function is called by the constructor to help initializing from
-		 * the input model.
-		 */
-		void init();	
+		static Environment* env;
 
-	public:
 		/**
 		 * \brief Constructor taking a base model. 
 		 * \param[in] mdl : base model from the configuration file.
@@ -65,92 +58,60 @@ namespace Damaris {
 		~Environment();
 
 	public:
-		/**
-		 * \brief Get the ID of the server.
-		 * \return ID of the server.
-		 */
-		int getID() { return id; }
-
-		/**
-		 * \brief Set the ID of the server.
-		 * \param[in] i : new ID.
-		 */
-		void setID(int i) { id = i; }
-
+		static void Init(const Model::Simulation& mdl);
 		/**
 		 * \brief Get the name of the simulation.
 		 */
-		const std::string & getSimulationName() const;
+		static std::string getSimulationName();
 
 		/**
 		 * \brief Get the default language for the running simulation.
 		 */
-		const Model::Language& getDefaultLanguage() const;
-
+		static Model::Language getDefaultLanguage();
 		/**
 		 * \brief Get the number of clients per node.
 		 */
-		int getClientsPerNode() const;
+		static int getClientsPerNode();
 
 		/**
 		 * \brief Get the number of cores per node.
 		 */
-		int getCoresPerNode() const;
-
-		/**
-		 * \brief Get the name of the shared memory segment.
-		 */
-		const std::string& getSegmentName() const;
-
-		/**
-		 * \brief Get the size (in bytes) of the shared memory segment.
-		 */
-		size_t getSegmentSize() const;
-
-		/**
-		 * \brief Get the name of the message queue.
-		 */
-		const std::string & getMsgQueueName() const;
-
-		/**
-		 * \brief Get the size (in number of messages) of the message queue.
-		 */
-		size_t getMsgQueueSize() const;
+		static int getCoresPerNode();
 
 		/**
 		 * \brief Set the communicator gathering processes of the same kind (client or server.
 		 */
-		void setEntityComm(MPI_Comm comm) { entityComm = comm; }
+		static void setEntityComm(MPI_Comm comm);
 
 		/**
 		 * \brief gets the communicator gathering processes of the same kind.
 		 */
-		MPI_Comm getEntityComm() { return entityComm; }
+		static MPI_Comm getEntityComm();
 
 		/**
 		 * \brief Set the global communicator (usually MPI_COMM_WORLD).
 		 */
-		void setGlobalComm(MPI_Comm comm) { globalComm = comm; }
+		static void setGlobalComm(MPI_Comm comm);
 
 		/**
 		 * \brief Gets the global communicator passed at start time.
 		 */
-		MPI_Comm getGlobalComm() { return globalComm; }
+		static MPI_Comm getGlobalComm();
 
 		/**
 		 * \brief Set the communicator gathering processes of the same node.
 		 */
-		void setNodeComm(MPI_Comm comm) { nodeComm = comm; }
+		static void setNodeComm(MPI_Comm comm);
 		
 		/**
 		 * \brief Get the communicator gathering processes of the same node.
 		 */
-		MPI_Comm getNodeComm() { return nodeComm; }
+		static MPI_Comm getNodeComm();
 
 		/**
 		 * \brief Tell if a dedicated core is present.
 		 */
-		bool hasServer() { return (getCoresPerNode() != getClientsPerNode()); }
+		static bool hasServer();
 	};
 
 }

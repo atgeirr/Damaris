@@ -26,6 +26,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/any.hpp>
 #include <string>
 
+#include "xml/Model.hpp"
+#include "common/Configurable.hpp"
+#include "common/Manager.hpp"
 #include "common/Debug.hpp"
 
 namespace Damaris {
@@ -33,29 +36,35 @@ namespace Damaris {
 	 * The Parameter class is based on boost::any to hold
 	 * any type of data and associate it with a name.
 	 */	
-	class Parameter {
+	class Parameter : public Configurable<Model::Parameter> {
+
+		friend class Manager<Parameter,Model::Parameter>;
+
 		private:
 			std::string name; /*!< Name of the parameter. */
+			int id;
 
-		public:
 			boost::any value; /*!< Value of the parameter. */
 		
 			/**
 			 * Constructor.
 			 */
 			template<typename T>
-			Parameter(const std::string&, const T&);
+			Parameter(const Model::Parameter& mdl, const std::string& name, const T& v);
 
+		public:
+			static Parameter* New(const Model::Parameter& mdl, const std::string& name);
 			/**
 			 * Gets the name of the parameter.
 			 */
 			const std::string& getName() const;
 
+			int getID() const;
 			/**
 			 * Gets the value of the parameter.
 			 */
 			template<typename T>
-			const T& getValue() const;
+			T getValue() const;
 	};
 }
 
@@ -64,14 +73,15 @@ namespace Damaris {
 namespace Damaris {
 
 template<typename T>
-Parameter::Parameter(const std::string& n, const T& v)
+Parameter::Parameter(const Model::Parameter& mdl, const std::string& n, const T& v)
+: Configurable<Model::Parameter>(mdl)
 {
-        name = n;
-        value = boost::any(v);
+    name = n;
+	value = boost::any(v);
 }
 
 template<typename T>
-const T& Parameter::getValue() const 
+T Parameter::getValue() const 
 {
 	try {
 		return boost::any_cast<T>(value);

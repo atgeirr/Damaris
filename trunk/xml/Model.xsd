@@ -178,11 +178,10 @@
 	<!-- Mesh node -->
 	<xs:complexType name="Mesh">
 		<xs:sequence>
-			<xs:element name="coords" type="mdl:MeshCoord" minOccurs="1" maxOccurs="3" />
+			<xs:element name="coords" type="mdl:MeshCoord" minOccurs="2" maxOccurs="3" />
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string"    use="required"/>
 		<xs:attribute name="type" type="mdl:MeshType" use="required"/>
-		<xs:attribute name="dimensions" type="xs:unsignedInt" use="optional" default="2" />
 		<xs:attribute name="topology"   type="xs:unsignedInt" use="optional" default="2" />
 	</xs:complexType>
 

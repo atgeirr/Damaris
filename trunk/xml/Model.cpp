@@ -1369,30 +1369,6 @@ namespace Damaris
       this->type_.set (x);
     }
 
-    const Mesh::dimensions_type& Mesh::
-    dimensions () const
-    {
-      return this->dimensions_.get ();
-    }
-
-    Mesh::dimensions_type& Mesh::
-    dimensions ()
-    {
-      return this->dimensions_.get ();
-    }
-
-    void Mesh::
-    dimensions (const dimensions_type& x)
-    {
-      this->dimensions_.set (x);
-    }
-
-    Mesh::dimensions_type Mesh::
-    dimensions_default_value ()
-    {
-      return dimensions_type (2);
-    }
-
     const Mesh::topology_type& Mesh::
     topology () const
     {
@@ -3954,7 +3930,6 @@ namespace Damaris
       coords_ (::xml_schema::flags (), this),
       name_ (name, ::xml_schema::flags (), this),
       type_ (type, ::xml_schema::flags (), this),
-      dimensions_ (dimensions_default_value (), ::xml_schema::flags (), this),
       topology_ (topology_default_value (), ::xml_schema::flags (), this)
     {
     }
@@ -3967,7 +3942,6 @@ namespace Damaris
       coords_ (x.coords_, f, this),
       name_ (x.name_, f, this),
       type_ (x.type_, f, this),
-      dimensions_ (x.dimensions_, f, this),
       topology_ (x.topology_, f, this)
     {
     }
@@ -3980,7 +3954,6 @@ namespace Damaris
       coords_ (f, this),
       name_ (f, this),
       type_ (f, this),
-      dimensions_ (f, this),
       topology_ (f, this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
@@ -4038,12 +4011,6 @@ namespace Damaris
           continue;
         }
 
-        if (n.name () == "dimensions" && n.namespace_ ().empty ())
-        {
-          this->dimensions_.set (dimensions_traits::create (i, f, this));
-          continue;
-        }
-
         if (n.name () == "topology" && n.namespace_ ().empty ())
         {
           this->topology_.set (topology_traits::create (i, f, this));
@@ -4063,11 +4030,6 @@ namespace Damaris
         throw ::xsd::cxx::tree::expected_attribute< char > (
           "type",
           "");
-      }
-
-      if (!dimensions_.present ())
-      {
-        this->dimensions_.set (dimensions_default_value ());
       }
 
       if (!topology_.present ())

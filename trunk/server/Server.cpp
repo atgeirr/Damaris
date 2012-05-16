@@ -26,6 +26,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/Message.hpp"
 #include "common/ShmChunk.hpp"
 #include "common/Layout.hpp"
+#include "common/VariableManager.hpp"
 #include "server/Server.hpp"
 #include "viz/VisItListener.hpp"
 
@@ -101,7 +102,7 @@ void Server::processMessage(const Message& msg)
 	{
 		try {
 		ShmChunk* chunk = new ShmChunk(process->getSharedMemorySegment(),handle);
-		Variable* v = process->getMetadataManager()->getVariable(object);
+		Variable* v = VariableManager::Search(object);
 		if(v != NULL) {
 			v->attachChunk(chunk);
 		} else {

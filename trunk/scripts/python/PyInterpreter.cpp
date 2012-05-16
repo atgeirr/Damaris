@@ -29,7 +29,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "common/Debug.hpp"
 #include "common/Process.hpp"
-#include "common/MetadataManager.hpp"
+#include "common/VariableManager.hpp"
 #include "scripts/python/PyChunk.hpp"
 #include "scripts/python/PyLayout.hpp"
 #include "scripts/python/PyVariable.hpp"
@@ -49,8 +49,7 @@ static bp::object damaris_dict;
  */
 static bp::object open(const std::string& varname)
 {
-	MetadataManager* metadata = Process::get()->getMetadataManager();
-	Variable* v = metadata->getVariable(varname);
+	Variable* v = VariableManager::Search(varname);
 	if(v == NULL) {
 		return bp::object();
 	} else {
@@ -63,15 +62,7 @@ static bp::object open(const std::string& varname)
  */
 static bp::object clear()
 {
-	MetadataManager* metadata = Process::get()->getMetadataManager();
-	VariableSet& varset = metadata->getVariableSet();
-	VariableSet::index<by_id>::type::iterator it, end;
-	it = varset.get<by_id>().begin();
-	end = varset.get<by_id>().end();
-	while(it != end) {
-		it->get()->clear();
-		it++;
-	}
+	WARN("Function damaris.clear() is not implemented yet.");
 	return bp::object();
 }
 

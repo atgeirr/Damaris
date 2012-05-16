@@ -124,6 +124,7 @@ set(VISIT_INCLUDE_DIR "${VISIT_ROOT}/sim/V2/lib")
 set(VISIT_LIBRARY_DIR "${VISIT_ROOT}/lib")
 include_directories(${VISIT_INCLUDE_DIR})
 link_directories(${VISIT_LIBRARY_DIR})
+add_definitions(-D__ENABLE_VISIT)
 set(VISIT_LIB simV2)
 #-----------------------------------------------------------#
 # Set everything related to Fortran

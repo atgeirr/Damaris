@@ -11,12 +11,13 @@ set(DAMARIS_MODEL_SRC
 set(DAMARIS_COMMON_SRC
 	${DAMARIS_SOURCE_DIR}/common/Process.cpp
 	${DAMARIS_SOURCE_DIR}/common/Parameter.cpp
-	${DAMARIS_SOURCE_DIR}/common/ParameterSet.cpp
+	${DAMARIS_SOURCE_DIR}/common/ParameterManager.cpp
 	${DAMARIS_SOURCE_DIR}/common/SharedMessageQueue.cpp
 	${DAMARIS_SOURCE_DIR}/common/SharedMemorySegment.cpp
 	${DAMARIS_SOURCE_DIR}/common/Environment.cpp
 	${DAMARIS_SOURCE_DIR}/common/Variable.cpp
-	${DAMARIS_SOURCE_DIR}/common/MetadataManager.cpp
+	${DAMARIS_SOURCE_DIR}/common/VariableManager.cpp
+	${DAMARIS_SOURCE_DIR}/common/LayoutManager.cpp
 	${DAMARIS_SOURCE_DIR}/common/Action.cpp
 	${DAMARIS_SOURCE_DIR}/common/DynamicAction.cpp
 	${DAMARIS_SOURCE_DIR}/common/NodeAction.cpp
@@ -43,7 +44,8 @@ endif(PYTHON_LIB)
 if(VISIT_ROOT)
 	set(DAMARIS_VISIT_SRC
 		${DAMARIS_SOURCE_DIR}/viz/VisItListener.cpp
-		${DAMARIS_SOURCE_DIR}/viz/Mesh.cpp)
+		${DAMARIS_SOURCE_DIR}/viz/Mesh.cpp
+		${DAMARIS_SOURCE_DIR}/viz/RectilinearMesh.cpp)
 endif(VISIT_ROOT)
 
 if(HDF5_ROOT)

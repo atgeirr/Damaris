@@ -26,7 +26,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdint.h>
 #include <string>
 
-#include "common/MetadataManager.hpp"
+#include "common/VariableManager.hpp"
 
 namespace Damaris {
 

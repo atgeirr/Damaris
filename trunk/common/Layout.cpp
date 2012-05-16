@@ -22,42 +22,44 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <cstring>
+
 #include "common/Debug.hpp"
+#include "common/Environment.hpp"
 #include "common/Layout.hpp"
 
 namespace Damaris {
-	
-	Layout::Layout(const std::string &n, const Model::Type& t, 
-			unsigned int d, const std::vector<int> &ex) :
-	name(n), type(t), dimensions(d), extents(ex)
-	{
-		if(ex.size() != d) {
-			ERROR("In layout initialization: extents size and dimensions do not match");
-		}
-	}
-	
-	Layout::~Layout()
-	{
-	}
 
+	Calc<std::string::const_iterator,ParameterManager::ParameterMap<int> > 
+			*Layout::calc;
+	
+	Layout::Layout(const Model::Layout& mdl,const std::string &n, const std::vector<int> &e)
+	: Configurable<Model::Layout>(mdl), name(n), extents(e)
+	{
+	}
+	
 	const std::string& Layout::getName() const
 	{
 		return name;
 	}
+
+	int Layout::getID() const
+	{
+		return id;
+	}
 	
 	Model::Type Layout::getType() const
 	{
-		return type;
+		return model.type();
 	}
 	
 	unsigned int Layout::getDimensions() const
 	{
-		return dimensions;
+		return extents.size();
 	}
 	
 	size_t Layout::getExtentAlongDimension(unsigned int dim) const
 	{
-		if(dim < dimensions)
+		if(dim < extents.size())
 			return (size_t)(extents[dim]);
 		else
 			return 0;
@@ -65,7 +67,42 @@ namespace Damaris {
 
 	bool Layout::isUnlimited() const
 	{
-		return (dimensions == 1) && (extents[0] == -1);
+		return (extents.size() == 1 && extents[0] == -1);
+	}
+
+	Layout* Layout::New(const Model::Layout& mdl, const std::string &name)
+	{
+		if(mdl.type() == Model::Type::undefined) {
+			CFGERROR("Unknown type \"" << mdl.type()
+					<< "\" for layout \"" << mdl.name() << "\"");
+			return NULL;
+		}
+		
+		if(calc == NULL) {
+			calc = new Calc<std::string::const_iterator,ParameterManager::ParameterMap<int> >
+				(ParameterManager::ParameterMap<int>()); 
+		}
+
+		std::vector<int> e;
+		std::string str = (std::string)(mdl.dimensions());
+		std::string::const_iterator iter = str.begin();
+		std::string::const_iterator end = str.end();
+		bool r = boost::spirit::qi::phrase_parse(iter, end, *calc,
+					boost::spirit::ascii::space, e);
+		if((!r) || (iter != str.end())) {
+			ERROR("While parsing dimension descriptor for layout \""
+							<< mdl.name() << "\"");
+			return NULL;
+		}
+
+		if((mdl.language() == Model::Language::fortran)
+				|| (mdl.language() == Model::Language::unknown
+					&& Environment::getDefaultLanguage() == Model::Language::fortran)) {
+			std::vector<int> rdims(e.rbegin(),e.rend());
+			e = rdims;
+		}
+
+		return new Layout(mdl,name,e);
 	}
 
 }

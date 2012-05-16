@@ -28,7 +28,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <map>
 
 #include "common/Action.hpp"
-#include "common/MetadataManager.hpp"
 
 namespace Damaris {
 

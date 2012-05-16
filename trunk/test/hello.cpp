@@ -1,6 +1,9 @@
+
 #include <stdint.h>
 #include <iostream>
 #include <string>
+
+#include "common/VariableManager.hpp"
 
 // The following is an embedded plugin.
 // Note the "extern C", used so Damaris can find the symboles correctly.
@@ -12,5 +15,11 @@ extern "C" {
 		// Getting access to the data :
 		// Damaris::MetadataManager* mm = Damaris::MetadataManager::getInstance();
 		// mm->getVariable(...) ... (see documentation)
+//		Damaris::VariableManager::ForEach(
+//				std::cout << boost::bind(&Damaris::Variable::getName,boost::lambda::_1) << std::endl
+//		);
+		Damaris::Variable* v = Damaris::VariableManager::Search("images/julia");
+		if(v != NULL) std::cout << "youpi it works";
+		else std::cout << "it doesn't";
 	}
 }

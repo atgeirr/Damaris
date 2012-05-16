@@ -25,40 +25,90 @@
 
 namespace Damaris {
 
+	Environment* Environment::env = NULL;
+
 	Environment::Environment(const Model::Simulation& mdl)
 	: Configurable<Model::Simulation>(mdl)
-	{
-		init();
-	}
-
-	Environment::~Environment() 
-	{ }
-
-	void Environment::init()
 	{
 		entityComm = MPI_COMM_NULL;
 		globalComm = MPI_COMM_NULL;
 		nodeComm   = MPI_COMM_NULL;
 	}
 
-	int Environment::getCoresPerNode() const
+	Environment::~Environment() 
+	{ }
+
+	void Environment::Init(const Model::Simulation& mdl)
 	{
-		return model.architecture().cores().count();
+		if(env != NULL) {
+			WARN("Called twice Environment::Init");
+			return;
+		}
+		env = new Environment(mdl);
 	}
 
-	int Environment::getClientsPerNode() const
+	int Environment::getCoresPerNode() 
 	{
-		DBG("In getClientsPerNode() : " << model.architecture().cores().clients().count());
-		return model.architecture().cores().clients().count();
+		if(env == NULL) return -1;
+		return env->model.architecture().cores().count();
 	}
 
-	const std::string & Environment::getSimulationName() const
+	int Environment::getClientsPerNode() 
 	{
-		return model.name();
+		if(env == NULL) return -1;
+		return env->model.architecture().cores().clients().count();
 	}
 
-	const Model::Language& Environment::getDefaultLanguage() const
+	std::string Environment::getSimulationName()
 	{
-		return model.language();
+		if(env == NULL) return "unknown";
+		return env->model.name();
+	}
+
+	Model::Language Environment::getDefaultLanguage()
+	{
+		if(env == NULL) return Model::Language::unknown;
+		return env->model.language();
+	}
+
+	void Environment::setEntityComm(MPI_Comm comm) 
+	{ 
+		if(env == NULL) return;
+		env->entityComm = comm;
+	}
+
+	MPI_Comm Environment::getEntityComm() 
+	{
+		if(env == NULL) return MPI_COMM_NULL;
+		return env->entityComm;
+	}
+
+	void Environment::setGlobalComm(MPI_Comm comm)
+	{
+		if(env == NULL) return;
+		env->globalComm = comm;
+	}
+
+	MPI_Comm Environment::getGlobalComm()
+	{
+		if(env == NULL) return MPI_COMM_NULL;
+		return env->globalComm;
+	}
+
+	void Environment::setNodeComm(MPI_Comm comm)
+	{
+		if(env == NULL) return;
+		env->nodeComm = comm;
+	}
+
+	MPI_Comm Environment::getNodeComm()
+	{
+		if(env == NULL) return MPI_COMM_NULL;
+		return env->nodeComm;
+	}
+
+	bool Environment::hasServer() 
+	{
+		return (getCoresPerNode() != getClientsPerNode());
 	}
 }

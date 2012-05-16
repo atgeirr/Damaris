@@ -32,7 +32,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/multi_index/composite_key.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include "common/Identified.hpp"
+#include <boost/lambda/lambda.hpp>
+//#include "common/Identified.hpp"
 #include "common/Debug.hpp"
 #include "common/Tags.hpp"
 
@@ -40,6 +41,7 @@ namespace Damaris {
 
 namespace bmi = boost::multi_index;
 
+class Identified;
 /**
  * This class serves as a factory the build identified (named)
  * objects. It keeps a record of all objects created and does
@@ -71,12 +73,15 @@ class Manager {
 								T,
 								bmi::const_mem_fun<
 									T,
-									const std::string&, &T::getName>,
-									bmi::const_mem_fun<T,int, &T::getID>
+									const std::string&, &T::getName
+								>,
+								bmi::const_mem_fun<T,
+									int, &T::getID
 								>
 							>
 						>
-					> ObjectSet;
+					>
+				> ObjectSet;
 
 		typedef typename ObjectSet::template index<by_name>::type IndexByName;
 		typedef typename ObjectSet::template index<by_id>::type IndexById;
@@ -90,17 +95,19 @@ class Manager {
 	public:	
 
 		template<typename S>
-		static T* New(const M &mdl)
+		static T* Create(const M &mdl, const std::string& name)
 		{
 			if(objects == NULL) {
 				objects = new ObjectSet();
 			}
 
-			T* t = static_cast<T*>(new S(mdl));
+			T* t = static_cast<T*>(S::New(mdl,name));
+			t->id = NumObjects();
+
 			std::pair<typename ObjectSet::iterator,bool> ret
 				= objects->insert(boost::shared_ptr<T>(t));
 			if(ret.second == false) {
-				WARN("Duplicate element \""<< t->getName() << "\" not created, " 
+				CFGWARN("Duplicate element \""<< name << "\" not created, " 
 					<< "returning previous value instead.");
 				// no need to delete t here, the shared_ptr does it for us
 				return ret.first->get();
@@ -116,26 +123,31 @@ class Manager {
 
 		static T* Search(const std::string &name) 
 		{
-			typename IndexByName::iterator it 
-				= objects->get().find(name);
-			if(it == objects->get().end()) {
+			typename IndexByName::iterator it = objects->template get<by_name>().find(name);
+			if(it == objects->template get<by_name>().end()) {
 				return NULL;
 			}
 			return it->get();
 
 		}
-
+/*
+		static void ForEach(const boost::lambda::function_action<1,const T&> &f)
+		{
+			typename IndexByName::iterator it = objects->template get<by_name>().begin();
+			for(;it != objects->template get<by_name>().end(); it++) {
+				f(*(it->get()));
+			}
+		}
+*/
 
 		static T* Search(const int &id) 
 		{
 			typename IndexById::iterator it 
-				= objects->get().find(id);
-			if(it == objects->get().end()) {
+				= objects->template get<by_id>().find(id);
+			if(it == objects->template get<by_id>().end()) {
 				return NULL;
 			}
 			return it->get();
-
-		return NULL;
 		}
 
 		static int NumObjects()

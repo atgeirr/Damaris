@@ -21,14 +21,32 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \version 0.5
  */
 #include "viz/Mesh.hpp"
+#include "viz/RectilinearMesh.hpp"
+#include "common/Debug.hpp"
 
 namespace Damaris {
 namespace Viz {
-
 	
 Mesh::Mesh(const Model::Mesh& mdl)
-: Configurable<Model::Mesh>(mdl), id(Manager<Mesh,Model::Mesh>::NumObjects())
+: Configurable<Model::Mesh>(mdl)
 { }
+
+Mesh* Mesh::New(const Model::Mesh& mdl)
+{
+	switch(mdl.type()) {
+		case Model::MeshType::rectilinear :
+			return new RectilinearMesh(mdl);
+        case Model::MeshType::curvilinear :
+        case Model::MeshType::unstructured :
+        case Model::MeshType::point :
+        case Model::MeshType::csg :
+        case Model::MeshType::amr :
+        case Model::MeshType::unknown :
+		default: break;
+	}
+	ERROR("Mesh type " << mdl.type() << " is not implemented.");
+	return NULL;
+}
 
 }
 }

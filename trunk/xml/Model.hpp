@@ -1792,23 +1792,6 @@ namespace Damaris
       void
       type (::std::auto_ptr< type_type > p);
 
-      // dimensions
-      // 
-      typedef ::xml_schema::unsigned_int dimensions_type;
-      typedef ::xsd::cxx::tree::traits< dimensions_type, char > dimensions_traits;
-
-      const dimensions_type&
-      dimensions () const;
-
-      dimensions_type&
-      dimensions ();
-
-      void
-      dimensions (const dimensions_type& x);
-
-      static dimensions_type
-      dimensions_default_value ();
-
       // topology
       // 
       typedef ::xml_schema::unsigned_int topology_type;
@@ -1857,7 +1840,6 @@ namespace Damaris
       coords_sequence coords_;
       ::xsd::cxx::tree::one< name_type > name_;
       ::xsd::cxx::tree::one< type_type > type_;
-      ::xsd::cxx::tree::one< dimensions_type > dimensions_;
       ::xsd::cxx::tree::one< topology_type > topology_;
     };
 

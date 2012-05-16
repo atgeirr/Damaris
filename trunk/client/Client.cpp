@@ -52,7 +52,7 @@ namespace Damaris {
 	{
 
 		// check that the variable is known in the configuration
-		Variable* variable = process->getMetadataManager()->getVariable(varname);
+		Variable* variable = VariableManager::Search(varname);
 
         if(variable == NULL) {
 			ERROR("Variable \""<< varname 
@@ -93,7 +93,7 @@ namespace Damaris {
 			}
 		}
 		// create the chunk header in memory
-		int source = process->getEnvironment()->getID();
+		int source = process->getID();
 		ChunkHeader* ch = new(location) ChunkHeader(cd,layout->getType(),iteration,source);
 
 		// create the ShmChunk and attach it to the variable
@@ -107,7 +107,7 @@ namespace Damaris {
 	
 	int Client::commit(const std::string & varname, int32_t iteration)
 	{		
-		Variable* v = process->getMetadataManager()->getVariable(varname);
+		Variable* v = VariableManager::Search(varname);
 		if(v == NULL)
 			return -1;
 
@@ -127,7 +127,7 @@ namespace Damaris {
 		
 		// create notification message
 		Message message;
-		message.source = process->getEnvironment()->getID();
+		message.source = process->getID();
 
 		message.iteration = iteration;
 		message.type = MSG_VAR;
@@ -148,7 +148,7 @@ namespace Damaris {
 	int Client::write(const std::string & varname, int32_t iteration, const void* data, bool blocking)
 	{
 		/* check that the variable is know in the configuration */
-		Variable* variable = process->getMetadataManager()->getVariable(varname);
+		Variable* variable = VariableManager::Search(varname);
 
         if(variable == NULL) {
 			return -1;
@@ -188,7 +188,7 @@ namespace Damaris {
         }
 
         // create the chunk header in memory
-        int source = process->getEnvironment()->getID();
+        int source = process->getID();
         ChunkHeader* ch = new(location) ChunkHeader(cd,layout->getType(),iteration,source);
 
         // create the ShmChunk and attach it to the variable
@@ -220,7 +220,7 @@ namespace Damaris {
 			int32_t iteration, const void* data, bool blocking)
 	{
 		/* check that the variable is know in the configuration */
-		Variable* variable = process->getMetadataManager()->getVariable(varname);
+		Variable* variable = VariableManager::Search(varname);
 
         if(variable == NULL) {
 			ERROR("Variable \""<< varname << "\" not defined in configuration");
@@ -256,7 +256,7 @@ namespace Damaris {
         }
 
 		// create the ChunkHeader
-		int source = process->getEnvironment()->getID();
+		int source = process->getID();
 		ChunkHeader* ch = new(location) ChunkHeader(cd,layout->getType(),iteration,source);
 
 		// create the ShmChunk object		
@@ -292,7 +292,7 @@ namespace Damaris {
 		}
 
 		Message sig;
-		sig.source = process->getEnvironment()->getID();
+		sig.source = process->getID();
 		sig.iteration = iteration;
 		sig.type = MSG_SIG;
 		sig.handle = 0;
@@ -324,7 +324,7 @@ namespace Damaris {
 		if(!killed) {
 			Message kill;
 			kill.type = MSG_INT;
-			kill.source = process->getEnvironment()->getID();
+			kill.source = process->getID();
 			kill.iteration = -1;
 			kill.object = KILL_SERVER;
 			process->getSharedMessageQueue()->send(&kill);
@@ -339,7 +339,7 @@ namespace Damaris {
     {
 		Message msg;
 		msg.type = MSG_INT;
-		msg.source = process->getEnvironment()->getID();
+		msg.source = process->getID();
 		msg.iteration = iteration;
 		msg.object = URGENT_CLEAN;
 		process->getSharedMessageQueue()->send(&msg);
@@ -350,7 +350,7 @@ namespace Damaris {
 	{
 		Message msg;
 		msg.type = MSG_INT;
-        msg.source = process->getEnvironment()->getID();
+        msg.source = process->getID();
         msg.iteration = iteration;
         msg.object = LOST_DATA;
         process->getSharedMessageQueue()->send(&msg);

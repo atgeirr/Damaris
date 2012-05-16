@@ -26,6 +26,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/Message.hpp"
 #include "common/ShmChunk.hpp"
 #include "common/Layout.hpp"
+#include "common/VariableManager.hpp"
 #include "client/StdAloneClient.hpp"
 
 namespace Damaris {
@@ -43,7 +44,7 @@ StdAloneClient::~StdAloneClient()
 void* StdAloneClient::alloc(const std::string & varname, int32_t iteration, bool blocking)
 {
 	// check that the variable is known in the configuration
-        Variable* variable = process->getMetadataManager()->getVariable(varname);
+        Variable* variable = VariableManager::Search(varname);
 
         if(variable == NULL) {
             ERROR("Variable \""<< varname
@@ -79,7 +80,7 @@ void* StdAloneClient::alloc(const std::string & varname, int32_t iteration, bool
 		}
 
         // create the chunk header in memory
-        int source = process->getEnvironment()->getID();
+        int source = process->getID();
         ChunkHeader* ch = new(location) ChunkHeader(cd,layout->getType(),iteration,source);
 
         // create the ShmChunk and attach it to the variable
@@ -94,7 +95,7 @@ void* StdAloneClient::alloc(const std::string & varname, int32_t iteration, bool
 
 int StdAloneClient::commit(const std::string & varname, int32_t iteration)
 {		
-	Variable* v = process->getMetadataManager()->getVariable(varname);
+	Variable* v = VariableManager::Search(varname);
 	if(v == NULL)
 		return -1;
 
@@ -118,10 +119,11 @@ int StdAloneClient::commit(const std::string & varname, int32_t iteration)
 	return 0;
 }
 
-int StdAloneClient::write(const std::string & varname, int32_t iteration, const void* data, bool blocking)
+int StdAloneClient::write(const std::string & varname, 
+				int32_t iteration, const void* data, bool blocking)
 {
 		/* check that the variable is know in the configuration */
-		Variable* variable = process->getMetadataManager()->getVariable(varname);
+		Variable* variable = VariableManager::Search(varname);
 
 		if(variable == NULL) {
             return -1;
@@ -154,7 +156,7 @@ int StdAloneClient::write(const std::string & varname, int32_t iteration, const 
             return -2;
         }
 		// create the chunk header in memory
-		int source = process->getEnvironment()->getID();
+		int source = process->getID();
 		ChunkHeader* ch = new(location) ChunkHeader(cd,layout->getType(),iteration,source);
 
 		// create the ShmChunk and attach it to the variable
@@ -177,52 +179,52 @@ int StdAloneClient::chunk_write(chunk_h chunkh, const std::string & varname,
 		int32_t iteration, const void* data, bool blocking)
 {
 	/* check that the variable is know in the configuration */
-        Variable* variable = process->getMetadataManager()->getVariable(varname);
+	Variable* variable = VariableManager::Search(varname);
 
-        if(variable == NULL) {
-            ERROR("Variable \""<< varname << "\" not defined in configuration");
-            return -1;
-        }
+	if(variable == NULL) {
+		ERROR("Variable \""<< varname << "\" not defined in configuration");
+		return -1;
+	}
 
-        ChunkDescriptor* cd = (ChunkDescriptor*)chunkh;
+	ChunkDescriptor* cd = (ChunkDescriptor*)chunkh;
 
-        // check if the chunk matches the layout boundaries
-        Layout* layout = variable->getLayout();
-        if(not cd->within(*layout)) {
-            ERROR("Chunk boundaries do not match variable's layout");
-            return -3;
-        }
+	// check if the chunk matches the layout boundaries
+	Layout* layout = variable->getLayout();
+	if(not cd->within(*layout)) {
+		ERROR("Chunk boundaries do not match variable's layout");
+		return -3;
+	}
 
-        // allocate memory
-        size_t size = sizeof(ChunkHeader)+cd->getDataMemoryLength(layout->getType());
-        void* location = process->getSharedMemorySegment()->allocate(size);
+	// allocate memory
+	size_t size = sizeof(ChunkHeader)+cd->getDataMemoryLength(layout->getType());
+	void* location = process->getSharedMemorySegment()->allocate(size);
 
-		        // This piece of code changes from Client.cpp: we don't want to block
-        // if there is no way to get more memory.
-        if(location == NULL && blocking) {
-                clean(iteration);
-                location = process->getSharedMemorySegment()->allocate(size);
-        }
-        if(location == NULL) {
-            ERROR("Could not allocate memory: not enough available memory");
-            return -2;
-        }
+	// This piece of code changes from Client.cpp: we don't want to block
+	// if there is no way to get more memory.
+	if(location == NULL && blocking) {
+		clean(iteration);
+		location = process->getSharedMemorySegment()->allocate(size);
+	}
+	if(location == NULL) {
+		ERROR("Could not allocate memory: not enough available memory");
+		return -2;
+	}
 
-        // create the ChunkHeader
-        int source = process->getEnvironment()->getID();
-        ChunkHeader* ch = new(location) ChunkHeader(cd,layout->getType(),iteration,source);
+	// create the ChunkHeader
+	int source = process->getID();
+	ChunkHeader* ch = new(location) ChunkHeader(cd,layout->getType(),iteration,source);
 
-        // create the ShmChunk object       
-        ShmChunk* chunk = new ShmChunk(process->getSharedMemorySegment(),ch);
+	// create the ShmChunk object       
+	ShmChunk* chunk = new ShmChunk(process->getSharedMemorySegment(),ch);
 
-		// copy data
-        size = cd->getDataMemoryLength(layout->getType());
-        memcpy(chunk->data(),data,size);
-		
-		variable->attachChunk(chunk);	
-		DBG("Variable \"" << varname << "\" has been written");
+	// copy data
+	size = cd->getDataMemoryLength(layout->getType());
+	memcpy(chunk->data(),data,size);
 
-		return size;
+	variable->attachChunk(chunk);	
+	DBG("Variable \"" << varname << "\" has been written");
+
+	return size;
 }
 
 int StdAloneClient::signal(const std::string & signal_name, int32_t iteration)
@@ -233,7 +235,7 @@ int StdAloneClient::signal(const std::string & signal_name, int32_t iteration)
 		return -2;
 	}
 
-	action->call(iteration,process->getEnvironment()->getID());
+	action->call(iteration,process->getID());
 
 	DBG("Event \""<< signal_name << "\" has been sent");
 	return 0;

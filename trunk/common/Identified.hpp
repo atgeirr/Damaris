@@ -24,6 +24,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #define __DAMARIS_IDENTIFIED_H
 
 #include <string>
+#include "common/Manager.hpp"
 
 namespace Damaris {
 
@@ -33,15 +34,24 @@ namespace Damaris {
  */
 class Identified
 {
-	/**
-	 * Returns the name of the object.
-	 */
-	virtual const std::string& getName() const = 0;
+	template<typename T, typename M>
+	friend class Manager;
 
-	/**
-	 * Returns the id of the object.
-	 */
-	virtual int getID() const = 0;
+	private:
+		int id;
+
+		virtual void setID(int i) { id = i; }
+
+	public:
+		/**
+		 * Returns the name of the object.
+		 */
+		virtual const std::string& getName() const = 0;
+
+		/**
+		 * Returns the id of the object.
+		 */
+		virtual int getID() const { return id; }
 };
 
 }

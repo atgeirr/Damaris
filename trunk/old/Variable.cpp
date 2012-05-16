@@ -21,25 +21,27 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \version 0.4
  */
 #include "common/Variable.hpp"
-#include "common/Debug.hpp"
 
 namespace Damaris {
-
-Variable::Variable(const Model::Variable& mdl, const std::string &n, Layout* l)
-: Configurable<Model::Variable>(mdl)
+	
+Variable::Variable(int i, const std::string& n, Layout* l)
 {
-	layout = l;
+	id = i;
 	name = n;
+	layout = l;
 }
-/*
+
+Variable::Variable()
+{
+}
+
 bool Variable::operator==(const Variable &another)
 {
 	bool c = true;
-	c = c && (another.getName.compare(name) == 0;
+	c = c && another.name.compare(name) == 0;
 	c = c && another.id == id;
 	return c;
 }
-*/
 
 void Variable::attachChunk(Chunk* chunk)
 {
@@ -120,18 +122,4 @@ visit_handle Variable::getVisItHandle() const
 	return VISIT_INVALID_HANDLE;
 }
 #endif
-
-Variable* Variable::New(const Model::Variable& mdl, const std::string& name)
-{
-	// checks that the layout exists
-	Layout* l = Manager<Layout,Model::Layout>::Search((std::string)mdl.layout());
-	if(l == NULL) {
-		CFGERROR("Layout \"" << mdl.layout() 
-				<< "\" not found for variable \"" 
-				<< mdl.name() << "\"");
-		return NULL;
-	}
-	return new Variable(mdl,name,l);
-}
-
 }

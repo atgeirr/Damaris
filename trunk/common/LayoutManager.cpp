@@ -15,49 +15,23 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file Mesh.hpp
- * \date May 2012
+ * \file MetadataManager.cpp
+ * \date February 2012
  * \author Matthieu Dorier
- * \version 0.5
+ * \version 0.4
  */
-#ifndef __DAMARIS_MESH_H
-#define __DAMARIS_MESH_H
-
-#ifdef __ENABLE_VISIT
-	#include <VisItDataInterface_V2.h>
-#endif
-#include "common/Identified.hpp"
-#include "common/Configurable.hpp"
-#include "common/Manager.hpp"
-#include "xml/Model.hpp"
+#include "common/Debug.hpp"
+#include "common/LayoutManager.hpp"
 
 namespace Damaris {
-namespace Viz {
 
-/**
- * The Mesh object is used for describing a mesh within
- * a metadata structure.
- */
-class Mesh : public Identified, public Configurable<Model::Mesh> {
-
-	protected:
-		Mesh(const Model::Mesh& mdl);
-		
-	public:
-
-		const std::string& getName() const {
-			return model.name();
-		}
-
-#ifdef __ENABLE_VISIT
-		virtual bool exposeVisItMetaData(visit_handle md) const = 0;
-		
-		virtual bool exposeVisItData() const = 0;
-#endif
-
-		static Mesh* New(const Model::Mesh& mdl);
-};
+void LayoutManager::Init(const Model::Data& model)
+{
+    Model::Data::layout_const_iterator l(model.layout().begin());
+    for(;l != model.layout().end(); l++)
+    {
+		Create<Layout>(*l,(std::string)l->name());
+    }
+}
 
 }
-}
-#endif

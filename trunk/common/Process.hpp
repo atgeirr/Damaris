@@ -32,7 +32,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "common/SharedMessageQueue.hpp"
 #include "common/SharedMemorySegment.hpp"
 #include "common/ActionsManager.hpp"
-#include "common/MetadataManager.hpp"
+#include "common/VariableManager.hpp"
 
 namespace Damaris {
 
@@ -79,11 +79,10 @@ class Process {
 	protected:
 		std::auto_ptr<Damaris::Model::Simulation> model; /*!< base model initialized from the configuration file. */
 		Environment 	*environment; /*!< environment object. */
-		MetadataManager *metadataManager; /*! metadata manager object. */
 		ActionsManager 	*actionsManager; /*! actions manager object. */
 		SharedMessageQueue 	*msgQueue; /*!< pointer to the message queue. */
 		SharedMemorySegment 	*segment; /*!< pointer to the shared memory segment. */
-
+		int id;
 	public:
 		/**
 		 * Get the singleton instance of the Process object. NULL is returned if
@@ -124,14 +123,6 @@ class Process {
 		}
 
 		/**
-		 * Get the initialized MetadataManager instance attached to the Process.
-		 */
-		MetadataManager* getMetadataManager()
-		{
-			return metadataManager;
-		}
-
-		/**
 		 * Get the initialized ActionsManager instance attached to the Process.
 		 */
 		ActionsManager* getActionsManager()
@@ -158,6 +149,11 @@ class Process {
 		Model::Simulation* getModel()
 		{
 			return model.get();
+		}
+
+		int getID() const
+		{
+			return id;
 		}
 
 }; // class Process 

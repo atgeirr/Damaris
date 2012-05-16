@@ -15,49 +15,36 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file Mesh.hpp
- * \date May 2012
+ * \file LayoutManager.hpp
+ * \date February 2012
  * \author Matthieu Dorier
- * \version 0.5
+ * \version 0.4
  */
-#ifndef __DAMARIS_MESH_H
-#define __DAMARIS_MESH_H
+#ifndef __DAMARIS_LAYOUT_MANAGER_H
+#define __DAMARIS_LAYOUT_MANAGER_H
 
-#ifdef __ENABLE_VISIT
-	#include <VisItDataInterface_V2.h>
-#endif
-#include "common/Identified.hpp"
-#include "common/Configurable.hpp"
-#include "common/Manager.hpp"
+#include <iostream>
+#include <map>
+#include <string>
+#include <vector>
+
 #include "xml/Model.hpp"
+#include "common/Layout.hpp"
+#include "common/Configurable.hpp"
 
 namespace Damaris {
-namespace Viz {
 
-/**
- * The Mesh object is used for describing a mesh within
- * a metadata structure.
- */
-class Mesh : public Identified, public Configurable<Model::Mesh> {
+	/**
+	 * VariableManager holds pointers to all Variables.
+	 * These variables can be retrieved by their name or by a unique ID.
+	 */
+	class LayoutManager : public Manager<Layout,Model::Layout> {
 
-	protected:
-		Mesh(const Model::Mesh& mdl);
-		
 	public:
+		static void Init(const Model::Data& mdl);
 
-		const std::string& getName() const {
-			return model.name();
-		}
-
-#ifdef __ENABLE_VISIT
-		virtual bool exposeVisItMetaData(visit_handle md) const = 0;
-		
-		virtual bool exposeVisItData() const = 0;
-#endif
-
-		static Mesh* New(const Model::Mesh& mdl);
-};
-
+	};
+	
 }
-}
+
 #endif

@@ -29,13 +29,12 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <VisItDataInterface_V2.h>
 
-#include "xml/Model.hpp"
-#include "common/Configurable.hpp"
 #include "common/ChunkSet.hpp"
 #include "common/Layout.hpp"
-#include "common/Manager.hpp"
 
 namespace Damaris {
+
+class MetadataManager;
 
 /**
  * The Variable object is used for describing a variable within
@@ -44,28 +43,38 @@ namespace Damaris {
  * A Variable cannot be created in a vacuum, only the MetadataManager
  * has the permission to create instances of them.
  */
-class Variable : public Configurable<Model::Variable> {
-
-	friend class Manager<Variable,Model::Variable>;
+class Variable {
+	friend class MetadataManager;
 	
 	private:	
+		std::string name;	/*!< Name of the variable. */
+		std::string description; /*!< Description of the variable. */
+		std::string unit;	 /*!< Unit of the variable. */
 		Layout* layout;		/*!< Layout of the data. */
+		int id;			/*!< The ID is used to avoid 
+					  passing variable's name in shared-memory. */
 		ChunkSet chunks; 	/*!< Chunks hold by the variable. */
 
-		std::string name;
-		int id;
-
-	protected:
 		/**
 		 * \brief Constructor. 
 		 * Creates a Variable record given a name, an iteration, a source, a layout
 		 * and a pointer to the data.
 		 * The constructor is private, only a MetadataManager has the permission
 		 * to create a new instance of Variable.
+		 * 
+		 * \param[in] vname : Name of the variable.
+		 * \param[in] id : id of the variable in the MetadataManager.
+		 * \param[in] layout : Layout that physically describe the data.
 		 */
-		Variable(const Model::Variable& v, const std::string& name, Layout* l);
+		Variable(int id, const std::string& vname, Layout* layout);
 
+		/**
+		 * \brief Constructor.
+		 */
+		Variable();
+	
 	public:	
+
 		/**
 		 * Returns the layout of the variable.
 		 */
@@ -76,7 +85,11 @@ class Variable : public Configurable<Model::Variable> {
 		 */
 		const std::string& getName() const { return name; }
 
+		/**
+		 * Returns the ID of the variable.
+		 */
 		int getID() const { return id; }
+
 		/**
 		 * Attach a new chunk to the variable.
 		 */
@@ -86,7 +99,7 @@ class Variable : public Configurable<Model::Variable> {
 		 * \brief Comparison operator between variables.
 		 * Variables are equals if they have a same name, iteration and source.
 		 */
-		//bool operator==(const Variable &another);
+		bool operator==(const Variable &another);
 
 		/**
 		 * Returns the list of chunks with a specified source.
@@ -149,18 +162,26 @@ class Variable : public Configurable<Model::Variable> {
 		/**
 		 * Returns a reference to the variabls description.
 		 */
-		std::string getDescription() const { return (std::string)model; }
+		const std::string& getDescription() const { return description; }
+
+		/**
+		 * Set the description of the variable.
+		 */
+		void setDescription(const std::string& desc) { description = desc; }
 
 		/**
 		 * Returns the unit of the variable.
 		 */
-		std::string getUnit() const { return model.unit(); }
+		const std::string& getUnit() const { return unit; }
+
+		/**
+		 * Set the unit of the variable.
+		 */
+		void setUnit(const std::string& u) { unit = u; }
 
 #ifdef __ENABLE_VISIT
 		visit_handle getVisItHandle() const;
 #endif
-
-		static Variable* New(const Model::Variable& mdl, const std::string &name);
 };
 
 }
