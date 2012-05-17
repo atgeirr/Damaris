@@ -10,7 +10,6 @@ set(DAMARIS_MODEL_SRC
 
 set(DAMARIS_COMMON_SRC
 	${DAMARIS_SOURCE_DIR}/core/Process.cpp
-	${DAMARIS_SOURCE_DIR}/core/Language.cpp
 	${DAMARIS_SOURCE_DIR}/core/ParameterManager.cpp
 	${DAMARIS_SOURCE_DIR}/core/SharedMessageQueue.cpp
 	${DAMARIS_SOURCE_DIR}/core/SharedMemorySegment.cpp

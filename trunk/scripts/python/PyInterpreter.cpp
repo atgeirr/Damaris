@@ -62,7 +62,10 @@ static bp::object open(const std::string& varname)
  */
 static bp::object clear()
 {
-	WARN("Function damaris.clear() is not implemented yet.");
+	VariableManager::iterator it = VariableManager::Begin();
+	for(;it != VariableManager::End(); it++) {
+		it->get()->clear();
+	}
 	return bp::object();
 }
 

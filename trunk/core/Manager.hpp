@@ -93,6 +93,8 @@ class Manager {
 
 	public:	
 
+		typedef typename ObjectSet::iterator iterator;
+
 		template<typename S>
 		static T* Create(const M &mdl, const std::string& name)
 		{
@@ -129,15 +131,16 @@ class Manager {
 			return it->get();
 
 		}
-/*
-		static void ForEach(const boost::lambda::function_action<1,const T&> &f)
+
+		template<typename FUNCTION>
+		static void ForEach(const FUNCTION& f)
 		{
-			typename IndexByName::iterator it = objects->template get<by_name>().begin();
-			for(;it != objects->template get<by_name>().end(); it++) {
+			iterator it = Begin();
+			for(;it != End(); it++) {
 				f(*(it->get()));
 			}
 		}
-*/
+
 
 		static T* Search(const int &id) 
 		{
@@ -161,6 +164,16 @@ class Manager {
 		{
 			if(objects != NULL)
 				delete objects;
+		}
+
+		static const iterator& End() 
+		{
+			return objects->end();
+		}
+
+		static iterator Begin()
+		{
+			return objects->begin();
 		}
 };
 
