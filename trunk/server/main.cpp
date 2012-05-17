@@ -29,8 +29,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <mpi.h>
 
 #include "server/Options.hpp"
-#include "common/Debug.hpp"
-#include "common/Process.hpp"
+#include "core/Debug.hpp"
+#include "core/Process.hpp"
 #include "server/Server.hpp"
 
 /**

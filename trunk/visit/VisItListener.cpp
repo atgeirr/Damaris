@@ -26,8 +26,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <VisItControlInterface_V2.h>
 #include <boost/bind.hpp>
 
-#include "common/Debug.hpp"
-#include "viz/VisItListener.hpp"
+#include "core/Debug.hpp"
+#include "visit/VisItListener.hpp"
 
 
 #define VISIT_COMMAND_PROCESS 0

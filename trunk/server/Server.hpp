@@ -26,8 +26,8 @@
 #include <string>
 #include <mpi.h>
 
-#include "common/Message.hpp"
-#include "common/Process.hpp"
+#include "core/Message.hpp"
+#include "core/Process.hpp"
 #include "server/Initiator.hpp"
 
 namespace Damaris {

@@ -22,9 +22,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <iostream>
 #include <list>
-#include "common/Debug.hpp"
-#include "common/Environment.hpp"
-#include "common/Process.hpp"
+#include "core/Debug.hpp"
+#include "core/Environment.hpp"
+#include "core/Process.hpp"
 #include "client/StdAloneClient.hpp"
 #include "server/Initiator.hpp"
 

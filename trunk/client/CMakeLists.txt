@@ -10,23 +10,24 @@ set(DAMARIS_MODEL_SRC
 
 set(DAMARIS_COMMON_SRC
 	${DAMARIS_SOURCE_DIR}/core/Process.cpp
-	${DAMARIS_SOURCE_DIR}/data/Parameter.cpp
+	${DAMARIS_SOURCE_DIR}/core/Language.cpp
 	${DAMARIS_SOURCE_DIR}/core/ParameterManager.cpp
 	${DAMARIS_SOURCE_DIR}/core/SharedMessageQueue.cpp
 	${DAMARIS_SOURCE_DIR}/core/SharedMemorySegment.cpp
 	${DAMARIS_SOURCE_DIR}/core/Environment.cpp
-	${DAMARIS_SOURCE_DIR}/data/Variable.cpp
 	${DAMARIS_SOURCE_DIR}/core/VariableManager.cpp
 	${DAMARIS_SOURCE_DIR}/core/LayoutManager.cpp
 	${DAMARIS_SOURCE_DIR}/core/Action.cpp
 	${DAMARIS_SOURCE_DIR}/core/DynamicAction.cpp
 	${DAMARIS_SOURCE_DIR}/core/NodeAction.cpp
 	${DAMARIS_SOURCE_DIR}/core/ActionsManager.cpp
+	${DAMARIS_SOURCE_DIR}/data/Variable.cpp
 	${DAMARIS_SOURCE_DIR}/data/ChunkDescriptor.cpp
 	${DAMARIS_SOURCE_DIR}/data/Chunk.cpp
 	${DAMARIS_SOURCE_DIR}/data/ShmChunk.cpp
 	${DAMARIS_SOURCE_DIR}/data/Types.cpp 
-	${DAMARIS_SOURCE_DIR}/data/Layout.cpp)
+	${DAMARIS_SOURCE_DIR}/data/Layout.cpp
+	${DAMARIS_SOURCE_DIR}/data/Parameter.cpp)
 
 
 if(PYTHON_LIB)

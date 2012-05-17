@@ -28,7 +28,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <exception>
 
 #include "core/Debug.hpp"
-#include "core/ShmChunk.hpp"
+#include "data/ShmChunk.hpp"
 #include "core/Message.hpp"
 #include "client/Client.hpp"
 

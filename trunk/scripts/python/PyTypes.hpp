@@ -27,7 +27,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #define PY_ARRAY_UNIQUE_SYMBOL damaris_ARRAY_API
 #define NO_IMPORT_ARRAY
 #include <numpy/arrayobject.h>
-#include "common/Types.hpp"
+#include "data/Types.hpp"
 
 namespace Damaris {
 

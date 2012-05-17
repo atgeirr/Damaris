@@ -32,7 +32,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "xml/Model.hpp"
 #include "server/Options.hpp"
-#include "common/Debug.hpp"
+#include "core/Debug.hpp"
 
 namespace po = boost::program_options;
 

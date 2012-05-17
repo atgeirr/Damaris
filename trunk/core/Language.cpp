@@ -15,55 +15,25 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file PyAction.cpp
+ * \file Language.cpp
  * \date February 2012
  * \author Matthieu Dorier
  * \version 0.4
  */
-#include <exception>
-
-#include "core/Debug.hpp"
-#include "scripts/python/PyInterpreter.hpp"
-#include "scripts/python/PyAction.hpp"
+#include "core/Language.hpp"
 
 namespace Damaris {
 
-namespace Python {
+namespace Language {
 
-PyAction::PyAction(std::string file)
-: Action()
+language_e getLanguageFromString(const std::string* s)
 {
-	fileName	= file;
-	loaded		= true;
-}
-	
-PyAction::PyAction(std::string n, int i, std::string file)
-: Action(n,i)
-{
-	fileName 	= file;
-	loaded		= true;
-}
-
-PyAction::~PyAction()
-{
-}
-	
-void PyAction::call(int32_t iteration, int32_t sourceID)
-{
-	try {
-		PyInterpreter* p = Python::PyInterpreter::getInstance();
-		if(p != NULL) {
-			p->execFile(fileName,sourceID,iteration);
-		} else { 
-			throw(std::runtime_error("Unable to get a pointer to a Python interpreter."));
-		}
-	} catch(std::exception &e) {
-		ERROR("in Python action \"" << name << "\": "<< e.what());
-	}
-}
-
-void PyAction::load()
-{
+	if(*s == "Fortran" || *s == "fortran" || *s == "FORTRAN" || *s == "F90" || *s == "F77"
+		|| *s == "f90" || *s == "f77") return LG_FORTRAN;
+	else 
+	if(*s == "Python" || *s == "python" || *s == "PYTHON") return LG_PYTHON;
+	else if(*s == "?") return LG_UNKNOWN;
+	else return LG_C;
 }
 
 }

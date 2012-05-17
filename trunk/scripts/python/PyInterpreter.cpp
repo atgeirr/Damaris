@@ -27,9 +27,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <string>
 
-#include "common/Debug.hpp"
-#include "common/Process.hpp"
-#include "common/VariableManager.hpp"
+#include "core/Debug.hpp"
+#include "core/Process.hpp"
+#include "core/VariableManager.hpp"
 #include "scripts/python/PyChunk.hpp"
 #include "scripts/python/PyLayout.hpp"
 #include "scripts/python/PyVariable.hpp"

@@ -23,7 +23,7 @@
 #ifndef __DAMARIS_SINGLETON_H
 #define __DAMARIS_SINGLETON_H
 
-#include "common/Debug.hpp"
+#include "core/Debug.hpp"
 
 namespace Damaris {
 

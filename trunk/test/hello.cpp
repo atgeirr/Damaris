@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 
-#include "common/VariableManager.hpp"
+#include "core/VariableManager.hpp"
 
 // The following is an embedded plugin.
 // Note the "extern C", used so Damaris can find the symboles correctly.

@@ -24,7 +24,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #define __DAMARIS_PYTHON_VARIABLE_H
 
 #include <boost/python.hpp>
-#include "common/Variable.hpp"
+#include "data/Variable.hpp"
 #include "scripts/python/PyChunk.hpp"
 #include "scripts/python/PyLayout.hpp"
 

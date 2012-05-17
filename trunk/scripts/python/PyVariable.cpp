@@ -22,7 +22,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "scripts/python/PyVariable.hpp"
 #include "scripts/python/PyChunk.hpp"
-#include "common/Debug.hpp"
+#include "core/Debug.hpp"
 
 namespace Damaris {
 

@@ -25,7 +25,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <boost/python.hpp>
 
-#include "common/Layout.hpp"
+#include "data/Layout.hpp"
 
 namespace Damaris {
 

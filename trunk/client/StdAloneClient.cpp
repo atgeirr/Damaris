@@ -24,7 +24,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <list>
 #include "core/Debug.hpp"
 #include "core/Message.hpp"
-#include "core/ShmChunk.hpp"
+#include "data/ShmChunk.hpp"
 #include "data/Layout.hpp"
 #include "core/VariableManager.hpp"
 #include "client/StdAloneClient.hpp"

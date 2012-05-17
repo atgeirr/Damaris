@@ -24,7 +24,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #define __DAMARIS_WRITER_H
 
 #include <string>
-#include "core/ChunkDescriptor.hpp"
+#include "data/ChunkDescriptor.hpp"
 #include "data/Layout.hpp"
 
 namespace Damaris {

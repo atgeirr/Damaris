@@ -21,7 +21,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \version 0.4
  */
 #include "scripts/python/PyChunk.hpp"
-#include "common/Debug.hpp"
+#include "core/Debug.hpp"
 #define PY_ARRAY_UNIQUE_SYMBOL damaris_ARRAY_API
 #define NO_IMPORT_ARRAY
 #include <numpy/arrayobject.h>

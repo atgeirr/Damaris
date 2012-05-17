@@ -24,7 +24,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #define __DAMARIS_PYTHON_CHUNK_H
 
 #include <boost/python.hpp>
-#include "common/Chunk.hpp"
+#include "data/Chunk.hpp"
 
 namespace Damaris {
 

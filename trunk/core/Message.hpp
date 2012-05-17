@@ -23,7 +23,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __DAMARIS_MESSAGE_H
 #define __DAMARIS_MESSAGE_H
 
-#include "common/SharedMemory.hpp"
+#include "core/SharedMemory.hpp"
 
 namespace Damaris {
 

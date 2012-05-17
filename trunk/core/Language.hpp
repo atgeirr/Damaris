@@ -15,56 +15,43 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file PyAction.cpp
+ * \file Language.hpp
  * \date February 2012
  * \author Matthieu Dorier
  * \version 0.4
+ *
+ * Language.hpp contains the enumeration that makes the distinction
+ * between C and Fortran. This distinction is important because C and
+ * Fortran programs don't have the same array layout.
  */
-#include <exception>
 
-#include "core/Debug.hpp"
-#include "scripts/python/PyInterpreter.hpp"
-#include "scripts/python/PyAction.hpp"
+#ifndef __DAMARIS_LANGUAGE_H
+#define __DAMARIS_LANGUAGE_H
+
+#include <string>
 
 namespace Damaris {
 
-namespace Python {
+namespace Language {
 
-PyAction::PyAction(std::string file)
-: Action()
-{
-	fileName	= file;
-	loaded		= true;
-}
-	
-PyAction::PyAction(std::string n, int i, std::string file)
-: Action(n,i)
-{
-	fileName 	= file;
-	loaded		= true;
-}
+/**
+ * The language_e enumeration distinguishes between C, Fortran, Python
+ * (and a potential unknown language).
+ */
+enum language_e {
+	LG_FORTRAN,
+	LG_C,
+	LG_PYTHON,
+	LG_UNKNOWN
+};
 
-PyAction::~PyAction()
-{
-}
-	
-void PyAction::call(int32_t iteration, int32_t sourceID)
-{
-	try {
-		PyInterpreter* p = Python::PyInterpreter::getInstance();
-		if(p != NULL) {
-			p->execFile(fileName,sourceID,iteration);
-		} else { 
-			throw(std::runtime_error("Unable to get a pointer to a Python interpreter."));
-		}
-	} catch(std::exception &e) {
-		ERROR("in Python action \"" << name << "\": "<< e.what());
-	}
-}
-
-void PyAction::load()
-{
-}
+/**
+ * \brief Converts a string representing the name of a language into a language.
+ * Recognized languages are Fortran, fortran, FORTRAN, F90, f90, F77, f77, C, c,
+ * CPP, cpp, C++, c++, CXX, cxx, Python, python.
+ */
+language_e getLanguageFromString(const std::string* s);
 
 }
 }
+#endif

@@ -22,7 +22,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * Contains the definition of functions for the Server in Fortran.
  */
 #ifdef __ENABLE_FORTRAN
-#include "common/FCMangle.h"
+#include "core/FCMangle.h"
 
 #ifndef FC_FUNC_GLOBAL
 #define FC_FUNC_GLOBAL(name,NAME) name##_
