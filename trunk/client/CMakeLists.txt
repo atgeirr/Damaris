@@ -15,12 +15,15 @@ set(DAMARIS_COMMON_SRC
 	${DAMARIS_SOURCE_DIR}/core/SharedMemorySegment.cpp
 	${DAMARIS_SOURCE_DIR}/core/Environment.cpp
 	${DAMARIS_SOURCE_DIR}/core/VariableManager.cpp
+	${DAMARIS_SOURCE_DIR}/core/MeshManager.cpp
 	${DAMARIS_SOURCE_DIR}/core/LayoutManager.cpp
 	${DAMARIS_SOURCE_DIR}/core/Action.cpp
 	${DAMARIS_SOURCE_DIR}/core/DynamicAction.cpp
 	${DAMARIS_SOURCE_DIR}/core/NodeAction.cpp
 	${DAMARIS_SOURCE_DIR}/core/ActionsManager.cpp
 	${DAMARIS_SOURCE_DIR}/data/Variable.cpp
+	${DAMARIS_SOURCE_DIR}/data/Mesh.cpp
+	${DAMARIS_SOURCE_DIR}/data/RectilinearMesh.cpp
 	${DAMARIS_SOURCE_DIR}/data/ChunkDescriptor.cpp
 	${DAMARIS_SOURCE_DIR}/data/Chunk.cpp
 	${DAMARIS_SOURCE_DIR}/data/ShmChunk.cpp
@@ -42,9 +45,7 @@ endif(PYTHON_LIB)
 
 if(VISIT_ROOT)
 	set(DAMARIS_VISIT_SRC
-		${DAMARIS_SOURCE_DIR}/visit/VisItListener.cpp
-		${DAMARIS_SOURCE_DIR}/data/Mesh.cpp
-		${DAMARIS_SOURCE_DIR}/data/RectilinearMesh.cpp)
+		${DAMARIS_SOURCE_DIR}/visit/VisItListener.cpp)
 endif(VISIT_ROOT)
 
 if(HDF5_ROOT)

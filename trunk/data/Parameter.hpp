@@ -38,7 +38,7 @@ namespace Damaris {
 	 */	
 	class Parameter : public Configurable<Model::Parameter> {
 
-		friend class Manager<Parameter,Model::Parameter>;
+		friend class Manager<Parameter>;
 
 		private:
 			std::string name; /*!< Name of the parameter. */

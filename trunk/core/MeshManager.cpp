@@ -21,44 +21,42 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \version 0.4
  */
 #include "core/Debug.hpp"
-#include "core/VariableManager.hpp"
-#include "core/LayoutManager.hpp"
+#include "core/MeshManager.hpp"
 
 namespace Damaris {
 
-void VariableManager::Init(const Model::Data& model)
+void MeshManager::Init(const Model::Data& model)
 {
-	// build all the variables in root group
-	Model::Data::variable_const_iterator v(model.variable().begin());
-	for(; v != model.variable().end(); v++)
+	Model::Data::mesh_const_iterator m(model.mesh().begin());
+	for(; m != model.mesh().end(); m++)
 	{
-		Create<Variable>(*v,(const std::string&)v->name());
+		Create<Mesh>(*m,(const std::string&)m->name());
 	}
 
 	// build all variables in sub-groups
 	Model::Data::group_const_iterator g(model.group().begin());
 	for(; g != model.group().end(); g++)
-		readVariablesInSubGroup(*g,(std::string)(g->name()));
+		readMeshesInSubGroup(*g,(std::string)(g->name()));
 }
 
-void VariableManager::readVariablesInSubGroup(const Model::Group &g,
+void MeshManager::readMeshesInSubGroup(const Model::Group &g,
                         const std::string& groupName)
 {
 	// first check if the group is enabled
 	if(!(g.enabled())) return;
 	// build recursively all variable in the subgroup
-	Model::Data::variable_const_iterator v(g.variable().begin());
-	for(; v != g.variable().end(); v++)
+	Model::Data::mesh_const_iterator m(g.mesh().begin());
+	for(; m != g.mesh().end(); m++)
 	{
-		std::string name = (std::string)(v->name());
+		std::string name = (std::string)(m->name());
 		std::string varName = groupName+"/"+name;
-		Create<Variable>(*v,varName);
+		Create<Mesh>(*m,varName);
 	}
 
 	// build recursively all the subgroups
 	Model::Data::group_const_iterator subg(g.group().begin());
 	for(; subg != g.group().end(); subg++)
-		readVariablesInSubGroup(*subg,groupName
+		readMeshesInSubGroup(*subg,groupName
 				+ "/" + (std::string)(subg->name()));
 }
 

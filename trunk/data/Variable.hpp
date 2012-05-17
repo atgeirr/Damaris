@@ -46,7 +46,7 @@ namespace Damaris {
  */
 class Variable : public Configurable<Model::Variable> {
 
-	friend class Manager<Variable,Model::Variable>;
+	friend class Manager<Variable>;
 	
 	private:	
 		Layout* layout;		/*!< Layout of the data. */

@@ -20,6 +20,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \author Matthieu Dorier
  * \version 0.4
  */
+#include "core/LayoutManager.hpp"
 #include "data/Variable.hpp"
 #include "core/Debug.hpp"
 
@@ -124,7 +125,7 @@ visit_handle Variable::getVisItHandle() const
 Variable* Variable::New(const Model::Variable& mdl, const std::string& name)
 {
 	// checks that the layout exists
-	Layout* l = Manager<Layout,Model::Layout>::Search((std::string)mdl.layout());
+	Layout* l = LayoutManager::Search((std::string)mdl.layout());
 	if(l == NULL) {
 		CFGERROR("Layout \"" << mdl.layout() 
 				<< "\" not found for variable \"" 

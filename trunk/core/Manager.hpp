@@ -46,7 +46,7 @@ class Identified;
  * objects. It keeps a record of all objects created and does
  * not create twice the same named object.
  */
-template<typename T, typename M>
+template<typename T>
 class Manager {
 	
 	private:
@@ -95,14 +95,14 @@ class Manager {
 
 		typedef typename ObjectSet::iterator iterator;
 
-		template<typename S>
-		static T* Create(const M &mdl, const std::string& name)
+		template<typename SUBCLASS, typename MODEL>
+		static T* Create(const MODEL &mdl, const std::string& name)
 		{
 			if(objects == NULL) {
 				objects = new ObjectSet();
 			}
 
-			T* t = static_cast<T*>(S::New(mdl,name));
+			T* t = static_cast<T*>(SUBCLASS::New(mdl,name));
 			t->id = NumObjects();
 
 			std::pair<typename ObjectSet::iterator,bool> ret
@@ -166,7 +166,7 @@ class Manager {
 				delete objects;
 		}
 
-		static const iterator& End() 
+		static iterator End() 
 		{
 			return objects->end();
 		}
@@ -177,8 +177,8 @@ class Manager {
 		}
 };
 
-template <typename T, typename M>
-typename Manager<T,M>::ObjectSet *Manager<T,M>::objects = NULL;
+template <typename T>
+typename Manager<T>::ObjectSet *Manager<T>::objects = NULL;
 
 }
 

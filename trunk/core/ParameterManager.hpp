@@ -35,7 +35,7 @@ namespace Damaris {
  * The ParameterSet class describes an object that holds
  * the parameters and offers an access by name.
  */
-class ParameterManager : public Manager<Parameter,Model::Parameter> {
+class ParameterManager : public Manager<Parameter> {
 	private:
 		ParameterManager();
 

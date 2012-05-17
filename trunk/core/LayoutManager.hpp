@@ -38,7 +38,7 @@ namespace Damaris {
 	 * VariableManager holds pointers to all Variables.
 	 * These variables can be retrieved by their name or by a unique ID.
 	 */
-	class LayoutManager : public Manager<Layout,Model::Layout> {
+	class LayoutManager : public Manager<Layout> {
 
 	public:
 		static void Init(const Model::Data& mdl);

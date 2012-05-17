@@ -20,8 +20,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \author Matthieu Dorier
  * \version 0.4
  */
-#ifndef __DAMARIS_METADATA_H
-#define __DAMARIS_METADATA_H
+#ifndef __DAMARIS_VARIABLE_MANAGER_H
+#define __DAMARIS_VARIABLE_MANAGER_H
 
 #include <iostream>
 #include <map>
@@ -29,11 +29,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 
 #include "xml/Model.hpp"
-#include "core/Calc.hpp"
-#include "data/Layout.hpp"
 #include "data/Variable.hpp"
-#include "core/Environment.hpp"
-#include "core/Configurable.hpp"
 
 namespace Damaris {
 
@@ -41,7 +37,7 @@ namespace Damaris {
 	 * VariableManager holds pointers to all Variables.
 	 * These variables can be retrieved by their name or by a unique ID.
 	 */
-	class VariableManager : public Manager<Variable,Model::Variable> {
+	class VariableManager : public Manager<Variable> {
 
 	public:
 		static void Init(const Model::Data& mdl);

@@ -43,7 +43,7 @@ namespace Damaris {
  * Layouts are not used to hold data. See Chunk for that purpose.
  */	
 class Layout : public Configurable<Model::Layout> {
-	friend class Manager<Layout,Model::Layout>;
+	friend class Manager<Layout>;
 		
 	private:
 		int id;

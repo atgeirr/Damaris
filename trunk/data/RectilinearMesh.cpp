@@ -24,10 +24,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "data/RectilinearMesh.hpp"
 
 namespace Damaris {
-namespace Viz {
 	
-RectilinearMesh::RectilinearMesh(const Model::Mesh& mdl)
-: Mesh(mdl)
+RectilinearMesh::RectilinearMesh(const Model::Mesh& mdl, const std::string& name)
+: Mesh(mdl,name)
 { }
 
 #ifdef __ENABLE_VISIT
@@ -64,7 +63,7 @@ bool RectilinearMesh::exposeVisItMetaData(visit_handle md) const
 	return false;
 }
 
-bool Mesh::exposeVisItData() const
+bool RectilinearMesh::exposeVisItData() const
 {
 	visit_handle h = VISIT_INVALID_HANDLE;
 	if(VisIt_RectilinearMesh_alloc(&h) != VISIT_ERROR) {
@@ -73,14 +72,14 @@ bool Mesh::exposeVisItData() const
 
 		{
 			Model::Mesh::coords_const_iterator it(model.coords().begin());
-			vx = Manager<Variable,Model::Variable>::Search(it->name());
+			vx = Manager<Variable>::Search(it->name());
 			hxc = vx->getVisItHandle();
 			it++;
-			vy = Manager<Variable,Model::Variable>::Search(it->name());
+			vy = Manager<Variable>::Search(it->name());
 			hyc = vy->getVisItHandle();
 			it++;
 			if(model.coords().size() == 3) {
-				vz = Manager<Variable,Model::Variable>::Search(it->name());
+				vz = Manager<Variable>::Search(it->name());
 				hzc = vz->getVisItHandle();
 			}
 		}
@@ -95,5 +94,4 @@ bool Mesh::exposeVisItData() const
 }
 
 #endif
-}
 }

@@ -25,17 +25,18 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "core/Debug.hpp"
 
 namespace Damaris {
-namespace Viz {
-	
-Mesh::Mesh(const Model::Mesh& mdl)
-: Configurable<Model::Mesh>(mdl)
-{ }
 
-Mesh* Mesh::New(const Model::Mesh& mdl)
+Mesh::Mesh(const Model::Mesh& mdl, const std::string &n)
+: Configurable<Model::Mesh>(mdl)
+{
+	name = n;
+}
+
+Mesh* Mesh::New(const Model::Mesh& mdl, const std::string& name)
 {
 	switch(mdl.type()) {
 		case Model::MeshType::rectilinear :
-			return new RectilinearMesh(mdl);
+			return new RectilinearMesh(mdl,name);
         case Model::MeshType::curvilinear :
         case Model::MeshType::unstructured :
         case Model::MeshType::point :
@@ -48,5 +49,4 @@ Mesh* Mesh::New(const Model::Mesh& mdl)
 	return NULL;
 }
 
-}
 }

@@ -26,7 +26,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "data/Mesh.hpp"
 
 namespace Damaris {
-namespace Viz {
 
 /**
  */
@@ -34,7 +33,7 @@ class RectilinearMesh : public Mesh {
 	friend class Mesh;
 
 	private:
-		RectilinearMesh(const Model::Mesh& mdl);
+		RectilinearMesh(const Model::Mesh& mdl, const std::string& name);
 	
 	public:
 
@@ -46,6 +45,5 @@ class RectilinearMesh : public Mesh {
 
 };
 
-}
 }
 #endif

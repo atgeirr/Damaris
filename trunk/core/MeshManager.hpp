@@ -15,54 +15,36 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file Mesh.hpp
- * \date May 2012
+ * \file MeshManager.hpp
+ * \date February 2012
  * \author Matthieu Dorier
- * \version 0.5
+ * \version 0.4
  */
-#ifndef __DAMARIS_MESH_H
-#define __DAMARIS_MESH_H
+#ifndef __DAMARIS_MESH_MANAGER_H
+#define __DAMARIS_MESH_MANAGER_H
 
-#ifdef __ENABLE_VISIT
-	#include <VisItDataInterface_V2.h>
-#endif
-#include "core/Configurable.hpp"
-#include "core/Manager.hpp"
+#include <iostream>
+#include <map>
+#include <string>
+#include <vector>
+
 #include "xml/Model.hpp"
+#include "data/Mesh.hpp"
 
 namespace Damaris {
 
-/**
- * The Mesh object is used for describing a mesh within
- * a metadata structure.
- */
-class Mesh : public Configurable<Model::Mesh> {
+	/**
+	 * MeshManager holds pointers to all Mesh objects.
+	 */
+	class MeshManager : public Manager<Mesh> {
 
-	friend class Manager<Mesh>;
+	public:
+		static void Init(const Model::Data& mdl);
 
 	private:
-		std::string name;
-		int id;
-
-	protected:
-		Mesh(const Model::Mesh& mdl, const std::string& name);
-		
-	public:
-
-		const std::string& getName() const {
-			return name;
-		}
-
-		int getID() const { return id; }
-
-#ifdef __ENABLE_VISIT
-		virtual bool exposeVisItMetaData(visit_handle md) const = 0;
-		
-		virtual bool exposeVisItData() const = 0;
-#endif
-
-		static Mesh* New(const Model::Mesh& mdl, const std::string& name);
-};
-
+		static void readMeshesInSubGroup(const Model::Group &g,
+                        const std::string& groupName);
+	};
 }
+
 #endif
