@@ -27,11 +27,11 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 #include <exception>
 
-#include "common/Debug.hpp"
-#include "common/VariableManager.hpp"
-#include "common/LayoutManager.hpp"
-#include "common/ParameterManager.hpp"
-#include "common/Process.hpp"
+#include "core/Debug.hpp"
+#include "core/VariableManager.hpp"
+#include "core/LayoutManager.hpp"
+#include "core/ParameterManager.hpp"
+#include "core/Process.hpp"
 
 namespace Damaris {
 

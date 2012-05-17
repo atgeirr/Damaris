@@ -27,9 +27,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 #include <exception>
 
-#include "common/Debug.hpp"
-#include "common/ShmChunk.hpp"
-#include "common/Message.hpp"
+#include "core/Debug.hpp"
+#include "core/ShmChunk.hpp"
+#include "core/Message.hpp"
 #include "client/Client.hpp"
 
 namespace Damaris {

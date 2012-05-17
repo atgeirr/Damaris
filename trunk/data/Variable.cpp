@@ -20,8 +20,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \author Matthieu Dorier
  * \version 0.4
  */
-#include "common/Variable.hpp"
-#include "common/Debug.hpp"
+#include "data/Variable.hpp"
+#include "core/Debug.hpp"
 
 namespace Damaris {
 

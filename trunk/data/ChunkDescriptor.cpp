@@ -21,7 +21,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \version 0.4
  */
 #include <string.h>
-#include "common/ChunkDescriptor.hpp"
+#include "data/ChunkDescriptor.hpp"
 
 namespace Damaris {
 

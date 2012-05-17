@@ -26,11 +26,10 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <string>
 #include <vector>
-#include "common/Calc.hpp"
-#include "common/ParameterManager.hpp"
-#include "common/Manager.hpp"
-#include "common/Configurable.hpp"
-#include "common/Types.hpp"
+#include "core/Calc.hpp"
+#include "core/ParameterManager.hpp"
+#include "core/Configurable.hpp"
+#include "data/Types.hpp"
 
 namespace Damaris {
 

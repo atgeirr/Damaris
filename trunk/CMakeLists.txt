@@ -131,7 +131,7 @@ set(VISIT_LIB simV2)
 #-----------------------------------------------------------#
 if(CMAKE_Fortran_COMPILER)
   include(FortranCInterface)
-  FortranCInterface_HEADER(${DAMARIS_SOURCE_DIR}/common/FCMangle.h
+  FortranCInterface_HEADER(${DAMARIS_SOURCE_DIR}/core/FCMangle.h
 			   MACRO_NAMESPACE "FC_FUNC_"
                            SYMBOL_NAMESPACE "FC_SYM_")
   add_definitions(-D__ENABLE_FORTRAN)

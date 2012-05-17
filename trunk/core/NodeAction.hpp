@@ -27,7 +27,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 #include <map>
 
-#include "common/Action.hpp"
+#include "core/Action.hpp"
 
 namespace Damaris {
 

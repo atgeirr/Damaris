@@ -25,9 +25,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <stdlib.h>
 
-#include "common/Chunk.hpp"
-#include "common/ChunkHeader.hpp"
-#include "common/SharedMemorySegment.hpp"
+#include "data/Chunk.hpp"
+#include "data/ChunkHeader.hpp"
+#include "core/SharedMemorySegment.hpp"
 
 namespace Damaris {
 

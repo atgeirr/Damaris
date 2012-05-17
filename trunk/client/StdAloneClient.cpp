@@ -22,11 +22,11 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <iostream>
 #include <list>
-#include "common/Debug.hpp"
-#include "common/Message.hpp"
-#include "common/ShmChunk.hpp"
-#include "common/Layout.hpp"
-#include "common/VariableManager.hpp"
+#include "core/Debug.hpp"
+#include "core/Message.hpp"
+#include "core/ShmChunk.hpp"
+#include "data/Layout.hpp"
+#include "core/VariableManager.hpp"
 #include "client/StdAloneClient.hpp"
 
 namespace Damaris {

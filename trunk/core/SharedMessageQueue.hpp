@@ -28,8 +28,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/interprocess/xsi_shared_memory.hpp>
 #include <boost/interprocess/mapped_region.hpp>
 #include "xml/Model.hpp"
-#include "common/Debug.hpp"
-#include "common/SharedMemory.hpp"
+#include "core/Debug.hpp"
+#include "core/SharedMemory.hpp"
 
 using namespace boost::interprocess;
 

@@ -25,8 +25,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <stdlib.h>
 #include "xml/Model.hpp"
-#include "common/Chunk.hpp"
-#include "common/ChunkDescriptor.hpp"
+#include "data/Chunk.hpp"
+#include "data/ChunkDescriptor.hpp"
 
 namespace Damaris {
 

@@ -33,9 +33,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/shared_ptr.hpp>
 
 #include <boost/lambda/lambda.hpp>
-//#include "common/Identified.hpp"
-#include "common/Debug.hpp"
-#include "common/Tags.hpp"
+#include "core/Debug.hpp"
+#include "core/Tags.hpp"
 
 namespace Damaris {
 

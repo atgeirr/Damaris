@@ -26,10 +26,10 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 
 #include "xml/Model.hpp"
-#include "common/Action.hpp"
-#include "common/ActionSet.hpp"
-#include "common/Configurable.hpp"
-#include "common/Environment.hpp"
+#include "core/Action.hpp"
+#include "core/ActionSet.hpp"
+#include "core/Configurable.hpp"
+#include "core/Environment.hpp"
 
 namespace Damaris {
 

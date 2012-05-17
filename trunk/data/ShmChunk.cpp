@@ -20,7 +20,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \author Matthieu Dorier
  * \version 0.4
  */
-#include "common/ShmChunk.hpp"
+#include "data/ShmChunk.hpp"
 
 namespace Damaris {
 

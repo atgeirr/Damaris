@@ -20,7 +20,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \author Matthieu Dorier
  * \version 0.4
  */
-#include "common/Parameter.hpp"
+#include "data/Parameter.hpp"
 
 namespace Damaris {
 

@@ -23,7 +23,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __DAMARIS_DYNAMIC_ACTION_H
 #define __DAMARIS_DYNAMIC_ACTION_H
 
-#include "common/Action.hpp"
+#include "core/Action.hpp"
 
 namespace Damaris {
 

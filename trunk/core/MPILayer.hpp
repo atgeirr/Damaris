@@ -26,7 +26,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <mpi.h>
 #include <list>
-#include "common/Communication.hpp"
+#include "core/Communication.hpp"
 
 namespace Damaris {
 

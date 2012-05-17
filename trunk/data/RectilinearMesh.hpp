@@ -15,47 +15,35 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file Mesh.hpp
+ * \file RectilinearMesh.hpp
  * \date May 2012
  * \author Matthieu Dorier
  * \version 0.5
  */
-#ifndef __DAMARIS_MESH_H
-#define __DAMARIS_MESH_H
+#ifndef __DAMARIS_RECTILINEAR_MESH_H
+#define __DAMARIS_RECTILINEAR_MESH_H
 
-#ifdef __ENABLE_VISIT
-	#include <VisItDataInterface_V2.h>
-#endif
-#include "common/Identified.hpp"
-#include "common/Configurable.hpp"
-#include "common/Manager.hpp"
-#include "xml/Model.hpp"
+#include "data/Mesh.hpp"
 
 namespace Damaris {
 namespace Viz {
 
 /**
- * The Mesh object is used for describing a mesh within
- * a metadata structure.
  */
-class Mesh : public Identified, public Configurable<Model::Mesh> {
+class RectilinearMesh : public Mesh {
+	friend class Mesh;
 
-	protected:
-		Mesh(const Model::Mesh& mdl);
-		
+	private:
+		RectilinearMesh(const Model::Mesh& mdl);
+	
 	public:
 
-		const std::string& getName() const {
-			return model.name();
-		}
-
 #ifdef __ENABLE_VISIT
-		virtual bool exposeVisItMetaData(visit_handle md) const = 0;
+		bool exposeVisItMetaData(visit_handle md) const;
 		
-		virtual bool exposeVisItData() const = 0;
+		bool exposeVisItData() const;
 #endif
 
-		static Mesh* New(const Model::Mesh& mdl);
 };
 
 }

@@ -15,25 +15,37 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file Language.cpp
- * \date February 2012
+ * \file Mesh.cpp
+ * \date May 2012
  * \author Matthieu Dorier
- * \version 0.4
+ * \version 0.5
  */
-#include "common/Language.hpp"
+#include "data/Mesh.hpp"
+#include "data/RectilinearMesh.hpp"
+#include "core/Debug.hpp"
 
 namespace Damaris {
+namespace Viz {
+	
+Mesh::Mesh(const Model::Mesh& mdl)
+: Configurable<Model::Mesh>(mdl)
+{ }
 
-namespace Language {
-
-language_e getLanguageFromString(const std::string* s)
+Mesh* Mesh::New(const Model::Mesh& mdl)
 {
-	if(*s == "Fortran" || *s == "fortran" || *s == "FORTRAN" || *s == "F90" || *s == "F77"
-		|| *s == "f90" || *s == "f77") return LG_FORTRAN;
-	else 
-	if(*s == "Python" || *s == "python" || *s == "PYTHON") return LG_PYTHON;
-	else if(*s == "?") return LG_UNKNOWN;
-	else return LG_C;
+	switch(mdl.type()) {
+		case Model::MeshType::rectilinear :
+			return new RectilinearMesh(mdl);
+        case Model::MeshType::curvilinear :
+        case Model::MeshType::unstructured :
+        case Model::MeshType::point :
+        case Model::MeshType::csg :
+        case Model::MeshType::amr :
+        case Model::MeshType::unknown :
+		default: break;
+	}
+	ERROR("Mesh type " << mdl.type() << " is not implemented.");
+	return NULL;
 }
 
 }

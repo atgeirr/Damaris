@@ -30,10 +30,10 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <VisItDataInterface_V2.h>
 
 #include "xml/Model.hpp"
-#include "common/Configurable.hpp"
-#include "common/ChunkSet.hpp"
-#include "common/Layout.hpp"
-#include "common/Manager.hpp"
+#include "core/Configurable.hpp"
+#include "data/ChunkSet.hpp"
+#include "data/Layout.hpp"
+#include "core/Manager.hpp"
 
 namespace Damaris {
 

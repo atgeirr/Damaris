@@ -30,8 +30,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/multi_index/composite_key.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include "Tags.hpp"
-#include "Chunk.hpp"
+#include "core/Tags.hpp"
+#include "data/Chunk.hpp"
 
 namespace Damaris {
 

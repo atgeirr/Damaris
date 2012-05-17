@@ -25,8 +25,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <stdlib.h>
 #include "xml/Model.hpp"
-#include "common/Layout.hpp"
-#include "common/Types.hpp"
+#include "data/Layout.hpp"
+#include "data/Types.hpp"
 
 namespace Damaris {
 

@@ -21,8 +21,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \version 0.4
  */
 #include <dlfcn.h>
-#include "common/Debug.hpp"
-#include "common/DynamicAction.hpp"
+#include "core/Debug.hpp"
+#include "core/DynamicAction.hpp"
 
 namespace Damaris {
 

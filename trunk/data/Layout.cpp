@@ -23,9 +23,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <cstring>
 
-#include "common/Debug.hpp"
-#include "common/Environment.hpp"
-#include "common/Layout.hpp"
+#include "core/Debug.hpp"
+#include "core/Environment.hpp"
+#include "data/Layout.hpp"
 
 namespace Damaris {
 

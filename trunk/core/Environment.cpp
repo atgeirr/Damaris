@@ -20,8 +20,8 @@
  * \author Matthieu Dorier
  * \version 0.4
  */
-#include "common/Debug.hpp"
-#include "common/Environment.hpp"
+#include "core/Debug.hpp"
+#include "core/Environment.hpp"
 
 namespace Damaris {
 

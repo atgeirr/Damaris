@@ -23,7 +23,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * Definition of the Fortran client functions.
  */
 #ifdef __ENABLE_FORTRAN
-#include "common/FCMangle.h"
+#include "core/FCMangle.h"
 #include "client/Client.hpp"
 
 #ifndef FC_FUNC_GLOBAL

@@ -25,12 +25,12 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 #include <list>
 #include <iostream>
-#include "common/Debug.hpp"
-#include "common/Language.hpp"
-#include "common/Environment.hpp"
-#include "common/ActionsManager.hpp"
-#include "common/NodeAction.hpp"
-#include "common/DynamicAction.hpp"
+#include "core/Debug.hpp"
+#include "core/Language.hpp"
+#include "core/Environment.hpp"
+#include "core/ActionsManager.hpp"
+#include "core/NodeAction.hpp"
+#include "core/DynamicAction.hpp"
 #ifdef __ENABLE_PYTHON
 	#include "scripts/python/PyAction.hpp"
 #endif

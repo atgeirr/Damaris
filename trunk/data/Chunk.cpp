@@ -23,8 +23,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <string.h>
  
-#include "common/Debug.hpp"
-#include "common/Chunk.hpp"
+#include "core/Debug.hpp"
+#include "data/Chunk.hpp"
 
 namespace Damaris {
 

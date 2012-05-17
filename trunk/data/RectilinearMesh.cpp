@@ -20,8 +20,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \author Matthieu Dorier
  * \version 0.5
  */
-#include "common/Variable.hpp"
-#include "viz/RectilinearMesh.hpp"
+#include "data/Variable.hpp"
+#include "data/RectilinearMesh.hpp"
 
 namespace Damaris {
 namespace Viz {

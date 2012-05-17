@@ -27,9 +27,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 
 #include "xml/Model.hpp"
-#include "common/Configurable.hpp"
-#include "common/Manager.hpp"
-#include "common/Debug.hpp"
+#include "core/Configurable.hpp"
+#include "core/Manager.hpp"
+#include "core/Debug.hpp"
 
 namespace Damaris {
 	/**

@@ -9,25 +9,24 @@ set(DAMARIS_MODEL_SRC
 	${DAMARIS_SOURCE_DIR}/xml/Model.cpp)
 
 set(DAMARIS_COMMON_SRC
-	${DAMARIS_SOURCE_DIR}/common/Process.cpp
-	${DAMARIS_SOURCE_DIR}/common/Parameter.cpp
-	${DAMARIS_SOURCE_DIR}/common/ParameterManager.cpp
-	${DAMARIS_SOURCE_DIR}/common/SharedMessageQueue.cpp
-	${DAMARIS_SOURCE_DIR}/common/SharedMemorySegment.cpp
-	${DAMARIS_SOURCE_DIR}/common/Environment.cpp
-	${DAMARIS_SOURCE_DIR}/common/Variable.cpp
-	${DAMARIS_SOURCE_DIR}/common/VariableManager.cpp
-	${DAMARIS_SOURCE_DIR}/common/LayoutManager.cpp
-	${DAMARIS_SOURCE_DIR}/common/Action.cpp
-	${DAMARIS_SOURCE_DIR}/common/DynamicAction.cpp
-	${DAMARIS_SOURCE_DIR}/common/NodeAction.cpp
-	${DAMARIS_SOURCE_DIR}/common/ActionsManager.cpp
-	${DAMARIS_SOURCE_DIR}/common/ChunkDescriptor.cpp
-	${DAMARIS_SOURCE_DIR}/common/Chunk.cpp
-	${DAMARIS_SOURCE_DIR}/common/ShmChunk.cpp
-	${DAMARIS_SOURCE_DIR}/common/Language.cpp
-	${DAMARIS_SOURCE_DIR}/common/Types.cpp 
-	${DAMARIS_SOURCE_DIR}/common/Layout.cpp)
+	${DAMARIS_SOURCE_DIR}/core/Process.cpp
+	${DAMARIS_SOURCE_DIR}/data/Parameter.cpp
+	${DAMARIS_SOURCE_DIR}/core/ParameterManager.cpp
+	${DAMARIS_SOURCE_DIR}/core/SharedMessageQueue.cpp
+	${DAMARIS_SOURCE_DIR}/core/SharedMemorySegment.cpp
+	${DAMARIS_SOURCE_DIR}/core/Environment.cpp
+	${DAMARIS_SOURCE_DIR}/data/Variable.cpp
+	${DAMARIS_SOURCE_DIR}/core/VariableManager.cpp
+	${DAMARIS_SOURCE_DIR}/core/LayoutManager.cpp
+	${DAMARIS_SOURCE_DIR}/core/Action.cpp
+	${DAMARIS_SOURCE_DIR}/core/DynamicAction.cpp
+	${DAMARIS_SOURCE_DIR}/core/NodeAction.cpp
+	${DAMARIS_SOURCE_DIR}/core/ActionsManager.cpp
+	${DAMARIS_SOURCE_DIR}/data/ChunkDescriptor.cpp
+	${DAMARIS_SOURCE_DIR}/data/Chunk.cpp
+	${DAMARIS_SOURCE_DIR}/data/ShmChunk.cpp
+	${DAMARIS_SOURCE_DIR}/data/Types.cpp 
+	${DAMARIS_SOURCE_DIR}/data/Layout.cpp)
 
 
 if(PYTHON_LIB)
@@ -43,9 +42,9 @@ endif(PYTHON_LIB)
 
 if(VISIT_ROOT)
 	set(DAMARIS_VISIT_SRC
-		${DAMARIS_SOURCE_DIR}/viz/VisItListener.cpp
-		${DAMARIS_SOURCE_DIR}/viz/Mesh.cpp
-		${DAMARIS_SOURCE_DIR}/viz/RectilinearMesh.cpp)
+		${DAMARIS_SOURCE_DIR}/visit/VisItListener.cpp
+		${DAMARIS_SOURCE_DIR}/data/Mesh.cpp
+		${DAMARIS_SOURCE_DIR}/data/RectilinearMesh.cpp)
 endif(VISIT_ROOT)
 
 if(HDF5_ROOT)

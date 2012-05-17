@@ -20,8 +20,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \author Matthieu Dorier
  * \version 0.4
  */
-#include "common/Debug.hpp"
-#include "common/NodeAction.hpp"
+#include "core/Debug.hpp"
+#include "core/NodeAction.hpp"
 
 namespace Damaris {
 

@@ -28,11 +28,11 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdint.h>
 
 #include "xml/Model.hpp"
-#include "common/Environment.hpp"
-#include "common/SharedMessageQueue.hpp"
-#include "common/SharedMemorySegment.hpp"
-#include "common/ActionsManager.hpp"
-#include "common/VariableManager.hpp"
+#include "core/Environment.hpp"
+#include "core/SharedMessageQueue.hpp"
+#include "core/SharedMemorySegment.hpp"
+#include "core/ActionsManager.hpp"
+#include "core/VariableManager.hpp"
 
 namespace Damaris {
 

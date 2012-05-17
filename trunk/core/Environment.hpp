@@ -28,8 +28,7 @@
 #include <mpi.h>
 
 #include "xml/Model.hpp"
-#include "common/Language.hpp"
-#include "common/Configurable.hpp"
+#include "core/Configurable.hpp"
 
 namespace Damaris {
 

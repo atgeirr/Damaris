@@ -20,9 +20,9 @@
  * \author Matthieu Dorier
  * \version 0.4
  */
-#include "common/ParameterManager.hpp"
-#include "common/Types.hpp"
-#include "common/Debug.hpp"
+#include "core/ParameterManager.hpp"
+#include "data/Types.hpp"
+#include "core/Debug.hpp"
 
 namespace Damaris {
 

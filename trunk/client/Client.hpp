@@ -31,10 +31,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 #include <stdint.h>
 
-#include "common/Writer.hpp"
-#include "common/Process.hpp"
-//#include "common/ChunkHandle.hpp"
-#include "common/Layout.hpp"
+#include "core/Writer.hpp"
+#include "core/Process.hpp"
+#include "data/Layout.hpp"
 
 /**
  * \namespace Damaris
