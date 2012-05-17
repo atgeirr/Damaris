@@ -32,6 +32,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "core/MeshManager.hpp"
 #include "core/LayoutManager.hpp"
 #include "core/ParameterManager.hpp"
+#include "core/ActionManager.hpp"
 #include "core/Process.hpp"
 
 namespace Damaris {
@@ -86,7 +87,7 @@ namespace Damaris {
 		VariableManager::Init(model->data());
 		MeshManager::Init(model->data());
 		DBG("Data Managers initialized");
-		actionsManager  = new ActionsManager(model->actions(),environment);
+		ActionManager::Init(model->actions());
 		DBG("ActionsManager initialized");
 		segment = NULL;
 		msgQueue = NULL;	
@@ -143,7 +144,6 @@ namespace Damaris {
 			SharedMessageQueue::remove(&(model->architecture().queue()));
 			SharedMemorySegment::remove(&(model->architecture().buffer()));	
 		}
-		delete actionsManager;
 	}
 }
 

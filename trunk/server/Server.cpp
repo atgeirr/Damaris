@@ -26,6 +26,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "core/Message.hpp"
 #include "data/ShmChunk.hpp"
 #include "data/Layout.hpp"
+#include "core/ActionManager.hpp"
 #include "core/VariableManager.hpp"
 #include "server/Server.hpp"
 #include "visit/VisItListener.hpp"
@@ -46,7 +47,7 @@ Server* Server::New(const std::string& cfgfile, int32_t id)
 Server::Server(Process* p)
 {
 	process = p;
-	needStop = process->getEnvironment()->getClientsPerNode();
+	needStop = Environment::getClientsPerNode();
 }
 
 
@@ -64,9 +65,9 @@ int Server::run()
 	DBG("Successfully entered in \"run\" mode");
 
 	if(process->getModel()->visit().present()) {
-		Viz::VisItListener::init(process->getEnvironment()->getEntityComm(),
+		Viz::VisItListener::init(Environment::getEntityComm(),
 			process->getModel()->visit().get(),
-			process->getEnvironment()->getSimulationName());
+			Environment::getSimulationName());
 	}
 	
 	Message msg;
@@ -120,7 +121,7 @@ void Server::processMessage(const Message& msg)
 	
 	if(msg.type == MSG_SIG)
 	{
-		process->getActionsManager()->reactToUserSignal(object,iteration,source);
+		ActionManager::reactToUserSignal(object,iteration,source);
 		return;
 	}
 
@@ -138,11 +139,11 @@ void Server::processInternalSignal(int32_t object, int iteration, int source)
 		break;
 	case URGENT_CLEAN:
 		DBG("Received a \"clean\" message");
-		process->getActionsManager()->reactToUserSignal("clean",iteration,source);
+		ActionManager::reactToUserSignal("clean",iteration,source);
 		break;
 	case LOST_DATA:
 		DBG("Received a \"lost data\" message");
-		process->getActionsManager()->reactToUserSignal("lost",iteration,source);
+		ActionManager::reactToUserSignal("lost",iteration,source);
 		break;
 	}
 }

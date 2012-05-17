@@ -26,47 +26,29 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdint.h>
 #include <string>
 
-#include "core/VariableManager.hpp"
+#include "core/Manager.hpp"
 
 namespace Damaris {
-
-class Action;
-class ActionsManager;
 
 /**
  * The Action object is an interface to a user-defined action.
  * It is an abstract class, child classes must overwrite the Action::call 
  * and Action::load functions.
  */
-class Action {
-	friend class ActionsManager;
+class Action  {
+	friend class Manager<Action>;
 
-	protected:
-		bool loaded; 	  /*!< Indicates wether associated ressources 
-				    are loaded and ready to call the action. */
 		std::string name; /*!< Name of the action. */
 		int id; 	  /*!< ID given to the action when set in
 				    the ActionsManager. */
 
-		/**
-		 * \brief Constructor.
-		 * Builds an anonymous action without name of ID. 
-		 * Accessible only to the ActionsManager class which can set the name and ID itself.
-		 */
-		Action();
-	public:
+	protected:
 		/**
 		 * \brief Constructor. 
-		 * \param[in] n : Name of the action.
-		 * \param[in] i : ID of the action.
 		 */
-		Action(std::string n,int i);
+		Action(const std::string& n) : name(n) {}
 		
-		/**
-		 * \brief Destructor.
-		 */
-		~Action();
-
+	public:
 		/**
 		 * \brief Gets the ID of the action.
 		 */		
@@ -75,7 +57,7 @@ class Action {
 		/**
 		 * \brief Gets the name of the action.
 		 */
-		std::string getName() const { return name; }	
+		const std::string& getName() const { return name; }	
 
 		/**
 		 * \brief Operator overloaded to simplify the call to an action.
@@ -97,15 +79,6 @@ class Action {
 		 */
 		virtual void call(int32_t iteration, int32_t sourceID) = 0;
 
-		/**
-		 * \brief Loads required resources for the action to be called. 
-		 * This function is virtual and has to be overloaded by child classes depending on
-		 * there needs. Only the server will load the action the first time the action 
-		 * is called (lazy loading).
-		 */
-		virtual void load() = 0;
-
-		
 		class EmptyAction; 
 };
 
@@ -119,7 +92,6 @@ class Action::EmptyAction : public Action {
 
 	void call(int32_t iteration, int32_t sourceID) { }
 
-	void load() {}
 };
 }
 

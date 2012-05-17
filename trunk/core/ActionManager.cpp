@@ -25,7 +25,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Damaris {
 
-void VariableManager::Init(const Model::Actions& model)
+void ActionManager::Init(const Model::Actions& model)
 {
 	// build events
 	Model::Actions::event_const_iterator e(model.event().begin());

@@ -31,8 +31,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "core/Environment.hpp"
 #include "core/SharedMessageQueue.hpp"
 #include "core/SharedMemorySegment.hpp"
-#include "core/ActionsManager.hpp"
-#include "core/VariableManager.hpp"
 
 namespace Damaris {
 
@@ -78,8 +76,6 @@ class Process {
 
 	protected:
 		std::auto_ptr<Damaris::Model::Simulation> model; /*!< base model initialized from the configuration file. */
-		Environment 	*environment; /*!< environment object. */
-		ActionsManager 	*actionsManager; /*! actions manager object. */
 		SharedMessageQueue 	*msgQueue; /*!< pointer to the message queue. */
 		SharedMemorySegment 	*segment; /*!< pointer to the shared memory segment. */
 		int id;
@@ -113,22 +109,6 @@ class Process {
 		 * Removes previously opened shared structures with the same name.
 		 */
 		void createSharedStructures();
-
-		/**
-		 * Get the initialized Environment instance attached to the Process.
-		 */
-		Environment* getEnvironment() 
-		{
-			return environment;
-		}
-
-		/**
-		 * Get the initialized ActionsManager instance attached to the Process.
-		 */
-		ActionsManager* getActionsManager()
-		{
-			return actionsManager;
-		}
 
 		/**
 		 * Get the SharedMessageQueue instance attached to the Process.

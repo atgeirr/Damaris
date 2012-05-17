@@ -2192,7 +2192,7 @@ namespace Damaris
 
       // language
       // 
-      typedef ::xml_schema::string language_type;
+      typedef ::Damaris::Model::Language language_type;
       typedef ::xsd::cxx::tree::traits< language_type, char > language_traits;
 
       const language_type&

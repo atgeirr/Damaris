@@ -32,6 +32,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "core/Message.hpp"
 #include "client/Client.hpp"
 
+#include "core/VariableManager.hpp"
+#include "core/ActionManager.hpp"
+
 namespace Damaris {
 	
 	Client* Client::New(const std::string &cfg, int32_t id)
@@ -285,7 +288,7 @@ namespace Damaris {
 	int Client::signal(const std::string & signal_name, int32_t iteration)
 	{
 		try {
-		Action* action = process->getActionsManager()->getAction(signal_name);
+		Action* action = ActionManager::Search(signal_name);
 		if(action == NULL) {
 			DBG("Undefined action \"" << signal_name << "\"");
 			return -2;
@@ -372,7 +375,7 @@ namespace Damaris {
 
 	MPI_Comm Client::mpi_get_client_comm()
 	{
-		return process->getEnvironment()->getEntityComm();
+		return Environment::getEntityComm();
 	}
 	
 	Client::~Client() 

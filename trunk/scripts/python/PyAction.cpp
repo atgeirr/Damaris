@@ -30,21 +30,8 @@ namespace Damaris {
 
 namespace Python {
 
-PyAction::PyAction(std::string file)
-: Action()
-{
-	fileName	= file;
-	loaded		= true;
-}
-	
-PyAction::PyAction(std::string n, int i, std::string file)
-: Action(n,i)
-{
-	fileName 	= file;
-	loaded		= true;
-}
-
-PyAction::~PyAction()
+PyAction::PyAction(const Model::Script& mdl, const std::string &name)
+: ScriptAction(mdl,name)
 {
 }
 	
@@ -53,17 +40,18 @@ void PyAction::call(int32_t iteration, int32_t sourceID)
 	try {
 		PyInterpreter* p = Python::PyInterpreter::getInstance();
 		if(p != NULL) {
-			p->execFile(fileName,sourceID,iteration);
+			p->execFile((std::string)model.file(),sourceID,iteration);
 		} else { 
 			throw(std::runtime_error("Unable to get a pointer to a Python interpreter."));
 		}
 	} catch(std::exception &e) {
-		ERROR("in Python action \"" << name << "\": "<< e.what());
+		ERROR("in Python action \"" << getName() << "\": "<< e.what());
 	}
 }
 
-void PyAction::load()
+PyAction* PyAction::New(const Model::Script& mdl, const std::string& name)
 {
+	return new PyAction(mdl,name);
 }
 
 }

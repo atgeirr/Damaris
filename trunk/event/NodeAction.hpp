@@ -27,50 +27,55 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 #include <map>
 
-#include "core/Action.hpp"
+#include "core/Debug.hpp"
 
 namespace Damaris {
-
-class ActionsManager;
 
 /**
  * The NodeAction object is a wrapper for an action that has to wait for
  * each core of a node to call it before actually firing the action.
  */
-class NodeAction : public Action {
-	friend class ActionsManager;
+template <class BASE, typename MODEL>
+class NodeAction : public BASE {
 
 	private:
-		Action* base; /*!< base action to call */
 		std::map<int,int> locks; /*!< This map associates an iteration with the number of
 					      clients that have fired the event for this iteration. */
 		int clientsPerNode; /*!< Number of clients in each node (to know who to wait for) */
 
-	public:
 		/**
 		 * \brief Constructor. 
 		 * \param[in] b : Base action to wrap.
 		 * \param[in] n : Number of clients to wait for (clients per node).
 		 */
-		NodeAction(Action* b, int n);
+		NodeAction(const MODEL& mdl, const std::string& name, int n)
+		: BASE(mdl,name) {
+			clientsPerNode = n;
+		}
 		
-		/**
-		 * \brief Destructor.
-		 */
-		~NodeAction();
-
+	public:
 		/**
 		 * \brief Call the action.
 		 * \param[in] iteration : iteration at which the action is called.
 		 * \param[in] sourceID : ID of the client that fired the action.
 		 * \see Damaris::Action::operator()
 		 */
-		void call(int32_t iteration, int32_t sourceID);
+		virtual void call(int32_t iteration, int32_t sourceID)
+		{
+			DBG("Node action called iteration is "<<iteration<<" and source is "<<sourceID);
+			locks[iteration] = locks[iteration] + 1;
+			if(locks[iteration] == clientsPerNode) {
+				DBG("calling base action");
+				BASE::call(iteration,sourceID);
+				locks.erase(iteration);
+			}
+		}
 
-		/**
-		 * \brief Loads required resources for the action to be called. 
-		 */
-		void load() { if(base != NULL) base->load();}
+		static BASE* New(const MODEL& mdl, const std::string& name, int n)
+		{
+			return new NodeAction<BASE,MODEL>(mdl,name,n);
+		}
+
 };
 
 }

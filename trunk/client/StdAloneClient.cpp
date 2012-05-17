@@ -27,6 +27,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "data/ShmChunk.hpp"
 #include "data/Layout.hpp"
 #include "core/VariableManager.hpp"
+#include "core/ActionManager.hpp"
 #include "client/StdAloneClient.hpp"
 
 namespace Damaris {
@@ -229,7 +230,7 @@ int StdAloneClient::chunk_write(chunk_h chunkh, const std::string & varname,
 
 int StdAloneClient::signal(const std::string & signal_name, int32_t iteration)
 {
-	Action* action = process->getActionsManager()->getAction(signal_name);
+	Action* action = ActionManager::Search(signal_name);
 	if(action == NULL) {
 		DBG("Undefined action \"" << signal_name << "\"");
 		return -2;

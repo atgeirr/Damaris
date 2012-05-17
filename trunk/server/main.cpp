@@ -30,6 +30,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "server/Options.hpp"
 #include "core/Debug.hpp"
+#include "core/Environment.hpp"
 #include "core/Process.hpp"
 #include "server/Server.hpp"
 
@@ -70,9 +71,8 @@ int main(int argc, char** argv)
 	/* Initializing the server with a Configuration object 
 	   pre-initialized by the Options object */
 	server = Damaris::Server::New(opt.getConfigFile(),id);
-	Damaris::Process* p = Damaris::Process::get();
-	p->getEnvironment()->setGlobalComm(MPI_COMM_WORLD);
-	p->getEnvironment()->setEntityComm(MPI_COMM_WORLD);
+	Damaris::Environment::setGlobalComm(MPI_COMM_WORLD);
+	Damaris::Environment::setEntityComm(MPI_COMM_WORLD);
 
 	INFO("Starting server");
 	/* Starts the server */

@@ -40,10 +40,9 @@ Client* Initiator::start(const std::string& configFile, MPI_Comm globalcomm)
 	Process::initialize(configFile,rank);
 	Process* p = Process::get();
 	
-	Environment* env = p->getEnvironment();
-	env->setGlobalComm(globalcomm);
-	int clpn = env->getClientsPerNode();
-	int copn = env->getCoresPerNode();
+	Environment::setGlobalComm(globalcomm);
+	int clpn = Environment::getClientsPerNode();
+	int copn = Environment::getCoresPerNode();
 
 	/* The name of the processor is used to compute communicators */
 	char procname[MPI_MAX_PROCESSOR_NAME];
@@ -63,7 +62,7 @@ Client* Initiator::start(const std::string& configFile, MPI_Comm globalcomm)
 	int color = ((int)nhash >= 0) ? (int)nhash : - ((int)nhash);
 	MPI_Comm nodecomm;
 	MPI_Comm_split(globalcomm,color,rank,&nodecomm);
-	env->setNodeComm(nodecomm);
+	Environment::setNodeComm(nodecomm);
 	
 	/* Get the size and rank in the node */
 	int rankInNode;
@@ -90,7 +89,7 @@ Client* Initiator::start(const std::string& configFile, MPI_Comm globalcomm)
 	int is_client = (rankInNode >= clpn) ? 0 : 1;
 	MPI_Comm entitycomm;
 	MPI_Comm_split(globalcomm,is_client,rank,&entitycomm);
-	env->setEntityComm(entitycomm);
+	Environment::setEntityComm(entitycomm);
 	
 	/* Get rank and size in the entity communicator */
 	int rankInEnComm, sizeOfEnComm;

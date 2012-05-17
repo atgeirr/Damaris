@@ -39,10 +39,10 @@ namespace Damaris {
 		static void Init(const Model::Actions& mdl);
 
 		static void reactToUserSignal(const std::string &sig,
-				int32_t iteration, int32_t sourceID)
+				int32_t iteration, int32_t sourceID);
 
 		static void reactToUserSignal(int id,
-				int32_t iteration, int32_t sourceID)
+				int32_t iteration, int32_t sourceID);
 	};
 }
 

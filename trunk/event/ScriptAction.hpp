@@ -15,39 +15,43 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file NodeAction.cpp
- * \date February 2012
+ * \file ScriptAction.hpp
+ * \date February 2012 
  * \author Matthieu Dorier
  * \version 0.4
  */
-#include "core/Debug.hpp"
-#include "core/NodeAction.hpp"
+#ifndef __DAMARIS_SCRIPT_ACTION_H
+#define __DAMARIS_SCRIPT_ACTION_H
+
+#include "xml/Model.hpp"
+#include "core/Manager.hpp"
+#include "event/Action.hpp"
+#include "core/Configurable.hpp"
 
 namespace Damaris {
 
-	NodeAction::NodeAction(Action* a, int clpn)
-	: Action()
-	{
-		base = a;
-		clientsPerNode = clpn;
-		DBG("Clients per node = " << clpn);
-	}
-	
-	NodeAction::~NodeAction()
-	{
-		delete base;
-	}
-	
-	void NodeAction::call(int32_t iteration, int32_t sourceID)
-	{
-		DBG("Node action called iteration is "<<iteration<<" and source is "<<sourceID);
-		locks[iteration] = locks[iteration] + 1;
-		if(locks[iteration] == clientsPerNode) {
-			if(base != NULL) {
-				DBG("calling base action");
-				base->call(iteration,sourceID);
-			}
-			locks.erase(iteration);
-		}
-	}
+/**
+ */
+class ScriptAction : public Action, public Configurable<Model::Script> {
+
+	protected:
+		/**
+		 * \brief Condtructor.
+		 */
+		ScriptAction(const Model::Script& mdl, const std::string& name)
+		: Action(name), Configurable<Model::Script>(mdl)
+		{ }
+
+	public:	
+		/**
+		 * \brief Another way of calling the inner function.
+		 * \see Damaris::Action::operator()
+		 */
+		virtual void call(int32_t iteration, int32_t sourceID) = 0;
+
+		static ScriptAction* New(const Model::Script& ev, const std::string& name);
+};
+
 }
+
+#endif

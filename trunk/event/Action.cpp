@@ -20,25 +20,10 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \author Matthieu Dorier
  * \version 0.4
  */
-#include "core/Action.hpp"
+#include "event/Action.hpp"
 
 namespace Damaris {
 
-	Action::Action()
-	{
-		loaded = false;
-	}
-
-	Action::Action(std::string n, int i)
-	{
-		loaded = false;
-		name = n;
-		id = i;
-	}
-	
-	Action::~Action()
-	{}
-	
 	void Action::operator()(int32_t iteration, int32_t sourceID)
 	{
 		call(iteration,sourceID);

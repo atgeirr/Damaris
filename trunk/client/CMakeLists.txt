@@ -17,10 +17,10 @@ set(DAMARIS_COMMON_SRC
 	${DAMARIS_SOURCE_DIR}/core/VariableManager.cpp
 	${DAMARIS_SOURCE_DIR}/core/MeshManager.cpp
 	${DAMARIS_SOURCE_DIR}/core/LayoutManager.cpp
-	${DAMARIS_SOURCE_DIR}/core/Action.cpp
-	${DAMARIS_SOURCE_DIR}/core/DynamicAction.cpp
-	${DAMARIS_SOURCE_DIR}/core/NodeAction.cpp
-	${DAMARIS_SOURCE_DIR}/core/ActionsManager.cpp
+	${DAMARIS_SOURCE_DIR}/core/ActionManager.cpp
+	${DAMARIS_SOURCE_DIR}/event/Action.cpp
+	${DAMARIS_SOURCE_DIR}/event/DynamicAction.cpp
+	${DAMARIS_SOURCE_DIR}/event/ScriptAction.cpp
 	${DAMARIS_SOURCE_DIR}/data/Variable.cpp
 	${DAMARIS_SOURCE_DIR}/data/Mesh.cpp
 	${DAMARIS_SOURCE_DIR}/data/RectilinearMesh.cpp
