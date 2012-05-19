@@ -24,6 +24,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #define __DAMARIS_CHUNK_H
 
 #include <stdlib.h>
+
+#include <VisItDataInterface_V2.h>
+
 #include "xml/Model.hpp"
 #include "data/Types.hpp"
 #include "data/Layout.hpp"
@@ -70,6 +73,11 @@ class Chunk {
 		virtual bool remove() = 0;
 
 		/**
+		 * Gives the number of items contained in the Chunk.
+		 */
+		int NbrOfItems() const;
+
+		/**
          * \brief Gets the number of dimensions.
          */
         virtual unsigned int getDimensions() const = 0;
@@ -100,6 +108,10 @@ class Chunk {
          * Note: returns false if NULL is passed.
          */
 		bool within(const Chunk& enclosing) const;
+
+#ifdef __ENABLE_VISIT
+		bool FillVisItDataHandle(visit_handle hdl);
+#endif
 
 }; // class Chunk
 	
