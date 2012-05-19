@@ -122,7 +122,9 @@ void PyInterpreter::initialize()
 		dict = main.attr("__dict__");
 		bp::object damaris =  bp::import("damaris");
 		damaris_dict = damaris.attr("__dict__");
+		DBG("Before import_array()");
 		import_array();
+		DBG("After import_array()");
 	} catch(boost::python::error_already_set) {
 		PyErr_Print();
 	}
