@@ -68,32 +68,72 @@ bool RectilinearMesh::exposeVisItData(int source, int iteration) const
 	visit_handle h = VISIT_INVALID_HANDLE;
 	if(VisIt_RectilinearMesh_alloc(&h) != VISIT_ERROR) {
 		visit_handle hxc, hyc, hzc = VISIT_INVALID_HANDLE;
-		Variable *vx, *vy, *vz;
+		Variable *vx, *vy, *vz = NULL;
 
-		{
-			Model::Mesh::coords_const_iterator it(model.coords().begin());
-			vx = Manager<Variable>::Search(it->name());
-			it++;
-			vy = Manager<Variable>::Search(it->name());
-			it++;
-			if(model.coords().size() == 3) {
-				vz = Manager<Variable>::Search(it->name());
+		Model::Mesh::coords_const_iterator it(model.coords().begin());
+
+		vx = Manager<Variable>::Search(it->name());
+		if(vx == NULL) {
+			ERROR("Undefined coordinate \""<< it->name() <<"\" for mesh \""
+					<< getName() << "\"");
+			return false;
+		}
+		it++;
+
+		vy = Manager<Variable>::Search(it->name());
+		if(vy == NULL) {
+			ERROR("Undefined coordinate \""<< it->name() <<"\" for mesh \""
+					<< getName() << "\"");
+			return false;
+		}
+		it++;
+
+		if(model.coords().size() == 3) {
+			vz = Manager<Variable>::Search(it->name());
+			if(vz == NULL) {
+				ERROR("Undefined coordinate \""<< it->name() <<"\" for mesh \""
+						<< getName() << "\"");
+				return false;
 			}
+		}
 
-			// TODO : check that vx != NULL, idem for vy and vz
+		ChunkIndex::iterator end;
 
+		ChunkIndex::iterator c = vx->getChunks(source,iteration,end);
+		if(c != end) {
 			VisIt_VariableData_alloc(&hxc);
+			(*c)->FillVisItDataHandle(hxc);
+		} else {
+			ERROR("Data unavailable for coordinate \"" << vx->getName() << "\"");
+			return false;
+		}
+			
+		c = vy->getChunks(source,iteration,end);
+		if(c != end) {
 			VisIt_VariableData_alloc(&hyc);
-			if(model.coords().size() == 3) {
-				VisIt_VariableData_alloc(&hzc);
-			}
+			(*c)->FillVisItDataHandle(hyc);
+		} else {
+			ERROR("Data unavailable for coordinate \"" << vy->getName() << "\"");
+			VisIt_VariableData_free(hxc);
+			return false;
+		}
 
-			// TODO : provide pointer to data
+		if(model.coords().size() == 3) {
+			c = vz->getChunks(source,iteration,end);
+			if(c != end) {
+				VisIt_VariableData_alloc(&hzc);
+				(*c)->FillVisItDataHandle(hzc);
+			} else {
+				ERROR("Data unavailable for coordinate \"" << vz->getName() << "\"");
+				VisIt_VariableData_free(hxc);
+				VisIt_VariableData_free(hyc);
+				return false;
+			}	
 		}
 
 		if(model.coords().size() == 2) {
 			VisIt_RectilinearMesh_setCoordsXY(h, hxc, hyc);
-	 	} else {
+		} else {
 			VisIt_RectilinearMesh_setCoordsXYZ(h, hxc, hyc, hzc);
 		}
 	}
