@@ -54,7 +54,7 @@ class Variable : public Configurable<Model::Variable> {
 
 		std::string name;
 		int id;
-
+	
 	protected:
 		/**
 		 * \brief Constructor. 
@@ -81,12 +81,6 @@ class Variable : public Configurable<Model::Variable> {
 		 * Attach a new chunk to the variable.
 		 */
 		void attachChunk(Chunk* chunk);
-
-		/**
-		 * \brief Comparison operator between variables.
-		 * Variables are equals if they have a same name, iteration and source.
-		 */
-		//bool operator==(const Variable &another);
 
 		/**
 		 * Returns the list of chunks with a specified source.
@@ -157,7 +151,13 @@ class Variable : public Configurable<Model::Variable> {
 		std::string getUnit() const { return model.unit(); }
 
 #ifdef __ENABLE_VISIT
-		visit_handle getVisItHandle() const;
+		bool exposeVisItMetaData(visit_handle md) const;
+
+		bool exposeVisItData(int source, int iteration) const;
+
+		static VisIt_VarCentering VarCenteringToVisIt(const Model::VarCentering& vc);
+
+		static VisIt_VarType VarTypeToVisIt(const Model::VarType& vt);
 #endif
 
 		static Variable* New(const Model::Variable& mdl, const std::string &name);

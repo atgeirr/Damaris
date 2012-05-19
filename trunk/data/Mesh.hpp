@@ -58,7 +58,7 @@ class Mesh : public Configurable<Model::Mesh> {
 #ifdef __ENABLE_VISIT
 		virtual bool exposeVisItMetaData(visit_handle md) const = 0;
 		
-		virtual bool exposeVisItData() const = 0;
+		virtual bool exposeVisItData(int source, int iteration) const = 0;
 #endif
 
 		static Mesh* New(const Model::Mesh& mdl, const std::string& name);

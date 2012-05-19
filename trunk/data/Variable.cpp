@@ -32,15 +32,6 @@ Variable::Variable(const Model::Variable& mdl, const std::string &n, Layout* l)
 	layout = l;
 	name = n;
 }
-/*
-bool Variable::operator==(const Variable &another)
-{
-	bool c = true;
-	c = c && (another.getName.compare(name) == 0;
-	c = c && another.id == id;
-	return c;
-}
-*/
 
 void Variable::attachChunk(Chunk* chunk)
 {
@@ -115,11 +106,70 @@ void Variable::clear()
 }
 
 #ifdef __ENABLE_VISIT
-visit_handle Variable::getVisItHandle() const
+bool Variable::exposeVisItMetaData(visit_handle md) const
+{
+	if(not model.visualizable()) {
+		return false;
+	}
+
+	visit_handle vmd = VISIT_INVALID_HANDLE;
+	if(VisIt_VariableMetaData_alloc(&vmd) == VISIT_OKAY) {
+		VisIt_VariableMetaData_setName(vmd, name.c_str());
+		if(model.mesh() != "#") {
+			VisIt_VariableMetaData_setMeshName(vmd, model.mesh().c_str());
+		}
+		VisIt_VariableMetaData_setType(vmd, VarTypeToVisIt(model.type()));
+		VisIt_VariableMetaData_setCentering(vmd, VarCenteringToVisIt(model.centering()));
+
+		VisIt_SimulationMetaData_addVariable(md, vmd);
+		return true;
+	}
+	ERROR("Unable to allocate VisIt handle for variable \"" << name << "\"");
+	return false;
+}
+
+bool Variable::exposeVisItData(int source, int iteration) const
 {
 	// TODO
-	return VISIT_INVALID_HANDLE;
+	return false;
 }
+
+VisIt_VarType Variable::VarTypeToVisIt(const Model::VarType& vt) 
+{
+	switch(vt) {
+		case Model::VarType::scalar :
+			return VISIT_VARTYPE_SCALAR;
+		case Model::VarType::vector :
+			return VISIT_VARTYPE_VECTOR;
+		case Model::VarType::tensor :
+			return VISIT_VARTYPE_TENSOR;
+		case Model::VarType::symmetric_tensor :
+			return VISIT_VARTYPE_SYMMETRIC_TENSOR;
+		case Model::VarType::material :
+			return VISIT_VARTYPE_MATERIAL;
+		case Model::VarType::matspecies :
+			return VISIT_VARTYPE_MATSPECIES;
+		case Model::VarType::label :
+			return VISIT_VARTYPE_LABEL;
+		case Model::VarType::array :
+			return VISIT_VARTYPE_ARRAY;
+		case Model::VarType::mesh :
+			return VISIT_VARTYPE_MESH;
+		case Model::VarType::curve :
+			return VISIT_VARTYPE_CURVE;
+	}
+	return VISIT_VARTYPE_SCALAR;
+}
+
+VisIt_VarCentering Variable::VarCenteringToVisIt(const Model::VarCentering& vc) 
+{
+	if(vc == Model::VarCentering::zonal) {
+		return VISIT_VARCENTERING_ZONE;
+	} else {
+		return VISIT_VARCENTERING_NODE;
+	}
+}
+
 #endif
 
 Variable* Variable::New(const Model::Variable& mdl, const std::string& name)

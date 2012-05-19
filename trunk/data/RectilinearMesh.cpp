@@ -63,7 +63,7 @@ bool RectilinearMesh::exposeVisItMetaData(visit_handle md) const
 	return false;
 }
 
-bool RectilinearMesh::exposeVisItData() const
+bool RectilinearMesh::exposeVisItData(int source, int iteration) const
 {
 	visit_handle h = VISIT_INVALID_HANDLE;
 	if(VisIt_RectilinearMesh_alloc(&h) != VISIT_ERROR) {
@@ -73,15 +73,22 @@ bool RectilinearMesh::exposeVisItData() const
 		{
 			Model::Mesh::coords_const_iterator it(model.coords().begin());
 			vx = Manager<Variable>::Search(it->name());
-			hxc = vx->getVisItHandle();
 			it++;
 			vy = Manager<Variable>::Search(it->name());
-			hyc = vy->getVisItHandle();
 			it++;
 			if(model.coords().size() == 3) {
 				vz = Manager<Variable>::Search(it->name());
-				hzc = vz->getVisItHandle();
 			}
+
+			// TODO : check that vx != NULL, idem for vy and vz
+
+			VisIt_VariableData_alloc(&hxc);
+			VisIt_VariableData_alloc(&hyc);
+			if(model.coords().size() == 3) {
+				VisIt_VariableData_alloc(&hzc);
+			}
+
+			// TODO : provide pointer to data
 		}
 
 		if(model.coords().size() == 2) {
