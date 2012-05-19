@@ -54,9 +54,7 @@ Server::Server(Process* p)
 /* destructor */
 Server::~Server()
 {
-	DBG("In ~Server()");
 	Process::kill();
-	DBG("After Process killed");
 }
 	
 /* starts the server and enter the main loop */

@@ -34,7 +34,7 @@ void ActionManager::Init(const Model::Actions& model)
 	}
 
 	// build scripts
-	Model::Actions::script_const_iterator s(model.event().begin());
+	Model::Actions::script_const_iterator s(model.script().begin());
 	for(; s != model.script().end(); s++) {
 		Create<ScriptAction>(*s,(std::string)s->name());
 	}

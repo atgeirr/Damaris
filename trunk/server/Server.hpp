@@ -69,7 +69,9 @@ namespace Damaris {
 			int run();
 
 			/** 
-			 * \brief Forces the server to stop after the next iteration of the main loop. 
+			 * Forces the server to stop after the next iteration of the main loop.
+			 * Does not remove the shared memory structures (the server can run again if
+			 * necessary).
 			 */
 			void stop();
 

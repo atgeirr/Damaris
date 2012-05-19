@@ -71,6 +71,8 @@ int main(int argc, char** argv)
 	/* Initializing the server with a Configuration object 
 	   pre-initialized by the Options object */
 	server = Damaris::Server::New(opt.getConfigFile(),id);
+
+	INFO("Setting communicators");
 	Damaris::Environment::setGlobalComm(MPI_COMM_WORLD);
 	Damaris::Environment::setEntityComm(MPI_COMM_WORLD);
 
@@ -91,6 +93,9 @@ int main(int argc, char** argv)
 static void sighandler(int sig)
 {
 	INFO("Kill signal caught, server will terminate");
-	if(server != NULL) server->stop();
+	if(server != NULL) {
+		server->stop();
+		delete server;
+	}
 	exit(0);
 }
