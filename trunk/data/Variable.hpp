@@ -151,9 +151,9 @@ class Variable : public Configurable<Model::Variable> {
 		std::string getUnit() const { return model.unit(); }
 
 #ifdef __ENABLE_VISIT
-		bool exposeVisItMetaData(visit_handle md) const;
+		bool exposeVisItMetaData(visit_handle md);
 
-		bool exposeVisItData(int source, int iteration) const;
+		bool exposeVisItData(int source, int iteration);
 
 		static VisIt_VarCentering VarCenteringToVisIt(const Model::VarCentering& vc);
 

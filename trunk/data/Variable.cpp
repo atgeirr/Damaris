@@ -106,7 +106,7 @@ void Variable::clear()
 }
 
 #ifdef __ENABLE_VISIT
-bool Variable::exposeVisItMetaData(visit_handle md) const
+bool Variable::exposeVisItMetaData(visit_handle md)
 {
 	if(not model.visualizable()) {
 		return false;
@@ -128,7 +128,7 @@ bool Variable::exposeVisItMetaData(visit_handle md) const
 	return false;
 }
 
-bool Variable::exposeVisItData(int source, int iteration) const
+bool Variable::exposeVisItData(int source, int iteration)
 {
 	visit_handle h = VISIT_INVALID_HANDLE;
 	if(VisIt_VariableData_alloc(&h) == VISIT_OKAY) {
