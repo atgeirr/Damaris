@@ -130,7 +130,15 @@ bool Variable::exposeVisItMetaData(visit_handle md) const
 
 bool Variable::exposeVisItData(int source, int iteration) const
 {
-	// TODO
+	visit_handle h = VISIT_INVALID_HANDLE;
+	if(VisIt_VariableData_alloc(&h) == VISIT_OKAY) {
+		ChunkIndex::iterator end;
+		ChunkIndex::iterator it = getChunks(source, iteration, end);
+		if(it == end) return false;
+
+		(*it)->FillVisItDataHandle(h);
+		return true;
+	}
 	return false;
 }
 
