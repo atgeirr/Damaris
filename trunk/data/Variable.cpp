@@ -128,15 +128,16 @@ bool Variable::exposeVisItMetaData(visit_handle md)
 	return false;
 }
 
-bool Variable::exposeVisItData(int source, int iteration)
+bool Variable::exposeVisItData(visit_handle* h, int source, int iteration)
 {
-	visit_handle h = VISIT_INVALID_HANDLE;
-	if(VisIt_VariableData_alloc(&h) == VISIT_OKAY) {
+	if(VisIt_VariableData_alloc(h) == VISIT_OKAY) {
 		ChunkIndex::iterator end;
 		ChunkIndex::iterator it = getChunks(source, iteration, end);
-		if(it == end) return false;
-
-		(*it)->FillVisItDataHandle(h);
+		if(it == end) {
+			VisIt_VariableData_free(*h);
+			return false;
+		}
+		(*it)->FillVisItDataHandle(*h);
 		return true;
 	}
 	return false;

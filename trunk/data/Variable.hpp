@@ -153,7 +153,7 @@ class Variable : public Configurable<Model::Variable> {
 #ifdef __ENABLE_VISIT
 		bool exposeVisItMetaData(visit_handle md);
 
-		bool exposeVisItData(int source, int iteration);
+		bool exposeVisItData(visit_handle *md, int source, int iteration);
 
 		static VisIt_VarCentering VarCenteringToVisIt(const Model::VarCentering& vc);
 

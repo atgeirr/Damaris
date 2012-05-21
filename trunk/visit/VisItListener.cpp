@@ -23,10 +23,12 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 #include <string.h>
 #include <mpi.h>
+#include <VisItDataInterface_V2.h>
 #include <VisItControlInterface_V2.h>
-#include <boost/bind.hpp>
 
 #include "core/Debug.hpp"
+#include "core/MeshManager.hpp"
+#include "core/VariableManager.hpp"
 #include "visit/VisItListener.hpp"
 
 
@@ -131,6 +133,57 @@ bool VisItListener::processVisItCommand()
 		}
 	}
 	return true;
+}
+
+visit_handle VisItListener::SimGetMetaData(void *cbdata)
+{
+	SimData* s = (SimData*)cbdata;
+	visit_handle md = VISIT_INVALID_HANDLE;
+	if(VisIt_SimulationMetaData_alloc(&md) == VISIT_OKAY)
+	{
+		VisIt_SimulationMetaData_setMode(md,VISIT_SIMMODE_RUNNING);
+		VisIt_SimulationMetaData_setCycleTime(md, s->iteration, s->iteration);
+		
+		{ // expose Meshes
+			MeshManager::iterator mesh = MeshManager::Begin();
+			MeshManager::iterator end = MeshManager::End();
+			while(mesh != end) {
+				(*mesh)->exposeVisItMetaData(md);
+				mesh++;
+			}
+		}
+
+		{ // expose Variables
+			VariableManager::iterator var = VariableManager::Begin();
+			VariableManager::iterator end = VariableManager::End();
+			while(var != end) {
+				(*var)->exposeVisItMetaData(md);
+			}
+		}
+	}
+	return md;
+}
+
+visit_handle VisItListener::SimGetMesh(int domain, const char *name, void *cbdata)
+{
+	SimData *s = (SimData*)cbdata;
+	Mesh* m = MeshManager::Search(std::string(name));
+	visit_handle h = VISIT_INVALID_HANDLE;
+	if(m != NULL) {
+		m->exposeVisItData(&h,domain,s->iteration);
+	}	
+	return h;	
+}
+
+visit_handle VisItListener::SimGetVariable(int domain, const char *name, void *cbdata)
+{
+	SimData *s = (SimData*)cbdata;
+	Variable* v = VariableManager::Search(std::string(name));
+	visit_handle h = VISIT_INVALID_HANDLE;
+	if(v != NULL) {
+		v->exposeVisItData(&h,domain,s->iteration);
+	}
+	return h;
 }
 
 }

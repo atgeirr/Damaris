@@ -37,11 +37,20 @@ class VisItListener {
 
 	private:
 
+		struct SimData {
+			int iteration;
+		};
+
+
 		static MPI_Comm comm;
 
 		static void broadcastSlaveCommand(int *command);
 		static void slaveProcessCallback();
 		static bool processVisItCommand();
+
+		static visit_handle SimGetMetaData(void *cbdata);
+		static visit_handle SimGetMesh(int domain, const char *name, void *cbdata);
+		static visit_handle SimGetVariable(int domain, const char *name, void *cbdata);
 
 	public:
 		static void init(MPI_Comm c, const Model::VisitParam& mdl, const std::string& simname);

@@ -63,10 +63,9 @@ bool RectilinearMesh::exposeVisItMetaData(visit_handle md) const
 	return false;
 }
 
-bool RectilinearMesh::exposeVisItData(int source, int iteration) const
+bool RectilinearMesh::exposeVisItData(visit_handle* h, int source, int iteration) const
 {
-	visit_handle h = VISIT_INVALID_HANDLE;
-	if(VisIt_RectilinearMesh_alloc(&h) != VISIT_ERROR) {
+	if(VisIt_RectilinearMesh_alloc(h) != VISIT_ERROR) {
 		visit_handle hxc, hyc, hzc = VISIT_INVALID_HANDLE;
 		Variable *vx, *vy, *vz = NULL;
 
@@ -132,12 +131,12 @@ bool RectilinearMesh::exposeVisItData(int source, int iteration) const
 		}
 
 		if(model.coords().size() == 2) {
-			VisIt_RectilinearMesh_setCoordsXY(h, hxc, hyc);
+			VisIt_RectilinearMesh_setCoordsXY(*h, hxc, hyc);
 		} else {
-			VisIt_RectilinearMesh_setCoordsXYZ(h, hxc, hyc, hzc);
+			VisIt_RectilinearMesh_setCoordsXYZ(*h, hxc, hyc, hzc);
 		}
 	}
-	return (h != VISIT_INVALID_HANDLE);
+	return (*h != VISIT_INVALID_HANDLE);
 }
 
 #endif

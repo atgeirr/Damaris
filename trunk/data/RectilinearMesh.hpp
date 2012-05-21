@@ -40,7 +40,7 @@ class RectilinearMesh : public Mesh {
 #ifdef __ENABLE_VISIT
 		bool exposeVisItMetaData(visit_handle md) const;
 		
-		bool exposeVisItData(int source, int iteration) const;
+		bool exposeVisItData(visit_handle* h, int source, int iteration) const;
 #endif
 
 };
