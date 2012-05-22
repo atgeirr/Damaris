@@ -1741,22 +1741,22 @@ namespace Damaris
     class Mesh: public ::xml_schema::type
     {
       public:
-      // coords
+      // coord
       // 
-      typedef ::Damaris::Model::MeshCoord coords_type;
-      typedef ::xsd::cxx::tree::sequence< coords_type > coords_sequence;
-      typedef coords_sequence::iterator coords_iterator;
-      typedef coords_sequence::const_iterator coords_const_iterator;
-      typedef ::xsd::cxx::tree::traits< coords_type, char > coords_traits;
+      typedef ::Damaris::Model::MeshCoord coord_type;
+      typedef ::xsd::cxx::tree::sequence< coord_type > coord_sequence;
+      typedef coord_sequence::iterator coord_iterator;
+      typedef coord_sequence::const_iterator coord_const_iterator;
+      typedef ::xsd::cxx::tree::traits< coord_type, char > coord_traits;
 
-      const coords_sequence&
-      coords () const;
+      const coord_sequence&
+      coord () const;
 
-      coords_sequence&
-      coords ();
+      coord_sequence&
+      coord ();
 
       void
-      coords (const coords_sequence& s);
+      coord (const coord_sequence& s);
 
       // name
       // 
@@ -1837,7 +1837,7 @@ namespace Damaris
              ::xml_schema::flags);
 
       protected:
-      coords_sequence coords_;
+      coord_sequence coord_;
       ::xsd::cxx::tree::one< name_type > name_;
       ::xsd::cxx::tree::one< type_type > type_;
       ::xsd::cxx::tree::one< topology_type > topology_;

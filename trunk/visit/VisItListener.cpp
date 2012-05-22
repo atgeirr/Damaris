@@ -39,20 +39,27 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 namespace Damaris {
 namespace Viz {
 
+VisItListener::SimData VisItListener::sim = {0};
 MPI_Comm VisItListener::comm = MPI_COMM_NULL;
 
 void VisItListener::init(MPI_Comm c, const Model::VisitParam& mdl, const std::string& simname)
 {
+	char* path;
 	if(mdl.path() != "") {
-		char* path = (char*)malloc(sizeof(char)*(mdl.path().length()+1));
+		path = (char*)malloc(sizeof(char)*(mdl.path().length()+1));
 		strcpy(path,mdl.path().c_str());
 		VisItSetDirectory(path);
 		free(path);
 	}
+	
 	VisItSetupEnvironment();
 	VisItInitializeSocketAndDumpSimFile(simname.c_str(),"", "", NULL, NULL, NULL);
 	comm = c;
-	INFO("VisIt-Damaris connection initialized with visit path = " << mdl.path());
+	if(mdl.path() != "#") {
+		INFO("VisIt-Damaris connection initialized with visit path = " << mdl.path());
+	} else {
+		INFO("VisIt-Damaris connection initialized");
+	}
 }
 
 int VisItListener::connected()
@@ -68,17 +75,19 @@ int VisItListener::connected()
 
 int VisItListener::enterSyncSection(int visitstate)
 {
-	INFO("Entering Sync Section");
+	INFO("Entering Sync Section, visit state is " << visitstate);
 	switch(visitstate) {
 		case 1:
 			if(VisItAttemptToCompleteConnection() == VISIT_OKAY) {
 				INFO("VisIt connected");
 				
 				//VisItSetSlaveProcessCallback(&VisItListener::slaveProcessCallback);
+				VisItSetGetMetaData(&VisItListener::GetMetaData,(void*)(&sim));
+				VisItSetGetMesh(&VisItListener::GetMesh,(void*)(&sim));
 			}
 			break;
 		case 2:
-			if(!processVisItCommand()) {
+			if(VisItProcessEngineCommand() == VISIT_ERROR) {
 				VisItDisconnect();
 			}
 			break;
@@ -135,7 +144,12 @@ bool VisItListener::processVisItCommand()
 	return true;
 }
 
-visit_handle VisItListener::SimGetMetaData(void *cbdata)
+void VisItListener::ControlCommandCallback(const char *cmd, const char *args, void *cbdata)
+{
+	INFO("called ControlCommandCallback");
+}
+
+visit_handle VisItListener::GetMetaData(void *cbdata)
 {
 	SimData* s = (SimData*)cbdata;
 	visit_handle md = VISIT_INVALID_HANDLE;
@@ -158,13 +172,14 @@ visit_handle VisItListener::SimGetMetaData(void *cbdata)
 			VariableManager::iterator end = VariableManager::End();
 			while(var != end) {
 				(*var)->exposeVisItMetaData(md);
+				var++;
 			}
 		}
 	}
 	return md;
 }
 
-visit_handle VisItListener::SimGetMesh(int domain, const char *name, void *cbdata)
+visit_handle VisItListener::GetMesh(int domain, const char *name, void *cbdata)
 {
 	SimData *s = (SimData*)cbdata;
 	Mesh* m = MeshManager::Search(std::string(name));
@@ -175,7 +190,7 @@ visit_handle VisItListener::SimGetMesh(int domain, const char *name, void *cbdat
 	return h;	
 }
 
-visit_handle VisItListener::SimGetVariable(int domain, const char *name, void *cbdata)
+visit_handle VisItListener::GetVariable(int domain, const char *name, void *cbdata)
 {
 	SimData *s = (SimData*)cbdata;
 	Variable* v = VariableManager::Search(std::string(name));

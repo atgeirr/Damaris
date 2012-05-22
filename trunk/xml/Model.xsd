@@ -178,7 +178,7 @@
 	<!-- Mesh node -->
 	<xs:complexType name="Mesh">
 		<xs:sequence>
-			<xs:element name="coords" type="mdl:MeshCoord" minOccurs="2" maxOccurs="3" />
+			<xs:element name="coord" type="mdl:MeshCoord" minOccurs="2" maxOccurs="3" />
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string"    use="required"/>
 		<xs:attribute name="type" type="mdl:MeshType" use="required"/>

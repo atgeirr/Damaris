@@ -103,6 +103,8 @@ class Manager {
 			}
 
 			T* t = static_cast<T*>(SUBCLASS::New(mdl,name));
+			if(t == NULL) return NULL;
+
 			t->id = NumObjects();
 
 			std::pair<typename ObjectSet::iterator,bool> ret

@@ -38,20 +38,20 @@ bool RectilinearMesh::exposeVisItMetaData(visit_handle md) const
 		VisIt_MeshMetaData_setName(m1, getName().c_str());
 		VisIt_MeshMetaData_setMeshType(m1, VISIT_MESHTYPE_RECTILINEAR);
 		VisIt_MeshMetaData_setTopologicalDimension(m1, (int)model.topology());
-		VisIt_MeshMetaData_setSpatialDimension(m1, (int)model.coords().size());
+		VisIt_MeshMetaData_setSpatialDimension(m1, (int)model.coord().size());
 
-		Model::Mesh::coords_const_iterator it(model.coords().begin());
-		if(model.coords().size() >= 1) {
+		Model::Mesh::coord_const_iterator it(model.coord().begin());
+		if(model.coord().size() >= 1) {
 			if(it->unit() != "#") VisIt_MeshMetaData_setXUnits(m1,it->unit().c_str());
 			if(it->label() != "#") VisIt_MeshMetaData_setXLabel(m1,it->label().c_str());
 			it++;
 		}
-		if(model.coords().size() >= 2) {
+		if(model.coord().size() >= 2) {
 			if(it->unit() != "#") VisIt_MeshMetaData_setYUnits(m1,it->unit().c_str());
             if(it->label() != "#") VisIt_MeshMetaData_setYLabel(m1,it->label().c_str());
 			it++;
 		}
-		if(model.coords().size() >= 3) {
+		if(model.coord().size() >= 3) {
 			if(it->unit() != "#") VisIt_MeshMetaData_setZUnits(m1,it->unit().c_str());
             if(it->label() != "#") VisIt_MeshMetaData_setZLabel(m1,it->label().c_str());
 			it++;
@@ -69,7 +69,7 @@ bool RectilinearMesh::exposeVisItData(visit_handle* h, int source, int iteration
 		visit_handle hxc, hyc, hzc = VISIT_INVALID_HANDLE;
 		Variable *vx, *vy, *vz = NULL;
 
-		Model::Mesh::coords_const_iterator it(model.coords().begin());
+		Model::Mesh::coord_const_iterator it(model.coord().begin());
 
 		vx = Manager<Variable>::Search(it->name());
 		if(vx == NULL) {
@@ -87,7 +87,7 @@ bool RectilinearMesh::exposeVisItData(visit_handle* h, int source, int iteration
 		}
 		it++;
 
-		if(model.coords().size() == 3) {
+		if(model.coord().size() == 3) {
 			vz = Manager<Variable>::Search(it->name());
 			if(vz == NULL) {
 				ERROR("Undefined coordinate \""<< it->name() <<"\" for mesh \""
@@ -117,7 +117,7 @@ bool RectilinearMesh::exposeVisItData(visit_handle* h, int source, int iteration
 			return false;
 		}
 
-		if(model.coords().size() == 3) {
+		if(model.coord().size() == 3) {
 			c = vz->getChunks(source,iteration,end);
 			if(c != end) {
 				VisIt_VariableData_alloc(&hzc);
@@ -130,7 +130,7 @@ bool RectilinearMesh::exposeVisItData(visit_handle* h, int source, int iteration
 			}	
 		}
 
-		if(model.coords().size() == 2) {
+		if(model.coord().size() == 2) {
 			VisIt_RectilinearMesh_setCoordsXY(*h, hxc, hyc);
 		} else {
 			VisIt_RectilinearMesh_setCoordsXYZ(*h, hxc, hyc, hzc);

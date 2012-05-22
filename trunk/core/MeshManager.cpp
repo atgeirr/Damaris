@@ -30,7 +30,9 @@ void MeshManager::Init(const Model::Data& model)
 	Model::Data::mesh_const_iterator m(model.mesh().begin());
 	for(; m != model.mesh().end(); m++)
 	{
-		Create<Mesh>(*m,(const std::string&)m->name());
+		if(Create<Mesh>(*m,(const std::string&)m->name()) != NULL) {
+			DBG("Mesh " << m->name() << " successfuly created");
+		}
 	}
 
 	// build all variables in sub-groups

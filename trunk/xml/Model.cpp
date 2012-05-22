@@ -1303,22 +1303,22 @@ namespace Damaris
     // Mesh
     // 
 
-    const Mesh::coords_sequence& Mesh::
-    coords () const
+    const Mesh::coord_sequence& Mesh::
+    coord () const
     {
-      return this->coords_;
+      return this->coord_;
     }
 
-    Mesh::coords_sequence& Mesh::
-    coords ()
+    Mesh::coord_sequence& Mesh::
+    coord ()
     {
-      return this->coords_;
+      return this->coord_;
     }
 
     void Mesh::
-    coords (const coords_sequence& s)
+    coord (const coord_sequence& s)
     {
-      this->coords_ = s;
+      this->coord_ = s;
     }
 
     const Mesh::name_type& Mesh::
@@ -3927,7 +3927,7 @@ namespace Damaris
     Mesh (const name_type& name,
           const type_type& type)
     : ::xml_schema::type (),
-      coords_ (::xml_schema::flags (), this),
+      coord_ (::xml_schema::flags (), this),
       name_ (name, ::xml_schema::flags (), this),
       type_ (type, ::xml_schema::flags (), this),
       topology_ (topology_default_value (), ::xml_schema::flags (), this)
@@ -3939,7 +3939,7 @@ namespace Damaris
           ::xml_schema::flags f,
           ::xml_schema::container* c)
     : ::xml_schema::type (x, f, c),
-      coords_ (x.coords_, f, this),
+      coord_ (x.coord_, f, this),
       name_ (x.name_, f, this),
       type_ (x.type_, f, this),
       topology_ (x.topology_, f, this)
@@ -3951,7 +3951,7 @@ namespace Damaris
           ::xml_schema::flags f,
           ::xml_schema::container* c)
     : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
-      coords_ (f, this),
+      coord_ (f, this),
       name_ (f, this),
       type_ (f, this),
       topology_ (f, this)
@@ -3973,14 +3973,14 @@ namespace Damaris
         const ::xsd::cxx::xml::qualified_name< char > n (
           ::xsd::cxx::xml::dom::name< char > (i));
 
-        // coords
+        // coord
         //
-        if (n.name () == "coords" && n.namespace_ () == "http://damaris.gforge.inria.fr/Damaris/Model")
+        if (n.name () == "coord" && n.namespace_ () == "http://damaris.gforge.inria.fr/Damaris/Model")
         {
-          ::std::auto_ptr< coords_type > r (
-            coords_traits::create (i, f, this));
+          ::std::auto_ptr< coord_type > r (
+            coord_traits::create (i, f, this));
 
-          this->coords_.push_back (r);
+          this->coord_.push_back (r);
           continue;
         }
 

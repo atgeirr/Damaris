@@ -48,6 +48,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
 
 #-----------------------------------------------------------#
 include_directories(${DAMARIS_SOURCE_DIR})
+include_directories(${DAMARIS_SOURCE_DIR}/include)
 
 #-----------------------------------------------------------#
 # Set everything related to the Boost libraries
@@ -147,3 +148,7 @@ add_subdirectory (client)
 add_subdirectory (server)
 add_subdirectory (test)
 add_subdirectory (examples)
+
+if(VISIT_ROOT)
+  add_subdirectory (visit/test)
+endif(VISIT_ROOT)
