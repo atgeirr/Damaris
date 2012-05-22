@@ -1,11 +1,4 @@
 /*****************************************************************************
-* This program is a modified version of a program originaly provided with the
-* VisIt software developed by LLNL and following the above Copyright.
-*
-* This program is part of the Damaris software, provided under LGPL-3 licence.
-******************************************************************************/
-
-/*****************************************************************************
 *
 * Copyright (c) 2000 - 2010, Lawrence Livermore National Security, LLC
 * Produced at the Lawrence Livermore National Laboratory
@@ -43,20 +36,22 @@
 *
 *****************************************************************************/
 
-/* SIMPLE SIMULATION SKELETON */
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <math.h>
+/* DUMMY IMPLEMENTATIONS */
 #include <unistd.h>
-
-#include "Damaris.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 typedef struct
 {
     int     cycle;
     double  time;
+    int     runMode;
     int     done;
+#ifdef PARALLEL
+    int     par_rank;
+    int     par_size;
+#endif
 } simulation_data;
 
 void
@@ -64,7 +59,12 @@ simulation_data_ctor(simulation_data *sim)
 {
     sim->cycle = 0;
     sim->time = 0.;
+    sim->runMode = 1; /* VISIT_SIMMODE_RUNNING */
     sim->done = 0;
+#ifdef PARALLEL
+    sim->par_rank = 0;
+    sim->par_size = 1;
+#endif
 }
 
 void
@@ -72,81 +72,27 @@ simulation_data_dtor(simulation_data *sim)
 {
 }
 
-void read_input_deck(int argc, char** argv) 
-{ 
-	if(argc != 2) {
-		printf("Usage: %s mesh.xml\n",argv[0]);
-		exit(0);
-	}
-	DC_initialize(argv[1],0);
-}
-
-void simulate_one_timestep(simulation_data *sim);
-
 void simulate_one_timestep(simulation_data *sim)
 {
+    /* simulate 1 time step. */
     ++sim->cycle;
     sim->time += 0.0134;
-    printf("Simulating time step: cycle=%d, time=%lg\n", sim->cycle, sim->time);
+
+#ifdef PARALLEL
+    printf("%d/%d: Simulating time step: cycle=%d, time=%lg\n",
+           sim->par_rank, sim->par_size, sim->cycle, sim->time);
+#else
+    printf("Simulating time step: cycle=%d, time=%lg\n", sim->cycle, sim->time);    printf("Simulating time step\n");
+#endif
     sleep(1);
 }
 
-void exposeDataToDamaris(simulation_data* s);
-
-void mainloop(void)
+void read_input_deck(simulation_data *sim)
 {
-    /* Set up some simulation data. */
-    simulation_data sim;
-    simulation_data_ctor(&sim);
-
-    //do
-    {
-		//simulate_one_timestep(&sim);
-		exposeDataToDamaris(&sim);
-    } //while(!sim.done);
-    
-	/* Clean up */
-    simulation_data_dtor(&sim);
+    /* Read in problem setup. */
 }
 
-int main(int argc, char **argv)
+void write_vis_dump(simulation_data *sim)
 {
-    /* Read input problem setup, geometry, data. */
-    read_input_deck(argc,argv);
-    /* Call the main loop. */
-    mainloop();
-
-	DC_finalize();
-    return 0;
-}
-
-/* Rectilinear mesh */
-float rmesh_x[] = {0., 1., 2.5, 5.};
-float rmesh_y[] = {0., 2., 2.25, 2.55,  5.};
-int   rmesh_dims[] = {4, 5, 1};
-int   rmesh_ndims = 2;
-
-/* Curvilinear mesh */
-float cmesh_x[2][3][4] = {
-   {{0.,1.,2.,3.},{0.,1.,2.,3.}, {0.,1.,2.,3.}},
-   {{0.,1.,2.,3.},{0.,1.,2.,3.}, {0.,1.,2.,3.}}
-};
-float cmesh_y[2][3][4] = {
-   {{0.5,0.,0.,0.5},{1.,1.,1.,1.}, {1.5,2.,2.,1.5}},
-   {{0.5,0.,0.,0.5},{1.,1.,1.,1.}, {1.5,2.,2.,1.5}}
-};
-float cmesh_z[2][3][4] = {
-   {{0.,0.,0.,0.},{0.,0.,0.,0.},{0.,0.,0.,0.}},
-   {{1.,1.,1.,1.},{1.,1.,1.,1.},{1.,1.,1.,1.}}
-};
-int cmesh_dims[] = {4, 3, 2};
-int cmesh_ndims = 3;
-
-void exposeDataToDamaris(simulation_data* sim) {
-	DC_write("coordinates/x2d",sim->cycle,rmesh_x);
-	DC_write("coordinates/y2d",sim->cycle,rmesh_y);
-	
-	DC_write("coordinates/x3d",sim->cycle,cmesh_x);
-	DC_write("coordinates/y3d",sim->cycle,cmesh_y);
-	DC_write("coordinates/z3d",sim->cycle,cmesh_z);
+    /* Write visualization dump. */
 }
