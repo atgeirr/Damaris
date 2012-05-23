@@ -84,6 +84,7 @@ int VisItListener::enterSyncSection(int visitstate)
 				//VisItSetSlaveProcessCallback(&VisItListener::slaveProcessCallback);
 				VisItSetGetMetaData(&VisItListener::GetMetaData,(void*)(&sim));
 				VisItSetGetMesh(&VisItListener::GetMesh,(void*)(&sim));
+				VisItSetGetVariable(&VisItListener::GetVariable,(void*)(&sim));
 			}
 			break;
 		case 2:
@@ -194,6 +195,7 @@ visit_handle VisItListener::GetMesh(int domain, const char *name, void *cbdata)
 
 visit_handle VisItListener::GetVariable(int domain, const char *name, void *cbdata)
 {
+	DBG("Entering VisItListener::GetVariable for variable " << name);
 	SimData *s = (SimData*)cbdata;
 	Variable* v = VariableManager::Search(std::string(name));
 	visit_handle h = VISIT_INVALID_HANDLE;
