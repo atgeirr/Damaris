@@ -252,7 +252,7 @@ int main(int argc, char **argv)
     /* Initialize environment variables. */
     SimulationArguments(argc, argv);
 	
-	VisItSetDirectory("/home/mdorier/Work/Visu/visit2.4.2/src");
+	VisItSetDirectory("/home/mdorier/Work/Visu2/visit2.5.0/src");
     VisItSetupEnvironment();
 
     /* Write out .sim2 file that VisIt uses to connect. */

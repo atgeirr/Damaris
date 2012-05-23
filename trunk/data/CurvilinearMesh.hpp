@@ -15,40 +15,36 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file Mesh.cpp
+ * \file CurvilinearMesh.hpp
  * \date May 2012
  * \author Matthieu Dorier
  * \version 0.5
  */
+#ifndef __DAMARIS_CURVILINEAR_MESH_H
+#define __DAMARIS_CURVILINEAR_MESH_H
+
 #include "data/Mesh.hpp"
-#include "data/CurvilinearMesh.hpp"
-#include "data/RectilinearMesh.hpp"
-#include "core/Debug.hpp"
 
 namespace Damaris {
 
-Mesh::Mesh(const Model::Mesh& mdl, const std::string &n)
-: Configurable<Model::Mesh>(mdl)
-{
-	name = n;
-}
+/**
+ */
+class CurvilinearMesh : public Mesh {
 
-Mesh* Mesh::New(const Model::Mesh& mdl, const std::string& name)
-{
-	switch(mdl.type()) {
-		case Model::MeshType::rectilinear :
-			return RectilinearMesh::New(mdl,name);
-        case Model::MeshType::curvilinear :
-			return CurvilinearMesh::New(mdl,name);
-        case Model::MeshType::unstructured :
-        case Model::MeshType::point :
-        case Model::MeshType::csg :
-        case Model::MeshType::amr :
-        case Model::MeshType::unknown :
-		default: break;
-	}
-	ERROR("Mesh type " << mdl.type() << " is not implemented.");
-	return NULL;
-}
+	private:
+		CurvilinearMesh(const Model::Mesh& mdl, const std::string& name);
+	
+	public:
+
+		static CurvilinearMesh* New(const Model::Mesh& mdl, const std::string& name);
+
+#ifdef __ENABLE_VISIT
+		bool exposeVisItMetaData(visit_handle md) const;
+		
+		bool exposeVisItData(visit_handle* h, int source, int iteration) const;
+#endif
+
+};
 
 }
+#endif

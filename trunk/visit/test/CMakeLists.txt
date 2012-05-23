@@ -46,3 +46,5 @@ target_link_libraries (updateplots ${CLIENT_SIDE_LIBRARIES})
 
 add_executable (var ${VISIT_TEST_DIR}/var.c)
 target_link_libraries (var ${CLIENT_SIDE_LIBRARIES})
+
+add_subdirectory (origin)

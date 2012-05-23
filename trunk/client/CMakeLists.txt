@@ -24,6 +24,7 @@ set(DAMARIS_COMMON_SRC
 	${DAMARIS_SOURCE_DIR}/data/Variable.cpp
 	${DAMARIS_SOURCE_DIR}/data/Mesh.cpp
 	${DAMARIS_SOURCE_DIR}/data/RectilinearMesh.cpp
+	${DAMARIS_SOURCE_DIR}/data/CurvilinearMesh.cpp
 	${DAMARIS_SOURCE_DIR}/data/ChunkDescriptor.cpp
 	${DAMARIS_SOURCE_DIR}/data/Chunk.cpp
 	${DAMARIS_SOURCE_DIR}/data/ShmChunk.cpp
