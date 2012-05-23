@@ -67,7 +67,9 @@ bool Chunk::within(const Chunk& enclosing) const
 bool Chunk::FillVisItDataHandle(visit_handle hdl)
 {
 	int nb_items = NbrOfItems();
+	DBG("Number of items is " << nb_items);
 	const Model::Type& t = getType();
+	DBG("Type is " << getType());
 	if(hdl != VISIT_INVALID_HANDLE) {
 		if(t == Model::Type::int_ or t == Model::Type::integer) {
 			VisIt_VariableData_setDataI(hdl, VISIT_OWNER_SIM, 1, nb_items, (int*)data());

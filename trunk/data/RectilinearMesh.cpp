@@ -29,6 +29,11 @@ RectilinearMesh::RectilinearMesh(const Model::Mesh& mdl, const std::string& name
 : Mesh(mdl,name)
 { }
 
+RectilinearMesh* RectilinearMesh::New(const Model::Mesh& mdl, const std::string& name)
+{
+	return new RectilinearMesh(mdl,name);
+}
+
 #ifdef __ENABLE_VISIT
 bool RectilinearMesh::exposeVisItMetaData(visit_handle md) const
 {
@@ -41,17 +46,17 @@ bool RectilinearMesh::exposeVisItMetaData(visit_handle md) const
 		VisIt_MeshMetaData_setSpatialDimension(m1, (int)model.coord().size());
 
 		Model::Mesh::coord_const_iterator it(model.coord().begin());
-		if(model.coord().size() >= 1) {
-			if(it->unit() != "#") VisIt_MeshMetaData_setXUnits(m1,it->unit().c_str());
-			if(it->label() != "#") VisIt_MeshMetaData_setXLabel(m1,it->label().c_str());
-			it++;
-		}
-		if(model.coord().size() >= 2) {
-			if(it->unit() != "#") VisIt_MeshMetaData_setYUnits(m1,it->unit().c_str());
-            if(it->label() != "#") VisIt_MeshMetaData_setYLabel(m1,it->label().c_str());
-			it++;
-		}
-		if(model.coord().size() >= 3) {
+		// the number of coordinates should be 2 or 3 (this condition is checked by
+		// the xml loader)
+		if(it->unit() != "#") VisIt_MeshMetaData_setXUnits(m1,it->unit().c_str());
+		if(it->label() != "#") VisIt_MeshMetaData_setXLabel(m1,it->label().c_str());
+		it++;
+		
+		if(it->unit() != "#") VisIt_MeshMetaData_setYUnits(m1,it->unit().c_str());
+		if(it->label() != "#") VisIt_MeshMetaData_setYLabel(m1,it->label().c_str());
+		it++;
+		
+		if(model.coord().size() == 3) {
 			if(it->unit() != "#") VisIt_MeshMetaData_setZUnits(m1,it->unit().c_str());
             if(it->label() != "#") VisIt_MeshMetaData_setZLabel(m1,it->label().c_str());
 			it++;
@@ -65,28 +70,41 @@ bool RectilinearMesh::exposeVisItMetaData(visit_handle md) const
 
 bool RectilinearMesh::exposeVisItData(visit_handle* h, int source, int iteration) const
 {
+	DBG("In RectilinearMesh::exposeVisItData");
+	// Allocates the VisIt handle
 	if(VisIt_RectilinearMesh_alloc(h) != VISIT_ERROR) {
 		visit_handle hxc, hyc, hzc = VISIT_INVALID_HANDLE;
 		Variable *vx, *vy, *vz = NULL;
 
 		Model::Mesh::coord_const_iterator it(model.coord().begin());
 
+		// Search for the X coordinate, checks that it has 1 dimenion
 		vx = Manager<Variable>::Search(it->name());
 		if(vx == NULL) {
-			ERROR("Undefined coordinate \""<< it->name() <<"\" for mesh \""
+			CFGERROR("Undefined coordinate \""<< it->name() <<"\" for mesh \""
 					<< getName() << "\"");
+			return false;
+		}
+		if(vx->getLayout()->getDimensions() != 1) {
+			CFGERROR("Wrong number of dimensions for coordinate " << vx->getName());
 			return false;
 		}
 		it++;
 
+		// Search for the Y coordinate, checks that it has 1 dimension
 		vy = Manager<Variable>::Search(it->name());
 		if(vy == NULL) {
-			ERROR("Undefined coordinate \""<< it->name() <<"\" for mesh \""
+			CFGERROR("Undefined coordinate \""<< it->name() <<"\" for mesh \""
 					<< getName() << "\"");
+			return false;
+		}
+		if(vy->getLayout()->getDimensions() != 1) {
+			CFGERROR("Wrong number of dimensions for coordinate " << vx->getName());
 			return false;
 		}
 		it++;
 
+		// Search for the Z coordinate if there is one, checks that it has 1 dimension
 		if(model.coord().size() == 3) {
 			vz = Manager<Variable>::Search(it->name());
 			if(vz == NULL) {
@@ -94,34 +112,60 @@ bool RectilinearMesh::exposeVisItData(visit_handle* h, int source, int iteration
 						<< getName() << "\"");
 				return false;
 			}
+			if(vz->getLayout()->getDimensions() != 1) {
+				CFGERROR("Wrong number of dimensions for coordinate " << vx->getName());
+				return false;
+			}
 		}
+		
+		// At this point, the 2 or 3 coordinate variables are found. 
+		// Now accessing the data.
 
 		ChunkIndex::iterator end;
 
-		ChunkIndex::iterator c = vx->getChunks(source,iteration,end);
+		// Accessing chunk for X coordinate
+		ChunkIndex::iterator c = vx->getChunks(source,iteration,end);		
 		if(c != end) {
-			VisIt_VariableData_alloc(&hxc);
-			(*c)->FillVisItDataHandle(hxc);
+			if(VisIt_VariableData_alloc(&hxc) == VISIT_OKAY) {
+				(*c)->FillVisItDataHandle(hxc);
+			} else {
+				ERROR("While allocating data handle");
+				return false;
+			}
 		} else {
-			ERROR("Data unavailable for coordinate \"" << vx->getName() << "\"");
+			ERROR("Data unavailable for coordinate \"" << vx->getName() << "\""
+					<< " for iteration " << iteration << " and source " << source);
 			return false;
 		}
-			
+
+		// Accessing chunk for Y coordinate
 		c = vy->getChunks(source,iteration,end);
 		if(c != end) {
-			VisIt_VariableData_alloc(&hyc);
-			(*c)->FillVisItDataHandle(hyc);
+			if(VisIt_VariableData_alloc(&hyc) == VISIT_OKAY) {
+				(*c)->FillVisItDataHandle(hyc);
+			} else {
+				ERROR("While allocating data handle");
+				VisIt_VariableData_free(hxc);
+				return false;
+			}
 		} else {
 			ERROR("Data unavailable for coordinate \"" << vy->getName() << "\"");
 			VisIt_VariableData_free(hxc);
 			return false;
 		}
-
+		
+		// Accessing chunk for Z coordinate we we need to
 		if(model.coord().size() == 3) {
 			c = vz->getChunks(source,iteration,end);
 			if(c != end) {
-				VisIt_VariableData_alloc(&hzc);
-				(*c)->FillVisItDataHandle(hzc);
+				if(VisIt_VariableData_alloc(&hzc) == VISIT_OKAY) {
+					(*c)->FillVisItDataHandle(hzc);
+				} else {
+					ERROR("While allocating data handle");
+					VisIt_VariableData_free(hxc);
+					VisIt_VariableData_free(hyc);
+					return false;
+				}
 			} else {
 				ERROR("Data unavailable for coordinate \"" << vz->getName() << "\"");
 				VisIt_VariableData_free(hxc);
@@ -130,12 +174,22 @@ bool RectilinearMesh::exposeVisItData(visit_handle* h, int source, int iteration
 			}	
 		}
 
+		// At this point, the 2 or 3 VisIt handle associated with the
+		// coordinate variables have been created, we now have to link
+		// the mesh data handle to the coordinate handles.
+		
 		if(model.coord().size() == 2) {
 			VisIt_RectilinearMesh_setCoordsXY(*h, hxc, hyc);
-		} else {
+		} else if (model.coord().size() == 3) {
 			VisIt_RectilinearMesh_setCoordsXYZ(*h, hxc, hyc, hzc);
+		} else {
+			CFGERROR("How could you possibly reach this point???");
+			VisIt_VariableData_free(hxc);
+			VisIt_VariableData_free(hyc);
+			VisIt_VariableData_free(hzc);
 		}
 	}
+
 	return (*h != VISIT_INVALID_HANDLE);
 }
 

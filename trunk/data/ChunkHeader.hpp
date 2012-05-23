@@ -38,10 +38,10 @@ class ChunkHeader : public ChunkDescriptor {
 	private:
 		int source;     /*!< ID of the process that generated the chunk.*/
 		int iteration;  /*!< iteration at which the chunk has been generated. */
-		Model::Type type;
+		Model::Type::value type;
 	
 	public:
-		ChunkHeader(const ChunkDescriptor* ch, const Model::Type t, int it, int src) 
+		ChunkHeader(const ChunkDescriptor* ch, const Model::Type& t, int it, int src) 
 		: ChunkDescriptor(*ch), source(src), iteration(it), type(t) {};
 
     	/**

@@ -30,12 +30,13 @@ namespace Damaris {
 /**
  */
 class RectilinearMesh : public Mesh {
-	friend class Mesh;
 
 	private:
 		RectilinearMesh(const Model::Mesh& mdl, const std::string& name);
 	
 	public:
+
+		static RectilinearMesh* New(const Model::Mesh& mdl, const std::string& name);
 
 #ifdef __ENABLE_VISIT
 		bool exposeVisItMetaData(visit_handle md) const;

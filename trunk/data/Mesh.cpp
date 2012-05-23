@@ -36,7 +36,7 @@ Mesh* Mesh::New(const Model::Mesh& mdl, const std::string& name)
 {
 	switch(mdl.type()) {
 		case Model::MeshType::rectilinear :
-			return new RectilinearMesh(mdl,name);
+			return RectilinearMesh::New(mdl,name);
         case Model::MeshType::curvilinear :
         case Model::MeshType::unstructured :
         case Model::MeshType::point :

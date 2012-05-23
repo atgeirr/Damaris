@@ -181,10 +181,12 @@ visit_handle VisItListener::GetMetaData(void *cbdata)
 
 visit_handle VisItListener::GetMesh(int domain, const char *name, void *cbdata)
 {
+	DBG("Entering VisItListener::GetMesh for mesh " << name);
 	SimData *s = (SimData*)cbdata;
 	Mesh* m = MeshManager::Search(std::string(name));
 	visit_handle h = VISIT_INVALID_HANDLE;
 	if(m != NULL) {
+		DBG("Mesg found, exposing data, iteration is " << s->iteration);
 		m->exposeVisItData(&h,domain,s->iteration);
 	}	
 	return h;	
