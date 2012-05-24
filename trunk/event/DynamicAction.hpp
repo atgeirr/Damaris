@@ -39,7 +39,7 @@ namespace Damaris {
 class DynamicAction : public Action, public Configurable<Model::Event> {
 
 	private:
-		void (*function)(std::string,int32_t,int32_t); /*!< Pointer to the loaded function */
+		void (*function)(std::string,int32_t,int32_t,const char*); /*!< Pointer to the loaded function */
 		void* handle; /*!< Handle for the opened dynamic library. */
 		bool loaded;
 
@@ -67,7 +67,9 @@ class DynamicAction : public Action, public Configurable<Model::Event> {
 		 * \brief Another way of calling the inner function.
 		 * \see Damaris::Action::operator()
 		 */
-		virtual void call(int32_t iteration, int32_t sourceID);
+		virtual void call(int32_t iteration, int32_t sourceID, const char* args = NULL);
+
+		virtual bool IsExternallyVisible() { return model.external(); }
 
 		static DynamicAction* New(const Model::Event& ev, const std::string& name);
 };

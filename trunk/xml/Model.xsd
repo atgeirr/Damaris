@@ -74,7 +74,7 @@
 			<xs:enumeration value="char" />
 			<xs:enumeration value="character" />
 			<xs:enumeration value="string" />
-			<xs:enumeration value="undefined" />
+			<xs:enumeration value="label" />
 		</xs:restriction>
 	</xs:simpleType>
 

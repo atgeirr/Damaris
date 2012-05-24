@@ -840,7 +840,7 @@ namespace Damaris
         char_,
         character,
         string,
-        undefined
+        label
       };
 
       Type (value v);

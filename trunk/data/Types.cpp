@@ -59,35 +59,10 @@ namespace Types {
 				return sizeof(char);
 				break;
 			default:
-				return 0;
+				return -1;
 		}
-		return 0;
+		return -1;
 	}
 
-//	static std::string names[] =
-//		{"undefined","short","int","long","float","double","char","string"};
-
-	Model::Type getTypeFromString(const std::string& str)
-	{
-/*		if(str.compare("short") == 0)  return SHORT;
-		if(str.compare("int") == 0)    return INT;
-		if(str.compare("long") == 0)   return LONG;
-		if(str.compare("float") == 0)  return FLOAT;
-		if(str.compare("double") == 0) return DOUBLE;
-		if(str.compare("char") == 0)   return CHAR;
-		if(str.compare("string") == 0) return STR;
-		return UNDEFINED_TYPE;
-*/
-		return Model::Type(str);
-	}
-/*
-	const std::string& getStringFromType(basic_type_e t)
-	{	
-		if(t <= 7)
-			return names[(int)t];
-		else
-			return names[0];
-	}
-*/
 }
 }

@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<simulation name="cmd" language="c" xmlns="http://damaris.gforge.inria.fr/Damaris/Model">
+	<architecture>
+		<cores  count="2">
+			<clients count="1"/>
+		</cores>
+		<buffer name="buffer" size="67108864" />
+		<queue  name="queue" size="100" />
+	</architecture>
+	<data>
+	</data>
+	<actions>
+		<event name="say_hello1" action="hello_world" library="libhello.so" external="true"/>
+		<script name="say_hello2" file="cmd.py" language="python" external="true"/>
+	</actions>
+	<visit>
+		<path>/home/mdorier/Work/Visu2/visit2.5.0/src</path>
+	</visit>
+</simulation>

@@ -29,6 +29,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "core/Debug.hpp"
 #include "core/MeshManager.hpp"
 #include "core/VariableManager.hpp"
+#include "core/ActionManager.hpp"
 #include "visit/VisItListener.hpp"
 
 
@@ -75,16 +76,16 @@ int VisItListener::connected()
 
 int VisItListener::enterSyncSection(int visitstate)
 {
-	INFO("Entering Sync Section, visit state is " << visitstate);
+	DBG("Entering Sync Section, visit state is " << visitstate);
 	switch(visitstate) {
 		case 1:
 			if(VisItAttemptToCompleteConnection() == VISIT_OKAY) {
 				INFO("VisIt connected");
 				
-				//VisItSetSlaveProcessCallback(&VisItListener::slaveProcessCallback);
 				VisItSetGetMetaData(&VisItListener::GetMetaData,(void*)(&sim));
 				VisItSetGetMesh(&VisItListener::GetMesh,(void*)(&sim));
 				VisItSetGetVariable(&VisItListener::GetVariable,(void*)(&sim));
+				VisItSetCommandCallback(&VisItListener::ControlCommandCallback,(void*)(&sim));
 			}
 			break;
 		case 2:
@@ -147,19 +148,33 @@ bool VisItListener::processVisItCommand()
 
 void VisItListener::ControlCommandCallback(const char *cmd, const char *args, void *cbdata)
 {
-	INFO("called ControlCommandCallback");
+	DBG("In VisItListener::ControlCommandCallback");
+	SimData* sim = (SimData*)(cbdata);
+	Action* a = ActionManager::Search(std::string(cmd));
+	if(a == NULL) {
+		ERROR("Damaris received the event \"" << cmd << "\" which does not correspond to "
+			<< "any in configuration");
+		return;
+	}
+	if(not a->IsExternallyVisible()) {
+		ERROR("Triggering an action not externally visible: \"" << cmd << "\"");
+		return;
+	}
+	a->call(sim->iteration,-1,args);
 }
 
 visit_handle VisItListener::GetMetaData(void *cbdata)
 {
 	SimData* s = (SimData*)cbdata;
 	visit_handle md = VISIT_INVALID_HANDLE;
+	DBG("Entering GetMetaData");
 	if(VisIt_SimulationMetaData_alloc(&md) == VISIT_OKAY)
 	{
 		VisIt_SimulationMetaData_setMode(md,VISIT_SIMMODE_RUNNING);
 		VisIt_SimulationMetaData_setCycleTime(md, s->iteration, s->iteration);
-		
-		{ // expose Meshes
+	
+		// expose Meshes
+		if(not MeshManager::IsEmpty()) {
 			MeshManager::iterator mesh = MeshManager::Begin();
 			MeshManager::iterator end = MeshManager::End();
 			while(mesh != end) {
@@ -167,8 +182,10 @@ visit_handle VisItListener::GetMetaData(void *cbdata)
 				mesh++;
 			}
 		}
+		DBG("Mesh exposed successfuly");
 
-		{ // expose Variables
+		// expose Variables
+		if(not VariableManager::IsEmpty()) { 
 			VariableManager::iterator var = VariableManager::Begin();
 			VariableManager::iterator end = VariableManager::End();
 			while(var != end) {
@@ -176,6 +193,18 @@ visit_handle VisItListener::GetMetaData(void *cbdata)
 				var++;
 			}
 		}
+		DBG("Variables exposed successfuly");
+
+		// expose commands
+		if(not ActionManager::IsEmpty()) {
+			ActionManager::iterator act = ActionManager::Begin();
+			ActionManager::iterator end = ActionManager::End();
+			while(act != end) {
+				(*act)->exposeVisItMetaData(md);
+				act++;
+			}
+		}
+		DBG("Actions exposed successfuly");
 	}
 	return md;
 }

@@ -43,12 +43,12 @@ namespace Damaris {
 			dlclose(handle);
 	}
 	
-	void DynamicAction::call(int32_t iteration, int32_t sourceID)
+	void DynamicAction::call(int32_t iteration, int32_t sourceID, const char* args)
 	{
 		if(!loaded)
 			load();
 		if(function != NULL)
-			(*function)(getName(),iteration,sourceID);
+			(*function)(getName(),iteration,sourceID,args);
 	}
 
 	void DynamicAction::load()
@@ -70,7 +70,7 @@ namespace Damaris {
 		}
 
 		/* loading function */
-		function = (void (*)(std::string,int32_t, int32_t))
+		function = (void (*)(std::string,int32_t, int32_t, const char*))
 			dlsym(handle,model.action().c_str());
 
 		if ((error = dlerror()) != NULL)  {

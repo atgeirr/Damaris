@@ -26,6 +26,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdint.h>
 #include <string>
 
+#include <VisItDataInterface_V2.h>
 #include "core/Manager.hpp"
 
 namespace Damaris {
@@ -67,7 +68,7 @@ class Action  {
 		 * \param[in,out] mm : pointer to the MetadataManager that contains 
 		 *                     all recorded variables.
 		 */
-		void operator()(int32_t iteration, int32_t sourceID);
+		void operator()(int32_t iteration, int32_t sourceID, const char *args = NULL);
 		
 		/**
 		 * \brief Call the action. To be overloaded by child classes.
@@ -77,7 +78,13 @@ class Action  {
 		 *                     all recorded variables.
 		 * \see Damaris::Actions::operator()
 		 */
-		virtual void call(int32_t iteration, int32_t sourceID) = 0;
+		virtual void call(int32_t iteration, int32_t sourceID, const char *args = NULL) = 0;
+
+		virtual bool IsExternallyVisible() = 0;
+
+#ifdef __ENABLE_VISIT
+		bool exposeVisItMetaData(visit_handle md);
+#endif
 
 		class EmptyAction; 
 };
@@ -90,7 +97,7 @@ class Action  {
  */
 class Action::EmptyAction : public Action {
 
-	void call(int32_t iteration, int32_t sourceID) { }
+	void call(int32_t iteration, int32_t sourceID, const char* args = NULL) { }
 
 };
 }

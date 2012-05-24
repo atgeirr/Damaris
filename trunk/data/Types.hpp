@@ -41,14 +41,6 @@ namespace Types {
 	 */
 	int basicTypeSize(const Model::Type& t);
 	
-	/**
-	 * This function returns a basic type from a string.
-	 * \param[in] str : string holding the name of a type.
-	 * \return The associated basic type or UNDEFINED_TYPE if it does
-	 *         not correspond to any known type.
-	 */
-	Model::Type getTypeFromString(const std::string &str);
-
 }
 }
 #endif

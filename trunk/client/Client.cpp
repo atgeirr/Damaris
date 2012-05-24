@@ -67,7 +67,8 @@ namespace Damaris {
 		Layout* layout = variable->getLayout();
 	
 		if(layout->isUnlimited()) {
-			ERROR("Trying to allocate memory for an unlimited layout");
+			ERROR("The layout as undefined extents or has a variable-sized type, "
+			<< "use chunk-based allocation");
 			return NULL;
 		}
 

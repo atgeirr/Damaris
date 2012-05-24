@@ -35,7 +35,7 @@ PyAction::PyAction(const Model::Script& mdl, const std::string &name)
 {
 }
 	
-void PyAction::call(int32_t iteration, int32_t sourceID)
+void PyAction::call(int32_t iteration, int32_t sourceID, const char* args)
 {
 	try {
 		PyInterpreter* p = Python::PyInterpreter::getInstance();

@@ -47,7 +47,7 @@ class PyAction : public ScriptAction {
 		 * \brief Calls the script.
 		 * \see Damaris::Action::operator()
 		 */
-		void call(int32_t iteration, int32_t sourceID);
+		void call(int32_t iteration, int32_t sourceID, const char* args = NULL);
 
 		static PyAction* New(const Model::Script& mdl, const std::string& name);
 };

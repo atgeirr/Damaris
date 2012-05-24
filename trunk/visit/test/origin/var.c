@@ -80,7 +80,7 @@ simulation_data_dtor(simulation_data *sim)
 {
 }
 
-const char *cmd_names[] = {"halt", "step", "run", "update"};
+const char *cmd_names[] = {"halt2", "step", "run", "update"};
 
 void simulate_one_timestep(simulation_data *sim);
 void read_input_deck(void) { }

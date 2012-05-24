@@ -2827,7 +2827,7 @@ namespace Damaris
       "char",
       "character",
       "string",
-      "undefined"
+      "label"
     };
 
     const Type::value Type::
@@ -2839,11 +2839,11 @@ namespace Damaris
       ::Damaris::Model::Type::float_,
       ::Damaris::Model::Type::int_,
       ::Damaris::Model::Type::integer,
+      ::Damaris::Model::Type::label,
       ::Damaris::Model::Type::long_,
       ::Damaris::Model::Type::real,
       ::Damaris::Model::Type::short_,
-      ::Damaris::Model::Type::string,
-      ::Damaris::Model::Type::undefined
+      ::Damaris::Model::Type::string
     };
 
     // Layout

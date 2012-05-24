@@ -47,7 +47,9 @@ class ScriptAction : public Action, public Configurable<Model::Script> {
 		 * \brief Another way of calling the inner function.
 		 * \see Damaris::Action::operator()
 		 */
-		virtual void call(int32_t iteration, int32_t sourceID) = 0;
+		virtual void call(int32_t iteration, int32_t sourceID, const char* args = NULL) = 0;
+
+		virtual bool IsExternallyVisible() { return model.external(); }
 
 		static ScriptAction* New(const Model::Script& ev, const std::string& name);
 };

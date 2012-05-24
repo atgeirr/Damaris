@@ -25,6 +25,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "core/Debug.hpp"
 #include "core/Environment.hpp"
+#include "data/Types.hpp"
 #include "data/Layout.hpp"
 
 namespace Damaris {
@@ -67,17 +68,12 @@ namespace Damaris {
 
 	bool Layout::isUnlimited() const
 	{
-		return (extents.size() == 1 && extents[0] == -1);
+		return (extents.size() == 1 && extents[0] == -1) 
+				|| (Types::basicTypeSize(model.type()) == -1);
 	}
 
 	Layout* Layout::New(const Model::Layout& mdl, const std::string &name)
 	{
-		if(mdl.type() == Model::Type::undefined) {
-			CFGERROR("Unknown type \"" << mdl.type()
-					<< "\" for layout \"" << mdl.name() << "\"");
-			return NULL;
-		}
-		
 		if(calc == NULL) {
 			calc = new Calc<std::string::const_iterator,ParameterManager::ParameterMap<int> >
 				(ParameterManager::ParameterMap<int>()); 

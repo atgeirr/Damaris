@@ -60,13 +60,18 @@ class NodeAction : public BASE {
 		 * \param[in] sourceID : ID of the client that fired the action.
 		 * \see Damaris::Action::operator()
 		 */
-		virtual void call(int32_t iteration, int32_t sourceID)
+		virtual void call(int32_t iteration, int32_t sourceID, const char* args = NULL)
 		{
+			if(sourceID == -1) { // case of an external call
+				BASE::call(iteration,sourceID,args);
+				return;
+			}
+
 			DBG("Node action called iteration is "<<iteration<<" and source is "<<sourceID);
 			locks[iteration] = locks[iteration] + 1;
 			if(locks[iteration] == clientsPerNode) {
 				DBG("calling base action");
-				BASE::call(iteration,sourceID);
+				BASE::call(iteration,sourceID,args);
 				locks.erase(iteration);
 			}
 		}
@@ -75,7 +80,6 @@ class NodeAction : public BASE {
 		{
 			return new NodeAction<BASE,MODEL>(mdl,name,n);
 		}
-
 };
 
 }

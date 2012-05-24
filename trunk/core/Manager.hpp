@@ -95,6 +95,11 @@ class Manager {
 
 		typedef typename ObjectSet::iterator iterator;
 
+	private:
+		static iterator empty;
+		
+	public:
+
 		template<typename SUBCLASS, typename MODEL>
 		static T* Create(const MODEL &mdl, const std::string& name)
 		{
@@ -126,6 +131,7 @@ class Manager {
 
 		static T* Search(const std::string &name) 
 		{
+			if(objects == NULL) return NULL;
 			typename IndexByName::iterator it = objects->template get<by_name>().find(name);
 			if(it == objects->template get<by_name>().end()) {
 				return NULL;
@@ -137,6 +143,8 @@ class Manager {
 		template<typename FUNCTION>
 		static void ForEach(const FUNCTION& f)
 		{
+			if(IsEmpty()) return;
+
 			iterator it = Begin();
 			for(;it != End(); it++) {
 				f(*(it->get()));
@@ -146,6 +154,7 @@ class Manager {
 
 		static T* Search(const int &id) 
 		{
+			if(objects == NULL) return NULL;
 			typename IndexById::iterator it 
 				= objects->template get<by_id>().find(id);
 			if(it == objects->template get<by_id>().end()) {
@@ -177,6 +186,12 @@ class Manager {
 		{
 			return objects->begin();
 		}
+
+		static bool IsEmpty()
+		{
+			if(objects == NULL) return true;
+			else return (Begin() == End());
+		} 
 };
 
 template <typename T>

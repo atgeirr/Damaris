@@ -20,12 +20,27 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \author Matthieu Dorier
  * \version 0.4
  */
+#include "core/Debug.hpp"
 #include "event/Action.hpp"
 
 namespace Damaris {
 
-	void Action::operator()(int32_t iteration, int32_t sourceID)
+	void Action::operator()(int32_t iteration, int32_t sourceID, const char* args)
 	{
-		call(iteration,sourceID);
+		call(iteration,sourceID,args);
+	}
+
+	bool Action::exposeVisItMetaData(visit_handle h)
+	{
+		visit_handle cmd = VISIT_INVALID_HANDLE;
+		if(not IsExternallyVisible()) return false;
+		DBG("AAAAA");
+		if(VisIt_CommandMetaData_alloc(&cmd) == VISIT_OKAY) {
+			VisIt_CommandMetaData_setName(cmd, getName().c_str());
+			DBG("BBBBB");
+			VisIt_SimulationMetaData_addGenericCommand(h, cmd);
+			return true;
+		}
+		return false;
 	}
 }
