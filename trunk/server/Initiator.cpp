@@ -37,8 +37,9 @@ Client* Initiator::start(const std::string& configFile, MPI_Comm globalcomm)
 	MPI_Comm_size(globalcomm,&size);
 	MPI_Comm_rank(globalcomm,&rank);
 
-	Process::initialize(configFile,rank);
+	Process::initialize(configFile);
 	Process* p = Process::get();
+	/* currently thie Process object had no ID */
 	
 	Environment::setGlobalComm(globalcomm);
 	int clpn = Environment::getClientsPerNode();
@@ -100,6 +101,7 @@ Client* Initiator::start(const std::string& configFile, MPI_Comm globalcomm)
 		// dedicated core mode : the number of servers to create is strictly positive
 		if(is_client) {
 			DBG("Client starting, rank = " << rank);
+			p->setID(rankInEnComm);
 			// the following barrier ensures that the client
 			// won't be created before the servers are started.
 			MPI_Barrier(globalcomm);
@@ -108,6 +110,7 @@ Client* Initiator::start(const std::string& configFile, MPI_Comm globalcomm)
 		} else {
 			DBG("Server starting, rank = " << rank);
 			p->createSharedStructures();
+			p->setID(rankInEnComm);
 			Server server(p);
 			MPI_Barrier(globalcomm);
 			server.run();
@@ -117,10 +120,12 @@ Client* Initiator::start(const std::string& configFile, MPI_Comm globalcomm)
 	} else {
 		// synchronous mode : the servers are attached to each client
 		if(rankInNode != 0) {
+			p->setID(rank);
 			MPI_Barrier(globalcomm);
 			p->openSharedStructures();
 			return new StdAloneClient(p);
 		} else {
+			p->setID(rank);
 			p->createSharedStructures();
 			Client* c = new StdAloneClient(p);
 			MPI_Barrier(globalcomm);
