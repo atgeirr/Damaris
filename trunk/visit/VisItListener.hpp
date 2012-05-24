@@ -53,6 +53,7 @@ class VisItListener {
 		static visit_handle GetMetaData(void *cbdata);
 		static visit_handle GetMesh(int domain, const char *name, void *cbdata);
 		static visit_handle GetVariable(int domain, const char *name, void *cbdata);
+		static visit_handle GetDomainList(const char* name, void* cbdata);
 
 	public:
 		static void init(MPI_Comm c, const Model::Simulation::visit_optional& mdl, 

@@ -30,6 +30,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "core/MeshManager.hpp"
 #include "core/VariableManager.hpp"
 #include "core/ActionManager.hpp"
+#include "core/Environment.hpp"
 #include "visit/VisItListener.hpp"
 
 
@@ -90,6 +91,7 @@ int VisItListener::enterSyncSection(int visitstate)
 				VisItSetGetMetaData(&VisItListener::GetMetaData,(void*)(&sim));
 				VisItSetGetMesh(&VisItListener::GetMesh,(void*)(&sim));
 				VisItSetGetVariable(&VisItListener::GetVariable,(void*)(&sim));
+				VisItSetGetDomainList(&VisItListener::GetDomainList,(void*)(&sim));
 				VisItSetCommandCallback(&VisItListener::ControlCommandCallback,(void*)(&sim));
 			}
 			break;
@@ -235,6 +237,34 @@ visit_handle VisItListener::GetVariable(int domain, const char *name, void *cbda
 	visit_handle h = VISIT_INVALID_HANDLE;
 	if(v != NULL) {
 		v->exposeVisItData(&h,domain,s->iteration);
+	}
+	return h;
+}
+
+visit_handle VisItListener::GetDomainList(const char* name, void* cbdata)
+{
+	visit_handle h = VISIT_INVALID_HANDLE;
+	if(VisIt_DomainList_alloc(&h) != VISIT_ERROR)
+	{
+		visit_handle hdl;
+		int *iptr = NULL;
+
+		std::list<int> clients = Environment::GetKnownLocalClients();
+		int nbrClients = clients.size();
+		int ttlClients = Environment::GetGlobalNumberOfClients();
+
+		std::list<int>::const_iterator it = clients.begin();
+		iptr = (int *)malloc(sizeof(int)*nbrClients);
+		for(int i = 0; i < nbrClients; i++) {
+			iptr[i] = *it;
+			it++;
+		}
+
+		if(VisIt_VariableData_alloc(&hdl) == VISIT_OKAY)
+		{
+			VisIt_VariableData_setDataI(hdl, VISIT_OWNER_VISIT, 1, nbrClients, iptr);
+			VisIt_DomainList_setDomains(h, ttlClients, hdl);
+		}
 	}
 	return h;
 }

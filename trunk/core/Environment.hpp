@@ -24,6 +24,7 @@
 #ifndef __DAMARIS_ENVIRONMENT_H
 #define __DAMARIS_ENVIRONMENT_H
 
+#include <list>
 #include <iostream>
 #include <mpi.h>
 
@@ -42,6 +43,8 @@ namespace Damaris {
 		MPI_Comm entityComm; /*!< clients or servers communicator (depending on the entity). */
 		MPI_Comm globalComm; /*!< global communicator. */
 		MPI_Comm nodeComm;   /*!< communicator for the processors in the node. */
+		
+		std::list<int> knownClients;
 
 		static Environment* env;
 
@@ -77,6 +80,11 @@ namespace Damaris {
 		 */
 		static int getCoresPerNode();
 
+		static const std::list<int>& GetKnownLocalClients();
+
+		static int GetGlobalNumberOfClients();
+
+		static void AddConnectedClient(int id);
 		/**
 		 * \brief Set the communicator gathering processes of the same kind (client or server.
 		 */

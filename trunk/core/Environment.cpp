@@ -59,6 +59,29 @@ namespace Damaris {
 		return env->model.architecture().cores().clients().count();
 	}
 
+	const std::list<int>& Environment::GetKnownLocalClients()
+	{
+		return env->knownClients;
+	}
+
+	void Environment::AddConnectedClient(int id)
+	{
+		std::list<int>::iterator it = env->knownClients.begin();
+		while(it != env->knownClients.end() && (*it) != id) {
+			it++;
+		}
+		if(it == env->knownClients.end()) {
+			env->knownClients.push_back(id);
+		}
+	}
+
+	int Environment::GetGlobalNumberOfClients()
+	{
+		int dcore = 0;
+		MPI_Comm_size(env->entityComm,&dcore);
+		return dcore*getClientsPerNode();
+	}
+
 	std::string Environment::getSimulationName()
 	{
 		if(env == NULL) return "unknown";
