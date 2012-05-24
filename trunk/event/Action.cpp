@@ -34,10 +34,8 @@ namespace Damaris {
 	{
 		visit_handle cmd = VISIT_INVALID_HANDLE;
 		if(not IsExternallyVisible()) return false;
-		DBG("AAAAA");
 		if(VisIt_CommandMetaData_alloc(&cmd) == VISIT_OKAY) {
 			VisIt_CommandMetaData_setName(cmd, getName().c_str());
-			DBG("BBBBB");
 			VisIt_SimulationMetaData_addGenericCommand(h, cmd);
 			return true;
 		}
