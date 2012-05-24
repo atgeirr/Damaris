@@ -64,7 +64,7 @@ int Server::run()
 
 	if(process->getModel()->visit().present()) {
 		Viz::VisItListener::init(Environment::getEntityComm(),
-			process->getModel()->visit().get(),
+			process->getModel()->visit(),
 			Environment::getSimulationName());
 	}
 	

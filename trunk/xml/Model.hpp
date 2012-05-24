@@ -263,6 +263,7 @@ namespace Damaris
     class Event;
     class Script;
     class VisitParam;
+    class PythonParam;
     class Actions;
     class Simulation;
   }
@@ -2331,6 +2332,75 @@ namespace Damaris
       ::xsd::cxx::tree::one< path_type > path_;
     };
 
+    class PythonParam: public ::xml_schema::type
+    {
+      public:
+      // path
+      // 
+      typedef ::xml_schema::string path_type;
+      typedef ::xsd::cxx::tree::traits< path_type, char > path_traits;
+
+      const path_type&
+      path () const;
+
+      path_type&
+      path ();
+
+      void
+      path (const path_type& x);
+
+      void
+      path (::std::auto_ptr< path_type > p);
+
+      // home
+      // 
+      typedef ::xml_schema::string home_type;
+      typedef ::xsd::cxx::tree::traits< home_type, char > home_traits;
+
+      const home_type&
+      home () const;
+
+      home_type&
+      home ();
+
+      void
+      home (const home_type& x);
+
+      void
+      home (::std::auto_ptr< home_type > p);
+
+      // Constructors.
+      //
+      PythonParam (const path_type&,
+                   const home_type&);
+
+      PythonParam (const ::xercesc::DOMElement& e,
+                   ::xml_schema::flags f = 0,
+                   ::xml_schema::container* c = 0);
+
+      PythonParam (const PythonParam& x,
+                   ::xml_schema::flags f = 0,
+                   ::xml_schema::container* c = 0);
+
+      virtual PythonParam*
+      _clone (::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0) const;
+
+      virtual 
+      ~PythonParam ();
+
+      // Implementation.
+      //
+      protected:
+      void
+      parse (::xsd::cxx::xml::dom::parser< char >&,
+             ::xml_schema::flags);
+
+      protected:
+      ::xsd::cxx::tree::one< path_type > path_;
+      ::xsd::cxx::tree::one< home_type > home_;
+    };
+
     class Actions: public ::xml_schema::type
     {
       public:
@@ -2453,6 +2523,27 @@ namespace Damaris
       void
       actions (::std::auto_ptr< actions_type > p);
 
+      // python
+      // 
+      typedef ::Damaris::Model::PythonParam python_type;
+      typedef ::xsd::cxx::tree::optional< python_type > python_optional;
+      typedef ::xsd::cxx::tree::traits< python_type, char > python_traits;
+
+      const python_optional&
+      python () const;
+
+      python_optional&
+      python ();
+
+      void
+      python (const python_type& x);
+
+      void
+      python (const python_optional& x);
+
+      void
+      python (::std::auto_ptr< python_type > p);
+
       // visit
       // 
       typedef ::Damaris::Model::VisitParam visit_type;
@@ -2549,6 +2640,7 @@ namespace Damaris
       ::xsd::cxx::tree::one< architecture_type > architecture_;
       ::xsd::cxx::tree::one< data_type > data_;
       ::xsd::cxx::tree::one< actions_type > actions_;
+      python_optional python_;
       visit_optional visit_;
       ::xsd::cxx::tree::one< name_type > name_;
       ::xsd::cxx::tree::one< language_type > language_;

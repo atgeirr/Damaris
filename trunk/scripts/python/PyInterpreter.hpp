@@ -25,6 +25,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <string>
 
+#include "xml/Model.hpp"
 #include "core/Singleton.hpp"
 
 namespace Damaris {
@@ -63,6 +64,8 @@ namespace Python {
 		 * by source at a given iteration.
 		 */
 		void execFile(const std::string &filename, int source, int iteration);
+
+		static void SetParameters(const Model::PythonParam& mdl);
 	};
 }
 }

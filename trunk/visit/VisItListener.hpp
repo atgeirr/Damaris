@@ -55,7 +55,8 @@ class VisItListener {
 		static visit_handle GetVariable(int domain, const char *name, void *cbdata);
 
 	public:
-		static void init(MPI_Comm c, const Model::VisitParam& mdl, const std::string& simname);
+		static void init(MPI_Comm c, const Model::Simulation::visit_optional& mdl, 
+						const std::string& simname);
 
 		static int connected();
 

@@ -43,21 +43,26 @@ namespace Viz {
 VisItListener::SimData VisItListener::sim = {0};
 MPI_Comm VisItListener::comm = MPI_COMM_NULL;
 
-void VisItListener::init(MPI_Comm c, const Model::VisitParam& mdl, const std::string& simname)
+void VisItListener::init(MPI_Comm c, const Model::Simulation::visit_optional& mdl, 
+				const std::string& simname)
 {
-	char* path;
-	if(mdl.path() != "") {
-		path = (char*)malloc(sizeof(char)*(mdl.path().length()+1));
-		strcpy(path,mdl.path().c_str());
-		VisItSetDirectory(path);
-		free(path);
+	if(mdl.present()) {
+		char* path;
+		if(mdl.get().path() != "") {
+			path = (char*)malloc(sizeof(char)*(mdl.get().path().length()+1));
+			strcpy(path,mdl.get().path().c_str());
+			VisItSetDirectory(path);
+			free(path);
+		}
 	}
 	
 	VisItSetupEnvironment();
 	VisItInitializeSocketAndDumpSimFile(simname.c_str(),"", "", NULL, NULL, NULL);
 	comm = c;
-	if(mdl.path() != "#") {
-		INFO("VisIt-Damaris connection initialized with visit path = " << mdl.path());
+	if(mdl.present()) { 
+		if(mdl.get().path() != "#") {
+			INFO("VisIt-Damaris connection initialized with visit path = " << mdl.get().path());
+		}
 	} else {
 		INFO("VisIt-Damaris connection initialized");
 	}

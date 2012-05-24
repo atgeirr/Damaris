@@ -25,6 +25,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #define PY_ARRAY_UNIQUE_SYMBOL damaris_ARRAY_API
 #include <numpy/arrayobject.h>
 
+#include <stdlib.h>
 #include <string>
 
 #include "core/Debug.hpp"
@@ -111,6 +112,16 @@ PyInterpreter::PyInterpreter()
 PyInterpreter::~PyInterpreter()
 {
 	finalize();
+}
+
+void PyInterpreter::SetParameters(const Model::PythonParam& mdl)
+{
+	if(mdl.path() != "") {
+		setenv("PYTHONPATH", mdl.path().c_str(),0);
+	}
+	if(mdl.home() != "") {
+		setenv("PYTHONHOME", mdl.home().c_str(),0);
+	}
 }
 
 void PyInterpreter::initialize()

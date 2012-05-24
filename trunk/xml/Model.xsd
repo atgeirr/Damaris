@@ -232,6 +232,14 @@
 		</xs:sequence>
 	</xs:complexType>
 
+	<!-- Parameters related to Python -->
+	<xs:complexType name="PythonParam">
+		<xs:sequence>	
+			<xs:element name="path" type="xs:string"/>
+			<xs:element name="home" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+
 	<!-- Actions node -->
 	<xs:complexType name="Actions">
 		<xs:sequence>
@@ -248,6 +256,7 @@
 			<xs:element name="architecture" type="mdl:Architecture" minOccurs="1" maxOccurs="1"/>
 			<xs:element name="data" type="mdl:Data" maxOccurs="1"/>
 			<xs:element name="actions" type="mdl:Actions" maxOccurs="1"/>
+			<xs:element name="python" type="mdl:PythonParam" maxOccurs="1" minOccurs="0"/>
 			<xs:element name="visit" type="mdl:VisitParam" maxOccurs="1" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="name"     type="xs:string" use="required"/>

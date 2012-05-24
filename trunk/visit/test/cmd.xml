@@ -16,4 +16,8 @@
 	<visit>
 		<path>/home/mdorier/Work/Visu2/visit2.5.0/src</path>
 	</visit>
+	<python>
+		<path>/home/mdorier/deploy/lib/python2.6</path>
+		<home>/home/mdorier/deploy</home>
+	</python>
 </simulation>

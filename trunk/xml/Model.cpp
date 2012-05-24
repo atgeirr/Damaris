@@ -1827,6 +1827,58 @@ namespace Damaris
     }
 
 
+    // PythonParam
+    // 
+
+    const PythonParam::path_type& PythonParam::
+    path () const
+    {
+      return this->path_.get ();
+    }
+
+    PythonParam::path_type& PythonParam::
+    path ()
+    {
+      return this->path_.get ();
+    }
+
+    void PythonParam::
+    path (const path_type& x)
+    {
+      this->path_.set (x);
+    }
+
+    void PythonParam::
+    path (::std::auto_ptr< path_type > x)
+    {
+      this->path_.set (x);
+    }
+
+    const PythonParam::home_type& PythonParam::
+    home () const
+    {
+      return this->home_.get ();
+    }
+
+    PythonParam::home_type& PythonParam::
+    home ()
+    {
+      return this->home_.get ();
+    }
+
+    void PythonParam::
+    home (const home_type& x)
+    {
+      this->home_.set (x);
+    }
+
+    void PythonParam::
+    home (::std::auto_ptr< home_type > x)
+    {
+      this->home_.set (x);
+    }
+
+
     // Actions
     // 
 
@@ -1940,6 +1992,36 @@ namespace Damaris
     actions (::std::auto_ptr< actions_type > x)
     {
       this->actions_.set (x);
+    }
+
+    const Simulation::python_optional& Simulation::
+    python () const
+    {
+      return this->python_;
+    }
+
+    Simulation::python_optional& Simulation::
+    python ()
+    {
+      return this->python_;
+    }
+
+    void Simulation::
+    python (const python_type& x)
+    {
+      this->python_.set (x);
+    }
+
+    void Simulation::
+    python (const python_optional& x)
+    {
+      this->python_ = x;
+    }
+
+    void Simulation::
+    python (::std::auto_ptr< python_type > x)
+    {
+      this->python_.set (x);
     }
 
     const Simulation::visit_optional& Simulation::
@@ -4622,6 +4704,111 @@ namespace Damaris
     {
     }
 
+    // PythonParam
+    //
+
+    PythonParam::
+    PythonParam (const path_type& path,
+                 const home_type& home)
+    : ::xml_schema::type (),
+      path_ (path, ::xml_schema::flags (), this),
+      home_ (home, ::xml_schema::flags (), this)
+    {
+    }
+
+    PythonParam::
+    PythonParam (const PythonParam& x,
+                 ::xml_schema::flags f,
+                 ::xml_schema::container* c)
+    : ::xml_schema::type (x, f, c),
+      path_ (x.path_, f, this),
+      home_ (x.home_, f, this)
+    {
+    }
+
+    PythonParam::
+    PythonParam (const ::xercesc::DOMElement& e,
+                 ::xml_schema::flags f,
+                 ::xml_schema::container* c)
+    : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+      path_ (f, this),
+      home_ (f, this)
+    {
+      if ((f & ::xml_schema::flags::base) == 0)
+      {
+        ::xsd::cxx::xml::dom::parser< char > p (e, true, false);
+        this->parse (p, f);
+      }
+    }
+
+    void PythonParam::
+    parse (::xsd::cxx::xml::dom::parser< char >& p,
+           ::xml_schema::flags f)
+    {
+      for (; p.more_elements (); p.next_element ())
+      {
+        const ::xercesc::DOMElement& i (p.cur_element ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        // path
+        //
+        if (n.name () == "path" && n.namespace_ () == "http://damaris.gforge.inria.fr/Damaris/Model")
+        {
+          ::std::auto_ptr< path_type > r (
+            path_traits::create (i, f, this));
+
+          if (!path_.present ())
+          {
+            this->path_.set (r);
+            continue;
+          }
+        }
+
+        // home
+        //
+        if (n.name () == "home" && n.namespace_ () == "http://damaris.gforge.inria.fr/Damaris/Model")
+        {
+          ::std::auto_ptr< home_type > r (
+            home_traits::create (i, f, this));
+
+          if (!home_.present ())
+          {
+            this->home_.set (r);
+            continue;
+          }
+        }
+
+        break;
+      }
+
+      if (!path_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_element< char > (
+          "path",
+          "http://damaris.gforge.inria.fr/Damaris/Model");
+      }
+
+      if (!home_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_element< char > (
+          "home",
+          "http://damaris.gforge.inria.fr/Damaris/Model");
+      }
+    }
+
+    PythonParam* PythonParam::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class PythonParam (*this, f, c);
+    }
+
+    PythonParam::
+    ~PythonParam ()
+    {
+    }
+
     // Actions
     //
 
@@ -4721,6 +4908,7 @@ namespace Damaris
       architecture_ (architecture, ::xml_schema::flags (), this),
       data_ (data, ::xml_schema::flags (), this),
       actions_ (actions, ::xml_schema::flags (), this),
+      python_ (::xml_schema::flags (), this),
       visit_ (::xml_schema::flags (), this),
       name_ (name, ::xml_schema::flags (), this),
       language_ (language_default_value (), ::xml_schema::flags (), this)
@@ -4736,6 +4924,7 @@ namespace Damaris
       architecture_ (architecture, ::xml_schema::flags (), this),
       data_ (data, ::xml_schema::flags (), this),
       actions_ (actions, ::xml_schema::flags (), this),
+      python_ (::xml_schema::flags (), this),
       visit_ (::xml_schema::flags (), this),
       name_ (name, ::xml_schema::flags (), this),
       language_ (language_default_value (), ::xml_schema::flags (), this)
@@ -4750,6 +4939,7 @@ namespace Damaris
       architecture_ (x.architecture_, f, this),
       data_ (x.data_, f, this),
       actions_ (x.actions_, f, this),
+      python_ (x.python_, f, this),
       visit_ (x.visit_, f, this),
       name_ (x.name_, f, this),
       language_ (x.language_, f, this)
@@ -4764,6 +4954,7 @@ namespace Damaris
       architecture_ (f, this),
       data_ (f, this),
       actions_ (f, this),
+      python_ (f, this),
       visit_ (f, this),
       name_ (f, this),
       language_ (f, this)
@@ -4823,6 +5014,20 @@ namespace Damaris
           if (!actions_.present ())
           {
             this->actions_.set (r);
+            continue;
+          }
+        }
+
+        // python
+        //
+        if (n.name () == "python" && n.namespace_ () == "http://damaris.gforge.inria.fr/Damaris/Model")
+        {
+          ::std::auto_ptr< python_type > r (
+            python_traits::create (i, f, this));
+
+          if (!this->python_)
+          {
+            this->python_.set (r);
             continue;
           }
         }
