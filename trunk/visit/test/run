@@ -1,0 +1,5 @@
+#!/bin/sh
+LD_LIBRARY_PATH=. \
+PYTHONPATH=$HOME/deploy/lib/python2.6 \
+PYTHONHOME=$HOME/deploy \
+../../server/server --configuration=$1
