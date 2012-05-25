@@ -51,7 +51,7 @@ class Process {
 		 * \param[in] conf : name of the configuration file to load.
 		 * \param[in] id : id of the process.
 		 */
-		void init(const std::string& conf, int32_t id);
+		void init(const std::string& conf, int32_t id = -1);
 
 		bool sharedStructuresOwner; /*!< This variable indicates wether the process
 						 has created the shared structures of not.
@@ -67,7 +67,7 @@ class Process {
 		 * \param[in] config : name of an XML configuration file.
 		 * \param[in] id : id of the process (should be unique).
 		 */
-		Process(const std::string & config, int32_t id);
+		Process(const std::string & config, int32_t id = -1);
 
 		/**
 		 * Destructor. This function is private, use Process:kill instead.
@@ -91,7 +91,7 @@ class Process {
 		 * \param[in] config : name of the configuration file.
 		 * \param[in] id : id of the process.
 		 */	
-		static void initialize(const std::string &config, int32_t id);		
+		static void initialize(const std::string &config, int32_t id = -1);		
 
 		/**
 		 * Kill the singleton instance of Process.
@@ -134,6 +134,11 @@ class Process {
 		int getID() const
 		{
 			return id;
+		}
+
+		void setID(int i) 
+		{
+			id = i;
 		}
 
 }; // class Process 

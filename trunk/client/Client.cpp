@@ -42,6 +42,16 @@ namespace Damaris {
 		Process::initialize(cfg,id);
 		Process* p = Process::get();
 		p->openSharedStructures();
+
+		// sends a message to the server to say that a new client
+		// is now connected	
+		Message msg;
+		msg.type = MSG_INT;
+		msg.source = id;
+		msg.iteration = 0;
+		msg.object = CLIENT_CONNECTED;
+		p->getSharedMessageQueue()->send(&msg);
+	
 		return new Client(p);
 	}
 

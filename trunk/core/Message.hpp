@@ -42,9 +42,10 @@ namespace Damaris {
  * The internal events naming.
  */
 	enum int_msg_e {
-		KILL_SERVER = 0,
-		URGENT_CLEAN = 1,
-		LOST_DATA = 2
+		CLIENT_CONNECTED,
+		KILL_SERVER,
+		URGENT_CLEAN,
+		LOST_DATA
 	};
 
 /**
