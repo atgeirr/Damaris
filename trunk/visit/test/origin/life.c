@@ -641,6 +641,7 @@ int main(int argc, char **argv)
     simulation_data_ctor(&sim);
 
     SimulationArguments(argc, argv);
+	VisItSetDirectory("/home/mdorier/Work/Visu2/visit2.5.0/src");
     VisItSetupEnvironment();
 
 #ifdef PARALLEL

@@ -47,6 +47,9 @@ class VisItListener {
 		static void broadcastSlaveCommand(int *command);
 		static void slaveProcessCallback();
 		static bool processVisItCommand();
+		
+		static int BroadcastIntCallback(int *value, int sender);
+		static int BroadcastStringCallback(char *str, int len, int sender);
 
 		static void ControlCommandCallback(const char *cmd, const char *args, void *cbdata);
 
@@ -56,12 +59,12 @@ class VisItListener {
 		static visit_handle GetDomainList(const char* name, void* cbdata);
 
 	public:
-		static void init(MPI_Comm c, const Model::Simulation::visit_optional& mdl, 
+		static void Init(MPI_Comm c, const Model::Simulation::visit_optional& mdl, 
 						const std::string& simname);
 
-		static int connected();
+		static int Connected();
 
-		static int enterSyncSection(int visitstat);
+		static int EnterSyncSection(int visitstat);
 
 };
 

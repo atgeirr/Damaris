@@ -2288,23 +2288,48 @@ namespace Damaris
       // path
       // 
       typedef ::xml_schema::string path_type;
+      typedef ::xsd::cxx::tree::optional< path_type > path_optional;
       typedef ::xsd::cxx::tree::traits< path_type, char > path_traits;
 
-      const path_type&
+      const path_optional&
       path () const;
 
-      path_type&
+      path_optional&
       path ();
 
       void
       path (const path_type& x);
 
       void
+      path (const path_optional& x);
+
+      void
       path (::std::auto_ptr< path_type > p);
+
+      // options
+      // 
+      typedef ::xml_schema::string options_type;
+      typedef ::xsd::cxx::tree::optional< options_type > options_optional;
+      typedef ::xsd::cxx::tree::traits< options_type, char > options_traits;
+
+      const options_optional&
+      options () const;
+
+      options_optional&
+      options ();
+
+      void
+      options (const options_type& x);
+
+      void
+      options (const options_optional& x);
+
+      void
+      options (::std::auto_ptr< options_type > p);
 
       // Constructors.
       //
-      VisitParam (const path_type&);
+      VisitParam ();
 
       VisitParam (const ::xercesc::DOMElement& e,
                   ::xml_schema::flags f = 0,
@@ -2329,7 +2354,8 @@ namespace Damaris
              ::xml_schema::flags);
 
       protected:
-      ::xsd::cxx::tree::one< path_type > path_;
+      path_optional path_;
+      options_optional options_;
     };
 
     class PythonParam: public ::xml_schema::type

@@ -44,32 +44,41 @@ namespace Viz {
 VisItListener::SimData VisItListener::sim = {0};
 MPI_Comm VisItListener::comm = MPI_COMM_NULL;
 
-void VisItListener::init(MPI_Comm c, const Model::Simulation::visit_optional& mdl, 
+void VisItListener::Init(MPI_Comm c, const Model::Simulation::visit_optional& mdl, 
 				const std::string& simname)
 {
 	if(mdl.present()) {
-		char* path;
-		if(mdl.get().path() != "") {
-			path = (char*)malloc(sizeof(char)*(mdl.get().path().length()+1));
-			strcpy(path,mdl.get().path().c_str());
-			VisItSetDirectory(path);
-			free(path);
+		char* s;
+		if(mdl.get().path().present()) {
+			s = (char*)malloc(mdl.get().path().get().length()+1);
+			strcpy(s,mdl.get().path().get().c_str());
+			VisItSetDirectory(s);
+			free(s);
+		}
+		if(mdl.get().options().present()) {
+			s = (char*)malloc(mdl.get().options().get().length()+1);
+			strcpy(s,mdl.get().options().get().c_str());
+			VisItSetOptions(s);
+			free(s);
 		}
 	}
 	
 	VisItSetupEnvironment();
 	VisItInitializeSocketAndDumpSimFile(simname.c_str(),"", "", NULL, NULL, NULL);
 	comm = c;
-	if(mdl.present()) { 
-		if(mdl.get().path() != "#") {
-			INFO("VisIt-Damaris connection initialized with visit path = " << mdl.get().path());
-		}
-	} else {
-		INFO("VisIt-Damaris connection initialized");
-	}
+
+	VisItSetBroadcastIntFunction(&BroadcastIntCallback);
+	VisItSetBroadcastStringFunction(&BroadcastStringCallback);
+
+	int rank, size;
+	MPI_Comm_rank(comm,&rank);
+	MPI_Comm_size(comm,&size);
+
+	VisItSetParallel(size > 1);
+	VisItSetParallelRank(rank);
 }
 
-int VisItListener::connected()
+int VisItListener::Connected()
 {
 	int visitstate = VisItDetectInput(0, -1);
 	if(visitstate >= -5 && visitstate <= -1) {
@@ -80,7 +89,7 @@ int VisItListener::connected()
 	return visitstate;
 }
 
-int VisItListener::enterSyncSection(int visitstate)
+int VisItListener::EnterSyncSection(int visitstate)
 {
 	DBG("Entering Sync Section, visit state is " << visitstate);
 	switch(visitstate) {
@@ -151,6 +160,16 @@ bool VisItListener::processVisItCommand()
 		}
 	}
 	return true;
+}
+
+int VisItListener::BroadcastIntCallback(int *value, int sender)
+{
+	return MPI_Bcast(value, 1, MPI_INT, sender, comm);
+}
+
+int VisItListener::BroadcastStringCallback(char *str, int len, int sender)
+{
+	return MPI_Bcast(str, len, MPI_CHAR, sender, comm);
 }
 
 void VisItListener::ControlCommandCallback(const char *cmd, const char *args, void *cbdata)

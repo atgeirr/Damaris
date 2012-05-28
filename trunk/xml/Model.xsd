@@ -228,7 +228,8 @@
 	<!-- Parameters related to VisIt -->
 	<xs:complexType name="VisitParam">
 		<xs:sequence>
-			<xs:element name="path" type="xs:string"/>
+			<xs:element name="path" type="xs:string" maxOccurs="1" minOccurs="0"/>
+			<xs:element name="options" type="xs:string" maxOccurs="1" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
 

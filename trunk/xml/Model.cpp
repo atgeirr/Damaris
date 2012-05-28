@@ -1802,16 +1802,16 @@ namespace Damaris
     // VisitParam
     // 
 
-    const VisitParam::path_type& VisitParam::
+    const VisitParam::path_optional& VisitParam::
     path () const
     {
-      return this->path_.get ();
+      return this->path_;
     }
 
-    VisitParam::path_type& VisitParam::
+    VisitParam::path_optional& VisitParam::
     path ()
     {
-      return this->path_.get ();
+      return this->path_;
     }
 
     void VisitParam::
@@ -1821,9 +1821,45 @@ namespace Damaris
     }
 
     void VisitParam::
+    path (const path_optional& x)
+    {
+      this->path_ = x;
+    }
+
+    void VisitParam::
     path (::std::auto_ptr< path_type > x)
     {
       this->path_.set (x);
+    }
+
+    const VisitParam::options_optional& VisitParam::
+    options () const
+    {
+      return this->options_;
+    }
+
+    VisitParam::options_optional& VisitParam::
+    options ()
+    {
+      return this->options_;
+    }
+
+    void VisitParam::
+    options (const options_type& x)
+    {
+      this->options_.set (x);
+    }
+
+    void VisitParam::
+    options (const options_optional& x)
+    {
+      this->options_ = x;
+    }
+
+    void VisitParam::
+    options (::std::auto_ptr< options_type > x)
+    {
+      this->options_.set (x);
     }
 
 
@@ -4628,9 +4664,10 @@ namespace Damaris
     //
 
     VisitParam::
-    VisitParam (const path_type& path)
+    VisitParam ()
     : ::xml_schema::type (),
-      path_ (path, ::xml_schema::flags (), this)
+      path_ (::xml_schema::flags (), this),
+      options_ (::xml_schema::flags (), this)
     {
     }
 
@@ -4639,7 +4676,8 @@ namespace Damaris
                 ::xml_schema::flags f,
                 ::xml_schema::container* c)
     : ::xml_schema::type (x, f, c),
-      path_ (x.path_, f, this)
+      path_ (x.path_, f, this),
+      options_ (x.options_, f, this)
     {
     }
 
@@ -4648,7 +4686,8 @@ namespace Damaris
                 ::xml_schema::flags f,
                 ::xml_schema::container* c)
     : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
-      path_ (f, this)
+      path_ (f, this),
+      options_ (f, this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
       {
@@ -4674,21 +4713,28 @@ namespace Damaris
           ::std::auto_ptr< path_type > r (
             path_traits::create (i, f, this));
 
-          if (!path_.present ())
+          if (!this->path_)
           {
             this->path_.set (r);
             continue;
           }
         }
 
-        break;
-      }
+        // options
+        //
+        if (n.name () == "options" && n.namespace_ () == "http://damaris.gforge.inria.fr/Damaris/Model")
+        {
+          ::std::auto_ptr< options_type > r (
+            options_traits::create (i, f, this));
 
-      if (!path_.present ())
-      {
-        throw ::xsd::cxx::tree::expected_element< char > (
-          "path",
-          "http://damaris.gforge.inria.fr/Damaris/Model");
+          if (!this->options_)
+          {
+            this->options_.set (r);
+            continue;
+          }
+        }
+
+        break;
       }
     }
 

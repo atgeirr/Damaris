@@ -63,7 +63,7 @@ int Server::run()
 	DBG("Successfully entered in \"run\" mode");
 
 	if(process->getModel()->visit().present()) {
-		Viz::VisItListener::init(Environment::getEntityComm(),
+		Viz::VisItListener::Init(Environment::getEntityComm(),
 			process->getModel()->visit(),
 			Environment::getSimulationName());
 	}
@@ -81,8 +81,8 @@ int Server::run()
 			processMessage(msg);
 		}
 		
-		if((vizstt = Viz::VisItListener::connected()) > 0) {
-			Viz::VisItListener::enterSyncSection(vizstt);
+		if((vizstt = Viz::VisItListener::Connected()) > 0) {
+			Viz::VisItListener::EnterSyncSection(vizstt);
 		}
 	}
 	
