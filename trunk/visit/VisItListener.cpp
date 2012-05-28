@@ -84,7 +84,7 @@ int VisItListener::Connected()
 	if(visitstate >= -5 && visitstate <= -1) {
 		ERROR("Uncaught VisIt error");
 	} else if(visitstate == 1) {
-		INFO("VisIt first attempt to connect...");
+		INFO("VisIt first attempt to connect");
 	}
 	return visitstate;
 }
