@@ -35,6 +35,9 @@ Variable::Variable(const Model::Variable& mdl, const std::string &n, Layout* l)
 
 void Variable::attachChunk(Chunk* chunk)
 {
+	if(not model.time_varying()) {
+		chunk->setIteration(0);
+	}
 	chunks.insert(boost::shared_ptr<Chunk>(chunk));
 }
 
@@ -55,6 +58,10 @@ ChunkIndexByIteration::iterator Variable::getChunksByIteration(int iteration,
 ChunkIndexByIteration::iterator Variable::getChunksByIterationsRange(int itstart, int itend,
             ChunkIndexByIteration::iterator& end)
 {
+	if(not model.time_varying()) {
+		itstart = 0;
+		itend = 0;
+	}
 	ChunkIndexByIteration::iterator it = chunks.get<by_iteration>().lower_bound(itstart);
     end = chunks.get<by_iteration>().upper_bound(itend);
     return it;
@@ -68,6 +75,9 @@ ChunkIndex::iterator Variable::getChunks(ChunkIndex::iterator &end)
 
 ChunkIndex::iterator Variable::getChunks(int source, int iteration, ChunkIndex::iterator &end)
 {
+	if(not model.time_varying()) {
+		iteration = 0;
+	}
 	end = chunks.get<by_any>().end();
 	return chunks.get<by_any>().find(boost::make_tuple(source,iteration));
 }

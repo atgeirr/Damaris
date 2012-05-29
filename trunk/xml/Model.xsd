@@ -127,6 +127,7 @@
 				<xs:attribute name="type"    type="mdl:VarType" use="optional" default="scalar" />
 				<xs:attribute name="centering" type="mdl:VarCentering" use="optional" default="zonal" />
 				<xs:attribute name="visualizable" type="xs:boolean" use="optional" default="true" />
+				<xs:attribute name="time-varying" type="xs:boolean" use="optional" default="true" />
 			</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>

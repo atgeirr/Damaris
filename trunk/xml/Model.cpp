@@ -984,6 +984,30 @@ namespace Damaris
       return visualizable_type (true);
     }
 
+    const Variable::time_varying_type& Variable::
+    time_varying () const
+    {
+      return this->time_varying_.get ();
+    }
+
+    Variable::time_varying_type& Variable::
+    time_varying ()
+    {
+      return this->time_varying_.get ();
+    }
+
+    void Variable::
+    time_varying (const time_varying_type& x)
+    {
+      this->time_varying_.set (x);
+    }
+
+    Variable::time_varying_type Variable::
+    time_varying_default_value ()
+    {
+      return time_varying_type (true);
+    }
+
 
     // Group
     // 
@@ -3335,7 +3359,8 @@ namespace Damaris
       mesh_ (mesh_default_value (), ::xml_schema::flags (), this),
       type_ (type_default_value (), ::xml_schema::flags (), this),
       centering_ (centering_default_value (), ::xml_schema::flags (), this),
-      visualizable_ (visualizable_default_value (), ::xml_schema::flags (), this)
+      visualizable_ (visualizable_default_value (), ::xml_schema::flags (), this),
+      time_varying_ (time_varying_default_value (), ::xml_schema::flags (), this)
     {
     }
 
@@ -3351,7 +3376,8 @@ namespace Damaris
       mesh_ (mesh_default_value (), ::xml_schema::flags (), this),
       type_ (type_default_value (), ::xml_schema::flags (), this),
       centering_ (centering_default_value (), ::xml_schema::flags (), this),
-      visualizable_ (visualizable_default_value (), ::xml_schema::flags (), this)
+      visualizable_ (visualizable_default_value (), ::xml_schema::flags (), this),
+      time_varying_ (time_varying_default_value (), ::xml_schema::flags (), this)
     {
     }
 
@@ -3367,7 +3393,8 @@ namespace Damaris
       mesh_ (mesh_default_value (), ::xml_schema::flags (), this),
       type_ (type_default_value (), ::xml_schema::flags (), this),
       centering_ (centering_default_value (), ::xml_schema::flags (), this),
-      visualizable_ (visualizable_default_value (), ::xml_schema::flags (), this)
+      visualizable_ (visualizable_default_value (), ::xml_schema::flags (), this),
+      time_varying_ (time_varying_default_value (), ::xml_schema::flags (), this)
     {
     }
 
@@ -3383,7 +3410,8 @@ namespace Damaris
       mesh_ (mesh_default_value (), ::xml_schema::flags (), this),
       type_ (type_default_value (), ::xml_schema::flags (), this),
       centering_ (centering_default_value (), ::xml_schema::flags (), this),
-      visualizable_ (visualizable_default_value (), ::xml_schema::flags (), this)
+      visualizable_ (visualizable_default_value (), ::xml_schema::flags (), this),
+      time_varying_ (time_varying_default_value (), ::xml_schema::flags (), this)
     {
     }
 
@@ -3399,7 +3427,8 @@ namespace Damaris
       mesh_ (x.mesh_, f, this),
       type_ (x.type_, f, this),
       centering_ (x.centering_, f, this),
-      visualizable_ (x.visualizable_, f, this)
+      visualizable_ (x.visualizable_, f, this),
+      time_varying_ (x.time_varying_, f, this)
     {
     }
 
@@ -3415,7 +3444,8 @@ namespace Damaris
       mesh_ (f, this),
       type_ (f, this),
       centering_ (f, this),
-      visualizable_ (f, this)
+      visualizable_ (f, this),
+      time_varying_ (f, this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
       {
@@ -3499,6 +3529,12 @@ namespace Damaris
           this->visualizable_.set (visualizable_traits::create (i, f, this));
           continue;
         }
+
+        if (n.name () == "time-varying" && n.namespace_ ().empty ())
+        {
+          this->time_varying_.set (time_varying_traits::create (i, f, this));
+          continue;
+        }
       }
 
       if (!name_.present ())
@@ -3543,6 +3579,11 @@ namespace Damaris
       if (!visualizable_.present ())
       {
         this->visualizable_.set (visualizable_default_value ());
+      }
+
+      if (!time_varying_.present ())
+      {
+        this->time_varying_.set (time_varying_default_value ());
       }
     }
 

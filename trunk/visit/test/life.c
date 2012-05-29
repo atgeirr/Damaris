@@ -7,8 +7,6 @@
  * Some initial conditions were taken from the Game of life Wiki page on Wikipedia
  ******************************************************************************/
 
-#include <VisItControlInterface_V2.h>
-#include <VisItDataInterface_V2.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -17,17 +15,7 @@
 #ifdef PARALLEL
 #include <mpi.h>
 #endif
-#include "SimulationExample.h"
-
-#define VISIT_COMMAND_PROCESS 0
-#define VISIT_COMMAND_SUCCESS 1
-#define VISIT_COMMAND_FAILURE 2
-
-/* Data Access Function prototypes */
-visit_handle SimGetMetaData(void *);
-visit_handle SimGetMesh(int, const char *, void *);
-visit_handle SimGetVariable(int, const char *, void *);
-visit_handle SimGetDomainList(const char *, void *);
+#include "Damaris.h"
 
 /******************************************************************************
  * Life data and functions
@@ -329,14 +317,10 @@ life_data_ResetInitialConditions(life_data *life, BCtype bc)
  * Simulation data and functions
  ******************************************************************************/
 
-#define SIM_STOPPED       0
-#define SIM_RUNNING       1
-
 typedef struct
 {
     int       cycle;
     double    time;
-    int       runMode;
     int       done;
     int       par_rank;
     int       par_size;
@@ -348,9 +332,8 @@ typedef struct
 void
 simulation_data_ctor(simulation_data *sim)
 {
-    sim->cycle = 0;
+    sim->cycle = -1;
     sim->time = 0.;
-    sim->runMode = SIM_STOPPED;
     sim->done = 0;
     sim->par_rank = 0;
     sim->par_size = 1;
@@ -364,8 +347,6 @@ simulation_data_dtor(simulation_data *sim)
     life_data_dtor(&sim->life);
 }
 
-const char *cmd_names[] = {"halt", "step", "run", "update", "reset"};
-
 /******************************************************************************
  ******************************************************************************
  ***
@@ -377,159 +358,15 @@ const char *cmd_names[] = {"halt", "step", "run", "update", "reset"};
 void
 simulate_one_timestep(simulation_data *sim)
 {
-    ++sim->cycle;
-    sim->time += 1;
-
     /* Simulate the current round of life. */
     life_data_simulate(&sim->life, sim->par_rank, sim->par_size);
 
-    VisItTimeStepChanged();
-    VisItUpdatePlots();
-}
+	
+	++sim->cycle;
+    sim->time += 1;
 
-/* Callback function for control commands, which are the buttons in the 
- * GUI's Simulation window. This type of command is handled automatically
- * provided that you have registered a command callback such as this.
- */
-void ControlCommandCallback(const char *cmd, const char *args, void *cbdata)
-{
-    simulation_data *sim = (simulation_data *)cbdata;
-
-    if(strcmp(cmd, "halt") == 0)
-        sim->runMode = SIM_STOPPED;
-    else if(strcmp(cmd, "step") == 0)
-        simulate_one_timestep(sim);
-    else if(strcmp(cmd, "run") == 0)
-        sim->runMode = SIM_RUNNING;
-    else if(strcmp(cmd, "update") == 0)
-    {
-        VisItTimeStepChanged();
-        VisItUpdatePlots();
-    }
-    else if(strcmp(cmd, "reset") == 0)
-    {
-        life_data_ResetInitialConditions(&sim->life, RANDOM);
-        VisItTimeStepChanged();
-        VisItUpdatePlots();
-    }
-}
-
-#ifdef PARALLEL
-static int visit_broadcast_int_callback(int *value, int sender)
-{
-    return MPI_Bcast(value, 1, MPI_INT, sender, MPI_COMM_WORLD);
-}
-
-static int visit_broadcast_string_callback(char *str, int len, int sender)
-{
-    return MPI_Bcast(str, len, MPI_CHAR, sender, MPI_COMM_WORLD);
-}
-#endif
-
-
-/* Helper function for ProcessVisItCommand */
-static void BroadcastSlaveCommand(int *command)
-{
-#ifdef PARALLEL
-    MPI_Bcast(command, 1, MPI_INT, 0, MPI_COMM_WORLD);
-#endif
-}
-
-/* Callback involved in command communication. */
-void SlaveProcessCallback()
-{
-   int command = VISIT_COMMAND_PROCESS;
-   BroadcastSlaveCommand(&command);
-}
-
-/* Process commands from viewer on all processors. */
-int ProcessVisItCommand(simulation_data *sim)
-{
-    int command;
-    if (sim->par_rank==0)
-    {  
-        int success = VisItProcessEngineCommand();
-
-        if (success == VISIT_OKAY)
-        {
-            command = VISIT_COMMAND_SUCCESS;
-            BroadcastSlaveCommand(&command);
-            return 1;
-        }
-        else
-        {
-            command = VISIT_COMMAND_FAILURE;
-            BroadcastSlaveCommand(&command);
-            return 0;
-        }
-    }
-    else
-    {
-        /* Note: only through the SlaveProcessCallback callback
-         * above can the rank 0 process send a VISIT_COMMAND_PROCESS
-         * instruction to the non-rank 0 processes. */
-        while (1)
-        {
-            BroadcastSlaveCommand(&command);
-            switch (command)
-            {
-            case VISIT_COMMAND_PROCESS:
-                VisItProcessEngineCommand();
-                break;
-            case VISIT_COMMAND_SUCCESS:
-                return 1;
-            case VISIT_COMMAND_FAILURE:
-                return 0;
-            }
-        }
-    }
-}
-
-/* Called to handle case 3 from VisItDetectInput where we have console
- * input that needs to be processed in order to accomplish an action.
- */
-void
-ProcessConsoleCommand(simulation_data *sim)
-{
-    /* Read A Command */
-    char cmd[1000];
-    if (sim->par_rank == 0)
-    {
-        int iseof = (fgets(cmd, 1000, stdin) == NULL);
-        if (iseof)
-        {
-            sprintf(cmd, "quit");
-            printf("quit\n");
-        }
-
-        if (strlen(cmd)>0 && cmd[strlen(cmd)-1] == '\n')
-            cmd[strlen(cmd)-1] = '\0';
-    }
-
-#ifdef PARALLEL
-    /* Broadcast the command to all processors. */
-    MPI_Bcast(cmd, 1000, MPI_CHAR, 0, MPI_COMM_WORLD);
-#endif
-
-    if(strcmp(cmd, "quit") == 0)
-        sim->done = 1;
-    else if(strcmp(cmd, "halt") == 0)
-        sim->runMode = SIM_STOPPED;
-    else if(strcmp(cmd, "step") == 0)
-        simulate_one_timestep(sim);
-    else if(strcmp(cmd, "run") == 0)
-        sim->runMode = SIM_RUNNING;
-    else if(strcmp(cmd, "update") == 0)
-    {
-        VisItTimeStepChanged();
-        VisItUpdatePlots();
-    }
-    else if(strcmp(cmd, "reset") == 0)
-    {
-        VisItTimeStepChanged();
-        life_data_ResetInitialConditions(&sim->life, RANDOM);
-        VisItUpdatePlots();
-    }
+//    VisItTimeStepChanged();
+//    VisItUpdatePlots();
 }
 
 /******************************************************************************
@@ -545,79 +382,23 @@ ProcessConsoleCommand(simulation_data *sim)
 
 void mainloop(simulation_data *sim)
 {
-    int blocking, visitstate, err = 0;
+//	do {
+			simulate_one_timestep(sim);
+			exposeDataToDamaris(sim);
+//    } while(!sim->done);
+}
 
-    if (sim->par_rank == 0)
-    {
-        fprintf(stderr, "command> ");
-        fflush(stderr);
-    }
-    do
-    {
-        blocking = (sim->runMode == VISIT_SIMMODE_RUNNING) ? 0 : 1;
+void exposeDataToDamaris(simulation_data* sim) {
+	static int firstCall = 0;
+	
+	if(firstCall == 0) {
+		DC_write("coordinates/x2d",sim->cycle,sim->life.rmesh_x);
+		DC_write("coordinates/y2d",sim->cycle,sim->life.rmesh_y);
+		firstCall = 1;
+	}
 
-        /* Get input from VisIt or timeout so the simulation can run. */
-        if(sim->par_rank == 0)
-            visitstate = VisItDetectInput(blocking, fileno(stdin));
-#ifdef PARALLEL
-        MPI_Bcast(&visitstate, 1, MPI_INT, 0, MPI_COMM_WORLD);
-#endif
-        /* Do different things depending on the output from VisItDetectInput. */
-        switch(visitstate)
-        {
-        case 0:
-            /* There was no input from VisIt, return control to sim. */
-            simulate_one_timestep(sim);
-            break;
-        case 1:
-            /* VisIt is trying to connect to sim. */
-            if(VisItAttemptToCompleteConnection() == VISIT_OKAY)
-            {
-                fprintf(stderr, "VisIt connected\n");
-                VisItSetCommandCallback(ControlCommandCallback, (void*)sim);
-                VisItSetSlaveProcessCallback(SlaveProcessCallback);
+	DC_write("life/cells",sim->cycle,sim->life.true_life);
 
-                VisItSetGetMetaData(SimGetMetaData, (void*)sim);
-                VisItSetGetMesh(SimGetMesh, (void*)sim);
-                VisItSetGetVariable(SimGetVariable, (void*)sim);
-                VisItSetGetDomainList(SimGetDomainList, (void*)sim);
-            }
-            else 
-            {
-                /* Print the error message */
-                char *err = VisItGetLastError();
-                fprintf(stderr, "VisIt did not connect: %s\n", err);
-                free(err);
-            }
-            break;
-        case 2:
-            /* VisIt wants to tell the engine something. */
-            if(!ProcessVisItCommand(sim))
-            {
-                /* Disconnect on an error or closed connection. */
-                VisItDisconnect();
-                /* Start running again if VisIt closes. */
-                /*sim->runMode = SIM_RUNNING;*/
-            }
-            break;
-        case 3:
-            /* VisItDetectInput detected console input - do something with it.
-             * NOTE: you can't get here unless you pass a file descriptor to
-             * VisItDetectInput instead of -1.
-             */
-            ProcessConsoleCommand(sim);
-            if (sim->par_rank == 0)
-            {
-                fprintf(stderr, "command> ");
-                fflush(stderr);
-            }
-            break;
-        default:
-            fprintf(stderr, "Can't recover from error %d!\n", visitstate);
-            err = 1;
-            break;
-        }
-    } while(!sim->done && err == 0);
 }
 
 /******************************************************************************
@@ -640,9 +421,11 @@ int main(int argc, char **argv)
     simulation_data sim;
     simulation_data_ctor(&sim);
 
-    SimulationArguments(argc, argv);
-	VisItSetDirectory("/home/mdorier/Work/Visu2/visit2.5.0/src");
-    VisItSetupEnvironment();
+	if(argc != 2)
+	{
+		fprintf(stderr,"Usage: %s life.xml\n",argv[0]);
+		exit(1);
+	}
 
 #ifdef PARALLEL
     /* Initialize MPI */
@@ -657,22 +440,9 @@ int main(int argc, char **argv)
         fprintf(stderr,"The total number of rows does not divide evenly by the number of MPI tasks. Resubmit\n");
         exit(1);
     }
-
-    /* Install callback functions for global communication. */
-    VisItSetBroadcastIntFunction(visit_broadcast_int_callback);
-    VisItSetBroadcastStringFunction(visit_broadcast_string_callback);
-    /* Tell whether the simulation is parallel. */
-    VisItSetParallel(sim.par_size > 1);
-    VisItSetParallelRank(sim.par_rank);
 #endif
 
-    if(sim.par_rank == 0)
-    {
-        VisItInitializeSocketAndDumpSimFile("life",
-            "Game of life by John Conway",
-            "/path/to/where/sim/was/started",
-            NULL, NULL, NULL);
-    }
+	DC_initialize(argv[1],0);
 
     life_data_allocate(&sim.life, sim.par_rank, sim.par_size);
     life_data_ResetInitialConditions(&sim.life, RANDOM);
@@ -686,153 +456,3 @@ int main(int argc, char **argv)
 #endif
     return 0;
 }
-
-/* DATA ACCESS FUNCTIONS */
-
-/******************************************************************************
- *
- * Purpose: This callback function returns simulation metadata.
- *
- * Programmer: Brad Whitlock
- * Date:       Fri Feb  6 14:29:36 PST 2009
- *
- * Modifications:
- *
- *****************************************************************************/
-
-visit_handle
-SimGetMetaData(void *cbdata)
-{
-    visit_handle md = VISIT_INVALID_HANDLE;
-    simulation_data *sim = (simulation_data *)cbdata;
-
-    /* Create metadata. */
-    if(VisIt_SimulationMetaData_alloc(&md) == VISIT_OKAY)
-    {
-        int i;
-        visit_handle m1 = VISIT_INVALID_HANDLE;
-        visit_handle vmd = VISIT_INVALID_HANDLE;
-        visit_handle cmd = VISIT_INVALID_HANDLE;
-
-        /* Set the simulation state. */
-        VisIt_SimulationMetaData_setMode(md, (sim->runMode == SIM_STOPPED) ?
-                VISIT_SIMMODE_STOPPED : VISIT_SIMMODE_RUNNING);
-        VisIt_SimulationMetaData_setCycleTime(md, sim->cycle, sim->time);
-
-        /* Set the first mesh's properties.*/
-        if(VisIt_MeshMetaData_alloc(&m1) == VISIT_OKAY)
-        {
-            /* Set the mesh's properties.*/
-            VisIt_MeshMetaData_setName(m1, "mesh2d");
-            VisIt_MeshMetaData_setMeshType(m1, VISIT_MESHTYPE_RECTILINEAR);
-            VisIt_MeshMetaData_setTopologicalDimension(m1, 2);
-            VisIt_MeshMetaData_setSpatialDimension(m1, 2);
-            VisIt_MeshMetaData_setNumDomains(m1, sim->par_size);
-            VisIt_MeshMetaData_setXUnits(m1, "cm");
-            VisIt_MeshMetaData_setYUnits(m1, "cm");
-            VisIt_MeshMetaData_setXLabel(m1, "Width");
-            VisIt_MeshMetaData_setYLabel(m1, "Height");
-    
-            VisIt_SimulationMetaData_addMesh(md, m1);
-        }
-
-        /* Add a zonal scalar variable on mesh2d. */
-        if(VisIt_VariableMetaData_alloc(&vmd) == VISIT_OKAY)
-        {
-            VisIt_VariableMetaData_setName(vmd, "life");
-            VisIt_VariableMetaData_setMeshName(vmd, "mesh2d");
-            VisIt_VariableMetaData_setType(vmd, VISIT_VARTYPE_SCALAR);
-            VisIt_VariableMetaData_setCentering(vmd, VISIT_VARCENTERING_ZONE);
-   
-            VisIt_SimulationMetaData_addVariable(md, vmd);
-        }
-
-        /* Add some custom commands. */
-        for(i = 0; i < sizeof(cmd_names)/sizeof(const char *); ++i)
-        {
-            visit_handle cmd = VISIT_INVALID_HANDLE;
-            if(VisIt_CommandMetaData_alloc(&cmd) == VISIT_OKAY)
-            {
-                VisIt_CommandMetaData_setName(cmd, cmd_names[i]);
-                VisIt_SimulationMetaData_addGenericCommand(md, cmd);
-            }
-        }
-    }
-
-    return md;
-}
-
-visit_handle
-SimGetMesh(int domain, const char *name, void *cbdata)
-{
-    visit_handle h = VISIT_INVALID_HANDLE;
-    simulation_data *sim = (simulation_data *)cbdata;
-
-    if(strcmp(name, "mesh2d") == 0)
-    {
-        if(VisIt_RectilinearMesh_alloc(&h) != VISIT_ERROR)
-        {
-            int minRealIndex[3], maxRealIndex[3];
-            minRealIndex[0] = minRealIndex[1] = minRealIndex[2] = 0;
-      
-            maxRealIndex[0] = sim->life.rmesh_dims[0]-1;
-            maxRealIndex[1] = sim->life.rmesh_dims[1]-1;
-            maxRealIndex[2] = 0;
-            visit_handle hxc, hyc;
-            VisIt_VariableData_alloc(&hxc);
-            VisIt_VariableData_alloc(&hyc);
-            VisIt_VariableData_setDataF(hxc, VISIT_OWNER_SIM, 1, sim->life.rmesh_dims[0], sim->life.rmesh_x);
-            VisIt_VariableData_setDataF(hyc, VISIT_OWNER_SIM, 1, sim->life.rmesh_dims[1], sim->life.rmesh_y);
-            VisIt_RectilinearMesh_setCoordsXY(h, hxc, hyc);
-
-            VisIt_RectilinearMesh_setRealIndices(h, minRealIndex, maxRealIndex);
-        }
-    }
-    return h;
-}
-
-visit_handle
-SimGetVariable(int domain, const char *name, void *cbdata)
-{
-    visit_handle h = VISIT_INVALID_HANDLE;
-    int nComponents = 1, nTuples = 0;
-    simulation_data *sim = (simulation_data *)cbdata;
-
-    if(VisIt_VariableData_alloc(&h) == VISIT_OKAY)
-    {
-        if(strcmp(name, "life") == 0)
-        {
-            nTuples = (sim->life.rmesh_dims[0]-1) * (sim->life.rmesh_dims[1]-1);
-            VisIt_VariableData_setDataI(h, VISIT_OWNER_SIM, nComponents, nTuples, sim->life.true_life);
-        }
-        else
-        {
-            VisIt_VariableData_free(h);
-            h = VISIT_INVALID_HANDLE;
-        }
-    }
-    return h;
-}
-
-visit_handle
-SimGetDomainList(const char *name, void *cbdata)
-{
-    visit_handle h = VISIT_INVALID_HANDLE;
-    if(VisIt_DomainList_alloc(&h) != VISIT_ERROR)
-    {
-        visit_handle hdl;
-        int i, *iptr = NULL;
-        simulation_data *sim = (simulation_data *)cbdata;
-
-        iptr = (int *)malloc(sizeof(int));
-        *iptr = sim->par_rank;
-
-        if(VisIt_VariableData_alloc(&hdl) == VISIT_OKAY)
-        {
-            VisIt_VariableData_setDataI(hdl, VISIT_OWNER_VISIT, 1, 1, iptr);
-            VisIt_DomainList_setDomains(h, sim->par_size, hdl);
-        }
-    }
-    return h;
-}
-

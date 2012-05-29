@@ -1305,6 +1305,23 @@ namespace Damaris
       static visualizable_type
       visualizable_default_value ();
 
+      // time-varying
+      // 
+      typedef ::xml_schema::boolean time_varying_type;
+      typedef ::xsd::cxx::tree::traits< time_varying_type, char > time_varying_traits;
+
+      const time_varying_type&
+      time_varying () const;
+
+      time_varying_type&
+      time_varying ();
+
+      void
+      time_varying (const time_varying_type& x);
+
+      static time_varying_type
+      time_varying_default_value ();
+
       // Constructors.
       //
       Variable (const name_type&,
@@ -1357,6 +1374,7 @@ namespace Damaris
       ::xsd::cxx::tree::one< centering_type > centering_;
       static const centering_type centering_default_value_;
       ::xsd::cxx::tree::one< visualizable_type > visualizable_;
+      ::xsd::cxx::tree::one< time_varying_type > time_varying_;
     };
 
     class Group: public ::xml_schema::type

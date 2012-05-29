@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<simulation name="life" language="c" xmlns="http://damaris.gforge.inria.fr/Damaris/Model">
+	<architecture>
+		<cores  count="2">
+			<clients count="1"/>
+		</cores>
+		<buffer name="buffer" size="67108864" />
+		<queue  name="queue" size="100" />
+	</architecture>
+	<data>
+		<parameter name="n" type="int" value="96" />
+
+		<layout name="rmeshX" type="float" dimensions="n" />
+		<layout name="rmeshY" type="float" dimensions="n" />
+
+		<layout name="cells" type="int" dimensions="n-1,n-1" />
+
+		<mesh name="mesh2d" type="rectilinear" topology="2">
+			<coord name="coordinates/x2d" unit="cm" label="Width"/>
+			<coord name="coordinates/y2d" unit="cm" label="Height"/>
+		</mesh>
+
+		<group name="coordinates">
+			<variable name="x2d" layout="rmeshX" visualizable="false" time-varying="false" />
+			<variable name="y2d" layout="rmeshY" visualizable="false" time-varying="false" />
+		</group>
+	
+		<group name="life">
+			<variable name="cells" type="scalar" layout="cells" mesh="mesh2d" centering="zonal" />
+		</group>
+	</data>
+	<actions>
+	</actions>
+	<visit>
+		<path>/home/mdorier/Work/Visu2/visit2.5.0/src</path>
+	</visit>
+</simulation>

@@ -242,7 +242,7 @@ visit_handle VisItListener::GetMesh(int domain, const char *name, void *cbdata)
 	Mesh* m = MeshManager::Search(std::string(name));
 	visit_handle h = VISIT_INVALID_HANDLE;
 	if(m != NULL) {
-		DBG("Mesg found, exposing data, iteration is " << s->iteration);
+		DBG("Mesh found, exposing data, iteration is " << s->iteration);
 		m->exposeVisItData(&h,domain,s->iteration);
 	}	
 	return h;	

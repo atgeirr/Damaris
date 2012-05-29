@@ -36,6 +36,8 @@ int Parameter::getID() const
 
 Parameter* Parameter::New(const Model::Parameter& mdl, const std::string& name)
 {
+	try {
+
 	switch(mdl.type()) {
 		case Model::Type::short_:
 			return new Parameter(mdl,name,boost::lexical_cast<short>(mdl.value()));
@@ -60,6 +62,12 @@ Parameter* Parameter::New(const Model::Parameter& mdl, const std::string& name)
 		default:
 			ERROR("Undefined type \"" << mdl.type()
 				<< "\" for parameter \""<< mdl.name() << "\"");
+	}
+
+	} catch(boost::bad_lexical_cast &) {
+		ERROR("Unable to interpret parameter's value \"" << mdl.value() << "\" "
+				<< "for parameter \"" << name << "\"");
+		return NULL;
 	}
 	return NULL;
 }

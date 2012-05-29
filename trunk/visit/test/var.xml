@@ -35,12 +35,12 @@
 		</mesh>
 
 		<group name="coordinates">
-			<variable name="x2d" layout="rmeshX" visualizable="false" />
-			<variable name="y2d" layout="rmeshY" visualizable="false" />
+			<variable name="x2d" layout="rmeshX" visualizable="false" time-varying="false" />
+			<variable name="y2d" layout="rmeshY" visualizable="false" time-varying="false" />
 
-			<variable name="x3d" layout="cmesh" visualizable="false" />
-			<variable name="y3d" layout="cmesh" visualizable="false" />
-			<variable name="z3d" layout="cmesh" visualizable="false" />
+			<variable name="x3d" layout="cmesh" visualizable="false" time-varying="false" />
+			<variable name="y3d" layout="cmesh" visualizable="false" time-varying="false" />
+			<variable name="z3d" layout="cmesh" visualizable="false" time-varying="false" />
 		</group>
 
 		<group name="zonal">
