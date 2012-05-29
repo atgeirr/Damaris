@@ -92,6 +92,7 @@ int VisItListener::Connected()
 int VisItListener::EnterSyncSection(int visitstate)
 {
 	DBG("Entering Sync Section, visit state is " << visitstate);
+	sim.iteration = Environment::GetLastIteration();
 	switch(visitstate) {
 		case 1:
 			if(VisItAttemptToCompleteConnection() == VISIT_OKAY) {
@@ -256,6 +257,8 @@ visit_handle VisItListener::GetVariable(int domain, const char *name, void *cbda
 	visit_handle h = VISIT_INVALID_HANDLE;
 	if(v != NULL) {
 		v->exposeVisItData(&h,domain,s->iteration);
+	} else {
+		ERROR("Variable not found: \"" << name << "\"");
 	}
 	return h;
 }

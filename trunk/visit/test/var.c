@@ -156,12 +156,17 @@ double nodal_vector[2][3][4][3] = {
 };
 
 void exposeDataToDamaris(simulation_data* sim) {
-	DC_write("coordinates/x2d",sim->cycle,rmesh_x);
-	DC_write("coordinates/y2d",sim->cycle,rmesh_y);
+	static int firstCall = 0;
 
-	DC_write("coordinates/x3d",sim->cycle,cmesh_x);
-	DC_write("coordinates/y3d",sim->cycle,cmesh_y);
-	DC_write("coordinates/z3d",sim->cycle,cmesh_z);
+	if(firstCall == 0) {
+		DC_write("coordinates/x2d",sim->cycle,rmesh_x);
+		DC_write("coordinates/y2d",sim->cycle,rmesh_y);
+
+		DC_write("coordinates/x3d",sim->cycle,cmesh_x);
+		DC_write("coordinates/y3d",sim->cycle,cmesh_y);
+		DC_write("coordinates/z3d",sim->cycle,cmesh_z);
+		firstCall = 1;
+	}
 
 	DC_write("zonal/scalar",sim->cycle,zonal);
 	DC_write("zonal/vector",sim->cycle,zonal_vector);
@@ -169,4 +174,6 @@ void exposeDataToDamaris(simulation_data* sim) {
 
 	DC_write("nodal/scalar",sim->cycle,nodal);
 	DC_write("nodal/vector",sim->cycle,nodal_vector);
+	
+	DC_end_iteration(sim->cycle);
 }

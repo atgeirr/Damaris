@@ -43,6 +43,7 @@ namespace Damaris {
  */
 	enum int_msg_e {
 		CLIENT_CONNECTED,
+		END_ITERATION,
 		KILL_SERVER,
 		URGENT_CLEAN,
 		LOST_DATA

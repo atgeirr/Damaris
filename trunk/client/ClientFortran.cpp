@@ -178,6 +178,12 @@ void FC_FUNC_GLOBAL(df_kill_server,DF_KILL_SERVER)
 		*ierr_f = client->kill_server();
 	}
 
+void FC_FUNC_GLOBAL(df_end_iteration,DF_END_ITERATION)
+	(int* it, int* ierr_f)
+	{
+		*ierr_f = client->end_iteration(*it);
+	}
+
 void FC_FUNC_GLOBAL(df_finalize,DF_FINALIZE)
 	(int* ierr_f)
 	{

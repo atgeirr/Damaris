@@ -371,6 +371,17 @@ namespace Damaris {
 		return 0;	
 	}
 
+	int Client::end_iteration(int iteration)
+    {
+		Message msg;
+		msg.type = MSG_INT;
+		msg.source = process->getID();
+		msg.iteration = iteration;
+		msg.object = END_ITERATION;
+		process->getSharedMessageQueue()->send(&msg);
+		return 0;
+	}
+
 	chunk_h Client::chunk_set(unsigned int dimensions,
 			const std::vector<int> & startIndices, 
 			const std::vector<int> & endIndices)

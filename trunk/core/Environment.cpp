@@ -33,6 +33,7 @@ namespace Damaris {
 		entityComm = MPI_COMM_NULL;
 		globalComm = MPI_COMM_NULL;
 		nodeComm   = MPI_COMM_NULL;
+		lastIteration = -1;
 	}
 
 	Environment::~Environment() 
@@ -133,5 +134,15 @@ namespace Damaris {
 	bool Environment::hasServer() 
 	{
 		return (getCoresPerNode() != getClientsPerNode());
+	}
+
+	int Environment::GetLastIteration()
+	{
+		return env->lastIteration;
+	}
+
+	void Environment::SetLastIteration(int i)
+	{
+		env->lastIteration = i;
 	}
 }

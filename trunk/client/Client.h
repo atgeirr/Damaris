@@ -115,6 +115,8 @@ MPI_Comm DC_mpi_get_client_comm();
  */
 int	DC_kill_server();
 
+int DC_end_iteration(int iteration);
+
 /**
  * \brief Call client's destructor.
  * \see Damaris::Client::~Client

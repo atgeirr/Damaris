@@ -143,10 +143,17 @@ int cmesh_dims[] = {4, 3, 2};
 int cmesh_ndims = 3;
 
 void exposeDataToDamaris(simulation_data* sim) {
-	DC_write("coordinates/x2d",sim->cycle,rmesh_x);
-	DC_write("coordinates/y2d",sim->cycle,rmesh_y);
+	static int firstCall = 0;
 	
-	DC_write("coordinates/x3d",sim->cycle,cmesh_x);
-	DC_write("coordinates/y3d",sim->cycle,cmesh_y);
-	DC_write("coordinates/z3d",sim->cycle,cmesh_z);
+	if(firstCall == 0) {
+		DC_write("coordinates/x2d",sim->cycle,rmesh_x);
+		DC_write("coordinates/y2d",sim->cycle,rmesh_y);
+	
+		DC_write("coordinates/x3d",sim->cycle,cmesh_x);
+		DC_write("coordinates/y3d",sim->cycle,cmesh_y);
+		DC_write("coordinates/z3d",sim->cycle,cmesh_z);
+		firstCall = 1;
+	}
+
+	DC_end_iteration(sim->cycle);
 }

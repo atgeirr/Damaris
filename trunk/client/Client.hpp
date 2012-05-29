@@ -135,6 +135,8 @@ class Client : public Writer {
 		 */
 		virtual int lost(int iteration);
 
+		virtual int end_iteration(int iteration);
+
 		/**
 		 * Gets the communicator gathering clients.
 		 */

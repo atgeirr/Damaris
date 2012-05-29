@@ -398,6 +398,7 @@ void exposeDataToDamaris(simulation_data* sim) {
 	}
 
 	DC_write("life/cells",sim->cycle,sim->life.true_life);
+	DC_end_iteration(sim->cycle);
 
 }
 

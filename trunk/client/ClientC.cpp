@@ -96,6 +96,11 @@ int DC_kill_server()
 	return client->kill_server();
 }
 
+int DC_end_iteration(int i)
+{
+	return client->end_iteration(i);
+}
+
 int DC_finalize()
 {
 	delete client;

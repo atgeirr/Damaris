@@ -135,6 +135,9 @@ void Server::processInternalSignal(int32_t object, int iteration, int source)
 	case CLIENT_CONNECTED:
 		Environment::AddConnectedClient(source);
 		break;
+	case END_ITERATION:
+		Environment::SetLastIteration(iteration);
+		break;
 	case KILL_SERVER:
 		needStop--; // TODO: check that each client has sent the event instead of checking the number
 		break;

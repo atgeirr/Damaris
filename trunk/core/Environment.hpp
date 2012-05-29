@@ -45,6 +45,7 @@ namespace Damaris {
 		MPI_Comm nodeComm;   /*!< communicator for the processors in the node. */
 		
 		std::list<int> knownClients;
+		int lastIteration;
 
 		static Environment* env;
 
@@ -119,6 +120,10 @@ namespace Damaris {
 		 * \brief Tell if a dedicated core is present.
 		 */
 		static bool hasServer();
+
+		static int GetLastIteration();
+
+		static void SetLastIteration(int i);
 	};
 
 }

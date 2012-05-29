@@ -126,6 +126,10 @@ void FC_FUNC_GLOBAL(df_mpi_get_client_comm,DF_GET_MPI_CLIENT_COMM)
  */
 void FC_FUNC_GLOBAL(df_kill_server,DF_KILL_SERVER)
 	(int* ierr);
+
+void FC_FUNC_GLOBAL(df_end_iteration,DF_END_ITERATION)
+    (int* it, int* ierr);
+
 /**
  * \fn df_finalize(ierr)
  * \brief Call client's destructor.
