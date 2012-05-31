@@ -143,6 +143,7 @@ namespace Damaris {
 
 	void Environment::SetLastIteration(int i)
 	{
+		INFO("Iteration " << i << " terminated");
 		env->lastIteration = i;
 	}
 }

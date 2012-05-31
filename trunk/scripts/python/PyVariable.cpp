@@ -123,7 +123,7 @@ PyLayout PyVariable::layout() const
 
 bool PyVariable::remove(PyChunk& pc)
 {
-	WARN("This function is not implemented");
+	inner->detachChunk(pc.inner);
 	return false;
 }
 

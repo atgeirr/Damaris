@@ -38,6 +38,7 @@ namespace Damaris {
 class ShmChunk : public Chunk {
 
 	private:
+		bool isOwner;
 		SharedMemorySegment* segment; /*!< Pointer to the shared memory 
 										segment containing the data. */
 		ChunkHeader* header; /*!< Pointer to header. */
@@ -113,12 +114,11 @@ class ShmChunk : public Chunk {
 		 */
 		void* data();
 		
-		/**
-		 * \brief Removes the data shared memory.
-		 * \return true if successfuly removed, false otherwise.
-		 * \warning See ShmChunk::data().
-		 */
-		bool remove();
+		virtual void SetDataOwnership(bool b)
+			{ isOwner = b; }
+
+        virtual bool GetDataOwnership()
+			{ return isOwner; }
 
 		/**
 		 * Returns a relative pointer (handle) to the memory region where the 

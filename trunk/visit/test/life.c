@@ -365,9 +365,9 @@ simulate_one_timestep(simulation_data *sim)
 	++sim->cycle;
     sim->time += 1;
 
-//    VisItTimeStepChanged();
-//    VisItUpdatePlots();
 }
+
+void exposeDataToDamaris(simulation_data* sim);
 
 /******************************************************************************
  *
@@ -382,10 +382,11 @@ simulate_one_timestep(simulation_data *sim)
 
 void mainloop(simulation_data *sim)
 {
-//	do {
+	do {
 			simulate_one_timestep(sim);
 			exposeDataToDamaris(sim);
-//    } while(!sim->done);
+			sleep(5);
+    } while(!sim->done);
 }
 
 void exposeDataToDamaris(simulation_data* sim) {
@@ -398,8 +399,12 @@ void exposeDataToDamaris(simulation_data* sim) {
 	}
 
 	DC_write("life/cells",sim->cycle,sim->life.true_life);
-	DC_end_iteration(sim->cycle);
+	if(sim->cycle >= 2) {
+		DC_signal("clean",sim->cycle-2);
+	}
 
+	// TODO : this function should be called by one process only
+	DC_end_iteration(sim->cycle);
 }
 
 /******************************************************************************

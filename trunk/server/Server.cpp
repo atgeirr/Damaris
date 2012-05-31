@@ -101,6 +101,7 @@ void Server::processMessage(const Message& msg)
 	{
 		try {
 		ShmChunk* chunk = new ShmChunk(process->getSharedMemorySegment(),handle);
+		chunk->SetDataOwnership(true);
 		Variable* v = VariableManager::Search(object);
 		if(v != NULL) {
 			v->attachChunk(chunk);
@@ -108,7 +109,6 @@ void Server::processMessage(const Message& msg)
 			// the variable is unknown, discarde it
 			ERROR("Server received a chunk " 
 				<< "for an unknown variable, discarding");
-			chunk->remove();
 			delete chunk;
 		}
 		} catch(std::exception &e) {
@@ -137,6 +137,9 @@ void Server::processInternalSignal(int32_t object, int iteration, int source)
 		break;
 	case END_ITERATION:
 		Environment::SetLastIteration(iteration);
+#ifdef __ENABLE_VISIT
+		Viz::VisItListener::Update();
+#endif
 		break;
 	case KILL_SERVER:
 		needStop--; // TODO: check that each client has sent the event instead of checking the number

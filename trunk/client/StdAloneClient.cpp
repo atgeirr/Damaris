@@ -86,6 +86,7 @@ void* StdAloneClient::alloc(const std::string & varname, int32_t iteration, bool
 
         // create the ShmChunk and attach it to the variable
         ShmChunk* chunk = new ShmChunk(process->getSharedMemorySegment(),ch);
+		chunk->SetDataOwnership(true);
         variable->attachChunk(chunk);
 
 		ChunkDescriptor::Delete(cd);
@@ -162,7 +163,7 @@ int StdAloneClient::write(const std::string & varname,
 
 		// create the ShmChunk and attach it to the variable
 		ShmChunk* chunk = new ShmChunk(process->getSharedMemorySegment(),ch);
-
+		chunk->SetDataOwnership(true);
 		// copy data
 		size = cd->getDataMemoryLength(layout->getType());
 		memcpy(chunk->data(),data,size);
@@ -217,6 +218,7 @@ int StdAloneClient::chunk_write(chunk_h chunkh, const std::string & varname,
 
 	// create the ShmChunk object       
 	ShmChunk* chunk = new ShmChunk(process->getSharedMemorySegment(),ch);
+	chunk->SetDataOwnership(true);
 
 	// copy data
 	size = cd->getDataMemoryLength(layout->getType());

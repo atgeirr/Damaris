@@ -154,7 +154,7 @@ namespace Damaris {
 
 		// we don't need to keep the chunk in the client now,
         // so we erase it from the variable.
-        v->detachChunk(it);
+        v->detachChunk(it->get());
 
 		return 0;
 	}

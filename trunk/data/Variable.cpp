@@ -82,37 +82,22 @@ ChunkIndex::iterator Variable::getChunks(int source, int iteration, ChunkIndex::
 	return chunks.get<by_any>().find(boost::make_tuple(source,iteration));
 }
 
-void Variable::detachChunk(ChunkIndexByIteration::iterator &it)
+void Variable::detachChunk(Chunk* c)
 {
-	chunks.get<by_iteration>().erase(it);
-}
-
-void Variable::eraseChunk(ChunkIndexByIteration::iterator &it)
-{
-	it->get()->remove();
-	detachChunk(it);
-}
-
-void Variable::detachChunk(ChunkIndexBySource::iterator &it)
-{
-    chunks.get<by_source>().erase(it);
-}
-
-void Variable::eraseChunk(ChunkIndexBySource::iterator &it)
-{
-	it->get()->remove();
-	detachChunk(it);
+	ChunkIndex::iterator end;
+	ChunkIndex::iterator it = getChunks(c->getSource(),c->getIteration(),end);
+	while(it != end) {
+		if(it->get() == c) {
+			chunks.get<by_any>().erase(it);
+			break;
+		}
+		it++;
+	}
 }
 
 void Variable::clear()
 {
-	ChunkIndexBySource::iterator it = chunks.get<by_source>().begin();
-	while(it != chunks.get<by_source>().end())
-	{
-		it->get()->remove();
-		it++;
-	}
-	chunks.get<by_source>().clear();
+	chunks.get<by_any>().clear();
 }
 
 #ifdef __ENABLE_VISIT
@@ -144,6 +129,8 @@ bool Variable::exposeVisItData(visit_handle* h, int source, int iteration)
 		ChunkIndex::iterator end;
 		ChunkIndex::iterator it = getChunks(source, iteration, end);
 		if(it == end) {
+			ERROR("Chunk not found for source = " << source
+				<< " and iteration = " << iteration);
 			VisIt_VariableData_free(*h);
 			return false;
 		}

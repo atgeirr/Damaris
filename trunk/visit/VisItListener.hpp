@@ -66,6 +66,7 @@ class VisItListener {
 
 		static int EnterSyncSection(int visitstat);
 
+		static int Update();
 };
 
 }

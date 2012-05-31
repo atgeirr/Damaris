@@ -30,7 +30,12 @@
 		</group>
 	</data>
 	<actions>
+		<script name="clean"    file="clean.py" language="python" />
 	</actions>
+	<python>
+		<path>/home/mdorier/Work/Visu2/visit/python/2.6.4/linux-i686_gcc-4.6/lib/python2.6</path>
+		<home>/home/mdorier/Work/Visu2/visit/python/2.6.4/linux-i686_gcc-4.6</home>
+	</python>
 	<visit>
 		<path>/home/mdorier/Work/Visu2/visit2.5.0/src</path>
 	</visit>

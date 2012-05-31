@@ -114,6 +114,14 @@ int VisItListener::EnterSyncSection(int visitstate)
 	return 0;
 }
 
+int VisItListener::Update()
+{
+	sim.iteration = Environment::GetLastIteration();
+	VisItTimeStepChanged();
+	VisItUpdatePlots();
+	return 0;
+}
+
 void VisItListener::broadcastSlaveCommand(int *command)
 {
 	MPI_Bcast(command, 1, MPI_INT, 0, comm);
@@ -253,6 +261,7 @@ visit_handle VisItListener::GetVariable(int domain, const char *name, void *cbda
 {
 	DBG("Entering VisItListener::GetVariable for variable " << name);
 	SimData *s = (SimData*)cbdata;
+	INFO("In GetVariable, iteration is " << s->iteration);
 	Variable* v = VariableManager::Search(std::string(name));
 	visit_handle h = VISIT_INVALID_HANDLE;
 	if(v != NULL) {

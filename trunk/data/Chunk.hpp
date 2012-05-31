@@ -67,10 +67,9 @@ class Chunk {
 		 */
 		virtual void* data() = 0;
 
-		/**
-		 * \brief Removes (if possible) the data from its underlying storage.
-		 */
-		virtual bool remove() = 0;
+		virtual void SetDataOwnership(bool isOwner) = 0;
+
+		virtual bool GetDataOwnership() = 0;
 
 		/**
 		 * Gives the number of items contained in the Chunk.

@@ -26,6 +26,7 @@ namespace Damaris {
 
 ShmChunk::ShmChunk(SharedMemorySegment* s, ChunkHeader* ch) 
 {
+	isOwner = false;
 	segment = s;
 	header = ch;
 	buffer = ((char*)header)+sizeof(ChunkHeader);
@@ -33,6 +34,7 @@ ShmChunk::ShmChunk(SharedMemorySegment* s, ChunkHeader* ch)
 
 ShmChunk::ShmChunk(SharedMemorySegment* s, handle_t h)
 {
+	isOwner = false;
 	segment = s;
 	header = (ChunkHeader*)segment->getAddressFromHandle(h);
 	buffer = ((char*)header)+sizeof(ChunkHeader);
@@ -40,21 +42,14 @@ ShmChunk::ShmChunk(SharedMemorySegment* s, handle_t h)
 
 ShmChunk::~ShmChunk()
 {
+	if(isOwner) {
+		segment->deallocate(header);
+	}
 }
 
 void* ShmChunk::data()
 {
 	return buffer;
-}
-
-bool ShmChunk::remove()
-{
-	if(buffer == NULL) return false;
-	
-	segment->deallocate(header);
-	header = NULL;
-	buffer = NULL;
-	return true;
 }
 
 handle_t ShmChunk::getHandle()
