@@ -76,6 +76,7 @@ void VisItListener::Init(MPI_Comm c, const Model::Simulation::visit_optional& md
 
 	VisItSetParallel(size > 1);
 	VisItSetParallelRank(rank);
+	VisItSetMPICommunicator(&comm);
 }
 
 int VisItListener::Connected()
