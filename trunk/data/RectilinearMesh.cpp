@@ -20,6 +20,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \author Matthieu Dorier
  * \version 0.5
  */
+#include "core/Environment.hpp"
 #include "data/Variable.hpp"
 #include "data/RectilinearMesh.hpp"
 
@@ -44,6 +45,9 @@ bool RectilinearMesh::exposeVisItMetaData(visit_handle md) const
 		VisIt_MeshMetaData_setMeshType(m1, VISIT_MESHTYPE_RECTILINEAR);
 		VisIt_MeshMetaData_setTopologicalDimension(m1, (int)model.topology());
 		VisIt_MeshMetaData_setSpatialDimension(m1, (int)model.coord().size());
+
+		int ttlClients = Environment::GetGlobalNumberOfClients();
+		VisIt_MeshMetaData_setNumDomains(m1,ttlClients);
 
 		Model::Mesh::coord_const_iterator it(model.coord().begin());
 		// the number of coordinates should be 2 or 3 (this condition is checked by
@@ -99,7 +103,7 @@ bool RectilinearMesh::exposeVisItData(visit_handle* h, int source, int iteration
 			return false;
 		}
 		if(vy->getLayout()->getDimensions() != 1) {
-			CFGERROR("Wrong number of dimensions for coordinate " << vx->getName());
+			CFGERROR("Wrong number of dimensions for coordinate " << vy->getName());
 			return false;
 		}
 		it++;
@@ -113,7 +117,7 @@ bool RectilinearMesh::exposeVisItData(visit_handle* h, int source, int iteration
 				return false;
 			}
 			if(vz->getLayout()->getDimensions() != 1) {
-				CFGERROR("Wrong number of dimensions for coordinate " << vx->getName());
+				CFGERROR("Wrong number of dimensions for coordinate " << vz->getName());
 				return false;
 			}
 		}

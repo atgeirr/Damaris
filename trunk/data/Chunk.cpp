@@ -66,6 +66,7 @@ bool Chunk::within(const Chunk& enclosing) const
 #ifdef __ENABLE_VISIT
 bool Chunk::FillVisItDataHandle(visit_handle hdl)
 {
+	DBG("source is " << getSource() << ", iteration is " << getIteration());
 	int nb_items = NbrOfItems();
 	DBG("Number of items is " << nb_items);
 	const Model::Type& t = getType();

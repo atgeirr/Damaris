@@ -1,6 +1,8 @@
 set(CLIENT_SIDE_LIBRARIES damaris ${BOOST_LIB} ${PYTHON_LIB} ${XERCESC_LIB} ${VISIT_LIB} rt dl)
 set(VISIT_TEST_DIR ${DAMARIS_SOURCE_DIR}/visit/test)
 
+add_definitions(-DPARALLEL)
+
 add_executable (amr ${VISIT_TEST_DIR}/amr.c)
 target_link_libraries (amr ${CLIENT_SIDE_LIBRARIES})
 

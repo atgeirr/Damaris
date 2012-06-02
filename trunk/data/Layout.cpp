@@ -98,6 +98,12 @@ namespace Damaris {
 			e = rdims;
 		}
 
+		std::cout << "Layout " << name << " dimensions are ";
+		for(int i = 0; i < e.size(); i++) {
+			std::cout << e[i] << ",";
+		}
+		std::cout << std::endl;
+
 		return new Layout(mdl,name,e);
 	}
 

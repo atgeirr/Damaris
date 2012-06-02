@@ -12,9 +12,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <math.h>
-#ifdef PARALLEL
 #include <mpi.h>
-#endif
 #include "Damaris.h"
 
 /******************************************************************************
@@ -23,7 +21,8 @@
 
 /* The number of cells (or zones) displayed on screen is NN * NN*/
 /*#define NN 48*96*2 */
-#define NN 48*2 
+#define NROW 96
+#define NCOL 32
 
 typedef enum {RANDOM = 0, GLIDER=1, ACORN=2, DIEHARD=3} BCtype;
 
@@ -42,12 +41,12 @@ typedef struct
 void
 life_data_ctor(int par_size, life_data *life)
 {
-    life->Nrows = NN/par_size;
-    life->Ncolumns = NN;
+    life->Nrows = NROW/par_size;
+    life->Ncolumns = NCOL;
     life->rmesh_x = NULL;
     life->rmesh_y = NULL;
-    life->rmesh_dims[0] = NN+1; /* shall be redefined later after Parallel init*/
-    life->rmesh_dims[1] = NN+1;
+    life->rmesh_dims[0] = NROW+1; /* shall be redefined later after Parallel init*/
+    life->rmesh_dims[1] = NCOL+1;
     life->rmesh_dims[2] = 1;
     life->rmesh_ndims = 2;
     life->true_life = NULL;
@@ -97,13 +96,13 @@ life_data_allocate(life_data *life, int par_rank, int par_size)
 
     for(i=0; i<= life->Ncolumns; i++)
     {
-        life->rmesh_x[i] = (float)(i)/life->Ncolumns;
+        life->rmesh_x[i] = (float)(i);// /life->Ncolumns;
     }
 
-    offset = (float)(par_rank) / par_size;
+    offset = (float)(par_rank)*(life->Nrows);
     for(i=0; i<=life->Nrows; i++)
     {
-        life->rmesh_y[i] = offset + (float)(i)/life->Ncolumns;
+        life->rmesh_y[i] = offset + (float)(i); // /life->Ncolumns;
     }
 
     /* 2D array of data items exposed as solution */
@@ -118,10 +117,8 @@ life_data_simulate(life_data *life, int par_rank, int par_size)
 {
     int nsum, i, j, JPNN, JNN, JMNN, source, dest;
     int *true_life = NULL, *working_life = NULL;
-#ifdef PARALLEL
     MPI_Status status;
     MPI_Request request;
-#endif
 
     /* Alias for readability */
     working_life = life->working_life;
@@ -156,56 +153,55 @@ life_data_simulate(life_data *life, int par_rank, int par_size)
        top row at index j=(life->Nrows+1) at rank J gets initialized from bottom row from rank J+1
        Using the integer modulo op allows us to wrap around the number of procs
      */
-#ifdef PARALLEL
-    source = (par_size + par_rank - 1) % par_size;
-    dest = (par_rank+1) % par_size;
-    MPI_Irecv(&working_life[1], life->Ncolumns, MPI_INT, dest, 1000, MPI_COMM_WORLD, &request);
-    MPI_Send(&true_life[(life->Nrows-1)*life->Ncolumns], life->Ncolumns, MPI_INT, source,  1000, MPI_COMM_WORLD);
-    MPI_Wait( &request, &status);
+	if(par_size > 1) {
+		source = (par_size + par_rank - 1) % par_size;
+		dest = (par_rank+1) % par_size;
+		MPI_Irecv(&working_life[1], life->Ncolumns, MPI_INT, dest, 1000, MPI_COMM_WORLD, &request);
+		MPI_Send(&true_life[(life->Nrows-1)*life->Ncolumns], life->Ncolumns, MPI_INT, source,  1000, MPI_COMM_WORLD);
+		MPI_Wait( &request, &status);
 
-    MPI_Irecv(&working_life[(life->Nrows+1)*(life->Ncolumns+2) + 1], life->Ncolumns, MPI_INT, dest, 1001, MPI_COMM_WORLD, &request);
-    MPI_Send(&true_life[0], life->Ncolumns, MPI_INT, source,  1001, MPI_COMM_WORLD);
-    MPI_Wait( &request, &status);
-#else
-    memcpy(&working_life[1], &true_life[(life->Nrows-1)*life->Ncolumns], life->Ncolumns * sizeof(int));
-    memcpy(&working_life[(life->Nrows+1)*(life->Ncolumns+2) + 1], &true_life[0], life->Ncolumns * sizeof(int));
-#endif
-
+		MPI_Irecv(&working_life[(life->Nrows+1)*(life->Ncolumns+2) + 1], life->Ncolumns, MPI_INT, dest, 1001, MPI_COMM_WORLD, &request);
+		MPI_Send(&true_life[0], life->Ncolumns, MPI_INT, source,  1001, MPI_COMM_WORLD);
+		MPI_Wait( &request, &status);
+	} else {
+    	memcpy(&working_life[1], &true_life[(life->Nrows-1)*life->Ncolumns], life->Ncolumns * sizeof(int));
+    	memcpy(&working_life[(life->Nrows+1)*(life->Ncolumns+2) + 1], &true_life[0], life->Ncolumns * sizeof(int));
+	}
     /* corners 
        rank 0, lower left corner    <= rank Max upper right corner
        rank 0, lower right corner   <= rank Max, upper left corner
        rank max, upper left corner  <= rank 0, lower right corner
        rank max, upper right corner <= rank 0, lower left corner
     */
-#ifdef PARALLEL
-    if(par_rank == 0)
-    {
-        source = par_size -1;
-        MPI_Irecv(&working_life[(life->Nrows+1)*(life->Ncolumns+2) + 0], 1, MPI_INT, source, 1002, MPI_COMM_WORLD, &request);
-        MPI_Send(&true_life[life->Ncolumns-1], 1, MPI_INT, source,  1004, MPI_COMM_WORLD);
-        MPI_Wait( &request, &status);
-  
-        MPI_Irecv(&working_life[life->Ncolumns+1], 1, MPI_INT, source, 1003, MPI_COMM_WORLD, &request);
-        MPI_Send(&true_life[0], 1, MPI_INT, source,  1005, MPI_COMM_WORLD);
-        MPI_Wait( &request, &status);
-    }
-    if(par_rank == (par_size -1))
-    {
-        source = 0;
-        MPI_Irecv(&working_life[0], 1, MPI_INT, source, 1004, MPI_COMM_WORLD, &request);
-        MPI_Send(&true_life[life->Ncolumns*(life->Nrows-1) + life->Ncolumns-1], 1, MPI_INT, source,  1002, MPI_COMM_WORLD);
-        MPI_Wait( &request, &status);
-  
-        MPI_Irecv(&working_life[(life->Nrows+1)*(life->Ncolumns+2) + life->Ncolumns+1], 1, MPI_INT, source, 1005, MPI_COMM_WORLD, &request);
-        MPI_Send(&true_life[life->Ncolumns*(life->Nrows-1) + 0], 1, MPI_INT, source,  1003, MPI_COMM_WORLD);
-        MPI_Wait( &request, &status);
-    }
-#else
-    working_life[0              ] = true_life[life->Ncolumns*(life->Nrows-1) + life->Ncolumns-1];     /* copy the upper right corner */
-    working_life[life->Ncolumns+1] = true_life[life->Ncolumns*(life->Nrows-1) + 0];                   /* copy the uppper left corner */
-    working_life[(life->Nrows+1)*(life->Ncolumns+2) + 0              ] = true_life[life->Ncolumns-1]; /* copy the bottom right corner */
-    working_life[(life->Nrows+1)*(life->Ncolumns+2) + life->Ncolumns+1] = true_life[0];               /* copy the bottom left corner */
-#endif
+	if(par_size > 1) {
+		if(par_rank == 0)
+    	{
+        	source = par_size -1;
+        	MPI_Irecv(&working_life[(life->Nrows+1)*(life->Ncolumns+2) + 0], 1, MPI_INT, source, 1002, MPI_COMM_WORLD, &request);
+        	MPI_Send(&true_life[life->Ncolumns-1], 1, MPI_INT, source,  1004, MPI_COMM_WORLD);
+        	MPI_Wait( &request, &status);
+  	
+			MPI_Irecv(&working_life[life->Ncolumns+1], 1, MPI_INT, source, 1003, MPI_COMM_WORLD, &request);
+			MPI_Send(&true_life[0], 1, MPI_INT, source,  1005, MPI_COMM_WORLD);
+			MPI_Wait( &request, &status);
+		}
+		if(par_rank == (par_size -1) && par_size > 1)
+		{
+			source = 0;
+			MPI_Irecv(&working_life[0], 1, MPI_INT, source, 1004, MPI_COMM_WORLD, &request);
+			MPI_Send(&true_life[life->Ncolumns*(life->Nrows-1) + life->Ncolumns-1], 1, MPI_INT, source,  1002, MPI_COMM_WORLD);
+			MPI_Wait( &request, &status);
+
+			MPI_Irecv(&working_life[(life->Nrows+1)*(life->Ncolumns+2) + life->Ncolumns+1], 1, MPI_INT, source, 1005, MPI_COMM_WORLD, &request);
+			MPI_Send(&true_life[life->Ncolumns*(life->Nrows-1) + 0], 1, MPI_INT, source,  1003, MPI_COMM_WORLD);
+			MPI_Wait( &request, &status);
+		}
+	} else {
+		working_life[0              ] = true_life[life->Ncolumns*(life->Nrows-1) + life->Ncolumns-1];     /* copy the upper right corner */
+		working_life[life->Ncolumns+1] = true_life[life->Ncolumns*(life->Nrows-1) + 0];                   /* copy the uppper left corner */
+		working_life[(life->Nrows+1)*(life->Ncolumns+2) + 0              ] = true_life[life->Ncolumns-1]; /* copy the bottom right corner */
+		working_life[(life->Nrows+1)*(life->Ncolumns+2) + life->Ncolumns+1] = true_life[0];               /* copy the bottom left corner */
+	}
 
     /* calculate true_life(i-1, j-1) using working_life */
     for(j=1; j<= life->Nrows; j++)
@@ -403,8 +399,13 @@ void exposeDataToDamaris(simulation_data* sim) {
 		DC_signal("clean",sim->cycle-2);
 	}
 
-	// TODO : this function should be called by one process only
-	DC_end_iteration(sim->cycle);
+#ifdef PARALLEL
+	MPI_Barrier(MPI_COMM_WORLD);
+	if(sim->par_rank == 0) 
+#endif
+	{
+			DC_end_iteration(sim->cycle);
+	}
 }
 
 /******************************************************************************
@@ -433,22 +434,20 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
-#ifdef PARALLEL
     /* Initialize MPI */
     MPI_Init(&argc, &argv);
     MPI_Comm_rank (MPI_COMM_WORLD, &sim.par_rank);
     MPI_Comm_size (MPI_COMM_WORLD, &sim.par_size);
 
     /* Adjust the life partitioning */
-    sim.life.Nrows = NN/sim.par_size; /* assume they divide evenly */
-    if((float)(NN)/sim.par_size - NN/sim.par_size > 0.0)
+    sim.life.Nrows = NROW/sim.par_size; /* assume they divide evenly */
+    if((float)(NROW)/sim.par_size - NROW/sim.par_size > 0.0)
     {
         fprintf(stderr,"The total number of rows does not divide evenly by the number of MPI tasks. Resubmit\n");
         exit(1);
     }
-#endif
 
-	DC_initialize(argv[1],0);
+	DC_initialize(argv[1],sim.par_rank);
 
     life_data_allocate(&sim.life, sim.par_rank, sim.par_size);
     life_data_ResetInitialConditions(&sim.life, RANDOM);
@@ -457,8 +456,6 @@ int main(int argc, char **argv)
 
     simulation_data_dtor(&sim);
 
-#ifdef PARALLEL
     MPI_Finalize();
-#endif
     return 0;
 }

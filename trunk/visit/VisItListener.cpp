@@ -247,7 +247,7 @@ visit_handle VisItListener::GetMetaData(void *cbdata)
 
 visit_handle VisItListener::GetMesh(int domain, const char *name, void *cbdata)
 {
-	DBG("Entering VisItListener::GetMesh for mesh " << name);
+	DBG("Entering VisItListener::GetMesh for mesh " << name << ", domain is " << domain);
 	SimData *s = (SimData*)cbdata;
 	Mesh* m = MeshManager::Search(std::string(name));
 	visit_handle h = VISIT_INVALID_HANDLE;
@@ -262,7 +262,7 @@ visit_handle VisItListener::GetVariable(int domain, const char *name, void *cbda
 {
 	DBG("Entering VisItListener::GetVariable for variable " << name);
 	SimData *s = (SimData*)cbdata;
-	INFO("In GetVariable, iteration is " << s->iteration);
+	INFO("In GetVariable, iteration is " << s->iteration << ", domain is " << domain);
 	Variable* v = VariableManager::Search(std::string(name));
 	visit_handle h = VISIT_INVALID_HANDLE;
 	if(v != NULL) {
@@ -282,20 +282,29 @@ visit_handle VisItListener::GetDomainList(const char* name, void* cbdata)
 		int *iptr = NULL;
 
 		std::list<int> clients = Environment::GetKnownLocalClients();
+		DBG("Known clients : ");
+		for(std::list<int>::iterator i = clients.begin(); i != clients.end(); i++)
+				std::cout	<< (*i) << " ";
+		std::cout << std::endl;
 		int nbrClients = clients.size();
 		int ttlClients = Environment::GetGlobalNumberOfClients();
+
+		DBG("nbrClients = " << nbrClients << " ttlClients = " << ttlClients);
 
 		std::list<int>::const_iterator it = clients.begin();
 		iptr = (int *)malloc(sizeof(int)*nbrClients);
 		for(int i = 0; i < nbrClients; i++) {
 			iptr[i] = *it;
 			it++;
+			DBG(iptr[i]);
 		}
 
 		if(VisIt_VariableData_alloc(&hdl) == VISIT_OKAY)
 		{
 			VisIt_VariableData_setDataI(hdl, VISIT_OWNER_VISIT, 1, nbrClients, iptr);
 			VisIt_DomainList_setDomains(h, ttlClients, hdl);
+		} else {
+			free(iptr);
 		}
 	}
 	return h;

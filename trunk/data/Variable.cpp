@@ -125,6 +125,7 @@ bool Variable::exposeVisItMetaData(visit_handle md)
 
 bool Variable::exposeVisItData(visit_handle* h, int source, int iteration)
 {
+	DBG("source = " << source << ", iteration = " << iteration);
 	if(VisIt_VariableData_alloc(h) == VISIT_OKAY) {
 		ChunkIndex::iterator end;
 		ChunkIndex::iterator it = getChunks(source, iteration, end);

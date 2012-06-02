@@ -1,5 +1,10 @@
 #ifndef SIMULATION_EXAMPLE_H
 #define SIMULATION_EXAMPLE_H
+
+#ifdef PARALLEL
+#include <mpi.h>
+#endif
+
 #include <string.h>
 #include <stdlib.h>
 

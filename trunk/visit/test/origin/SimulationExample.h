@@ -3,6 +3,9 @@
 #include <string.h>
 #include <stdlib.h>
 
+#ifdef PARALLEL
+#include <mpi.h>
+#endif
 /*****************************************************************************
  * Method: SimulationExample
  *

@@ -6,5 +6,5 @@ print "----------------------"
 var = damaris.open("life/cells")
 chunks = var.select({'iteration':i})
 print chunks
-#for c in chunks:
-#	var.remove(c)
+for c in chunks:
+	var.remove(c)

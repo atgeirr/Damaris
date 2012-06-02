@@ -1,19 +1,21 @@
 <?xml version="1.0"?>
 <simulation name="life" language="c" xmlns="http://damaris.gforge.inria.fr/Damaris/Model">
 	<architecture>
-		<cores  count="2">
-			<clients count="1"/>
+		<cores  count="5">
+			<clients count="4"/>
 		</cores>
 		<buffer name="buffer" size="67108864" />
 		<queue  name="queue" size="100" />
 	</architecture>
 	<data>
-		<parameter name="n" type="int" value="96" />
+		<parameter name="NROW" type="int" value="96" />
+		<parameter name="NCOL" type="int" value="32" />
+		<parameter name="size" type="int" value="4" />
 
-		<layout name="rmeshX" type="float" dimensions="n" />
-		<layout name="rmeshY" type="float" dimensions="n" />
+		<layout name="rmeshX" type="float" dimensions="1+NCOL" />
+		<layout name="rmeshY" type="float" dimensions="1+NROW/size" />
 
-		<layout name="cells" type="int" dimensions="n-1,n-1" />
+		<layout name="cells" type="int" dimensions="NCOL,NROW/size" />
 
 		<mesh name="mesh2d" type="rectilinear" topology="2">
 			<coord name="coordinates/x2d" unit="cm" label="Width"/>
