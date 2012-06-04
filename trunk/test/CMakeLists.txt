@@ -3,6 +3,10 @@ set(EMB_SERVER_LIBRARIES damaris-server ${CLIENT_SIDE_LIBRARIES})
 
 add_library(hello SHARED hello.cpp)
 
+IF( CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" )
+  SET_TARGET_PROPERTIES(hello PROPERTIES COMPILE_FLAGS "-fPIC")
+ENDIF( CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" )
+
 add_executable (julia_cpp ${DAMARIS_SOURCE_DIR}/test/julia.cpp)
 target_link_libraries (julia_cpp ${CLIENT_SIDE_LIBRARIES})
 

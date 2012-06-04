@@ -282,10 +282,6 @@ visit_handle VisItListener::GetDomainList(const char* name, void* cbdata)
 		int *iptr = NULL;
 
 		std::list<int> clients = Environment::GetKnownLocalClients();
-		DBG("Known clients : ");
-		for(std::list<int>::iterator i = clients.begin(); i != clients.end(); i++)
-				std::cout	<< (*i) << " ";
-		std::cout << std::endl;
 		int nbrClients = clients.size();
 		int ttlClients = Environment::GetGlobalNumberOfClients();
 
@@ -296,7 +292,6 @@ visit_handle VisItListener::GetDomainList(const char* name, void* cbdata)
 		for(int i = 0; i < nbrClients; i++) {
 			iptr[i] = *it;
 			it++;
-			DBG(iptr[i]);
 		}
 
 		if(VisIt_VariableData_alloc(&hdl) == VISIT_OKAY)

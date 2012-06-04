@@ -116,12 +116,7 @@ class Variable : public Configurable<Model::Variable> {
 		ChunkIndex::iterator getChunks(int source, int iteration, ChunkIndex::iterator &end);
 
 		/**
-		 * Delete a chunk from the variable, free its memory.
-		 */
-		void eraseChunk(Chunk* c);
-
-		/**
-		 * Detach a chunk from a variable (don't free the memory).
+		 * Detach a chunk from a variable. Free its memory if the process owns the variable.
 		 */
 		void detachChunk(Chunk* c);
 
