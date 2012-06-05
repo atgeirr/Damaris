@@ -24,6 +24,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <list>
 #include "core/Debug.hpp"
 #include "core/Message.hpp"
+#include "core/MPILayer.hpp"
 #include "data/ShmChunk.hpp"
 #include "data/Layout.hpp"
 #include "core/ActionManager.hpp"
@@ -55,6 +56,7 @@ Server::Server(Process* p)
 Server::~Server()
 {
 	Process::kill();
+	MPILayer<int>::Delete(visitMPIlayer);
 }
 	
 /* starts the server and enter the main loop */
@@ -66,6 +68,7 @@ int Server::run()
 		Viz::VisItListener::Init(Environment::getEntityComm(),
 			process->getModel()->visit(),
 			Environment::getSimulationName());
+			visitMPIlayer = MPILayer<int>::New(Environment::getEntityComm());
 	}
 	
 	Message msg;
@@ -73,6 +76,7 @@ int Server::run()
 	int vizstt;
 
 	while(needStop > 0) {
+		// try receiving from the shared message queue
 		received = process->getSharedMessageQueue()->tryReceive(&msg,sizeof(Message));
 		if(received) {
 			DBG("Received a message of type " << msg.type
@@ -81,8 +85,19 @@ int Server::run()
 			processMessage(msg);
 		}
 		
-		if((vizstt = Viz::VisItListener::Connected()) > 0) {
-			Viz::VisItListener::EnterSyncSection(vizstt);
+		if(process->getModel()->visit().present()) {
+			// try receiving from VisIt (only for rank 0)
+	
+			if(process->getID() == 0) {
+				if((vizstt = Viz::VisItListener::Connected()) > 0) {
+					visitMPIlayer->bcast(&vizstt);
+				}
+			}
+
+			// try receiving from the VisIt callback communication layer
+			if(visitMPIlayer->deliver(&vizstt)) {
+				Viz::VisItListener::EnterSyncSection(vizstt);
+			}
 		}
 	}
 	

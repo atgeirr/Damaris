@@ -98,7 +98,7 @@ int VisItListener::EnterSyncSection(int visitstate)
 		case 1:
 			if(VisItAttemptToCompleteConnection() == VISIT_OKAY) {
 				INFO("VisIt connected");
-				
+				VisItSetSlaveProcessCallback(&VisItListener::SlaveProcessCallback);	
 				VisItSetGetMetaData(&VisItListener::GetMetaData,(void*)(&sim));
 				VisItSetGetMesh(&VisItListener::GetMesh,(void*)(&sim));
 				VisItSetGetVariable(&VisItListener::GetVariable,(void*)(&sim));
@@ -107,7 +107,7 @@ int VisItListener::EnterSyncSection(int visitstate)
 			}
 			break;
 		case 2:
-			if(VisItProcessEngineCommand() == VISIT_ERROR) {
+			if(!ProcessVisItCommand()) {
 				VisItDisconnect();
 			}
 			break;
@@ -123,19 +123,19 @@ int VisItListener::Update()
 	return 0;
 }
 
-void VisItListener::broadcastSlaveCommand(int *command)
+void VisItListener::BroadcastSlaveCommand(int *command)
 {
 	MPI_Bcast(command, 1, MPI_INT, 0, comm);
 }
 
 
-void VisItListener::slaveProcessCallback()
+void VisItListener::SlaveProcessCallback()
 {
 	int command = VISIT_COMMAND_PROCESS;
-	broadcastSlaveCommand(&command);
+	BroadcastSlaveCommand(&command);
 }
 
-bool VisItListener::processVisItCommand()
+bool VisItListener::ProcessVisItCommand()
 {
 	int command;
 	int rank;
@@ -145,18 +145,18 @@ bool VisItListener::processVisItCommand()
 		int success = VisItProcessEngineCommand();
 		if(success) {
 			command = VISIT_COMMAND_SUCCESS;
-			broadcastSlaveCommand(&command);
+			BroadcastSlaveCommand(&command);
 			return true;
 		}
 		else
 		{
 			command = VISIT_COMMAND_FAILURE;
-			broadcastSlaveCommand(&command);
+			BroadcastSlaveCommand(&command);
 			return false;
 		}
 	} else {
 		while(true) {
-			broadcastSlaveCommand(&command);
+			BroadcastSlaveCommand(&command);
 			switch (command)
 			{
 				case VISIT_COMMAND_PROCESS:
@@ -262,7 +262,7 @@ visit_handle VisItListener::GetVariable(int domain, const char *name, void *cbda
 {
 	DBG("Entering VisItListener::GetVariable for variable " << name);
 	SimData *s = (SimData*)cbdata;
-	INFO("In GetVariable, iteration is " << s->iteration << ", domain is " << domain);
+	DBG("In GetVariable, iteration is " << s->iteration << ", domain is " << domain);
 	Variable* v = VariableManager::Search(std::string(name));
 	visit_handle h = VISIT_INVALID_HANDLE;
 	if(v != NULL) {

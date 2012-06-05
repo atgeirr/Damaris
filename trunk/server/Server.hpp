@@ -28,6 +28,7 @@
 
 #include "core/Message.hpp"
 #include "core/Process.hpp"
+#include "core/MPILayer.hpp"
 #include "server/Initiator.hpp"
 
 namespace Damaris {
@@ -37,7 +38,7 @@ namespace Damaris {
 
 		private:
 			Process* process;
-
+			MPILayer<int>* visitMPIlayer;
 			/**
 			 * \brief Constructor.
 			 * Used when starting a server from an external program.

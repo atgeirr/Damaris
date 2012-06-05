@@ -26,6 +26,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <mpi.h>
 #include <list>
+#include <boost/shared_ptr.hpp>
 #include "core/Communication.hpp"
 
 namespace Damaris {
@@ -42,6 +43,7 @@ class MPILayer : public Communication<MSG> {
 
 		MPI_Comm comm;
 		std::list<MSG> toDeliver;
+		std::list<boost::shared_ptr<MPI_Request> > pendingSendReq;
 		int rank;
 		int size;
 
@@ -57,7 +59,7 @@ class MPILayer : public Communication<MSG> {
 		 * Sends a message (non-blocking). The message will be eventually
 		 * delevered by the process identifyed by its ID.
 		 */
-		void send(int receiver, const MSG *m);
+		void send(int receiver, MSG *m);
 
 		/**
 		 * Delivers the next message in the queue. If there is no message,
@@ -69,7 +71,7 @@ class MPILayer : public Communication<MSG> {
 		 * Broadcast a message to all processes in the communication layer.
 		 * The message will be eventually delivered by all processes.
 		 */
-		void bcast(const MSG* m);
+		void bcast(MSG* m);
 };
 
 
@@ -109,13 +111,44 @@ void MPILayer<MSG>::update()
 	static MPI_Status status;
 	static bool listening = false;
 
+	// start by deleting one request of a previously sent message
+	// if the request is obsolete, otherwise put it back in the queue
+	if(!pendingSendReq.empty()) {
+		boost::shared_ptr<MPI_Request> pending = pendingSendReq.front();
+		pendingSendReq.pop_front();
+		int done;
+		MPI_Status s;
+		MPI_Test(pending.get(),&done,&s);
+		if(!done) {
+			pendingSendReq.push_back(pending);
+		}
+	}
+
+	// if we haven't started an MPI_IRecv yet, we do it now
 	if(!listening) {
 		MPI_Irecv(&m, sizeof(MSG), MPI_BYTE, MPI_ANY_SOURCE, MPI_ANY_TAG, comm, &request);
 		listening = true;
+	// otherwise, we check the status of the last MPI_Irecv request
 	} else {
-		int flag;
-		MPI_Test(&request,flag,&status);
-		if(flag) {
+		int done;
+		MPI_Test(&request,&done,&status);
+		if(done) {
+			// if the tag is a TAG_BCAST, forward to child processes
+			if(status.MPI_TAG == TAG_BCAST) {
+				int c1 = rank*2 + 1;
+				int c2 = rank*2 + 2;
+				if(c1 < size) {
+					MPI_Request *pending = new MPI_Request;
+					MPI_Isend(&m,sizeof(MSG),MPI_BYTE, c1, TAG_BCAST, comm, pending);
+					pendingSendReq.push_back(boost::shared_ptr<MPI_Request>(pending));
+				}
+				if(c2 < size) {
+					MPI_Request *pending = new MPI_Request;
+					MPI_Isend(&m,sizeof(MSG),MPI_BYTE, c2, TAG_BCAST, comm, pending);
+					pendingSendReq.push_back(boost::shared_ptr<MPI_Request>(pending));
+				}
+			}
+			// in any case, deliver it
 			toDeliver.push_back(m);
 			listening = false;
 		}
@@ -123,28 +156,46 @@ void MPILayer<MSG>::update()
 }
 
 template<typename MSG>
-void MPILayer<MSG>::send(int recvid, const MSG *m)
+void MPILayer<MSG>::send(int recvid, MSG *m)
 {
-	static MPI_Request request;
-	MPI_Isend(m,sizeof(MSG),MPI_BYTE, recvid, TAG_SEND, comm, &request);
+	MPI_Request* pending = new MPI_Request;
+	MPI_Isend(m,sizeof(MSG),MPI_BYTE, recvid, TAG_SEND, comm, pending);
+	pendingSendReq.push_back(boost::shared_ptr<MPI_Request>(pending));
 }
 
 template<typename MSG>
 bool MPILayer<MSG>::deliver(MSG* m)
 {
+	update();
 	if(toDeliver.empty()) {
 		return false;
 	} else {
+		DBG("message present, delivering");
 		*m = *(toDeliver.begin());
-	}	
+		toDeliver.pop_front();
+	}
 	return true;
 }
 
 template<typename MSG>
-void MPILayer<MSG>::bcast(const MSG* m)
+void MPILayer<MSG>::bcast(MSG* m)
 {
-	static MPI_Request request;
-	MPI_Isend(m,sizeof(MSG),MPI_BYTE, 0, TAG_BCAST, comm, &request);
+	DBG("entering bcast");
+	int c1 = rank*2 + 1;
+	int c2 = rank*2 + 2;
+	if(c1 < size) {
+		MPI_Request* pending = new MPI_Request;
+		MPI_Isend(m,sizeof(MSG),MPI_BYTE, c1, TAG_BCAST, comm, pending);
+		pendingSendReq.push_back(boost::shared_ptr<MPI_Request>(pending));
+		DBG("message sent to child " << c1);
+	}
+	if(c2 < size) {
+		MPI_Request* pending = new MPI_Request;
+		MPI_Isend(m,sizeof(MSG),MPI_BYTE, c2, TAG_BCAST, comm, pending);
+		pendingSendReq.push_back(boost::shared_ptr<MPI_Request>(pending));
+		DBG("message sent to child " << c2);
+	}
+	toDeliver.push_back(*m);
 }
 
 }

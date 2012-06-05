@@ -1,15 +1,15 @@
 <?xml version="1.0"?>
 <simulation name="life" language="c" xmlns="http://damaris.gforge.inria.fr/Damaris/Model">
 	<architecture>
-		<cores  count="5">
-			<clients count="4"/>
+		<cores  count="3">
+			<clients count="2"/>
 		</cores>
 		<buffer name="buffer" size="67108864" />
 		<queue  name="queue" size="100" />
 	</architecture>
 	<data>
 		<parameter name="NROW" type="int" value="96" />
-		<parameter name="NCOL" type="int" value="32" />
+		<parameter name="NCOL" type="int" value="96" />
 		<parameter name="size" type="int" value="4" />
 
 		<layout name="rmeshX" type="float" dimensions="1+NCOL" />
@@ -32,13 +32,13 @@
 		</group>
 	</data>
 	<actions>
-		<script name="clean"    file="clean.py" language="python" />
+		<event name="clean" action="internal_gc" library="libgc.so" />
 	</actions>
 	<python>
-		<path>/home/mdorier/Work/Visu2/visit/python/2.6.4/linux-i686_gcc-4.6/lib/python2.6</path>
-		<home>/home/mdorier/Work/Visu2/visit/python/2.6.4/linux-i686_gcc-4.6</home>
+		<path>/home/mdorier/visu/visit/python/2.6.4/linux-x86_64_gcc-4.4/lib/python2.6</path>
+		<home>/home/mdorier/visu/visit/python/2.6.4/linux-x86_64_gcc-4.4</home>
 	</python>
 	<visit>
-		<path>/home/mdorier/Work/Visu2/visit2.5.0/src</path>
+		<path>/home/mdorier/visu/visit2.5.0/src</path>
 	</visit>
 </simulation>

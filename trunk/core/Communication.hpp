@@ -37,7 +37,7 @@ class Communication {
 		 * Sends a message (non-blocking). The message will be eventually
 		 * delevered by the process identifyed by its ID.
 		 */
-		virtual void send(int receiver, const MSG *m) = 0;
+		virtual void send(int receiver, MSG *m) = 0;
 
 		/**
 		 * Delivers the next message in the queue. If there is no message,
@@ -49,7 +49,7 @@ class Communication {
 		 * Broadcast a message to all processes in the communication layer.
 		 * The message will be eventually delivered by all processes.
 		 */
-		virtual void bcast(const MSG* m) = 0;
+		virtual void bcast(MSG* m) = 0;
 };
 
 }

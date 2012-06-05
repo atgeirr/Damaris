@@ -44,9 +44,9 @@ class VisItListener {
 		static SimData sim;
 		static MPI_Comm comm;
 
-		static void broadcastSlaveCommand(int *command);
-		static void slaveProcessCallback();
-		static bool processVisItCommand();
+		static void BroadcastSlaveCommand(int *command);
+		static void SlaveProcessCallback();
+		static bool ProcessVisItCommand();
 		
 		static int BroadcastIntCallback(int *value, int sender);
 		static int BroadcastStringCallback(char *str, int len, int sender);

@@ -13,6 +13,7 @@
 #include <unistd.h>
 #include <math.h>
 #include <mpi.h>
+#include <time.h>
 #include "Damaris.h"
 
 /******************************************************************************
@@ -22,7 +23,7 @@
 /* The number of cells (or zones) displayed on screen is NN * NN*/
 /*#define NN 48*96*2 */
 #define NROW 96
-#define NCOL 32
+#define NCOL 96 
 
 typedef enum {RANDOM = 0, GLIDER=1, ACORN=2, DIEHARD=3} BCtype;
 
@@ -233,11 +234,12 @@ life_data_simulate(life_data *life, int par_rank, int par_size)
 }
 
 void
-life_data_ResetInitialConditions(life_data *life, BCtype bc)
+life_data_ResetInitialConditions(life_data *life, BCtype bc, int rank)
 {
     /* in all cases, we center the figure in the middle of the grid */
     int i, j;
 
+		srand(time(NULL)+rank*32);
     switch(bc)
     {
     case RANDOM:
@@ -401,7 +403,7 @@ void exposeDataToDamaris(simulation_data* sim) {
 
 #ifdef PARALLEL
 	MPI_Barrier(MPI_COMM_WORLD);
-	if(sim->par_rank == 0) 
+	if(sim->par_rank % 2 == 0) 
 #endif
 	{
 			DC_end_iteration(sim->cycle);
@@ -450,7 +452,7 @@ int main(int argc, char **argv)
 	DC_initialize(argv[1],sim.par_rank);
 
     life_data_allocate(&sim.life, sim.par_rank, sim.par_size);
-    life_data_ResetInitialConditions(&sim.life, RANDOM);
+    life_data_ResetInitialConditions(&sim.life, RANDOM, sim.par_rank);
 
     mainloop(&sim);
 
