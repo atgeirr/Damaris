@@ -15,13 +15,13 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file ParameterSet.hpp
+ * \file ParameterManager.hpp
  * \date February 2012 
  * \author Matthieu Dorier
  * \version 0.4
  */
-#ifndef __DAMARIS_PARAMETER_SET_H
-#define __DAMARIS_PARAMETER_SET_H
+#ifndef __DAMARIS_PARAMETER_MANAGER_H
+#define __DAMARIS_PARAMETER_MANAGER_H
 
 #include <map>
 #include "xml/Model.hpp"
@@ -32,20 +32,29 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 namespace Damaris {
 
 /**
- * The ParameterSet class describes an object that holds
- * the parameters and offers an access by name.
+ * The ParameterManager class describes an object that holds
+ * the parameters and offers an access by name and by id.
  */
 class ParameterManager : public Manager<Parameter> {
 	private:
+		/**
+		 * Private constructor: the ParameterManager cannot be instanciated.
+		 */
 		ParameterManager();
 
 	public:
 		/**
-		 * Constructor.
+		 * Constructor. Goes through all the objects described in the XML model
+		 * and creates them.
 		 * \param[in] mdl : base model to initialize from.
 		 */
 		static void Init(const Model::Data& mdl);
 	
+		/**
+		 * Some parts of the program require to have an object that exposes
+		 * the parameters, and cannot work with the static functions, so
+		 * we provide a class that wraps the ParameterManager in an object.
+		 */
 		template<typename T>
 		class ParameterMap {
 			public:

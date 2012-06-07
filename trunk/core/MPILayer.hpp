@@ -38,23 +38,42 @@ template<typename MSG>
 class MPILayer : public Communication<MSG> {
 
 	private:
-		static const int TAG_SEND  = 0;
-		static const int TAG_BCAST = 1;
+		static const int TAG_SEND  = 0; /*!< MPI tag indicating that the message is sent. */
+		static const int TAG_BCAST = 1;	/*!< MPI tag indicating that the message is broadcasted. */
 
-		MPI_Comm comm;
-		std::list<MSG> toDeliver;
-		std::list<boost::shared_ptr<MPI_Request> > pendingSendReq;
-		int rank;
-		int size;
+		MPI_Comm comm; /*!< Communicator through which sending messages. */
+		std::list<MSG> toDeliver; /*!< List of messages ready to be delivered. */
+		std::list<boost::shared_ptr<MPI_Request> > pendingSendReq; /*!< List of requests associated to message sent. */
+		int rank; /*!< Rank of the process in the communicator. */
+		int size; /*!< Size of the communicator. */
 
+		/**
+		 * Constructor. The constructor is private, use New to create an instance.
+		 */
 		MPILayer(const MPI_Comm &c);
+		
+		/**
+		 * Destructor (private)
+		 */
 		~MPILayer();
 
 	public:
+		/**
+		 * Creates a new MPILayer object with a given communicator.
+		 */
 		static MPILayer* New(const MPI_Comm &c);
+		
+		/**
+		 * Deletes the given MPILayer instance.
+		 */
 		static void Delete(MPILayer* l);
 
+		/**
+		 * Update (try receiving messages from other processes and put them in
+		 * the toDeliver queue).
+		 */
 		void update();
+
 		/**
 		 * Sends a message (non-blocking). The message will be eventually
 		 * delevered by the process identifyed by its ID.

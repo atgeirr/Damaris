@@ -23,11 +23,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __DAMARIS_LAYOUT_MANAGER_H
 #define __DAMARIS_LAYOUT_MANAGER_H
 
-#include <iostream>
-#include <map>
-#include <string>
-#include <vector>
-
 #include "xml/Model.hpp"
 #include "data/Layout.hpp"
 #include "core/Configurable.hpp"
@@ -35,12 +30,15 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 namespace Damaris {
 
 	/**
-	 * VariableManager holds pointers to all Variables.
-	 * These variables can be retrieved by their name or by a unique ID.
+	 * LayoutManager keeps track of all Layout instance, and records them
+	 * by name and by id.
 	 */
 	class LayoutManager : public Manager<Layout> {
 
 	public:
+		/**
+		 * Initializes all the Layout instances from a given model (from XML).
+		 */
 		static void Init(const Model::Data& mdl);
 
 	};

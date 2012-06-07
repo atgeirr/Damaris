@@ -40,7 +40,7 @@ class NodeAction : public BASE {
 
 	private:
 		std::map<int,int> locks; /*!< This map associates an iteration with the number of
-					      clients that have fired the event for this iteration. */
+								   clients that have fired the event for this iteration. */
 		int clientsPerNode; /*!< Number of clients in each node (to know who to wait for) */
 
 		/**

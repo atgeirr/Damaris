@@ -67,8 +67,16 @@ class Chunk {
 		 */
 		virtual void* data() = 0;
 
+		/**
+		 * This function let the user decide wether this instance of Chunk
+		 * can or cannot destroy its associated data when deleted.
+		 */
 		virtual void SetDataOwnership(bool isOwner) = 0;
 
+		/**
+		 * Return true if this instance is the owner of its data or
+		 * if it just points to it.
+		 */
 		virtual bool GetDataOwnership() = 0;
 
 		/**
@@ -109,6 +117,10 @@ class Chunk {
 		bool within(const Chunk& enclosing) const;
 
 #ifdef __ENABLE_VISIT
+		/**
+		 * Fills a VisIt data handle (already allocated) to expose the data
+		 * to VisIt. Return true if it managed to expose the data.
+		 */
 		bool FillVisItDataHandle(visit_handle hdl);
 #endif
 

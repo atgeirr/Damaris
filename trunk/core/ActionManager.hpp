@@ -18,7 +18,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \file ActionsManager.hpp
  * \date May 2012
  * \author Matthieu Dorier
- * \version 0.4
+ * \version 0.5
  */
 #ifndef __DAMARIS_ACTION_MANAGER_H
 #define __DAMARIS_ACTION_MANAGER_H
@@ -32,15 +32,30 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 namespace Damaris {
 
 	/**
+	 * ActionManager is a class that offers an access by name
+	 * and by id to all actions managed by the program. It
+	 * also exposes two functions to execute these actions.
+	 * It inherites from Manage<Action>.
 	 */
 	class ActionManager : public Manager<Action> {
 
 	public:
+		/**
+		 * Initialize the ActionManager with a model: goes through
+		 * all the events and scripts described in the XML file,
+		 * creates the appropriate Actions instances, and stores them.
+		 */
 		static void Init(const Model::Actions& mdl);
 
+		/**
+		 * Trigger a particular action identified by its name.
+		 */
 		static void reactToUserSignal(const std::string &sig,
 				int32_t iteration, int32_t sourceID);
 
+		/**
+		 * Trigger a particular action identified by its id.
+		 */
 		static void reactToUserSignal(int id,
 				int32_t iteration, int32_t sourceID);
 	};

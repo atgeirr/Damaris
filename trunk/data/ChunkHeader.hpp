@@ -30,15 +30,17 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Damaris {
 
-
 /**
+ * The ChunkHeader class is used to store some information
+ * related to the Chunk inside a shared memory segment when passing
+ * a Chunk from a process to another.
  */
 class ChunkHeader : public ChunkDescriptor {
 
 	private:
 		int source;     /*!< ID of the process that generated the chunk.*/
 		int iteration;  /*!< iteration at which the chunk has been generated. */
-		Model::Type::value type;
+		Model::Type::value type; /*! Type of the Chunk. */
 	
 	public:
 		ChunkHeader(const ChunkDescriptor* ch, const Model::Type& t, int it, int src) 

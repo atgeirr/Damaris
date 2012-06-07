@@ -30,7 +30,7 @@ namespace Damaris {
 	Environment::Environment(const Model::Simulation& mdl)
 	: Configurable<Model::Simulation>(mdl)
 	{
-		entityComm = MPI_COMM_NULL;
+		entityComm = MPI_COMM_WORLD;
 		globalComm = MPI_COMM_NULL;
 		nodeComm   = MPI_COMM_NULL;
 		lastIteration = -1;
@@ -80,7 +80,11 @@ namespace Damaris {
 	{
 		int dcore = 0;
 		MPI_Comm_size(env->entityComm,&dcore);
-		return dcore*getClientsPerNode();
+		if(hasServer()) {
+			return dcore*getClientsPerNode();
+		} else {
+			return dcore;
+		}
 	}
 
 	std::string Environment::getSimulationName()

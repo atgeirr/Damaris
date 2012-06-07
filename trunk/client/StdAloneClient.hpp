@@ -18,7 +18,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \file StdAloneClient.hpp
  * \date February 2012
  * \author Matthieu Dorier
- * \version 0.4
+ * \version 0.5
  */
 #ifndef __DAMARIS_STDALONE_CLIENT_H
 #define __DAMARIS_STDALONE_CLIENT_H
@@ -35,7 +35,7 @@ class Initiator;
 /**
  * The StdAloneClient object represents a single core running the
  * simulation when no dedicated core is present. In this case the
- * client runs the plugins by itself.
+ * client runs the plugins by itself, synchronously.
  */
 class StdAloneClient : public Client {
 
@@ -89,6 +89,12 @@ class StdAloneClient : public Client {
 		 * \see Client::clean
 		 */
 		virtual int clean(int iteration);
+
+		/**
+		 * Indicates that the iteration has terminated, this will potentially
+		 * update connected backends such as VisIt.
+		 */
+		virtual int end_iteration(int iteration);
 
 		/**
 		 * \brief Destructor.

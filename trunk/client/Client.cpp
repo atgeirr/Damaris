@@ -373,6 +373,7 @@ namespace Damaris {
 
 	int Client::end_iteration(int iteration)
     {
+		Environment::SetLastIteration(iteration);
 		Message msg;
 		msg.type = MSG_INT;
 		msg.source = process->getID();

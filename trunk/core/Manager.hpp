@@ -42,15 +42,23 @@ namespace bmi = boost::multi_index;
 
 class Identified;
 /**
- * This class serves as a factory the build identified (named)
+ * This class serves as a factory to build identified (named)
  * objects. It keeps a record of all objects created and does
  * not create twice the same named object.
+ * Each object must have a unique name, and the Manager also gives
+ * them a unique integer id.
  */
 template<typename T>
 class Manager {
 	
 	private:
 
+		/**
+		 * ObjectSet is a boost MultiIndex to store all the pointers
+		 * to objects. The objects are stored using boost::shared_ptr
+		 * so as soon as they are removed from the set, they are destroyed
+		 * (unless another shared_ptr exists somewhere else for these objects.
+		 */
 		typedef typename boost::multi_index_container<
 					boost::shared_ptr<T>,
 					bmi::indexed_by<
@@ -86,20 +94,40 @@ class Manager {
 		typedef typename ObjectSet::template index<by_id>::type IndexById;
 		typedef typename ObjectSet::template index<by_any>::type Index;	
 
-		static ObjectSet *objects;
+		static ObjectSet *objects; /*!< pointer to an ObjectSet that will store all the objects.
+									This pointer is initialized only if some objects have to be
+									stored, otherwise we save memory by deleting it.*/
 
 	private:
+		/**
+		 * Constructor is private: all the methods are static and we shouldn't be able
+		 * to create on such an object.
+		 */
 		Manager() {}
 
-	public:	
-
+	public:
+		/**
+		 * From outside the Manager object, an iterator type is defined to 
+		 * iterator over elements of the set.
+		 */
 		typedef typename ObjectSet::iterator iterator;
 
-	private:
-		static iterator empty;
-		
 	public:
 
+		/**
+		 * This function creates an object of type SUBCLASS 
+		 * (which must be a subclass of the class T) by calling
+		 * its "New" function with a MODEL parameter. The name of the object
+		 * must be provided. The object is stored in the multiindex structure
+		 * and a pointer to it is returned. If another object with the same name
+		 * already exists, the object is not created but the old object is returned
+		 * instead. A configuration warning is output on stderr.
+		 * 
+		 * Example: in a Manager<Action>, one can use
+		 * Manager<Action>::Create<DynamicAction>(Model::Event mdl, "a name")
+		 * since DynamicAction inherites from Action and has a constructor that
+		 * takes a Model::Event instance.
+		 */
 		template<typename SUBCLASS, typename MODEL>
 		static T* Create(const MODEL &mdl, const std::string& name)
 		{
@@ -123,12 +151,19 @@ class Manager {
 			return t;
 		}
 
+		/**
+		 * Deletes an object from the structure.
+		 */
 		static void Delete(T* t)
 		{
 			if(t != NULL && objects != NULL)
 				objects->erase(t);
 		}
 
+		/**
+		 * Searches an object by its name, return a pointer to the object
+		 * if it exists, NULL otherwise.
+		 */
 		static T* Search(const std::string &name) 
 		{
 			if(objects == NULL) return NULL;
@@ -140,6 +175,21 @@ class Manager {
 
 		}
 
+		/**
+		 * Applies a function to each objects of the set.
+		 * This mimics functional languages and eases the design of
+		 * procedures that have to be executed on all objects.
+		 * The template FUNCTION type must overload the operator ()
+		 * for reference over the T class. No assumption can be made
+		 * on the order of the objects.
+		 * 
+		 * An example of structure that can be used as a function:
+		 * struct function {
+		 * 		void operator()(T& t) {
+		 *			... do something with t...
+		 *		}
+		 * }
+		 */
 		template<typename FUNCTION>
 		static void ForEach(const FUNCTION& f)
 		{
@@ -151,7 +201,10 @@ class Manager {
 			}
 		}
 
-
+		/**
+		 * Searches an object by its id, return a pointer to the object if found,
+		 * NULL otherwise.
+		 */
 		static T* Search(const int &id) 
 		{
 			if(objects == NULL) return NULL;
@@ -163,6 +216,9 @@ class Manager {
 			return it->get();
 		}
 
+		/**
+		 * Returns the number of objects contained in the set.
+		 */
 		static int NumObjects()
 		{
 			if(objects == NULL)
@@ -171,26 +227,42 @@ class Manager {
 				return objects->size();
 		}
 
+		/**
+		 * Remove all the objects from the set and deletes the set
+		 * (can be reinitialized later by adding new objects).
+		 */
 		static void DeleteAll()
 		{
 			if(objects != NULL)
 				delete objects;
 		}
 
+		/**
+		 * Returns an iterator over the end of the index.
+		 * The index must NOT be empty: the user has to check this condition
+		 * using IsEmtpy() before trying to call this function.
+		 */
 		static iterator End() 
 		{
 			return objects->end();
 		}
 
+		/**
+		 * Returns an iterator over the begining of the index.
+		 * The index must NOT be empty: the use has to check this condition
+		 * using IsEmpty() before trying to call this function.
+		 */
 		static iterator Begin()
 		{
 			return objects->begin();
 		}
 
+		/**
+		 * Indicates is the index is empty or not.
+		 */
 		static bool IsEmpty()
 		{
-			if(objects == NULL) return true;
-			else return (Begin() == End());
+			return (NumObjects() == 0);
 		} 
 };
 

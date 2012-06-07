@@ -32,7 +32,11 @@ namespace Damaris {
 template<typename MSG>
 class Communication {
 	public:
+		/**
+		 * Updates the communication layer.
+		 */
 		virtual void update() = 0;
+
 		/**
 		 * Sends a message (non-blocking). The message will be eventually
 		 * delevered by the process identifyed by its ID.

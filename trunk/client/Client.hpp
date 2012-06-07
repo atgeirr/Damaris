@@ -45,8 +45,11 @@ class Initiator;
 /**
  * \class Client
  * The Client object represents a single core running the
- * simulation. It is characterized by an ID and is initialized
- * with the name of an XML configuration file.
+ * simulation. It wraps a Processor object and exposes the set of
+ * functions allowing a simulation to write data and send signals to
+ * a dedicated core. This Client object is not supposed to work in
+ * a standalone mode (when no core is dedicated). For this purpose, see
+ * the StdAloneClient class.
  */
 class Client : public Writer {
 
@@ -67,12 +70,21 @@ class Client : public Writer {
 		Client(Process* p);
 
 	public:
+		/**
+		 * Constructor. This function creates a Client object. It must be used only
+		 * when clients and servers are deployed separately. Moreover, this function
+		 * sends a message to the dedicated core to notify that a new client is now
+		 * connected.
+		 * \param[in] file : name of the XML file to load.
+		 * \param[in] id : id of the client. This id must be unique across all application clients.
+		 */
 		static Client* New(const std::string& file, int32_t id);
 
 		/**
 		 * \see Writer::write
 		 */
-		virtual int write(const std::string & varname, int32_t iteration, const void* data, bool blocking = false);
+		virtual int write(const std::string & varname, 
+						int32_t iteration, const void* data, bool blocking = false);
 		
 		/**
 		 * \see Writer::chunk_write
@@ -135,6 +147,10 @@ class Client : public Writer {
 		 */
 		virtual int lost(int iteration);
 
+		/**
+		 * Indicates that the iteration has terminated, this will potentially
+		 * update connected backends such as VisIt.
+		 */
 		virtual int end_iteration(int iteration);
 
 		/**

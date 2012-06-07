@@ -69,8 +69,15 @@ class DynamicAction : public Action, public Configurable<Model::Event> {
 		 */
 		virtual void call(int32_t iteration, int32_t sourceID, const char* args = NULL);
 
+		/**
+		 * Return true if the action can be called from outside the simulation 
+		 * (typically from VisIt).
+		 */
 		virtual bool IsExternallyVisible() { return model.external(); }
 
+		/**
+		 * Tries to create a DynamicAction given a model.
+		 */
 		static DynamicAction* New(const Model::Event& ev, const std::string& name);
 };
 

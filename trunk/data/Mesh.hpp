@@ -41,26 +41,45 @@ class Mesh : public Configurable<Model::Mesh> {
 	friend class Manager<Mesh>;
 
 	private:
-		std::string name;
-		int id;
+		std::string name; /*! Name of the mesh, copy from the model. */
+		int id;	/*! id of the mesh, provided when created by the MeshManager. */
 
 	protected:
+		/**
+		 * Constructor, is protected (cannot be instanciated by outside,
+		 * allows child classes).
+		 */
 		Mesh(const Model::Mesh& mdl, const std::string& name);
 		
 	public:
 
+		/**
+		 * Returns the name of the Mesh.
+		 */
 		const std::string& getName() const {
 			return name;
 		}
 
+		/**
+		 * Returns the id of the Mesh.
+		 */
 		int getID() const { return id; }
 
 #ifdef __ENABLE_VISIT
+		/**
+		 * Fills visit handle with metadata related to the Mesh.
+		 */
 		virtual bool exposeVisItMetaData(visit_handle md) const = 0;
 		
+		/**
+		 * Fills visit handle with metadata related to the Mesh.
+		 */
 		virtual bool exposeVisItData(visit_handle* h, int source, int iteration) const = 0;
 #endif
 
+		/**
+		 * Creates an instance of a child class of Mesh according to the Mesh model.
+		 */
 		static Mesh* New(const Model::Mesh& mdl, const std::string& name);
 };
 

@@ -250,6 +250,13 @@ int StdAloneClient::kill_server()
 	return -1;
 }
 
+int StdAloneClient::end_iteration(int iteration)
+{
+	// TODO : update backends, such as VisIt
+	Environment::SetLastIteration(iteration);
+	return 0;
+}
+
 int StdAloneClient::clean(int iteration)
 {
 	return signal("clean",iteration);

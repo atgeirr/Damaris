@@ -31,6 +31,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 namespace Damaris {
 
 /**
+ * ScriptAction describes an Action that wraps an interpretable script,
+ * such as a Python script. This class is virtual and inherited, for
+ * example, by PyAction.
  */
 class ScriptAction : public Action, public Configurable<Model::Script> {
 
@@ -49,8 +52,15 @@ class ScriptAction : public Action, public Configurable<Model::Script> {
 		 */
 		virtual void call(int32_t iteration, int32_t sourceID, const char* args = NULL) = 0;
 
+		/**
+		 * Tells if the action can be called from outside the simulation.
+		 */
 		virtual bool IsExternallyVisible() { return model.external(); }
 
+		/**
+		 * Creates a new instance of an inherited class of ScriptAction according
+		 * to the "language" field in the description.
+		 */
 		static ScriptAction* New(const Model::Script& ev, const std::string& name);
 };
 

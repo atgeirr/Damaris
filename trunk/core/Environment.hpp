@@ -61,7 +61,11 @@ namespace Damaris {
 		~Environment();
 
 	public:
+		/**
+		 * Initializes the environement given a model.
+		 */
 		static void Init(const Model::Simulation& mdl);
+
 		/**
 		 * \brief Get the name of the simulation.
 		 */
@@ -71,6 +75,7 @@ namespace Damaris {
 		 * \brief Get the default language for the running simulation.
 		 */
 		static Model::Language getDefaultLanguage();
+
 		/**
 		 * \brief Get the number of clients per node.
 		 */
@@ -81,11 +86,23 @@ namespace Damaris {
 		 */
 		static int getCoresPerNode();
 
+		/**
+		 * Returns the list of id of clients connected to the
+		 * dedicated core. In standalone mode, will return a list
+		 * with only the id of the calling client.
+		 */
 		static const std::list<int>& GetKnownLocalClients();
 
+		/**
+		 * Returns the total number of clients used by the simulation.
+		 */
 		static int GetGlobalNumberOfClients();
 
+		/**
+		 * Add the id of newly connected client.
+		 */
 		static void AddConnectedClient(int id);
+
 		/**
 		 * \brief Set the communicator gathering processes of the same kind (client or server.
 		 */
@@ -121,8 +138,14 @@ namespace Damaris {
 		 */
 		static bool hasServer();
 
+		/**
+		 * Returns the last known terminated iteration.
+		 */
 		static int GetLastIteration();
 
+		/**
+		 * Sets the iteration that just terminated.
+		 */
 		static void SetLastIteration(int i);
 	};
 

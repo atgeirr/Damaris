@@ -42,24 +42,33 @@ namespace Damaris {
 
 		private:
 			std::string name; /*!< Name of the parameter. */
-			int id;
+			int id; /*!< id of the parameter, provided by the ParameterManager when created. */
 
 			boost::any value; /*!< Value of the parameter. */
 		
 			/**
-			 * Constructor.
+			 * Constructor. This constructor is private, use New to create an instance.
 			 */
 			template<typename T>
 			Parameter(const Model::Parameter& mdl, const std::string& name, const T& v);
 
 		public:
+
+			/**
+			 * Creates a new Parameter object according to a provided model and a name.
+			 */
 			static Parameter* New(const Model::Parameter& mdl, const std::string& name);
+
 			/**
 			 * Gets the name of the parameter.
 			 */
 			const std::string& getName() const;
-
+			
+			/**
+			 * Returns the id of the parameter.
+			 */
 			int getID() const;
+
 			/**
 			 * Gets the value of the parameter.
 			 */

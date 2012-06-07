@@ -126,16 +126,25 @@ class Process {
 			return segment;
 		}
 
+		/**
+		 * Returns a pointer over the XML model.
+		 */
 		Model::Simulation* getModel()
 		{
 			return model.get();
 		}
 
+		/**
+		 * Returns the rank of the process.
+		 */
 		int getID() const
 		{
 			return id;
 		}
 
+		/**
+		 * Set the rank of the process.
+		 */
 		void setID(int i) 
 		{
 			id = i;

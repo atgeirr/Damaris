@@ -80,9 +80,16 @@ class Action  {
 		 */
 		virtual void call(int32_t iteration, int32_t sourceID, const char *args = NULL) = 0;
 
+		/**
+		 * Indicates if the Action can be called from outside the simulation.
+		 */
 		virtual bool IsExternallyVisible() = 0;
 
 #ifdef __ENABLE_VISIT
+		/**
+		 * Expose the Action's metadata to VisIt.
+		 * \param[out] md : an allocated visit_handle associated with a Command metadata.
+		 */
 		bool exposeVisItMetaData(visit_handle md);
 #endif
 

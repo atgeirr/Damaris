@@ -39,7 +39,7 @@ namespace bmi = boost::multi_index;
 
 /**
  * ChunksSet is a container based on Boost Multi-Index, it indexes Chunks by
- * source and by iteration.
+ * source and by iteration within a Variable.
  */
 typedef boost::multi_index_container<
         boost::shared_ptr<Chunk>,

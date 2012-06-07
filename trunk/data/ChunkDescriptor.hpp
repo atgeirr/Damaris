@@ -37,7 +37,7 @@ namespace Damaris {
  */
 class ChunkDescriptor {
 	private:
-		static const int MAX_DIM = 32; /*!< The maximum number of dimensions is fixed to 32. */
+		static const int MAX_DIM = 16; /*!< The maximum number of dimensions is fixed to 32. */
 
 	protected:
 		unsigned int dimensions;  /*!< Number of dimensions. */

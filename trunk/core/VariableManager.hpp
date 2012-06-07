@@ -40,6 +40,12 @@ namespace Damaris {
 	class VariableManager : public Manager<Variable> {
 
 	public:
+
+		/**
+		 * Initializes the VariableManager given an XML model.
+		 * Goes through all the variables described in the model,
+		 * creates and stores them.
+		 */
 		static void Init(const Model::Data& mdl);
 
 	private:

@@ -46,8 +46,8 @@ class Layout : public Configurable<Model::Layout> {
 	friend class Manager<Layout>;
 		
 	private:
-		int id;
-		std::string name;
+		int id; /*!< id of the Layout, provided when initialized by the LayoutManager. */
+		std::string name; /*! name of the Layout, a simple copy of its name from the model. */
 		std::vector<int> extents;	/*!< Extents along each dimension. */	
 
 		static Calc<std::string::const_iterator,ParameterManager::ParameterMap<int> > *calc;
@@ -69,7 +69,11 @@ class Layout : public Configurable<Model::Layout> {
 		 */
 		const std::string& getName() const;
 
+		/**
+		 * Returns the id of the Layout.
+		 */
 		int getID() const;	
+
 		/**
 		 * \return The type of the data. 
 		 */
@@ -91,6 +95,10 @@ class Layout : public Configurable<Model::Layout> {
 		 */
 		bool isUnlimited() const;
 
+		/**
+		 * Tries to create a new Layout from a model and a name.
+		 * Returns NULL in case of failure.
+		 */
 		static Layout* New(const Model::Layout& mdl, const std::string &name);
 
 }; // class Layout

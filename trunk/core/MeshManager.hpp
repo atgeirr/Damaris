@@ -23,11 +23,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __DAMARIS_MESH_MANAGER_H
 #define __DAMARIS_MESH_MANAGER_H
 
-#include <iostream>
-#include <map>
-#include <string>
-#include <vector>
-
 #include "xml/Model.hpp"
 #include "data/Mesh.hpp"
 
@@ -35,13 +30,21 @@ namespace Damaris {
 
 	/**
 	 * MeshManager holds pointers to all Mesh objects.
+	 * These objects are associated to a unique name and a unique id.
 	 */
 	class MeshManager : public Manager<Mesh> {
 
 	public:
+		/**
+		 * This function initialize all mesh instances described in
+		 * the XML model passed as parameter.
+		 */
 		static void Init(const Model::Data& mdl);
 
 	private:
+		/**
+		 * Helper function to recursively navigate in the model.
+		 */
 		static void readMeshesInSubGroup(const Model::Group &g,
                         const std::string& groupName);
 	};
