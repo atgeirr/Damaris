@@ -10,7 +10,7 @@
 	<data>
 		<parameter name="NROW" type="int" value="96" />
 		<parameter name="NCOL" type="int" value="96" />
-		<parameter name="size" type="int" value="4" />
+		<parameter name="size" type="int" value="2" />
 
 		<layout name="rmeshX" type="float" dimensions="1+NCOL" />
 		<layout name="rmeshY" type="float" dimensions="1+NROW/size" />
@@ -39,6 +39,6 @@
 		<home>/home/mdorier/visu/visit/python/2.6.4/linux-x86_64_gcc-4.4</home>
 	</python>
 	<visit>
-		<path>/home/mdorier/visu/visit2.5.0/src</path>
+		<path>/home/mdorier/Work/Visu2/visit2.5.0/src</path>
 	</visit>
 </simulation>

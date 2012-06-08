@@ -3,6 +3,11 @@ set(VISIT_TEST_DIR ${DAMARIS_SOURCE_DIR}/visit/test)
 
 add_definitions(-DPARALLEL)
 
+add_library(gc SHARED gc.cpp)
+IF( CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" )
+  SET_TARGET_PROPERTIES(gc PROPERTIES COMPILE_FLAGS "-fPIC")
+ENDIF( CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" )
+
 add_executable (amr ${VISIT_TEST_DIR}/amr.c)
 target_link_libraries (amr ${CLIENT_SIDE_LIBRARIES})
 
