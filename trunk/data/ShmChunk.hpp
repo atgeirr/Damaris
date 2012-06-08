@@ -38,12 +38,14 @@ namespace Damaris {
 class ShmChunk : public Chunk {
 
 	private:
-		bool isOwner;
+		bool isOwner; /*!< Indicates if this instance is the owner of the data
+						(multiple instances can hold a pointer to the same data. */
 		SharedMemorySegment* segment; /*!< Pointer to the shared memory 
 										segment containing the data. */
 		ChunkHeader* header; /*!< Pointer to header. */
 		void* buffer; /*!< Pointer to the actual data. */
 	public:
+
 		/**
 		 * Initialize a ShmChunk from a SharedMemorySegment and
 		 * a pointer to an existing header in the process's memory.
@@ -56,11 +58,13 @@ class ShmChunk : public Chunk {
 		 * given as a handle.
          */
 		ShmChunk(SharedMemorySegment* s, handle_t ch);
+
 		/**
 		 * \brief Destructor.
-		 * Does not free the associated header.
+		 * If this instance is the owner of the data, the data will be deleted.
 		 */
 		~ShmChunk();
+
 		/**
          * \brief Gets the ID of the process that has written the chunk.
          */
@@ -106,17 +110,25 @@ class ShmChunk : public Chunk {
 		 * \return A pointer to where the data is stored, or NULL if the data
 		 *         has been removed by this object using remove().
 		 * \warning If several instances of ShmChunk exist (possibly in different processes)
-		 *          and the program calls "remove" on one of them, the other will be
-		 *          inconsistant. If an instance of ShmChunk is deleted without removing
-		 *          the shared memory region before, the region will be lost. Thus make sure 
-		 *          there is always eventually exactly one ShmChunk instance attached to a
-		 *          region.
+		 *          and the program deletes an instance of ShmChunk which is the owner of the data,
+		 * 			the other will be inconsistant. 
+		 *			If no instance of ShmChunk is the owner of their corresponding data,
+		 *          the shared memory region will be lost when these chunks are deleted. 
+		 *			Thus make sure there is always eventually exactly 
+		 *			one ShmChunk instance attached to a region which is owner of the data.
 		 */
 		void* data();
-		
+			
+		/**
+		 * Indicates whether or not this instance of chunk is responsible for deleting
+		 * the data it points to.
+		 */
 		virtual void SetDataOwnership(bool b)
 			{ isOwner = b; }
 
+		/**
+		 * Returns the data ownership of this instance of chunk.
+		 */
         virtual bool GetDataOwnership()
 			{ return isOwner; }
 

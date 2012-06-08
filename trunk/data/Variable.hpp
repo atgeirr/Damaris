@@ -52,16 +52,13 @@ class Variable : public Configurable<Model::Variable> {
 		Layout* layout;		/*!< Layout of the data. */
 		ChunkSet chunks; 	/*!< Chunks hold by the variable. */
 
-		std::string name;
-		int id;
+		std::string name; 	/*!< Name of the variable. */
+		int id;				/*!< id of the variable, given by the VariableManager. */
 	
-	protected:
 		/**
 		 * \brief Constructor. 
-		 * Creates a Variable record given a name, an iteration, a source, a layout
-		 * and a pointer to the data.
-		 * The constructor is private, only a MetadataManager has the permission
-		 * to create a new instance of Variable.
+		 * Creates a Variable record given a model (from XML), a name and a layout.
+		 * The constructor is private, use New to create an instance.
 		 */
 		Variable(const Model::Variable& v, const std::string& name, Layout* l);
 
@@ -76,7 +73,11 @@ class Variable : public Configurable<Model::Variable> {
 		 */
 		const std::string& getName() const { return name; }
 
+		/**
+		 * Returns the id of the variable, as given by the VariableManager.
+		 */
 		int getID() const { return id; }
+
 		/**
 		 * Attach a new chunk to the variable.
 		 */
@@ -116,7 +117,9 @@ class Variable : public Configurable<Model::Variable> {
 		ChunkIndex::iterator getChunks(int source, int iteration, ChunkIndex::iterator &end);
 
 		/**
-		 * Detach a chunk from a variable. Free its memory if the process owns the variable.
+		 * Detach a chunk from a variable. Free its memory if the process owns the chunk.
+		 * To prevent from loosing data, don't forget to unset the chunk's ownership before
+		 * detaching the chunk.
 		 */
 		void detachChunk(Chunk* c);
 
@@ -126,7 +129,7 @@ class Variable : public Configurable<Model::Variable> {
 		void clear();
 
 		/**
-		 * Returns a reference to the variabls description.
+		 * Returns the variables description.
 		 */
 		std::string getDescription() const { return (std::string)model; }
 
@@ -136,15 +139,32 @@ class Variable : public Configurable<Model::Variable> {
 		std::string getUnit() const { return model.unit(); }
 
 #ifdef __ENABLE_VISIT
+		/**
+		 * Fills VisIt's metadata handle with information related to the variable.
+		 */
 		bool exposeVisItMetaData(visit_handle md);
 
+		/**
+		 * Fills VisIt's data handle with the proper data.
+		 */
 		bool exposeVisItData(visit_handle *md, int source, int iteration);
 
+	private:
+		/**
+		 * Converts a Model::VarCentering enum to a VisIt_VarCentering enum.
+		 */
 		static VisIt_VarCentering VarCenteringToVisIt(const Model::VarCentering& vc);
-
+		
+		/**
+		 * Converts a Model::VarType enum to a VisIt_VarType enum.
+		 */
 		static VisIt_VarType VarTypeToVisIt(const Model::VarType& vt);
 #endif
 
+	public:
+		/**
+		 * Creates an instance of Variable if the provided model is consistant.
+		 */
 		static Variable* New(const Model::Variable& mdl, const std::string &name);
 };
 
