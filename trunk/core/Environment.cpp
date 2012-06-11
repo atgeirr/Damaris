@@ -142,6 +142,7 @@ namespace Damaris {
 
 	int Environment::GetLastIteration()
 	{
+		DBG("Getting last iteration");
 		return env->lastIteration;
 	}
 

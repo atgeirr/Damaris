@@ -25,7 +25,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <mpi.h>
 #include <VisItDataInterface_V2.h>
 #include <VisItControlInterface_V2.h>
-
 #include "core/Debug.hpp"
 #include "core/MeshManager.hpp"
 #include "core/VariableManager.hpp"
@@ -104,6 +103,8 @@ int VisItListener::EnterSyncSection(int visitstate)
 				VisItSetGetVariable(&VisItListener::GetVariable,(void*)(&sim));
 				VisItSetGetDomainList(&VisItListener::GetDomainList,(void*)(&sim));
 				VisItSetCommandCallback(&VisItListener::ControlCommandCallback,(void*)(&sim));
+			} else {
+				INFO("VisIt did not connect");
 			}
 			break;
 		case 2:

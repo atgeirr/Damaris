@@ -147,30 +147,30 @@ void MPILayer<MSG>::update()
 	if(!listening) {
 		MPI_Irecv(&m, sizeof(MSG), MPI_BYTE, MPI_ANY_SOURCE, MPI_ANY_TAG, comm, &request);
 		listening = true;
-	// otherwise, we check the status of the last MPI_Irecv request
-	} else {
-		int done;
-		MPI_Test(&request,&done,&status);
-		if(done) {
-			// if the tag is a TAG_BCAST, forward to child processes
-			if(status.MPI_TAG == TAG_BCAST) {
-				int c1 = rank*2 + 1;
-				int c2 = rank*2 + 2;
-				if(c1 < size) {
-					MPI_Request *pending = new MPI_Request;
-					MPI_Isend(&m,sizeof(MSG),MPI_BYTE, c1, TAG_BCAST, comm, pending);
-					pendingSendReq.push_back(boost::shared_ptr<MPI_Request>(pending));
-				}
-				if(c2 < size) {
-					MPI_Request *pending = new MPI_Request;
-					MPI_Isend(&m,sizeof(MSG),MPI_BYTE, c2, TAG_BCAST, comm, pending);
-					pendingSendReq.push_back(boost::shared_ptr<MPI_Request>(pending));
-				}
+	}
+
+	// we check the status of the last MPI_Irecv request
+	int done;
+	MPI_Test(&request,&done,&status);
+	if(done) {
+		// if the tag is a TAG_BCAST, forward to child processes
+		if(status.MPI_TAG == TAG_BCAST) {
+			int c1 = rank*2 + 1;
+			int c2 = rank*2 + 2;
+			if(c1 < size) {
+				MPI_Request *pending = new MPI_Request;
+				MPI_Isend(&m,sizeof(MSG),MPI_BYTE, c1, TAG_BCAST, comm, pending);
+				pendingSendReq.push_back(boost::shared_ptr<MPI_Request>(pending));
 			}
-			// in any case, deliver it
-			toDeliver.push_back(m);
-			listening = false;
+			if(c2 < size) {
+				MPI_Request *pending = new MPI_Request;
+				MPI_Isend(&m,sizeof(MSG),MPI_BYTE, c2, TAG_BCAST, comm, pending);
+				pendingSendReq.push_back(boost::shared_ptr<MPI_Request>(pending));
+			}
 		}
+		// in any case, deliver it
+		toDeliver.push_back(m);
+		listening = false;
 	}
 }
 
