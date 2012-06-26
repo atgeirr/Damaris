@@ -108,8 +108,8 @@ namespace Damaris {
 			return;
 		}
 		try {
-			msgQueue = SharedMessageQueue::open(&(model->architecture().queue()));
-			segment  = SharedMemorySegment::open(&(model->architecture().buffer()));
+			msgQueue = SharedMessageQueue::Open(&(model->architecture().queue()));
+			segment  = SharedMemorySegment::Open(&(model->architecture().buffer()));
 		}
 		catch(interprocess_exception &ex) {
 			ERROR("While initializing shared memory objects:  " << ex.what());
@@ -126,11 +126,11 @@ namespace Damaris {
 			return;
 		}
 		try {
-			SharedMessageQueue::remove(&(model->architecture().queue()));
-			SharedMemorySegment::remove(&(model->architecture().buffer()));
+			SharedMessageQueue::Remove(&(model->architecture().queue()));
+			SharedMemorySegment::Remove(&(model->architecture().buffer()));
 
-			msgQueue = SharedMessageQueue::create(&(model->architecture().queue()));
-			segment  = SharedMemorySegment::create(&(model->architecture().buffer()));
+			msgQueue = SharedMessageQueue::Create(&(model->architecture().queue()));
+			segment  = SharedMemorySegment::Create(&(model->architecture().buffer()));
 		}
 		catch(interprocess_exception &ex) {
 			ERROR("While initializing shared memory objects:  " << ex.what());
@@ -146,8 +146,8 @@ namespace Damaris {
 	Process::~Process()
 	{
 		if(sharedStructuresOwner) {
-			SharedMessageQueue::remove(&(model->architecture().queue()));
-			SharedMemorySegment::remove(&(model->architecture().buffer()));	
+			SharedMessageQueue::Remove(&(model->architecture().queue()));
+			SharedMemorySegment::Remove(&(model->architecture().buffer()));	
 		}
 	}
 }

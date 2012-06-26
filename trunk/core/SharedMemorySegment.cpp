@@ -29,7 +29,7 @@ namespace Damaris {
 
 SharedMemorySegment::SharedMemorySegment() {}
 
-SharedMemorySegment* SharedMemorySegment::create(Model::Buffer* model)
+SharedMemorySegment* SharedMemorySegment::Create(Model::Buffer* model)
 {
 	std::string& name = model->name();
 	Model::ShmType& type = model->type();
@@ -56,7 +56,7 @@ SharedMemorySegment* SharedMemorySegment::create(Model::Buffer* model)
 	return NULL;
 }
 
-SharedMemorySegment* SharedMemorySegment::open(Model::Buffer* model)
+SharedMemorySegment* SharedMemorySegment::Open(Model::Buffer* model)
 {
 	std::string& name = model->name();
 	Model::ShmType& type = model->type();
@@ -82,7 +82,7 @@ SharedMemorySegment* SharedMemorySegment::open(Model::Buffer* model)
 	return NULL;
 }
 
-bool SharedMemorySegment::remove(Model::Buffer* model)
+bool SharedMemorySegment::Remove(Model::Buffer* model)
 {
 	std::string& name = model->name();
 	Model::ShmType& type = model->type();

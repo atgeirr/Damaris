@@ -95,52 +95,52 @@ namespace Damaris {
 			 * Creates a SharedMessageQueue based on a model.
 			 * \param[in] mdl : base model from which to create the SharedMessageQueue.
 			 */
-			static SharedMessageQueue* create(Model::Queue* mdl);
+			static SharedMessageQueue* Create(Model::Queue* mdl);
 
 			/**
 			 * Helper function to create a POSIX shared message queue.
 			 */
-			static SharedMessageQueue* create(posix_shmem_t posix_shmem, 
+			static SharedMessageQueue* Create(posix_shmem_t posix_shmem, 
 				const std::string& name, size_t num_msg, size_t size_msg);
 
 			/**
 			 * Helper function to creates an XSI shared messahe queue.
 			 */
-			static SharedMessageQueue* create(sysv_shmem_t sysv_shmem, 
+			static SharedMessageQueue* Create(sysv_shmem_t sysv_shmem, 
 				const std::string& name, size_t num_msg, size_t size_msg);
 
 			/**
 			 * Opens a SharedMessageQueue based on a model.
 			 * \param[in] mdl : base model from which to create the SharedMessageQueue.
 			 */
-			static SharedMessageQueue* open(Model::Queue* mdl);
+			static SharedMessageQueue* Open(Model::Queue* mdl);
 	
 			/**
 			 * Opens an existing POSIX shared message queue.
 			 */
-			static SharedMessageQueue* open(posix_shmem_t posix_shmem, 
+			static SharedMessageQueue* Open(posix_shmem_t posix_shmem, 
 				const std::string& name);
 
 			/**
 			 * Opens an existing XSI shared message queue.
 			 */
-			static SharedMessageQueue* open(sysv_shmem_t sysv_shmem, 
+			static SharedMessageQueue* Open(sysv_shmem_t sysv_shmem, 
 				const std::string& name);
 	
 			/**
 			 * Removes a SharedMessageQueue described by a model.
 			 */
-			static bool remove(Model::Queue* mdl);
+			static bool Remove(Model::Queue* mdl);
 	
 			/**
 			 * Removes a POSIX shared message queue.
 			 */
-			static bool remove(posix_shmem_t posix_shmem, const std::string& name);
+			static bool Remove(posix_shmem_t posix_shmem, const std::string& name);
 
 			/**
 			 * Removes an XSI shared message queue.
 			 */
-			static bool remove(sysv_shmem_t sysv_shmem, const std::string& name);
+			static bool Remove(sysv_shmem_t sysv_shmem, const std::string& name);
 	
 			/**
 			 * Sends a message. Blocks if the queue is full.

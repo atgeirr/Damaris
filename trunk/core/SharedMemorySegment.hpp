@@ -69,19 +69,19 @@ class SharedMemorySegment {
 		 * to the described model.
 		 * \param[in] model : base model from configuration file.
 		 */
-		static SharedMemorySegment* create(Model::Buffer* model);
+		static SharedMemorySegment* Create(Model::Buffer* model);
 
 		/**
 		 * Opens a SharedMemorySegment implementation corresponding
 		 * to the description in the model.
 		 * \param[in] model : base model from configuration file.
 		 */	
-		static SharedMemorySegment* open(Model::Buffer* model);
+		static SharedMemorySegment* Open(Model::Buffer* model);
 
 		/**
 		 * Removes a SharedMemorySegment described in a model.
 		 */
-		static bool remove(Model::Buffer* model);
+		static bool Remove(Model::Buffer* model);
 
 		/**
 		 * This typedef is just to prevent compilation error
@@ -122,6 +122,10 @@ class SharedMemorySegment {
 		 */
 		virtual bool waitAvailable(size_t size);
 
+		/**
+		 * Returns true if and only if the adress is
+		 * in the shared memory segment.
+		 */
 		virtual bool pointerBelongsToSegment(void* p) = 0;
 };
 
@@ -168,6 +172,14 @@ class SharedMemorySegment::SYSV_ShMem : public SharedMemorySegment {
 		bool pointerBelongsToSegment(void* p);
 };
 
+/**
+ * The SharedMemorySegment::CompositeShMem class helps building
+ * a shared memory segment with a size bigger than what is accepted
+ * by the underlying operating system. It works by opening a set of
+ * blocks instead of one single shared memory segment.
+ * It is however not possible to allocate an object with a size
+ * bigger than that of a block in this type of segment.
+ */
 class SharedMemorySegment::CompositeShMem : public SharedMemorySegment {
 	private:
 		std::vector<SharedMemorySegment*> blocks;

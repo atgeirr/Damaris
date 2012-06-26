@@ -40,7 +40,7 @@ SharedMessageQueue::~SharedMessageQueue()
 	delete region;
 }
 
-SharedMessageQueue* SharedMessageQueue::create(Model::Queue* mdl)
+SharedMessageQueue* SharedMessageQueue::Create(Model::Queue* mdl)
 {
 	std::string& name = mdl->name();
 	size_t num_msg = mdl->size();
@@ -50,16 +50,16 @@ SharedMessageQueue* SharedMessageQueue::create(Model::Queue* mdl)
 	switch(type) {
 
 	case Model::ShmType::posix : 
-		return create(posix_shmem_t(),name,num_msg,size_msg);
+		return Create(posix_shmem_t(),name,num_msg,size_msg);
 	case Model::ShmType::sysv : 
-		return create(sysv_shmem_t(),name,num_msg,size_msg);
+		return Create(sysv_shmem_t(),name,num_msg,size_msg);
 	default :
 		ERROR("Unknown shared memory type \"" << type << "\"");
 	}
 	return NULL;
 }
 
-SharedMessageQueue* SharedMessageQueue::create(posix_shmem_t posix_shmem, 
+SharedMessageQueue* SharedMessageQueue::Create(posix_shmem_t posix_shmem, 
 		const std::string& name, size_t num_msg, size_t size_msg)
 {
 	shared_memory_object base(create_only,name.c_str(),read_write);
@@ -73,7 +73,7 @@ SharedMessageQueue* SharedMessageQueue::create(posix_shmem_t posix_shmem,
 	return new SharedMessageQueue(region);
 }
 
-SharedMessageQueue* SharedMessageQueue::create(sysv_shmem_t sysv_shmem, 
+SharedMessageQueue* SharedMessageQueue::Create(sysv_shmem_t sysv_shmem, 
 		const std::string& name, size_t num_msg, size_t size_msg)
 {
 	size_t size = num_msg*size_msg + sizeof(struct shm_queue_hdr);
@@ -86,7 +86,7 @@ SharedMessageQueue* SharedMessageQueue::create(sysv_shmem_t sysv_shmem,
 	return new SharedMessageQueue(region);
 }
 
-SharedMessageQueue* SharedMessageQueue::open(Model::Queue* mdl)
+SharedMessageQueue* SharedMessageQueue::Open(Model::Queue* mdl)
 {
 	std::string& name = mdl->name();
 	Model::ShmType& type = mdl->type();
@@ -94,9 +94,9 @@ SharedMessageQueue* SharedMessageQueue::open(Model::Queue* mdl)
 	switch(type) {
 	
 	case Model::ShmType::posix : 
-		return open(posix_shmem_t(),name);
+		return Open(posix_shmem_t(),name);
 	case Model::ShmType::sysv :
-		return open(sysv_shmem_t(),name);
+		return Open(sysv_shmem_t(),name);
 	default : 
 		ERROR("Unknown shared memory type \"" << type << "\"");
 	}
@@ -104,7 +104,7 @@ SharedMessageQueue* SharedMessageQueue::open(Model::Queue* mdl)
 	return NULL;
 }
 
-SharedMessageQueue* SharedMessageQueue::open(posix_shmem_t posix_shmem, 
+SharedMessageQueue* SharedMessageQueue::Open(posix_shmem_t posix_shmem, 
 		const std::string& name)
 {
 	shared_memory_object base(open_only,name.c_str(),read_write);
@@ -113,7 +113,7 @@ SharedMessageQueue* SharedMessageQueue::open(posix_shmem_t posix_shmem,
 	return new SharedMessageQueue(region);
 }
 
-SharedMessageQueue* SharedMessageQueue::open(sysv_shmem_t sysv_shmem, 
+SharedMessageQueue* SharedMessageQueue::Open(sysv_shmem_t sysv_shmem, 
 		const std::string& name)
 {
 	xsi_shared_memory base(open_only,xsi_key(name.c_str(),1));
@@ -122,7 +122,7 @@ SharedMessageQueue* SharedMessageQueue::open(sysv_shmem_t sysv_shmem,
 	return new SharedMessageQueue(region);
 }
 
-bool SharedMessageQueue::remove(Model::Queue* mdl)
+bool SharedMessageQueue::Remove(Model::Queue* mdl)
 {
 	std::string& name = mdl->name();
 	Model::ShmType& type = mdl->type();
@@ -131,9 +131,9 @@ bool SharedMessageQueue::remove(Model::Queue* mdl)
         switch(type) {
 
 		case Model::ShmType::posix :
-			return remove(posix_shmem_t(),name);
+			return Remove(posix_shmem_t(),name);
         case Model::ShmType::sysv :
-			return remove(sysv_shmem_t(),name);
+			return Remove(sysv_shmem_t(),name);
      	default: 
 			return false;
         }
@@ -142,12 +142,12 @@ bool SharedMessageQueue::remove(Model::Queue* mdl)
 	return false;
 }
 
-bool SharedMessageQueue::remove(posix_shmem_t posix_shmem, const std::string& name)
+bool SharedMessageQueue::Remove(posix_shmem_t posix_shmem, const std::string& name)
 {
 	return shared_memory_object::remove(name.c_str());
 }
 
-bool SharedMessageQueue::remove(sysv_shmem_t sysv_shmem, const std::string& name)
+bool SharedMessageQueue::Remove(sysv_shmem_t sysv_shmem, const std::string& name)
 {
 	int id = xsi_shared_memory(open_only,xsi_key(name.c_str(),1)).get_shmid();
 	return xsi_shared_memory::remove(id);
