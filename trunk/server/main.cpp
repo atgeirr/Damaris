@@ -55,7 +55,6 @@ extern Damaris::Server *server;
 int main(int argc, char** argv)
 {
 	MPI_Init(&argc,&argv);
-	INFO("Parsing program options");
 	/* The Options object is used to parse the command line arguments */
 	Damaris::Options opt(argc,argv);
 

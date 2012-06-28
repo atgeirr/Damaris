@@ -30,6 +30,13 @@ void LayoutManager::Init(const Model::Data& model)
     Model::Data::layout_const_iterator l(model.layout().begin());
     for(;l != model.layout().end(); l++)
     {
+		if(l->type() == "string" or l->type() == "label") {
+			if(not (l->dimensions() == "?")) {
+				ERROR("string and label -based layouts should have an unlimited dimension "
+					<< "descriptor. Layout \"" << l->name() << "\" won't be built.");
+				continue;
+			}
+		}
 		Create<Layout>(*l,(std::string)l->name());
     }
 }

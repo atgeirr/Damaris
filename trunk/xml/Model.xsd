@@ -6,75 +6,189 @@
 
 	<!-- Client node -->
 	<xs:complexType name="Clients">
-		<xs:attribute name="count" type="xs:unsignedInt" use="required"/>	
+		<xs:attribute name="count" type="xs:unsignedInt" use="required">
+			<xs:annotation><xs:documentation>
+				Number of client processes in a node.
+			</xs:documentation></xs:annotation>
+		</xs:attribute>
 	</xs:complexType>
 
 	<!-- Cores node -->
 	<xs:complexType name="Cores">
 		<xs:sequence>
-			<xs:element name="clients" type="mdl:Clients"/>
+			<xs:element name="clients" type="mdl:Clients">
+				<xs:annotation><xs:documentation>
+					Description of client processes.
+				</xs:documentation></xs:annotation>
+			</xs:element>
 		</xs:sequence>
-		<xs:attribute name="count" type="xs:unsignedInt" use="required"/>
+		<xs:attribute name="count" type="xs:unsignedInt" use="required">
+			<xs:annotation><xs:documentation>
+				Number of cores per node.
+			</xs:documentation></xs:annotation>
+		</xs:attribute>
 	</xs:complexType>
 
 	<!-- Type of shared memory (POSIX or System-V) -->
 	<xs:simpleType name="ShmType">
 		<xs:restriction base="xs:string">
-			<xs:enumeration value="posix"/>
-			<xs:enumeration value="sysv"/>
+			<xs:enumeration value="posix"> 
+				<xs:annotation><xs:documentation>
+					POSIX shared memory type (based on shm_open function).
+				</xs:documentation></xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="sysv"> 
+				<xs:annotation><xs:documentation>
+					SYS-V shared memory type (based on shmget function).
+				</xs:documentation></xs:annotation>
+			</xs:enumeration>
 		</xs:restriction>
 	</xs:simpleType>
 
 	<!-- Buffer node -->
 	<xs:complexType name="Buffer">
-		<xs:attribute name="name"   type="xs:string"      use="required"/>
-		<xs:attribute name="size"   type="xs:unsignedInt" use="required"/>
-		<xs:attribute name="type"   type="mdl:ShmType"    use="optional" default="posix"/>
-		<xs:attribute name="blocks" type="xs:unsignedInt" use="optional" default="0"/>
+		<xs:attribute name="name"   type="xs:string"      use="required">
+			<xs:annotation><xs:documentation>
+				Name of the shared memory buffer, should be
+				a valid C identifier name for a POSIX shared memory buffer,
+				the name of an existing file for a SYSTEM-V shared memory buffer.
+			</xs:documentation></xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="size"   type="xs:unsignedInt" use="required">
+			<xs:annotation><xs:documentation>
+				Size (in bytes) of the shared memory buffer. This size cannot exceed
+				the maximum allowed by the operating system.
+			</xs:documentation></xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="type"   type="mdl:ShmType"    use="optional" default="posix">
+			<xs:annotation><xs:documentation>
+				Type (posix or sysv) of shared memory.
+			</xs:documentation></xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="blocks" type="xs:unsignedInt" use="optional" default="0">
+			<xs:annotation><xs:documentation>
+				Number of blocks (use several blocks to open a buffer with a size
+				bigger than the maximum size allows by the operating system).
+			</xs:documentation></xs:annotation>
+		</xs:attribute>
 	</xs:complexType>	
 
 	<!-- Queue node -->
 	<xs:complexType name="Queue">
-		<xs:attribute name="name" type="xs:string"      use="required"/>
-		<xs:attribute name="size" type="xs:unsignedInt" use="required"/>
-		<xs:attribute name="type" type="mdl:ShmType"    use="optional" default="posix"/>
+		<xs:attribute name="name" type="xs:string"      use="required">
+			<xs:annotation><xs:documentation>
+				Name of the shared message queue, should be a valid C identifier name
+				for POSIX shared memory type, the name of an existing file for a SYSTEM-V
+				shared memory buffer. Must be different from the name of the buffer.
+			</xs:documentation></xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="size" type="xs:unsignedInt" use="required">
+			<xs:annotation><xs:documentation>
+				Size of the message queue (in number of messages).
+			</xs:documentation></xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="type" type="mdl:ShmType"    use="optional" default="posix">
+			<xs:annotation><xs:documentation>
+				Type (posix or sysv) of shared memory.
+			</xs:documentation></xs:annotation>
+		</xs:attribute>
 	</xs:complexType>
 
 	<!-- Architecture node -->
 	<xs:complexType name="Architecture">
 		<xs:all>
-			<xs:element name="cores"  type="mdl:Cores" />
-			<xs:element name="buffer" type="mdl:Buffer"/>
-			<xs:element name="queue"  type="mdl:Queue" />
+			<xs:element name="cores"  type="mdl:Cores" >
+				<xs:annotation><xs:documentation>
+					Description of a node (number of cores, processes, etc.).
+				</xs:documentation></xs:annotation>
+			</xs:element>
+			<xs:element name="buffer" type="mdl:Buffer" >
+				<xs:annotation><xs:documentation>
+					Shared memory buffer description.
+				</xs:documentation></xs:annotation>
+			</xs:element>
+			<xs:element name="queue"  type="mdl:Queue" >
+				<xs:annotation><xs:documentation>
+					Shared message queue description.
+				</xs:documentation></xs:annotation>
+			</xs:element>
 		</xs:all>
-		<xs:attribute name="name" type="xs:string" use="optional"/>
+		<xs:attribute name="name" type="xs:string" use="optional">
+			<xs:annotation><xs:documentation>
+				Name of the architecture.
+			</xs:documentation></xs:annotation>
+		</xs:attribute>
 	</xs:complexType>
 
 	<!-- Languages -->
 	<xs:simpleType name="Language">
 		<xs:restriction base="xs:string">
-			<xs:enumeration value="unknown" />
+			<xs:enumeration value="unknown"/>
 			<xs:enumeration value="fortran"/>
-			<xs:enumeration value="c" />
-			<xs:enumeration value="cpp" />
-			<xs:enumeration value="python" />
+			<xs:enumeration value="c"/>
+			<xs:enumeration value="cpp"/>
+			<xs:enumeration value="python"/>
 		</xs:restriction>
 	</xs:simpleType>
 
 	<!-- Type Model -->
 	<xs:simpleType name="Type">
 		<xs:restriction base="xs:string">
-			<xs:enumeration value="short"/>
-			<xs:enumeration value="int" />
-			<xs:enumeration value="integer" />
-			<xs:enumeration value="long" />
-			<xs:enumeration value="float" />
-			<xs:enumeration value="real" />
-			<xs:enumeration value="double" />
-			<xs:enumeration value="char" />
-			<xs:enumeration value="character" />
-			<xs:enumeration value="string" />
-			<xs:enumeration value="label" />
+			<xs:enumeration value="short"> 
+				<xs:annotation><xs:documentation>
+                    2 bytes integer value.
+				</xs:documentation></xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="int"> 
+                <xs:annotation><xs:documentation>
+                    4 bytes integer value.
+				</xs:documentation></xs:annotation>
+            </xs:enumeration>
+			<xs:enumeration value="integer"> 
+                <xs:annotation><xs:documentation>
+                    4 bytes integer value (equivalent to int).
+				</xs:documentation></xs:annotation>
+            </xs:enumeration>
+			<xs:enumeration value="long">
+                <xs:annotation><xs:documentation>
+                    8 bytes integer value.
+				</xs:documentation></xs:annotation>
+            </xs:enumeration>
+			<xs:enumeration value="float">
+                <xs:annotation><xs:documentation>
+                    4 bytes float value.
+                </xs:documentation></xs:annotation>
+            </xs:enumeration>
+			<xs:enumeration value="real">
+                <xs:annotation><xs:documentation>
+                    4 bytes float value (equivalent to float).
+				</xs:documentation></xs:annotation>
+            </xs:enumeration>
+			<xs:enumeration value="double">
+                <xs:annotation><xs:documentation>
+                    8 bytes float value (equivalent to real*8 in Fortran)
+				</xs:documentation></xs:annotation>
+            </xs:enumeration>
+			<xs:enumeration value="char">
+                <xs:annotation><xs:documentation>
+                    1 byte value.
+				</xs:documentation></xs:annotation>
+            </xs:enumeration>
+			<xs:enumeration value="character">
+                <xs:annotation><xs:documentation>
+                    1 byte value (equivalent to char).
+				</xs:documentation></xs:annotation>
+            </xs:enumeration>
+			<xs:enumeration value="string">
+                <xs:annotation><xs:documentation>
+                    Variable length null-terminated string.
+				</xs:documentation></xs:annotation>
+            </xs:enumeration>
+			<xs:enumeration value="label">
+                <xs:annotation><xs:documentation>
+                    Variable length null-terminated string (equivalent to string).
+				</xs:documentation></xs:annotation>
+            </xs:enumeration>
 		</xs:restriction>
 	</xs:simpleType>
 
@@ -82,11 +196,35 @@
 	<xs:complexType name="Layout">
 		<xs:simpleContent>
 		<xs:extension base="xs:string">
-			<xs:attribute name="name"       type="xs:string" use="required"/>
-			<xs:attribute name="type"       type="mdl:Type" use="required"/>
-			<xs:attribute name="dimensions" type="xs:string" use="required"/>
-			<xs:attribute name="language"   type="mdl:Language" use="optional" default="unknown"/>
-			<xs:attribute name="visualizable" type="xs:boolean" use="optional" default="true" />
+			<xs:attribute name="name"       type="xs:string" use="required">
+                <xs:annotation><xs:documentation>
+                    Name of the layout (all layouts should have a unique name).
+                </xs:documentation></xs:annotation>
+            </xs:attribute>
+			<xs:attribute name="type"       type="mdl:Type" use="required">
+                <xs:annotation><xs:documentation>
+                    Data type.
+                </xs:documentation></xs:annotation>
+            </xs:attribute>
+			<xs:attribute name="dimensions" type="xs:string" use="required">
+                <xs:annotation><xs:documentation>
+                    Comma-separated list of correct mathematical expressions featuring (,),-, +, *, /, %, 
+                    integer values and parameters name. Exemple: "(3+x)*y,5%z,k*p/2". The interpretation
+                    of expressions follow the C rules regarding integers (5/2 = 2) and operators precedence.
+                    The string "?" is also allowed and indicates an undefined layout (the application can
+                    write data using the Chunk API).
+                </xs:documentation></xs:annotation>
+            </xs:attribute>
+			<xs:attribute name="language"   type="mdl:Language" use="optional" default="unknown">
+                <xs:annotation><xs:documentation>
+                    Language (Fortran layouts have a reverse-order array of extents).
+                </xs:documentation></xs:annotation>
+            </xs:attribute>
+			<xs:attribute name="visualizable" type="xs:boolean" use="optional" default="true">
+                <xs:annotation><xs:documentation>
+                    Not yet implemented. Exposes the Layout as a rectilinear mesh.
+                </xs:documentation></xs:annotation>
+            </xs:attribute>
 		</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
@@ -119,15 +257,57 @@
 	<xs:complexType name="Variable">
 		<xs:simpleContent>
 			<xs:extension base="xs:string">
-				<xs:attribute name="name"    type="xs:string"  use="required"/>
-				<xs:attribute name="unit"    type="xs:string"  use="optional" default=""/>
-				<xs:attribute name="layout"  type="xs:string"  use="required"/>
-				<xs:attribute name="enabled" type="xs:boolean" use="optional" default="true" />
-				<xs:attribute name="mesh"	 type="xs:string"  use="optional" default="#" />
-				<xs:attribute name="type"    type="mdl:VarType" use="optional" default="scalar" />
-				<xs:attribute name="centering" type="mdl:VarCentering" use="optional" default="zonal" />
-				<xs:attribute name="visualizable" type="xs:boolean" use="optional" default="true" />
-				<xs:attribute name="time-varying" type="xs:boolean" use="optional" default="true" />
+				<xs:attribute name="name"    type="xs:string"  use="required">
+                    <xs:annotation><xs:documentation>
+                            Name of the variable. All variables in a given group must have a unique name,
+                            which should not include a "/" character.
+                    </xs:documentation></xs:annotation>
+                </xs:attribute>
+				<xs:attribute name="unit"    type="xs:string"  use="optional" default="">
+                    <xs:annotation><xs:documentation>
+                        Unit of the variable.
+                    </xs:documentation></xs:annotation>
+                </xs:attribute>
+				<xs:attribute name="layout"  type="xs:string"  use="required">
+                    <xs:annotation><xs:documentation>
+                        Name of a defined Layout. The variable won't be created if the corresponding
+                        layout does not exists. The layout can also be a simple data type (e.g. integer, float, etc.)
+                    </xs:documentation></xs:annotation>
+                </xs:attribute>
+				<xs:attribute name="enabled" type="xs:boolean" use="optional" default="true">
+                    <xs:annotation><xs:documentation>
+                        Should be "true" or "false", indicates if the variable should be considered or not.
+                        This allows to disable easily a variable without deleting or commenting it from the configuration.
+                    </xs:documentation></xs:annotation>
+                </xs:attribute>
+				<xs:attribute name="mesh"	 type="xs:string"  use="optional" default="#">
+                    <xs:annotation><xs:documentation>
+                        Attached mesh. Must be a valid mesh name.
+                    </xs:documentation></xs:annotation>
+                </xs:attribute>
+				<xs:attribute name="type"    type="mdl:VarType" use="optional" default="scalar">
+                    <xs:annotation><xs:documentation>
+                        Variable type (different from the data type, which is defined in the Layout).
+                    </xs:documentation></xs:annotation>
+                </xs:attribute>
+				<xs:attribute name="centering" type="mdl:VarCentering" use="optional" default="zonal">
+                    <xs:annotation><xs:documentation>
+                        Centering over the mesh (values correspond to a node, or to a zone).
+                    </xs:documentation></xs:annotation>
+                </xs:attribute>
+				<xs:attribute name="visualizable" type="xs:boolean" use="optional" default="true">
+                    <xs:annotation><xs:documentation>
+                        Indicates whether the variable should be exposed to visualization backends.
+                        If so, it must have a valid mesh attribute.
+                    </xs:documentation></xs:annotation>
+                </xs:attribute>
+				<xs:attribute name="time-varying" type="xs:boolean" use="optional" default="true">
+                    <xs:annotation><xs:documentation>
+                        If set to true, the variable is expected to be written at every iteration.
+                        If set to false, the variable is expected to be written only once. Writing it twice will
+                        potentially overwrite a previous value.
+                    </xs:documentation></xs:annotation>
+                </xs:attribute>
 			</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
@@ -136,22 +316,55 @@
 	<xs:complexType name="Group">
 		<xs:sequence>
 			<xs:choice maxOccurs="unbounded" minOccurs="0">
-				<xs:element name="variable" type="mdl:Variable"/>
-				<xs:element name="group"    type="mdl:Group"/>
-				<xs:element name="mesh"     type="mdl:Mesh"/>
+				<xs:element name="variable" type="mdl:Variable"> 
+                    <xs:annotation><xs:documentation>
+                        List of variable elements.
+                    </xs:documentation></xs:annotation>
+                </xs:element>
+				<xs:element name="group"    type="mdl:Group"> 
+                    <xs:annotation><xs:documentation>
+                        Nested groups.
+                    </xs:documentation></xs:annotation>
+                </xs:element>
+				<xs:element name="mesh"     type="mdl:Mesh"> 
+                    <xs:annotation><xs:documentation>
+                        List of mesh elements.
+                    </xs:documentation></xs:annotation>
+                </xs:element>
 			</xs:choice>
 		</xs:sequence>
-		<xs:attribute name="name"    type="xs:string"  use="required"/>
-		<xs:attribute name="enabled" type="xs:boolean" use="optional" default="true"/>
+		<xs:attribute name="name"    type="xs:string"  use="required"> 
+            <xs:annotation><xs:documentation>
+                Name of the group (should be unique within the scope of the parent group).
+            </xs:documentation></xs:annotation>
+        </xs:attribute>
+		<xs:attribute name="enabled" type="xs:boolean" use="optional" default="true"> 
+            <xs:annotation><xs:documentation>
+                Should be "true" or "false", indicates if the group should be considered or not.
+                This allows to disable easily a variable without deleting or commenting it from the configuration.
+            </xs:documentation></xs:annotation>
+        </xs:attribute>
 	</xs:complexType>
 
 	<!-- Parameter node -->
 	<xs:complexType name="Parameter">
 		<xs:simpleContent>
 			<xs:extension base="xs:string">
-				<xs:attribute name="name"  type="xs:string" use="required"/>
-				<xs:attribute name="type"  type="mdl:Type" use="required"/>
-				<xs:attribute name="value" type="xs:string" use="required"/>
+				<xs:attribute name="name"  type="xs:string" use="required"> 
+                    <xs:annotation><xs:documentation>
+                        Name of the parameter. Should be a valid C identifier.
+                    </xs:documentation></xs:annotation>
+                </xs:attribute>
+				<xs:attribute  name="type"  type="mdl:Type" use="required"> 
+                    <xs:annotation><xs:documentation>
+                        Data type.
+                    </xs:documentation></xs:annotation>
+                </xs:attribute>
+				<xs:attribute name="value" type="xs:string" use="required"> 
+                    <xs:annotation><xs:documentation>
+                        Value (does not accept expressions).
+                    </xs:documentation></xs:annotation>
+                </xs:attribute>
 			</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
@@ -159,42 +372,121 @@
 	<!-- MeshType node -->
 	<xs:simpleType name="MeshType">
 		<xs:restriction base="xs:string">
-			<xs:enumeration value="unknown" />
-			<xs:enumeration value="rectilinear" />
-			<xs:enumeration value="curvilinear" />
-			<xs:enumeration value="unstructured" />
-			<xs:enumeration value="point" />
-			<xs:enumeration value="csg" />
-			<xs:enumeration value="amr" />
+			<xs:enumeration value="unknown"> 
+                <xs:annotation><xs:documentation>
+                    Default, should not be used.
+                </xs:documentation></xs:annotation>
+            </xs:enumeration>
+			<xs:enumeration value="rectilinear"> 
+                <xs:annotation><xs:documentation>
+                    Rectilinear grid.
+                </xs:documentation></xs:annotation>
+            </xs:enumeration>
+			<xs:enumeration value="curvilinear"> 
+                <xs:annotation><xs:documentation>
+                    Curvilinear mesh.
+                </xs:documentation></xs:annotation>
+            </xs:enumeration>
+			<xs:enumeration value="unstructured"> 
+                <xs:annotation><xs:documentation>
+                    Unstructured mesh, not implemented.
+                </xs:documentation></xs:annotation>
+            </xs:enumeration>
+			<xs:enumeration value="point"> 
+                <xs:annotation><xs:documentation>
+                    List of points, not implemented.
+                </xs:documentation></xs:annotation>
+            </xs:enumeration>
+			<xs:enumeration value="csg"> 
+                <xs:annotation><xs:documentation>
+                    CSG, not implemented.
+                </xs:documentation></xs:annotation>
+            </xs:enumeration>
+			<xs:enumeration value="amr"> 
+                <xs:annotation><xs:documentation>
+                    AMR, not implemented.
+                </xs:documentation></xs:annotation>
+            </xs:enumeration>
 		</xs:restriction>
 	</xs:simpleType>
 
 	<!-- Mesh Coordinates -->
 	<xs:complexType name="MeshCoord">
-		<xs:attribute name="name"  type="xs:string" use="required" />
-		<xs:attribute name="unit"  type="xs:string" use="optional" default="#" />
-		<xs:attribute name="label" type="xs:string" use="optional" default="#" />
+		<xs:attribute name="name"  type="xs:string" use="required"> 
+            <xs:annotation><xs:documentation>
+                Name of the variable to use as coordinate. The name must correspond to an existing
+                variable (defined, enabled, in an enabled group). Its layout must be a 1-dimensional,
+                well-defined (different from "?") layout.
+            </xs:documentation></xs:annotation>
+        </xs:attribute>
+		<xs:attribute name="unit"  type="xs:string" use="optional" default="#">
+            <xs:annotation><xs:documentation>
+                Unit of the coordinate. If not specified, the value taken is that of the underlying variable
+                instance.
+            </xs:documentation></xs:annotation>
+        </xs:attribute>
+		<xs:attribute name="label" type="xs:string" use="optional" default="#">
+            <xs:annotation><xs:documentation>
+                Label (title to print on a figure) of the coordinate.
+            </xs:documentation></xs:annotation>
+        </xs:attribute>
 	</xs:complexType>
 
 	<!-- Mesh node -->
 	<xs:complexType name="Mesh">
 		<xs:sequence>
-			<xs:element name="coord" type="mdl:MeshCoord" minOccurs="2" maxOccurs="3" />
+			<xs:element name="coord" type="mdl:MeshCoord" minOccurs="2" maxOccurs="3">
+                <xs:annotation><xs:documentation>
+                    Coordinates of the mesh.
+                </xs:documentation></xs:annotation>
+            </xs:element>
 		</xs:sequence>
-		<xs:attribute name="name" type="xs:string"    use="required"/>
-		<xs:attribute name="type" type="mdl:MeshType" use="required"/>
-		<xs:attribute name="topology"   type="xs:unsignedInt" use="optional" default="2" />
+		<xs:attribute name="name" type="xs:string"    use="required">
+            <xs:annotation><xs:documentation>
+                Name of the mesh. Every mesh within a same group must have the same name.
+            </xs:documentation></xs:annotation>
+        </xs:attribute>
+		<xs:attribute name="type" type="mdl:MeshType" use="required">
+            <xs:annotation><xs:documentation>
+                Type of mesh (currently supported: rectilinear, curvilinear).
+            </xs:documentation></xs:annotation>
+        </xs:attribute>
+		<xs:attribute name="topology"   type="xs:unsignedInt" use="optional" default="2">
+            <xs:annotation><xs:documentation>
+                Tolopolgical dimension of the mesh.
+            </xs:documentation></xs:annotation>
+        </xs:attribute>
 	</xs:complexType>
 
 	<!-- Data node -->
 	<xs:complexType name="Data">
 		<xs:sequence>
 		<xs:choice minOccurs="0" maxOccurs="unbounded">
-			<xs:element name="parameter" type="mdl:Parameter" />
-			<xs:element name="layout"    type="mdl:Layout" />
-			<xs:element name="variable"  type="mdl:Variable" />
-			<xs:element name="group"     type="mdl:Group" />
-			<xs:element name="mesh"		 type="mdl:Mesh"/>
+			<xs:element name="parameter" type="mdl:Parameter"> 
+                <xs:annotation><xs:documentation>
+                    List of parameters.
+                </xs:documentation></xs:annotation>
+            </xs:element>
+			<xs:element name="layout"    type="mdl:Layout"> 
+                <xs:annotation><xs:documentation>
+                    List of layouts.
+                </xs:documentation></xs:annotation>
+            </xs:element>
+			<xs:element name="variable"  type="mdl:Variable">
+                <xs:annotation><xs:documentation>
+                    List of variables.
+                </xs:documentation></xs:annotation>
+            </xs:element>
+			<xs:element name="group"     type="mdl:Group">
+                <xs:annotation><xs:documentation>
+                    List of groups.
+                </xs:documentation></xs:annotation>
+            </xs:element>
+			<xs:element name="mesh"		 type="mdl:Mesh">
+                <xs:annotation><xs:documentation>
+                    List of meshes.
+                </xs:documentation></xs:annotation>
+            </xs:element>
 		</xs:choice>
 		</xs:sequence>
 	</xs:complexType>
@@ -202,43 +494,119 @@
     <!-- Scope node  -->
 	<xs:simpleType name="Scope">
 		<xs:restriction base="xs:string">
-			<xs:enumeration value="core" />
-			<xs:enumeration value="node" />
-			<xs:enumeration value="global" />
+			<xs:enumeration value="core"> 
+                <xs:annotation><xs:documentation>
+                    Indicates that the dedicated core triggers the action immediately when
+                    receiving the corresponding event.
+                </xs:documentation></xs:annotation>
+            </xs:enumeration>
+			<xs:enumeration value="node"> 
+                <xs:annotation><xs:documentation>
+                    Indicates that the dedicated core waits for all the clients to send the
+                    event for a given iteration before actually triggering the action.
+                </xs:documentation></xs:annotation>
+            </xs:enumeration>
+			<xs:enumeration value="global"> 
+                <xs:annotation><xs:documentation>
+                    Not implemented yet. 
+                    Indicates that the dedicated core must wait for all the clients of the simulation
+                    to have sent the event before all dedicated cores can trigger a common, synchronized action.
+                </xs:documentation></xs:annotation>
+            </xs:enumeration>
 		</xs:restriction>
 	</xs:simpleType>
 
 	<!-- Event node -->
 	<xs:complexType name="Event">
-		<xs:attribute name="name"     type="xs:string"  use="required"/>
-		<xs:attribute name="action"   type="xs:string"  use="required"/>
-		<xs:attribute name="library"  type="xs:string"  use="optional" default="" />
-		<xs:attribute name="scope"    type="mdl:Scope"  use="optional" default="core" />
-		<xs:attribute name="external" type="xs:boolean" use="optional" default="false" />
+		<xs:attribute name="name"     type="xs:string"  use="required">
+            <xs:annotation><xs:documentation>
+                Name of the event to send in order to trigger this action.
+                Should be different from all other events/scripts.
+            </xs:documentation></xs:annotation>
+        </xs:attribute>
+		<xs:attribute name="action"   type="xs:string"  use="required">
+            <xs:annotation><xs:documentation>
+                Name of the C/C++ function to call.
+            </xs:documentation></xs:annotation>
+        </xs:attribute>
+		<xs:attribute name="library"  type="xs:string"  use="optional" default="">
+            <xs:annotation><xs:documentation>
+                Location of this function. Should be the path to a .so file. If the path
+                is relative, LD\_LIBRARY\_PATH must be set to find it. If not specified,
+                Damaris will try to find it in the main program itself.
+            </xs:documentation></xs:annotation>
+        </xs:attribute>
+		<xs:attribute name="scope"    type="mdl:Scope"  use="optional" default="core">
+            <xs:annotation><xs:documentation>
+                Scope of the action.
+            </xs:documentation></xs:annotation>
+        </xs:attribute>
+		<xs:attribute name="external" type="xs:boolean" use="optional" default="false">
+            <xs:annotation><xs:documentation>
+                If set to "true", the event will be visible to external backends (such as VisIt).
+            </xs:documentation></xs:annotation>
+        </xs:attribute>
 	</xs:complexType>
 
 	<!-- Script node -->
 	<xs:complexType name="Script">
-		<xs:attribute name="name"     type="xs:string"  use="required" />
-		<xs:attribute name="file"     type="xs:string"  use="required" />
-		<xs:attribute name="language" type="mdl:Language"  use="required" />
-		<xs:attribute name="scope"    type="mdl:Scope"  use="optional" default="core" />
-		<xs:attribute name="external" type="xs:boolean" use="optional" default="false" />
+		<xs:attribute name="name"     type="xs:string"  use="required">
+            <xs:annotation><xs:documentation>
+                Name of the event to send in order to trigger this action.
+                Should be different from all other events/scripts.
+            </xs:documentation></xs:annotation>
+        </xs:attribute>
+		<xs:attribute name="file"     type="xs:string"  use="required">
+            <xs:annotation><xs:documentation>
+                Name of the file containing the script.
+            </xs:documentation></xs:annotation>
+        </xs:attribute>
+		<xs:attribute name="language" type="mdl:Language"  use="required">
+            <xs:annotation><xs:documentation>
+                Language of the script. Currently, only Python is supported.
+            </xs:documentation></xs:annotation>
+        </xs:attribute>
+		<xs:attribute name="scope"    type="mdl:Scope"  use="optional" default="core">
+            <xs:annotation><xs:documentation>
+                Scope of the action.
+            </xs:documentation></xs:annotation>
+        </xs:attribute>
+		<xs:attribute name="external" type="xs:boolean" use="optional" default="false">
+            <xs:annotation><xs:documentation>
+                If set to "true", the script will be visible to external backends (such as VisIt).
+            </xs:documentation></xs:annotation>
+        </xs:attribute>
 	</xs:complexType>
 
 	<!-- Parameters related to VisIt -->
 	<xs:complexType name="VisitParam">
 		<xs:sequence>
-			<xs:element name="path" type="xs:string" maxOccurs="1" minOccurs="0"/>
-			<xs:element name="options" type="xs:string" maxOccurs="1" minOccurs="0"/>
+			<xs:element name="path" type="xs:string" maxOccurs="1" minOccurs="0">
+                <xs:annotation><xs:documentation>
+                    Path to the VisIt software.
+                </xs:documentation></xs:annotation>
+            </xs:element>
+			<xs:element name="options" type="xs:string" maxOccurs="1" minOccurs="0">
+                <xs:annotation><xs:documentation>
+                    Any options to pass to VisIt at initialization.
+                </xs:documentation></xs:annotation>
+            </xs:element>
 		</xs:sequence>
 	</xs:complexType>
 
 	<!-- Parameters related to Python -->
 	<xs:complexType name="PythonParam">
 		<xs:sequence>	
-			<xs:element name="path" type="xs:string"/>
-			<xs:element name="home" type="xs:string"/>
+			<xs:element name="path" type="xs:string">
+                <xs:annotation><xs:documentation>
+                    Equivalent of the PYTHON\_PATH environment variable.
+                </xs:documentation></xs:annotation>
+            </xs:element>
+			<xs:element name="home" type="xs:string">
+                <xs:annotation><xs:documentation>
+                    Equivalent of the PYTHON\_HOME environment variable.
+                </xs:documentation></xs:annotation>
+            </xs:element>
 		</xs:sequence>
 	</xs:complexType>
 
@@ -246,8 +614,16 @@
 	<xs:complexType name="Actions">
 		<xs:sequence>
 			<xs:choice minOccurs="0" maxOccurs="unbounded">
-				<xs:element name="event" type="mdl:Event"/>
-				<xs:element name="script" type="mdl:Script"/>
+				<xs:element name="event" type="mdl:Event">
+                    <xs:annotation><xs:documentation>
+                        List of events.
+                    </xs:documentation></xs:annotation>
+                </xs:element>
+				<xs:element name="script" type="mdl:Script">
+                    <xs:annotation><xs:documentation>
+                        List of scripts.
+                    </xs:documentation></xs:annotation>
+                </xs:element>
 			</xs:choice>
 		</xs:sequence>
 	</xs:complexType>
@@ -255,16 +631,50 @@
 	<!-- Simulation node -->
 	<xs:complexType name="Simulation">
 		<xs:sequence>
-			<xs:element name="architecture" type="mdl:Architecture" minOccurs="1" maxOccurs="1"/>
-			<xs:element name="data" type="mdl:Data" maxOccurs="1"/>
-			<xs:element name="actions" type="mdl:Actions" maxOccurs="1"/>
-			<xs:element name="python" type="mdl:PythonParam" maxOccurs="1" minOccurs="0"/>
-			<xs:element name="visit" type="mdl:VisitParam" maxOccurs="1" minOccurs="0"/>
+			<xs:element name="architecture" type="mdl:Architecture" minOccurs="1" maxOccurs="1">
+                <xs:annotation><xs:documentation>
+                    Architecture definition.
+                </xs:documentation></xs:annotation>
+            </xs:element>
+			<xs:element name="data" type="mdl:Data" maxOccurs="1">
+                <xs:annotation><xs:documentation>
+                    All data definitions (variables, parameters, layouts, etc.).
+                </xs:documentation></xs:annotation>
+            </xs:element>
+			<xs:element name="actions" type="mdl:Actions" maxOccurs="1">
+                <xs:annotation><xs:documentation>
+                    All actions definitions.
+                </xs:documentation></xs:annotation>
+            </xs:element>
+			<xs:element name="python" type="mdl:PythonParam" maxOccurs="1" minOccurs="0">
+                <xs:annotation><xs:documentation>
+                    Python options and variables (Python support must have been enabled).
+                </xs:documentation></xs:annotation>
+            </xs:element>
+			<xs:element name="visit" type="mdl:VisitParam" maxOccurs="1" minOccurs="0">
+                <xs:annotation><xs:documentation>
+                    VisIt options and variables (VisIt support must have been enabled).
+                </xs:documentation></xs:annotation>
+            </xs:element>
 		</xs:sequence>
-		<xs:attribute name="name"     type="xs:string" use="required"/>
-		<xs:attribute name="language" type="mdl:Language" use="optional" default="unknown"/>
+		<xs:attribute name="name"     type="xs:string" use="required">
+            <xs:annotation><xs:documentation>
+                Name of the simulation. Can be used by backend to name tracing files or
+                set titles on figures, etc.
+            </xs:documentation></xs:annotation>
+        </xs:attribute>
+		<xs:attribute name="language" type="mdl:Language" use="optional" default="unknown">
+            <xs:annotation><xs:documentation>
+                Language of the simulation. This will be the default language when no language
+                is provided in layout descriptions.
+            </xs:documentation></xs:annotation>
+        </xs:attribute>
 	</xs:complexType>
 
 	<!-- Root element -->
-	<xs:element name="simulation" type="mdl:Simulation"/>
+	<xs:element name="simulation" type="mdl:Simulation">
+        <xs:annotation><xs:documentation>
+            Root element of the XML description.
+        </xs:documentation></xs:annotation>
+    </xs:element>
 </xs:schema>
