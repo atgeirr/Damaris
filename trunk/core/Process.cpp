@@ -34,7 +34,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "core/ParameterManager.hpp"
 #include "core/ActionManager.hpp"
 #include "core/Process.hpp"
+#ifdef __ENABLE_PYTHON
 #include "scripts/python/PyInterpreter.hpp"
+#endif
 
 namespace Damaris {
 
@@ -81,9 +83,11 @@ namespace Damaris {
 		}
 	    id = i;
 
+#ifdef __ENABLE_PYTHON
 		if(model->python().present()) {
 			Python::PyInterpreter::SetParameters(model->python().get());
 		}
+#endif
 		DBG("Configuration file succefuly read");
 		Environment::Init(*(model.get()));
 		DBG("Environment initialized");
