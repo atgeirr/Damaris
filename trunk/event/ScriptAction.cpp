@@ -46,7 +46,7 @@ namespace Damaris {
 				 } else {
 					CFGERROR("\"" << mdl.language() << "\" is not a valid scripting language.");
 				}
-
+				break;
 			case Model::Scope::node :
 				if(mdl.language() == Model::Language::python)
 #ifdef __ENABLE_PYTHON
@@ -57,9 +57,10 @@ namespace Damaris {
 				else {
 					CFGERROR("\"" << mdl.language() << "\" is not a valid scripting language.");
 				}
-	
+				break;
 			case Model::Scope::global :
 				CFGERROR("Scope \"global\" not implementer yet.");
+				break;
 			default:
 				CFGERROR("Scope \""<< mdl.scope() <<"\" not implementer yet.");		
 		}

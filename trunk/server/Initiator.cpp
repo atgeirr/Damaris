@@ -50,6 +50,8 @@ Client* Initiator::start(const std::string& configFile, MPI_Comm globalcomm)
 	int len;
 	MPI_Get_processor_name(procname,&len);
 
+	DBG("On process " << rank << ", name is " << procname);
+
 	/* Compute the node identifier from the name */
 	uint64_t nhash = (uint64_t)(14695981039346656037ULL);
 	uint64_t fnv =  ((uint64_t)1 << 40) + (1 << 8) + 0xb3;
