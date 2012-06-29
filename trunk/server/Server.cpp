@@ -30,7 +30,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "core/ActionManager.hpp"
 #include "core/VariableManager.hpp"
 #include "server/Server.hpp"
+#ifdef __ENABLE_VISIT
 #include "visit/VisItListener.hpp"
+#endif
 
 Damaris::Server *server;
 
@@ -64,16 +66,18 @@ int Server::run()
 {
 	DBG("Successfully entered in \"run\" mode");
 
+#ifdef __ENABLE_VISIT
+	int vizstt;
 	if(process->getModel()->visit().present()) {
 		Viz::VisItListener::Init(Environment::getEntityComm(),
 			process->getModel()->visit(),
 			Environment::getSimulationName());
 			visitMPIlayer = MPILayer<int>::New(Environment::getEntityComm());
 	}
+#endif
 	
 	Message msg;
 	bool received;
-	int vizstt;
 
 	while(needStop > 0) {
 		// try receiving from the shared message queue
@@ -84,7 +88,8 @@ int Server::run()
 				<< " source is " <<msg.source);
 			processMessage(msg);
 		}
-		
+
+#ifdef __ENABLE_VISIT		
 		if(process->getModel()->visit().present()) {
 			// try receiving from VisIt (only for rank 0)
 	
@@ -99,6 +104,7 @@ int Server::run()
 				Viz::VisItListener::EnterSyncSection(vizstt);
 			}
 		}
+#endif
 	}
 	
 	return 0;

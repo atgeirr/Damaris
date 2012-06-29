@@ -30,6 +30,7 @@ namespace Damaris {
 		call(iteration,sourceID,args);
 	}
 
+#ifdef __ENABLE_VISIT
 	bool Action::exposeVisItMetaData(visit_handle h)
 	{
 		visit_handle cmd = VISIT_INVALID_HANDLE;
@@ -41,4 +42,5 @@ namespace Damaris {
 		}
 		return false;
 	}
+#endif
 }

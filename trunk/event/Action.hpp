@@ -26,7 +26,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdint.h>
 #include <string>
 
+#ifdef __ENABLE_VISIT
 #include <VisItDataInterface_V2.h>
+#endif
 #include "core/Manager.hpp"
 
 namespace Damaris {

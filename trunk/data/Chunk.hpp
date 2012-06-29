@@ -25,7 +25,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <stdlib.h>
 
+#ifdef __ENABLE_VISIT
 #include <VisItDataInterface_V2.h>
+#endif
 
 #include "xml/Model.hpp"
 #include "data/Types.hpp"
