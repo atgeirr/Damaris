@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
-<simulation name="fractal" language="CPP" xmlns="http://damaris.gforge.inria.fr/Damaris/Model">
+<simulation name="fractal" language="cpp" xmlns="http://damaris.gforge.inria.fr/Damaris/Model">
 	<architecture>
-		<cores  count="4">
+		<cores  count="5">
 			<clients count="4"/>
 		</cores>
 		<buffer name="buffer" size="16777216" />
