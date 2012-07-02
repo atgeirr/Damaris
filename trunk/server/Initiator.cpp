@@ -121,6 +121,7 @@ Client* Initiator::start(const std::string& configFile, MPI_Comm globalcomm)
 		}
 	} else {
 		// synchronous mode : the servers are attached to each client
+		DBG("Starting in synchronous mode");
 		if(rankInNode != 0) {
 			p->setID(rank);
 			MPI_Barrier(globalcomm);

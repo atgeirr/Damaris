@@ -58,7 +58,9 @@ Server::Server(Process* p)
 Server::~Server()
 {
 	Process::kill();
+#ifdef __ENABLE_VISIT
 	MPILayer<int>::Delete(visitMPIlayer);
+#endif
 }
 	
 /* starts the server and enter the main loop */

@@ -1,4 +1,5 @@
 set(CLIENT_SIDE_LIBRARIES damaris ${BOOST_LIB} ${PYTHON_LIB} ${XERCESC_LIB} ${VISIT_LIB} rt dl)
+set(SERVER_SIDE_LIBRARIES damaris-server)
 set(VISIT_TEST_DIR ${DAMARIS_SOURCE_DIR}/visit/test)
 
 add_definitions(-DPARALLEL)
@@ -21,7 +22,9 @@ add_executable (interleave ${VISIT_TEST_DIR}/interleave.c)
 target_link_libraries (interleave ${CLIENT_SIDE_LIBRARIES})
 
 add_executable (life ${VISIT_TEST_DIR}/life.c)
-target_link_libraries (life ${CLIENT_SIDE_LIBRARIES})
+target_link_libraries (life 
+				${SERVER_SIDE_LIBRARIES}
+				${CLIENT_SIDE_LIBRARIES})
 
 add_executable (mandelbrot ${VISIT_TEST_DIR}/mandelbrot.C
 						   ${VISIT_TEST_DIR}/patch.C)

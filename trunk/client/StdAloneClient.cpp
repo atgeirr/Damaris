@@ -29,12 +29,23 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "core/VariableManager.hpp"
 #include "core/ActionManager.hpp"
 #include "client/StdAloneClient.hpp"
+#ifdef __ENABLE_VISIT
+#include "visit/VisItListener.hpp"
+#endif
 
 namespace Damaris {
 
 StdAloneClient::StdAloneClient(Process* p)
 : Client(p)
-{ }
+{ 
+#ifdef __ENABLE_VISIT
+    if(process->getModel()->visit().present()) {
+			Viz::VisItListener::Init(Environment::getEntityComm(),
+							p->getModel()->visit(),
+							Environment::getSimulationName());
+    }
+#endif
+}
 
 
 /* destructor */
@@ -252,8 +263,24 @@ int StdAloneClient::kill_server()
 
 int StdAloneClient::end_iteration(int iteration)
 {
-	// TODO : update backends, such as VisIt
+	DBG("Ending iteration " << iteration);
 	Environment::SetLastIteration(iteration);
+#ifdef __ENABLE_VISIT
+	int vizstt;
+	if(process->getModel()->visit().present()) {
+		Viz::VisItListener::Update();
+		// try receiving from VisIt (only for rank 0)
+
+		if(process->getID() == 0) {
+			vizstt = Viz::VisItListener::Connected();
+		}		
+		MPI_Bcast(&vizstt,1,MPI_INT,0, Environment::getEntityComm());
+		// try receiving from the VisIt callback communication layer
+		if(vizstt > 0) {
+			Viz::VisItListener::EnterSyncSection(vizstt);
+		}
+	}
+#endif
 	return 0;
 }
 

@@ -25,6 +25,8 @@
 #define NROW 96
 #define NCOL 96 
 
+MPI_Comm comm;
+
 typedef enum {RANDOM = 0, GLIDER=1, ACORN=2, DIEHARD=3} BCtype;
 
 typedef struct
@@ -157,12 +159,12 @@ life_data_simulate(life_data *life, int par_rank, int par_size)
 	if(par_size > 1) {
 		source = (par_size + par_rank - 1) % par_size;
 		dest = (par_rank+1) % par_size;
-		MPI_Irecv(&working_life[1], life->Ncolumns, MPI_INT, dest, 1000, MPI_COMM_WORLD, &request);
-		MPI_Send(&true_life[(life->Nrows-1)*life->Ncolumns], life->Ncolumns, MPI_INT, source,  1000, MPI_COMM_WORLD);
+		MPI_Irecv(&working_life[1], life->Ncolumns, MPI_INT, dest, 1000, comm, &request);
+		MPI_Send(&true_life[(life->Nrows-1)*life->Ncolumns], life->Ncolumns, MPI_INT, source,  1000, comm);
 		MPI_Wait( &request, &status);
 
-		MPI_Irecv(&working_life[(life->Nrows+1)*(life->Ncolumns+2) + 1], life->Ncolumns, MPI_INT, dest, 1001, MPI_COMM_WORLD, &request);
-		MPI_Send(&true_life[0], life->Ncolumns, MPI_INT, source,  1001, MPI_COMM_WORLD);
+		MPI_Irecv(&working_life[(life->Nrows+1)*(life->Ncolumns+2) + 1], life->Ncolumns, MPI_INT, dest, 1001, comm, &request);
+		MPI_Send(&true_life[0], life->Ncolumns, MPI_INT, source,  1001, comm);
 		MPI_Wait( &request, &status);
 	} else {
     	memcpy(&working_life[1], &true_life[(life->Nrows-1)*life->Ncolumns], life->Ncolumns * sizeof(int));
@@ -178,23 +180,23 @@ life_data_simulate(life_data *life, int par_rank, int par_size)
 		if(par_rank == 0)
     	{
         	source = par_size -1;
-        	MPI_Irecv(&working_life[(life->Nrows+1)*(life->Ncolumns+2) + 0], 1, MPI_INT, source, 1002, MPI_COMM_WORLD, &request);
-        	MPI_Send(&true_life[life->Ncolumns-1], 1, MPI_INT, source,  1004, MPI_COMM_WORLD);
+        	MPI_Irecv(&working_life[(life->Nrows+1)*(life->Ncolumns+2) + 0], 1, MPI_INT, source, 1002, comm, &request);
+        	MPI_Send(&true_life[life->Ncolumns-1], 1, MPI_INT, source,  1004, comm);
         	MPI_Wait( &request, &status);
   	
-			MPI_Irecv(&working_life[life->Ncolumns+1], 1, MPI_INT, source, 1003, MPI_COMM_WORLD, &request);
-			MPI_Send(&true_life[0], 1, MPI_INT, source,  1005, MPI_COMM_WORLD);
+			MPI_Irecv(&working_life[life->Ncolumns+1], 1, MPI_INT, source, 1003, comm, &request);
+			MPI_Send(&true_life[0], 1, MPI_INT, source,  1005, comm);
 			MPI_Wait( &request, &status);
 		}
 		if(par_rank == (par_size -1) && par_size > 1)
 		{
 			source = 0;
-			MPI_Irecv(&working_life[0], 1, MPI_INT, source, 1004, MPI_COMM_WORLD, &request);
-			MPI_Send(&true_life[life->Ncolumns*(life->Nrows-1) + life->Ncolumns-1], 1, MPI_INT, source,  1002, MPI_COMM_WORLD);
+			MPI_Irecv(&working_life[0], 1, MPI_INT, source, 1004, comm, &request);
+			MPI_Send(&true_life[life->Ncolumns*(life->Nrows-1) + life->Ncolumns-1], 1, MPI_INT, source,  1002, comm);
 			MPI_Wait( &request, &status);
 
-			MPI_Irecv(&working_life[(life->Nrows+1)*(life->Ncolumns+2) + life->Ncolumns+1], 1, MPI_INT, source, 1005, MPI_COMM_WORLD, &request);
-			MPI_Send(&true_life[life->Ncolumns*(life->Nrows-1) + 0], 1, MPI_INT, source,  1003, MPI_COMM_WORLD);
+			MPI_Irecv(&working_life[(life->Nrows+1)*(life->Ncolumns+2) + life->Ncolumns+1], 1, MPI_INT, source, 1005, comm, &request);
+			MPI_Send(&true_life[life->Ncolumns*(life->Nrows-1) + 0], 1, MPI_INT, source,  1003, comm);
 			MPI_Wait( &request, &status);
 		}
 	} else {
@@ -401,13 +403,7 @@ void exposeDataToDamaris(simulation_data* sim) {
 		DC_signal("clean",sim->cycle-2);
 	}
 
-#ifdef PARALLEL
-	MPI_Barrier(MPI_COMM_WORLD);
-	if(sim->par_rank % 2 == 0) 
-#endif
-	{
-			DC_end_iteration(sim->cycle);
-	}
+	DC_end_iteration(sim->cycle);
 }
 
 /******************************************************************************
@@ -438,8 +434,17 @@ int main(int argc, char **argv)
 
     /* Initialize MPI */
     MPI_Init(&argc, &argv);
-    MPI_Comm_rank (MPI_COMM_WORLD, &sim.par_rank);
-    MPI_Comm_size (MPI_COMM_WORLD, &sim.par_size);
+	MPI_Comm all = MPI_COMM_WORLD;	
+
+	/* Initialize Damaris */
+	if( ! DC_mpi_start(argv[1],all)) {
+		MPI_Finalize();
+		return 0;
+	}
+	comm = DC_mpi_get_client_comm();
+
+    MPI_Comm_rank (comm, &sim.par_rank);
+    MPI_Comm_size (comm, &sim.par_size);
 
     /* Adjust the life partitioning */
     sim.life.Nrows = NROW/sim.par_size; /* assume they divide evenly */
@@ -448,8 +453,6 @@ int main(int argc, char **argv)
         fprintf(stderr,"The total number of rows does not divide evenly by the number of MPI tasks. Resubmit\n");
         exit(1);
     }
-
-	DC_initialize(argv[1],sim.par_rank);
 
     life_data_allocate(&sim.life, sim.par_rank, sim.par_size);
     life_data_ResetInitialConditions(&sim.life, RANDOM, sim.par_rank);

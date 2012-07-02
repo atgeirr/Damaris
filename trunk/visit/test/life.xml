@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <simulation name="life" language="c" xmlns="http://damaris.gforge.inria.fr/Damaris/Model">
 	<architecture>
-		<cores  count="3">
+		<cores  count="2">
 			<clients count="2"/>
 		</cores>
 		<buffer name="buffer" size="67108864" />

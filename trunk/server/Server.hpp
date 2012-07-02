@@ -38,7 +38,9 @@ namespace Damaris {
 
 		private:
 			Process* process;
+#ifdef __ENABLE_VISIT
 			MPILayer<int>* visitMPIlayer;
+#endif
 			/**
 			 * \brief Constructor.
 			 * Used when starting a server from an external program.
