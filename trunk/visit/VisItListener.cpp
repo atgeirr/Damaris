@@ -63,7 +63,6 @@ void VisItListener::Init(MPI_Comm c, const Model::Simulation::visit_optional& md
 	}
 	
 	VisItSetupEnvironment();
-	VisItInitializeSocketAndDumpSimFile(simname.c_str(),"", "", NULL, NULL, NULL);
 	comm = c;
 
 	VisItSetBroadcastIntFunction(&BroadcastIntCallback);
@@ -76,11 +75,14 @@ void VisItListener::Init(MPI_Comm c, const Model::Simulation::visit_optional& md
 	VisItSetParallel(size > 1);
 	VisItSetParallelRank(rank);
 	VisItSetMPICommunicator(&comm);
+	if(rank == 0) {
+		VisItInitializeSocketAndDumpSimFile(simname.c_str(),"", "", NULL, NULL, NULL);
+	}
 }
 
 int VisItListener::Connected()
 {
-	int visitstate = VisItDetectInput(0, -1);
+	int visitstate = VisItDetectInputWithTimeout(0,1000,-1);
 	if(visitstate >= -5 && visitstate <= -1) {
 		ERROR("Uncaught VisIt error");
 	} else if(visitstate == 1) {

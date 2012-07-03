@@ -37,7 +37,8 @@ namespace Damaris {
 
 StdAloneClient::StdAloneClient(Process* p)
 : Client(p)
-{ 
+{
+	Environment::AddConnectedClient(p->getID()); 
 #ifdef __ENABLE_VISIT
     if(process->getModel()->visit().present()) {
 			Viz::VisItListener::Init(Environment::getEntityComm(),
@@ -273,6 +274,7 @@ int StdAloneClient::end_iteration(int iteration)
 
 		if(process->getID() == 0) {
 			vizstt = Viz::VisItListener::Connected();
+			DBG("In end_iteration for process 0, stat is " << vizstt);
 		}		
 		MPI_Bcast(&vizstt,1,MPI_INT,0, Environment::getEntityComm());
 		// try receiving from the VisIt callback communication layer
