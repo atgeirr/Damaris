@@ -38,7 +38,6 @@ namespace Damaris {
 StdAloneClient::StdAloneClient(Process* p)
 : Client(p)
 {
-	Environment::AddConnectedClient(p->getID()); 
 #ifdef __ENABLE_VISIT
     if(process->getModel()->visit().present()) {
 			Viz::VisItListener::Init(Environment::getEntityComm(),
@@ -48,6 +47,16 @@ StdAloneClient::StdAloneClient(Process* p)
 #endif
 }
 
+int StdAloneClient::connect()
+{
+	static bool connected = false;
+	if(not connected) {
+		Environment::AddConnectedClient(process->getID());
+		connected = true;
+		return true;
+	}
+	return false;
+}
 
 /* destructor */
 StdAloneClient::~StdAloneClient()

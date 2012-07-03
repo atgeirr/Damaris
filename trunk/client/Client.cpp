@@ -42,24 +42,32 @@ namespace Damaris {
 		Process::initialize(cfg,id);
 		Process* p = Process::get();
 		p->openSharedStructures();
-
-		// sends a message to the server to say that a new client
-		// is now connected	
-		Message msg;
-		msg.type = MSG_INT;
-		msg.source = id;
-		msg.iteration = 0;
-		msg.object = CLIENT_CONNECTED;
-		p->getSharedMessageQueue()->send(&msg);
-	
-		return new Client(p);
+		Client* c = new Client(p);
+		c->connect();
+		return c;
 	}
 
 	Client::Client(Process* p)
 	{
 		FATAL((p == NULL),"Fatal error in Client constructor, Process pointer is NULL");
 		process = p;
-	}	
+	}
+
+	int Client::connect()
+	{
+		static bool connected = false;
+		if(not connected) {
+			Message msg;
+			msg.type = MSG_INT;
+			msg.source = process->getID();
+			msg.iteration = 0;
+			msg.object = CLIENT_CONNECTED;
+			process->getSharedMessageQueue()->send(&msg);
+			connected = true;
+			return true;
+		}
+		return false;
+	}
 
 	void* Client::alloc(const std::string & varname, int32_t iteration, bool blocking)
 	{

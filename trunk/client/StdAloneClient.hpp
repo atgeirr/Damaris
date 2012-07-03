@@ -51,6 +51,12 @@ class StdAloneClient : public Client {
 		StdAloneClient(Process* p);
 
 	public:
+
+		/**
+		 * \see Client::connect
+		 */
+		virtual int connect();
+
 		/**
 		 * \see Writer::write
 		 */

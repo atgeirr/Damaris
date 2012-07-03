@@ -80,6 +80,12 @@ class Client : public Writer {
 		 */
 		static Client* New(const std::string& file, int32_t id);
 
+
+		/**
+		 * Notifies a potential server that the client has connected.
+		 */
+		virtual int connect();
+
 		/**
 		 * \see Writer::write
 		 */

@@ -108,7 +108,9 @@ Client* Initiator::start(const std::string& configFile, MPI_Comm globalcomm)
 			// won't be created before the servers are started.
 			MPI_Barrier(globalcomm);
 			p->openSharedStructures();
-			return new Client(p);
+			Client* c = new Client(p);
+			c->connect();
+			return c;
 		} else {
 			DBG("Server starting, rank = " << rank);
 			p->createSharedStructures();
@@ -126,12 +128,15 @@ Client* Initiator::start(const std::string& configFile, MPI_Comm globalcomm)
 			p->setID(rank);
 			MPI_Barrier(globalcomm);
 			p->openSharedStructures();
-			return new StdAloneClient(p);
+			Client* c = new StdAloneClient(p);
+			c->connect();
+			return c;
 		} else {
 			p->setID(rank);
 			p->createSharedStructures();
 			Client* c = new StdAloneClient(p);
 			MPI_Barrier(globalcomm);
+			c->connect();
 			return c;
 		}
 		return NULL;
