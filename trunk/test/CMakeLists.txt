@@ -10,9 +10,9 @@ ENDIF( CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" )
 add_executable (julia_cpp ${DAMARIS_SOURCE_DIR}/test/julia.cpp)
 target_link_libraries (julia_cpp ${CLIENT_SIDE_LIBRARIES})
 
-
 add_executable (julia_alloc_cpp ${DAMARIS_SOURCE_DIR}/test/julia_alloc.cpp)
 target_link_libraries (julia_alloc_cpp ${CLIENT_SIDE_LIBRARIES})
 
 add_executable (julia_mpi_cpp ${DAMARIS_SOURCE_DIR}/test/julia_mpi.cpp)
 target_link_libraries (julia_mpi_cpp ${EMB_SERVER_LIBRARIES})
+set_target_properties (julia_mpi_cpp PROPERTIES LINK_FLAGS "-Wl,-export-dynamic")

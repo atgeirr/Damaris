@@ -36,8 +36,10 @@ target_link_libraries (test_chunk_c ${CLIENT_SIDE_LIBRARIES})
 
 add_executable (test_mpi_c ${DAMARIS_SOURCE_DIR}/examples/test_mpi.c)
 target_link_libraries (test_mpi_c ${EMB_SERVER_LIBRARIES})
+set_target_properties (test_mpi_c PROPERTIES LINK_FLAGS "-Wl,-export-dynamic")
 
 if(CMAKE_Fortran_COMPILER)
   add_executable (test_mpi_fortran ${DAMARIS_SOURCE_DIR}/examples/test_mpi.f90)
   target_link_libraries (test_mpi_fortran ${EMB_SERVER_LIBRARIES} gfortran)
+  set_target_properties (test_mpi_fortran PROPERTIES LINK_FLAGS "-Wl,-export-dynamic")
 endif(CMAKE_Fortran_COMPILER)

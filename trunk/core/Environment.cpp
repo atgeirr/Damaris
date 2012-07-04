@@ -148,14 +148,15 @@ namespace Damaris {
 
 	void Environment::SetLastIteration(int i)
 	{
-		// assumes that all the cores will post the same
-		// end of iteration about at the same time (a core won't post
-		// the end of iteration 10 if other cores haven't yet posted 
-		// the end of iteration 9). This should be corrected later...
+		if(not hadServer()) {
+			env->lastIteration = i;
+			return;
+		}
+
 		static int locks = 0;
 		locks += 1;
 		if(locks == getClientsPerNode()) { 
-			INFO("Iteration " << i << " terminated");
+			DBG("Iteration " << i << " terminated");
 			env->lastIteration = i;
 			locks = 0;
 		}
