@@ -36,6 +36,10 @@ add_executable (mandelbrot ${VISIT_TEST_DIR}/mandelbrot.C
 target_link_libraries (mandelbrot ${CLIENT_SIDE_LIBRARIES})
 set_target_properties (mandelbrot PROPERTIES LINK_FLAGS "-Wl,-export-dynamic")
 
+add_executable (mandelbulb ${VISIT_TEST_DIR}/mandelbulb.c)
+target_link_libraries (mandelbulb ${CLIENT_SIDE_LIBRARIES})
+set_target_properties (mandelbulb PROPERTIES LINK_FLAGS "-Wl,-export-dynamic")
+
 add_executable (material ${VISIT_TEST_DIR}/material.c)
 target_link_libraries (material ${CLIENT_SIDE_LIBRARIES})
 set_target_properties (material PROPERTIES LINK_FLAGS "-Wl,-export-dynamic")

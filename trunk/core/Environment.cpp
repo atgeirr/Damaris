@@ -148,7 +148,7 @@ namespace Damaris {
 
 	void Environment::SetLastIteration(int i)
 	{
-		if(not hadServer()) {
+		if(not hasServer()) {
 			env->lastIteration = i;
 			return;
 		}
