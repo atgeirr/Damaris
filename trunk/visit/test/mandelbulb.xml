@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<simulation name="life" language="c" xmlns="http://damaris.gforge.inria.fr/Damaris/Model">
+	<architecture>
+		<cores  count="2">
+			<clients count="1"/>
+		</cores>
+		<buffer name="buffer" size="67108864" />
+		<queue  name="queue" size="100" />
+	</architecture>
+	<data>
+		<parameter name="WIDTH" type="int" value="100" />
+		<parameter name="HEIGHT" type="int" value="100" />
+		<parameter name="DEPTH" type="int" value="100" />
+
+		<layout name="cells"  type="int" dimensions="WIDTH,HEIGHT,DEPTH" />
+		<layout name="rmeshX" type="double" dimensions="WIDTH" />
+		<layout name="rmeshY" type="double" dimensions="HEIGHT" />
+		<layout name="rmeshZ" type="double" dimensions="DEPTH" />
+
+		<mesh name="mesh" type="rectilinear" topology="3">
+			<coord name="coord/x"/>
+			<coord name="coord/y"/>
+			<coord name="coord/z"/>
+		</mesh>
+
+		<group name="coord">
+			<variable name="x" layout="rmeshX" visualizable="false" time-varying="false" />
+			<variable name="y" layout="rmeshY" visualizable="false" time-varying="false" />
+			<variable name="z" layout="rmeshZ" visualizable="false" time-varying="false" />
+		</group>
+	
+		<variable name="space" type="scalar" layout="cells" mesh="mesh" centering="nodal" />
+	</data>
+	<actions>
+	</actions>
+	<python>
+		<path>/home/mdorier/visu/visit/python/2.6.4/linux-x86_64_gcc-4.4/lib/python2.6</path>
+		<home>/home/mdorier/visu/visit/python/2.6.4/linux-x86_64_gcc-4.4</home>
+	</python>
+	<visit>
+		<path>/home/mdorier/Work/Visu2/visit2.5.0/src</path>
+	</visit>
+</simulation>
