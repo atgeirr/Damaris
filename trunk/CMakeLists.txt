@@ -37,7 +37,7 @@ add_definitions (-D__ENABLE_MPI) # this line to be deleted
 #-----------------------------------------------------------#
 add_definitions (-D__INFO)
 #add_definitions (-D__TRACE)
-add_definitions (-D__DEBUG_ALL)
+#add_definitions (-D__DEBUG_ALL)
 add_definitions (-D__BENCHMARK)
 
 #-----------------------------------------------------------#
@@ -85,7 +85,7 @@ set(NUMPY_INCLUDE_DIR ${EXTERNAL_ROOT}/lib/python2.6/site-packages/numpy/core/in
 find_package(PythonLibs)
 
 if (PYTHON_INCLUDE_PATH)
-  find_package(Boost 1.47 QUIET COMPONENTS python)
+  find_package(Boost 1.49 QUIET COMPONENTS python)
     if (Boost_PYTHON_LIBRARY)
 	message(STATUS "Building Python support. Python lib: ${Boost_PYTHON_LIBRARY}")
 	message(STATUS "Python include: ${PYTHON_INCLUDE_PATH}")
