@@ -1,13 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <mpi.h>
 #include "include/Damaris.h"
 
 #define MAX_ITERATION 255
 #define ORDER    8
 #define WIDTH  100
 #define HEIGHT 100
-#define DEPTH  100
+#define DEPTH  200
 #define RANGE  1.2
 
 typedef struct {
@@ -65,35 +66,58 @@ int main(int argc, char** argv)
 		exit(0);
 	}
 
-	DC_initialize(argv[1],0);
+	MPI_Init(&argc,&argv);
 
-	int space[WIDTH][HEIGHT][DEPTH];
-	double coord_x[WIDTH];
-	double coord_y[HEIGHT];
+	int nbprocs, rank;
+	MPI_Comm_rank(MPI_COMM_WORLD,&rank);
+	MPI_Comm_size(MPI_COMM_WORLD,&nbprocs);
+
+	int size = (int)sqrt((double)nbprocs);
+	if(size*size != nbprocs) {
+		fprintf(stderr,"Number of processes must be a square\n");
+		MPI_Finalize();
+		exit(0);
+	}
+
+	DC_initialize(argv[1],rank);
+
+	int offset_x = (rank/size)*WIDTH;
+	int offset_y = (rank%size)*HEIGHT;
+	int offset_z = 0;
+
+	int space[DEPTH][HEIGHT+1][WIDTH+1];
+	double coord_x[WIDTH+1];
+	double coord_y[HEIGHT+1];
 	double coord_z[DEPTH];
 
 	int x,y,z;
-	for(x = 0; x < WIDTH; x++)
-	for(y = 0; y < HEIGHT; y++)
 	for(z = 0; z < DEPTH; z++)
+	for(y = 0; y < HEIGHT+1; y++)
+	for(x = 0; x < WIDTH+1; x++)
 	{
 		vector v = {
-			2.0*RANGE*x/WIDTH - RANGE,
-			2.0*RANGE*y/HEIGHT - RANGE,
-			2.0*RANGE*z/DEPTH - RANGE
+			2.0*RANGE*(x+offset_x)/(WIDTH*size)  - RANGE,
+			2.0*RANGE*(y+offset_y)/(HEIGHT*size) - RANGE,
+			2.0*RANGE*(z+offset_z)/DEPTH - RANGE
 		};
-		space[x][y][z] = iterate(&v);
+		space[z][y][x] = iterate(&v);
 	}
 
-	for(x = 0; x < WIDTH; x++) 	coord_x[x] = ((double)x)/WIDTH;
-	for(y = 0; y < HEIGHT; y++) coord_y[y] = ((double)y)/HEIGHT;
-	for(z = 0; z < DEPTH; z++)	coord_z[z] = ((double)z)/DEPTH;
+	for(x = 0; x < WIDTH+1; x++)  coord_x[x] = ((double)(x+offset_x))/((double)(WIDTH*size));
+	for(y = 0; y < HEIGHT+1; y++) coord_y[y] = ((double)(y+offset_y))/((double)(HEIGHT*size));
+	for(z = 0; z < DEPTH; z++) 	  coord_z[z] = ((double)(z+offset_z))/DEPTH;
 
 	DC_write("coord/x",0,coord_x);
 	DC_write("coord/y",0,coord_y);
 	DC_write("coord/z",0,coord_z);
 	DC_write("space",0,space);
+
 	DC_end_iteration(0);
+
 	DC_finalize();
+
+	MPI_Barrier(MPI_COMM_WORLD);
+	MPI_Finalize();
+
 	return 0;
 }

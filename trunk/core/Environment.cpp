@@ -148,6 +148,8 @@ namespace Damaris {
 
 	void Environment::SetLastIteration(int i)
 	{
+		// TODO : this function is not correct
+		// for the client side
 		if(not hasServer()) {
 			env->lastIteration = i;
 			return;
