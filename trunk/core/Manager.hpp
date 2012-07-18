@@ -191,7 +191,7 @@ class Manager {
 		 * }
 		 */
 		template<typename FUNCTION>
-		static void ForEach(const FUNCTION& f)
+		static void ForEach(FUNCTION& f)
 		{
 			if(IsEmpty()) return;
 
