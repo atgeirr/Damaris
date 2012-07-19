@@ -74,6 +74,12 @@ void* StdAloneClient::alloc(const std::string & varname, int32_t iteration, bool
             return NULL;
         }
 
+		if((not variable->IsTimeVarying()) && iteration != 0) {
+			WARN("Trying to write a non-time-varying variable at an iteration "
+				<< "different from 0, the variable won't be allocated");
+			return NULL;
+		}
+
         // the variable is known, get its layout
         Layout* layout = variable->getLayout();
 
@@ -151,6 +157,12 @@ int StdAloneClient::write(const std::string & varname,
 		if(variable == NULL) {
             return -1;
 		}
+		
+		if((not variable->IsTimeVarying()) && iteration != 0) {
+			WARN("Trying to write a non-time-varying variable at an iteration "
+				<< "different from 0, the variable won't be written");
+			return -4;
+		}
 
 		Layout* layout = variable->getLayout();
 
@@ -207,6 +219,12 @@ int StdAloneClient::chunk_write(chunk_h chunkh, const std::string & varname,
 	if(variable == NULL) {
 		ERROR("Variable \""<< varname << "\" not defined in configuration");
 		return -1;
+	}
+
+	if((not variable->IsTimeVarying()) && iteration != 0) {
+		WARN("Trying to write a non-time-varying variable at an iteration "
+			<< "different from 0, the variable won't be written");
+		return -4;
 	}
 
 	ChunkDescriptor* cd = (ChunkDescriptor*)chunkh;
