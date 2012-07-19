@@ -22,6 +22,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/interprocess/xsi_shared_memory.hpp>
+//#define __DEBUG
 #include "core/Debug.hpp"
 #include "core/SharedMemorySegment.hpp"
 
@@ -199,16 +200,21 @@ handle_t SharedMemorySegment::POSIX_ShMem::getHandleFromAddress(SharedMemorySegm
 SharedMemorySegment::ptr SharedMemorySegment::POSIX_ShMem::allocate(size_t size)
 {
 	SharedMemorySegment::ptr t = impl->allocate(size,std::nothrow);
+	if(t != NULL) {
+		DBG("Allocated: " << size);
+	}
 	return t;
 }
 
 void SharedMemorySegment::POSIX_ShMem::deallocate(void* addr)
 {
+	size_t oldsize = getFreeMemory();
 	scoped_lock<interprocess_mutex> lock(size_manager->lock);
 	impl->deallocate(addr);
 	size_t newsize = getFreeMemory();
 	size_manager->size = newsize;
 	size_manager->cond_size.notify_all();
+	DBG("Deallocated: " << (newsize - oldsize));
 }
 
 size_t SharedMemorySegment::POSIX_ShMem::getFreeMemory()

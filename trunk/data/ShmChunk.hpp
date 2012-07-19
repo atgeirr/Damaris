@@ -63,7 +63,7 @@ class ShmChunk : public Chunk {
 		 * \brief Destructor.
 		 * If this instance is the owner of the data, the data will be deleted.
 		 */
-		~ShmChunk();
+		virtual ~ShmChunk();
 
 		/**
          * \brief Gets the ID of the process that has written the chunk.

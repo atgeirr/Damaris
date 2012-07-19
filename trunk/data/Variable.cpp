@@ -20,6 +20,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \author Matthieu Dorier
  * \version 0.4
  */
+#define __DEBUG
 #include "core/LayoutManager.hpp"
 #include "data/Variable.hpp"
 #include "core/Debug.hpp"

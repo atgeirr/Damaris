@@ -43,7 +43,13 @@ namespace Damaris {
  * shared memory).
  */
 class Chunk {
-	public:		
+	public:	
+
+		/**
+		 * Destructor (does nothing since it's an abstract class)
+		 */
+		virtual ~Chunk() {}
+
 		/**
          * \brief Gets the ID of the process that has written the chunk.
          */
