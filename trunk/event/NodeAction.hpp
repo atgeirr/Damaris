@@ -69,6 +69,7 @@ class NodeAction : public BASE {
 
 			DBG("Node action called iteration is "<<iteration<<" and source is "<<sourceID);
 			locks[iteration] = locks[iteration] + 1;
+			DBG("lock is now " << locks[iteration] << "/" << clientsPerNode);
 			if(locks[iteration] == clientsPerNode) {
 				DBG("calling base action");
 				BASE::call(iteration,sourceID,args);

@@ -140,6 +140,11 @@ class Variable : public Configurable<Model::Variable> {
 		 */
 		std::string getUnit() const { return model.unit(); }
 
+		/**
+		 * Return true if the variable is time-varying.
+		 */
+		bool IsTimeVarying() const { return model.time_varying(); }
+
 #ifdef __ENABLE_VISIT
 		/**
 		 * Fills VisIt's metadata handle with information related to the variable.

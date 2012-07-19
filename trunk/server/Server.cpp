@@ -169,11 +169,11 @@ void Server::processInternalSignal(int32_t object, int iteration, int source)
 		break;
 	case URGENT_CLEAN:
 		DBG("Received a \"clean\" message");
-		ActionManager::reactToUserSignal("clean",iteration,source);
+		ActionManager::reactToUserSignal("#clean",iteration,source);
 		break;
 	case LOST_DATA:
 		DBG("Received a \"lost data\" message");
-		ActionManager::reactToUserSignal("lost",iteration,source);
+		ActionManager::reactToUserSignal("#lost",iteration,source);
 		break;
 	}
 }

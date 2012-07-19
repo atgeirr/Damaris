@@ -84,7 +84,7 @@ namespace Damaris {
 		if(ev.scope() == Model::Scope::core)
 			return new DynamicAction(ev,name);
 		else if(ev.scope() == Model::Scope::node)
-			return NodeAction<DynamicAction,Model::Event>::New(ev,name,Environment::getCoresPerNode());
+			return NodeAction<DynamicAction,Model::Event>::New(ev,name,Environment::getClientsPerNode());
 		else {
 			CFGERROR("Scope \"" << ev.scope() << "\" is not implemented for event \"" << name << "\".");
 			return NULL;
