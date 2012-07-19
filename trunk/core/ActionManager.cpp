@@ -48,7 +48,9 @@ void ActionManager::reactToUserSignal(const std::string &sig,
 	{
 		(*a)(iteration,sourceID);
 	} else {
-		ERROR("Unable to process \""<< sig <<"\" signal: unknown event name");
+		if(sig[0] != '#') {
+			ERROR("Unable to process \""<< sig <<"\" signal: unknown event name");
+		}
 	}
 }
 
