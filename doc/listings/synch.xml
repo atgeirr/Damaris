@@ -1,0 +1,6 @@
+<architecture>
+    <cores  count="16">
+        <clients count="16"/>
+    </cores>
+    ...
+</architecture>
