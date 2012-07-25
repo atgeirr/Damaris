@@ -1,0 +1,3 @@
+<actions>
+	<event name="my_event" action="my_function" library="libsomething.so" scope="core"/>
+</actions>

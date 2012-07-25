@@ -1,0 +1,1071 @@
+\documentclass[11pt]{report} 
+\usepackage{url}
+\usepackage{anysize}
+\usepackage{makeidx}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{color}
+
+\marginsize{2cm}{2cm}{2cm}{2cm}
+ 
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\definecolor{gray}{rgb}{0.4,0.4,0.4}
+\definecolor{darkblue}{rgb}{0.0,0.0,0.6}
+\definecolor{cyan}{rgb}{0.0,0.0,1}
+ 
+\lstset{ %
+  language=C,                % the language of the code
+  basicstyle=\footnotesize,           % the size of the fonts that are used for the code
+  %numbers=left,                   % where to put the line-numbers
+  %numberstyle=\tiny\color{black},  % the style that is used for the line-numbers
+  %stepnumber=1,                   % the step between two line-numbers. If it's 1, each line 
+                                  % will be numbered
+  numbersep=5pt,                  % how far the line-numbers are from the code
+  backgroundcolor=\color{white},      % choose the background color. You must add \usepackage{color}
+  showspaces=false,               % show spaces adding particular underscores
+  showstringspaces=false,         % underline spaces within strings
+  showtabs=false,                 % show tabs within strings adding particular underscores
+  frame=single,                   % adds a frame around the code
+  frameround=ftft,
+  float=th,
+  rulecolor=\color{black},        % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. commens (green here))
+  tabsize=2,                      % sets default tabsize to 2 spaces
+  captionpos=b,                   % sets the caption-position to bottom
+  breaklines=true,                % sets automatic line breaking
+  breakatwhitespace=false,        % sets if automatic breaks should only happen at whitespace
+  title=\lstname,                   % show the filename of files included with \lstinputlisting;
+                                  % also try caption instead of title
+  keywordstyle=\color{blue},          % keyword style
+  commentstyle=\color{dkgreen},       % comment style
+  stringstyle=\color{mauve},         % string literal style
+  escapeinside={\%*}{*)},            % if you want to add a comment within your code
+  morekeywords={*,...}               % if you want to add more keywords to the set
+}
+
+\lstdefinelanguage{XML}
+{
+  morestring=[b]",
+  %morestring=[s]{>}{<},
+  morecomment=[s]{<?}{?>},
+  morecomment=[s]{<!--}{-->},
+  stringstyle=\color{mauve},
+  identifierstyle=\color{blue},
+  keywordstyle=\color{blue},
+  morekeywords={xmlns,version,type,simulation,architecture,
+  cores,clients,buffer,queue,data,actions,parameter,layout,variable,
+  group}% list your attributes here
+}
+
+\newcommand{\Damaris}{\emph{\textbf{Damaris}}}
+\newcommand{\installdir}[1]{\texttt{\$HOME/local#1}}
+\newcommand{\file}[1]{\emph{#1}}
+\newcommand{\function}[1]{\texttt{#1}}
+
+\makeindex
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\title{\Huge{ 
+	 Getting Started with \Damaris{}} \\
+	\normalsize{} version 0.5.1}
+
+\author{\textbf{Matthieu Dorier}}
+\date{June 2012}
+\maketitle
+
+\setcounter{tocdepth}{1}
+\tableofcontents
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter*{The \Damaris{} approach}
+
+Large-scale simulations usually perform I/O in a time-partitioning manner.
+The simulation periodically stops and all processes perform a write (for checkpointing
+or future analysis purpose) concurrently to a parallel file system. This approach has also been
+used to perform in-situ visualization, where the simulation periodically stops to compute images.
+
+On recent infrastructures, the large number of cores available in each SMP node makes
+it possible to offload these tasks in order to gain efficiency by working in a space-partitioning manner.
+\Damaris{} proposes to dedicate one core on each SMP node to perform these tasks.
+It uses shared memory to communicate data from the cores running the simulation's code and
+the cores dedicated to these set-aside, data intensive tasks.
+
+A plugin system is used to enrich \Damaris{} with new functionalities. Plugins can be written
+in C++ or Python, making asynchronous, in-situ data management straightforward for end-users.
+Besides, \Damaris{} can be connected to the VisIt visualization software to provide
+non-impacting, in-situ, interactive visualization to existing simulations.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Downloading and installing}\label{chap:downloadingAndInstalling}
+
+%==============================================================================%
+%==============================================================================%
+\section{Dependencies}\label{sec:dependencies}
+
+In the following, we will assume that you install all dependencies locally in \installdir.
+\Damaris{} requires the following dependencies.
+\begin{itemize}
+	\item CMake (2.8 or newer), \\ available at \url{http://www.cmake.org/}
+	\item The XSD code synthesis library, \\ available at \url{http://www.codesynthesis.com/products/xsd/}
+	\item The Xerces-C library (version 3.1.1 or newer), \\
+	available at \url{http://xerces.apache.org/xerces-c/download.cgi}
+	\item The following parts of the Boost C++ library (version 1.47 or newer): python (if you enable the 
+	Python support), filesystem, system and program\_options, available at \url{http://www.boost.org/}
+\end{itemize}
+
+Additionally, the Python support and the VisIt support can be enabled by installing the corresponding
+libraries. See Chapters~\ref{Python} and~\ref{chap:VisIt} for this (in the right order: start by installing VisIt, then
+Python, then come back to this main installation process).
+
+\subsection{XSD codesynthesis}
+
+Download the XSD sources for your platform.
+Untar/unzip it and install it by copying it into the \installdir directory. 
+(Only the headers are required, you should copy the \texttt{cxx} folder into \installdir{/include}).
+
+\subsection{Xerces-C}
+
+Download Xerces-C (version 3.1.1 or greater). Take the source for your platform.
+Configure and compile:
+
+\begin{verbatim}
+./configure --prefix=$HOME/local --disable-threads --disable-network
+make
+make install
+\end{verbatim}
+
+\subsection{Boost}
+
+Download Boost (version 1.49 or higher). Configure and compile it:
+
+\begin{verbatim}
+./bootstrap.sh --prefix=$HOME/local --with-python-root=$HOME/local \
+       --with-libraries=date_time,program_options,system,filesystem,python 
+./b2
+./b2 install
+\end{verbatim}
+
+\noindent\textbf{Note:} delete ``python'' and ``--with-python-root=\$HOME/local'' if you do not intend 
+to use the Python support in \Damaris{}. If you use the Python interface for \Damaris{}, check
+Chapter~\ref{Python}.\newline
+
+\noindent\textbf{Note:} install VisIt first if you intend to use the VisIt support. VisIt also depends on Python
+so if you use VisIt and Python, make sure the same Python installation is used both for
+VisIt and Damaris. See Chapter~\ref{chap:VisIt} for more information on installing VisIt.
+
+%==============================================================================%
+%==============================================================================%
+\section{Compiling \Damaris{}}
+
+Download and untar the \Damaris{} archive. \Damaris{} uses CMake to be compiled.
+Make sure the \texttt{cmake} command is in your PATH environment variable.
+
+In the \Damaris{} root directory, the \file{CMakeLists.txt} file contains the compilation directives
+and various options. Open this file and modify the lines listed in Table~\ref{tab:cmake}.
+When these modifications are done, type
+\begin{verbatim}
+cmake -G "Unix Makefiles"
+\end{verbatim}
+This will generate the \file{Makefile} to compile \Damaris{}. Go on with 
+\begin{verbatim}
+make
+\end{verbatim}
+You're done!
+
+\begin{table}
+\centering
+\begin{tabular}{|l|l|l|}
+	\hline
+   Line & Variable & Content \\
+   \hline
+   \hline
+   13 &  & Name of the C MPI compiler. \\
+   14 &  & Name of the C++ MPI compiler. \\
+   15 &  & Name of the Fortran MPI compiler (uncomment if needed). \\
+   27 & EXTERNAL\_ROOT & Prefix path where dependencies have been installed. \\
+   56 & BOOST\_ROOT & Boost library location. \\
+   66 & XSD\_ROOT & XSD library location. \\
+   73 & XERCESC\_ROOT & Xerces-C library location. \\
+   83 & PYTHON\_ROOT & Python library location. \\
+   84 & NUMPY\_INCLUDE\_DIR & Location of the NumPy headers. \\
+   123 & VISIT\_ROOT & Location of VisIt. Comment if you don't need VisIt support. \\
+   \hline
+\end{tabular}\caption{CMakeLists.txt modifications before compiling \Damaris{}}\label{tab:cmake}
+\end{table}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Instrumenting a simulation}\label{Instrumenting}
+
+%==============================================================================%
+%==============================================================================%
+\section{Initializing and finalizing \Damaris{}}
+
+
+
+This chapter will teach you how to instrument a simulation in order to use dedicated cores
+with \Damaris{}.
+\Damaris{} can be deployed in two different ways.
+\begin{itemize}
+	\item The dedicated cores and the simulation can be deployed separately (decoupled version). In
+	this type of deployment the user has to be careful that exactly one \Damaris{} server is started on each node;
+	\item \Damaris{} can be integrated in the MPI-based simulation and use part of its MPI processes, in which
+	case the \Damaris{} library will take care of starting a server on each node and provide a communicator
+	for client processes.
+\end{itemize}
+We warmly recommend the second solution. Event if it involves more modifications in the simulation's code,
+it is the easiest way to deploy a \Damaris{}-instrumented simulation on most supercomputers.
+
+\subsection{Minimal configuration file}\label{sec:MinimalConfigFile}
+
+Before actually instrumenting your code, an XML configuration file has to be created.
+This configuration file will contain some information about the simulation, 
+the system, the data and the plugins that you want to use with \Damaris{}.
+Listing~\ref{InitAndFinitXML} presents a minimal configuration file. This file will be necessary,
+whatever deployment mode you choose (coupled or decoupled).
+
+\noindent\begin{minipage}{\textwidth}
+\vspace{0.5cm}
+\lstset{language=XML,caption={\Damaris{} initial architecture description},label=InitAndFinitXML}
+\lstinputlisting[language=XML]{listings/init.xml}
+\end{minipage}
+
+The \texttt{simulation}'s \texttt{name} is used in different backends, for example to name trace files or
+to be added on figures. The language (\texttt{"c"}, \texttt{"cpp"}, or \texttt{"fortran"}) is optional (default is \texttt{"c"}),
+it indicates in which language the simulation is written so fortran array layouts can be converted into
+C layouts.
+The \texttt{cores} tag provides the number of cores in a node (\texttt{cores count}) and the number of client
+processes (\texttt{clients count}).
+
+The \texttt{buffer} node provides the \texttt{name} and the \texttt{size} (in bytes) of the shared memory buffer that
+will be used for the simulation processes to communicate with \Damaris{}.
+The \texttt{queue} node provides the \texttt{name} and \texttt{size} 
+(in number of messages) of the shared message queue.
+Both buffer and queue can have an additional \texttt{type} attribute which can be either "posix" 
+(by default) or "sysv".
+POSIX shared memory will use the \function{shm\_open} function, while SYS-V shared memory will
+use \function{shmget}. Many HPC operating systems don't have POSIX shared memory available.
+Finally, an additional \texttt{blocks} attribute can be added to the buffer, taking an integer (e.g. \texttt{blocks="3"})
+to indicate that several blocks of shared memory must be opened of the given \texttt{size}. This feature is
+useful in order to open a shared memory buffer 
+with a size bigger than the maximum allowed by the operating system (most operating systems limit this size
+to 1 or 2~GB).
+However, a variable can never have a size bigger than the blog size (since blocks may not be contiguous).
+Finally the \texttt{data} and \texttt{actions} nodes will be described later.
+
+\subsection{Decoupled version}
+
+Now that a minimal configuration file has been provided, let's instrument our code.
+This section will explain how to instrument the code for a decoupled deployment 
+(\Damaris{} and the simulation are deployed as separate programs).
+
+\subsubsection{Writing the code}
+
+Listings~\ref{InitAndFinitC} and~\ref{InitAndFinitF90} present the minimal code instrumentation
+for a C and a Fortran code respectively. All \Damaris{} function calls must be placed after a first call to the
+\function{DC\_initialize} function (resp. \function{df\_initialize} in Fortran). This function
+takes as parameter an XML configuration file 
+and a process rank. The user should make sure that each client process provides a unique rank, 
+its MPI rank in the MPI\_COMM\_WORLD communicator in MPI applications.
+The call to \function{DC\_initialize} should be placed after the MPI initialization.
+
+Symmetrically a call
+to \function{DC\_finalize} (resp. \function{df\_finalize}) ends all interactions with \Damaris{} before
+the simulation finishes. Inside the simulation's main loop, a call to \function{DC\_end\_iteration}
+(reps. \function{df\_end\_iteration}) will inform the dedicated cores that the iteration $i$ has finished.
+This will update potential backends such as VisIt, and give more information to \Damaris{} about
+the average durations of an iteration.
+These three main functions are summarized in Table~\ref{tab:initFunctions}.
+
+\begin{table}
+\centering
+\begin{tabular}{|l|}
+	\hline
+   \textbf{C functions} \\
+   \hline
+   \hline
+   \function{int DC\_initialize(char* configfile, int rank)}  \\
+   \function{int DC\_end\_iteration(int iteration)}  \\
+   \function{int DC\_finalize()} \\
+   \hline
+   \hline
+   \textbf{Fortran functions} \\
+   \hline
+   \hline
+   \function{df\_initialize(character* configfile, integer rank, integer ierr)} \\
+   \function{df\_end\_iteration(integer iteration, integer ierr)} \\
+   \function{df\_finalize(integer ierr)} \\
+   \hline
+\end{tabular}\caption{Main \Damaris{} functions}\label{tab:initFunctions}
+\end{table}
+
+\noindent\begin{minipage}{\textwidth}
+\lstset{language=C,caption={Initializing and finalizing \Damaris{}},label=InitAndFinitC}
+\lstinputlisting[language=C]{listings/init.c}
+\end{minipage}
+
+\noindent\begin{minipage}{\textwidth}
+\lstset{language=fortran,caption={Initializing and finalizing \Damaris{}},label=InitAndFinitF90}
+\lstinputlisting[language=fortran]{listings/init.f90}
+\end{minipage}
+
+\textbf{Note:} \Damaris{} is not thread-safe yet. If your application uses an hybrid model
+where different threads run on the same node, only one call to \function{DC\_initialize} should be
+made and all the threads one a node should act as one single client (the XML configuration file
+should also reflect this situation by setting the clients count accordingly).
+
+\subsubsection{Compiling}
+
+In order to compile your instrumented simulation, the \Damaris{} header files must be
+provided, as well as the dependencies headers. The following options must be passed to the C compiler:
+
+\begin{verbatim}
+-I/path/to/damaris -I/path/to/dependencies/include
+\end{verbatim}
+Fortran program do not need any headers for now.
+The linker will need the client library file \file{libdamaris.a} as well as other dependent libraries.
+The following provides the necessary options for the linker:
+\begin{verbatim}
+-rdynamic
+-L/path/to/damaris/client -ldamaris -L/path/to/dependencies/lib \
+-Wl,--whole-archive,-ldamaris,--no-whole-archive \
+-lxerces-c \
+-lboost_program_options -lboost_filesystem -lboost_system -lboost_date_time \
+-lboost_python -lpython2.6 \
+-lsimV2 \
+-lstdc++ -lrt -ldl
+\end{verbatim}
+
+The \texttt{-rdynamic} option instructs the linker to add all symbols, not only used ones, 
+to the dynamic symbol table. 
+This option is needed for some uses of dlopen in \Damaris{}.
+Remove the Python-related dependencies if you didn't enabled the Python support.
+Remove the simV2 line if you didn't enabled the VisIt support.
+
+\subsubsection{Running}
+
+Let's assume the program that we have compiled is called \file{sim}. As explained before,
+the decoupled version of \Damaris{} requires two deployments.
+First, go to the \file{server} subdirectory in the \Damaris{} source tree. If the compilation process
+has finished correctly, a \file{server} program should be present. This is an MPI program that deploys
+dedicated cores on every node. For now, we will use it on a single machine.
+Call it using:
+\begin{verbatim}
+	./server --configuration=config.xml
+\end{verbatim}
+The server starts and waits for incoming data (this process is not a daemon). Additional options can be provided
+to redirect standard outputs:
+\begin{verbatim}
+	./server --configuration=config.xml --stdout=out.txt --stderr=err.txt
+\end{verbatim}
+
+Now that our server is running, let's start the simulation using \texttt{./sim}. The simulation should correctly terminate. If the \textbf{INFO} flag was enabled when compiling \Damaris{}, the server will output a message
+at the end of each iteration.
+
+To shut down the server, just send a kill signal. The signal will be caught by the server, which will
+properly clean its resources.
+
+To run on multiple nodes, launch the server program with \texttt{mpirun}:
+\begin{verbatim}
+	mpirun -np X -machinefile FILE ./server --configuration=config.xml
+\end{verbatim}
+where X is the number of nodes and FILE contains the list of nodes. Be careful NOT to start several servers
+on the same node! \Damaris{} is not yet able to handle multiple dedicated cores.
+
+When killing the servers, MPI implementations usually send a kill -9 signal, which cannot be caught by
+the servers. Thus, it may happen that shared memory objects remain opened and you have to delete them
+manually (by deleting the corresponding files in /dev/shm for POSIX shared memory, or using ipcrm for
+SYS-V shared memory).
+
+\clearpage
+\subsection{Integration in an MPI application}
+
+\subsubsection{Writing the code}
+
+An easier way of deploying an application using \Damaris{} consists in embedding the servers
+directly within the simulation. Listings~\ref{InitMPIC} and \ref{InitMPIF90} show how to instrument
+the code for this purpose.
+
+The main different with the decoupled version is the use of \function{DC\_mpi\_start} instead of
+\function{DC\_initialize}. This function takes a communicator (typically MPI\_COMM\_WORLD)
+and splits it such that the lower rank on each node runs the server. Therefor, this
+function does not returns for these ranks. It returns 1 for client processes, which enter the \emph{if}
+statement. Clients then have to get back a valid communicator to communicate between each other.
+This is possible thanks to the \function{DC\_mpi\_get\_client\_comm}.
+Finally, the call to \function{DC\_kill\_server} at the end of the simulation will force the server to stop.
+In server processes, \function{DC\_mpi\_start} will return 0 and thus, the \emph{if} block will not
+be executed, leaving immediately the program.
+\textbf{Note:} the servers will wait for \emph{all} the clients on a node to call \function{DC\_kill\_server} 
+before stoping.
+
+\noindent\begin{minipage}{\textwidth}
+\vspace{0.5cm}
+\lstset{language=C,caption={Integrating \Damaris{} in an MPI application},label=InitMPIC}
+\lstinputlisting[language=C]{listings/mpiinit.c}
+\end{minipage}
+
+\noindent\begin{minipage}{\textwidth}
+\lstset{language=fortran,caption={Integrating \Damaris{} in an MPI application},label=InitMPIF90}
+\lstinputlisting[language=fortran]{listings/mpiinit.f90}
+\end{minipage}
+
+\subsubsection{Compiling}
+
+Compiling a program in coupled deployment mode is pretty much the same than the decoupled version,
+except that the \file{libdamaris-server.a} should be added when linking, using \texttt{-ldamaris-server}. 
+This library must be added before all the other.
+
+\subsubsection{Running}
+
+This time the deployment is much simpler:
+
+\begin{verbatim}
+	mpirun -np X -machinefile FILE ./sim
+\end{verbatim}
+
+Where X is the number of processes (in total), and FILE lists the hostnames on which to start the program.
+The \Damaris{} library will take care of starting one server per node. This time the machine file should
+contain each hostname as many times as the number of cores in a node.
+
+\textbf{Note:} \Damaris{} doesn't use any a priori knowledge about rank-to-cores binding and is able
+to start one server per node even if process ranks are not consecutive in the node.
+
+%==============================================================================%
+%==============================================================================%
+\section{Describing and Writing data}
+
+Now that we have a working simulation instrumented with \Damaris{}, it's time to write data.
+This section explains how to describe data in the XML file and how to send it to the dedicated cores.
+All the data items must be describes in the XML configuration within the \texttt{<data>} section.
+
+\subsection{Parameters}
+
+Parameters are simple constant values associated with a name and a type. It allows to
+easily change some important value of the simulation without changing all the variables
+and objects that depend on it. Listing~\ref{parameterXML} shows how to define a parameter.
+Parameters must be defined at the root of the \texttt{<data>}  section, not within nested groups
+(later explained). We advice to describe the parameters at the beginning of the \texttt{<data>}  section,
+even though other objects can be described that depend on a later defined parameter.
+
+\noindent\begin{minipage}{\textwidth}
+\vspace{0.5cm}
+\lstset{language=XML,caption={Parameters descriptions},label=parameterXML}
+\lstinputlisting[language=XML]{listings/parameter.xml}
+\end{minipage}
+
+Parameters must have a valid \texttt{name}, that is to say it should not contain any space or special symbols,
+and should not start with a digit. The \texttt{type} attribute must be one of the types listed in 
+Appendix~\ref{sec:types}. The provided \texttt{value} must be acceptable for the specified type. For instance
+\texttt{value="xyz"} is not valid for an integer parameter. 
+
+\subsection{Layouts}
+
+Layouts describe the shape of the data. \Damaris{} separates this description from the description
+of the variables themselves since several variables can have the same layout.
+A layout is characterized by a \texttt{name}, a basic \texttt{type} and a list of \texttt{dimensions}.
+Three examples are given in Listing~\ref{layoutXML}. These descriptions
+must be placed at the root of the \texttt{<data>} section, not in a nested group.
+
+The \texttt{name} of a layout can be any string (may include special characters, white spaces, numbers, etc. even
+though we advise to keep it simple and use classic C identifiers).
+The \texttt{type} should be one of the basic types listed in Appendix~\ref{sec:types}.
+Finally the list of dimensions is a comma-separated list of arithmetical expression featuring
++, -, *, /, \%, numbers and any defined parameters.
+
+In the following examples, the first layout has three dimensions, the last one has two dimensions.
+The second one, however, is an unlimited layout. The "?" dimension is a special dimension descriptor
+used for this purpose. This descriptor cannot be used in multi-dimensional layout, e.g. \texttt{dimensions="3,4,?"}
+is not valid.
+
+\noindent\begin{minipage}{\textwidth}
+\vspace{0.5cm}
+\lstset{language=XML,caption={Layouts descriptions},label=layoutXML}
+\lstinputlisting[language=XML]{listings/layout.xml}
+\end{minipage}
+
+\textbf{Note:} \texttt{string} and \texttt{label} data types are variable-length types, thus
+it is not possible to create a well-dimensioned layout for these types and only the unlimited layout descriptor "?"
+is valid.
+
+\subsection{Variables and groups}
+
+\subsubsection{XML description}
+
+Actual data is described through the \texttt{<variable>} and \texttt{<group>} nodes, which
+allow to build a hierarchy of variables. An example is given in Listing~\ref{varXML}.
+Each variable must be given a \texttt{name}, and be associated to a defined \texttt{layout}.
+These are the two mandatory attributes. The \texttt{time-varying} attributes indicates whether
+a variable is expected to be written at every iteration, or just once at the beginning of the
+simulation. The \texttt{visualizable} attribute indicates whether a variable can be accessed
+by visualization backends. In the following example, we expect the \texttt{x\_coordinates} variable
+to be the coordinate of points in a rectilinear grid. This data is not itself visualization, however
+the rectilinear grid (later described in Chapter~\ref{chap:VisIt}) will be a visualizable object.
+
+\noindent\begin{minipage}{\textwidth}
+\vspace{0.5cm}
+\lstset{language=XML,caption={Variables and groups descriptions},label=varXML}
+\lstinputlisting[language=XML]{listings/var.xml}
+\end{minipage}
+
+\subsubsection{Writing full variables}
+
+Now that the data is described, we can write it from our simulation. 
+Listings~\ref{writingVarC} and~\ref{writingVarF90} present how to write a variable. 
+The full name of the variable should be provided: this full name consists of a path within
+the hierarchy of groups (similar to directories).
+
+The returned value of this function (or the value contained in \texttt{ierr} in Fortran) is
+0 in case of success, -1 if the variable does not exist, -2 if the library could not allocate
+enough space in the shared memory segment (for instance if the shared memory is full),
+and -3 indicates that the layout associated to the variable is unlimited, in which case \Damaris{}
+cannot guess its size: use \function{DC\_chunk\_write} instead.
+
+\noindent\begin{minipage}{\textwidth}
+\vspace{0.5cm}
+\lstset{language=C,caption={Writing a variable to \Damaris{} in C},label=writingVarC}
+\lstinputlisting[language=C]{listings/write.c}
+\end{minipage}
+
+\noindent\begin{minipage}{\textwidth}
+%\vspace{0.5cm}
+\lstset{language=Fortran,caption={Writing a variable to \Damaris{} in Fortran},label=writingVarF90}
+\lstinputlisting[language=Fortran]{listings/write.f90}
+\end{minipage}
+
+\subsubsection{Writing chunks of variables}
+
+It may be necessary to write chunks of variables instead of full variables. 
+For well-dimensioned layout, a chunk
+must have the same numbers of dimensions than the variable's layout, and its boundaries
+must fall within the extents of the layout.
+Listings~\ref{writingChunkC} and~\ref{writingChunkF90} show how to define a chunk handle,
+which packs together the number of dimensions and the boundaries.
+In the example, the chunk extent along the first dimension is $4 - 2 + 1 = 3$ (the last index is included
+in the chunk).
+A chunk handle is not attached to any particular variable and can be used in several calls 
+to \function{DC\_chunk\_write}.
+
+Chunks are also the only mean to write on a variable that have an unlimited layout, in which case
+the dimensionality of the chunk must be 1.
+
+\noindent\begin{minipage}{\textwidth}
+\vspace{0.5cm}
+\lstset{language=C,caption={Writing a chunk of variable to \Damaris{} in C},label=writingChunkC}
+\lstinputlisting[language=C]{listings/chunk.c}
+\end{minipage}
+
+\noindent\begin{minipage}{\textwidth}
+%\vspace{0.5cm}
+\lstset{language=Fortran,caption={Writing a chunk of variable to \Damaris{} in Fortran},label=writingChunkF90}
+\lstinputlisting[language=Fortran]{listings/chunk.f90}
+\end{minipage}
+
+\subsubsection{Direct access to the shared memory}
+
+The API presented above has the disadvantage to copy local data into the shared memory.
+A more efficient way of proceeding consists in getting direct access to the shared memory.
+Listings~\ref{allocateC} and~\ref{allocateF90} present this capability.
+
+If \function{DC\_alloc} fails, it will return a NULL pointer. Otherwise, a valid pointer
+to an allocated region of shared memory is returned. In Fortran, \function{df\_alloc} sets \texttt{ierr}
+to 0 in case of failure, to non-zero otherwise.
+After writing the data to the returned buffer, a call to \function{DC\_commit} will notify the server
+of the presence of new data. After this call, the user is not expected to read or write the data anymore.
+Equivalent functions to allocate chunks have not been yet implemented in \Damaris{}.
+
+\noindent\begin{minipage}{\textwidth}
+\vspace{0.5cm}
+\lstset{language=C,caption={Allocate a variable in shared memory from C},label=allocateC}
+\lstinputlisting[language=C]{listings/alloc.c}
+\end{minipage}
+
+\noindent\begin{minipage}{\textwidth}
+%\vspace{0.5cm}
+\lstset{language=Fortran,caption={Allocate a variable in shared memory from Fortran},label=allocateF90}
+\lstinputlisting[language=Fortran]{listings/alloc.f90}
+\end{minipage}
+
+Du to the C/Fortran interface, the use of \function{df\_alloc} is more complex in Fortran than in C.
+The \Damaris{} module should be used (this module is located in the \file{client} directory of the \Damaris{}
+source tree). An additional call to \function{c\_f\_pointer} is mandatory to convert the returned C pointer
+to a valid Fortran array. This function takes a shape array to provide the extents along each dimensions.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Writing and calling plugins}
+
+Writing data to \Damaris{} is cool, but what should the server do with them? For now the shared memory
+buffer will simply get quickly filled and future write operations will fail. The role of processing data
+(and removing them from the shared memory) is delegated to plugins, which are triggered by events
+sent by the simulation and performed asynchronously by the dedicated cores while the simulation keeps running.
+This section explains how to program a plugin for \Damaris{} and to trigger it from the simulation.
+
+%==============================================================================%
+%==============================================================================%
+\section{Describing actions}
+
+The interactions between the simulation processes and the dedicated cores are based on events.
+These events are sent by simulation processes to \Damaris{} using the shared message queue.
+Like other \Damaris{} objects, these events have to be described in the XML configuration file.
+These description should be placed in the \texttt{<actions>} section of the XML file.
+Listing~\ref{actionXML} presents the description of such an \texttt{event}.
+An \texttt{event} is described by a unique \texttt{name}, and an \texttt{action}, which corresponds to
+the name of a C++ function. If this function is located in a shared \texttt{library} (.so file), the name
+of the library has to be provided. \Damaris{} will look for shared libraries within the directories
+specified by the LD\_LIBRARY\_PATH environment variable. If no library is specified, \Damaris{}
+will look for the function within its own binary code. Be aware that, in decoupled deployment mode,
+a dedicated core is not able to look for a function in the simulation's code.
+Finally one important characteristic of events is the \texttt{scope}:
+\begin{itemize}
+	\item \textbf{"core"} indicates that every time a simulation process sends the event, the
+	corresponding action is triggered. If the 16 processes of a 16-cores node 
+	send the same event, the corresponding action is triggered 16 times.
+	\item \textbf{"node"} indicates that \Damaris{} has to wait for all the cores of a node to send
+	the same event (at the same iteration) before triggering the action. If the 16 processes
+	send the event, the action is triggered only one. If one of the processes does not send the
+	event, the corresponding action is never triggered.
+	\item \textbf{"global"} (not yet implement) induces a particular behavior: each \Damaris{} 
+	server will wait for all the clients of its node to send the event. It will then synchronize with
+	all other dedicated cores to ensure that, eventually when all the clients of the simulation
+	have sent the event, all the dedicated cores trigger the same action at the same time.
+	Within a function called through a "global" event, MPI communications can safely be used.
+\end{itemize}
+
+\noindent\begin{minipage}{\textwidth}
+\vspace{0.5cm}
+\lstset{language=XML,caption={Actions description},label=actionXML}
+\lstinputlisting[language=XML]{listings/action.xml}
+\end{minipage}
+
+The semantics of these scopes with respect to the order of triggered actions is the following:
+\begin{itemize}
+\item Two local ("core") events sent by the same process will be received in the same order by the dedicated core.
+\item If an event (whatever the scope) is sent after writing or committing a variable, it is ensured that the
+dedicated core has received the variable before triggering the event's action.
+\item Two "node" events sent by all the processes of a node in the same order will trigger their actions in
+the same order in the dedicated core. No particular order should be assumed if different processes send the
+same event in a different order.
+\item Two "global" events sent by all the processes of the simulation in the same order will trigger their actions
+in the same order in all the dedicated cores. No particular order should be assumed if different processes send
+the same event in a different order.
+\item If a simulation process sends two events $e_1$ and $e_2$, if $e_1$ has a "core" scope 
+then it is ensured that its corresponding action will be executed before the action of 
+$e_2$. 
+\item However, if $e_1$ has another scope than "core", no ordering can be assumed.
+\item To force an ordered execution of $e_1$ and $e_2$ where the scope of $e_1$ is not "core",
+a global synchronization barrier can be used in the simulation before sending $e_2$.
+\end{itemize}
+
+%==============================================================================%
+%==============================================================================%
+\section{\emph{Hello World!} plugin example}
+
+Now let's take a look at a C++ function that can be called by \Damaris{}. An example of such a function
+is provided in Listing~\ref{PluginCPP}. Note the use of \texttt{extern "C"} to prevent C++ name mangling.
+
+\noindent\begin{minipage}{\textwidth}
+\vspace{0.5cm}
+\lstset{language=C++,caption={Example \Damaris{} plugin},label=PluginCPP}
+\lstinputlisting[language=C++]{listings/plugin.cpp}
+\end{minipage}
+
+The first argument of such a function is a string representing the name of the event that triggered
+the action (since several events can be connected to the same action). The second parameter
+corresponds to the iteration at which the event has been sent. The last parameter is the rank
+of the client that sent the event. For "node" and "global" actions, this source is set to $-1$.
+
+This first example only helps you start with plugins, more consideration on how to
+access the data written by clients will be provided in Section~\ref{sec:internalAPI}.
+
+%==============================================================================%
+%==============================================================================%
+\section{Compiling and linking C/C++ plugins}
+
+To compile a plugin within a shared library, 
+you need to create an object file from your source file with the -fPIC option,
+then create a shared library:
+\begin{verbatim}
+g++ -fPIC -c something.cpp -I/path/to/damaris -I/path/to/boost/include
+gcc -shared -Wl,-soname,libsomething.so -o libsomething.so something.o
+\end{verbatim}
+
+If you want to integrate your plugin in the application's code (for instance to avoid
+loading the .so file from many processes at the same time, which could result in performance
+degradation at large scale), simply compile the source of your plugin with your application.
+
+%==============================================================================%
+%==============================================================================%
+
+\section{Sending events from the simulation}
+
+To send events from the simulation, use the \function{DC\_signal} function (in C) or \function{df\_signal}
+(in Fortran). These functions takes the name of an event as parameter; this name should correspond to
+an event described in the configuration file. The second parameter is the iteration within the simulation.
+
+\noindent\begin{minipage}{\textwidth}
+\vspace{0.5cm}
+\lstset{language=C,caption={Sending events from a C program},label=EventC}
+\lstinputlisting[language=C]{listings/event.c}
+\end{minipage}
+
+\noindent\begin{minipage}{\textwidth}
+%\vspace{0.5cm}
+\lstset{language=fortran,caption={Sending events from a Fortran program},label=EventF90}
+\lstinputlisting[language=fortran]{listings/event.f90}
+\end{minipage}
+
+The prototype of these two functions are summarized in Table~\ref{tab:signalFunctions}. The returned
+value (or the ierr value in Fortran) is 0 in case of success, -1 in case of failure when sending the
+event through the shared memory, and -2 if the name does not correspond to a defined event.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|}
+	\hline
+   \textbf{C function} \\
+   \hline
+   \hline
+   \function{int DC\_signal(char* configfile, int iteration)}  \\
+   \hline
+   \hline
+   \textbf{Fortran function} \\
+   \hline
+   \hline
+   \function{df\_signal(character* configfile, integer iteration, integer ierr)} \\
+   \hline
+\end{tabular}\caption{\Damaris{} signal functions}\label{tab:signalFunctions}
+\end{table}
+
+%==============================================================================%
+%==============================================================================%
+\section{The internal \Damaris{} API}\label{sec:internalAPI}
+
+In order to access the data from within a plugin, you will have to used \Damaris{}' data structures.
+The main structure is the \texttt{VariableManager}, which can be used to access \texttt{Variable} instances
+and, from there, \texttt{Chunk} instances. We invite the reader to refer to the Doxygen documentation of
+\Damaris{}, which is complete enough to understand how to retrieve data.
+
+
+%==============================================================================%
+%==============================================================================%
+\chapter{Asynchronous vs Synchronous mode}
+
+This is a small chapter to introduce the synchronous mode in \Damaris{}, a mode that was not initially
+intended to be part of the software, but that we finally implemented in order to be able to compare
+our design to time-partitioning approaches.
+
+In synchronous mode, there is no dedicated core. Events are not anymore sent by simulation processes
+through shared memory. Their action is instead triggered immediately and executed by the simulation
+process itself.
+
+\section{Enabling the synchronous mode}
+
+The synchronous mode can be enabled simply by setting the number of clients to the number of cores
+in the XML file, as exemplified in Listing~\ref{synchronousXML}.
+
+\noindent\begin{minipage}{\textwidth}
+\vspace{0.5cm}
+\lstset{language=XML,caption={\Damaris{} XML file for synchronous mode},label=synchronousXML}
+\lstinputlisting[language=XML]{listings/synch.xml}
+\end{minipage}
+
+Not that only simulations instrumented in coupled mode (i.e. with \function{DC\_mpi\_start}) 
+can use this synchronous mode. This is because the server-side library must be available
+in the simulation, as well as the functionalities it carries.
+
+\section{Event scopes and semantics}
+
+In synchronous mode, the simulation acts as if there were as many dedicated cores as clients.
+In other words, each client has its own "dedicated core", and cannot access the data 
+written by other processes.
+Thus, "core", "node" and "global" scopes are not differentiated anymore.
+Additionally, it is expected that if one process triggers a "global" action, all the process do,
+since in a synchronous mode there is no way for a process to know whether other processes
+will trigger the same action.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Python interface}\label{Python}
+
+\Damaris{} allows plugins written in Python, as soon as the Python system has been
+enabled when compiling \Damaris{}. This section explains how to install and use the Python
+plugins system.
+
+%==============================================================================%
+%==============================================================================%
+\section{Installation requirements}
+
+Download Python (\Damaris{} has been tested with version 2.6.8 so far, even though any 2.x version
+should work. Because of compatibility issues with Boost, it is not ensured that version 3.x will work) at 
+\url{http://www.python.org/download/releases/}.
+Untar and install using
+\begin{verbatim}
+./configure --prefix=$HOME/local --disable-shared
+make
+make install
+\end{verbatim}
+
+This will install Python in your \installdir directory. \textbf{Important note:} if you have installed VisIt,
+VisIt provides a local python installation. In order to avoid conflicts when using both Python and VisIt,
+use the one provided by VisIt (located in \texttt{/path/to/visit/python}).
+
+\Damaris{} also needs NumPy, from \url{http://www.scipy.org/Download/}. Download the source archive,
+then untar it install it:
+
+\begin{verbatim}
+python setup.py install
+\end{verbatim}
+\textbf{Note:} make sure the \textbf{python} command you runs calls the Python interpreter you just installed
+or the one from VisIt, and NOT the default interpreter of your platform.
+
+Now that Python and NumPy are both installed, recompile \Damaris{} (make sure to change
+the lines in the CMakeLists.txt that include PYTHON\_ROOT and NUMPY\_INCLUDE\_DIR).
+
+\section{XML configuration}
+
+In the XML configuration of your simulation, you can provide some information related to
+Python, by writing the lines in Listing~\ref{PythonXML} after the \texttt{</actions>} tag.
+
+\noindent\begin{minipage}{\textwidth}
+\vspace{0.5cm}
+\lstset{language=XML,caption={Providing Python options},label=PythonXML}
+\lstinputlisting[language=XML]{listings/pythonpath.xml}
+\end{minipage}
+
+The \texttt{<path>} section corresponds to the PYTHON\_PATH environment variable,
+while the \texttt{<home>} section corresponds to the PYTHON\_HOME environment variable.
+These options are useful as it may be difficult on some machines to properly forward environment
+variables to compute nodes.
+
+%==============================================================================%
+%==============================================================================%
+\section{Python scripts as plugins}
+
+Python plugins in \Damaris{} are written in Python scripts. To connect an event to
+a script, follow the example in Listing~\ref{PluginPythonXML}. By calling \function{DC\_signal}
+with the name provided in the configuration, the corresponding script will be executed.
+\Damaris{} currently support only Python scripts, thus the \texttt{language} tag will always contain
+"python". The \texttt{scope} tat has the same semantic than for events.
+
+\noindent\begin{minipage}{\textwidth}
+\vspace{0.5cm}
+\lstset{language=XML,caption={Describing a Python script},label=PluginPythonXML}
+\lstinputlisting[language=XML]{listings/python.xml}
+\end{minipage}
+
+%==============================================================================%
+%==============================================================================%
+\section{Accessing \Damaris{} data from Python}
+
+In the Python scripts, everything related to \Damaris{} is located in the \texttt{damaris} module. 
+Use \texttt{import damaris} and \texttt{import numpy} to access these functionalities.
+Table~\ref{tab:pythonAPI} presents how to access chunks of data from Python.
+
+\begin{table}[h]
+\centering{}
+   \begin{tabular}{|l|l|l|}
+       \hline
+       Statement & Description \\
+       \hline
+       \hline
+       damaris.iteration & Iteration at which the event has been sent. \\
+       damaris.source & Rank of the process that sent the event.\\
+       damaris.clear & Remove all the chunks from all the variables. \\
+       var = damaris.open("group/varname") & Opens a variable.\\
+       var.name & Name of the variable.\\
+       var.fullname & Full name (including groups) of the variable.\\
+       var.unit & Unit of the variable.\\
+       var.description & Description from the XML file. \\
+       layout = var.layout & Layout of the variable.\\
+       list = var.select(\{"iteration": x, "source": y\}) & Select a list of chunks by source and/or iteration.\\
+       var.remove(c) & Removes a Chunk (free the memory). \\
+       var.clear() & Removes all the chunks attached to the variable. \\
+       layout.name & Name of the layout. \\
+       layout.type & Type of the layout (string). \\
+       layout.extents & Array of dimensions. \\
+       chunk.source & Source of the Chunk (process rank). \\
+       chunk.iteration & Iteration of the Chunk. \\
+       chunk.type & Type of the chunk (string). \\
+       chunk.lower\_bounds & List of lower bounds along each dimension. \\
+       chunk.upper\_bounds & List of upper bounds along each dimension. \\
+       chunk.data & NumPy array of the chunk's data. \\
+       \hline
+   \end{tabular}\caption{\Damaris{} Python API}\label{tab:pythonAPI}
+\end{table}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{VisIt interface}\label{chap:VisIt}
+
+\Damaris{} can be used to perform in-situ visualization with VisIt through its \emph{libsimV2} interface, 
+both in synchronous and asynchronous modes. \textbf{Warning:} because of a bug in VisIt (as of version 2.5.1),
+The VisIt backend only works in decoupled mode, or in synchronous mode (not in asynchronous coupled).
+A patch has been sent to the VisIt developers and future versions of VisIt should work with the
+synchronous coupled mode of \Damaris{}.
+VisIt must be installed on your platform (see the VisIt website at \url{https://wci.llnl.gov/codes/visit/}).
+Follow the installation process of \Damaris{} presented in Chapter~\ref{chap:downloadingAndInstalling}
+and enable VisIt by providing the VISIT\_ROOT 
+VisIt install directory in the CMakeLists.txt (see Table~\ref{tab:cmake}).
+\Damaris{} requires VisIt 2.5.0 or greater.
+
+%==============================================================================%
+%==============================================================================%
+\section{VisIt options}
+
+In a way similar to Python, some options can be provided to VisIt through the XML file.
+Listing~\ref{VisItXML} presents these options. The \texttt{<path>} tag locates the installation
+directory of VisIt, it is used by the simulation to load VisIt plugins.
+The \texttt{<options>} tag provides an equivalent to VisIt's command line options (see
+the VisIt manual). Most of the time, the \texttt{<options>} section is not required.
+
+\noindent\begin{minipage}{\textwidth}
+\vspace{0.5cm}
+\lstset{language=XML,caption={Providing VisIt options},label=VisItXML}
+\lstinputlisting[language=XML]{listings/visit.xml}
+\end{minipage}
+
+%==============================================================================%
+%==============================================================================%
+\section{Meshes and fields description}
+
+\subsection{Meshes}
+
+The current version of \Damaris{} only supports three types of objects exposed to VisIt:
+rectilinear meshes, curvilinear meshes and commands. This section shows how to expose
+a mesh and how to connect a variable to a mesh.
+Just like other \Damaris{} objects, meshes have to be described in the XML file, as shown
+in Listing~\ref{MeshVisItXML}. This kind of description should be placed in the \texttt{<data>} section
+of the configuration, at the root or within any subgroup.
+
+\noindent\begin{minipage}{\textwidth}
+\vspace{0.5cm}
+\lstset{language=XML,caption={Describing a Mesh in \Damaris{}},label=MeshVisItXML}
+\lstinputlisting[language=XML]{listings/mesh.xml}
+\end{minipage}
+
+A mesh is characterized by a \texttt{name}, a \texttt{type} (currently only "rectilinear" or "curvilinear" are
+allowed), and a topological dimension (for instance a surface in a 3D space is characterized by three
+coordinates for each of its points, but has a 2D topology).
+
+Finally two to three coordinate have to be provided through the \texttt{<coord>} tag. 
+These coordinates refer to existing variables from the configuration. In the current version of \Damaris{},
+the name of these variables should be absolute (a mesh is not capable to look for a variable only in
+its group). The \texttt{unit} of a coordinate, when provided, hides the \texttt{unit} of the corresponding variable.
+The \texttt{label} is used when drawing figures.
+
+\subsection{Fields}
+
+A field is a value that can be placed on each node or each zone of a mesh.
+To allow a described variable to be a field, some new attributes have to be added in its description.
+Listing~\ref{xml:field} shows the description of a variable with attributes related to visualization.
+
+\noindent\begin{minipage}{\textwidth}
+\vspace{0.5cm}
+\lstset{language=XML,caption={Extended variable description to expose it as a field},label=xml:field}
+\lstinputlisting[language=XML]{listings/field.xml}
+\end{minipage}
+
+The most important attribute is \texttt{mesh}, which is a reference to an existing mesh on which
+to draw the field. The \texttt{centering} attribute can be either "nodal" (values correspond to nodes 
+of the mesh) or "zonal" (values correspond to zones in the mesh). The \texttt{type} should be
+"scalar" (other types are not yet supported by \Damaris{}).
+
+By default, \texttt{visualizable} and \texttt{time-varying} are already set to "true", \texttt{unit} can be omitted.
+The other attributes (\texttt{type} and \texttt{centering}) can be omitted if the variable is not concerned by
+visualization.
+The ``rule'' is that variables that serve as coordinates in meshes are not visualizable, while
+other variable are considered as fields and are visualizable, thus must have an attached mesh.
+%==============================================================================%
+%==============================================================================%
+\section{External actions and interactivity}
+
+Events and scripts can be set as ``external'' by adding the \texttt{external="true"} attribute to their
+description. An external event can be fired from the VisIt client itself. These events are exposed as commands
+and are accessible through the VisIt viewer's commands interface.
+Clicking on a command will trigger the corresponding event in all dedicated processes (or all processes
+in synchronous mode). It is ensured that all the actions will be triggered at the same time, thus
+the actions can safely use global communications using MPI.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\appendix
+\chapter{\Damaris{} basic types}\label{sec:types}
+
+\begin{table}[h]
+\centering
+   \begin{tabular}{|c|c|c|l|}
+      \hline
+      \Damaris{} type & C type & Fortran type & Description \\
+      \hline
+short & short int & integer*2 &
+                    2 bytes integer value.\\
+int & int & integer &
+                    4 bytes integer value.\\
+integer & int & integer &
+                    4 bytes integer value.\\
+long & long int & integer*8 &
+                    8 bytes integer value.\\
+float & float & real*4 &
+                    4 bytes float value.\\
+real & float & real*4 &
+                    4 bytes float value.\\
+double & double & real*8 &
+                    8 bytes float value.\\
+char & char & character &
+                    1 byte character value.\\
+character & char & character &
+                    1 byte character value.\\
+string & char[] & character(:) &
+                    Variable length null-terminated string.\\
+label & ? & ? &
+                    Not implemented yet.\\
+                    \hline
+   \end{tabular}
+   \caption{Correspondence between \Damaris{} types, C and Fortran types.}
+\end{table}
+
+\printindex
+
+\end{document}
