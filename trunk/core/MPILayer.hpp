@@ -55,7 +55,7 @@ class MPILayer : public Communication<MSG> {
 		/**
 		 * Destructor (private)
 		 */
-		~MPILayer();
+		virtual ~MPILayer();
 
 	public:
 		/**

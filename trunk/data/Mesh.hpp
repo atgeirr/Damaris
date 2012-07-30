@@ -50,8 +50,10 @@ class Mesh : public Configurable<Model::Mesh> {
 		 * allows child classes).
 		 */
 		Mesh(const Model::Mesh& mdl, const std::string& name);
-		
+
 	public:
+
+		virtual ~Mesh() {}
 
 		/**
 		 * Returns the name of the Mesh.
