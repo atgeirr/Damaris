@@ -146,13 +146,13 @@ namespace Damaris {
 		return env->lastIteration;
 	}
 
-	void Environment::SetLastIteration(int i)
+	bool Environment::SetLastIteration(int i)
 	{
 		// TODO : this function is not correct
 		// for the client side
 		if(not hasServer()) {
 			env->lastIteration = i;
-			return;
+			return true;
 		}
 
 		static int locks = 0;
@@ -161,6 +161,8 @@ namespace Damaris {
 			DBG("Iteration " << i << " terminated");
 			env->lastIteration = i;
 			locks = 0;
+			return true;
 		}
+		return false;
 	}
 }

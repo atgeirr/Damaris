@@ -159,10 +159,11 @@ void Server::processInternalSignal(int32_t object, int iteration, int source)
 		Environment::AddConnectedClient(source);
 		break;
 	case END_ITERATION:
-		Environment::SetLastIteration(iteration);
+		if(Environment::SetLastIteration(iteration)) {
 #ifdef __ENABLE_VISIT
-		Viz::VisItListener::Update();
+			Viz::VisItListener::Update();
 #endif
+		}
 		break;
 	case KILL_SERVER:
 		needStop--; // TODO: check that each client has sent the event instead of checking the number

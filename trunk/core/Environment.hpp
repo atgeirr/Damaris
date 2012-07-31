@@ -146,7 +146,7 @@ namespace Damaris {
 		/**
 		 * Sets the iteration that just terminated.
 		 */
-		static void SetLastIteration(int i);
+		static bool SetLastIteration(int i);
 	};
 
 }
