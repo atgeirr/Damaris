@@ -67,6 +67,11 @@ class NodeAction : public BASE {
 				return;
 			}
 
+			if(not Environment::hasServer()) { // if the environment doesn't have a server, we don't wait for other
+				BASE::call(iteration,sourceID,args);
+				return;
+			}
+
 			DBG("Node action called iteration is "<<iteration<<" and source is "<<sourceID);
 			locks[iteration] = locks[iteration] + 1;
 			DBG("lock is now " << locks[iteration] << "/" << clientsPerNode);
