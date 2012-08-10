@@ -151,7 +151,7 @@ void FC_FUNC_GLOBAL(df_signal,DF_SIGNAL)
 	}
 
 void FC_FUNC_GLOBAL(df_get_parameter,DF_GET_PARAMETER)
-	(char* param_name_f, void* buffer_f, int* ierr_f, int param_name_size)
+	(char* param_name_f, void* buffer_f, int* size, int* ierr_f, int param_name_size)
 	{
 		// make a copy of the name and delete possible spaces at the end of the string
 		char* paramname_copy = (char*)malloc(param_name_size+1);
@@ -162,7 +162,7 @@ void FC_FUNC_GLOBAL(df_get_parameter,DF_GET_PARAMETER)
 		paramname_copy[i+1] = '\0';
 
 		std::string paramName(paramname_copy);
-		*ierr_f = client->get_parameter(paramName,buffer_f);
+		*ierr_f = client->get_parameter(paramName,buffer_f,*size);
 		free(paramname_copy);
 	}
 

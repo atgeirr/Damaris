@@ -99,7 +99,7 @@ int 	DC_signal(const char* signal_name, int32_t iteration);
  * \param[out] buffer : pointer to the buffer to hold the value.
  * \return 0 in case of success, -1 if the parameter does not exist.
  */
-int 	DC_get_parameter(const char* param_name, void* buffer);
+int 	DC_get_parameter(const char* param_name, void* buffer, unsigned int size);
 
 /**
  * \brief Get the communicator gathering all clients.

@@ -110,7 +110,7 @@ void FC_FUNC_GLOBAL(df_signal,DF_SIGNAL)
  * \see Damaris::Client::getParameter
  */
 void FC_FUNC_GLOBAL(df_get_parameter,DF_GET_PARAMETER)
-	(char* param_name_f, void* buffer_f, int* ierr_f, int param_name_size);
+	(char* param_name_f, void* buffer_f, int* size, int* ierr_f, int param_name_size);
 
 /**
  * \fn df_mpi_get_client_comm

@@ -133,7 +133,7 @@ class Client : public Writer {
 		 *
 		 * \return 0 in case of success, -1 if the parameter is not found.
 		 */
-		virtual int get_parameter(const std::string & paramName, void* buffer);
+		virtual int get_parameter(const std::string & paramName, void* buffer, unsigned int size);
 		
 		/**
 		 * Sends a signal to the server to shut it down (all clients in node need

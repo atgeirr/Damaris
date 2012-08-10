@@ -80,10 +80,10 @@ int DC_signal(const char* signal_name, int32_t iteration)
 	return client->signal(signal_name_str,iteration);
 }
 
-int DC_get_parameter(const char* param_name, void* buffer)
+int DC_get_parameter(const char* param_name, void* buffer, unsigned int size)
 {
 	std::string paramName(param_name);
-	return client->get_parameter(paramName,buffer);
+	return client->get_parameter(paramName,buffer,size);
 }
 
 MPI_Comm DC_mpi_get_client_comm()

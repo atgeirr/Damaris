@@ -72,4 +72,12 @@ Parameter* Parameter::New(const Model::Parameter& mdl, const std::string& name)
 	return NULL;
 }
 
+int Parameter::toBuffer(void* b, unsigned int maxsize) const
+{
+//	b = boost::any_cast(&value);
+        size_t s1 = Types::basicTypeSize(model.type());
+        size_t s = std::min(s1,maxsize);
+	memcpy(b,value,s);
+	return s;
+}
 }
