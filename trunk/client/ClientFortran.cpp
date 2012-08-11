@@ -37,13 +37,12 @@ void FC_FUNC_GLOBAL(df_initialize,DF_INITIALIZE)
 	{
 		std::string config_file_name(config_file_name_f, config_file_name_size);
 		client = Damaris::Client::New(config_file_name,*core_id_f);
-		*ierr_f = 0;
+		if(ierr_f != NULL) *ierr_f = 0;
 	}
 
 void FC_FUNC_GLOBAL(df_write,DF_WRITE)
 	(char* var_name_f, int32_t* iteration_f, void* data_f, int32_t* ierr_f, int var_name_size)
 	{
-		DBG("iteration = " << *iteration_f);
 		// make a copy of the name and delete possible spaces at the end of the string
 		char* varname_copy = (char*)malloc(var_name_size+1);
 		memset(varname_copy,' ',var_name_size+1);
@@ -53,8 +52,9 @@ void FC_FUNC_GLOBAL(df_write,DF_WRITE)
 		varname_copy[i+1] = '\0';
 
 		std::string var_name(varname_copy);
-		*ierr_f = client->write(var_name,*iteration_f,data_f);
+		int res = client->write(var_name,*iteration_f,data_f);
 		free(varname_copy);
+		if(ierr_f != NULL) *ierr_f = res;
 	}
 
 void FC_FUNC_GLOBAL_(df_chunk_set,DF_CHUNK_SET)
@@ -88,9 +88,10 @@ void FC_FUNC_GLOBAL(df_chunk_write,DF_WRITE)
 		varname_copy[i+1] = '\0';
 
 		std::string var_name(varname_copy);
-		*ierr_f = client->chunk_write((Damaris::chunk_h)(*chunkh),
+		int res = client->chunk_write((Damaris::chunk_h)(*chunkh),
 				var_name,*iteration_f,data_f);
 		free(varname_copy);
+		if(ierr_f != NULL) *ierr_f = res;
 	}
 
 void* FC_FUNC_GLOBAL(df_alloc,DF_ALLOC)
@@ -109,10 +110,10 @@ void* FC_FUNC_GLOBAL(df_alloc,DF_ALLOC)
 		free(varname_copy);
 		DBG("function alloc called with argument " << var_name << ", " << *iteration_f);
 		if(result == NULL) {
-			*ierr_f = -1;
+			if(ierr_f != NULL) *ierr_f = -1;
 			return NULL;
 		} else {
-			*ierr_f = 0;
+			if(ierr_f != NULL) *ierr_f = 0;
 			return result;
 		}
 	}
@@ -130,8 +131,9 @@ void FC_FUNC_GLOBAL(df_commit,DF_COMMIT)
 
 		std::string var_name(varname_copy);
 		DBG("commiting " << var_name);
-		*ierr_f = client->commit(var_name,*iteration_f);
+		int res = client->commit(var_name,*iteration_f);
 		free(varname_copy);
+		if(ierr_f != NULL) *ierr_f = res;
 	}
 
 void FC_FUNC_GLOBAL(df_signal,DF_SIGNAL)
@@ -146,8 +148,9 @@ void FC_FUNC_GLOBAL(df_signal,DF_SIGNAL)
 		eventname_copy[i+1] = '\0';
 
 		std::string event_name(eventname_copy);
-		*ierr_f = client->signal(event_name,*iteration_f);
+		int res = client->signal(event_name,*iteration_f);
 		free(eventname_copy);
+		if(ierr_f != NULL) *ierr_f = res;
 	}
 
 void FC_FUNC_GLOBAL(df_get_parameter,DF_GET_PARAMETER)
@@ -162,8 +165,9 @@ void FC_FUNC_GLOBAL(df_get_parameter,DF_GET_PARAMETER)
 		paramname_copy[i+1] = '\0';
 
 		std::string paramName(paramname_copy);
-		*ierr_f = client->get_parameter(paramName,buffer_f,*size);
+		int res = client->get_parameter(paramName,buffer_f,*size);
 		free(paramname_copy);
+		if(ierr_f != NULL) *ierr_f = res;
 	}
 
 void FC_FUNC_GLOBAL(df_mpi_get_client_comm,DF_GET_MPI_CLIENT_COMM)
@@ -175,21 +179,29 @@ void FC_FUNC_GLOBAL(df_mpi_get_client_comm,DF_GET_MPI_CLIENT_COMM)
 void FC_FUNC_GLOBAL(df_kill_server,DF_KILL_SERVER)
 	(int* ierr_f)
 	{
-		*ierr_f = client->kill_server();
+		int res = client->kill_server();
+		if(ierr_f != NULL) *ierr_f = res;
 	}
 
 void FC_FUNC_GLOBAL(df_end_iteration,DF_END_ITERATION)
 	(int* it, int* ierr_f)
 	{
-		*ierr_f = client->end_iteration(*it);
+		int res = client->end_iteration(*it);
+		if(ierr_f != NULL) *ierr_f = res;
 	}
 
 void FC_FUNC_GLOBAL(df_finalize,DF_FINALIZE)
 	(int* ierr_f)
 	{
-		delete client;
+		int res;
+		if(client != NULL) {
+			delete client;
+			res = 0;
+		} else {
+			res = -1;
+		}
 		if(ierr_f != NULL)
-			*ierr_f = 0;
+			*ierr_f = res;
 	}
 }
 #endif

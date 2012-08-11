@@ -28,6 +28,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "xml/Model.hpp"
 #include "data/Types.hpp"
+#include "core/Observable.hpp"
 #include "core/Configurable.hpp"
 #include "core/Manager.hpp"
 #include "core/Debug.hpp"
@@ -37,7 +38,7 @@ namespace Damaris {
 	 * The Parameter class is based on boost::any to hold
 	 * any type of data and associate it with a name.
 	 */	
-	class Parameter : public Configurable<Model::Parameter> {
+	class Parameter : public Configurable<Model::Parameter>, public Observable {
 
 		friend class Manager<Parameter>;
 
@@ -76,7 +77,26 @@ namespace Damaris {
 			template<typename T>
 			T getValue() const;
 
+			/**
+			 * Sets the value of the parameter.
+			 */
+			template<typename T>
+			void setValue(const T& v);
+
+			/**
+			 * Copy the value to a buffer of given maximum size.
+			 */
 			int toBuffer(void* buffer, unsigned int size) const;
+		
+			/**
+		 	 * Get the value from a buffer.
+			 */
+			int fromBuffer(const void* buffer, unsigned int size);
+
+			/**
+			 * Destructor.
+			 */
+			virtual ~Parameter();
 	};
 }
 
@@ -89,7 +109,7 @@ Parameter::Parameter(const Model::Parameter& mdl, const std::string& n, const T&
 : Configurable<Model::Parameter>(mdl)
 {
 	name = n;
-	value = (void*)(new T(v));
+	setValue<T>(v);
 	//value = boost::any(v);
 }
 
@@ -115,4 +135,9 @@ T Parameter::getValue() const
 	return t;
 }
 
+template<typename T>
+void Parameter::setValue(const T& v)
+{
+	fromBuffer(&v,sizeof(T));
+}
 }

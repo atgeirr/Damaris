@@ -31,7 +31,7 @@ namespace Damaris {
 	{
 		std::set<Observer*>::iterator i = observers.begin();
 		for(;i != observers.end(); i++) {
-			i->notify();
+			(*i)->Notify();
 		}
 	}
 
@@ -44,8 +44,6 @@ namespace Damaris {
 	{
 		observers.erase(obs);
 	}
-};
 
 } // namespace Damaris
 
-#endif

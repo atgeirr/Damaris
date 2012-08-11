@@ -39,8 +39,7 @@ namespace Types {
 	 * \param[in] t : Basic type from which you want the size.
 	 * \return The size (in bytes) of the data type.
 	 */
-	int basicTypeSize(const Model::Type& t);
-	
+	int basicTypeSize(const Model::Type& t);	
 }
 }
 #endif

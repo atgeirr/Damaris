@@ -23,6 +23,10 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __DAMARIS_OBSERVABLE_H
 #define __DAMARIS_OBSERVABLE_H
 
+#include <set>
+
+#include "core/Observer.hpp"
+
 namespace Damaris {
 
 /**

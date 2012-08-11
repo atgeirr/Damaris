@@ -31,7 +31,7 @@ class Observer {
 	friend class Observable;
 
 	protected:
-		virtual void notify() = 0;
+		virtual void Notify() = 0;
 };
 
 } // namespace Damaris

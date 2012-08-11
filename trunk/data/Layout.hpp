@@ -26,6 +26,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <string>
 #include <vector>
+#include "core/Observer.hpp"
 #include "core/Calc.hpp"
 #include "core/ParameterManager.hpp"
 #include "core/Configurable.hpp"
@@ -42,7 +43,7 @@ namespace Damaris {
  *
  * Layouts are not used to hold data. See Chunk for that purpose.
  */	
-class Layout : public Configurable<Model::Layout> {
+class Layout : public Configurable<Model::Layout>, private Observer {
 	friend class Manager<Layout>;
 		
 	private:
@@ -63,6 +64,18 @@ class Layout : public Configurable<Model::Layout> {
 		 */
 		Layout(const Model::Layout& mdl, const std::string& name, const std::vector<int>& e);
 		
+
+		/**
+		 * Interpret the dimensions from the model's description.
+		 * Can be called to change the dimensions if some parameters have been changed.
+		 */
+		void InterpretDimensions();
+
+		/**
+		 * Called by the constructor to connect to dependent parameters
+		 * and be notified if they change.
+		 */
+		void ObserveDependentParameters();
 	public:
 		/**
 		 * \brief Returns the name of the Layout.
@@ -101,6 +114,12 @@ class Layout : public Configurable<Model::Layout> {
 		 */
 		static Layout* New(const Model::Layout& mdl, const std::string &name);
 
+
+		/**
+		 * Overwrite the Notify function of Observer. Causes the layout to
+		 * be rebuilt when a parameter has changed.
+		 */
+		virtual void Notify();
 }; // class Layout
 
 } // namespace Damaris
