@@ -37,6 +37,7 @@ namespace Damaris {
 
 	void Observable::AddObserver(Observer* obs)
 	{
+		obs->observed.insert(this);
 		observers.insert(obs);
 	}
 

@@ -208,7 +208,7 @@ SharedMemorySegment::ptr SharedMemorySegment::POSIX_ShMem::allocate(size_t size)
 
 void SharedMemorySegment::POSIX_ShMem::deallocate(void* addr)
 {
-	size_t oldsize = getFreeMemory();
+	size_t oldsize __attribute__((unused)) = getFreeMemory();
 	scoped_lock<interprocess_mutex> lock(size_manager->lock);
 	impl->deallocate(addr);
 	size_t newsize = getFreeMemory();
