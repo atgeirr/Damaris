@@ -27,6 +27,21 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "core/FCMangle.h"
 #include "client/ClientFortran.hpp"
 
+// Converts a fortran string to a cpp string and deletes any
+// blanc spaces at the end of the string
+static std::string fortranStringToCpp(char* fstr, int size)
+{
+	char* fstr_copy = (char*)malloc(size+1);
+	memset(fstr_copy,' ',size+1);
+	memcpy(fstr_copy,fstr,size);
+	int i = size;
+	while(fstr_copy[i] == ' ' && i != 0) i--;
+	fstr_copy[i+1] = '\0';
+	std::string s(fstr_copy);
+	free(fstr_copy);
+	return s;
+}
+
 extern "C" {
 
 /** The actual object is defined in ClientC.cpp */	
@@ -35,7 +50,7 @@ extern Damaris::Client *client;
 void FC_FUNC_GLOBAL(df_initialize,DF_INITIALIZE)
 	(char* config_file_name_f, int32_t* core_id_f, int32_t* ierr_f, int config_file_name_size)
 	{
-		std::string config_file_name(config_file_name_f, config_file_name_size);
+		std::string config_file_name = fortranStringToCpp(config_file_name_f, config_file_name_size);
 		client = Damaris::Client::New(config_file_name,*core_id_f);
 		if(ierr_f != NULL) *ierr_f = 0;
 	}
@@ -43,17 +58,8 @@ void FC_FUNC_GLOBAL(df_initialize,DF_INITIALIZE)
 void FC_FUNC_GLOBAL(df_write,DF_WRITE)
 	(char* var_name_f, int32_t* iteration_f, void* data_f, int32_t* ierr_f, int var_name_size)
 	{
-		// make a copy of the name and delete possible spaces at the end of the string
-		char* varname_copy = (char*)malloc(var_name_size+1);
-		memset(varname_copy,' ',var_name_size+1);
-		memcpy(varname_copy,var_name_f,var_name_size);
-		int i = var_name_size;
-		while(varname_copy[i] == ' ' && i != 0) i--;
-		varname_copy[i+1] = '\0';
-
-		std::string var_name(varname_copy);
+		std::string var_name = fortranStringToCpp(var_name_f, var_name_size);
 		int res = client->write(var_name,*iteration_f,data_f);
-		free(varname_copy);
 		if(ierr_f != NULL) *ierr_f = res;
 	}
 
@@ -79,35 +85,17 @@ void FC_FUNC_GLOBAL(df_chunk_write,DF_WRITE)
 	(int64_t* chunkh, char* var_name_f, int32_t* iteration_f, 
 	void* data_f, int32_t* ierr_f, int var_name_size)
 	{
-		// make a copy of the name and delete possible spaces at the end of the string
-		char* varname_copy = (char*)malloc(var_name_size+1);
-		memset(varname_copy,' ',var_name_size+1);
-		memcpy(varname_copy,var_name_f,var_name_size);
-		int i = var_name_size;
-		while(varname_copy[i] == ' ' && i != 0) i--;
-		varname_copy[i+1] = '\0';
-
-		std::string var_name(varname_copy);
+		std::string var_name = fortranStringToCpp(var_name_f,var_name_size);
 		int res = client->chunk_write((Damaris::chunk_h)(*chunkh),
 				var_name,*iteration_f,data_f);
-		free(varname_copy);
 		if(ierr_f != NULL) *ierr_f = res;
 	}
 
 void* FC_FUNC_GLOBAL(df_alloc,DF_ALLOC)
         (char* var_name_f, int32_t* iteration_f, int32_t* ierr_f, int var_name_size)
 	{
-		// make a copy of the name and delete possible spaces at the end of the string
-		char* varname_copy = (char*)malloc(var_name_size+1);
-		memset(varname_copy,' ',var_name_size+1);
-		memcpy(varname_copy,var_name_f,var_name_size);
-		int i = var_name_size;
-		while(varname_copy[i] == ' ' && i != 0) i--;
-		varname_copy[i+1] = '\0';
-
-		std::string var_name(varname_copy);
+		std::string var_name = fortranStringToCpp(var_name_f,var_name_size);
 		void* result = client->alloc(var_name,*iteration_f);
-		free(varname_copy);
 		DBG("function alloc called with argument " << var_name << ", " << *iteration_f);
 		if(result == NULL) {
 			if(ierr_f != NULL) *ierr_f = -1;
@@ -121,52 +109,33 @@ void* FC_FUNC_GLOBAL(df_alloc,DF_ALLOC)
 void FC_FUNC_GLOBAL(df_commit,DF_COMMIT)
 	(char* var_name_f, int32_t* iteration_f, int32_t* ierr_f, int var_name_size)
 	{
-		// make a copy of the name and delete possible spaces at the end of the string
-		char* varname_copy = (char*)malloc(var_name_size+1);
-		memset(varname_copy,' ',var_name_size+1);
-		memcpy(varname_copy,var_name_f,var_name_size);
-		int i = var_name_size;
-		while(varname_copy[i] == ' ' && i != 0) i--;
-		varname_copy[i+1] = '\0';
-
-		std::string var_name(varname_copy);
+		std::string var_name = fortranStringToCpp(var_name_f,var_name_size);
 		DBG("commiting " << var_name);
 		int res = client->commit(var_name,*iteration_f);
-		free(varname_copy);
 		if(ierr_f != NULL) *ierr_f = res;
 	}
 
 void FC_FUNC_GLOBAL(df_signal,DF_SIGNAL)
 	(char* event_name_f, int32_t* iteration_f, int* ierr_f, int event_name_size)
 	{
-		// make a copy of the name and delete possible spaces at the end of the string
-		char* eventname_copy = (char*)malloc(event_name_size+1);
-		memset(eventname_copy,' ',event_name_size+1);
-		memcpy(eventname_copy,event_name_f,event_name_size);
-		int i = event_name_size;
-		while(eventname_copy[i] == ' ' && i != 0) i--;
-		eventname_copy[i+1] = '\0';
-
-		std::string event_name(eventname_copy);
+		std::string event_name = fortranStringToCpp(event_name_f,event_name_size);
 		int res = client->signal(event_name,*iteration_f);
-		free(eventname_copy);
 		if(ierr_f != NULL) *ierr_f = res;
 	}
 
 void FC_FUNC_GLOBAL(df_get_parameter,DF_GET_PARAMETER)
 	(char* param_name_f, void* buffer_f, int* size, int* ierr_f, int param_name_size)
 	{
-		// make a copy of the name and delete possible spaces at the end of the string
-		char* paramname_copy = (char*)malloc(param_name_size+1);
-		memset(paramname_copy,' ',param_name_size+1);
-		memcpy(paramname_copy,param_name_f,param_name_size);
-		int i = param_name_size;
-		while(paramname_copy[i] == ' ' && i != 0) i--;
-		paramname_copy[i+1] = '\0';
-
-		std::string paramName(paramname_copy);
+		std::string paramName = fortranStringToCpp(param_name_f,param_name_size);
 		int res = client->get_parameter(paramName,buffer_f,*size);
-		free(paramname_copy);
+		if(ierr_f != NULL) *ierr_f = res;
+	}
+
+void FC_FUNC_GLOBAL(df_set_parameter,DF_SET_PARAMETER)
+        (char* param_name_f, void* buffer_f, int* size, int* ierr_f, int param_name_size)
+	{
+		std::string paramName = fortranStringToCpp(param_name_f,param_name_size);
+		int res = client->set_parameter(paramName,buffer_f,*size);
 		if(ierr_f != NULL) *ierr_f = res;
 	}
 

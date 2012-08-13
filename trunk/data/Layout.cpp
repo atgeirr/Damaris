@@ -111,18 +111,19 @@ namespace Damaris {
 		// of the parameters. Every time we find one, search in the
 		// ParameterManager and connect to it.
 		std::string dims = model.dimensions();
-		std::vector<char> buffer(dims.size());
+		std::vector<char> buffer(dims.size()+1);
 		buffer[0] = '\0';
 		int j = 0;
 		bool reading = false;
 		for(unsigned int i = 0; i < dims.size(); i++) {
-			if((isalpha(dims[i]) && !reading) || (dims[i] == '_')) {
+			if((isalpha(dims[i]) || dims[i] == '_') && !reading) {
 				reading = true;
 				j = 0;
 			}
 			if(reading) {
 				if(isalnum(dims[i]) || (dims[i] == '_')) {
 					buffer[j] = dims[i];
+					j++;
 				} else {
 					reading = false;
 					buffer[j] = '\0';
@@ -133,7 +134,16 @@ namespace Damaris {
 					}
 				}
 			}
-		}		
+		}
+		// add last parameter if necessary
+		if(reading) {
+			buffer[j] = '\0';
+			std::string param(&(buffer[0]));
+			Parameter *p = ParameterManager::Search(param);
+			if(p != NULL) {
+				p->AddObserver((Observer*)this);
+			}
+		}
 	}
 
 	void Layout::InterpretDimensions()
@@ -162,6 +172,7 @@ namespace Damaris {
 		} else {
 			extents = e;
 		}
+		DBG("Re-interpreting dimensions for layout " << name);
 	}
 
 	void Layout::Notify()

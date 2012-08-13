@@ -85,9 +85,10 @@ int Parameter::fromBuffer(const void* b, unsigned int maxsize)
 	size_t s1 = Types::basicTypeSize(model.type());
         size_t s = std::min(s1,maxsize);
 	if(value == NULL) {
-		value = malloc(s1);
+		value = malloc(s);
 	}
 	memcpy(value,b,s);
+	Changed();
 	return s;
 }
 

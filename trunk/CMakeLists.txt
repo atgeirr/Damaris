@@ -27,7 +27,7 @@ project(DAMARIS)
 set(EXTERNAL_ROOT ~/deploy)
 
 #-----------------------------------------------------------#
-add_definitions (-O2 -Wall -rdynamic)
+add_definitions (-g -O2 -Wall -rdynamic)
 add_definitions (-D__ENABLE_MPI) # this line to be deleted
 #-----------------------------------------------------------#
 

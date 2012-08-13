@@ -86,6 +86,12 @@ int DC_get_parameter(const char* param_name, void* buffer, unsigned int size)
 	return client->get_parameter(paramName,buffer,size);
 }
 
+int DC_set_parameter(const char* param_name, const void* buffer, unsigned int size)
+{
+	std::string paramName(param_name);
+	return client->set_parameter(paramName,buffer,size);
+}
+
 MPI_Comm DC_mpi_get_client_comm()
 {
 	return client->mpi_get_client_comm();

@@ -362,6 +362,17 @@ namespace Damaris {
 			return -1;
 		}
 	}
+
+	int Client::set_parameter(const std::string & paramName, const void* buffer, unsigned int size)
+	{
+		Parameter* p = ParameterManager::Search(paramName);
+		if(p != NULL) {
+			p->fromBuffer(buffer,size);
+			return 0;
+		} else {
+			return -1;
+		}
+	}
 		
 	int Client::kill_server()
 	{

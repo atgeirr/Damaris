@@ -108,6 +108,7 @@ template<typename T>
 Parameter::Parameter(const Model::Parameter& mdl, const std::string& n, const T& v)
 : Configurable<Model::Parameter>(mdl)
 {
+	value = NULL;
 	name = n;
 	setValue<T>(v);
 	//value = boost::any(v);

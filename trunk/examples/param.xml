@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<simulation name="my simulation" 
+	language="cpp" xmlns="http://damaris.gforge.inria.fr/Damaris/Model">
+	<architecture>
+		<cores  count="2">
+			<clients count="1"/>
+		</cores>
+		<buffer name="buffer" size="1000000" />
+		<queue  name="queue" size="10" />
+	</architecture>
+	<data>
+		<parameter name="x" type="int" value="64" />
+		<parameter name="y" type="float" value="16.0" />
+
+		<layout name="my layout" type="float" dimensions="x,32"/>
+
+	</data>
+	<actions>
+	</actions>
+</simulation>

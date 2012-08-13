@@ -105,11 +105,19 @@ void FC_FUNC_GLOBAL(df_signal,DF_SIGNAL)
 	(char* event_name_f, int32_t* iteration_f, int* ierr_f, int event_name_size);
 
 /**
- * \fn df_get_parameter(param_name, buffer, ierr)
+ * \fn df_get_parameter(param_name, buffer, size, ierr)
  * \brief Retrieve the value associated to a parameter.
- * \see Damaris::Client::getParameter
+ * \see Damaris::Client::get_parameter
  */
 void FC_FUNC_GLOBAL(df_get_parameter,DF_GET_PARAMETER)
+	(char* param_name_f, void* buffer_f, int* size, int* ierr_f, int param_name_size);
+
+/**
+ * \fn df_set_parameter(param_name, buffer, size, ierr)
+ * \brief Modify the value associated to a parameter.
+ * \see Damaris::Client::set_parameter
+ */
+void FC_FUNC_GLOBAL(df_set_parameter,DF_SET_PARAMETER)
 	(char* param_name_f, void* buffer_f, int* size, int* ierr_f, int param_name_size);
 
 /**

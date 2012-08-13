@@ -30,7 +30,9 @@ namespace Damaris {
 	{
 		Model::Data::parameter_const_iterator p(mdl.parameter().begin());
 		for(; p < mdl.parameter().end(); p++) {
+			DBG("Creating parameter \"" << p->name() << "\"");
 			Create<Parameter>(*p,(std::string)(p->name()));
+			DBG("Parameter \""  << p->name() << "\" created");
 		}
 	}
 }

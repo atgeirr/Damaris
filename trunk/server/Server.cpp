@@ -50,6 +50,7 @@ Server* Server::New(const std::string& cfgfile, int32_t id)
 Server::Server(Process* p)
 {
 	process = p;
+	visitMPIlayer = NULL;
 	needStop = Environment::getClientsPerNode();
 }
 
@@ -58,8 +59,10 @@ Server::Server(Process* p)
 Server::~Server()
 {
 	Process::kill();
+	DBG("Process killed successfuly");
 #ifdef __ENABLE_VISIT
 	MPILayer<int>::Delete(visitMPIlayer);
+	DBG("VisIt MPI layer deleted successfuly");
 #endif
 }
 	
@@ -73,8 +76,8 @@ int Server::run()
 	if(process->getModel()->visit().present()) {
 		Viz::VisItListener::Init(Environment::getEntityComm(),
 			process->getModel()->visit(),
-			Environment::getSimulationName());
-			visitMPIlayer = MPILayer<int>::New(Environment::getEntityComm());
+		Environment::getSimulationName());
+		visitMPIlayer = MPILayer<int>::New(Environment::getEntityComm());
 	}
 #endif
 	

@@ -126,7 +126,7 @@ class Client : public Writer {
 		virtual void chunk_free(chunk_h chunkh);
 
 		/** 
-		 * \brief Retrieves a parameter's value. Not implemented yet.
+		 * \brief Retrieves a parameter's value. 
 		 * 
 		 * \param[in] paramName : name of the parameter to retrieve.
 		 * \param[out] buffer : pointer to the memory where to copy the parameter's value.
@@ -134,6 +134,20 @@ class Client : public Writer {
 		 * \return 0 in case of success, -1 if the parameter is not found.
 		 */
 		virtual int get_parameter(const std::string & paramName, void* buffer, unsigned int size);
+
+		/**
+		 * Modify a parameter's value. Will cause all dependent layout to be
+		 * rebuilt. The modification only has effect on the core that called this function.
+		 * The user is responsible for coordinating processes if the modification has to be done
+		 * globally. Note: this function will NOT define an inexisting parameter.
+		 * 
+		 * \param[in] paramName : name of the parameter to modify.
+		 * \param[in] buffer : address of the value to set.
+		 * \param[in] size : maximum size of the buffer (usually sizeof(type of the parameter)).
+		 *
+		 * \return 0 in case of success, -1 if the parameter does not exist.
+		 */
+		virtual int set_parameter(const std::string & paramName, const void* buffer, unsigned int size);
 		
 		/**
 		 * Sends a signal to the server to shut it down (all clients in node need
