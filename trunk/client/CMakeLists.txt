@@ -19,6 +19,7 @@ set(DAMARIS_COMMON_SRC
 	${DAMARIS_SOURCE_DIR}/core/LayoutManager.cpp
 	${DAMARIS_SOURCE_DIR}/core/ActionManager.cpp
 	${DAMARIS_SOURCE_DIR}/core/Observable.cpp
+	${DAMARIS_SOURCE_DIR}/core/Observer.cpp
 	${DAMARIS_SOURCE_DIR}/event/Action.cpp
 	${DAMARIS_SOURCE_DIR}/event/DynamicAction.cpp
 	${DAMARIS_SOURCE_DIR}/event/ScriptAction.cpp

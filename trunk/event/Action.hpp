@@ -95,6 +95,11 @@ class Action  {
 		bool exposeVisItMetaData(visit_handle md);
 #endif
 
+		/**
+		 * Destructor.
+		 */
+		virtual ~Action() {}
+
 		class EmptyAction; 
 };
 
@@ -108,6 +113,8 @@ class Action::EmptyAction : public Action {
 
 	void call(int32_t iteration, int32_t sourceID, const char* args = NULL) { }
 
+	public:
+		virtual ~EmptyAction() {}
 };
 }
 

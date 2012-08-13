@@ -60,7 +60,7 @@ class DynamicAction : public Action, public Configurable<Model::Event> {
 		/**
 		 * \brief Destructor.
 		 */
-		~DynamicAction();
+		virtual ~DynamicAction();
 	
 	public:	
 		/**

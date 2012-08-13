@@ -120,6 +120,11 @@ class Layout : public Configurable<Model::Layout>, private Observer {
 		 * be rebuilt when a parameter has changed.
 		 */
 		virtual void Notify();
+
+		/**
+		 * Destructor.
+		 */
+		virtual ~Layout();
 }; // class Layout
 
 } // namespace Damaris

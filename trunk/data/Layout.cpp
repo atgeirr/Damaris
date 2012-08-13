@@ -124,7 +124,8 @@ namespace Damaris {
 				if(isalnum(dims[i]) || (dims[i] == '_')) {
 					buffer[j] = dims[i];
 					j++;
-				} else {
+				}
+				if((not (isalnum(dims[i]) || (dims[i] == '_'))) || (i == dims.size() - 1)){
 					reading = false;
 					buffer[j] = '\0';
 					std::string param(&(buffer[0]));
@@ -133,15 +134,6 @@ namespace Damaris {
 						p->AddObserver((Observer*)this);
 					}
 				}
-			}
-		}
-		// add last parameter if necessary
-		if(reading) {
-			buffer[j] = '\0';
-			std::string param(&(buffer[0]));
-			Parameter *p = ParameterManager::Search(param);
-			if(p != NULL) {
-				p->AddObserver((Observer*)this);
 			}
 		}
 	}
@@ -178,5 +170,9 @@ namespace Damaris {
 	void Layout::Notify()
 	{
 		InterpretDimensions();
+	}
+
+	Layout::~Layout()
+	{
 	}
 }

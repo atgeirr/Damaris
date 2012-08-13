@@ -50,7 +50,9 @@ Server* Server::New(const std::string& cfgfile, int32_t id)
 Server::Server(Process* p)
 {
 	process = p;
+#ifdef __ENABLE_VISIT
 	visitMPIlayer = NULL;
+#endif
 	needStop = Environment::getClientsPerNode();
 }
 

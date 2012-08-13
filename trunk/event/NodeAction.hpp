@@ -86,6 +86,8 @@ class NodeAction : public BASE {
 		{
 			return new NodeAction<BASE,MODEL>(mdl,name,n);
 		}
+
+		virtual ~NodeAction() {}
 };
 
 }

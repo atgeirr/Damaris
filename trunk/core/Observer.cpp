@@ -15,33 +15,22 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file Observer.hpp
+ * \file Observer.cpp
  * \date February 2012
  * \author Matthieu Dorier
  * \version 0.5
  */
-#ifndef __DAMARIS_OBSERVER_H
-#define __DAMARIS_OBSERVER_H
-
-#include <set>
+#include "core/Observer.hpp"
+#include "core/Observable.hpp"
 
 namespace Damaris {
 
-class Observable;
-/**
- */
-class Observer {
-	friend class Observable;
-
-		std::set<Observable*> observed;
-
-	protected:
-		virtual void Notify() = 0;
-
-	public:
-		virtual ~Observer(); 
-};
-
+	Observer::~Observer()
+	{
+		std::set<Observable*>::iterator it = observed.begin();
+		while(it != observed.end()) {
+			(*it)->RemoveObserver(this);
+			it++;
+		}
+	}
 } // namespace Damaris
-
-#endif

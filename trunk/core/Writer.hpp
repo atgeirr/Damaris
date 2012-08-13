@@ -143,6 +143,10 @@ class Writer  {
 		 */
 		virtual void chunk_free(chunk_h chunkh) = 0;
 
+		/**
+		 * Destructor.
+		 */
+		virtual ~Writer() {}
 }; // class Writer
 
 } // namespace Damaris

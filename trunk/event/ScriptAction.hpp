@@ -45,6 +45,11 @@ class ScriptAction : public Action, public Configurable<Model::Script> {
 		: Action(name), Configurable<Model::Script>(mdl)
 		{ }
 
+		/**
+		 * Destructor.
+		 */
+		virtual ~ScriptAction() {}
+
 	public:	
 		/**
 		 * \brief Another way of calling the inner function.

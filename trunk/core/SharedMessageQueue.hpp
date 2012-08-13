@@ -182,7 +182,7 @@ namespace Damaris {
 			/**
 			 * Destructor. Will not remove the shared structures.
 			 */
-			~SharedMessageQueue();
+			virtual ~SharedMessageQueue();
 	};
 }
 #endif

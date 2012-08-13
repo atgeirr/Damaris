@@ -127,6 +127,11 @@ class SharedMemorySegment {
 		 * in the shared memory segment.
 		 */
 		virtual bool pointerBelongsToSegment(void* p) = 0;
+
+		/**
+		 * Destructor.
+		 */
+		virtual ~SharedMemorySegment() {}
 };
 
 using namespace boost::interprocess;
@@ -147,7 +152,8 @@ class SharedMemorySegment::POSIX_ShMem : public SharedMemorySegment {
 		ptr allocate(size_t size);
 		void deallocate(void* addr);
 		size_t getFreeMemory();
-		bool pointerBelongsToSegment(void* p);	
+		bool pointerBelongsToSegment(void* p);
+		virtual ~POSIX_ShMem() {}
 };
 
 /**
@@ -170,6 +176,7 @@ class SharedMemorySegment::SYSV_ShMem : public SharedMemorySegment {
 		void deallocate(void* addr);
 		size_t getFreeMemory();
 		bool pointerBelongsToSegment(void* p);
+		virtual ~SYSV_ShMem() {}
 };
 
 /**
@@ -187,7 +194,7 @@ class SharedMemorySegment::CompositeShMem : public SharedMemorySegment {
 
 	public:
 		CompositeShMem(const std::string &name, int64_t size, int count, posix_shmem_t);
-        CompositeShMem(const std::string &name, int count, posix_shmem_t);
+		CompositeShMem(const std::string &name, int count, posix_shmem_t);
 		CompositeShMem(const std::string &name, int64_t size, int count, sysv_shmem_t);
 		CompositeShMem(const std::string &name, int count, sysv_shmem_t);
 
@@ -197,6 +204,7 @@ class SharedMemorySegment::CompositeShMem : public SharedMemorySegment {
 		void deallocate(void* addr);
 		size_t getFreeMemory();
 		bool pointerBelongsToSegment(void* p);
+		virtual ~CompositeShMem() {}
 };
 
 }
