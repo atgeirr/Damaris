@@ -22,11 +22,23 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "core/Debug.hpp"
 #include "core/LayoutManager.hpp"
+#include "data/TypeLayout.hpp"
+#include "data/BoxLayout.hpp"
 
 namespace Damaris {
 
 void LayoutManager::Init(const Model::Data& model)
 {
+    Create<TypeLayout>(Model::Type::short_,"short");
+    Create<TypeLayout>(Model::Type::int_,"int");
+    Create<TypeLayout>(Model::Type::integer,"integer");
+    Create<TypeLayout>(Model::Type::long_,"long");
+    Create<TypeLayout>(Model::Type::float_,"float");
+    Create<TypeLayout>(Model::Type::real,"real");
+    Create<TypeLayout>(Model::Type::double_,"double");
+    Create<TypeLayout>(Model::Type::char_,"char");
+    Create<TypeLayout>(Model::Type::character,"character");
+
     Model::Data::layout_const_iterator l(model.layout().begin());
     for(;l != model.layout().end(); l++)
     {
@@ -37,7 +49,7 @@ void LayoutManager::Init(const Model::Data& model)
 				continue;
 			}
 		}
-		Create<Layout>(*l,(std::string)l->name());
+		Create<BoxLayout>(*l,(std::string)l->name());
     }
 }
 

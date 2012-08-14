@@ -32,6 +32,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "core/Message.hpp"
 #include "client/Client.hpp"
 
+#include "core/ParameterManager.hpp"
 #include "core/VariableManager.hpp"
 #include "core/ActionManager.hpp"
 

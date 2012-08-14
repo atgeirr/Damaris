@@ -31,8 +31,10 @@ set(DAMARIS_COMMON_SRC
 	${DAMARIS_SOURCE_DIR}/data/ChunkDescriptor.cpp
 	${DAMARIS_SOURCE_DIR}/data/Chunk.cpp
 	${DAMARIS_SOURCE_DIR}/data/ShmChunk.cpp
-	${DAMARIS_SOURCE_DIR}/data/Types.cpp 
+	${DAMARIS_SOURCE_DIR}/data/Types.cpp
 	${DAMARIS_SOURCE_DIR}/data/Layout.cpp
+	${DAMARIS_SOURCE_DIR}/data/BoxLayout.cpp
+	${DAMARIS_SOURCE_DIR}/data/TypeLayout.cpp
 	${DAMARIS_SOURCE_DIR}/data/Parameter.cpp)
 
 

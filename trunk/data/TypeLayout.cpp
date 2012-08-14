@@ -15,16 +15,54 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file Damaris.hpp
- * \date October 2011
+ * \file TypeLayout.cpp
+ * \date February 2012
  * \author Matthieu Dorier
- * \version 0.3
- * Main file to be included in simulations.
+ * \version 0.4
  */
-#ifndef __DAMARIS_C_H
-#define __DAMARIS_C_H
 
-#include "../client/Client.h"
-#include "../server/Server.h"
+#include <cstring>
 
-#endif
+#include "core/Debug.hpp"
+#include "data/Types.hpp"
+#include "data/TypeLayout.hpp"
+
+namespace Damaris {
+
+	TypeLayout::TypeLayout(const Model::Type& mdl)
+	: Layout((std::string)mdl), Configurable<Model::Type>(mdl)
+	{
+	}
+	
+	Model::Type TypeLayout::getType() const
+	{
+		return model;
+	}
+	
+	unsigned int TypeLayout::getDimensions() const
+	{
+		return 1;
+	}
+	
+	size_t TypeLayout::getExtentAlongDimension(unsigned int dim) const
+	{
+		if(dim == 0)
+			return 1;
+		else
+			return 0;
+	}
+
+	bool TypeLayout::isUnlimited() const
+	{
+		return false;
+	}
+
+	Layout* TypeLayout::New(const Model::Type& mdl, const std::string &name)
+	{
+		return new TypeLayout(mdl);
+	}
+
+	TypeLayout::~TypeLayout()
+	{
+	}
+}

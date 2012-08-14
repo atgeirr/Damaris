@@ -15,19 +15,20 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file Layout.hpp
+ * \file TypeLayout.hpp
  * \date February 2012
  * \author Matthieu Dorier
  * \version 0.4
  */
 
-#ifndef __DAMARIS_LAYOUT_H
-#define __DAMARIS_LAYOUT_H
+#ifndef __DAMARIS_TYPE_LAYOUT_H
+#define __DAMARIS_TYPE_LAYOUT_H
 
 #include <string>
 #include <vector>
-#include "core/Manager.hpp"
+#include "core/Configurable.hpp"
 #include "data/Types.hpp"
+#include "data/Layout.hpp"
 
 namespace Damaris {
 
@@ -40,57 +41,46 @@ namespace Damaris {
  *
  * Layouts are not used to hold data. See Chunk for that purpose.
  */	
-class Layout {
-	friend class Manager<Layout>;
+class TypeLayout : public Layout, public Configurable<Model::Type> {
 		
-	protected:
-		int id; /*!< id of the Layout, provided when initialized by the LayoutManager. */
-		std::string name; /*! name of the Layout, a simple copy of its name from the model. */
-
+	private:
 		/**
 		 * \brief Constructor.
-		 * Initializes a Layout from the data type, the dimensions and the vector of extents. 
-		 * 
-		 * \param[in] name : name of the layout (as defined in the configuration file).
 		 */
-		Layout(const std::string& name);
+		TypeLayout(const Model::Type& mdl);
 		
 	public:
 		/**
-		 * \brief Returns the name of the Layout.
-		 */
-		virtual const std::string& getName() const;
-
-		/**
-		 * Returns the id of the Layout.
-		 */
-		virtual int getID() const;	
-
-		/**
 		 * \return The type of the data. 
 		 */
-		virtual Model::Type getType() const = 0;
+		virtual Model::Type getType() const;
 		
 		/**
 		 * \return the number of dimensions. 
 		 */
-		virtual unsigned int getDimensions() const = 0;
+		virtual unsigned int getDimensions() const;
 
 		/**
 		 * \return the extent along a given dimension. 
 		 */
-		virtual size_t getExtentAlongDimension(unsigned int dim) const = 0;
+		virtual size_t getExtentAlongDimension(unsigned int dim) const;
 
 		/**
 		 * \return true if the Layout has unlimited dimension 
 		 *         (defined as "?" in the configuration file).
 		 */
-		virtual bool isUnlimited() const = 0;
+		virtual bool isUnlimited() const;
+
+		/**
+		 * Tries to create a new Layout from a model and a name.
+		 * Returns NULL in case of failure.
+		 */
+		static Layout* New(const Model::Type& mdl, const std::string &name);
 
 		/**
 		 * Destructor.
 		 */
-		virtual ~Layout();
+		virtual ~TypeLayout();
 }; // class Layout
 
 } // namespace Damaris
