@@ -21,6 +21,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \version 0.5
  */
 #include <stdint.h>
+#include <string.h>
 
 #include "core/ProcInfo.hpp"
 
@@ -54,11 +55,12 @@ static int computeHashValue(char* str, size_t len)
 int GetNodeID()
 {
 	char procname[MAX_PROCESSOR_NAME];
-	int len;
+	int len = 0;
 #ifdef BGP
 	_BGP_Personality_t personality;
 	Kernel_GetPersonality(&personality, sizeof(personality));
 	BGP_Personality_getLocationString(&personality, procname);
+	len = strlen(procname);
 #else
 	MPI_Get_processor_name(procname,&len);
 #endif

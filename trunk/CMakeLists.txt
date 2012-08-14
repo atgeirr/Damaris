@@ -44,8 +44,10 @@ add_definitions (-D__BENCHMARK)
 # Check if we are on BlueGene/P
 # uncomment the following line (set(BGP)) if you run on BGP.
 #-----------------------------------------------------------#
-#set(BGP)
+#set(BGP "yes")
 if(BGP)
+  set(BGP_FLOOR "/bgsys/drivers/ppcfloor")
+  include_directories(${BGP_FLOOR}/arch/include)
   add_definitions(-DBGP)
 endif(BGP)
 
