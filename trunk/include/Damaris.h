@@ -24,7 +24,11 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __DAMARIS_C_H
 #define __DAMARIS_C_H
 
+extern "C" {
+
 #include "../client/Client.h"
 #include "../server/Server.h"
+
+}
 
 #endif
