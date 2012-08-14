@@ -25,6 +25,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "core/Debug.hpp"
 #include "core/Environment.hpp"
 #include "core/Process.hpp"
+#include "core/ProcInfo.hpp"
 #include "client/StdAloneClient.hpp"
 #include "server/Initiator.hpp"
 
@@ -45,24 +46,9 @@ Client* Initiator::start(const std::string& configFile, MPI_Comm globalcomm)
 	int clpn = Environment::getClientsPerNode();
 	int copn = Environment::getCoresPerNode();
 
-	/* The name of the processor is used to compute communicators */
-	char procname[MPI_MAX_PROCESSOR_NAME];
-	int len;
-	MPI_Get_processor_name(procname,&len);
-
-	DBG("On process " << rank << ", name is " << procname);
-
-	/* Compute the node identifier from the name */
-	uint64_t nhash = (uint64_t)(14695981039346656037ULL);
-	uint64_t fnv =  ((uint64_t)1 << 40) + (1 << 8) + 0xb3;
-	for(int i=0; i < len; i++) {
-		uint64_t c = (uint64_t)(procname[i]);
-		nhash = nhash xor c;
-		nhash *= fnv;
-	}
-
 	/* Create a new communicator gathering processes of the same node */
-	int color = ((int)nhash >= 0) ? (int)nhash : - ((int)nhash);
+	int color = ProcInfo::GetNodeID();
+
 	MPI_Comm nodecomm;
 	MPI_Comm_split(globalcomm,color,rank,&nodecomm);
 	Environment::setNodeComm(nodecomm);

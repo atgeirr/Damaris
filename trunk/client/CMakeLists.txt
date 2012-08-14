@@ -2,7 +2,7 @@ set(DAMARIS_CLIENT_SRC
 	${DAMARIS_SOURCE_DIR}/client/Client.cpp
 	${DAMARIS_SOURCE_DIR}/client/ClientC.cpp
 	${DAMARIS_SOURCE_DIR}/client/ClientFortran.cpp
-	${DAMARIS_SOURCE_DIR}/client/Client.f90
+	${DAMARIS_SOURCE_DIR}/client/Client.F90
 	${DAMARIS_SOURCE_DIR}/client/StdAloneClient.cpp)
 
 set(DAMARIS_MODEL_SRC
@@ -20,6 +20,7 @@ set(DAMARIS_COMMON_SRC
 	${DAMARIS_SOURCE_DIR}/core/ActionManager.cpp
 	${DAMARIS_SOURCE_DIR}/core/Observable.cpp
 	${DAMARIS_SOURCE_DIR}/core/Observer.cpp
+	${DAMARIS_SOURCE_DIR}/core/ProcInfo.cpp
 	${DAMARIS_SOURCE_DIR}/event/Action.cpp
 	${DAMARIS_SOURCE_DIR}/event/DynamicAction.cpp
 	${DAMARIS_SOURCE_DIR}/event/ScriptAction.cpp
