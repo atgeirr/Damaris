@@ -41,6 +41,15 @@ add_definitions (-D__INFO)
 add_definitions (-D__BENCHMARK)
 
 #-----------------------------------------------------------#
+# Check if we are on BlueGene/P
+# uncomment the following line (set(BGP)) if you run on BGP.
+#-----------------------------------------------------------#
+#set(BGP)
+if(BGP)
+  add_definitions(-DBGP)
+endif(BGP)
+
+#-----------------------------------------------------------#
 # Set the location of CMake Modules
 #-----------------------------------------------------------#
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} 
