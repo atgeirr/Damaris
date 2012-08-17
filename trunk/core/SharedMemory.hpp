@@ -23,7 +23,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __DAMARIS_SHARED_MEMORY_H
 #define __DAMARIS_SHARED_MEMORY_H
 
-#include <boost/interprocess/managed_shared_memory.hpp>
+#include <boost/interprocess/managed_external_buffer.hpp>
 
 namespace Damaris {
 
@@ -44,21 +44,24 @@ namespace Damaris {
 	 * even in different process memory spaces.
 	 */
 	struct handle_t {
-		boost::interprocess::managed_shared_memory::handle_t value;
+		boost::interprocess::managed_external_buffer::handle_t value;
 		int objid;
-		handle_t(boost::interprocess::managed_shared_memory::handle_t ph, int id)
+
+		handle_t(boost::interprocess::managed_external_buffer::handle_t ph, int id)
 		: value(ph), objid(id) {}
-		handle_t(boost::interprocess::managed_shared_memory::handle_t ph)
+
+		handle_t(boost::interprocess::managed_external_buffer::handle_t ph)
 		: value(ph), objid(0) {}
+
 		handle_t() {}
-		handle_t& operator=(const boost::interprocess::managed_shared_memory::handle_t& hdl)
+
+		handle_t& operator=(const boost::interprocess::managed_external_buffer::handle_t& hdl)
 		{
 			value = hdl;
 			objid = 0;
 			return *this;
 		}
 	};
-	// typedef boost::interprocess::managed_shared_memory::handle_t handle_t;
 }
 
 #endif

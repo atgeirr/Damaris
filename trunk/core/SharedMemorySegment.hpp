@@ -25,6 +25,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <string>
 #include <boost/interprocess/managed_shared_memory.hpp>
+#include <boost/interprocess/managed_external_buffer.hpp>
 #include <boost/interprocess/managed_xsi_shared_memory.hpp>
 #include <boost/interprocess/xsi_shared_memory.hpp>
 #include <boost/interprocess/mapped_region.hpp>
@@ -44,8 +45,6 @@ using namespace boost::interprocess;
 
 class SharedMemorySegment {
 	protected:
-		class POSIX_ShMem;
-		class SYSV_ShMem;
 		class CompositeShMem;
 	
 	protected:	
@@ -53,15 +52,18 @@ class SharedMemorySegment {
 			interprocess_condition cond_size; /*!< Condition to block processes attempting 
 												to allocate more than available size. */
 			interprocess_mutex lock; /*!< To lock the size manager when accessing the size. */
-			size_t size; /*!< Current available size (in bytes). */
+			size_t size; /*!< Current available size (in bytes). Only updated when deallocating. */
 			const size_t max; /*!< Maximum size (in bytes). */
 			size_manager_s(size_t initSize): cond_size(), lock(), size(initSize), max(initSize) {};
 		} *size_manager;
-		
+	
+		mapped_region* region;
+		managed_external_buffer* buffer;	
+
 		/**
 		 * Constructor.
 		 */
-		SharedMemorySegment();
+		SharedMemorySegment(mapped_region* r, managed_external_buffer* b);
 	public:
 
 		/**
@@ -71,6 +73,17 @@ class SharedMemorySegment {
 		 */
 		static SharedMemorySegment* Create(Model::Buffer* model);
 
+
+		static SharedMemorySegment* Create(posix_shmem_t posix_shmem,
+			const std::string& name, size_t size);
+
+		static SharedMemorySegment* Create(sysv_shmem_t sysv_shmem,
+			const std::string& name, size_t size);
+
+	private:
+		static SharedMemorySegment* CreateMultiBlock(Model::Buffer* model);
+
+	public:
 		/**
 		 * Opens a SharedMemorySegment implementation corresponding
 		 * to the description in the model.
@@ -78,11 +91,31 @@ class SharedMemorySegment {
 		 */	
 		static SharedMemorySegment* Open(Model::Buffer* model);
 
+		static SharedMemorySegment* Open(posix_shmem_t posix_shmem,
+			const std::string &name, size_t size = 0);
+
+		static SharedMemorySegment* Open(sysv_shmem_t sysv_shmem,
+			const std::string& name, size_t size = 0);
+
+	private:
+		static SharedMemorySegment* OpenMultiBlock(Model::Buffer* model);
+
+	public:
 		/**
 		 * Removes a SharedMemorySegment described in a model.
 		 */
 		static bool Remove(Model::Buffer* model);
 
+		static bool Remove(posix_shmem_t posix_shmem,
+			const std::string& name);
+		
+		static bool Remove(sysv_shmem_t sysv_shmem,
+			const std::string& name);
+
+	private:
+		static bool RemoveMultiBlock(const Model::Buffer* model);
+
+	public:
 		/**
 		 * This typedef is just to prevent compilation error
 		 * when defining pur virtual function that return void* pointers.
@@ -92,27 +125,27 @@ class SharedMemorySegment {
 		/**
 		 * Gets an absolute address from a relative handle.
 		 */
-		virtual ptr getAddressFromHandle(handle_t h) = 0;
+		virtual ptr getAddressFromHandle(handle_t h) const;
 
 		/**
 		 * Gets a relative handle from an absolute pointer.
 		 */
-		virtual handle_t getHandleFromAddress(ptr p) = 0;
+		virtual handle_t getHandleFromAddress(ptr p) const;
 
 		/**
 		 * Allocates size bytes inside the shared memory segment.
 		 */
-		virtual ptr allocate(size_t size) = 0;
+		virtual ptr allocate(size_t size);
 
 		/**
 		 * Deallocate an allocated region.
 		 */
-		virtual void deallocate(void* addr) = 0;
+		virtual void deallocate(void* addr);
 
 		/**
 		 * Gets the amount of free memory left.
 		 */
-		virtual size_t getFreeMemory() = 0;
+		virtual size_t getFreeMemory() const;
 
 		/**
 		 * Waits until enough free memory is available.
@@ -126,58 +159,15 @@ class SharedMemorySegment {
 		 * Returns true if and only if the adress is
 		 * in the shared memory segment.
 		 */
-		virtual bool pointerBelongsToSegment(void* p) = 0;
+		virtual bool pointerBelongsToSegment(void* p) const;
 
 		/**
 		 * Destructor.
 		 */
-		virtual ~SharedMemorySegment() {}
+		virtual ~SharedMemorySegment();
 };
 
 using namespace boost::interprocess;
-
-/**
- * The SharedMemorySegment::POSIX_ShMem class defines a
- * SharedMemorySegment based on shm_open functions.
- */
-class SharedMemorySegment::POSIX_ShMem : public SharedMemorySegment {
-	private:
-		managed_shared_memory* impl;
-	public:
-		POSIX_ShMem(const std::string &name, int64_t size);
-		POSIX_ShMem(const std::string &name);
-
-		SharedMemorySegment::ptr getAddressFromHandle(handle_t h);
-		handle_t getHandleFromAddress(SharedMemorySegment::ptr p);
-		ptr allocate(size_t size);
-		void deallocate(void* addr);
-		size_t getFreeMemory();
-		bool pointerBelongsToSegment(void* p);
-		virtual ~POSIX_ShMem() {}
-};
-
-/**
- * The SharedMemorySegment::SYSV_ShMem class defines a
- * SharedMemorySegment based on shmget functions.
- */
-class SharedMemorySegment::SYSV_ShMem : public SharedMemorySegment {
-	private:
-		managed_xsi_shared_memory* impl;
-		xsi_key key;
-	public:
-		SYSV_ShMem(const xsi_key& k, int64_t size);
-		SYSV_ShMem(const xsi_key& k);
-		SYSV_ShMem(const std::string &name, int64_t size);
-		SYSV_ShMem(const std::string &name);
-
-		SharedMemorySegment::ptr getAddressFromHandle(handle_t h);
-		handle_t getHandleFromAddress(SharedMemorySegment::ptr p);
-		ptr allocate(size_t size);
-		void deallocate(void* addr);
-		size_t getFreeMemory();
-		bool pointerBelongsToSegment(void* p);
-		virtual ~SYSV_ShMem() {}
-};
 
 /**
  * The SharedMemorySegment::CompositeShMem class helps building
@@ -189,22 +179,19 @@ class SharedMemorySegment::SYSV_ShMem : public SharedMemorySegment {
  */
 class SharedMemorySegment::CompositeShMem : public SharedMemorySegment {
 	private:
-		std::vector<SharedMemorySegment*> blocks;
+		std::vector<SharedMemorySegment*> *blocks;
 		int nbseg;
 
 	public:
-		CompositeShMem(const std::string &name, int64_t size, int count, posix_shmem_t);
-		CompositeShMem(const std::string &name, int count, posix_shmem_t);
-		CompositeShMem(const std::string &name, int64_t size, int count, sysv_shmem_t);
-		CompositeShMem(const std::string &name, int count, sysv_shmem_t);
+		CompositeShMem(int count, std::vector<SharedMemorySegment*>* segments);
 
-		SharedMemorySegment::ptr getAddressFromHandle(handle_t h);
-		handle_t getHandleFromAddress(SharedMemorySegment::ptr p);
-		ptr allocate(size_t size);
-		void deallocate(void* addr);
-		size_t getFreeMemory();
-		bool pointerBelongsToSegment(void* p);
-		virtual ~CompositeShMem() {}
+		virtual SharedMemorySegment::ptr getAddressFromHandle(handle_t h) const;
+		virtual handle_t getHandleFromAddress(SharedMemorySegment::ptr p) const;
+		virtual ptr allocate(size_t size);
+		virtual void deallocate(void* addr);
+		virtual size_t getFreeMemory() const;
+		virtual bool pointerBelongsToSegment(void* p) const;
+		virtual ~CompositeShMem(); 
 };
 
 }

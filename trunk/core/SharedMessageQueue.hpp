@@ -97,6 +97,7 @@ namespace Damaris {
 			 */
 			static SharedMessageQueue* Create(Model::Queue* mdl);
 
+
 			/**
 			 * Helper function to create a POSIX shared message queue.
 			 */
@@ -119,13 +120,13 @@ namespace Damaris {
 			 * Opens an existing POSIX shared message queue.
 			 */
 			static SharedMessageQueue* Open(posix_shmem_t posix_shmem, 
-				const std::string& name);
+				const std::string& name, size_t num_msg = 0, size_t size_msg = 0);
 
 			/**
 			 * Opens an existing XSI shared message queue.
 			 */
 			static SharedMessageQueue* Open(sysv_shmem_t sysv_shmem, 
-				const std::string& name);
+				const std::string& name, size_t num_msg = 0, size_t size_msg = 0);
 	
 			/**
 			 * Removes a SharedMessageQueue described by a model.

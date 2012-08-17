@@ -21,6 +21,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \version 0.4
  */
 #include <boost/interprocess/mapped_region.hpp>
+#include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/interprocess/xsi_shared_memory.hpp>
 #include "core/Debug.hpp"
 #include "core/Message.hpp"
@@ -66,7 +67,7 @@ SharedMessageQueue* SharedMessageQueue::Create(posix_shmem_t posix_shmem,
 	size_t size = num_msg*size_msg + sizeof(struct shm_queue_hdr);
 	base.truncate(size);
 
-	mapped_region *region = new mapped_region(base,read_write);
+	mapped_region *region = new mapped_region(base,read_write,0,size);
 	void* addr = region->get_address();
 	new (addr) shm_queue_hdr(num_msg,size_msg);
 	
@@ -79,7 +80,7 @@ SharedMessageQueue* SharedMessageQueue::Create(sysv_shmem_t sysv_shmem,
 	size_t size = num_msg*size_msg + sizeof(struct shm_queue_hdr);
 	xsi_shared_memory base(create_only,xsi_key(name.c_str(),1),size);
 	
-	mapped_region *region = new mapped_region(base,read_write);
+	mapped_region *region = new mapped_region(base,read_write,0,size);
 	void* addr = region->get_address();
 	new (addr) shm_queue_hdr(num_msg,size_msg);
 
@@ -90,13 +91,15 @@ SharedMessageQueue* SharedMessageQueue::Open(Model::Queue* mdl)
 {
 	std::string& name = mdl->name();
 	Model::ShmType& type = mdl->type();
+	size_t num_msg = mdl->size();
+	size_t size_msg = sizeof(Message);
 
 	switch(type) {
 	
 	case Model::ShmType::posix : 
-		return Open(posix_shmem_t(),name);
+		return Open(posix_shmem_t(),name,num_msg,size_msg);
 	case Model::ShmType::sysv :
-		return Open(sysv_shmem_t(),name);
+		return Open(sysv_shmem_t(),name,num_msg,size_msg);
 	default : 
 		ERROR("Unknown shared memory type \"" << type << "\"");
 	}
@@ -105,19 +108,25 @@ SharedMessageQueue* SharedMessageQueue::Open(Model::Queue* mdl)
 }
 
 SharedMessageQueue* SharedMessageQueue::Open(posix_shmem_t posix_shmem, 
-		const std::string& name)
+		const std::string& name, size_t num_msg, size_t size_msg)
 {
+	size_t size = (num_msg == 0 || size_msg == 0) ? 0 
+			: (num_msg*size_msg + sizeof(struct shm_queue_hdr));
+
 	shared_memory_object base(open_only,name.c_str(),read_write);
-	mapped_region *region = new mapped_region(base,read_write);
+	mapped_region *region = new mapped_region(base,read_write,0,size);
 
 	return new SharedMessageQueue(region);
 }
 
 SharedMessageQueue* SharedMessageQueue::Open(sysv_shmem_t sysv_shmem, 
-		const std::string& name)
+		const std::string& name, size_t num_msg, size_t size_msg)
 {
+	size_t size = (num_msg == 0 || size_msg == 0) ? 0
+			: (num_msg*size_msg + sizeof(struct shm_queue_hdr));
+
 	xsi_shared_memory base(open_only,xsi_key(name.c_str(),1));
-	mapped_region *region = new mapped_region(base,read_write);
+	mapped_region *region = new mapped_region(base,read_write,0,size);
 
 	return new SharedMessageQueue(region);
 }
