@@ -42,6 +42,9 @@ add_executable (test_param_c ${DAMARIS_SOURCE_DIR}/examples/test_param.c)
 target_link_libraries (test_param_c ${EMB_SERVER_LIBRARIES})
 set_target_properties (test_param_c PROPERTIES LINK_FLAGS "-Wl,-export-dynamic")
 
+add_executable (test_fun_cpp ${DAMARIS_SOURCE_DIR}/examples/test_fun.cpp)
+target_link_libraries (test_fun_cpp ${EMB_SERVER_LIBRARIES})
+
 if(CMAKE_Fortran_COMPILER)
   add_executable (test_mpi_fortran ${DAMARIS_SOURCE_DIR}/examples/test_mpi.f90)
   target_link_libraries (test_mpi_fortran ${EMB_SERVER_LIBRARIES} gfortran)

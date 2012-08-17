@@ -25,6 +25,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #define __DAMARIS_SERVER_C_H
 #include <mpi.h>
 
+//extern "C" {
+
 /**
  * Initializes a server (does NOT start it).
  * \param[in] configFile : name of the XML configuration file.
@@ -44,5 +46,7 @@ int DC_mpi_init_and_start(const char* configFile, MPI_Comm globalcomm);
 int DC_mpi_init(const char* configFile, MPI_Comm globalcomm);
 
 int DC_server_start();
+
+//}
 
 #endif

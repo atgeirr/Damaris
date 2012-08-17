@@ -27,6 +27,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdlib.h>
 #include <mpi.h>
 
+//extern "C" {
+
 typedef int64_t DC_chunk_handle_t;
 
 /**
@@ -135,4 +137,5 @@ int DC_end_iteration(int iteration);
  */
 int 	DC_finalize();
 
+//}
 #endif

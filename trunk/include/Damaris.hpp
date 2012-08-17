@@ -27,5 +27,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "server/Initiator.hpp"
 #include "client/Client.hpp"
 #include "server/Server.hpp"
+#include "client/Definition.hpp"
+extern "C" {
+#include "include/Damaris.h"
+}
 
 #endif
