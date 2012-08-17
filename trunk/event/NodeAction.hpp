@@ -28,6 +28,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <map>
 
 #include "core/Debug.hpp"
+#include "core/Environment.hpp"
 
 namespace Damaris {
 

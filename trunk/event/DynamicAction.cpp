@@ -42,7 +42,7 @@ namespace Damaris {
 		if(handle != NULL)
 			dlclose(handle);
 	}
-	
+
 	void DynamicAction::call(int32_t iteration, int32_t sourceID, const char* args)
 	{
 		if(!loaded)

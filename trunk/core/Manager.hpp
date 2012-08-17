@@ -152,6 +152,24 @@ class Manager {
 		}
 
 		/**
+		 * Adds in the manager an object that has already been created externally.
+		 * The object is not added is another object already exists with the same name.
+		 */
+		template<typename SUBCLASS>
+		static bool Add(SUBCLASS *t)
+		{
+			if(t == NULL) return false;
+
+			if(objects == NULL) {
+				objects = new ObjectSet();
+			}
+
+			std::pair<typename ObjectSet::iterator,bool> ret
+				= objects->insert(boost::shared_ptr<T>(t));
+			return ret.second;
+		}
+
+		/**
 		 * Deletes an object from the structure.
 		 */
 		static void Delete(T* t)

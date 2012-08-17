@@ -116,6 +116,7 @@ class Action::EmptyAction : public Action {
 	public:
 		virtual ~EmptyAction() {}
 };
+
 }
 
 #endif
