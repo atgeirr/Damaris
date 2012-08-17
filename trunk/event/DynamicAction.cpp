@@ -70,7 +70,7 @@ namespace Damaris {
 		}
 
 		/* loading function */
-		function = (void (*)(std::string,int32_t, int32_t, const char*))
+		function = (void (*)(const std::string&,int32_t, int32_t, const char*))
 			dlsym(handle,model.action().c_str());
 
 		if ((error = dlerror()) != NULL)  {

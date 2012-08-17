@@ -39,7 +39,7 @@ namespace Damaris {
 class DynamicAction : public Action, public Configurable<Model::Event> {
 
 	private:
-		void (*function)(std::string,int32_t,int32_t,const char*); /*!< Pointer to the loaded function */
+		void (*function)(const std::string&,int32_t,int32_t,const char*); /*!< Pointer to the loaded function */
 		void* handle; /*!< Handle for the opened dynamic library. */
 		bool loaded;
 
