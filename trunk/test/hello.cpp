@@ -8,7 +8,7 @@
 // The following is an embedded plugin.
 // Note the "extern C", used so Damaris can find the symboles correctly.
 extern "C" {
-	void hello_world(const std::string eventName, int32_t step, int32_t source) {
+	void hello_world(const std::string& eventName, int32_t step, int32_t source, const char* args) {
 		std::cout << "Hello World! "
 				  << "(event sent by client " << source
 				  << " at iteration " << step << ")" << std::endl;

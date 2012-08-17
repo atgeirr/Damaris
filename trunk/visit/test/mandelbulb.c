@@ -6,9 +6,9 @@
 
 #define MAX_ITERATION 255
 #define ORDER    8
-#define WIDTH  100
-#define HEIGHT 100
-#define DEPTH  200
+#define WIDTH  50
+#define HEIGHT 50
+#define DEPTH  100
 #define RANGE  1.2
 
 typedef struct {
