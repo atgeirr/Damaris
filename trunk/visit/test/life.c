@@ -437,7 +437,7 @@ int main(int argc, char **argv)
 	MPI_Comm all = MPI_COMM_WORLD;	
 
 	/* Initialize Damaris */
-	if( ! DC_mpi_start(argv[1],all)) {
+	if( ! DC_mpi_init_and_start(argv[1],all)) {
 		MPI_Finalize();
 		return 0;
 	}

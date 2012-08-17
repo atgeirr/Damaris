@@ -37,26 +37,37 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "server/Initiator.hpp"
 #include "server/Server.hpp"
 
-extern Damaris::Server *server;
-extern Damaris::Client *client;
+extern Damaris::Server *__server;
+extern Damaris::Client *__client;
 
 extern "C" {
 
-void FC_FUNC_GLOBAL(df_server,DF_SERVER)
+void FC_FUNC_GLOBAL(df_server_init,DF_SERVER_INIT)
 	(char* configFile_f, int32_t* server_id_f, int32_t* ierr_f, int32_t configFile_size)
 	{
 		std::string config_str(configFile_f,configFile_size);
-		server = Damaris::Server::New(config_str,*server_id_f);
-		*ierr_f = server->run();
-		delete server;
+		__server = Damaris::Server::New(config_str,*server_id_f);
 	}
 
-void FC_FUNC_GLOBAL(df_mpi_start,DF_START_MPI_ENTITY)
+void FC_FUNC_GLOBAL(df_mpi_init_and_start,DF_MPI_INIT_AND_START)
 	(char* configFile_f, MPI_Fint* globalcomm, int* result, int configsize)
 	{
 		MPI_Comm oc = MPI_Comm_f2c(*globalcomm);
-		client = Damaris::Initiator::start(std::string(configFile_f,configsize),oc);
-		*result = (client != NULL) ? 1 : 0;
+		Damaris::Initiator::mpi_init_and_start(std::string(configFile_f,configsize),oc);
+		*result = (__client != NULL) ? 1 : 0;
+	}
+
+void FC_FUNC_GLOBAL(df_mpi_init,DF_MPI_INIT)
+	(char* configFile_f, MPI_Fint* globalcomm, int* result, int configsize)
+	{
+		MPI_Comm oc = MPI_Comm_f2c(*globalcomm);
+		*result = Damaris::Initiator::mpi_init(std::string(configFile_f,configsize),oc);
+	}
+
+void FC_FUNC_GLOBAL(df_server_start,DF_SERVER_START)
+	(int* result)
+	{
+		*result = Damaris::Initiator::start_server();
 	}
 }
 #endif

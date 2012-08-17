@@ -46,7 +46,7 @@ static void sighandler(int sig);
  * so this one is set as extern to refer to the one defined
  * in Server.cpp)
  */
-extern Damaris::Server *server;
+extern Damaris::Server *__server;
 /**
  * Main function for the standalone mode server.
  * \param[in] argc : argc
@@ -69,7 +69,7 @@ int main(int argc, char** argv)
 	INFO("Initializing server");
 	/* Initializing the server with a Configuration object 
 	   pre-initialized by the Options object */
-	server = Damaris::Server::New(opt.getConfigFile(),id);
+	__server = Damaris::Server::New(opt.getConfigFile(),id);
 
 	INFO("Setting communicators");
 	Damaris::Environment::setGlobalComm(MPI_COMM_WORLD);
@@ -77,13 +77,13 @@ int main(int argc, char** argv)
 
 	INFO("Starting server");
 	/* Starts the server */
-	server->run();
+	__server->run();
 	
 	/* If we go here, it means that a requests has been sent
 	   to the server for stoping it. This is the normal way
 	   of doing. */
 	INFO("Correctly terminating server\n");
-	delete server;
+	delete __server;
 	
 	MPI_Finalize();
 	return 0;
@@ -92,9 +92,9 @@ int main(int argc, char** argv)
 static void sighandler(int sig)
 {
 	INFO("Kill signal caught, server will terminate");
-	if(server != NULL) {
-		server->stop();
-		delete server;
+	if(__server != NULL) {
+		__server->stop();
+		delete __server;
 	}
 	exit(0);
 }

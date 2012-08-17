@@ -25,25 +25,36 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "server/Initiator.hpp"
 #include "server/Server.hpp"
 
-extern Damaris::Server* server; // defined in Server.cpp
-extern Damaris::Client* client; // defined in ClientC.cpp
+extern Damaris::Server* __server; // defined in Server.cpp
+extern Damaris::Client* __client; // defined in ClientC.cpp
 
 extern "C" {
 
 #include "server/Server.h"
 
-	int DC_server(const char* configFile, int server_id)
+	int DC_server_init(const char* configFile, int server_id)
 	{
 		std::string config_str(configFile);
-		server = Damaris::Server::New(config_str,server_id);
-		server->run();
-		delete server;
-		return 0;
+		if(__server == NULL) {
+			__server = Damaris::Server::New(config_str,server_id);
+			return 0;
+		}
+		return -1;
 	}
 
-	int DC_mpi_start(const char* configFile, MPI_Comm globalcomm)
+	int DC_mpi_init_and_start(const char* configFile, MPI_Comm globalcomm)
 	{
-		client = Damaris::Initiator::start(std::string(configFile),globalcomm);
-		return (client != NULL);
+		Damaris::Initiator::mpi_init_and_start(std::string(configFile),globalcomm);
+		return (__client != NULL);
+	}
+
+	int DC_mpi_init(const char* configFile, MPI_Comm globalcomm)
+	{
+		return Damaris::Initiator::mpi_init(std::string(configFile),globalcomm);
+	}
+
+	int DC_server_start()
+	{
+		return Damaris::Initiator::start_server();
 	}
 }

@@ -36,8 +36,10 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "core/VariableManager.hpp"
 #include "core/ActionManager.hpp"
 
+Damaris::Client* __client = NULL;
+
 namespace Damaris {
-	
+
 	Client* Client::New(const std::string &cfg, int32_t id)
 	{
 		Process::initialize(cfg,id);

@@ -34,7 +34,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "visit/VisItListener.hpp"
 #endif
 
-Damaris::Server *server;
+Damaris::Server *__server = NULL;
 
 namespace Damaris {
 

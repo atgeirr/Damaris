@@ -71,10 +71,10 @@ int main(int argc, char** argv)
 	// they return NULL.
 	// Clients will return valid Client pointers.
 	std::string config(argv[1]);
-	Damaris::Client* client = Damaris::Initiator::start(config,global);
+	Damaris::Client* client = Damaris::Initiator::mpi_init_and_start(config,global);
 
-	// If this process is a client
-	if(client != NULL) {
+	// If the server was not started in this process...
+	if(not (client == NULL)) {
 		// get the communicator that has been build by Damaris
 		// to communicate between clients
 		comm = client->mpi_get_client_comm();

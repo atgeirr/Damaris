@@ -57,7 +57,11 @@ class Initiator {
 		 * \param[in] configFile : name of the configuration file.
 		 * \param[in] globalcomm : the MPI communicator to split.
 		 */
-		static Client* start(const std::string& configFile, MPI_Comm globalcomm);
+		static Client* mpi_init_and_start(const std::string& configFile, MPI_Comm globalcomm);
+
+		static bool mpi_init(const std::string& configFile, MPI_Comm globalcomm);
+
+		static bool start_server();
 
 }; // class Initiator
 

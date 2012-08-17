@@ -26,11 +26,11 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <mpi.h>
 
 /**
- * Starts a server (blocks in the server's mainloop).
+ * Initializes a server (does NOT start it).
  * \param[in] configFile : name of the XML configuration file.
  * \param[in] server_id : an identifier for this server.
  */
-int DC_server(const char* configFile, int server_id);
+int DC_server_init(const char* configFile, int server_id);
 
 /**
  * Start clients and servers as MPI entities.
@@ -39,5 +39,10 @@ int DC_server(const char* configFile, int server_id);
  * \return a positive integer for clients, 0 for servers (blocks in the function
  * until the server is killed).
  */
-int DC_mpi_start(const char* configFile, MPI_Comm globalcomm);
+int DC_mpi_init_and_start(const char* configFile, MPI_Comm globalcomm);
+
+int DC_mpi_init(const char* configFile, MPI_Comm globalcomm);
+
+int DC_server_start();
+
 #endif

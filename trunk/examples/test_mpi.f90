@@ -6,7 +6,7 @@
 
       call MPI_INIT(ierr)
       comm = MPI_COMM_WORLD
-      call df_mpi_start("mpi.xml",comm,is_client)
+      call df_mpi_init_and_start("mpi.xml",comm,is_client)
       if(is_client.GT.0) then
          call client_code()
          call df_kill_server(ierr)

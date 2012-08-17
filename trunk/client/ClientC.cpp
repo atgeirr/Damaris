@@ -28,88 +28,88 @@ extern "C" {
 
 #include "client/Client.h"
 
-Damaris::Client *client;
+extern Damaris::Client *__client;
 
 int DC_initialize(const char* configfile, int32_t core_id)
 {
 	std::string config_str(configfile);
-	client = Damaris::Client::New(config_str,core_id);
+	__client = Damaris::Client::New(config_str,core_id);
 	return 0;
 }
 	
 int DC_write(const char* varname, int32_t iteration, const void* data)
 {
 	std::string varname_str(varname);
-	return client->write(varname_str,iteration,data);
+	return __client->write(varname_str,iteration,data);
 }
 
 int DC_chunk_write(DC_chunk_handle_t chunkh, const char* varname, 
 		int32_t iteration, const void* data)
 {
 	std::string varname_str(varname);
-	return client->chunk_write((Damaris::chunk_h)chunkh,varname_str,iteration,data);
+	return __client->chunk_write((Damaris::chunk_h)chunkh,varname_str,iteration,data);
 }
 
 DC_chunk_handle_t DC_chunk_set(unsigned int dimensions, int* si, int* ei)
 {
 	std::vector<int> sti(si,si+dimensions);
 	std::vector<int> eni(ei,ei+dimensions);
-	return (DC_chunk_handle_t)client->chunk_set(dimensions,sti,eni);
+	return (DC_chunk_handle_t)__client->chunk_set(dimensions,sti,eni);
 }
 
 void DC_chunk_free(DC_chunk_handle_t chunkh)
 {
-	client->chunk_free((Damaris::chunk_h)chunkh);
+	__client->chunk_free((Damaris::chunk_h)chunkh);
 }
 
 void* DC_alloc(const char* varname, int32_t iteration)
 {
 	std::string varname_str(varname);
-	return client->alloc(varname_str,iteration);
+	return __client->alloc(varname_str,iteration);
 }
 
 int DC_commit(const char* varname, int32_t iteration)
 {
 	std::string varname_str(varname);
-	return client->commit(varname_str,iteration);
+	return __client->commit(varname_str,iteration);
 }
 
 int DC_signal(const char* signal_name, int32_t iteration)
 {
 	std::string signal_name_str(signal_name);
-	return client->signal(signal_name_str,iteration);
+	return __client->signal(signal_name_str,iteration);
 }
 
 int DC_get_parameter(const char* param_name, void* buffer, unsigned int size)
 {
 	std::string paramName(param_name);
-	return client->get_parameter(paramName,buffer,size);
+	return __client->get_parameter(paramName,buffer,size);
 }
 
 int DC_set_parameter(const char* param_name, const void* buffer, unsigned int size)
 {
 	std::string paramName(param_name);
-	return client->set_parameter(paramName,buffer,size);
+	return __client->set_parameter(paramName,buffer,size);
 }
 
 MPI_Comm DC_mpi_get_client_comm()
 {
-	return client->mpi_get_client_comm();
+	return __client->mpi_get_client_comm();
 }
 
 int DC_kill_server()
 {
-	return client->kill_server();
+	return __client->kill_server();
 }
 
 int DC_end_iteration(int i)
 {
-	return client->end_iteration(i);
+	return __client->end_iteration(i);
 }
 
 int DC_finalize()
 {
-	delete client;
+	delete __client;
 	return 0;
 }
 

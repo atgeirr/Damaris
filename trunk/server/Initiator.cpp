@@ -29,9 +29,12 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "client/StdAloneClient.hpp"
 #include "server/Initiator.hpp"
 
+extern Damaris::Server* __server;
+extern Damaris::Client* __client;
+
 namespace Damaris {
 
-Client* Initiator::start(const std::string& configFile, MPI_Comm globalcomm)
+bool Initiator::mpi_init(const std::string& configFile, MPI_Comm globalcomm)
 {
 	/* Global rank and size in the passed communicator */
 	int size, rank;
@@ -94,18 +97,14 @@ Client* Initiator::start(const std::string& configFile, MPI_Comm globalcomm)
 			// won't be created before the servers are started.
 			MPI_Barrier(globalcomm);
 			p->openSharedStructures();
-			Client* c = new Client(p);
-			c->connect();
-			return c;
+			__client = new Client(p);
+			__client->connect();
 		} else {
 			DBG("Server starting, rank = " << rank);
 			p->createSharedStructures();
 			p->setID(rankInEnComm);
-			Server server(p);
+			__server = new Server(p);
 			MPI_Barrier(globalcomm);
-			server.run();
-			DBG("After Server.run");
-			return NULL;
 		}
 	} else {
 		// synchronous mode : the servers are attached to each client
@@ -114,19 +113,34 @@ Client* Initiator::start(const std::string& configFile, MPI_Comm globalcomm)
 			p->setID(rank);
 			MPI_Barrier(globalcomm);
 			p->openSharedStructures();
-			Client* c = new StdAloneClient(p);
-			c->connect();
-			return c;
+			__client = new StdAloneClient(p);
+			__client->connect();
 		} else {
 			p->setID(rank);
 			p->createSharedStructures();
-			Client* c = new StdAloneClient(p);
+			__client = new StdAloneClient(p);
 			MPI_Barrier(globalcomm);
-			c->connect();
-			return c;
+			__client->connect();
 		}
-		return NULL;
 	}
-}	
+	return true;
+}
+
+bool Initiator::start_server()
+{
+	if(__server != NULL)
+	{
+		__server->run();
+		return true;
+	}
+	return false;
+}
+
+Client* Initiator::mpi_init_and_start(const std::string& configFile, MPI_Comm globalcomm)
+{
+	mpi_init(configFile,globalcomm);
+	start_server();
+	return __client;
+}
 
 }

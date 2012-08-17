@@ -45,13 +45,13 @@ static std::string fortranStringToCpp(char* fstr, int size)
 extern "C" {
 
 /** The actual object is defined in ClientC.cpp */	
-extern Damaris::Client *client;
+extern Damaris::Client *__client;
 
 void FC_FUNC_GLOBAL(df_initialize,DF_INITIALIZE)
 	(char* config_file_name_f, int32_t* core_id_f, int32_t* ierr_f, int config_file_name_size)
 	{
 		std::string config_file_name = fortranStringToCpp(config_file_name_f, config_file_name_size);
-		client = Damaris::Client::New(config_file_name,*core_id_f);
+		__client = Damaris::Client::New(config_file_name,*core_id_f);
 		if(ierr_f != NULL) *ierr_f = 0;
 	}
 
@@ -59,7 +59,7 @@ void FC_FUNC_GLOBAL(df_write,DF_WRITE)
 	(char* var_name_f, int32_t* iteration_f, void* data_f, int32_t* ierr_f, int var_name_size)
 	{
 		std::string var_name = fortranStringToCpp(var_name_f, var_name_size);
-		int res = client->write(var_name,*iteration_f,data_f);
+		int res = __client->write(var_name,*iteration_f,data_f);
 		if(ierr_f != NULL) *ierr_f = res;
 	}
 
@@ -71,13 +71,13 @@ void FC_FUNC_GLOBAL_(df_chunk_set,DF_CHUNK_SET)
 		// arrays in Fortran must be reversed
 		std::reverse(sti.begin(),sti.end());
 		std::reverse(eni.begin(),eni.end());
-		*chunkh = (int64_t)(client->chunk_set(*dimensions,sti,eni));
+		*chunkh = (int64_t)(__client->chunk_set(*dimensions,sti,eni));
 	}
 
 void FC_FUNC_GLOBAL_(df_chunk_free,DF_CHUNK_FREE)
 	(int64_t* chunkh)
 	{
-		client->chunk_free((Damaris::chunk_h)(*chunkh));
+		__client->chunk_free((Damaris::chunk_h)(*chunkh));
 		chunkh = NULL;
 	}
 
@@ -86,7 +86,7 @@ void FC_FUNC_GLOBAL(df_chunk_write,DF_WRITE)
 	void* data_f, int32_t* ierr_f, int var_name_size)
 	{
 		std::string var_name = fortranStringToCpp(var_name_f,var_name_size);
-		int res = client->chunk_write((Damaris::chunk_h)(*chunkh),
+		int res = __client->chunk_write((Damaris::chunk_h)(*chunkh),
 				var_name,*iteration_f,data_f);
 		if(ierr_f != NULL) *ierr_f = res;
 	}
@@ -95,7 +95,7 @@ void* FC_FUNC_GLOBAL(df_alloc,DF_ALLOC)
         (char* var_name_f, int32_t* iteration_f, int32_t* ierr_f, int var_name_size)
 	{
 		std::string var_name = fortranStringToCpp(var_name_f,var_name_size);
-		void* result = client->alloc(var_name,*iteration_f);
+		void* result = __client->alloc(var_name,*iteration_f);
 		DBG("function alloc called with argument " << var_name << ", " << *iteration_f);
 		if(result == NULL) {
 			if(ierr_f != NULL) *ierr_f = -1;
@@ -111,7 +111,7 @@ void FC_FUNC_GLOBAL(df_commit,DF_COMMIT)
 	{
 		std::string var_name = fortranStringToCpp(var_name_f,var_name_size);
 		DBG("commiting " << var_name);
-		int res = client->commit(var_name,*iteration_f);
+		int res = __client->commit(var_name,*iteration_f);
 		if(ierr_f != NULL) *ierr_f = res;
 	}
 
@@ -119,7 +119,7 @@ void FC_FUNC_GLOBAL(df_signal,DF_SIGNAL)
 	(char* event_name_f, int32_t* iteration_f, int* ierr_f, int event_name_size)
 	{
 		std::string event_name = fortranStringToCpp(event_name_f,event_name_size);
-		int res = client->signal(event_name,*iteration_f);
+		int res = __client->signal(event_name,*iteration_f);
 		if(ierr_f != NULL) *ierr_f = res;
 	}
 
@@ -127,7 +127,7 @@ void FC_FUNC_GLOBAL(df_get_parameter,DF_GET_PARAMETER)
 	(char* param_name_f, void* buffer_f, int* size, int* ierr_f, int param_name_size)
 	{
 		std::string paramName = fortranStringToCpp(param_name_f,param_name_size);
-		int res = client->get_parameter(paramName,buffer_f,*size);
+		int res = __client->get_parameter(paramName,buffer_f,*size);
 		if(ierr_f != NULL) *ierr_f = res;
 	}
 
@@ -135,27 +135,27 @@ void FC_FUNC_GLOBAL(df_set_parameter,DF_SET_PARAMETER)
         (char* param_name_f, void* buffer_f, int* size, int* ierr_f, int param_name_size)
 	{
 		std::string paramName = fortranStringToCpp(param_name_f,param_name_size);
-		int res = client->set_parameter(paramName,buffer_f,*size);
+		int res = __client->set_parameter(paramName,buffer_f,*size);
 		if(ierr_f != NULL) *ierr_f = res;
 	}
 
 void FC_FUNC_GLOBAL(df_mpi_get_client_comm,DF_GET_MPI_CLIENT_COMM)
         (MPI_Fint* fcomm)
 	{
-		*fcomm = MPI_Comm_c2f(client->mpi_get_client_comm());
+		*fcomm = MPI_Comm_c2f(__client->mpi_get_client_comm());
 	}
 
 void FC_FUNC_GLOBAL(df_kill_server,DF_KILL_SERVER)
 	(int* ierr_f)
 	{
-		int res = client->kill_server();
+		int res = __client->kill_server();
 		if(ierr_f != NULL) *ierr_f = res;
 	}
 
 void FC_FUNC_GLOBAL(df_end_iteration,DF_END_ITERATION)
 	(int* it, int* ierr_f)
 	{
-		int res = client->end_iteration(*it);
+		int res = __client->end_iteration(*it);
 		if(ierr_f != NULL) *ierr_f = res;
 	}
 
@@ -163,8 +163,8 @@ void FC_FUNC_GLOBAL(df_finalize,DF_FINALIZE)
 	(int* ierr_f)
 	{
 		int res;
-		if(client != NULL) {
-			delete client;
+		if(__client != NULL) {
+			delete __client;
 			res = 0;
 		} else {
 			res = -1;
