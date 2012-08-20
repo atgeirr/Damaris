@@ -100,7 +100,7 @@ int 	DC_signal(const char* signal_name, int32_t iteration);
  * \param[in] size : maximum size of the buffer.
  * \return 0 in case of success, -1 if the parameter does not exist.
  */
-int 	DC_get_parameter(const char* param_name, void* buffer, unsigned int size);
+int 	DC_parameter_get(const char* param_name, void* buffer, unsigned int size);
 
 /**
  * \brief Change the value of a parameter.
@@ -110,7 +110,7 @@ int 	DC_get_parameter(const char* param_name, void* buffer, unsigned int size);
  * \param[in] size : maximum size of the buffer.
  * \return 0 in case of success, -1 if the parameter was not found.
  */
-int 	DC_set_parameter(const char* param_name, const void* buffer, unsigned int size);
+int 	DC_parameter_set(const char* param_name, const void* buffer, unsigned int size);
 
 /**
  * \brief Get the communicator gathering all clients.

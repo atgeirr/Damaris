@@ -13,9 +13,9 @@ int client_code(int id)
 
 	printf("Starting code...\n");
 
-	res = DC_get_parameter("x",&x,sizeof(int));
+	res = DC_parameter_get("x",&x,sizeof(int));
 	printf("res = %d\n",res);
-	res = DC_get_parameter("y",&y,sizeof(float));
+	res = DC_parameter_get("y",&y,sizeof(float));
 	printf("res = %d\n",res);
 
 	printf("x = %d, y = %f\n",x,y);
@@ -23,17 +23,17 @@ int client_code(int id)
 	x = 42;
 	y = 13.37;
 
-	res = DC_set_parameter("x",&x,sizeof(int));
+	res = DC_parameter_set("x",&x,sizeof(int));
 	printf("res = %d\n",res);
-	res = DC_set_parameter("y",&y,sizeof(float));
+	res = DC_parameter_set("y",&y,sizeof(float));
 	printf("res = %d\n",res);
 
 	int x2;
 	float y2;
 
-	res = DC_get_parameter("x",&x2,sizeof(int));
+	res = DC_parameter_get("x",&x2,sizeof(int));
 	printf("res = %d\n",res);
-	res = DC_get_parameter("y",&y2,sizeof(float));
+	res = DC_parameter_get("y",&y2,sizeof(float));
 	printf("res = %d\n",res);
 
 	printf("x = %d, y = %f\n",x2,y2);

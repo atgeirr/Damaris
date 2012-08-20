@@ -123,7 +123,7 @@ void FC_FUNC_GLOBAL(df_signal,DF_SIGNAL)
 		if(ierr_f != NULL) *ierr_f = res;
 	}
 
-void FC_FUNC_GLOBAL(df_get_parameter,DF_GET_PARAMETER)
+void FC_FUNC_GLOBAL(df_parameter_get,DF_PARAMETER_GET)
 	(char* param_name_f, void* buffer_f, int* size, int* ierr_f, int param_name_size)
 	{
 		std::string paramName = fortranStringToCpp(param_name_f,param_name_size);
@@ -131,7 +131,7 @@ void FC_FUNC_GLOBAL(df_get_parameter,DF_GET_PARAMETER)
 		if(ierr_f != NULL) *ierr_f = res;
 	}
 
-void FC_FUNC_GLOBAL(df_set_parameter,DF_SET_PARAMETER)
+void FC_FUNC_GLOBAL(df_parameter_set,DF_PARAMETER_SET)
         (char* param_name_f, void* buffer_f, int* size, int* ierr_f, int param_name_size)
 	{
 		std::string paramName = fortranStringToCpp(param_name_f,param_name_size);

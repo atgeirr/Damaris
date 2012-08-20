@@ -80,13 +80,13 @@ int DC_signal(const char* signal_name, int32_t iteration)
 	return __client->signal(signal_name_str,iteration);
 }
 
-int DC_get_parameter(const char* param_name, void* buffer, unsigned int size)
+int DC_parameter_get(const char* param_name, void* buffer, unsigned int size)
 {
 	std::string paramName(param_name);
 	return __client->get_parameter(paramName,buffer,size);
 }
 
-int DC_set_parameter(const char* param_name, const void* buffer, unsigned int size)
+int DC_parameter_set(const char* param_name, const void* buffer, unsigned int size)
 {
 	std::string paramName(param_name);
 	return __client->set_parameter(paramName,buffer,size);
