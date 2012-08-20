@@ -55,7 +55,7 @@ class Variable : public Configurable<Model::Variable> {
 		ChunkSet chunks; 	/*!< Chunks hold by the variable. */
 
 		std::string name; 	/*!< Name of the variable. */
-		int id;				/*!< id of the variable, given by the VariableManager. */
+		int id;			/*!< id of the variable, given by the VariableManager. */
 	
 		/**
 		 * \brief Constructor. 

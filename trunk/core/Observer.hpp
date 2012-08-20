@@ -28,17 +28,29 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 namespace Damaris {
 
 class Observable;
+
 /**
+ * Observer represents an object that needs to be notified of
+ * any changes of some Observable objects.
  */
 class Observer {
 	friend class Observable;
 
-		std::set<Observable*> observed;
+		std::set<Observable*> observed; /*!< Set of Observable that need to notify this object of their changes. */
 
 	protected:
+
+		/**
+		 * This function needs to be overwritten by the child classes such that
+		 * they can take proper dedictions when an observed Observable changes.
+		 */
 		virtual void Notify() = 0;
 
 	public:
+		/**
+		 * This destructor disconnects properly from all the observed objects
+		 * such that they do not notify an inexiting object.
+		 */
 		virtual ~Observer(); 
 };
 

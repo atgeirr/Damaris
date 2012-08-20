@@ -25,8 +25,15 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Damaris {
 
+/**
+ * The ProcInfo namespace contains functions that help retrieving
+ * information about the processor, such as a unique ID.
+ */
 namespace ProcInfo {
 
+	/**
+	 * Returns a unique node identifier based on a hash of its name.
+	 */
 	int GetNodeID();
 
 }

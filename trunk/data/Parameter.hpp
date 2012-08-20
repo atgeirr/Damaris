@@ -46,8 +46,8 @@ namespace Damaris {
 			std::string name; /*!< Name of the parameter. */
 			int id; /*!< id of the parameter, provided by the ParameterManager when created. */
 
-//			boost::any value; /*!< Value of the parameter. */
-			void* value;		
+			void* value; /*!< Pointer to the memory where the actual value is stored. */
+
 			/**
 			 * Constructor. This constructor is private, use New to create an instance.
 			 */
@@ -111,26 +111,11 @@ Parameter::Parameter(const Model::Parameter& mdl, const std::string& n, const T&
 	value = NULL;
 	name = n;
 	setValue<T>(v);
-	//value = boost::any(v);
 }
 
 template<typename T>
 T Parameter::getValue() const 
 {
-	/*
-	try {
-		return boost::any_cast<T>(value);
-	} catch(boost::bad_any_cast &e) {
-	*/
-/*	try {
-		T* t = (T*)value;
-		return *t;
-	} catch(std::bad_cast &e) {
-		ERROR("Bad type cast in Parameter::getValue(),"
-			<< " returning the default value for the type");
-		return T();
-	}
-*/
 	T t;
 	toBuffer((void*)(&t), sizeof(T));
 	return t;

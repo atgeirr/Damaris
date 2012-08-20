@@ -29,6 +29,11 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 namespace Damaris {
 
 /**
+ * BoundAction is a special type of Action that is
+ * created by the user through a call to DC_bind_function.
+ * Contrary to DynamicAction, it does not seek functions in
+ * a shared library or in the main program, but already has
+ * a pointer to it.
  */
 class BoundAction : public Action {
 
@@ -39,6 +44,9 @@ class BoundAction : public Action {
 		fun_t function; /*!< Pointer to the loaded function */
 
 	protected:
+		/**
+		 * Constructor. Takes a function pointer and associates it with a name.
+		 */
 		BoundAction(fun_t f, const std::string& name);
 
 	public:		

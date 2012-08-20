@@ -27,8 +27,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdlib.h>
 #include <mpi.h>
 
-//extern "C" {
-
 typedef int64_t DC_chunk_handle_t;
 
 /**
@@ -128,6 +126,10 @@ MPI_Comm DC_mpi_get_client_comm();
  */
 int	DC_kill_server();
 
+/**
+ * Notifies the server that the iteration has ended.
+ * This will update potential external backends such as VisIt.
+ */
 int DC_end_iteration(int iteration);
 
 /**
@@ -137,5 +139,4 @@ int DC_end_iteration(int iteration);
  */
 int 	DC_finalize();
 
-//}
 #endif

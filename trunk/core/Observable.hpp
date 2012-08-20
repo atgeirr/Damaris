@@ -30,18 +30,31 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 namespace Damaris {
 
 /**
+ * This class is used by child subclasses that need to notify
+ * other objects that their internal stat has changed.
  */
 class Observable {
 
 	private:
-		std::set<Observer*> observers;
+		std::set<Observer*> observers; /*!< List of pointers to objects to notify. */
 
 	protected:
+
+		/**
+		 * This function has to be called from any member function that modifies the
+		 * Observable.
+		 */
 		void Changed() const;
 
 	public:
+		/**
+		 * Adds an object to be notified of any changes in this Observable instance.
+		 */
 		void AddObserver(Observer* obs);
 
+		/**
+		 * Removes an object from the list of objects that observe this Observable.
+		 */
 		void RemoveObserver(Observer* obs);
 };
 

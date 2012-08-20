@@ -47,7 +47,13 @@ class SharedMemorySegment {
 	protected:
 		class CompositeShMem;
 	
-	protected:	
+	protected:
+
+		/**
+		 * The size_manager_s structure is a header located at the beginning of a
+		 * shared memory segment or a block, it holds information related to available
+		 * size, as well as locks and interprocess conditions to handle concurrency.
+		 */
 		struct size_manager_s {
 			interprocess_condition cond_size; /*!< Condition to block processes attempting 
 												to allocate more than available size. */
@@ -57,15 +63,15 @@ class SharedMemorySegment {
 			size_manager_s(size_t initSize): cond_size(), lock(), size(initSize), max(initSize) {};
 		} *size_manager;
 	
-		mapped_region* region;
-		managed_external_buffer* buffer;	
+		mapped_region* region; /*!< pointer to the mapped_region object. */
+		managed_external_buffer* buffer; /*!< pointer to the managed buffer. */
 
 		/**
 		 * Constructor.
 		 */
 		SharedMemorySegment(mapped_region* r, managed_external_buffer* b);
-	public:
 
+	public:
 		/**
 		 * Returns a SharedMemorySegment implementation corresponding
 		 * to the described model.
@@ -73,14 +79,25 @@ class SharedMemorySegment {
 		 */
 		static SharedMemorySegment* Create(Model::Buffer* model);
 
-
+		/**
+		 * Creates a POSIX-based shared memory segment with a given
+		 * name and size.
+		 */
 		static SharedMemorySegment* Create(posix_shmem_t posix_shmem,
 			const std::string& name, size_t size);
 
+		/**
+		 * Creates a SYSV-based shared memory segment with a given name
+		 * and size.
+		 */
 		static SharedMemorySegment* Create(sysv_shmem_t sysv_shmem,
 			const std::string& name, size_t size);
 
 	private:
+		/**
+		 * Creates multiple blocks of shared memory based on a given modeli.
+		 * This function is private and only used to create a Composite shared memory.
+		 */
 		static SharedMemorySegment* CreateMultiBlock(Model::Buffer* model);
 
 	public:
@@ -91,13 +108,28 @@ class SharedMemorySegment {
 		 */	
 		static SharedMemorySegment* Open(Model::Buffer* model);
 
+		/**
+		 * Opens a POSIX-based shared memory segment.
+		 * When size = 0, the system will try to query the actual
+		 * shared memory size using fstat. If this function is not
+		 * available on your platform, make sure to provide a size.
+		 */
 		static SharedMemorySegment* Open(posix_shmem_t posix_shmem,
 			const std::string &name, size_t size = 0);
 
+		/**
+		 * Opens a SYSV-based shared memory segment.
+		 * When size = 0, the system will try to query the actual
+		 * shared memory size using fstat. If this function is not
+		 * available on your platform, make sure to provide a size.
+		 */
 		static SharedMemorySegment* Open(sysv_shmem_t sysv_shmem,
 			const std::string& name, size_t size = 0);
 
 	private:
+		/**
+		 * Opens multiple blocks of shared memory.
+		 */
 		static SharedMemorySegment* OpenMultiBlock(Model::Buffer* model);
 
 	public:
@@ -106,13 +138,22 @@ class SharedMemorySegment {
 		 */
 		static bool Remove(Model::Buffer* model);
 
+		/**
+		 * Removes a POSIX-based SharedMemorySegment.
+		 */
 		static bool Remove(posix_shmem_t posix_shmem,
 			const std::string& name);
 		
+		/**
+		 * Removes a SYSV-based SharedMemorySegment.
+		 */
 		static bool Remove(sysv_shmem_t sysv_shmem,
 			const std::string& name);
 
 	private:
+		/**
+		 * Removes multiple blocks of shared memory.
+		 */
 		static bool RemoveMultiBlock(const Model::Buffer* model);
 
 	public:
@@ -179,18 +220,50 @@ using namespace boost::interprocess;
  */
 class SharedMemorySegment::CompositeShMem : public SharedMemorySegment {
 	private:
-		std::vector<SharedMemorySegment*> *blocks;
-		int nbseg;
+		std::vector<SharedMemorySegment*> *blocks; /*!< pointers to blocks of shared memory. */
+		int nbseg; /*!< number of blocks. */
 
 	public:
+		/**
+		 * Constructor. Takes the number of blocks and a pointer to a dynamically allocated
+		 * vector of pointers to already initialized shared memory segments.
+		 */
 		CompositeShMem(int count, std::vector<SharedMemorySegment*>* segments);
 
+		/**
+		 * \see SharedMemorySegment::getAddressFromHandle
+		 */
 		virtual SharedMemorySegment::ptr getAddressFromHandle(handle_t h) const;
+
+		/**
+		 * \see SharedMemorySegment::getHandleFromAddress
+		 */
 		virtual handle_t getHandleFromAddress(SharedMemorySegment::ptr p) const;
+
+		/**
+		 * \see SharedMemorySegment::allocate
+		 */
 		virtual ptr allocate(size_t size);
+
+		/**
+		 * \see SharedMemorySegment::deallocate
+		 */
 		virtual void deallocate(void* addr);
+
+		/**
+		 * \see SharedMemorySegment::getFreeMemory();
+		 */
 		virtual size_t getFreeMemory() const;
+
+		/**
+		 * \see SharedMemorySegment::pointerBelongsToSegment
+		 */
 		virtual bool pointerBelongsToSegment(void* p) const;
+
+		/**
+		 * Destructor. Free the vector of blocks after deleting
+		 * each block individually.
+		 */
 		virtual ~CompositeShMem(); 
 };
 

@@ -33,11 +33,6 @@ namespace Damaris {
 
 /**
  * Layouts are objects that describe the representation of data. 
- * For example "a 3D array of integers which extents are 4,2 and 16".
- * Layouts are represented C-like, each index along each dimension
- * starting from 0 and going to n-1, where n is the extent of the
- * array along that dimension.
- *
  * Layouts are not used to hold data. See Chunk for that purpose.
  */	
 class Layout {

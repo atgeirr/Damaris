@@ -42,6 +42,9 @@ namespace Damaris {
 	/**
 	 * A handle_t is an object that can be converted into pointers
 	 * even in different process memory spaces.
+	 * To deal with the fact that a handle can be interpreted in
+	 * different blocks of shared memory, we add an object's id to
+	 * the handle to identify the block to which it belongs.
 	 */
 	struct handle_t {
 		boost::interprocess::managed_external_buffer::handle_t value;

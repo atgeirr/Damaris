@@ -16,9 +16,9 @@
  ********************************************************************/
 /**
  * \file SharedMemorySegment.cpp
- * \date February 2012
+ * \date August 2012
  * \author Matthieu Dorier
- * \version 0.4
+ * \version 0.6
  */
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/interprocess/shared_memory_object.hpp>
@@ -58,16 +58,16 @@ namespace Damaris {
 		switch(type) {
 
 			case Model::ShmType::posix :
-				return Create(posix_shmem_t(),name,size);
+				return Create(posix_shmem,name,size);
 			case Model::ShmType::sysv :
-				return Create(sysv_shmem_t(),name,size);
+				return Create(sysv_shmem,name,size);
 		}
 
 		ERROR("Unknown shared memory type \"" << type << "\"");
 		return NULL;
 	}
 
-	SharedMemorySegment* SharedMemorySegment::Create(posix_shmem_t posix_shmem,
+	SharedMemorySegment* SharedMemorySegment::Create(posix_shmem_t /*unused*/,
 			const std::string &name, size_t size)
 	{
 		try {
@@ -92,7 +92,7 @@ namespace Damaris {
 		return NULL;
 	}
 
-	SharedMemorySegment* SharedMemorySegment::Create(sysv_shmem_t sysv_shmem,
+	SharedMemorySegment* SharedMemorySegment::Create(sysv_shmem_t /*unused*/,
 			const std::string &name, size_t size)
 	{
 		try {
@@ -128,16 +128,16 @@ namespace Damaris {
 		switch(type) {
 
 			case Model::ShmType::posix :
-				return Open(posix_shmem_t(),name,size);
+				return Open(posix_shmem,name,size);
 			case Model::ShmType::sysv :
-				return Open(sysv_shmem_t(),name,size);
+				return Open(sysv_shmem,name,size);
 		}
 
 		ERROR("Unknown shared memory type \"" << type << "\"");
 		return NULL;
 	}
 
-	SharedMemorySegment* SharedMemorySegment::Open(posix_shmem_t posix_shmem,
+	SharedMemorySegment* SharedMemorySegment::Open(posix_shmem_t /*unused*/,
 			const std::string &name, size_t size)
 	{
 		try {
@@ -160,7 +160,7 @@ namespace Damaris {
 		return NULL;
 	}
 
-	SharedMemorySegment* SharedMemorySegment::Open(sysv_shmem_t sysv_shmem,
+	SharedMemorySegment* SharedMemorySegment::Open(sysv_shmem_t /*unused*/,
 			const std::string &name, size_t size)
 	{
 		try {
@@ -193,15 +193,15 @@ namespace Damaris {
 
 		switch(type) {
 			case Model::ShmType::posix :
-				return Remove(posix_shmem_t(),name);
+				return Remove(posix_shmem,name);
 			case Model::ShmType::sysv :
-				return Remove(sysv_shmem_t(),name);
+				return Remove(sysv_shmem,name);
 		}
 
 		return false;
 	}
 
-	bool SharedMemorySegment::Remove(posix_shmem_t posix_shmem, const std::string &name)
+	bool SharedMemorySegment::Remove(posix_shmem_t /*unused*/, const std::string &name)
 	{
 		try {
 			return shared_memory_object::remove(name.c_str());
@@ -210,7 +210,7 @@ namespace Damaris {
 		return false;
 	}
 
-	bool SharedMemorySegment::Remove(sysv_shmem_t sysv_shmem, const std::string &name)
+	bool SharedMemorySegment::Remove(sysv_shmem_t /*unused*/, const std::string &name)
 	{
 		try {
 			int id = shmget(xsi_key(name.c_str(),0).get_key(),0,0600);
@@ -321,7 +321,7 @@ namespace Damaris {
 			ss << name << "_" << i;
 			switch(type) {
 				case Model::ShmType::posix :
-					(*v)[i] = SharedMemorySegment::Create(posix_shmem_t(),ss.str(),size);
+					(*v)[i] = SharedMemorySegment::Create(posix_shmem,ss.str(),size);
 					if((*v)[i] == NULL) {
 						ERROR("While opening composite segment " << i);
 						WARN("Other shared memory structures may be left open");
@@ -329,7 +329,7 @@ namespace Damaris {
 					}
 					break;
 				case Model::ShmType::sysv :
-					(*v)[i] = SharedMemorySegment::Create(sysv_shmem_t(),ss.str(),size);
+					(*v)[i] = SharedMemorySegment::Create(sysv_shmem,ss.str(),size);
 					if((*v)[i] == NULL) {
 						ERROR("While opening composite segment " << i);
 						WARN("Other shared memory structures may be left open");
@@ -359,7 +359,7 @@ namespace Damaris {
 			ss << name << "_" << i;
 			switch(type) {
 				case Model::ShmType::posix :
-					(*v)[i] = SharedMemorySegment::Open(posix_shmem_t(),ss.str(),size);
+					(*v)[i] = SharedMemorySegment::Open(posix_shmem,ss.str(),size);
 					if((*v)[i] == NULL) {
 						ERROR("While opening composite segment " << i);
 						WARN("Other shared memory structures may be left open");
@@ -367,7 +367,7 @@ namespace Damaris {
 					}
 					break;
 				case Model::ShmType::sysv :
-					(*v)[i] = SharedMemorySegment::Open(sysv_shmem_t(),ss.str(),size);
+					(*v)[i] = SharedMemorySegment::Open(sysv_shmem,ss.str(),size);
 					if((*v)[i] == NULL) {
 						ERROR("While opening composite segment " << i);
 						WARN("Other shared memory structures may be left open");

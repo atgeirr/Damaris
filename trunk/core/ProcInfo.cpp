@@ -38,6 +38,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 namespace Damaris {
+
 namespace ProcInfo {
 
 static int computeHashValue(char* str, size_t len)
