@@ -12,7 +12,7 @@ void sim_main_loop(MPI_Comm c)
 int main(int argc, char** argv)
 {
 	MPI_Init(&argc,&argv);
-	if(DC_mpi_start("config.xml",MPI_COMM_WORLD)) {
+	if(DC_mpi_init_and_start("config.xml",MPI_COMM_WORLD)) {
 		MPI_Comm comm = DC_mpi_get_client_comm();
 		sim_main_loop(comm);
 		DC_kill_server();

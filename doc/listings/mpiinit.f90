@@ -5,7 +5,7 @@ program sim
       integer :: is_client
       call MPI_INIT(ierr)
       comm = MPI_COMM_WORLD
-      call df_mpi_start("config.xml",comm,is_client)
+      call df_mpi_init_and_start("config.xml",comm,is_client)
       if(is_client.GT.0) then
          call df_mpi_get_client_comm(comm)
          call sim_main_loop(comm)
