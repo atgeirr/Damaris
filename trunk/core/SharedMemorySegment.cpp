@@ -28,7 +28,7 @@
 
 namespace Damaris {
 
-	SharedMemorySegment::SharedMemorySegment(mapped_region* r, managed_external_buffer* b)
+	SharedMemorySegment::SharedMemorySegment(mapped_region* r, managed_protected_external_buffer* b)
 	{
 		// The header of the region is initialized in the Create function
 		// that called this constructor. No need to initialize it.
@@ -80,8 +80,8 @@ namespace Damaris {
 
 			new (addr) size_manager_s(size);
 
-			managed_external_buffer *buffer = 
-				new managed_external_buffer(create_only, ((char*)addr)+sizeof(struct size_manager_s), size);
+			managed_protected_external_buffer *buffer = 
+				new managed_protected_external_buffer(create_only, ((char*)addr)+sizeof(struct size_manager_s), size);
 
 			return new SharedMemorySegment(region,buffer);
 
@@ -103,8 +103,8 @@ namespace Damaris {
 			void* addr = region->get_address();
 			new (addr) size_manager_s(size);
 
-			managed_external_buffer *buffer = 
-				new managed_external_buffer(create_only, ((char*)addr)+sizeof(struct size_manager_s), size);
+			managed_protected_external_buffer *buffer = 
+				new managed_protected_external_buffer(create_only, ((char*)addr)+sizeof(struct size_manager_s), size);
 
 			return new SharedMemorySegment(region,buffer);
 
@@ -148,8 +148,8 @@ namespace Damaris {
 			mapped_region *region = new mapped_region(base,read_write,0,s);
 			void* addr = region->get_address();
 
-			managed_external_buffer *buffer =
-				new managed_external_buffer(open_only, ((char*)addr)+sizeof(struct size_manager_s), size);
+			managed_protected_external_buffer *buffer =
+				new managed_protected_external_buffer(open_only, ((char*)addr)+sizeof(struct size_manager_s), size);
 
 			return new SharedMemorySegment(region,buffer);
 
@@ -170,8 +170,8 @@ namespace Damaris {
 			mapped_region *region = new mapped_region(base,read_write,0,s);
 
 			void* addr = region->get_address();
-			managed_external_buffer *buffer =
-				new managed_external_buffer(open_only, ((char*)addr)+sizeof(struct size_manager_s), size);
+			managed_protected_external_buffer *buffer =
+				new managed_protected_external_buffer(open_only, ((char*)addr)+sizeof(struct size_manager_s), size);
 
 			return new SharedMemorySegment(region,buffer);
 

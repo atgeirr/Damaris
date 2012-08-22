@@ -35,6 +35,14 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "core/SharedMemory.hpp"
 
 namespace Damaris {
+
+typedef boost::interprocess::basic_managed_external_buffer<
+		char,
+		boost::interprocess::rbtree_best_fit<boost::interprocess::mutex_family>,
+		boost::interprocess::iset_index
+	>
+	managed_protected_external_buffer;
+
 /*
  * Contains the definition of a shared memory segment in which
  * we can store chunks of variables. This definition is abstract.
@@ -64,12 +72,12 @@ class SharedMemorySegment {
 		} *size_manager;
 	
 		mapped_region* region; /*!< pointer to the mapped_region object. */
-		managed_external_buffer* buffer; /*!< pointer to the managed buffer. */
+		managed_protected_external_buffer* buffer; /*!< pointer to the managed buffer. */
 
 		/**
 		 * Constructor.
 		 */
-		SharedMemorySegment(mapped_region* r, managed_external_buffer* b);
+		SharedMemorySegment(mapped_region* r, managed_protected_external_buffer* b);
 
 	public:
 		/**
