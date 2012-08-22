@@ -42,7 +42,6 @@ typedef boost::interprocess::basic_managed_external_buffer<
 		boost::interprocess::iset_index
 	>
 	managed_protected_external_buffer;
-
 /*
  * Contains the definition of a shared memory segment in which
  * we can store chunks of variables. This definition is abstract.
