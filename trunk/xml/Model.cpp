@@ -638,16 +638,10 @@ namespace Damaris
       this->blocks_.set (x);
     }
 
-    void Layout::
-    blocks (::std::auto_ptr< blocks_type > x)
-    {
-      this->blocks_.set (x);
-    }
-
-    const Layout::blocks_type& Layout::
+    Layout::blocks_type Layout::
     blocks_default_value ()
     {
-      return blocks_default_value_;
+      return blocks_type (1);
     }
 
     const Layout::language_type& Layout::
@@ -3021,9 +3015,6 @@ namespace Damaris
     // Layout
     //
 
-    const Layout::blocks_type Layout::blocks_default_value_ (
-      "1");
-
     const Layout::language_type Layout::language_default_value_ (
       "unknown");
 
@@ -3158,10 +3149,7 @@ namespace Damaris
 
         if (n.name () == "blocks" && n.namespace_ ().empty ())
         {
-          ::std::auto_ptr< blocks_type > r (
-            blocks_traits::create (i, f, this));
-
-          this->blocks_.set (r);
+          this->blocks_.set (blocks_traits::create (i, f, this));
           continue;
         }
 

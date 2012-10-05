@@ -215,7 +215,13 @@
                     write data using the Chunk API).
                 </xs:documentation></xs:annotation>
             </xs:attribute>
-		<xs:attribute name="blocks" type="xs:string" use="optional" default="1"/>
+		<xs:attribute name="blocks" type="xs:unsignedInt" use="optional" default="1">
+			<xs:annotation><xs:documentation>
+				The blocks field acts as an extra dimension from the
+				point of view of the simulation. It can be used for visualization
+				tools to partition meshes.
+			</xs:documentation></xs:annotation>
+		</xs:attribute>
 			<xs:attribute name="language"   type="mdl:Language" use="optional" default="unknown">
                 <xs:annotation><xs:documentation>
                     Language (Fortran layouts have a reverse-order array of extents).

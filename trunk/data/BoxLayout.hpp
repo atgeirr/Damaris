@@ -48,7 +48,6 @@ class BoxLayout : public Layout, public Configurable<Model::Layout>, private Obs
 		
 	private:
 		std::vector<int> extents;	/*!< Extents along each dimension. */
-		unsigned int blocks;		/*!< Number of blocks. */
 
 		static Calc<std::string::const_iterator,ParameterManager::ParameterMap<int> > *calc;
 
@@ -62,7 +61,7 @@ class BoxLayout : public Layout, public Configurable<Model::Layout>, private Obs
 		 * \param[in] blocks : number of blocks.
 		 */
 		BoxLayout(const Model::Layout& mdl, const std::string& name, 
-			  const std::vector<int>& e, const unsigned int blocks = 1);
+			  const std::vector<int>& e);
 		
 		/**
 		 * Interpret the dimensions from the model's description.

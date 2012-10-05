@@ -33,9 +33,8 @@ namespace Damaris {
 	Calc<std::string::const_iterator,ParameterManager::ParameterMap<int> > 
 			*BoxLayout::calc;
 	
-	BoxLayout::BoxLayout(const Model::Layout& mdl, const std::string &n, const std::vector<int> &e,
-				const unsigned int b)
-	: Layout(n), Configurable<Model::Layout>(mdl), extents(e), blocks(b)
+	BoxLayout::BoxLayout(const Model::Layout& mdl, const std::string &n, const std::vector<int> &e)
+	: Layout(n), Configurable<Model::Layout>(mdl), extents(e)
 	{
 		ObserveDependentParameters();
 		InterpretDimensions();
@@ -53,7 +52,7 @@ namespace Damaris {
 
 	unsigned int BoxLayout::getBlocks() const
 	{
-		return blocks;
+		return model.blocks();
 	}
 
 	size_t BoxLayout::getExtentAlongDimension(unsigned int dim) const
@@ -108,6 +107,7 @@ namespace Damaris {
 			}
 		}
 		// do the same for the "blocks" field
+/*
 		buffer = std::vector<char>(model.blocks().size()+1);
 		buffer[0] = '\0';
 		j = 0;
@@ -134,6 +134,7 @@ namespace Damaris {
 				}
 			}
 		}
+*/
 	}
 
 	void BoxLayout::InterpretDimensions()
@@ -162,7 +163,7 @@ namespace Damaris {
 		} else {
 			extents = e;
 		}
-
+/*
 		e.resize(0);
 		str = (std::string)(model.blocks());
 		iter = str.begin();
@@ -180,7 +181,8 @@ namespace Damaris {
 		} else {
 			blocks = e[0];
 		}
-		DBG("Re-interpreting dimensions and/or blocks for layout " << name);
+*/
+		DBG("Re-interpreting dimensions and for layout " << name);
 	}
 
 	void BoxLayout::Notify()

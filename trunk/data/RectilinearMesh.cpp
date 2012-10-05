@@ -21,6 +21,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \version 0.5
  */
 #include "core/Environment.hpp"
+#include "core/VariableManager.hpp"
 #include "data/Variable.hpp"
 #include "data/RectilinearMesh.hpp"
 
@@ -47,7 +48,53 @@ bool RectilinearMesh::exposeVisItMetaData(visit_handle md) const
 		VisIt_MeshMetaData_setSpatialDimension(m1, (int)model.coord().size());
 
 		int ttlClients = Environment::GetGlobalNumberOfClients();
-		VisIt_MeshMetaData_setNumDomains(m1,ttlClients);
+		int numBlocks = 1;
+
+		{ // check that all the coordinates have the same layout
+			Layout* l;
+			Model::Mesh::coord_const_iterator it(model.coord().begin());
+
+			Variable* vx = VariableManager::Search(it->name());
+			if(vx == NULL) {
+				ERROR("Unknown coordinate " << it->name());
+				VisIt_MeshMetaData_free(m1);
+				return VISIT_INVALID_HANDLE;
+			}
+			l = vx->getLayout();
+			it++;
+
+			Variable* vy = VariableManager::Search(it->name());
+			if(vy == NULL) {
+				ERROR("Unknown coordinate " << it->name());
+				VisIt_MeshMetaData_free(m1);
+				return VISIT_INVALID_HANDLE;
+			}
+			if(l != vy->getLayout()) {
+				ERROR("Coordinates must share the same layout for mesh " << getName());
+				VisIt_MeshMetaData_free(m1);
+				return VISIT_INVALID_HANDLE;
+			}
+			it++;
+
+			Variable* vz = NULL;
+			if(model.coord().size() == 3) {
+				vz = VariableManager::Search(it->name());
+				if(vz == NULL) {
+					ERROR("Unknown coordinate " << it->name());
+					VisIt_MeshMetaData_free(m1);
+					return VISIT_INVALID_HANDLE;
+				}
+				if(l != vy->getLayout()) {
+					ERROR("Coordinates must share the same layout for mesh " << getName());
+					VisIt_MeshMetaData_free(m1);
+					return VISIT_INVALID_HANDLE;
+				}
+			}
+
+			numBlocks = l->getBlocks();
+		}
+
+		VisIt_MeshMetaData_setNumDomains(m1,ttlClients*numBlocks);
 
 		Model::Mesh::coord_const_iterator it(model.coord().begin());
 		// the number of coordinates should be 2 or 3 (this condition is checked by
@@ -62,7 +109,7 @@ bool RectilinearMesh::exposeVisItMetaData(visit_handle md) const
 		
 		if(model.coord().size() == 3) {
 			if(it->unit() != "#") VisIt_MeshMetaData_setZUnits(m1,it->unit().c_str());
-            if(it->label() != "#") VisIt_MeshMetaData_setZLabel(m1,it->label().c_str());
+			if(it->label() != "#") VisIt_MeshMetaData_setZLabel(m1,it->label().c_str());
 			it++;
 		}
 
@@ -83,7 +130,7 @@ bool RectilinearMesh::exposeVisItData(visit_handle* h, int source, int iteration
 		Model::Mesh::coord_const_iterator it(model.coord().begin());
 
 		// Search for the X coordinate, checks that it has 1 dimenion
-		vx = Manager<Variable>::Search(it->name());
+		vx = VariableManager::Search(it->name());
 		if(vx == NULL) {
 			CFGERROR("Undefined coordinate \""<< it->name() <<"\" for mesh \""
 					<< getName() << "\"");
@@ -96,7 +143,7 @@ bool RectilinearMesh::exposeVisItData(visit_handle* h, int source, int iteration
 		it++;
 
 		// Search for the Y coordinate, checks that it has 1 dimension
-		vy = Manager<Variable>::Search(it->name());
+		vy = VariableManager::Search(it->name());
 		if(vy == NULL) {
 			CFGERROR("Undefined coordinate \""<< it->name() <<"\" for mesh \""
 					<< getName() << "\"");
@@ -110,7 +157,7 @@ bool RectilinearMesh::exposeVisItData(visit_handle* h, int source, int iteration
 
 		// Search for the Z coordinate if there is one, checks that it has 1 dimension
 		if(model.coord().size() == 3) {
-			vz = Manager<Variable>::Search(it->name());
+			vz = VariableManager::Search(it->name());
 			if(vz == NULL) {
 				ERROR("Undefined coordinate \""<< it->name() <<"\" for mesh \""
 						<< getName() << "\"");
