@@ -43,6 +43,11 @@ namespace Damaris {
 	{
 		return 1;
 	}
+
+	unsigned int TypeLayout::getBlocks() const
+	{
+		return 1;
+	}
 	
 	size_t TypeLayout::getExtentAlongDimension(unsigned int dim) const
 	{

@@ -47,20 +47,22 @@ namespace Damaris {
 class BoxLayout : public Layout, public Configurable<Model::Layout>, private Observer {
 		
 	private:
-		std::vector<int> extents;	/*!< Extents along each dimension. */	
+		std::vector<int> extents;	/*!< Extents along each dimension. */
+		unsigned int blocks;		/*!< Number of blocks. */
 
 		static Calc<std::string::const_iterator,ParameterManager::ParameterMap<int> > *calc;
 
 		/**
 		 * \brief Constructor.
 		 * Initializes a Layout from the data type, the dimensions and the vector of extents. 
-		 * 
+		 *
+		 * \param[in] mdl : base model from configuration file. 
 		 * \param[in] name : name of the layout (as defined in the configuration file).
-		 * \param[in] t : basic type.
-		 * \param[in] d : number of dimensions.
-		 * \param[in] extents : list of extents.
+		 * \param[in] e : list of extents.
+		 * \param[in] blocks : number of blocks.
 		 */
-		BoxLayout(const Model::Layout& mdl, const std::string& name, const std::vector<int>& e);
+		BoxLayout(const Model::Layout& mdl, const std::string& name, 
+			  const std::vector<int>& e, const unsigned int blocks = 1);
 		
 		/**
 		 * Interpret the dimensions from the model's description.
@@ -84,6 +86,11 @@ class BoxLayout : public Layout, public Configurable<Model::Layout>, private Obs
 		 */
 		virtual unsigned int getDimensions() const;
 
+		/**
+                 * \return the number of blocks expected to be written.
+                 */
+                virtual unsigned int getBlocks() const;
+	
 		/**
 		 * \return the extent along a given dimension. 
 		 */

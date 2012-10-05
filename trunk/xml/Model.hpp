@@ -945,6 +945,26 @@ namespace Damaris
       void
       dimensions (::std::auto_ptr< dimensions_type > p);
 
+      // blocks
+      // 
+      typedef ::xml_schema::string blocks_type;
+      typedef ::xsd::cxx::tree::traits< blocks_type, char > blocks_traits;
+
+      const blocks_type&
+      blocks () const;
+
+      blocks_type&
+      blocks ();
+
+      void
+      blocks (const blocks_type& x);
+
+      void
+      blocks (::std::auto_ptr< blocks_type > p);
+
+      static const blocks_type&
+      blocks_default_value ();
+
       // language
       // 
       typedef ::Damaris::Model::Language language_type;
@@ -1029,6 +1049,8 @@ namespace Damaris
       ::xsd::cxx::tree::one< name_type > name_;
       ::xsd::cxx::tree::one< type_type > type_;
       ::xsd::cxx::tree::one< dimensions_type > dimensions_;
+      ::xsd::cxx::tree::one< blocks_type > blocks_;
+      static const blocks_type blocks_default_value_;
       ::xsd::cxx::tree::one< language_type > language_;
       static const language_type language_default_value_;
       ::xsd::cxx::tree::one< visualizable_type > visualizable_;

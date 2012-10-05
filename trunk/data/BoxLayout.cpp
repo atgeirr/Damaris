@@ -33,8 +33,9 @@ namespace Damaris {
 	Calc<std::string::const_iterator,ParameterManager::ParameterMap<int> > 
 			*BoxLayout::calc;
 	
-	BoxLayout::BoxLayout(const Model::Layout& mdl, const std::string &n, const std::vector<int> &e)
-	: Layout(n), Configurable<Model::Layout>(mdl), extents(e)
+	BoxLayout::BoxLayout(const Model::Layout& mdl, const std::string &n, const std::vector<int> &e,
+				const unsigned int b)
+	: Layout(n), Configurable<Model::Layout>(mdl), extents(e), blocks(b)
 	{
 		ObserveDependentParameters();
 		InterpretDimensions();
@@ -49,7 +50,12 @@ namespace Damaris {
 	{
 		return extents.size();
 	}
-	
+
+	unsigned int BoxLayout::getBlocks() const
+	{
+		return blocks;
+	}
+
 	size_t BoxLayout::getExtentAlongDimension(unsigned int dim) const
 	{
 		if(dim < extents.size())
@@ -101,6 +107,33 @@ namespace Damaris {
 				}
 			}
 		}
+		// do the same for the "blocks" field
+		buffer = std::vector<char>(model.blocks().size()+1);
+		buffer[0] = '\0';
+		j = 0;
+		std::string b = model.blocks();
+		reading = false;
+		for(unsigned int i = 0; i < b.size(); i++) {
+			if((isalpha(b[i]) || b[i] == '_') && !reading) {
+				reading = true;
+				j = 0;
+			}
+			if(reading) {
+				if(isalnum(b[i]) || (b[i] == '_')) {
+					buffer[j] = b[i];
+					j++;
+				}
+				if((not (isalnum(b[i]) || (b[i] == '_'))) || (i == b.size() - 1)){
+					reading = false;
+					buffer[j] = '\0';
+					std::string param(&(buffer[0]));
+					Parameter* p = ParameterManager::Search(param);
+					if(p != NULL) {
+						p->AddObserver((Observer*)this);
+					}
+				}
+			}
+		}
 	}
 
 	void BoxLayout::InterpretDimensions()
@@ -129,7 +162,25 @@ namespace Damaris {
 		} else {
 			extents = e;
 		}
-		DBG("Re-interpreting dimensions for layout " << name);
+
+		e.resize(0);
+		str = (std::string)(model.blocks());
+		iter = str.begin();
+		end = str.end();
+		r = boost::spirit::qi::phrase_parse(iter, end, *calc,
+				boost::spirit::ascii::space, e);
+		if((!r) || (iter != str.end())) {
+			ERROR("While parsing blocks descriptor for layout \""
+					<< model.name() << "\"");
+		}
+		blocks = 1;
+		if(e.size() != 1) {
+			ERROR("\"blocks\" field must have exactly one dimension in layout \""
+					<< model.name() << "\"");
+		} else {
+			blocks = e[0];
+		}
+		DBG("Re-interpreting dimensions and/or blocks for layout " << name);
 	}
 
 	void BoxLayout::Notify()

@@ -83,6 +83,11 @@ class Layout {
 		virtual bool isUnlimited() const = 0;
 
 		/**
+		 * \return the number of blocks expected to be written.
+		 */
+		virtual unsigned int getBlocks() const = 0;
+
+		/**
 		 * Destructor.
 		 */
 		virtual ~Layout();

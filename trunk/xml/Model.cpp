@@ -620,6 +620,36 @@ namespace Damaris
       this->dimensions_.set (x);
     }
 
+    const Layout::blocks_type& Layout::
+    blocks () const
+    {
+      return this->blocks_.get ();
+    }
+
+    Layout::blocks_type& Layout::
+    blocks ()
+    {
+      return this->blocks_.get ();
+    }
+
+    void Layout::
+    blocks (const blocks_type& x)
+    {
+      this->blocks_.set (x);
+    }
+
+    void Layout::
+    blocks (::std::auto_ptr< blocks_type > x)
+    {
+      this->blocks_.set (x);
+    }
+
+    const Layout::blocks_type& Layout::
+    blocks_default_value ()
+    {
+      return blocks_default_value_;
+    }
+
     const Layout::language_type& Layout::
     language () const
     {
@@ -2991,6 +3021,9 @@ namespace Damaris
     // Layout
     //
 
+    const Layout::blocks_type Layout::blocks_default_value_ (
+      "1");
+
     const Layout::language_type Layout::language_default_value_ (
       "unknown");
 
@@ -3002,6 +3035,7 @@ namespace Damaris
       name_ (name, ::xml_schema::flags (), this),
       type_ (type, ::xml_schema::flags (), this),
       dimensions_ (dimensions, ::xml_schema::flags (), this),
+      blocks_ (blocks_default_value (), ::xml_schema::flags (), this),
       language_ (language_default_value (), ::xml_schema::flags (), this),
       visualizable_ (visualizable_default_value (), ::xml_schema::flags (), this)
     {
@@ -3016,6 +3050,7 @@ namespace Damaris
       name_ (name, ::xml_schema::flags (), this),
       type_ (type, ::xml_schema::flags (), this),
       dimensions_ (dimensions, ::xml_schema::flags (), this),
+      blocks_ (blocks_default_value (), ::xml_schema::flags (), this),
       language_ (language_default_value (), ::xml_schema::flags (), this),
       visualizable_ (visualizable_default_value (), ::xml_schema::flags (), this)
     {
@@ -3030,6 +3065,7 @@ namespace Damaris
       name_ (name, ::xml_schema::flags (), this),
       type_ (type, ::xml_schema::flags (), this),
       dimensions_ (dimensions, ::xml_schema::flags (), this),
+      blocks_ (blocks_default_value (), ::xml_schema::flags (), this),
       language_ (language_default_value (), ::xml_schema::flags (), this),
       visualizable_ (visualizable_default_value (), ::xml_schema::flags (), this)
     {
@@ -3044,6 +3080,7 @@ namespace Damaris
       name_ (name, ::xml_schema::flags (), this),
       type_ (type, ::xml_schema::flags (), this),
       dimensions_ (dimensions, ::xml_schema::flags (), this),
+      blocks_ (blocks_default_value (), ::xml_schema::flags (), this),
       language_ (language_default_value (), ::xml_schema::flags (), this),
       visualizable_ (visualizable_default_value (), ::xml_schema::flags (), this)
     {
@@ -3057,6 +3094,7 @@ namespace Damaris
       name_ (x.name_, f, this),
       type_ (x.type_, f, this),
       dimensions_ (x.dimensions_, f, this),
+      blocks_ (x.blocks_, f, this),
       language_ (x.language_, f, this),
       visualizable_ (x.visualizable_, f, this)
     {
@@ -3070,6 +3108,7 @@ namespace Damaris
       name_ (f, this),
       type_ (f, this),
       dimensions_ (f, this),
+      blocks_ (f, this),
       language_ (f, this),
       visualizable_ (f, this)
     {
@@ -3117,6 +3156,15 @@ namespace Damaris
           continue;
         }
 
+        if (n.name () == "blocks" && n.namespace_ ().empty ())
+        {
+          ::std::auto_ptr< blocks_type > r (
+            blocks_traits::create (i, f, this));
+
+          this->blocks_.set (r);
+          continue;
+        }
+
         if (n.name () == "language" && n.namespace_ ().empty ())
         {
           ::std::auto_ptr< language_type > r (
@@ -3152,6 +3200,11 @@ namespace Damaris
         throw ::xsd::cxx::tree::expected_attribute< char > (
           "dimensions",
           "");
+      }
+
+      if (!blocks_.present ())
+      {
+        this->blocks_.set (blocks_default_value ());
       }
 
       if (!language_.present ())
