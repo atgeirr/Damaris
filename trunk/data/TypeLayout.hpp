@@ -61,11 +61,6 @@ class TypeLayout : public Layout, public Configurable<Model::Type> {
 		virtual size_t getExtentAlongDimension(unsigned int dim) const;
 
 		/**
-                 * \return the number of blocks expected to be written.
-                 */
-                virtual unsigned int getBlocks() const;
-
-		/**
 		 * \return true if the Layout has unlimited dimension 
 		 *         (defined as "?" in the configuration file).
 		 */

@@ -48,10 +48,13 @@ typedef boost::multi_index_container<
                         bmi::const_mem_fun<Chunk,int,&Chunk::getSource> >,
                 bmi::ordered_non_unique<bmi::tag<by_iteration>,
                         bmi::const_mem_fun<Chunk,int,&Chunk::getIteration> >,
+		bmi::ordered_non_unique<bmi::tag<by_block>,
+			bmi::const_mem_fun<Chunk,int,&Chunk::getBlock> >,
 		bmi::ordered_non_unique<bmi::tag<by_any>,
 			bmi::composite_key<Chunk,
 				bmi::const_mem_fun<Chunk,int,&Chunk::getSource>,
-				bmi::const_mem_fun<Chunk,int,&Chunk::getIteration> 
+				bmi::const_mem_fun<Chunk,int,&Chunk::getIteration>,
+				bmi::const_mem_fun<Chunk,int,&Chunk::getBlock>
 			> 
 		>
         >
@@ -59,6 +62,7 @@ typedef boost::multi_index_container<
 
 typedef ChunkSet::index<by_source>::type ChunkIndexBySource;
 typedef ChunkSet::index<by_iteration>::type ChunkIndexByIteration;
+typedef ChunkSet::index<by_block>::type ChunkIndexByBlock;
 typedef ChunkSet::index<by_any>::type ChunkIndex;
 
 }

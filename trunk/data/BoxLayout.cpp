@@ -50,11 +50,6 @@ namespace Damaris {
 		return extents.size();
 	}
 
-	unsigned int BoxLayout::getBlocks() const
-	{
-		return model.blocks();
-	}
-
 	size_t BoxLayout::getExtentAlongDimension(unsigned int dim) const
 	{
 		if(dim < extents.size())

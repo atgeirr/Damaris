@@ -51,7 +51,6 @@ bool RectilinearMesh::exposeVisItMetaData(visit_handle md) const
 		int numBlocks = 1;
 
 		{ // check that all the coordinates have the same layout
-			Layout* l;
 			Model::Mesh::coord_const_iterator it(model.coord().begin());
 
 			Variable* vx = VariableManager::Search(it->name());
@@ -60,17 +59,11 @@ bool RectilinearMesh::exposeVisItMetaData(visit_handle md) const
 				VisIt_MeshMetaData_free(m1);
 				return VISIT_INVALID_HANDLE;
 			}
-			l = vx->getLayout();
 			it++;
 
 			Variable* vy = VariableManager::Search(it->name());
 			if(vy == NULL) {
 				ERROR("Unknown coordinate " << it->name());
-				VisIt_MeshMetaData_free(m1);
-				return VISIT_INVALID_HANDLE;
-			}
-			if(l != vy->getLayout()) {
-				ERROR("Coordinates must share the same layout for mesh " << getName());
 				VisIt_MeshMetaData_free(m1);
 				return VISIT_INVALID_HANDLE;
 			}
@@ -84,14 +77,7 @@ bool RectilinearMesh::exposeVisItMetaData(visit_handle md) const
 					VisIt_MeshMetaData_free(m1);
 					return VISIT_INVALID_HANDLE;
 				}
-				if(l != vy->getLayout()) {
-					ERROR("Coordinates must share the same layout for mesh " << getName());
-					VisIt_MeshMetaData_free(m1);
-					return VISIT_INVALID_HANDLE;
-				}
 			}
-
-			numBlocks = l->getBlocks();
 		}
 
 		VisIt_MeshMetaData_setNumDomains(m1,ttlClients*numBlocks);

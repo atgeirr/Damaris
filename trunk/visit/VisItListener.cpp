@@ -100,6 +100,7 @@ int VisItListener::EnterSyncSection(int visitstate)
 		case 1:
 			if(VisItAttemptToCompleteConnection() == VISIT_OKAY) {
 				INFO("VisIt connected");
+				VisItSetActivateTimestep(&VisItListener::TimeStepCallback,(void*)(&sim));
 				VisItSetSlaveProcessCallback(&VisItListener::SlaveProcessCallback);	
 				VisItSetGetMetaData(&VisItListener::GetMetaData,(void*)(&sim));
 				VisItSetGetMesh(&VisItListener::GetMesh,(void*)(&sim));
@@ -125,6 +126,12 @@ int VisItListener::Update()
 	VisItTimeStepChanged();
 	VisItUpdatePlots();
 	return 0;
+}
+
+int VisItListener::TimeStepCallback(void* cbdata)
+{
+	INFO("Inside TimeStepCallBack");
+	return VISIT_OKAY;
 }
 
 void VisItListener::BroadcastSlaveCommand(int *command)

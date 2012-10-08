@@ -86,11 +86,6 @@ class BoxLayout : public Layout, public Configurable<Model::Layout>, private Obs
 		virtual unsigned int getDimensions() const;
 
 		/**
-                 * \return the number of blocks expected to be written.
-                 */
-                virtual unsigned int getBlocks() const;
-	
-		/**
 		 * \return the extent along a given dimension. 
 		 */
 		virtual size_t getExtentAlongDimension(unsigned int dim) const;
