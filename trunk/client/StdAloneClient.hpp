@@ -1,19 +1,19 @@
 /*******************************************************************
-This file is part of Damaris.
+  This file is part of Damaris.
 
-Damaris is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+  Damaris is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
 
-Damaris is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+  Damaris is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
-********************************************************************/
+  You should have received a copy of the GNU General Public License
+  along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
+ ********************************************************************/
 /**
  * \file StdAloneClient.hpp
  * \date February 2012
@@ -31,15 +31,15 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Damaris {
 
-class Initiator;
-/**
- * The StdAloneClient object represents a single core running the
- * simulation when no dedicated core is present. In this case the
- * client runs the plugins by itself, synchronously.
- */
-class StdAloneClient : public Client {
+	class Initiator;
+	/**
+	 * The StdAloneClient object represents a single core running the
+	 * simulation when no dedicated core is present. In this case the
+	 * client runs the plugins by itself, synchronously.
+	 */
+	class StdAloneClient : public Client {
 
-	friend class Initiator;
+		friend class Initiator;
 
 		/** 
 		 * \brief Constructor.
@@ -50,7 +50,7 @@ class StdAloneClient : public Client {
 		 */
 		StdAloneClient(Process* p);
 
-	public:
+		public:
 
 		/**
 		 * \see Client::connect
@@ -61,13 +61,20 @@ class StdAloneClient : public Client {
 		 * \see Writer::write
 		 */
 		virtual int write(const std::string & varname, int32_t iteration, 
-						const void* data, bool blocking = true);
-		
+				const void* data, bool blocking = true);
+
+		/**
+		 * \see Writer::write_block
+		 */
+		virtual int write_block(const std::string &varname,
+				int32_t iteration, int32_t block, const void* data,
+				bool blocking = false);
+
 		/**
 		 * \see Writer::chunk_write
 		 */
 		virtual int chunk_write(chunk_h chunkh, const std::string & varname, 
-						int32_t iteration, const void* data, bool blocking = true);		
+				int32_t iteration, const void* data, bool blocking = true);		
 
 		/**
 		 * \see Writer::signal
@@ -107,7 +114,7 @@ class StdAloneClient : public Client {
 		 * To be called at the end of the before stopping the client program.
 		 */
 		virtual ~StdAloneClient();
-}; // class StdAloneClient
+	}; // class StdAloneClient
 
 } // namespace Damaris
 
