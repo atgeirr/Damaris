@@ -28,7 +28,7 @@
 #include <exception>
 
 #include "core/Debug.hpp"
-#include "data/ShmChunk.hpp"
+#include "data/ChunkImpl.hpp"
 #include "memory/Message.hpp"
 #include "client/Client.hpp"
 
@@ -127,8 +127,8 @@ namespace Damaris {
 		int source = process->getID();
 		ChunkHeader* ch = new(location) ChunkHeader(cd,layout->getType(),iteration,source);
 
-		// create the ShmChunk and attach it to the variable
-		ShmChunk* chunk = new ShmChunk(process->getSharedMemorySegment(),ch);
+		// create the ChunkImpl and attach it to the variable
+		ChunkImpl* chunk = new ChunkImpl(process->getSharedMemorySegment(),ch);
 		variable->attachChunk(chunk);	
 
 		ChunkDescriptor::Delete(cd);
@@ -142,7 +142,7 @@ namespace Damaris {
 		if(v == NULL)
 			return -1;
 
-		ShmChunk* chunk = NULL;
+		ChunkImpl* chunk = NULL;
 		// get the pointer to the allocated chunk
 		ChunkIndexByIteration::iterator end;
 		ChunkIndexByIteration::iterator it = v->getChunksByIteration(iteration,end);
@@ -150,7 +150,7 @@ namespace Damaris {
 		if(it == end)
 			return -2;
 		try {
-			chunk = dynamic_cast<ShmChunk*>(it->get());
+			chunk = dynamic_cast<ChunkImpl*>(it->get());
 		} catch(std::exception &e) {
 			ERROR("When doing dynamic cast: " << e.what());
 			return -3;
@@ -236,8 +236,8 @@ namespace Damaris {
 		ChunkHeader* ch = new(location) ChunkHeader(cd,layout->getType(),
 								iteration,source, block);
 
-		// create the ShmChunk and attach it to the variable
-		ShmChunk chunk(process->getSharedMemorySegment(),ch);
+		// create the ChunkImpl and attach it to the variable
+		ChunkImpl chunk(process->getSharedMemorySegment(),ch);
 
 		// copy data
 		size = cd->getDataMemoryLength(layout->getType());
@@ -310,8 +310,8 @@ namespace Damaris {
 		int source = process->getID();
 		ChunkHeader* ch = new(location) ChunkHeader(cd,layout->getType(),iteration,source);
 
-		// create the ShmChunk object		
-		ShmChunk chunk(process->getSharedMemorySegment(),ch);
+		// create the ChunkImpl object		
+		ChunkImpl chunk(process->getSharedMemorySegment(),ch);
 
 		// copy data
 		size = cd->getDataMemoryLength(layout->getType());

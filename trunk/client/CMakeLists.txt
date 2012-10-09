@@ -32,7 +32,7 @@ set(DAMARIS_COMMON_SRC
 	${DAMARIS_SOURCE_DIR}/data/CurvilinearMesh.cpp
 	${DAMARIS_SOURCE_DIR}/data/ChunkDescriptor.cpp
 	${DAMARIS_SOURCE_DIR}/data/Chunk.cpp
-	${DAMARIS_SOURCE_DIR}/data/ShmChunk.cpp
+	${DAMARIS_SOURCE_DIR}/data/ChunkImpl.cpp
 	${DAMARIS_SOURCE_DIR}/data/Types.cpp
 	${DAMARIS_SOURCE_DIR}/data/Layout.cpp
 	${DAMARIS_SOURCE_DIR}/data/BoxLayout.cpp

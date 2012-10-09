@@ -32,7 +32,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/interprocess/sync/interprocess_mutex.hpp>
 #include <boost/interprocess/sync/interprocess_condition.hpp>
 #include "xml/Model.hpp"
-#include "memory/SharedMemory.hpp"
 #include "memory/Buffer.hpp"
 
 namespace Damaris {

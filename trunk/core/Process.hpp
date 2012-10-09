@@ -121,9 +121,9 @@ class Process {
 		/**
 		 * Get the SharedMemorySegment instance attached to the Process.
 		 */
-		SharedMemorySegment* getSharedMemorySegment()
+		Buffer* getSharedMemorySegment()
 		{
-			return segment;
+			return (Buffer*)segment;
 		}
 
 		/**

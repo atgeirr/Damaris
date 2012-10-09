@@ -24,7 +24,7 @@
 #include <list>
 #include "core/Debug.hpp"
 #include "memory/Message.hpp"
-#include "data/ShmChunk.hpp"
+#include "data/ChunkImpl.hpp"
 #include "data/Layout.hpp"
 #include "core/VariableManager.hpp"
 #include "core/ActionManager.hpp"
@@ -111,8 +111,8 @@ namespace Damaris {
 		int source = process->getID();
 		ChunkHeader* ch = new(location) ChunkHeader(cd,layout->getType(),iteration,source);
 
-		// create the ShmChunk and attach it to the variable
-		ShmChunk* chunk = new ShmChunk(process->getSharedMemorySegment(),ch);
+		// create the ChunkImpl and attach it to the variable
+		ChunkImpl* chunk = new ChunkImpl(process->getSharedMemorySegment(),ch);
 		chunk->SetDataOwnership(true);
 		variable->attachChunk(chunk);
 
@@ -135,7 +135,7 @@ namespace Damaris {
 		if(it == end)
 			return -2;
 		try {
-			dynamic_cast<ShmChunk*>(it->get());
+			dynamic_cast<ChunkImpl*>(it->get());
 		} catch(std::exception &e) {
 			ERROR("When doing dynamic cast: " << e.what());
 			return -3;
@@ -202,8 +202,8 @@ namespace Damaris {
 		ChunkHeader* ch = new(location) ChunkHeader(cd,layout->getType(),
 							iteration,source,block);
 
-		// create the ShmChunk and attach it to the variable
-		ShmChunk* chunk = new ShmChunk(process->getSharedMemorySegment(),ch);
+		// create the ChunkImpl and attach it to the variable
+		ChunkImpl* chunk = new ChunkImpl(process->getSharedMemorySegment(),ch);
 		chunk->SetDataOwnership(true);
 		// copy data
 		size = cd->getDataMemoryLength(layout->getType());
@@ -263,8 +263,8 @@ namespace Damaris {
 		int source = process->getID();
 		ChunkHeader* ch = new(location) ChunkHeader(cd,layout->getType(),iteration,source);
 
-		// create the ShmChunk object       
-		ShmChunk* chunk = new ShmChunk(process->getSharedMemorySegment(),ch);
+		// create the ChunkImpl object       
+		ChunkImpl* chunk = new ChunkImpl(process->getSharedMemorySegment(),ch);
 		chunk->SetDataOwnership(true);
 
 		// copy data

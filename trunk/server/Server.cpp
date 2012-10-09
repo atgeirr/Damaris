@@ -24,7 +24,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <list>
 #include "core/Debug.hpp"
 #include "core/MPILayer.hpp"
-#include "data/ShmChunk.hpp"
+#include "data/ChunkImpl.hpp"
 #include "data/Layout.hpp"
 #include "core/ActionManager.hpp"
 #include "core/VariableManager.hpp"
@@ -127,7 +127,7 @@ void Server::processMessage(const Message& msg)
 	if(msg.type == MSG_VAR)
 	{
 		try {
-		ShmChunk* chunk = new ShmChunk(process->getSharedMemorySegment(),handle);
+		ChunkImpl* chunk = new ChunkImpl(process->getSharedMemorySegment(),handle);
 		chunk->SetDataOwnership(true);
 		Variable* v = VariableManager::Search(object);
 		if(v != NULL) {

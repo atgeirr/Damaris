@@ -33,6 +33,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "xml/Model.hpp"
 #include "core/Configurable.hpp"
+#include "memory/Buffer.hpp"
 #include "data/ChunkSet.hpp"
 #include "data/Layout.hpp"
 #include "core/Manager.hpp"
@@ -53,7 +54,7 @@ class Variable : public Configurable<Model::Variable> {
 	private:	
 		Layout* layout;		/*!< Layout of the data. */
 		ChunkSet chunks; 	/*!< Chunks hold by the variable. */
-		//Allocator* allocator;	/*!< Allocator to use for chunks. */
+		Buffer* allocator;	/*!< Allocator to use for chunks. */
 		std::string name; 	/*!< Name of the variable. */
 		int id;			/*!< id of the variable, given by the VariableManager. */
 	
@@ -79,6 +80,11 @@ class Variable : public Configurable<Model::Variable> {
 		 * Returns the id of the variable, as given by the VariableManager.
 		 */
 		int getID() const { return id; }
+
+		/**
+		 * Returns the allocator used for chunks allocation.
+		 */
+		Buffer* getAllocator() const { return allocator; }
 
 		/**
 		 * Attach a new chunk to the variable.

@@ -15,46 +15,46 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file ShmChunk.cpp
- * \date February 2012
+ * \file ChunkImpl.cpp
+ * \date Oct. 2012
  * \author Matthieu Dorier
- * \version 0.4
+ * \version 0.7
  */
-#include "data/ShmChunk.hpp"
+#include "data/ChunkImpl.hpp"
 
 namespace Damaris {
 
-ShmChunk::ShmChunk(SharedMemorySegment* s, ChunkHeader* ch) 
+ChunkImpl::ChunkImpl(Buffer* b, ChunkHeader* ch) 
 {
 	isOwner = false;
-	segment = s;
+	buffer = b;
 	header = ch;
-	buffer = ((char*)header)+sizeof(ChunkHeader);
+	addr = ((char*)header)+sizeof(ChunkHeader);
 }
 
-ShmChunk::ShmChunk(SharedMemorySegment* s, handle_t h)
+ChunkImpl::ChunkImpl(Buffer* b, handle_t h)
 {
 	isOwner = false;
-	segment = s;
-	header = (ChunkHeader*)segment->getAddressFromHandle(h);
-	buffer = ((char*)header)+sizeof(ChunkHeader);
+	buffer = b;
+	header = (ChunkHeader*)buffer->getAddressFromHandle(h);
+	addr = ((char*)header)+sizeof(ChunkHeader);
 }
 
-ShmChunk::~ShmChunk()
+ChunkImpl::~ChunkImpl()
 {
 	if(isOwner) {
-		segment->deallocate(header);
+		buffer->deallocate(header);
 	}
 }
 
-void* ShmChunk::data()
+void* ChunkImpl::data()
 {
-	return buffer;
+	return addr;
 }
 
-handle_t ShmChunk::getHandle()
+handle_t ChunkImpl::getHandle()
 {
-	return segment->getHandleFromAddress(header);
+	return buffer->getHandleFromAddress(header);
 }
 
 } // namespace Damaris

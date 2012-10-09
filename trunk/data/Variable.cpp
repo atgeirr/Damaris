@@ -32,6 +32,7 @@ Variable::Variable(const Model::Variable& mdl, const std::string &n, Layout* l)
 {
 	layout = l;
 	name = n;
+	allocator = NULL;
 }
 
 void Variable::attachChunk(Chunk* chunk)
@@ -195,7 +196,9 @@ Variable* Variable::New(const Model::Variable& mdl, const std::string& name)
 
 Chunk* Variable::Allocate(int block)
 {
-	SharedMemorySegment* allocator = Process::get()->getSharedMemorySegment();
+	if(allocator == NULL) {
+		allocator = Process::get()->getSharedMemorySegment();
+	}
 	// TODO
 	return NULL;
 }

@@ -15,55 +15,55 @@
   along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  ********************************************************************/
 /**
- * \file ShmChunk.hpp
- * \date February 2012
+ * \file ChunkImpl.hpp
+ * \date Oct. 2012
  * \author Matthieu Dorier
- * \version 0.4
+ * \version 0.7
  */
-#ifndef __DAMARIS_SHMCHUNK_H
-#define __DAMARIS_SHMCHUNK_H
+#ifndef __DAMARIS_CHUNKIMPL_H
+#define __DAMARIS_CHUNKIMPL_H
 
 #include <stdlib.h>
 
 #include "data/Chunk.hpp"
 #include "data/ChunkHeader.hpp"
-#include "memory/SharedMemorySegment.hpp"
+#include "memory/Buffer.hpp"
 
 namespace Damaris {
 
 	/**
-	 * The ShmChunk class inherites from Chunk, it represents
-	 * a chunk located in shared memory.
+	 * The ChunkImpl class inherites from Chunk, it represents
+	 * a chunk located in memory.
 	 */
-	class ShmChunk : public Chunk {
+	class ChunkImpl : public Chunk {
 
 		private:
 			bool isOwner; /*!< Indicates if this instance is the owner of the data
 					(multiple instances can hold a pointer to the same data. */
-			SharedMemorySegment* segment; /*!< Pointer to the shared memory 
+			Buffer* buffer; /*!< Pointer to the shared memory 
 							segment containing the data. */
 			ChunkHeader* header; /*!< Pointer to header. */
-			void* buffer; /*!< Pointer to the actual data. */
+			void* addr; /*!< Pointer to the actual data. */
 		public:
 
 			/**
 			 * Initialize a ShmChunk from a SharedMemorySegment and
 			 * a pointer to an existing header in the process's memory.
 			 */
-			ShmChunk(SharedMemorySegment* s, ChunkHeader* ch);
+			ChunkImpl(Buffer* b, ChunkHeader* ch);
 
 			/**
 			 * Initialize a ShmChunk from a SharedMemorySegment and
 			 * a pointer to an existing header in the process's memory,
 			 * given as a handle.
 			 */
-			ShmChunk(SharedMemorySegment* s, handle_t ch);
+			ChunkImpl(Buffer* b, handle_t ch);
 
 			/**
 			 * \brief Destructor.
 			 * If this instance is the owner of the data, the data will be deleted.
 			 */
-			virtual ~ShmChunk();
+			virtual ~ChunkImpl();
 
 			/**
 			 * \brief Gets the ID of the process that has written the chunk.

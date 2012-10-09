@@ -23,6 +23,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __DAMARIS_BUFFER_H
 #define __DAMARIS_BUFFER_H
 
+#include "memory/SharedMemory.hpp"
+
 namespace Damaris {
 
 class Buffer {
