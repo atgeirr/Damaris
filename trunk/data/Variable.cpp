@@ -20,6 +20,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \author Matthieu Dorier
  * \version 0.4
  */
+#include "core/Process.hpp"
 #include "core/LayoutManager.hpp"
 #include "data/Variable.hpp"
 #include "core/Debug.hpp"
@@ -190,6 +191,13 @@ Variable* Variable::New(const Model::Variable& mdl, const std::string& name)
 		return NULL;
 	}
 	return new Variable(mdl,name,l);
+}
+
+Chunk* Variable::Allocate(int block)
+{
+	SharedMemorySegment* allocator = Process::get()->getSharedMemorySegment();
+	// TODO
+	return NULL;
 }
 
 }

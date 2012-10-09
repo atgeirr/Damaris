@@ -27,7 +27,7 @@
 
 #include "data/Chunk.hpp"
 #include "data/ChunkHeader.hpp"
-#include "core/SharedMemorySegment.hpp"
+#include "memory/SharedMemorySegment.hpp"
 
 namespace Damaris {
 

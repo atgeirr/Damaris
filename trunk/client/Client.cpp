@@ -29,7 +29,7 @@
 
 #include "core/Debug.hpp"
 #include "data/ShmChunk.hpp"
-#include "core/Message.hpp"
+#include "memory/Message.hpp"
 #include "client/Client.hpp"
 
 #include "core/ParameterManager.hpp"

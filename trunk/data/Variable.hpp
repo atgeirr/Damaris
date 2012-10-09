@@ -53,7 +53,7 @@ class Variable : public Configurable<Model::Variable> {
 	private:	
 		Layout* layout;		/*!< Layout of the data. */
 		ChunkSet chunks; 	/*!< Chunks hold by the variable. */
-
+		//Allocator* allocator;	/*!< Allocator to use for chunks. */
 		std::string name; 	/*!< Name of the variable. */
 		int id;			/*!< id of the variable, given by the VariableManager. */
 	
@@ -169,6 +169,7 @@ class Variable : public Configurable<Model::Variable> {
 #endif
 
 	public:
+		virtual Chunk* Allocate(int block);
 		/**
 		 * Creates an instance of Variable if the provided model is consistant.
 		 */

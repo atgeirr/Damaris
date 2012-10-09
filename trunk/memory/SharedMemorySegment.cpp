@@ -24,7 +24,7 @@
 #include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/interprocess/xsi_shared_memory.hpp>
 #include "core/Debug.hpp"
-#include "core/SharedMemorySegment.hpp"
+#include "memory/SharedMemorySegment.hpp"
 
 namespace Damaris {
 

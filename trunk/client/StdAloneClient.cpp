@@ -23,7 +23,7 @@
 #include <iostream>
 #include <list>
 #include "core/Debug.hpp"
-#include "core/Message.hpp"
+#include "memory/Message.hpp"
 #include "data/ShmChunk.hpp"
 #include "data/Layout.hpp"
 #include "core/VariableManager.hpp"

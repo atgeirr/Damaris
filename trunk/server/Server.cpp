@@ -23,7 +23,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 #include <list>
 #include "core/Debug.hpp"
-#include "core/Message.hpp"
 #include "core/MPILayer.hpp"
 #include "data/ShmChunk.hpp"
 #include "data/Layout.hpp"
