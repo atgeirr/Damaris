@@ -52,6 +52,13 @@ void* ChunkImpl::data()
 	return addr;
 }
 
+size_t ChunkImpl::MemCopy(const void* src)
+{
+	size_t size = header->getDataMemoryLength(getType());
+	memcpy(addr,src,size);
+	return size;
+}
+
 handle_t ChunkImpl::getHandle()
 {
 	return buffer->getHandleFromAddress(header);

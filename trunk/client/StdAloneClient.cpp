@@ -114,7 +114,7 @@ namespace Damaris {
 		// create the ChunkImpl and attach it to the variable
 		ChunkImpl* chunk = new ChunkImpl(process->getSharedMemorySegment(),ch);
 		chunk->SetDataOwnership(true);
-		variable->attachChunk(chunk);
+		variable->AttachChunk(chunk);
 
 		ChunkDescriptor::Delete(cd);
 
@@ -209,7 +209,7 @@ namespace Damaris {
 		size = cd->getDataMemoryLength(layout->getType());
 		memcpy(chunk->data(),data,size);
 
-		variable->attachChunk(chunk);	
+		variable->AttachChunk(chunk);	
 
 		DBG("Variable \"" << varname << "\" has been written");
 
@@ -271,7 +271,7 @@ namespace Damaris {
 		size = cd->getDataMemoryLength(layout->getType());
 		memcpy(chunk->data(),data,size);
 
-		variable->attachChunk(chunk);	
+		variable->AttachChunk(chunk);	
 		DBG("Variable \"" << varname << "\" has been written");
 
 		return size;

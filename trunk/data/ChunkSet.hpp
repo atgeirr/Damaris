@@ -50,7 +50,7 @@ typedef boost::multi_index_container<
                         bmi::const_mem_fun<Chunk,int,&Chunk::getIteration> >,
 		bmi::ordered_non_unique<bmi::tag<by_block>,
 			bmi::const_mem_fun<Chunk,int,&Chunk::getBlock> >,
-		bmi::ordered_non_unique<bmi::tag<by_any>,
+		bmi::ordered_unique<bmi::tag<by_any>,
 			bmi::composite_key<Chunk,
 				bmi::const_mem_fun<Chunk,int,&Chunk::getSource>,
 				bmi::const_mem_fun<Chunk,int,&Chunk::getIteration>,

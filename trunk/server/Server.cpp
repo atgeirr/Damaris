@@ -127,16 +127,21 @@ void Server::processMessage(const Message& msg)
 	if(msg.type == MSG_VAR)
 	{
 		try {
-		ChunkImpl* chunk = new ChunkImpl(process->getSharedMemorySegment(),handle);
-		chunk->SetDataOwnership(true);
+//		ChunkImpl* chunk = new ChunkImpl(process->getSharedMemorySegment(),handle);
+//		chunk->SetDataOwnership(true);
 		Variable* v = VariableManager::Search(object);
 		if(v != NULL) {
-			v->attachChunk(chunk);
+			//v->attachChunk(chunk);
+			DBG("A");
+			v->Retrieve(handle);
+			DBG("B");
 		} else {
-			// the variable is unknown, discarde it
-			ERROR("Server received a chunk " 
-				<< "for an unknown variable, discarding");
-			delete chunk;
+			// the variable is unknown, we are f....
+			ERROR("Server received data for an unknown variable entry."
+			<< " This is a very uncommon error considering all the client-side checking."
+			<< " Be sure that from now on, your program will not behave as expected and"
+			<< " will be subject to possibly huge memory leaks.");
+			//delete chunk;
 		}
 		} catch(std::exception &e) {
 			ERROR(e.what());

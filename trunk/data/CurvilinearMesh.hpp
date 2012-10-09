@@ -60,7 +60,7 @@ class CurvilinearMesh : public Mesh {
 		 * Fills the visit handle with the data related to this Mesh.
 		 * Returns true if successful.
 		 */
-		bool exposeVisItData(visit_handle* h, int source, int iteration) const;
+		bool exposeVisItData(visit_handle* h, int source, int iteration, int block) const;
 #endif
 
 };

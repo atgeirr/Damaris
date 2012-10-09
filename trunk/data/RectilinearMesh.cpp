@@ -105,7 +105,7 @@ bool RectilinearMesh::exposeVisItMetaData(visit_handle md) const
 	return false;
 }
 
-bool RectilinearMesh::exposeVisItData(visit_handle* h, int source, int iteration) const
+bool RectilinearMesh::exposeVisItData(visit_handle* h, int source, int iteration, int block) const
 {
 	DBG("In RectilinearMesh::exposeVisItData");
 	// Allocates the VisIt handle
@@ -158,13 +158,14 @@ bool RectilinearMesh::exposeVisItData(visit_handle* h, int source, int iteration
 		// At this point, the 2 or 3 coordinate variables are found. 
 		// Now accessing the data.
 
-		ChunkIndex::iterator end;
+		//ChunkIndex::iterator end;
 
 		// Accessing chunk for X coordinate
-		ChunkIndex::iterator c = vx->getChunks(source,iteration,end);		
-		if(c != end) {
+		//ChunkIndex::iterator c = vx->getChunks(source,iteration,end);
+		Chunk* c = vx->GetChunk(source,iteration,block);
+		if(c != NULL) {
 			if(VisIt_VariableData_alloc(&hxc) == VISIT_OKAY) {
-				(*c)->FillVisItDataHandle(hxc);
+				c->FillVisItDataHandle(hxc);
 			} else {
 				ERROR("While allocating data handle");
 				return false;
@@ -176,10 +177,10 @@ bool RectilinearMesh::exposeVisItData(visit_handle* h, int source, int iteration
 		}
 
 		// Accessing chunk for Y coordinate
-		c = vy->getChunks(source,iteration,end);
-		if(c != end) {
+		c = vy->GetChunk(source,iteration,block);
+		if(c != NULL) {
 			if(VisIt_VariableData_alloc(&hyc) == VISIT_OKAY) {
-				(*c)->FillVisItDataHandle(hyc);
+				c->FillVisItDataHandle(hyc);
 			} else {
 				ERROR("While allocating data handle");
 				VisIt_VariableData_free(hxc);
@@ -193,10 +194,10 @@ bool RectilinearMesh::exposeVisItData(visit_handle* h, int source, int iteration
 		
 		// Accessing chunk for Z coordinate we we need to
 		if(model.coord().size() == 3) {
-			c = vz->getChunks(source,iteration,end);
-			if(c != end) {
+			c = vz->GetChunk(source,iteration,block);
+			if(c != NULL) {
 				if(VisIt_VariableData_alloc(&hzc) == VISIT_OKAY) {
-					(*c)->FillVisItDataHandle(hzc);
+					c->FillVisItDataHandle(hzc);
 				} else {
 					ERROR("While allocating data handle");
 					VisIt_VariableData_free(hxc);

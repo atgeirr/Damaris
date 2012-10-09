@@ -265,7 +265,8 @@ visit_handle VisItListener::GetMesh(int domain, const char *name, void *cbdata)
 	visit_handle h = VISIT_INVALID_HANDLE;
 	if(m != NULL) {
 		DBG("Mesh found, exposing data, iteration is " << s->iteration);
-		m->exposeVisItData(&h,domain,s->iteration);
+		// TODO : retrieve source and block from the domain, don't pass 0 as block ID
+		m->exposeVisItData(&h,domain,s->iteration,0);
 	}	
 	return h;	
 }
@@ -278,7 +279,8 @@ visit_handle VisItListener::GetVariable(int domain, const char *name, void *cbda
 	Variable* v = VariableManager::Search(std::string(name));
 	visit_handle h = VISIT_INVALID_HANDLE;
 	if(v != NULL) {
-		v->exposeVisItData(&h,domain,s->iteration);
+		// TODO : retrieve source and block from the domain, don't pass 0 as block ID
+		v->exposeVisItData(&h,domain,s->iteration,0);
 	} else {
 		ERROR("Variable not found: \"" << name << "\"");
 	}

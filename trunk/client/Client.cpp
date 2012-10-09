@@ -129,7 +129,7 @@ namespace Damaris {
 
 		// create the ChunkImpl and attach it to the variable
 		ChunkImpl* chunk = new ChunkImpl(process->getSharedMemorySegment(),ch);
-		variable->attachChunk(chunk);	
+		variable->AttachChunk(chunk);	
 
 		ChunkDescriptor::Delete(cd);
 		// return the pointer to data
@@ -171,7 +171,7 @@ namespace Damaris {
 
 		// we don't need to keep the chunk in the client now,
 		// so we erase it from the variable.
-		v->detachChunk(it->get());
+		v->DetachChunk(it->get());
 
 		return 0;
 	}
@@ -191,7 +191,7 @@ namespace Damaris {
 		if(variable == NULL) {
 			return -1;
 		}
-
+/*
 		if((not variable->IsTimeVarying()) && iteration != 0) {
 			WARN("Trying to write a non-time-varying variable at an iteration "
 					<< "different from 0, the variable won't be written");
@@ -238,25 +238,29 @@ namespace Damaris {
 
 		// create the ChunkImpl and attach it to the variable
 		ChunkImpl chunk(process->getSharedMemorySegment(),ch);
-
+*/
+		Chunk* chunk = variable->Allocate(block);
+		if(chunk == NULL) return -1;
 		// copy data
-		size = cd->getDataMemoryLength(layout->getType());
-		memcpy(chunk.data(),data,size);
+		//size = cd->getDataMemoryLength(layout->getType());
+		//memcpy(chunk.data(),data,size);
+		int size = chunk->MemCopy(data);
 
 		// create message
 		Message message;
 
-		message.source = source;
-		message.iteration = iteration;
+		message.source = chunk->getSource();
+		message.iteration = chunk->getIteration();
 		message.object = variable->getID();
 		message.type = MSG_VAR;
-		message.handle = chunk.getHandle();
+		message.handle = chunk->getHandle();
 
 		// send message
 		process->getSharedMessageQueue()->send(&message);
 		DBG("Variable \"" << varname << "\" has been written");
 
-		ChunkDescriptor::Delete(cd);
+		//ChunkDescriptor::Delete(cd);
+		variable->DetachChunk(chunk);
 
 		return size;
 	}

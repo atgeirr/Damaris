@@ -143,6 +143,11 @@ namespace Damaris {
 			{ return isOwner; }
 
 			/**
+			 * Copy data from a pointer.
+			 */
+			virtual size_t MemCopy(const void* src);
+
+			/**
 			 * Returns a relative pointer (handle) to the memory region where the 
 			 * chunk is located. Warning: this handle points to the header, not the data.
 			 */

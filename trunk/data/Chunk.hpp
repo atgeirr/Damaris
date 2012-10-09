@@ -30,6 +30,7 @@
 #endif
 
 #include "xml/Model.hpp"
+#include "memory/SharedMemory.hpp"
 #include "data/Types.hpp"
 #include "data/Layout.hpp"
 
@@ -134,6 +135,17 @@ namespace Damaris {
 			 */
 			bool within(const Chunk& enclosing) const;
 
+			/**
+			 * Copy data from a pointer to the Chunk.
+			 * Returns the size of the copied data.
+			 */
+			virtual size_t MemCopy(const void* addr) = 0;
+
+			/**
+			 * Returns a handle to get the Chunk from the device
+			 * that stores it (typically a shared memory segment).
+			 */
+			virtual handle_t getHandle() = 0;
 #ifdef __ENABLE_VISIT
 			/**
 			 * Fills a VisIt data handle (already allocated) to expose the data

@@ -68,7 +68,7 @@ bool CurvilinearMesh::exposeVisItMetaData(visit_handle md) const
 	return false;
 }
 
-bool CurvilinearMesh::exposeVisItData(visit_handle* h, int source, int iteration) const
+bool CurvilinearMesh::exposeVisItData(visit_handle* h, int source, int iteration, int block) const
 {
 	DBG("In CurvilinearMesh::exposeVisItData");
 	// Allocates the VisIt handle
@@ -121,17 +121,18 @@ bool CurvilinearMesh::exposeVisItData(visit_handle* h, int source, int iteration
 		// At this point, the 2 or 3 coordinate variables are found. 
 		// Now accessing the data.
 
-		ChunkIndex::iterator end;
+		//ChunkIndex::iterator end;
 		int cmesh_dims[3];
 
 		// Accessing chunk for X coordinate
-		ChunkIndex::iterator c = vx->getChunks(source,iteration,end);		
-		if(c != end) {
+		//ChunkIndex::iterator c = vx->getChunks(source,iteration,end);		
+		Chunk* c = vx->GetChunk(source,iteration,block);
+		if(c != NULL) {
 			if(VisIt_VariableData_alloc(&hxc) == VISIT_OKAY) {
-				(*c)->FillVisItDataHandle(hxc);
-				cmesh_dims[0] = 1 + (*c)->getEndIndex(0) - (*c)->getStartIndex(0);
-				cmesh_dims[1] = 1 + (*c)->getEndIndex(1) - (*c)->getStartIndex(1);
-				cmesh_dims[2] = 1 + (*c)->getEndIndex(2) - (*c)->getStartIndex(2);
+				c->FillVisItDataHandle(hxc);
+				cmesh_dims[0] = 1 + c->getEndIndex(0) - c->getStartIndex(0);
+				cmesh_dims[1] = 1 + c->getEndIndex(1) - c->getStartIndex(1);
+				cmesh_dims[2] = 1 + c->getEndIndex(2) - c->getStartIndex(2);
 			} else {
 				ERROR("While allocating data handle");
 				return false;
@@ -143,13 +144,13 @@ bool CurvilinearMesh::exposeVisItData(visit_handle* h, int source, int iteration
 		}
 
 		// Accessing chunk for Y coordinate
-		c = vy->getChunks(source,iteration,end);
-		if(c != end) {
+		c = vy->GetChunk(source,iteration,block);
+		if(c != NULL) {
 			if(VisIt_VariableData_alloc(&hyc) == VISIT_OKAY) {
-				(*c)->FillVisItDataHandle(hyc);
-				if(    (cmesh_dims[0] != 1 + (*c)->getEndIndex(0) - (*c)->getStartIndex(0))
-					|| (cmesh_dims[1] != 1 + (*c)->getEndIndex(1) - (*c)->getStartIndex(1))
-                	|| (cmesh_dims[2] != 1 + (*c)->getEndIndex(2) - (*c)->getStartIndex(2))) {
+				c->FillVisItDataHandle(hyc);
+				if(    (cmesh_dims[0] != 1 + c->getEndIndex(0) - c->getStartIndex(0))
+					|| (cmesh_dims[1] != 1 + c->getEndIndex(1) - c->getStartIndex(1))
+					|| (cmesh_dims[2] != 1 + c->getEndIndex(2) - c->getStartIndex(2))) {
 					ERROR("Unmatching chunk sizes between coordinate variables");
 					VisIt_VariableData_free(hxc);
 					VisIt_VariableData_free(hyc);
@@ -167,13 +168,13 @@ bool CurvilinearMesh::exposeVisItData(visit_handle* h, int source, int iteration
 		
 		// Accessing chunk for Z coordinate we we need to
 		if(model.coord().size() == 3) {
-			c = vz->getChunks(source,iteration,end);
-			if(c != end) {
+			c = vz->GetChunk(source,iteration,block);
+			if(c != NULL) {
 				if(VisIt_VariableData_alloc(&hzc) == VISIT_OKAY) {
-					(*c)->FillVisItDataHandle(hzc);
-					if(    (cmesh_dims[0] != 1 + (*c)->getEndIndex(0) - (*c)->getStartIndex(0))
-						|| (cmesh_dims[1] != 1 + (*c)->getEndIndex(1) - (*c)->getStartIndex(1))
-						|| (cmesh_dims[2] != 1 + (*c)->getEndIndex(2) - (*c)->getStartIndex(2))) {
+					c->FillVisItDataHandle(hzc);
+					if(    (cmesh_dims[0] != 1 + c->getEndIndex(0) - c->getStartIndex(0))
+						|| (cmesh_dims[1] != 1 + c->getEndIndex(1) - c->getStartIndex(1))
+						|| (cmesh_dims[2] != 1 + c->getEndIndex(2) - c->getStartIndex(2))) {
 						ERROR("Unmatching chunk sizes between coordinate variables");
 						VisIt_VariableData_free(hxc);
 						VisIt_VariableData_free(hyc);

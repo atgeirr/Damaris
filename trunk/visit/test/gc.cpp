@@ -13,7 +13,7 @@ void internal_gc(const std::string& event, int32_t step, int32_t src)
 		ChunkIndexByIteration::iterator end;
 		ChunkIndexByIteration::iterator c = v->getChunksByIteration(step, end);
 		while(c != end) {
-			v->detachChunk(c->get());
+			v->DetachChunk(c->get());
 			x++;
 			c++;
 		}
