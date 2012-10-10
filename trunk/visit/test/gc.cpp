@@ -3,22 +3,40 @@
 
 using namespace Damaris;
 
+struct iteration_eraser {
+
+	static Variable* var;
+	static int iteration;
+
+	static bool condition(Chunk* c) {
+		return c->getIteration() == iteration;
+	}
+	
+	static void erase(Chunk *c) {
+		var->DetachChunk(c);
+	}
+};
+
 extern "C" {
 
 void internal_gc(const std::string& event, int32_t step, int32_t src)
 {
-	int x = 0;
+//	int x = 0;
 	Variable* v = VariableManager::Search("life/cells");
 	if(v != NULL) {
-		ChunkIndexByIteration::iterator end;
-		ChunkIndexByIteration::iterator c = v->getChunksByIteration(step, end);
-		while(c != end) {
-			v->DetachChunk(c->get());
-			x++;
-			c++;
-		}
+		//ChunkIndexByIteration::iterator end;
+		//ChunkIndexByIteration::iterator c = v->getChunksByIteration(step, end);
+		//while(c != end) {
+		//	v->DetachChunk(c->get());
+		//	x++;
+		//	c++;
+		//}
+		iteration_eraser::var = v;
+		iteration_eraser::iteration = step;
+		v->ForEach(iteration_eraser::erase,
+				iteration_eraser::condition);
 	}
-	INFO("successfully deleted " << x << " chunks");
+//	INFO("successfully deleted " << x << " chunks");
 }
 
 }

@@ -97,34 +97,48 @@ class Variable : public Configurable<Model::Variable> {
 		 * \deprecated
 		 */
 		ChunkIndexBySource::iterator getChunksBySource(int source,
-			ChunkIndexBySource::iterator& end);
+			ChunkIndexBySource::iterator& end)
+		__attribute__ ((deprecated));
 
 		/**
 		 * Returns the list of chunks with a specified iteration.
 		 * \deprecated
 		 */
 		ChunkIndexByIteration::iterator getChunksByIteration(int iteration,
-			ChunkIndexByIteration::iterator& end);
+			ChunkIndexByIteration::iterator& end)
+		__attribute__ ((deprecated));
 
 		/**
 		 * Returns an iterator of chunks with an iteration within a given range.
 		 * \deprecated
 		 */
 		ChunkIndexByIteration::iterator getChunksByIterationsRange(int itstart, int itend,
-			ChunkIndexByIteration::iterator& end);
-
+			ChunkIndexByIteration::iterator& end)
+		__attribute__ ((deprecated));
+		
 		/**
 		 * Returns an iterator over all the chunks.
 		 * \param[out] end : a reference that will hold the end of the iterator.
 		 * \deprecated
 		 */
-		ChunkIndex::iterator getChunks(ChunkIndex::iterator &end);
+		ChunkIndex::iterator getChunks(ChunkIndex::iterator &end)
+		__attribute__ ((deprecated));
 
 		/**
 		 * Finds a Chunk of a given source, iteration and block.
 		 * Returns NULL if this chunk doesn't exist.
 		 */
 		Chunk* GetChunk(int source, int iteration, int block=0);
+
+		/**
+		 * Counts the number of blocks for a given iteration.
+		 */
+		int CountLocalBlocks(int iteration) const;
+
+		/**
+		 * Counts the total number of blocks for a given iteration.
+		 */
+		int CountTotalBlocks(int iteration) const;
 
 		/**
 		 * Returns an iterator over all the chunks that correspond to a given
@@ -135,7 +149,7 @@ class Variable : public Configurable<Model::Variable> {
 		 * \param[out] end : a reference that will hold the end of the iterator.
 		 * \deprecated
 		 */
-		ChunkIndex::iterator getChunks(int source, int iteration, int block, ChunkIndex::iterator &end);
+		ChunkIndex::iterator getChunks(int source, int iteration, int block, ChunkIndex::iterator &end) __attribute__ ((deprecated));
 
 		/**
 		 * Detach a chunk from a variable. Free its memory if the process owns the chunk.
@@ -168,7 +182,7 @@ class Variable : public Configurable<Model::Variable> {
 		/**
 		 * Fills VisIt's metadata handle with information related to the variable.
 		 */
-		bool exposeVisItMetaData(visit_handle md);
+		bool exposeVisItMetaData(visit_handle md, int iteration);
 
 		/**
 		 * Fills VisIt's data handle with the proper data.
@@ -230,7 +244,7 @@ void Variable::ForEach(F& f)
 	ChunkIndex::iterator it = chunks.get<by_any>().begin();
 	ChunkIndex::iterator end = chunks.get<by_any>().end();
 	while(it != end) {
-		f(it->get);
+		f(it->get());
 		it++;
 	}
 }
@@ -242,7 +256,7 @@ void Variable::ForEach(F& f, C& c)
 	ChunkIndex::iterator end = chunks.get<by_any>().end();
 	while(it != end) {
 		if(c(it->get())) {
-			f(it->get);
+			f(it->get());
 			it++;
 		}
 	}

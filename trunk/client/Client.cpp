@@ -144,13 +144,15 @@ namespace Damaris {
 
 		ChunkImpl* chunk = NULL;
 		// get the pointer to the allocated chunk
-		ChunkIndexByIteration::iterator end;
-		ChunkIndexByIteration::iterator it = v->getChunksByIteration(iteration,end);
+		//ChunkIndexByIteration::iterator end;
+		//ChunkIndexByIteration::iterator it = v->getChunksByIteration(iteration,end);
+		int source = Process::get()->getID();
+		Chunk* c = v->GetChunk(source,iteration,0);
 
-		if(it == end)
+		if(c == NULL)
 			return -2;
 		try {
-			chunk = dynamic_cast<ChunkImpl*>(it->get());
+			chunk = dynamic_cast<ChunkImpl*>(c);
 		} catch(std::exception &e) {
 			ERROR("When doing dynamic cast: " << e.what());
 			return -3;
@@ -171,7 +173,7 @@ namespace Damaris {
 
 		// we don't need to keep the chunk in the client now,
 		// so we erase it from the variable.
-		v->DetachChunk(it->get());
+		v->DetachChunk(chunk);
 
 		return 0;
 	}

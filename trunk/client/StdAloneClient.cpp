@@ -129,13 +129,15 @@ namespace Damaris {
 			return -1;
 
 		// get the pointer to the allocated chunk
-		ChunkIndexByIteration::iterator end;
-		ChunkIndexByIteration::iterator it = v->getChunksByIteration(iteration,end);
+		//ChunkIndexByIteration::iterator end;
+		//ChunkIndexByIteration::iterator it = v->getChunksByIteration(iteration,end);
+		int source = Process::get()->getID();
+		Chunk* chunk = v->GetChunk(source,iteration,0);
 
-		if(it == end)
+		if(chunk == NULL)
 			return -2;
 		try {
-			dynamic_cast<ChunkImpl*>(it->get());
+			dynamic_cast<ChunkImpl*>(chunk);
 		} catch(std::exception &e) {
 			ERROR("When doing dynamic cast: " << e.what());
 			return -3;

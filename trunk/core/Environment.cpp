@@ -76,7 +76,7 @@ namespace Damaris {
 		}
 	}
 
-	int Environment::GetGlobalNumberOfClients()
+	int Environment::CountTotalClients()
 	{
 		int dcore = 0;
 		MPI_Comm_size(env->entityComm,&dcore);
@@ -85,6 +85,24 @@ namespace Damaris {
 		} else {
 			return dcore;
 		}
+	}
+
+	int Environment::CountTotalServers()
+	{
+		int dcore = 0;
+		MPI_Comm_size(env->entityComm,&dcore);
+		return dcore;
+	}
+
+	int Environment::CountLocalClients()
+	{
+		return env->knownClients.size();
+	}
+	
+	int Environment::CountLocalServers()
+	{
+		int c = env->model.architecture().cores().count();
+		return c - CountLocalClients();
 	}
 
 	std::string Environment::getSimulationName()

@@ -20,6 +20,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \author Matthieu Dorier
  * \version 0.4
  */
+#include <iterator>
 #include "core/Process.hpp"
 #include "core/LayoutManager.hpp"
 #include "data/Variable.hpp"
@@ -92,10 +93,31 @@ Chunk* Variable::GetChunk(int source, int iteration, int block)
 	if(not model.time_varying()) {
 		iteration = 0;
 	}
-	ChunkIndex::iterator end = chunks.get<by_any>().end();
-	ChunkIndex::iterator begin = chunks.get<by_any>().find(boost::make_tuple(source,iteration,block));
+	const ChunkIndex::iterator& end = chunks.get<by_any>().end();
+	ChunkIndex::iterator begin = chunks.get<by_any>().find(
+			boost::make_tuple(source,iteration,block));
 	if(begin == end) return NULL;
 	return begin->get();
+}
+
+int Variable::CountLocalBlocks(int iteration) const
+{
+	int istart = iteration;
+	int iend = iteration;
+	if(not model.time_varying()) {
+		istart = 0;
+		iend = 0;
+	}
+	ChunkIndexByIteration::iterator begin = chunks.get<by_iteration>().lower_bound(istart);
+	ChunkIndexByIteration::iterator end = chunks.get<by_iteration>().upper_bound(iend);
+	return std::distance(begin,end);
+}
+
+int Variable::CountTotalBlocks(int iteration) const
+{
+	// we assume every process holds the same number of blocks
+	int nbrServer = Environment::CountTotalServers();
+	return nbrServer*CountLocalBlocks(iteration);
 }
 
 bool Variable::DetachChunk(Chunk* c)
@@ -128,7 +150,7 @@ void Variable::ClearAll()
 }
 
 #ifdef __ENABLE_VISIT
-bool Variable::exposeVisItMetaData(visit_handle md)
+bool Variable::exposeVisItMetaData(visit_handle md, int iteration)
 {
 	if(not model.visualizable()) {
 		return false;
@@ -142,6 +164,8 @@ bool Variable::exposeVisItMetaData(visit_handle md)
 		}
 		VisIt_VariableMetaData_setType(vmd, VarTypeToVisIt(model.type()));
 		VisIt_VariableMetaData_setCentering(vmd, VarCenteringToVisIt(model.centering()));
+		//int numBlocks = CountTotalBlocks(iteration);
+		//VisIt_VariableMetaData_setNumDomains(vmd, numBlocks);
 
 		VisIt_SimulationMetaData_addVariable(md, vmd);
 		return true;

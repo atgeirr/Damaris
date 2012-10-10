@@ -35,7 +35,7 @@ CurvilinearMesh* CurvilinearMesh::New(const Model::Mesh& mdl, const std::string&
 }
 
 #ifdef __ENABLE_VISIT
-bool CurvilinearMesh::exposeVisItMetaData(visit_handle md) const
+bool CurvilinearMesh::exposeVisItMetaData(visit_handle md, int iteration) const
 {
 	visit_handle m1 = VISIT_INVALID_HANDLE;
 	if(VisIt_MeshMetaData_alloc(&m1) == VISIT_OKAY)
@@ -44,6 +44,9 @@ bool CurvilinearMesh::exposeVisItMetaData(visit_handle md) const
 		VisIt_MeshMetaData_setMeshType(m1, VISIT_MESHTYPE_CURVILINEAR);
 		VisIt_MeshMetaData_setTopologicalDimension(m1, (int)model.topology());
 		VisIt_MeshMetaData_setSpatialDimension(m1, (int)model.coord().size());
+	
+		int numBlocks = CountTotalBlocks(iteration);
+		VisIt_MeshMetaData_setNumDomains(m1,numBlocks);
 
 		Model::Mesh::coord_const_iterator it(model.coord().begin());
 		// the number of coordinates should be 2 or 3 (this condition is checked by
@@ -58,7 +61,7 @@ bool CurvilinearMesh::exposeVisItMetaData(visit_handle md) const
 		
 		if(model.coord().size() == 3) {
 			if(it->unit() != "#") VisIt_MeshMetaData_setZUnits(m1,it->unit().c_str());
-            if(it->label() != "#") VisIt_MeshMetaData_setZLabel(m1,it->label().c_str());
+			if(it->label() != "#") VisIt_MeshMetaData_setZLabel(m1,it->label().c_str());
 			it++;
 		}
 
@@ -221,4 +224,5 @@ bool CurvilinearMesh::exposeVisItData(visit_handle* h, int source, int iteration
 }
 
 #endif
+
 }

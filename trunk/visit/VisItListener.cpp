@@ -226,7 +226,7 @@ visit_handle VisItListener::GetMetaData(void *cbdata)
 			MeshManager::iterator mesh = MeshManager::Begin();
 			MeshManager::iterator end = MeshManager::End();
 			while(mesh != end) {
-				(*mesh)->exposeVisItMetaData(md);
+				(*mesh)->exposeVisItMetaData(md,s->iteration);
 				mesh++;
 			}
 		}
@@ -237,7 +237,7 @@ visit_handle VisItListener::GetMetaData(void *cbdata)
 			VariableManager::iterator var = VariableManager::Begin();
 			VariableManager::iterator end = VariableManager::End();
 			while(var != end) {
-				(*var)->exposeVisItMetaData(md);
+				(*var)->exposeVisItMetaData(md,s->iteration);
 				var++;
 			}
 		}
@@ -248,7 +248,7 @@ visit_handle VisItListener::GetMetaData(void *cbdata)
 			ActionManager::iterator act = ActionManager::Begin();
 			ActionManager::iterator end = ActionManager::End();
 			while(act != end) {
-				(*act)->exposeVisItMetaData(md);
+				(*act)->exposeVisItMetaData(md,s->iteration);
 				act++;
 			}
 		}
@@ -265,8 +265,17 @@ visit_handle VisItListener::GetMesh(int domain, const char *name, void *cbdata)
 	visit_handle h = VISIT_INVALID_HANDLE;
 	if(m != NULL) {
 		DBG("Mesh found, exposing data, iteration is " << s->iteration);
-		// TODO : retrieve source and block from the domain, don't pass 0 as block ID
-		m->exposeVisItData(&h,domain,s->iteration,0);
+		
+		std::list<int> clients = Environment::GetKnownLocalClients();
+		int nbrLocalClients = Environment::CountLocalClients();
+		int nbrLocalBlocks = m->CountLocalBlocks(s->iteration);
+		// TODO : here we assume each client sent the same number of blocks
+		int nbrLocalBlocksPerClient = nbrLocalBlocks/nbrLocalClients;
+
+		int source = domain / nbrLocalBlocksPerClient;
+		int block = domain % nbrLocalBlocksPerClient;
+
+		m->exposeVisItData(&h,source,s->iteration,block);
 	}	
 	return h;	
 }
@@ -279,8 +288,15 @@ visit_handle VisItListener::GetVariable(int domain, const char *name, void *cbda
 	Variable* v = VariableManager::Search(std::string(name));
 	visit_handle h = VISIT_INVALID_HANDLE;
 	if(v != NULL) {
-		// TODO : retrieve source and block from the domain, don't pass 0 as block ID
-		v->exposeVisItData(&h,domain,s->iteration,0);
+		std::list<int> clients = Environment::GetKnownLocalClients();
+		int nbrLocalClients = Environment::CountLocalClients();
+		int nbrLocalBlocks = v->CountLocalBlocks(s->iteration);
+		int nbrLocalBlocksPerClient = nbrLocalBlocks/nbrLocalClients;
+
+		int source = domain / nbrLocalBlocksPerClient;
+		int block = domain % nbrLocalBlocksPerClient;
+
+		v->exposeVisItData(&h,source,s->iteration,block);
 	} else {
 		ERROR("Variable not found: \"" << name << "\"");
 	}
@@ -289,29 +305,42 @@ visit_handle VisItListener::GetVariable(int domain, const char *name, void *cbda
 
 visit_handle VisItListener::GetDomainList(const char* name, void* cbdata)
 {
+	Variable* var = VariableManager::Search(std::string(name));
+	if(var == NULL) {
+		ERROR("VisIt requested domain list for an unknown variable");
+		return VISIT_INVALID_HANDLE;
+	}
+	
+	SimData *s = (SimData*)cbdata;
 	visit_handle h = VISIT_INVALID_HANDLE;
+
 	if(VisIt_DomainList_alloc(&h) != VISIT_ERROR)
 	{
 		visit_handle hdl;
 		int *iptr = NULL;
 
 		std::list<int> clients = Environment::GetKnownLocalClients();
-		int nbrClients = clients.size();
-		int ttlClients = Environment::GetGlobalNumberOfClients();
+		int nbrLocalClients = Environment::CountLocalClients();
+		int nbrLocalBlocks = var->CountLocalBlocks(s->iteration);
+		int nbrLocalBlocksPerClient = nbrLocalBlocks/nbrLocalClients;
+		int ttlClients = Environment::CountTotalClients();
+		int ttlBlocks = ttlClients*nbrLocalBlocksPerClient;
 
 		DBG("nbrClients = " << nbrClients << " ttlClients = " << ttlClients);
 
 		std::list<int>::const_iterator it = clients.begin();
-		iptr = (int *)malloc(sizeof(int)*nbrClients);
-		for(int i = 0; i < nbrClients; i++) {
-			iptr[i] = *it;
+		iptr = (int *)malloc(sizeof(int)*nbrLocalBlocks);
+		for(int i = 0; i < nbrLocalClients; i++) {
+			for(int j = 0; j < nbrLocalBlocksPerClient; j++) {
+				iptr[i] = (*it)*nbrLocalBlocksPerClient + j;
+			}
 			it++;
 		}
 
 		if(VisIt_VariableData_alloc(&hdl) == VISIT_OKAY)
 		{
-			VisIt_VariableData_setDataI(hdl, VISIT_OWNER_VISIT, 1, nbrClients, iptr);
-			VisIt_DomainList_setDomains(h, ttlClients, hdl);
+			VisIt_VariableData_setDataI(hdl, VISIT_OWNER_VISIT, 1, nbrLocalBlocks, iptr);
+			VisIt_DomainList_setDomains(h, ttlBlocks, hdl);
 		} else {
 			free(iptr);
 		}

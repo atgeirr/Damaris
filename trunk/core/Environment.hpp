@@ -78,11 +78,13 @@ namespace Damaris {
 
 		/**
 		 * \brief Get the number of clients per node.
+		 * \deprecated
 		 */
 		static int getClientsPerNode();
 
 		/**
 		 * \brief Get the number of cores per node.
+		 * \deprecated
 		 */
 		static int getCoresPerNode();
 
@@ -96,7 +98,22 @@ namespace Damaris {
 		/**
 		 * Returns the total number of clients used by the simulation.
 		 */
-		static int GetGlobalNumberOfClients();
+		static int CountTotalClients();
+
+		/**
+		 * Returns the total number of servers used by the simulation.
+		 */
+		static int CountTotalServers();
+
+		/**
+		 * Returns the local number of clients
+		 */
+		static int CountLocalClients();
+		
+		/**
+		 * Returns the local number of servers
+		 */
+		static int CountLocalServers();
 
 		/**
 		 * Add the id of newly connected client.
