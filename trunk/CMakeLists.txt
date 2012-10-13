@@ -131,7 +131,7 @@ endif(HDF5_ROOT)
 #-----------------------------------------------------------#
 # Set everything related to VisIt 
 #-----------------------------------------------------------#
-set(VISIT_ROOT "~/Work/Visu2/visit2.5.0/src")
+set(VISIT_ROOT "~/Work/Visu3/visit2.5.2/src")
 if(VISIT_ROOT)
   set(VISIT_INCLUDE_DIR "${VISIT_ROOT}/sim/V2/lib")
   set(VISIT_LIBRARY_DIR "${VISIT_ROOT}/lib")

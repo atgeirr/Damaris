@@ -29,8 +29,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "xml/Model.hpp"
 #include "core/Environment.hpp"
-#include "core/SharedMessageQueue.hpp"
-#include "core/SharedMemorySegment.hpp"
+#include "memory/SharedMessageQueue.hpp"
+#include "memory/SharedMemorySegment.hpp"
 
 namespace Damaris {
 
@@ -121,9 +121,9 @@ class Process {
 		/**
 		 * Get the SharedMemorySegment instance attached to the Process.
 		 */
-		SharedMemorySegment* getSharedMemorySegment()
+		Buffer* getSharedMemorySegment()
 		{
-			return segment;
+			return (Buffer*)segment;
 		}
 
 		/**

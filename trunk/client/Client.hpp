@@ -90,8 +90,12 @@ class Client : public Writer {
 		 * \see Writer::write
 		 */
 		virtual int write(const std::string & varname, 
-						int32_t iteration, const void* data, bool blocking = false);
-		
+				int32_t iteration, const void* data, bool blocking = false);
+	
+		virtual int write_block(const std::string &varname,
+				int32_t iteration, int32_t block, const void* data,
+				bool blocking = false);
+	
 		/**
 		 * \see Writer::chunk_write
 		 */

@@ -54,13 +54,13 @@ class RectilinearMesh : public Mesh {
 		 * Fills the visit handle with Metadata related to this Mesh.
 		 * Returns true in case of success.
 		 */
-		bool exposeVisItMetaData(visit_handle md) const;
+		bool exposeVisItMetaData(visit_handle md, int iteration) const;
 		
 		/**	
 		 * Fills the visit handle with the data related to this Mesh.
 		 * Returns true is successful.
 		 */
-		bool exposeVisItData(visit_handle* h, int source, int iteration) const;
+		bool exposeVisItData(visit_handle* h, int source, int iteration, int block) const;
 #endif
 
 };

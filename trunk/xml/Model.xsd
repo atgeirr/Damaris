@@ -136,59 +136,59 @@
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="short"> 
 				<xs:annotation><xs:documentation>
-                    2 bytes integer value.
+					2 bytes integer value.
 				</xs:documentation></xs:annotation>
 			</xs:enumeration>
 			<xs:enumeration value="int"> 
-                <xs:annotation><xs:documentation>
-                    4 bytes integer value.
+				<xs:annotation><xs:documentation>
+					4 bytes integer value.
 				</xs:documentation></xs:annotation>
-            </xs:enumeration>
+			</xs:enumeration>
 			<xs:enumeration value="integer"> 
-                <xs:annotation><xs:documentation>
-                    4 bytes integer value (equivalent to int).
+				<xs:annotation><xs:documentation>
+					4 bytes integer value (equivalent to int).
 				</xs:documentation></xs:annotation>
-            </xs:enumeration>
+			</xs:enumeration>
 			<xs:enumeration value="long">
-                <xs:annotation><xs:documentation>
-                    8 bytes integer value.
+				<xs:annotation><xs:documentation>
+					8 bytes integer value.
 				</xs:documentation></xs:annotation>
-            </xs:enumeration>
+			</xs:enumeration>
 			<xs:enumeration value="float">
-                <xs:annotation><xs:documentation>
-                    4 bytes float value.
-                </xs:documentation></xs:annotation>
-            </xs:enumeration>
+		                <xs:annotation><xs:documentation>
+					4 bytes float value.
+				</xs:documentation></xs:annotation>
+			</xs:enumeration>
 			<xs:enumeration value="real">
-                <xs:annotation><xs:documentation>
-                    4 bytes float value (equivalent to float).
+				<xs:annotation><xs:documentation>
+					4 bytes float value (equivalent to float).
 				</xs:documentation></xs:annotation>
-            </xs:enumeration>
+			</xs:enumeration>
 			<xs:enumeration value="double">
-                <xs:annotation><xs:documentation>
-                    8 bytes float value (equivalent to real*8 in Fortran)
+				<xs:annotation><xs:documentation>
+					8 bytes float value (equivalent to real*8 in Fortran)
 				</xs:documentation></xs:annotation>
-            </xs:enumeration>
+			</xs:enumeration>
 			<xs:enumeration value="char">
-                <xs:annotation><xs:documentation>
-                    1 byte value.
+				<xs:annotation><xs:documentation>
+					1 byte value.
 				</xs:documentation></xs:annotation>
-            </xs:enumeration>
+			</xs:enumeration>
 			<xs:enumeration value="character">
-                <xs:annotation><xs:documentation>
-                    1 byte value (equivalent to char).
+				<xs:annotation><xs:documentation>
+					1 byte value (equivalent to char).
 				</xs:documentation></xs:annotation>
-            </xs:enumeration>
+			</xs:enumeration>
 			<xs:enumeration value="string">
-                <xs:annotation><xs:documentation>
-                    Variable length null-terminated string.
+				<xs:annotation><xs:documentation>
+					Variable length null-terminated string.
 				</xs:documentation></xs:annotation>
-            </xs:enumeration>
+			</xs:enumeration>
 			<xs:enumeration value="label">
-                <xs:annotation><xs:documentation>
-                    Variable length null-terminated string (equivalent to string).
+				<xs:annotation><xs:documentation>
+					Variable length null-terminated string (equivalent to string).
 				</xs:documentation></xs:annotation>
-            </xs:enumeration>
+			</xs:enumeration>
 		</xs:restriction>
 	</xs:simpleType>
 

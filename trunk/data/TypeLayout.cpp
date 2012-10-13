@@ -43,7 +43,7 @@ namespace Damaris {
 	{
 		return 1;
 	}
-	
+
 	size_t TypeLayout::getExtentAlongDimension(unsigned int dim) const
 	{
 		if(dim == 0)

@@ -20,8 +20,13 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \author Matthieu Dorier
  * \version 0.4
  */
+#include <iterator>
+#include "core/Process.hpp"
 #include "core/LayoutManager.hpp"
 #include "data/Variable.hpp"
+#include "data/ChunkDescriptor.hpp"
+#include "data/ChunkHeader.hpp"
+#include "data/ChunkImpl.hpp"
 #include "core/Debug.hpp"
 
 namespace Damaris {
@@ -31,14 +36,15 @@ Variable::Variable(const Model::Variable& mdl, const std::string &n, Layout* l)
 {
 	layout = l;
 	name = n;
+	allocator = NULL;
 }
 
-void Variable::attachChunk(Chunk* chunk)
+bool Variable::AttachChunk(Chunk* chunk)
 {
 	if(not model.time_varying()) {
 		chunk->setIteration(0);
 	}
-	chunks.insert(boost::shared_ptr<Chunk>(chunk));
+	return chunks.insert(boost::shared_ptr<Chunk>(chunk)).second;
 }
 
 ChunkIndexBySource::iterator Variable::getChunksBySource(int source,
@@ -73,35 +79,78 @@ ChunkIndex::iterator Variable::getChunks(ChunkIndex::iterator &end)
 	return chunks.get<by_any>().begin();
 }
 
-ChunkIndex::iterator Variable::getChunks(int source, int iteration, ChunkIndex::iterator &end)
+ChunkIndex::iterator Variable::getChunks(int source, int iteration, int block, ChunkIndex::iterator &end)
 {
 	if(not model.time_varying()) {
 		iteration = 0;
 	}
 	end = chunks.get<by_any>().end();
-	return chunks.get<by_any>().find(boost::make_tuple(source,iteration));
+	return chunks.get<by_any>().find(boost::make_tuple(source,iteration,block));
 }
 
-void Variable::detachChunk(Chunk* c)
+Chunk* Variable::GetChunk(int source, int iteration, int block)
 {
-	ChunkIndex::iterator end;
-	ChunkIndex::iterator it = getChunks(c->getSource(),c->getIteration(),end);
+	if(not model.time_varying()) {
+		iteration = 0;
+	}
+	const ChunkIndex::iterator& end = chunks.get<by_any>().end();
+	ChunkIndex::iterator begin = chunks.get<by_any>().find(
+			boost::make_tuple(source,iteration,block));
+	if(begin == end) return NULL;
+	return begin->get();
+}
+
+int Variable::CountLocalBlocks(int iteration) const
+{
+	int istart = iteration;
+	int iend = iteration;
+	if(not model.time_varying()) {
+		istart = 0;
+		iend = 0;
+	}
+	ChunkIndexByIteration::iterator begin = chunks.get<by_iteration>().lower_bound(istart);
+	ChunkIndexByIteration::iterator end = chunks.get<by_iteration>().upper_bound(iend);
+	return std::distance(begin,end);
+}
+
+int Variable::CountTotalBlocks(int iteration) const
+{
+	// we assume every process holds the same number of blocks
+	int nbrServer = Environment::CountTotalServers();
+	return nbrServer*CountLocalBlocks(iteration);
+}
+
+bool Variable::DetachChunk(Chunk* c)
+{
+	int iteration = c->getIteration();
+	int source = c->getSource();
+	int block = c->getBlock();
+
+	if(not model.time_varying()) {
+                iteration = 0;
+        }
+        ChunkIndex::iterator end = chunks.get<by_any>().end();
+        ChunkIndex::iterator it = chunks.get<by_any>().find(
+					boost::make_tuple(source,iteration,block));
+
 	while(it != end) {
 		if(it->get() == c) {
 			chunks.get<by_any>().erase(it);
+			return true;
 			break;
 		}
 		it++;
 	}
+	return false;
 }
 
-void Variable::clear()
+void Variable::ClearAll()
 {
 	chunks.get<by_any>().clear();
 }
 
 #ifdef __ENABLE_VISIT
-bool Variable::exposeVisItMetaData(visit_handle md)
+bool Variable::exposeVisItMetaData(visit_handle md, int iteration)
 {
 	if(not model.visualizable()) {
 		return false;
@@ -115,6 +164,8 @@ bool Variable::exposeVisItMetaData(visit_handle md)
 		}
 		VisIt_VariableMetaData_setType(vmd, VarTypeToVisIt(model.type()));
 		VisIt_VariableMetaData_setCentering(vmd, VarCenteringToVisIt(model.centering()));
+		//int numBlocks = CountTotalBlocks(iteration);
+		//VisIt_VariableMetaData_setNumDomains(vmd, numBlocks);
 
 		VisIt_SimulationMetaData_addVariable(md, vmd);
 		return true;
@@ -123,19 +174,20 @@ bool Variable::exposeVisItMetaData(visit_handle md)
 	return false;
 }
 
-bool Variable::exposeVisItData(visit_handle* h, int source, int iteration)
+bool Variable::exposeVisItData(visit_handle* h, int source, int iteration, int block)
 {
 	DBG("source = " << source << ", iteration = " << iteration);
 	if(VisIt_VariableData_alloc(h) == VISIT_OKAY) {
-		ChunkIndex::iterator end;
-		ChunkIndex::iterator it = getChunks(source, iteration, end);
-		if(it == end) {
+		//ChunkIndex::iterator end;
+		//ChunkIndex::iterator it = getChunks(source, iteration, end);
+		Chunk* chunk = GetChunk(source,iteration,block);
+		if(chunk == NULL) {
 			ERROR("Chunk not found for source = " << source
-				<< " and iteration = " << iteration);
+				<< ", iteration = " << iteration << ", block = " << block);
 			VisIt_VariableData_free(*h);
 			return false;
 		}
-		(*it)->FillVisItDataHandle(*h);
+		chunk->FillVisItDataHandle(*h);
 		return true;
 	}
 	return false;
@@ -190,6 +242,80 @@ Variable* Variable::New(const Model::Variable& mdl, const std::string& name)
 		return NULL;
 	}
 	return new Variable(mdl,name,l);
+}
+
+Chunk* Variable::Allocate(int block)
+{
+	if(allocator == NULL) {
+		allocator = Process::get()->getSharedMemorySegment();
+	}
+	int iteration = Environment::GetLastIteration() + 1;
+	int source = Process::get()->getID();
+
+	if(not IsTimeVarying()) {
+		iteration = 0;
+	}
+
+	Chunk* chunk = GetChunk(source,iteration,block);
+	if(chunk != NULL) {
+		ERROR("Trying to overwrite an existing chunk for variable \""
+			<< name << "\"");
+		return NULL;
+	}
+
+	ChunkDescriptor* cd = ChunkDescriptor::New(*layout);
+	size_t size = sizeof(ChunkHeader)+cd->getDataMemoryLength(layout->getType());
+	void* location = allocator->allocate(size);
+
+	if(location == NULL) {
+		ERROR("Could not allocate memory for variable \"" 
+			<< name << "\": not enough memory");
+		ChunkDescriptor::Delete(cd);
+		return NULL;
+	}
+
+	ChunkHeader* ch = 
+		new(location) ChunkHeader(cd,layout->getType(),
+					iteration,source, block);
+	
+	chunk = new ChunkImpl(allocator,ch);
+	AttachChunk(chunk);
+
+	ChunkDescriptor::Delete(cd);
+	return chunk;
+}
+
+Chunk* Variable::Retrieve(void* addr)
+{
+	handle_t h = allocator->getHandleFromAddress(addr);
+	return Retrieve(h);
+}
+
+Chunk* Variable::Retrieve(handle_t h)
+{
+	allocator = Process::get()->getSharedMemorySegment();
+
+	ChunkImpl* chunk = new ChunkImpl(allocator,h);
+
+	int iteration = chunk->getIteration();
+	int source = chunk->getSource();
+	int block = chunk->getBlock();
+
+	Chunk* existing = GetChunk(source,iteration,block);
+	if(existing != NULL) {
+		if(existing->data() == chunk->data()) {
+			delete chunk;
+			return existing;
+		} else {
+			ERROR("Retrieving an already existing Chunk. The new one will not be considered.");
+			chunk->SetDataOwnership(true);
+			delete chunk;
+			return existing;
+		}
+	}
+	chunk->SetDataOwnership(true);
+	AttachChunk(chunk);
+	return chunk;
 }
 
 }

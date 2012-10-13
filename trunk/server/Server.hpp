@@ -26,7 +26,7 @@
 #include <string>
 #include <mpi.h>
 
-#include "core/Message.hpp"
+#include "memory/Message.hpp"
 #include "core/Process.hpp"
 #include "core/MPILayer.hpp"
 #include "server/Initiator.hpp"

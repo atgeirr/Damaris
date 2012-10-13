@@ -24,11 +24,13 @@
 #include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/interprocess/xsi_shared_memory.hpp>
 #include "core/Debug.hpp"
-#include "core/SharedMemorySegment.hpp"
+#include "memory/SharedMemorySegment.hpp"
 
 namespace Damaris {
 
-	SharedMemorySegment::SharedMemorySegment(mapped_region* r, managed_external_buffer* b)
+	static size_t alignment = boost::interprocess::rbtree_best_fit<boost::interprocess::mutex_family>::Alignment;
+
+	SharedMemorySegment::SharedMemorySegment(mapped_region* r, managed_protected_external_buffer* b)
 	{
 		// The header of the region is initialized in the Create function
 		// that called this constructor. No need to initialize it.
@@ -78,10 +80,15 @@ namespace Damaris {
 			mapped_region *region = new mapped_region(base,read_write,0,s);
 			void* addr = region->get_address();
 
-			new (addr) size_manager_s(size);
+			void* buff_addr = ((char*)addr) + sizeof(struct size_manager_s);
+			buff_addr = ((size_t)buff_addr) % alignment == 0 ? buff_addr
+						: ((char*)buff_addr) + alignment - (((size_t)buff_addr) % alignment);
+			size_t buff_size = s - ((size_t)(buff_addr)-(size_t)(addr));
 
-			managed_external_buffer *buffer = 
-				new managed_external_buffer(create_only, ((char*)addr)+sizeof(struct size_manager_s), size);
+			new (addr) size_manager_s(buff_size);
+
+			managed_protected_external_buffer *buffer = 
+				new managed_protected_external_buffer(create_only, buff_addr, buff_size);
 
 			return new SharedMemorySegment(region,buffer);
 
@@ -101,10 +108,15 @@ namespace Damaris {
 
 			mapped_region *region = new mapped_region(base,read_write,0,s);
 			void* addr = region->get_address();
-			new (addr) size_manager_s(size);
 
-			managed_external_buffer *buffer = 
-				new managed_external_buffer(create_only, ((char*)addr)+sizeof(struct size_manager_s), size);
+			void* buff_addr = (char*)addr + sizeof(struct size_manager_s);
+                        buff_addr = ((size_t)buff_addr) % alignment == 0 ? buff_addr
+                                                : (char*)buff_addr + alignment - (((size_t)buff_addr) % alignment);
+                        size_t buff_size = s - ((size_t)(buff_addr)-(size_t)(addr));
+
+			new (addr) size_manager_s(buff_size);
+			managed_protected_external_buffer *buffer = 
+				new managed_protected_external_buffer(create_only, buff_addr, buff_size);
 
 			return new SharedMemorySegment(region,buffer);
 
@@ -148,8 +160,13 @@ namespace Damaris {
 			mapped_region *region = new mapped_region(base,read_write,0,s);
 			void* addr = region->get_address();
 
-			managed_external_buffer *buffer =
-				new managed_external_buffer(open_only, ((char*)addr)+sizeof(struct size_manager_s), size);
+			void* buff_addr = (char*)addr + sizeof(struct size_manager_s);
+			buff_addr = ((size_t)buff_addr) % alignment == 0 ? buff_addr
+				: (char*)buff_addr + alignment - (((size_t)buff_addr) % alignment);
+			size_t buff_size = s - ((size_t)(buff_addr)-(size_t)(addr));
+
+			managed_protected_external_buffer *buffer =
+				new managed_protected_external_buffer(open_only, buff_addr, buff_size);
 
 			return new SharedMemorySegment(region,buffer);
 
@@ -170,8 +187,13 @@ namespace Damaris {
 			mapped_region *region = new mapped_region(base,read_write,0,s);
 
 			void* addr = region->get_address();
-			managed_external_buffer *buffer =
-				new managed_external_buffer(open_only, ((char*)addr)+sizeof(struct size_manager_s), size);
+			void* buff_addr = (char*)addr + sizeof(struct size_manager_s);
+			buff_addr = ((size_t)buff_addr) % alignment == 0 ? buff_addr
+				: (char*)buff_addr + alignment - (((size_t)buff_addr) % alignment);
+			size_t buff_size = s - ((size_t)(buff_addr)-(size_t)(addr));
+
+			managed_protected_external_buffer *buffer =
+				new managed_protected_external_buffer(open_only, buff_addr, buff_size);
 
 			return new SharedMemorySegment(region,buffer);
 

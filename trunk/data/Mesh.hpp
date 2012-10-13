@@ -71,13 +71,23 @@ class Mesh : public Configurable<Model::Mesh> {
 		/**
 		 * Fills visit handle with metadata related to the Mesh.
 		 */
-		virtual bool exposeVisItMetaData(visit_handle md) const = 0;
+		virtual bool exposeVisItMetaData(visit_handle md, int iteration) const = 0;
 		
 		/**
 		 * Fills visit handle with metadata related to the Mesh.
 		 */
-		virtual bool exposeVisItData(visit_handle* h, int source, int iteration) const = 0;
+		virtual bool exposeVisItData(visit_handle* h, int source, int iteration, int block) const = 0;
 #endif
+
+		/**
+		 * Count the number of local blocks required to build the mesh.
+		 */
+		virtual int CountLocalBlocks(int iteration) const;
+
+		/**
+		 * Count the total number of blocks for this mesh across all processes.
+		 */
+		virtual int CountTotalBlocks(int iteration) const;
 
 		/**
 		 * Creates an instance of a child class of Mesh according to the Mesh model.

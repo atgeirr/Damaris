@@ -1,19 +1,19 @@
 /*******************************************************************
-This file is part of Damaris.
+  This file is part of Damaris.
 
-Damaris is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+  Damaris is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
 
-Damaris is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+  Damaris is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
-********************************************************************/
+  You should have received a copy of the GNU General Public License
+  along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
+ ********************************************************************/
 /**
  * \file Client.cpp
  * \date February 2012 
@@ -28,8 +28,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <exception>
 
 #include "core/Debug.hpp"
-#include "data/ShmChunk.hpp"
-#include "core/Message.hpp"
+#include "data/ChunkImpl.hpp"
+#include "memory/Message.hpp"
 #include "client/Client.hpp"
 
 #include "core/ParameterManager.hpp"
@@ -78,24 +78,24 @@ namespace Damaris {
 		// check that the variable is known in the configuration
 		Variable* variable = VariableManager::Search(varname);
 
-        if(variable == NULL) {
+		if(variable == NULL) {
 			ERROR("Variable \""<< varname 
-				<< "\" not defined in configuration");
+					<< "\" not defined in configuration");
 			return NULL;
-        }
+		}
 
 		if((not variable->IsTimeVarying()) && iteration != 0) {
 			WARN("Trying to write a non-time-varying variable at an iteration "
-				<< "different from 0, the variable won't be allocated");
-            return NULL;
+					<< "different from 0, the variable won't be allocated");
+			return NULL;
 		}
 
 		// the variable is known, get its layout
 		Layout* layout = variable->getLayout();
-	
+
 		if(layout->isUnlimited()) {
 			ERROR("The layout as undefined extents or has a variable-sized type, "
-			<< "use chunk-based allocation");
+					<< "use chunk-based allocation");
 			return NULL;
 		}
 
@@ -127,35 +127,37 @@ namespace Damaris {
 		int source = process->getID();
 		ChunkHeader* ch = new(location) ChunkHeader(cd,layout->getType(),iteration,source);
 
-		// create the ShmChunk and attach it to the variable
-		ShmChunk* chunk = new ShmChunk(process->getSharedMemorySegment(),ch);
-		variable->attachChunk(chunk);	
+		// create the ChunkImpl and attach it to the variable
+		ChunkImpl* chunk = new ChunkImpl(process->getSharedMemorySegment(),ch);
+		variable->AttachChunk(chunk);	
 
 		ChunkDescriptor::Delete(cd);
 		// return the pointer to data
 		return chunk->data();
 	}
-	
+
 	int Client::commit(const std::string & varname, int32_t iteration)
 	{		
 		Variable* v = VariableManager::Search(varname);
 		if(v == NULL)
 			return -1;
 
-		ShmChunk* chunk = NULL;
+		ChunkImpl* chunk = NULL;
 		// get the pointer to the allocated chunk
-		ChunkIndexByIteration::iterator end;
-		ChunkIndexByIteration::iterator it = v->getChunksByIteration(iteration,end);
+		//ChunkIndexByIteration::iterator end;
+		//ChunkIndexByIteration::iterator it = v->getChunksByIteration(iteration,end);
+		int source = Process::get()->getID();
+		Chunk* c = v->GetChunk(source,iteration,0);
 
-		if(it == end)
+		if(c == NULL)
 			return -2;
 		try {
-			chunk = dynamic_cast<ShmChunk*>(it->get());
+			chunk = dynamic_cast<ChunkImpl*>(c);
 		} catch(std::exception &e) {
 			ERROR("When doing dynamic cast: " << e.what());
 			return -3;
 		}
-		
+
 		// create notification message
 		Message message;
 		message.source = process->getID();
@@ -170,24 +172,31 @@ namespace Damaris {
 		DBG("Variable \"" << varname << "\" has been commited");
 
 		// we don't need to keep the chunk in the client now,
-        // so we erase it from the variable.
-        v->detachChunk(it->get());
+		// so we erase it from the variable.
+		v->DetachChunk(chunk);
 
 		return 0;
 	}
-	
-	int Client::write(const std::string & varname, int32_t iteration, const void* data, bool blocking)
+
+	int Client::write(const std::string & varname, int32_t iteration, 
+			const void* data, bool blocking)
+	{
+		return write_block(varname,iteration, 0, data, blocking);
+	}
+
+	int Client::write_block(const std::string &varname, int32_t iteration, int32_t block,
+			const void* data, bool blocking)
 	{
 		/* check that the variable is know in the configuration */
 		Variable* variable = VariableManager::Search(varname);
 
-        if(variable == NULL) {
+		if(variable == NULL) {
 			return -1;
-        }
-
+		}
+/*
 		if((not variable->IsTimeVarying()) && iteration != 0) {
 			WARN("Trying to write a non-time-varying variable at an iteration "
-				<< "different from 0, the variable won't be written");
+					<< "different from 0, the variable won't be written");
 			return -4;
 		}
 
@@ -195,60 +204,65 @@ namespace Damaris {
 
 		if(layout->isUnlimited()) {
 			ERROR("Trying to write a variable" 
-				<< " with an unlimited layout (use chunk_write instead)");
+					<< " with an unlimited layout (use chunk_write instead)");
 			return -3;
 		}
 
 		// initialize the chunk descriptor
-        ChunkDescriptor* cd = ChunkDescriptor::New(*layout);
+		ChunkDescriptor* cd = ChunkDescriptor::New(*layout);
 
-        // try allocating the required memory
-        size_t size = sizeof(ChunkHeader)+cd->getDataMemoryLength(layout->getType());
-        void* location = process->getSharedMemorySegment()->allocate(size);
+		// try allocating the required memory
+		size_t size = sizeof(ChunkHeader)+cd->getDataMemoryLength(layout->getType());
+		void* location = process->getSharedMemorySegment()->allocate(size);
 
 		if(location == NULL && not blocking) {
-            ERROR("Could not allocate memory: not enough available memory");
+			ERROR("Could not allocate memory: not enough available memory");
 			lost(iteration);
 			ChunkDescriptor::Delete(cd);
-            return -2;
-        } else if(location == NULL && blocking) {
-            while(location == NULL) {
+			return -2;
+		} else if(location == NULL && blocking) {
+			while(location == NULL) {
 				clean(iteration);
-                if(process->getSharedMemorySegment()->waitAvailable(size)) {
-                    location = process->getSharedMemorySegment()->allocate(size);
-                } else {
-                    ERROR("Could not allocate memory: not enough total memory");
+				if(process->getSharedMemorySegment()->waitAvailable(size)) {
+					location = process->getSharedMemorySegment()->allocate(size);
+				} else {
+					ERROR("Could not allocate memory: not enough total memory");
 					ChunkDescriptor::Delete(cd);
-                    return -2;
-                }
-            }
-        }
+					return -2;
+				}
+			}
+		}
 
-        // create the chunk header in memory
-        int source = process->getID();
-        ChunkHeader* ch = new(location) ChunkHeader(cd,layout->getType(),iteration,source);
+		// create the chunk header in memory
+		int source = process->getID();
+		ChunkHeader* ch = new(location) ChunkHeader(cd,layout->getType(),
+								iteration,source, block);
 
-        // create the ShmChunk and attach it to the variable
-        ShmChunk chunk(process->getSharedMemorySegment(),ch);
-
+		// create the ChunkImpl and attach it to the variable
+		ChunkImpl chunk(process->getSharedMemorySegment(),ch);
+*/
+		Chunk* chunk = variable->Allocate(block);
+		if(chunk == NULL) return -1;
 		// copy data
-		size = cd->getDataMemoryLength(layout->getType());
-		memcpy(chunk.data(),data,size);
-		
+		//size = cd->getDataMemoryLength(layout->getType());
+		//memcpy(chunk.data(),data,size);
+		int size = chunk->MemCopy(data);
+
 		// create message
 		Message message;
-		
-		message.source = source;
-		message.iteration = iteration;
+
+		message.source = chunk->getSource();
+		message.iteration = chunk->getIteration();
 		message.object = variable->getID();
 		message.type = MSG_VAR;
-		message.handle = chunk.getHandle();
-		
+		message.handle = chunk->getHandle();
+
 		// send message
 		process->getSharedMessageQueue()->send(&message);
 		DBG("Variable \"" << varname << "\" has been written");
-	
-		ChunkDescriptor::Delete(cd);
+
+		//ChunkDescriptor::Delete(cd);
+		variable->DetachChunk(chunk);
 
 		return size;
 	}
@@ -259,14 +273,14 @@ namespace Damaris {
 		/* check that the variable is know in the configuration */
 		Variable* variable = VariableManager::Search(varname);
 
-        if(variable == NULL) {
+		if(variable == NULL) {
 			ERROR("Variable \""<< varname << "\" not defined in configuration");
 			return -1;
-        }
+		}
 
 		if((not variable->IsTimeVarying()) && iteration != 0) {
 			WARN("Trying to write a non-time-varying variable at an iteration "
-				<< "different from 0, the variable won't be written");
+					<< "different from 0, the variable won't be written");
 			return -4;
 		}
 
@@ -277,78 +291,78 @@ namespace Damaris {
 			ERROR("Chunk boundaries do not match variable's layout");
 			return -3;
 		}
-	
+
 		// allocate memory
 		size_t size = sizeof(ChunkHeader)+cd->getDataMemoryLength(layout->getType());
 		void* location = process->getSharedMemorySegment()->allocate(size);
 
 		if(location == NULL && not blocking) {
-            ERROR("Could not allocate memory: not enough available memory");
+			ERROR("Could not allocate memory: not enough available memory");
 			lost(iteration);
-            return -2;
-        } else if(location == NULL && blocking) {
-            while(location == NULL) {
+			return -2;
+		} else if(location == NULL && blocking) {
+			while(location == NULL) {
 				clean(iteration);
-                if(process->getSharedMemorySegment()->waitAvailable(size)) {
-                    location = process->getSharedMemorySegment()->allocate(size);
-                } else {
-                    ERROR("Could not allocate memory: not enough total memory");
-                    return -2;
-                }
-            }
-        }
+				if(process->getSharedMemorySegment()->waitAvailable(size)) {
+					location = process->getSharedMemorySegment()->allocate(size);
+				} else {
+					ERROR("Could not allocate memory: not enough total memory");
+					return -2;
+				}
+			}
+		}
 
 		// create the ChunkHeader
 		int source = process->getID();
 		ChunkHeader* ch = new(location) ChunkHeader(cd,layout->getType(),iteration,source);
 
-		// create the ShmChunk object		
-		ShmChunk chunk(process->getSharedMemorySegment(),ch);
+		// create the ChunkImpl object		
+		ChunkImpl chunk(process->getSharedMemorySegment(),ch);
 
 		// copy data
 		size = cd->getDataMemoryLength(layout->getType());
 		memcpy(chunk.data(),data,size);
-		
+
 		// create message
 		Message message;
-		
+
 		message.source = source;
 		message.iteration = iteration;
 		message.object = variable->getID();
 		message.type = MSG_VAR;
 		message.handle = chunk.getHandle();
-		
+
 		// send message
 		process->getSharedMessageQueue()->send(&message);
 		DBG("Variable \"" << varname << "\" has been written");
-	
+
 		return size;
 	}
 
 	int Client::signal(const std::string & signal_name, int32_t iteration)
 	{
 		try {
-		Action* action = ActionManager::Search(signal_name);
-		if(action == NULL) {
-			DBG("Undefined action \"" << signal_name << "\"");
-			return -2;
-		}
+			Action* action = ActionManager::Search(signal_name);
+			if(action == NULL) {
+				DBG("Undefined action \"" << signal_name << "\"");
+				return -2;
+			}
 
-		Message sig;
-		sig.source = process->getID();
-		sig.iteration = iteration;
-		sig.type = MSG_SIG;
-		sig.handle = 0;
-		sig.object = action->getID();
-		
-		try {
-			process->getSharedMessageQueue()->send(&sig);
-		} catch(interprocess_exception &e) {
-			ERROR("Error while sending event \"" << signal_name << "\", " << e.what());
-			return -1;
-		}
-		DBG("Event \""<< signal_name << "\" has been sent");
-		return 0;
+			Message sig;
+			sig.source = process->getID();
+			sig.iteration = iteration;
+			sig.type = MSG_SIG;
+			sig.handle = 0;
+			sig.object = action->getID();
+
+			try {
+				process->getSharedMessageQueue()->send(&sig);
+			} catch(interprocess_exception &e) {
+				ERROR("Error while sending event \"" << signal_name << "\", " << e.what());
+				return -1;
+			}
+			DBG("Event \""<< signal_name << "\" has been sent");
+			return 0;
 		} catch (std::exception &e) {
 			ERROR(e.what());
 			return -3;
@@ -376,7 +390,7 @@ namespace Damaris {
 			return -1;
 		}
 	}
-		
+
 	int Client::kill_server()
 	{
 		static int killed;
@@ -395,7 +409,7 @@ namespace Damaris {
 	}
 
 	int Client::clean(int iteration)
-    {
+	{
 		Message msg;
 		msg.type = MSG_INT;
 		msg.source = process->getID();
@@ -403,21 +417,21 @@ namespace Damaris {
 		msg.object = URGENT_CLEAN;
 		process->getSharedMessageQueue()->send(&msg);
 		return 0;
-    }
+	}
 
 	int Client::lost(int iteration)
 	{
 		Message msg;
 		msg.type = MSG_INT;
-        msg.source = process->getID();
-        msg.iteration = iteration;
-        msg.object = LOST_DATA;
-        process->getSharedMessageQueue()->send(&msg);
+		msg.source = process->getID();
+		msg.iteration = iteration;
+		msg.object = LOST_DATA;
+		process->getSharedMessageQueue()->send(&msg);
 		return 0;	
 	}
 
 	int Client::end_iteration(int iteration)
-    {
+	{
 		Environment::SetLastIteration(iteration);
 		Message msg;
 		msg.type = MSG_INT;
@@ -445,12 +459,12 @@ namespace Damaris {
 	{
 		return Environment::getEntityComm();
 	}
-	
+
 	Client::~Client() 
 	{
 		Process::kill();
 		DBG("Client destroyed successfuly");
 	}
-	
+
 }
 

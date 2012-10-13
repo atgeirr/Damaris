@@ -92,7 +92,7 @@ class Action  {
 		 * Expose the Action's metadata to VisIt.
 		 * \param[out] md : an allocated visit_handle associated with a Command metadata.
 		 */
-		bool exposeVisItMetaData(visit_handle md);
+		bool exposeVisItMetaData(visit_handle md, int iteration);
 #endif
 
 		/**

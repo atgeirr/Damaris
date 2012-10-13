@@ -12,8 +12,6 @@ set(DAMARIS_MODEL_SRC
 set(DAMARIS_COMMON_SRC
 	${DAMARIS_SOURCE_DIR}/core/Process.cpp
 	${DAMARIS_SOURCE_DIR}/core/ParameterManager.cpp
-	${DAMARIS_SOURCE_DIR}/core/SharedMessageQueue.cpp
-	${DAMARIS_SOURCE_DIR}/core/SharedMemorySegment.cpp
 	${DAMARIS_SOURCE_DIR}/core/Environment.cpp
 	${DAMARIS_SOURCE_DIR}/core/VariableManager.cpp
 	${DAMARIS_SOURCE_DIR}/core/MeshManager.cpp
@@ -22,6 +20,8 @@ set(DAMARIS_COMMON_SRC
 	${DAMARIS_SOURCE_DIR}/core/Observable.cpp
 	${DAMARIS_SOURCE_DIR}/core/Observer.cpp
 	${DAMARIS_SOURCE_DIR}/core/ProcInfo.cpp
+	${DAMARIS_SOURCE_DIR}/memory/SharedMessageQueue.cpp
+	${DAMARIS_SOURCE_DIR}/memory/SharedMemorySegment.cpp
 	${DAMARIS_SOURCE_DIR}/event/Action.cpp
 	${DAMARIS_SOURCE_DIR}/event/BoundAction.cpp
 	${DAMARIS_SOURCE_DIR}/event/DynamicAction.cpp
@@ -32,7 +32,7 @@ set(DAMARIS_COMMON_SRC
 	${DAMARIS_SOURCE_DIR}/data/CurvilinearMesh.cpp
 	${DAMARIS_SOURCE_DIR}/data/ChunkDescriptor.cpp
 	${DAMARIS_SOURCE_DIR}/data/Chunk.cpp
-	${DAMARIS_SOURCE_DIR}/data/ShmChunk.cpp
+	${DAMARIS_SOURCE_DIR}/data/ChunkImpl.cpp
 	${DAMARIS_SOURCE_DIR}/data/Types.cpp
 	${DAMARIS_SOURCE_DIR}/data/Layout.cpp
 	${DAMARIS_SOURCE_DIR}/data/BoxLayout.cpp

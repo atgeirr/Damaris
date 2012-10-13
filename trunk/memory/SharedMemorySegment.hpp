@@ -32,9 +32,16 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/interprocess/sync/interprocess_mutex.hpp>
 #include <boost/interprocess/sync/interprocess_condition.hpp>
 #include "xml/Model.hpp"
-#include "core/SharedMemory.hpp"
+#include "memory/Buffer.hpp"
 
 namespace Damaris {
+
+typedef boost::interprocess::basic_managed_external_buffer<
+		char,
+		boost::interprocess::rbtree_best_fit<boost::interprocess::mutex_family>,
+		boost::interprocess::iset_index
+	>
+	managed_protected_external_buffer;
 /*
  * Contains the definition of a shared memory segment in which
  * we can store chunks of variables. This definition is abstract.
@@ -43,7 +50,7 @@ namespace Damaris {
  */
 using namespace boost::interprocess;
 
-class SharedMemorySegment {
+class SharedMemorySegment : public Buffer {
 	protected:
 		class CompositeShMem;
 	
@@ -64,12 +71,12 @@ class SharedMemorySegment {
 		} *size_manager;
 	
 		mapped_region* region; /*!< pointer to the mapped_region object. */
-		managed_external_buffer* buffer; /*!< pointer to the managed buffer. */
+		managed_protected_external_buffer* buffer; /*!< pointer to the managed buffer. */
 
 		/**
 		 * Constructor.
 		 */
-		SharedMemorySegment(mapped_region* r, managed_external_buffer* b);
+		SharedMemorySegment(mapped_region* r, managed_protected_external_buffer* b);
 
 	public:
 		/**
@@ -157,12 +164,6 @@ class SharedMemorySegment {
 		static bool RemoveMultiBlock(const Model::Buffer* model);
 
 	public:
-		/**
-		 * This typedef is just to prevent compilation error
-		 * when defining pur virtual function that return void* pointers.
-		 */
-		typedef void* ptr;
-
 		/**
 		 * Gets an absolute address from a relative handle.
 		 */
