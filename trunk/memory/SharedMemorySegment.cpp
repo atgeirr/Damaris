@@ -277,17 +277,17 @@ namespace Damaris {
 		return false;
 	}
 
-	SharedMemorySegment::ptr SharedMemorySegment::getAddressFromHandle(handle_t h) const
+	SharedMemorySegment::ptr SharedMemorySegment::GetAddressFromHandle(handle_t h) const
 	{
 		return buffer->get_address_from_handle(h.value);
 	}
 
-	handle_t SharedMemorySegment::getHandleFromAddress(SharedMemorySegment::ptr p) const
+	handle_t SharedMemorySegment::GetHandleFromAddress(SharedMemorySegment::ptr p) const
 	{
 		return buffer->get_handle_from_address(p);
 	}
 
-	SharedMemorySegment::ptr SharedMemorySegment::allocate(size_t size)
+	SharedMemorySegment::ptr SharedMemorySegment::Allocate(size_t size)
 	{
 		SharedMemorySegment::ptr t = buffer->allocate(size,std::nothrow);
 		if(t != NULL) {
@@ -296,33 +296,33 @@ namespace Damaris {
 		return t;
 	}
 
-	void SharedMemorySegment::deallocate(void* addr)
+	void SharedMemorySegment::Deallocate(void* addr)
 	{
-		size_t oldsize __attribute__((unused)) = getFreeMemory();
+		size_t oldsize __attribute__((unused)) = GetFreeMemory();
 		scoped_lock<interprocess_mutex> lock(size_manager->lock);
 		buffer->deallocate(addr);
-		size_t newsize = getFreeMemory();
+		size_t newsize = GetFreeMemory();
 		size_manager->size = newsize;
 		size_manager->cond_size.notify_all();
 		DBG("Deallocated: " << (newsize - oldsize));
 	}
 
-	size_t SharedMemorySegment::getFreeMemory() const
+	size_t SharedMemorySegment::GetFreeMemory() const
 	{
 		return buffer->get_free_memory();
 	}
 
-	bool SharedMemorySegment::pointerBelongsToSegment(void* p) const
+	bool SharedMemorySegment::PointerBelongsToSegment(void* p) const
 	{
 		return buffer->belongs_to_segment(p);
 	}
 
-	bool SharedMemorySegment::waitAvailable(size_t size)
+	bool SharedMemorySegment::WaitAvailable(size_t size)
 	{
 		if(size > size_manager->max) return false;
 
 		scoped_lock<interprocess_mutex> lock(size_manager->lock);
-		while(size > getFreeMemory()) {
+		while(size > GetFreeMemory()) {
 			size_manager->cond_size.wait(lock);
 		}
 		return true;
@@ -414,21 +414,21 @@ namespace Damaris {
 		blocks = v;
 	}
 
-	SharedMemorySegment::ptr SharedMemorySegment::CompositeShMem::getAddressFromHandle(handle_t h) const
+	SharedMemorySegment::ptr SharedMemorySegment::CompositeShMem::GetAddressFromHandle(handle_t h) const
 	{
 		if(h.objid < 0 or h.objid >= nbseg) {
 			ERROR("Invalid object id");
 			return NULL;
 		}
-		return (*blocks)[h.objid]->getAddressFromHandle(h);
+		return (*blocks)[h.objid]->GetAddressFromHandle(h);
 	}
 
-	handle_t SharedMemorySegment::CompositeShMem::getHandleFromAddress(SharedMemorySegment::ptr p) const
+	handle_t SharedMemorySegment::CompositeShMem::GetHandleFromAddress(SharedMemorySegment::ptr p) const
 	{
 		int id = 0;
 		bool found = false;
 		for(int i=0;i<nbseg;i++) {
-			if((*blocks)[i]->pointerBelongsToSegment(p)) {
+			if((*blocks)[i]->PointerBelongsToSegment(p)) {
 				id = i;
 				found = true;
 				break;
@@ -438,34 +438,34 @@ namespace Damaris {
 			ERROR("Pointer does not belong to any segment");
 			return handle_t();
 		}
-		handle_t h = (*blocks)[id]->getHandleFromAddress(p);
+		handle_t h = (*blocks)[id]->GetHandleFromAddress(p);
 		h.objid = id;
 		return h;
 	}
 
-	SharedMemorySegment::ptr SharedMemorySegment::CompositeShMem::allocate(size_t size)
+	SharedMemorySegment::ptr SharedMemorySegment::CompositeShMem::Allocate(size_t size)
 	{
 		// tries to find a segment that have enough free space
 		void* res = NULL;
 		for(int i = 0; i < nbseg; i++) {
-			res = (*blocks)[i]->allocate(size);
+			res = (*blocks)[i]->Allocate(size);
 			if(res != NULL) return res;
 		}
 		return NULL;
 	}
 
-	void SharedMemorySegment::CompositeShMem::deallocate(void* addr)
+	void SharedMemorySegment::CompositeShMem::Deallocate(void* addr)
 	{
 		// find the segment in charge of this address
 		for(int i=0; i < nbseg; i++) {
-			if((*blocks)[i]->pointerBelongsToSegment(addr)) {
-				(*blocks)[i]->deallocate(addr);
+			if((*blocks)[i]->PointerBelongsToSegment(addr)) {
+				(*blocks)[i]->Deallocate(addr);
 				return;
 			}
 		}
 	}
 
-	size_t SharedMemorySegment::CompositeShMem::getFreeMemory() const
+	size_t SharedMemorySegment::CompositeShMem::GetFreeMemory() const
 	{
 		// this function actually returns the maximum free memory
 		// that we can find in a block, since the user in not allowed
@@ -473,17 +473,17 @@ namespace Damaris {
 		size_t max = 0;
 		for(int i = 0 ; i<nbseg; i++)
 		{
-			size_t m = (*blocks)[i]->getFreeMemory();
+			size_t m = (*blocks)[i]->GetFreeMemory();
 			max = (m > max) ? m : max;
 		}
 		return max;
 	}
 
-	bool SharedMemorySegment::CompositeShMem::pointerBelongsToSegment(void* p) const
+	bool SharedMemorySegment::CompositeShMem::PointerBelongsToSegment(void* p) const
 	{
 		bool res = false;
 		for(int i = 0; i < nbseg; i++) {
-			res = res || (*blocks)[i]->pointerBelongsToSegment(p);
+			res = res || (*blocks)[i]->PointerBelongsToSegment(p);
 		}
 		return res; 
 	}

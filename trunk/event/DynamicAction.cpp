@@ -43,15 +43,15 @@ namespace Damaris {
 			dlclose(handle);
 	}
 
-	void DynamicAction::call(int32_t iteration, int32_t sourceID, const char* args)
+	void DynamicAction::Call(int32_t iteration, int32_t sourceID, const char* args)
 	{
 		if(!loaded)
-			load();
+			Load();
 		if(function != NULL)
-			(*function)(getName(),iteration,sourceID,args);
+			(*function)(GetName(),iteration,sourceID,args);
 	}
 
-	void DynamicAction::load()
+	void DynamicAction::Load()
 	{
 		if(loaded) return;
 
@@ -84,7 +84,7 @@ namespace Damaris {
 		if(ev.scope() == Model::Scope::core)
 			return new DynamicAction(ev,name);
 		else if(ev.scope() == Model::Scope::node)
-			return NodeAction<DynamicAction,Model::Event>::New(ev,name,Environment::getClientsPerNode());
+			return NodeAction<DynamicAction,Model::Event>::New(ev,name,Environment::CountLocalClients());
 		else {
 			CFGERROR("Scope \"" << ev.scope() << "\" is not implemented for event \"" << name << "\".");
 			return NULL;

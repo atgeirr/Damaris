@@ -11,6 +11,11 @@
 				Number of client processes in a node.
 			</xs:documentation></xs:annotation>
 		</xs:attribute>
+		<xs:attribute name="domains" type="xs:unsignedInt" use="optional" default="1">
+			<xs:annotation><xs:documentation>
+				Number of domains handled by each client.
+			</xs:documentation></xs:annotation>
+		</xs:attribute>
 	</xs:complexType>
 
 	<!-- Cores node -->

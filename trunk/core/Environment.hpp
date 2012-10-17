@@ -80,13 +80,13 @@ namespace Damaris {
 		 * \brief Get the number of clients per node.
 		 * \deprecated
 		 */
-		static int getClientsPerNode();
+		static int getClientsPerNode() __attribute__ ((deprecated));
 
 		/**
 		 * \brief Get the number of cores per node.
 		 * \deprecated
 		 */
-		static int getCoresPerNode();
+		static int getCoresPerNode() __attribute__ ((deprecated));
 
 		/**
 		 * Returns the list of id of clients connected to the
@@ -154,6 +154,11 @@ namespace Damaris {
 		 * \brief Tell if a dedicated core is present.
 		 */
 		static bool hasServer();
+
+		/**
+		 * Returns the number of domain that each client is supposed to handle.
+		 */
+		static unsigned int GetNumDomainsPerClient();
 
 		/**
 		 * Returns the last known terminated iteration.

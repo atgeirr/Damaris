@@ -48,6 +48,10 @@ add_executable (mesh ${VISIT_TEST_DIR}/mesh.c)
 target_link_libraries (mesh ${CLIENT_SIDE_LIBRARIES})
 set_target_properties (mesh PROPERTIES LINK_FLAGS "-Wl,-export-dynamic")
 
+add_executable (blocks ${VISIT_TEST_DIR}/blocks.c)
+target_link_libraries (blocks ${CLIENT_SIDE_LIBRARIES})
+set_target_properties (blocks PROPERTIES LINK_FLAGS "-Wl,-export-dynamic")
+
 add_executable (point ${VISIT_TEST_DIR}/point.c)
 target_link_libraries (point ${CLIENT_SIDE_LIBRARIES})
 set_target_properties (point PROPERTIES LINK_FLAGS "-Wl,-export-dynamic")

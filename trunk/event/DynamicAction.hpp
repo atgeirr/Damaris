@@ -61,7 +61,7 @@ class DynamicAction : public Action, public Configurable<Model::Event> {
 		/**
 		 * Loads the function from the shared library or from the main program.
 		 */
-		virtual void load();
+		virtual void Load();
 
 		/**
 		 * \brief Destructor.
@@ -73,7 +73,7 @@ class DynamicAction : public Action, public Configurable<Model::Event> {
 		 * \brief Another way of calling the inner function.
 		 * \see Damaris::Action::operator()
 		 */
-		virtual void call(int32_t iteration, int32_t sourceID, const char* args = NULL);
+		virtual void Call(int32_t iteration, int32_t sourceID, const char* args = NULL);
 
 		/**
 		 * Return true if the action can be called from outside the simulation 

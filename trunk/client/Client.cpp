@@ -91,9 +91,9 @@ namespace Damaris {
 		}
 
 		// the variable is known, get its layout
-		Layout* layout = variable->getLayout();
+		Layout* layout = variable->GetLayout();
 
-		if(layout->isUnlimited()) {
+		if(layout->IsUnlimited()) {
 			ERROR("The layout as undefined extents or has a variable-sized type, "
 					<< "use chunk-based allocation");
 			return NULL;
@@ -103,8 +103,8 @@ namespace Damaris {
 		ChunkDescriptor* cd = ChunkDescriptor::New(*layout);
 
 		// try allocating the required memory
-		size_t size = sizeof(ChunkHeader)+cd->getDataMemoryLength(layout->getType());			
-		void* location = process->getSharedMemorySegment()->allocate(size);	
+		size_t size = sizeof(ChunkHeader)+cd->GetDataMemoryLength(layout->GetType());			
+		void* location = process->getSharedMemorySegment()->Allocate(size);	
 
 		if(location == NULL && not blocking) {
 			ERROR("Could not allocate memory: not enough available memory");
@@ -114,8 +114,8 @@ namespace Damaris {
 		} else if(location == NULL && blocking) {
 			while(location == NULL) {
 				clean(iteration);
-				if(process->getSharedMemorySegment()->waitAvailable(size)) {
-					location = process->getSharedMemorySegment()->allocate(size);
+				if(process->getSharedMemorySegment()->WaitAvailable(size)) {
+					location = process->getSharedMemorySegment()->Allocate(size);
 				} else {
 					ERROR("Could not allocate memory: not enough total memory");
 					ChunkDescriptor::Delete(cd);
@@ -125,7 +125,7 @@ namespace Damaris {
 		}
 		// create the chunk header in memory
 		int source = process->getID();
-		ChunkHeader* ch = new(location) ChunkHeader(cd,layout->getType(),iteration,source);
+		ChunkHeader* ch = new(location) ChunkHeader(cd,layout->GetType(),iteration,source);
 
 		// create the ChunkImpl and attach it to the variable
 		ChunkImpl* chunk = new ChunkImpl(process->getSharedMemorySegment(),ch);
@@ -133,7 +133,7 @@ namespace Damaris {
 
 		ChunkDescriptor::Delete(cd);
 		// return the pointer to data
-		return chunk->data();
+		return chunk->Data();
 	}
 
 	int Client::commit(const std::string & varname, int32_t iteration)
@@ -164,8 +164,8 @@ namespace Damaris {
 
 		message.iteration = iteration;
 		message.type = MSG_VAR;
-		message.handle = chunk->getHandle();
-		message.object = v->getID();
+		message.handle = chunk->GetHandle();
+		message.object = v->GetID();
 		// send message
 		process->getSharedMessageQueue()->send(&message);
 		// free message
@@ -251,11 +251,11 @@ namespace Damaris {
 		// create message
 		Message message;
 
-		message.source = chunk->getSource();
-		message.iteration = chunk->getIteration();
-		message.object = variable->getID();
+		message.source = chunk->GetSource();
+		message.iteration = chunk->GetIteration();
+		message.object = variable->GetID();
 		message.type = MSG_VAR;
-		message.handle = chunk->getHandle();
+		message.handle = chunk->GetHandle();
 
 		// send message
 		process->getSharedMessageQueue()->send(&message);
@@ -286,15 +286,15 @@ namespace Damaris {
 
 		ChunkDescriptor* cd = (ChunkDescriptor*)chunkh;
 		// check if the chunk matches the layout boundaries
-		Layout* layout = variable->getLayout();
-		if(not cd->within(*layout)) {
+		Layout* layout = variable->GetLayout();
+		if(not cd->Within(*layout)) {
 			ERROR("Chunk boundaries do not match variable's layout");
 			return -3;
 		}
 
 		// allocate memory
-		size_t size = sizeof(ChunkHeader)+cd->getDataMemoryLength(layout->getType());
-		void* location = process->getSharedMemorySegment()->allocate(size);
+		size_t size = sizeof(ChunkHeader)+cd->GetDataMemoryLength(layout->GetType());
+		void* location = process->getSharedMemorySegment()->Allocate(size);
 
 		if(location == NULL && not blocking) {
 			ERROR("Could not allocate memory: not enough available memory");
@@ -303,8 +303,8 @@ namespace Damaris {
 		} else if(location == NULL && blocking) {
 			while(location == NULL) {
 				clean(iteration);
-				if(process->getSharedMemorySegment()->waitAvailable(size)) {
-					location = process->getSharedMemorySegment()->allocate(size);
+				if(process->getSharedMemorySegment()->WaitAvailable(size)) {
+					location = process->getSharedMemorySegment()->Allocate(size);
 				} else {
 					ERROR("Could not allocate memory: not enough total memory");
 					return -2;
@@ -314,23 +314,23 @@ namespace Damaris {
 
 		// create the ChunkHeader
 		int source = process->getID();
-		ChunkHeader* ch = new(location) ChunkHeader(cd,layout->getType(),iteration,source);
+		ChunkHeader* ch = new(location) ChunkHeader(cd,layout->GetType(),iteration,source);
 
 		// create the ChunkImpl object		
 		ChunkImpl chunk(process->getSharedMemorySegment(),ch);
 
 		// copy data
-		size = cd->getDataMemoryLength(layout->getType());
-		memcpy(chunk.data(),data,size);
+		size = cd->GetDataMemoryLength(layout->GetType());
+		memcpy(chunk.Data(),data,size);
 
 		// create message
 		Message message;
 
 		message.source = source;
 		message.iteration = iteration;
-		message.object = variable->getID();
+		message.object = variable->GetID();
 		message.type = MSG_VAR;
-		message.handle = chunk.getHandle();
+		message.handle = chunk.GetHandle();
 
 		// send message
 		process->getSharedMessageQueue()->send(&message);
@@ -353,7 +353,7 @@ namespace Damaris {
 			sig.iteration = iteration;
 			sig.type = MSG_SIG;
 			sig.handle = 0;
-			sig.object = action->getID();
+			sig.object = action->GetID();
 
 			try {
 				process->getSharedMessageQueue()->send(&sig);
@@ -373,7 +373,7 @@ namespace Damaris {
 	{
 		Parameter* p = ParameterManager::Search(paramName);
 		if(p != NULL) {
-			p->toBuffer(buffer, size);
+			p->ToBuffer(buffer, size);
 			return 0;
 		} else {
 			return -1;
@@ -384,7 +384,7 @@ namespace Damaris {
 	{
 		Parameter* p = ParameterManager::Search(paramName);
 		if(p != NULL) {
-			p->fromBuffer(buffer,size);
+			p->FromBuffer(buffer,size);
 			return 0;
 		} else {
 			return -1;

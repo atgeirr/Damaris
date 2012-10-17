@@ -66,7 +66,7 @@ class ParameterManager : public Manager<Parameter> {
 			{
 				Parameter* p = ParameterManager::Search(n);
 				if(p == NULL) return T();
-				return p->getValue<T>();
+				return p->GetValue<T>();
 			}
 		};
 };

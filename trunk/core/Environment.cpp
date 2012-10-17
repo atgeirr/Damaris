@@ -158,6 +158,12 @@ namespace Damaris {
 		return (getCoresPerNode() != getClientsPerNode());
 	}
 
+	unsigned int Environment::GetNumDomainsPerClient()
+	{
+		if(env == NULL) return 0;
+		return env->model.architecture().cores().clients().domains();
+	}
+
 	int Environment::GetLastIteration()
 	{
 		DBG("Getting last iteration");

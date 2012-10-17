@@ -51,7 +51,7 @@ namespace Damaris {
 		ERROR("Mesh type " << mdl.type() << " is not implemented.");
 		return NULL;
 	}
-
+/*
 	int Mesh::CountLocalBlocks(int iteration) const
 	{
 		int c = 0;
@@ -111,5 +111,5 @@ namespace Damaris {
 		}
 		return c;
 	}
-
+*/
 }

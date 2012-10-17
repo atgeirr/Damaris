@@ -34,17 +34,17 @@ namespace Damaris {
 	{
 	}
 	
-	Model::Type TypeLayout::getType() const
+	Model::Type TypeLayout::GetType() const
 	{
 		return model;
 	}
 	
-	unsigned int TypeLayout::getDimensions() const
+	unsigned int TypeLayout::GetDimensions() const
 	{
 		return 1;
 	}
 
-	size_t TypeLayout::getExtentAlongDimension(unsigned int dim) const
+	size_t TypeLayout::GetExtentAlongDimension(unsigned int dim) const
 	{
 		if(dim == 0)
 			return 1;
@@ -52,7 +52,7 @@ namespace Damaris {
 			return 0;
 	}
 
-	bool TypeLayout::isUnlimited() const
+	bool TypeLayout::IsUnlimited() const
 	{
 		return false;
 	}

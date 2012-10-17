@@ -27,16 +27,16 @@ namespace Damaris {
 
 	void Action::operator()(int32_t iteration, int32_t sourceID, const char* args)
 	{
-		call(iteration,sourceID,args);
+		Call(iteration,sourceID,args);
 	}
 
 #ifdef __ENABLE_VISIT
-	bool Action::exposeVisItMetaData(visit_handle h, int iteration)
+	bool Action::ExposeVisItMetaData(visit_handle h, int iteration)
 	{
 		visit_handle cmd = VISIT_INVALID_HANDLE;
 		if(not IsExternallyVisible()) return false;
 		if(VisIt_CommandMetaData_alloc(&cmd) == VISIT_OKAY) {
-			VisIt_CommandMetaData_setName(cmd, getName().c_str());
+			VisIt_CommandMetaData_setName(cmd, GetName().c_str());
 			VisIt_SimulationMetaData_addGenericCommand(h, cmd);
 			return true;
 		}

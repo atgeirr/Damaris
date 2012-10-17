@@ -43,6 +43,12 @@ int DC_write(const char* varname, int32_t iteration, const void* data)
 	return __client->write(varname_str,iteration,data);
 }
 
+int DC_write_block(const char* varname, int32_t iteration, int32_t block, const void* data)
+{
+	std::string varname_str(varname);
+	return __client->write_block(varname_str,iteration,block,data);
+}
+
 int DC_chunk_write(DC_chunk_handle_t chunkh, const char* varname, 
 		int32_t iteration, const void* data)
 {

@@ -78,28 +78,28 @@ namespace Damaris {
 			/**
 			 * \brief Computes the required number of bytes to allocate for the data.
 			 */
-			size_t getDataMemoryLength(const Model::Type& t) const;
+			size_t GetDataMemoryLength(const Model::Type& t) const;
 
 			/**
 			 * \brief Gets the number of dimensions.
 			 */
-			unsigned int getDimensions() const { return dimensions; }
+			unsigned int GetDimensions() const { return dimensions; }
 
 			/**
 			 * \brief Gets a start index.
 			 */
-			int getStartIndex(int i) const;
+			int GetStartIndex(int i) const;
 
 			/**
 			 * \brief Gets an end index.
 			 */
-			int getEndIndex(int i) const;
+			int GetEndIndex(int i) const;
 
 			/**
 			 * \brief Check if the chunk is within an enclosing Layout.
 			 * Note: returns false if NULL is passed.
 			 */
-			bool within(const Layout& enclosing) const;
+			bool Within(const Layout& enclosing) const;
 
 	}; // class ChunkDescriptor
 

@@ -81,6 +81,30 @@ namespace Damaris
       this->count_.set (x);
     }
 
+    const Clients::domains_type& Clients::
+    domains () const
+    {
+      return this->domains_.get ();
+    }
+
+    Clients::domains_type& Clients::
+    domains ()
+    {
+      return this->domains_.get ();
+    }
+
+    void Clients::
+    domains (const domains_type& x)
+    {
+      this->domains_.set (x);
+    }
+
+    Clients::domains_type Clients::
+    domains_default_value ()
+    {
+      return domains_type (1);
+    }
+
 
     // Cores
     // 
@@ -2182,7 +2206,8 @@ namespace Damaris
     Clients::
     Clients (const count_type& count)
     : ::xml_schema::type (),
-      count_ (count, ::xml_schema::flags (), this)
+      count_ (count, ::xml_schema::flags (), this),
+      domains_ (domains_default_value (), ::xml_schema::flags (), this)
     {
     }
 
@@ -2191,7 +2216,8 @@ namespace Damaris
              ::xml_schema::flags f,
              ::xml_schema::container* c)
     : ::xml_schema::type (x, f, c),
-      count_ (x.count_, f, this)
+      count_ (x.count_, f, this),
+      domains_ (x.domains_, f, this)
     {
     }
 
@@ -2200,7 +2226,8 @@ namespace Damaris
              ::xml_schema::flags f,
              ::xml_schema::container* c)
     : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
-      count_ (f, this)
+      count_ (f, this),
+      domains_ (f, this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
       {
@@ -2224,6 +2251,12 @@ namespace Damaris
           this->count_.set (count_traits::create (i, f, this));
           continue;
         }
+
+        if (n.name () == "domains" && n.namespace_ ().empty ())
+        {
+          this->domains_.set (domains_traits::create (i, f, this));
+          continue;
+        }
       }
 
       if (!count_.present ())
@@ -2231,6 +2264,11 @@ namespace Damaris
         throw ::xsd::cxx::tree::expected_attribute< char > (
           "count",
           "");
+      }
+
+      if (!domains_.present ())
+      {
+        this->domains_.set (domains_default_value ());
       }
     }
 

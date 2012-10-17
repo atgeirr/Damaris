@@ -65,26 +65,29 @@ class Variable : public Configurable<Model::Variable> {
 		 */
 		Variable(const Model::Variable& v, const std::string& name, Layout* l);
 
-	public:	
+	public:
+		
+		typedef typename ChunkSet::iterator iterator;
+	
 		/**
 		 * Returns the layout of the variable.
 		 */
-		Layout* getLayout() const { return layout; }
+		Layout* GetLayout() const { return layout; }
 	
 		/**
 		 * Returns the name of the variable.
 		 */
-		const std::string& getName() const { return name; }
+		const std::string& GetName() const { return name; }
 
 		/**
 		 * Returns the id of the variable, as given by the VariableManager.
 		 */
-		int getID() const { return id; }
+		int GetID() const { return id; }
 
 		/**
 		 * Returns the allocator used for chunks allocation.
 		 */
-		Buffer* getAllocator() const { return allocator; }
+		Buffer* Allocator() const { return allocator; }
 
 		/**
 		 * Attach a new chunk to the variable.
@@ -149,7 +152,8 @@ class Variable : public Configurable<Model::Variable> {
 		 * \param[out] end : a reference that will hold the end of the iterator.
 		 * \deprecated
 		 */
-		ChunkIndex::iterator getChunks(int source, int iteration, int block, ChunkIndex::iterator &end) __attribute__ ((deprecated));
+		ChunkIndex::iterator getChunks(int source, int iteration, int block, 
+			ChunkIndex::iterator &end) __attribute__ ((deprecated));
 
 		/**
 		 * Detach a chunk from a variable. Free its memory if the process owns the chunk.
@@ -166,12 +170,12 @@ class Variable : public Configurable<Model::Variable> {
 		/**
 		 * Returns the variables description.
 		 */
-		std::string getDescription() const { return (std::string)model; }
+		std::string GetDescription() const { return (std::string)model; }
 
 		/**
 		 * Returns the unit of the variable.
 		 */
-		std::string getUnit() const { return model.unit(); }
+		std::string GetUnit() const { return model.unit(); }
 
 		/**
 		 * Return true if the variable is time-varying.
@@ -182,12 +186,17 @@ class Variable : public Configurable<Model::Variable> {
 		/**
 		 * Fills VisIt's metadata handle with information related to the variable.
 		 */
-		bool exposeVisItMetaData(visit_handle md, int iteration);
+		bool ExposeVisItMetaData(visit_handle md, int iteration);
 
 		/**
 		 * Fills VisIt's data handle with the proper data.
 		 */
-		bool exposeVisItData(visit_handle *md, int source, int iteration, int block);
+		bool ExposeVisItData(visit_handle *md, int source, int iteration, int block);
+
+		/**
+		 * Fills a VisIt handle to expose the domain list.
+		 */
+		bool ExposeVisItDomainList(visit_handle *md, int iteration);
 
 	private:
 		/**
@@ -231,6 +240,16 @@ class Variable : public Configurable<Model::Variable> {
 		 */
 		template<typename F, typename C>
 		void ForEach(F& f, C& c);
+
+		/**
+		 * Returns an iterator to the list of stored chunks
+		 */
+		iterator Begin();
+
+		/**
+		 * Returns an iterator to the end of the stored chunks
+		 */
+		iterator End();
 
 		/**
 		 * Creates an instance of Variable if the provided model is consistant.

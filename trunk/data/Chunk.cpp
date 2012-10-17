@@ -31,33 +31,33 @@ namespace Damaris {
 int Chunk::NbrOfItems() const
 {
 	int acc = 1;
-	for(unsigned int i = 0; i < getDimensions(); i++) {
-		acc *= (getEndIndex(i) - getStartIndex(i) + 1);
+	for(unsigned int i = 0; i < GetDimensions(); i++) {
+		acc *= (GetEndIndex(i) - GetStartIndex(i) + 1);
 	}
 	return acc;
 }
 
-bool Chunk::within(const Layout& enclosing) const
+bool Chunk::Within(const Layout& enclosing) const
 {
-    if(enclosing.isUnlimited()) return true;
+    if(enclosing.IsUnlimited()) return true;
 
-    bool b = (enclosing.getDimensions() == getDimensions());
+    bool b = (enclosing.GetDimensions() == GetDimensions());
     if(b) {
-        for(unsigned int i=0; i < getDimensions();i++) {
-            b = b && (getStartIndex(i) >= 0);
-            b = b && (getEndIndex(i) < (int)enclosing.getExtentAlongDimension(i));
+        for(unsigned int i=0; i < GetDimensions();i++) {
+            b = b && (GetStartIndex(i) >= 0);
+            b = b && (GetEndIndex(i) < (int)enclosing.GetExtentAlongDimension(i));
         }
     }
     return b;
 }
 
-bool Chunk::within(const Chunk& enclosing) const
+bool Chunk::Within(const Chunk& enclosing) const
 {
-    bool b = (enclosing.getDimensions() == getDimensions());
+    bool b = (enclosing.GetDimensions() == GetDimensions());
     if(b) {
-        for(unsigned int i=0; i < getDimensions(); i++) {
-            b = b && (getStartIndex(i) >= enclosing.getStartIndex(i));
-            b = b && (getEndIndex(i) <= enclosing.getEndIndex(i));
+        for(unsigned int i=0; i < GetDimensions(); i++) {
+            b = b && (GetStartIndex(i) >= enclosing.GetStartIndex(i));
+            b = b && (GetEndIndex(i) <= enclosing.GetEndIndex(i));
         }
     }
     return b;
@@ -66,20 +66,20 @@ bool Chunk::within(const Chunk& enclosing) const
 #ifdef __ENABLE_VISIT
 bool Chunk::FillVisItDataHandle(visit_handle hdl)
 {
-	DBG("source is " << getSource() << ", iteration is " << getIteration());
+	DBG("source is " << GetSource() << ", iteration is " << GetIteration());
 	int nb_items = NbrOfItems();
 	DBG("Number of items is " << nb_items);
-	const Model::Type& t = getType();
-	DBG("Type is " << getType());
+	const Model::Type& t = GetType();
+	DBG("Type is " << t);
 	if(hdl != VISIT_INVALID_HANDLE) {
 		if(t == Model::Type::int_ or t == Model::Type::integer) {
-			VisIt_VariableData_setDataI(hdl, VISIT_OWNER_SIM, 1, nb_items, (int*)data());
+			VisIt_VariableData_setDataI(hdl, VISIT_OWNER_SIM, 1, nb_items, (int*)Data());
 		} else if(t == Model::Type::float_ or t == Model::Type::real) {
-			VisIt_VariableData_setDataF(hdl, VISIT_OWNER_SIM, 1, nb_items, (float*)data());
+			VisIt_VariableData_setDataF(hdl, VISIT_OWNER_SIM, 1, nb_items, (float*)Data());
 		} else if(t == Model::Type::double_) {
-			VisIt_VariableData_setDataD(hdl, VISIT_OWNER_SIM, 1, nb_items, (double*)data());
+			VisIt_VariableData_setDataD(hdl, VISIT_OWNER_SIM, 1, nb_items, (double*)Data());
 		} else if(t == Model::Type::char_ or Model::Type::character) {
-			VisIt_VariableData_setDataC(hdl, VISIT_OWNER_SIM, 1, nb_items, (char*)data());
+			VisIt_VariableData_setDataC(hdl, VISIT_OWNER_SIM, 1, nb_items, (char*)Data());
 		} else {
 			ERROR("VisIt cannot accept chunk data of type \"" << t << "\"");
 			return false;

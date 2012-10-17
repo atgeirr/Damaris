@@ -304,6 +304,23 @@ namespace Damaris
       void
       count (const count_type& x);
 
+      // domains
+      // 
+      typedef ::xml_schema::unsigned_int domains_type;
+      typedef ::xsd::cxx::tree::traits< domains_type, char > domains_traits;
+
+      const domains_type&
+      domains () const;
+
+      domains_type&
+      domains ();
+
+      void
+      domains (const domains_type& x);
+
+      static domains_type
+      domains_default_value ();
+
       // Constructors.
       //
       Clients (const count_type&);
@@ -332,6 +349,7 @@ namespace Damaris
 
       protected:
       ::xsd::cxx::tree::one< count_type > count_;
+      ::xsd::cxx::tree::one< domains_type > domains_;
     };
 
     class Cores: public ::xml_schema::type

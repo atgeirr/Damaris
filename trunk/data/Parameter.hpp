@@ -64,34 +64,36 @@ namespace Damaris {
 			/**
 			 * Gets the name of the parameter.
 			 */
-			const std::string& getName() const;
+			const std::string& GetName() const
+			{ return name; }
 			
 			/**
 			 * Returns the id of the parameter.
 			 */
-			int getID() const;
+			int GetID() const
+			{ return id; }
 
 			/**
 			 * Gets the value of the parameter.
 			 */
 			template<typename T>
-			T getValue() const;
+			T GetValue() const;
 
 			/**
 			 * Sets the value of the parameter.
 			 */
 			template<typename T>
-			void setValue(const T& v);
+			void SetValue(const T& v);
 
 			/**
 			 * Copy the value to a buffer of given maximum size.
 			 */
-			int toBuffer(void* buffer, unsigned int size) const;
+			int ToBuffer(void* buffer, unsigned int size) const;
 		
 			/**
 		 	 * Get the value from a buffer.
 			 */
-			int fromBuffer(const void* buffer, unsigned int size);
+			int FromBuffer(const void* buffer, unsigned int size);
 
 			/**
 			 * Destructor.
@@ -110,20 +112,20 @@ Parameter::Parameter(const Model::Parameter& mdl, const std::string& n, const T&
 {
 	value = NULL;
 	name = n;
-	setValue<T>(v);
+	SetValue<T>(v);
 }
 
 template<typename T>
-T Parameter::getValue() const 
+T Parameter::GetValue() const 
 {
 	T t;
-	toBuffer((void*)(&t), sizeof(T));
+	ToBuffer((void*)(&t), sizeof(T));
 	return t;
 }
 
 template<typename T>
-void Parameter::setValue(const T& v)
+void Parameter::SetValue(const T& v)
 {
-	fromBuffer(&v,sizeof(T));
+	FromBuffer(&v,sizeof(T));
 }
 }

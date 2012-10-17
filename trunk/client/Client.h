@@ -52,6 +52,11 @@ int 	DC_initialize(const char* configfile, int32_t core_id);
 int 	DC_write(const char* varname, int32_t iteration, const void* data);
 
 /**
+ * \see Damaris::Client::write_block
+ */
+int DC_write_block(const char* varname, int32_t iteration, int32_t block, const void* data);
+
+/**
  * \brief Writes a chunk of a variable.
  * \see Damaris::Client::chunk_write
  */

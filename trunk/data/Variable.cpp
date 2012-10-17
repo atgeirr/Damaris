@@ -42,7 +42,7 @@ Variable::Variable(const Model::Variable& mdl, const std::string &n, Layout* l)
 bool Variable::AttachChunk(Chunk* chunk)
 {
 	if(not model.time_varying()) {
-		chunk->setIteration(0);
+		chunk->SetIteration(0);
 	}
 	return chunks.insert(boost::shared_ptr<Chunk>(chunk)).second;
 }
@@ -122,9 +122,9 @@ int Variable::CountTotalBlocks(int iteration) const
 
 bool Variable::DetachChunk(Chunk* c)
 {
-	int iteration = c->getIteration();
-	int source = c->getSource();
-	int block = c->getBlock();
+	int iteration = c->GetIteration();
+	int source = c->GetSource();
+	int block = c->GetBlock();
 
 	if(not model.time_varying()) {
                 iteration = 0;
@@ -150,7 +150,7 @@ void Variable::ClearAll()
 }
 
 #ifdef __ENABLE_VISIT
-bool Variable::exposeVisItMetaData(visit_handle md, int iteration)
+bool Variable::ExposeVisItMetaData(visit_handle md, int iteration)
 {
 	if(not model.visualizable()) {
 		return false;
@@ -174,7 +174,45 @@ bool Variable::exposeVisItMetaData(visit_handle md, int iteration)
 	return false;
 }
 
-bool Variable::exposeVisItData(visit_handle* h, int source, int iteration, int block)
+bool Variable::ExposeVisItDomainList(visit_handle *h, int iteration)
+{
+	if(VisIt_DomainList_alloc(h) != VISIT_ERROR)
+	{
+		visit_handle hdl;
+		int *iptr = NULL;
+
+		std::list<int> clients = Environment::GetKnownLocalClients();
+		int nbrLocalClients = Environment::CountLocalClients();
+		int nbrLocalBlocks = CountLocalBlocks(iteration);
+		int nbrLocalBlocksPerClient = nbrLocalBlocks/nbrLocalClients;
+		int ttlClients = Environment::CountTotalClients();
+		int ttlBlocks = ttlClients*nbrLocalBlocksPerClient;
+
+		DBG("nbrClients = " << nbrClients << " ttlClients = " << ttlClients);
+
+		std::list<int>::const_iterator it = clients.begin();
+		iptr = (int *)malloc(sizeof(int)*nbrLocalBlocks);
+		for(int i = 0; i < nbrLocalClients; i++) {
+			for(int j = 0; j < nbrLocalBlocksPerClient; j++) {
+				iptr[i] = (*it)*nbrLocalBlocksPerClient + j;
+			}
+			it++;
+		}
+
+		if(VisIt_VariableData_alloc(&hdl) == VISIT_OKAY)
+		{
+			VisIt_VariableData_setDataI(hdl, VISIT_OWNER_VISIT, 1, 
+					nbrLocalBlocks, iptr);
+			VisIt_DomainList_setDomains(*h, ttlBlocks, hdl);
+			return true;
+		} else {
+			free(iptr);
+		}
+	}
+	return false;
+}
+
+bool Variable::ExposeVisItData(visit_handle* h, int source, int iteration, int block)
 {
 	DBG("source = " << source << ", iteration = " << iteration);
 	if(VisIt_VariableData_alloc(h) == VISIT_OKAY) {
@@ -264,8 +302,8 @@ Chunk* Variable::Allocate(int block)
 	}
 
 	ChunkDescriptor* cd = ChunkDescriptor::New(*layout);
-	size_t size = sizeof(ChunkHeader)+cd->getDataMemoryLength(layout->getType());
-	void* location = allocator->allocate(size);
+	size_t size = sizeof(ChunkHeader)+cd->GetDataMemoryLength(layout->GetType());
+	void* location = allocator->Allocate(size);
 
 	if(location == NULL) {
 		ERROR("Could not allocate memory for variable \"" 
@@ -275,7 +313,7 @@ Chunk* Variable::Allocate(int block)
 	}
 
 	ChunkHeader* ch = 
-		new(location) ChunkHeader(cd,layout->getType(),
+		new(location) ChunkHeader(cd,layout->GetType(),
 					iteration,source, block);
 	
 	chunk = new ChunkImpl(allocator,ch);
@@ -287,7 +325,7 @@ Chunk* Variable::Allocate(int block)
 
 Chunk* Variable::Retrieve(void* addr)
 {
-	handle_t h = allocator->getHandleFromAddress(addr);
+	handle_t h = allocator->GetHandleFromAddress(addr);
 	return Retrieve(h);
 }
 
@@ -297,13 +335,13 @@ Chunk* Variable::Retrieve(handle_t h)
 
 	ChunkImpl* chunk = new ChunkImpl(allocator,h);
 
-	int iteration = chunk->getIteration();
-	int source = chunk->getSource();
-	int block = chunk->getBlock();
+	int iteration = chunk->GetIteration();
+	int source = chunk->GetSource();
+	int block = chunk->GetBlock();
 
 	Chunk* existing = GetChunk(source,iteration,block);
 	if(existing != NULL) {
-		if(existing->data() == chunk->data()) {
+		if(existing->Data() == chunk->Data()) {
 			delete chunk;
 			return existing;
 		} else {
@@ -318,4 +356,13 @@ Chunk* Variable::Retrieve(handle_t h)
 	return chunk;
 }
 
+Variable::iterator Variable::Begin() 
+{
+	return chunks.begin();
+}
+
+Variable::iterator Variable::End()
+{
+	return chunks.end();
+}
 }

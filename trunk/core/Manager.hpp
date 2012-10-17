@@ -65,13 +65,13 @@ class Manager {
 						bmi::ordered_unique<
 							bmi::tag<by_id>,
 							bmi::const_mem_fun<T,int,
-								&T::getID
+								&T::GetID
 							> 
 						>,
 						bmi::ordered_unique<
 							bmi::tag<by_name>,
 							bmi::const_mem_fun<T,const std::string&,
-								&T::getName
+								&T::GetName
 							> 
 						>,
 						bmi::ordered_unique<
@@ -80,10 +80,10 @@ class Manager {
 								T,
 								bmi::const_mem_fun<
 									T,
-									const std::string&, &T::getName
+									const std::string&, &T::GetName
 								>,
 								bmi::const_mem_fun<T,
-									int, &T::getID
+									int, &T::GetID
 								>
 							>
 						>

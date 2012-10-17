@@ -9,7 +9,7 @@ struct iteration_eraser {
 	static int iteration;
 
 	static bool condition(Chunk* c) {
-		return c->getIteration() == iteration;
+		return c->GetIteration() == iteration;
 	}
 	
 	static void erase(Chunk *c) {

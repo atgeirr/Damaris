@@ -39,27 +39,27 @@ class Buffer {
 		/**
 		 * Gets an absolute address from a relative handle.
 		 */
-		virtual ptr getAddressFromHandle(handle_t h) const = 0;
+		virtual ptr GetAddressFromHandle(handle_t h) const = 0;
 
 		/**
 		 * Gets a relative handle from an absolute pointer.
 		 */
-		virtual handle_t getHandleFromAddress(ptr p) const = 0;
+		virtual handle_t GetHandleFromAddress(ptr p) const = 0;
 
 		/**
 		 * Allocates size bytes inside the shared memory segment.
 		 */
-		virtual ptr allocate(size_t size) = 0;
+		virtual ptr Allocate(size_t size) = 0;
 
 		/**
 		 * Deallocate an allocated region.
 		 */
-		virtual void deallocate(void* addr) = 0;
+		virtual void Deallocate(void* addr) = 0;
 
 		/**
 		 * Gets the amount of free memory left.
 		 */
-		virtual size_t getFreeMemory() const = 0;
+		virtual size_t GetFreeMemory() const = 0;
 
 		/**
 		 * Waits until enough free memory is available.
@@ -67,13 +67,13 @@ class Buffer {
 		 * does not ensure that the next call to allocate will work.
 		 * Return false if the size will never be satisfied, true otherwise.
 		 */
-		virtual bool waitAvailable(size_t size) = 0;
+		virtual bool WaitAvailable(size_t size) = 0;
 
 		/**
 		 * Returns true if and only if the adress is
 		 * in the shared memory segment.
 		 */
-		virtual bool pointerBelongsToSegment(void* p) const = 0;
+		virtual bool PointerBelongsToSegment(void* p) const = 0;
 
 		/**
 		 * Destructor.

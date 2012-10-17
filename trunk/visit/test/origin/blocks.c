@@ -49,6 +49,7 @@
 /* Data Access Function prototypes */
 visit_handle SimGetMetaData(void *);
 visit_handle SimGetMesh(int, const char *, void *);
+visit_handle SimGetDomainList(const char*, void*);
 
 /******************************************************************************
  * Simulation data and functions
@@ -201,7 +202,8 @@ void mainloop(void)
 
                 VisItSetGetMetaData(SimGetMetaData, (void*)&sim);
                 VisItSetGetMesh(SimGetMesh, (void*)&sim);
-            }
+		VisItSetGetDomainList(SimGetDomainList, (void*)&sim); 
+           }
             else
                 fprintf(stderr, "VisIt did not connect\n");
         }
@@ -256,8 +258,8 @@ int main(int argc, char **argv)
     VisItSetupEnvironment();
 
     /* Write out .sim2 file that VisIt uses to connect. */
-    VisItInitializeSocketAndDumpSimFile("mesh",
-        "Demonstrates returning meshes",
+    VisItInitializeSocketAndDumpSimFile("blocks",
+        "Demonstrates returning multiple domains",
         "/path/to/where/sim/was/started",
         NULL, NULL, NULL);
 
@@ -272,6 +274,20 @@ int main(int argc, char **argv)
 
 /* DATA ACCESS FUNCTIONS */
 
+visit_handle
+SimGetDomainList(const char* name, void* cbdata)
+{
+	int domains[] = {0,1,2,3};
+	visit_handle h = VISIT_INVALID_HANDLE;
+	if(VisIt_DomainList_alloc(&h) != VISIT_ERROR)
+	{
+		visit_handle hdl;
+		VisIt_VariableData_alloc(&hdl);
+		VisIt_VariableData_setDataI(hdl, VISIT_OWNER_COPY, 1, 4, domains);
+		VisIt_DomainList_setDomains(h, 4, hdl);
+	}
+	return h;
+}
 /******************************************************************************
  *
  * Purpose: This callback function returns simulation metadata.
@@ -312,14 +328,13 @@ SimGetMetaData(void *cbdata)
             VisIt_MeshMetaData_setYUnits(m1, "cm");
             VisIt_MeshMetaData_setXLabel(m1, "Width");
             VisIt_MeshMetaData_setYLabel(m1, "Height");
-
+	    VisIt_MeshMetaData_setNumDomains(m1, 4);
             VisIt_SimulationMetaData_addMesh(md, m1);
         }
 
         /* Set the second mesh's properties.*/
-        if(VisIt_MeshMetaData_alloc(&m2) == VISIT_OKAY)
+/*        if(VisIt_MeshMetaData_alloc(&m2) == VISIT_OKAY)
         {
-            /* Set the mesh's properties.*/
             VisIt_MeshMetaData_setName(m2, "mesh3d");
             VisIt_MeshMetaData_setMeshType(m2, VISIT_MESHTYPE_CURVILINEAR);
             VisIt_MeshMetaData_setTopologicalDimension(m2, 3);
@@ -333,7 +348,7 @@ SimGetMetaData(void *cbdata)
 
             VisIt_SimulationMetaData_addMesh(md, m2);
         }
-
+*/
         /* Add some custom commands. */
         for(i = 0; i < sizeof(cmd_names)/sizeof(const char *); ++i)
         {
@@ -350,13 +365,16 @@ SimGetMetaData(void *cbdata)
 }
 
 /* Rectilinear mesh */
-float rmesh_x[] = {0., 1., 2.5, 5.};
-float rmesh_y[] = {0., 2., 2.25, 2.55,  5.};
+float rmesh_x[2][4] = {{0., 1., 2.5, 5.},
+		     {5., 6., 7.5, 10. }};
+float rmesh_y[2][5] = {{0., 2., 2.25, 2.55,  5.},
+		     {5., 7., 7.25, 7.55, 10.}};
+
 int   rmesh_dims[] = {4, 5, 1};
 int   rmesh_ndims = 2;
 
 /* Curvilinear mesh */
-float cmesh_x[2][3][4] = {
+/*float cmesh_x[2][3][4] = {
    {{0.,1.,2.,3.},{0.,1.,2.,3.}, {0.,1.,2.,3.}},
    {{0.,1.,2.,3.},{0.,1.,2.,3.}, {0.,1.,2.,3.}}
 };
@@ -370,7 +388,7 @@ float cmesh_z[2][3][4] = {
 };
 int cmesh_dims[] = {4, 3, 2};
 int cmesh_ndims = 3;
-
+*/
 /******************************************************************************
  *
  * Purpose: This callback function returns meshes.
@@ -394,12 +412,12 @@ SimGetMesh(int domain, const char *name, void *cbdata)
             visit_handle hxc, hyc;
             VisIt_VariableData_alloc(&hxc);
             VisIt_VariableData_alloc(&hyc);
-            VisIt_VariableData_setDataF(hxc, VISIT_OWNER_SIM, 1, rmesh_dims[0], rmesh_x);
-            VisIt_VariableData_setDataF(hyc, VISIT_OWNER_SIM, 1, rmesh_dims[1], rmesh_y);
+            VisIt_VariableData_setDataF(hxc, VISIT_OWNER_SIM, 1, rmesh_dims[0], rmesh_x[domain%2]);
+            VisIt_VariableData_setDataF(hyc, VISIT_OWNER_SIM, 1, rmesh_dims[1], rmesh_y[domain/2]);
             VisIt_RectilinearMesh_setCoordsXY(h, hxc, hyc);
         }
     }
-    else if(strcmp(name, "mesh3d") == 0)
+ /*   else if(strcmp(name, "mesh3d") == 0)
     {
         if(VisIt_CurvilinearMesh_alloc(&h) != VISIT_ERROR)
         {
@@ -414,7 +432,7 @@ SimGetMesh(int domain, const char *name, void *cbdata)
             VisIt_VariableData_setDataF(hzc, VISIT_OWNER_SIM, 1, nn, (float*)cmesh_z);
             VisIt_CurvilinearMesh_setCoordsXYZ(h, cmesh_dims, hxc, hyc, hzc);
         }
-    }
+    } */
 
     return h;
 }

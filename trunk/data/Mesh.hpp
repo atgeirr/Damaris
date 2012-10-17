@@ -58,36 +58,36 @@ class Mesh : public Configurable<Model::Mesh> {
 		/**
 		 * Returns the name of the Mesh.
 		 */
-		const std::string& getName() const {
+		const std::string& GetName() const {
 			return name;
 		}
 
 		/**
 		 * Returns the id of the Mesh.
 		 */
-		int getID() const { return id; }
+		int GetID() const { return id; }
 
 #ifdef __ENABLE_VISIT
 		/**
 		 * Fills visit handle with metadata related to the Mesh.
 		 */
-		virtual bool exposeVisItMetaData(visit_handle md, int iteration) const = 0;
+		virtual bool ExposeVisItMetaData(visit_handle md, int iteration) const = 0;
 		
 		/**
 		 * Fills visit handle with metadata related to the Mesh.
 		 */
-		virtual bool exposeVisItData(visit_handle* h, int source, int iteration, int block) const = 0;
+		virtual bool ExposeVisItData(visit_handle* h, int source, int iteration, int block) const = 0;
 #endif
 
 		/**
 		 * Count the number of local blocks required to build the mesh.
 		 */
-		virtual int CountLocalBlocks(int iteration) const;
+		//virtual int CountLocalBlocks(int iteration) const;
 
 		/**
 		 * Count the total number of blocks for this mesh across all processes.
 		 */
-		virtual int CountTotalBlocks(int iteration) const;
+		//virtual int CountTotalBlocks(int iteration) const;
 
 		/**
 		 * Creates an instance of a child class of Mesh according to the Mesh model.
