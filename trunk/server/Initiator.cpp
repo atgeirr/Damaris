@@ -22,6 +22,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <iostream>
 #include <list>
+#define __DEBUG
 #include "core/Debug.hpp"
 #include "core/Environment.hpp"
 #include "core/Process.hpp"
@@ -98,6 +99,7 @@ bool Initiator::mpi_init(const std::string& configFile, MPI_Comm globalcomm)
 			MPI_Barrier(globalcomm);
 			p->openSharedStructures();
 			__client = new Client(p);
+			__client->connect();
 			__client->connect();
 		} else {
 			DBG("Server starting, rank = " << rank);

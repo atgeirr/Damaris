@@ -165,8 +165,8 @@ bool SharedMessageQueue::Remove(sysv_shmem_t /*unused*/, const std::string& name
 void SharedMessageQueue::send(const void* buffer)
 {
 	scoped_lock<interprocess_mutex> lock(shmq_hdr->main_lock);
-	while(shmq_hdr->current_num_msg() == shmq_hdr->maxMsg) {
-		INFO(shmq_hdr->current_num_msg());
+	while(shmq_hdr->numMsg == shmq_hdr->maxMsg) {
+		DBG(shmq_hdr->numMsg);
 		shmq_hdr->cond_send.wait(lock);
 	}
 
@@ -174,6 +174,7 @@ void SharedMessageQueue::send(const void* buffer)
 	std::memcpy(dst,buffer,shmq_hdr->sizeMsg);
 	shmq_hdr->tail += 1;
 	shmq_hdr->tail %= shmq_hdr->maxMsg;
+	shmq_hdr->numMsg += 1;
 
 	shmq_hdr->cond_recv.notify_one();
 }
@@ -182,13 +183,13 @@ bool SharedMessageQueue::trySend(const void* buffer)
 {
 	scoped_lock<interprocess_mutex> lock(shmq_hdr->main_lock);
 
-	if(shmq_hdr->current_num_msg() == shmq_hdr->maxMsg) return false;
+	if(shmq_hdr->numMsg == shmq_hdr->maxMsg) return false;
 
 	char* dst = data + (shmq_hdr->tail * shmq_hdr->sizeMsg);
 	std::memcpy(dst,buffer,shmq_hdr->sizeMsg);
 	shmq_hdr->tail += 1;
 	shmq_hdr->tail %= shmq_hdr->maxMsg;
-
+	shmq_hdr->numMsg += 1;
 	shmq_hdr->cond_recv.notify_one();
 
 	return true;
@@ -197,31 +198,31 @@ bool SharedMessageQueue::trySend(const void* buffer)
 void SharedMessageQueue::receive(void* buffer, size_t buffer_size)
 {
 	scoped_lock<interprocess_mutex> lock(shmq_hdr->main_lock);
-	while(shmq_hdr->current_num_msg() == 0) {
+	while(shmq_hdr->numMsg == 0) {
 		shmq_hdr->cond_recv.wait(lock);
 	}
 	char* src = data + (shmq_hdr->head * shmq_hdr->sizeMsg);
 	std::memcpy(buffer,src,std::min((int)buffer_size,shmq_hdr->sizeMsg));
 	shmq_hdr->head += 1;
 	shmq_hdr->head %= shmq_hdr->maxMsg;
-
+	shmq_hdr->numMsg -= 1;
 	shmq_hdr->cond_send.notify_one();	
 }
 
 bool SharedMessageQueue::tryReceive(void* buffer, 
 		size_t buffer_size)
 {
-	if(shmq_hdr->current_num_msg() == 0) return false;
-	
-	{
-		scoped_lock<interprocess_mutex> lock(shmq_hdr->main_lock);
+	scoped_lock<interprocess_mutex> lock(shmq_hdr->main_lock);
+	if(shmq_hdr->numMsg == 0) 
+		return false;
+	else {
 
 		char* src = data + (shmq_hdr->head * shmq_hdr->sizeMsg);
 		int s = std::min((int)buffer_size,shmq_hdr->sizeMsg);
 		std::memcpy(buffer,src,s);
 		shmq_hdr->head += 1;
 		shmq_hdr->head %= shmq_hdr->maxMsg;
-	
+		shmq_hdr->numMsg -= 1;
 		shmq_hdr->cond_send.notify_one();
 
 		return true;
@@ -241,7 +242,7 @@ size_t SharedMessageQueue::getMaxMsgSize() const
 size_t SharedMessageQueue::getNumMsg()
 {
 	scoped_lock<interprocess_mutex> lock(shmq_hdr->main_lock);
-	return shmq_hdr->current_num_msg();
+	return shmq_hdr->numMsg;
 }
 
 }

@@ -333,6 +333,9 @@ visit_handle VisItListener::GetDomainList(const char* name, void* cbdata)
 		int ttlClients = Environment::CountTotalClients();
 		int ttlBlocks = ttlClients*nbrLocalBlocksPerClient;
 
+		INFO("nbrLocalClients = " << nbrLocalClients << "\n"
+		<<   "nbrLocalBlocksPerClient = " << nbrLocalBlocksPerClient);
+
 		std::list<int>::const_iterator it = clients.begin();
 		iptr = (int *)malloc(sizeof(int)*nbrLocalBlocks);
 		for(int i = 0; i < nbrLocalClients; i++) {

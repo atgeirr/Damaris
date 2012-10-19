@@ -131,10 +131,8 @@ void Server::processMessage(const Message& msg)
 //		chunk->SetDataOwnership(true);
 		Variable* v = VariableManager::Search(object);
 		if(v != NULL) {
-			//v->attachChunk(chunk);
-			DBG("A");
+			DBG("Retrieving data for variable " << v->GetName());
 			v->Retrieve(handle);
-			DBG("B");
 		} else {
 			// the variable is unknown, we are f....
 			ERROR("Server received data for an unknown variable entry."
@@ -157,6 +155,7 @@ void Server::processMessage(const Message& msg)
 
 	if(msg.type == MSG_INT)
 	{
+		DBG("AAA");
 		processInternalSignal(object,iteration,source);
 	}
 }

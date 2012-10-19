@@ -67,11 +67,13 @@ namespace Damaris {
 
 	void Environment::AddConnectedClient(int id)
 	{
+		INFO("");
 		std::list<int>::iterator it = env->knownClients.begin();
 		while(it != env->knownClients.end() && (*it) != id) {
 			it++;
 		}
 		if(it == env->knownClients.end()) {
+			INFO("connecting " << id);
 			env->knownClients.push_back(id);
 		}
 	}

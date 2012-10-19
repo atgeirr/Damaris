@@ -55,6 +55,9 @@ void FC_FUNC_GLOBAL_(df_initialize,DF_INITIALIZE)
 void FC_FUNC_GLOBAL_(df_write,DF_WRITE)
 	(char* var_name_f, int32_t* iteration_f, void* data_f, int32_t* ierr_f, int var_name_size);
 
+void FC_FUNC_GLOBAL_(df_write_block,DF_WRITE)
+        (char* var_name_f, int32_t* iteration_f, int32_t* block_f, void* data_f, int32_t* ierr_f, int var_name_size);
+
 /**
  * \fn df_chunk_set
  * \brief Define a chunk.

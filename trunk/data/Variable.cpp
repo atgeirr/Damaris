@@ -188,7 +188,7 @@ bool Variable::ExposeVisItDomainList(visit_handle *h, int iteration)
 		int ttlClients = Environment::CountTotalClients();
 		int ttlBlocks = ttlClients*nbrLocalBlocksPerClient;
 
-		DBG("nbrClients = " << nbrClients << " ttlClients = " << ttlClients);
+		DBG("nbrLocalClients = " << nbrLocalClients << " ttlClients = " << ttlClients);
 
 		std::list<int>::const_iterator it = clients.begin();
 		iptr = (int *)malloc(sizeof(int)*nbrLocalBlocks);
@@ -351,8 +351,10 @@ Chunk* Variable::Retrieve(handle_t h)
 			return existing;
 		}
 	}
+	DBG("Chunk retrieved for iteration " << iteration << " block " << block);
 	chunk->SetDataOwnership(true);
 	AttachChunk(chunk);
+	DBG("Number of stored chunks: " << chunks.size());
 	return chunk;
 }
 

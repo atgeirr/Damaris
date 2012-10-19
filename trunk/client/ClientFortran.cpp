@@ -55,8 +55,18 @@ void FC_FUNC_GLOBAL(df_initialize,DF_INITIALIZE)
 		if(ierr_f != NULL) *ierr_f = 0;
 	}
 
+void FC_FUNC_GLOBAL(df_write_block,DF_WRITE)
+	(char* var_name_f, int32_t* iteration_f, int32_t* block_f, 
+	 void* data_f, int32_t* ierr_f, int var_name_size)
+	{
+		std::string var_name = fortranStringToCpp(var_name_f, var_name_size);
+		int res = __client->write_block(var_name,*iteration_f,*block_f,data_f);
+		if(ierr_f != NULL) *ierr_f = res;
+	}
+
 void FC_FUNC_GLOBAL(df_write,DF_WRITE)
-	(char* var_name_f, int32_t* iteration_f, void* data_f, int32_t* ierr_f, int var_name_size)
+        (char* var_name_f, int32_t* iteration_f, 
+         void* data_f, int32_t* ierr_f, int var_name_size)
 	{
 		std::string var_name = fortranStringToCpp(var_name_f, var_name_size);
 		int res = __client->write(var_name,*iteration_f,data_f);

@@ -60,6 +60,7 @@ namespace Damaris {
 	{
 		static bool connected = false;
 		if(not connected) {
+			INFO("connecting client " << Process::get()->getID());
 			Message msg;
 			msg.type = MSG_INT;
 			msg.source = process->getID();
@@ -191,8 +192,12 @@ namespace Damaris {
 		Variable* variable = VariableManager::Search(varname);
 
 		if(variable == NULL) {
+			ERROR("Unknown variable \"" << varname <<"\"");
 			return -1;
 		}
+
+		DBG("Writing block " << block << " of variable " << varname <<
+			" at iteration " << iteration);
 /*
 		if((not variable->IsTimeVarying()) && iteration != 0) {
 			WARN("Trying to write a non-time-varying variable at an iteration "
@@ -242,7 +247,11 @@ namespace Damaris {
 		ChunkImpl chunk(process->getSharedMemorySegment(),ch);
 */
 		Chunk* chunk = variable->Allocate(block);
-		if(chunk == NULL) return -1;
+		if(chunk == NULL) 
+		{
+			ERROR("Unable to allocat variable");
+			return -1;
+		}
 		// copy data
 		//size = cd->getDataMemoryLength(layout->getType());
 		//memcpy(chunk.data(),data,size);
