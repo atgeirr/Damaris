@@ -130,7 +130,7 @@ int VisItListener::Update()
 
 int VisItListener::TimeStepCallback(void* cbdata)
 {
-	INFO("Inside TimeStepCallBack");
+	DBG("Inside TimeStepCallBack");
 	//VariableManager::ForEach
 	return VISIT_OKAY;
 }

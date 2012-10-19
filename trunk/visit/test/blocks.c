@@ -75,34 +75,48 @@ int main(int argc, char **argv)
 }
 
 /* Rectilinear mesh */
-float rmesh_x1[] = {0., 1., 2.5, 5.};
-float rmesh_y1[] = {0., 2., 2.25, 2.55,  5.};
+float rmesh_x[2][4] = {{0., 1., 2.5, 5.},{5., 6., 7.5, 10.}};
+float rmesh_y[2][5] = {{0., 2., 2.25, 2.55,  5.},{5., 7., 7.25, 7.55,  10.}};
 
-float rmesh_x2[] = {5., 6., 7.5, 10.};
-float rmesh_y2[] = {0., 2., 2.25, 2.55,  5.};
+/* Curvilinear mesh */
+float cmesh_x[2][2][3][4] = { 
+  {
+   {{0.,1.,2.,3.},{0.,1.,2.,3.}, {0.,1.,2.,3.}},
+   {{0.,1.,2.,3.},{0.,1.,2.,3.}, {0.,1.,2.,3.}}
+  }, {
+   {{4.,5.,6.,7.},{4.,5.,6.,7.}, {4.,5.,6.,7.}},
+   {{4.,5.,6.,7.},{4.,5.,6.,7.}, {4.,5.,6.,7.}}
+  }
+};
 
-float rmesh_x3[] = {5., 6., 7.5, 10.};
-float rmesh_y3[] = {5., 7., 7.25, 7.55,  10.};
+float cmesh_y[2][2][3][4] = {
+  {
+   {{0.5,0.,0.,0.5},{1.,1.,1.,1.}, {1.5,2.,2.,1.5}},
+   {{0.5,0.,0.,0.5},{1.,1.,1.,1.}, {1.5,2.,2.,1.5}}
+  }, {
+   {{4.5,4.,4.,4.5},{5.,5.,5.,5.}, {5.5,6.,6.,5.5}},
+   {{4.5,4.,4.,4.5},{5.,5.,5.,5.}, {5.5,6.,6.,5.5}}
+ }
+};
 
-float rmesh_x4[] = {0., 1., 2.5, 5.};
-float rmesh_y4[] = {5., 7., 7.25, 7.55,  10.};
-
+float cmesh_z[2][3][4] = {
+   {{0.,0.,0.,0.},{0.,0.,0.,0.},{0.,0.,0.,0.}},
+   {{1.,1.,1.,1.},{1.,1.,1.,1.},{1.,1.,1.,1.}}
+};
 
 void exposeDataToDamaris(simulation_data* sim) {
 	static int firstCall = 0;
 	
 	if(firstCall == 0) {
-		DC_write_block("coordinates/x2d",sim->cycle,0,rmesh_x1);
-		DC_write_block("coordinates/y2d",sim->cycle,0,rmesh_y1);
-	
-		DC_write_block("coordinates/x2d",sim->cycle,1,rmesh_x2);
-		DC_write_block("coordinates/y2d",sim->cycle,1,rmesh_y2);
+		int i;
+		for(i=0; i<4; i++) {
+			DC_write_block("coordinates/x2d",sim->cycle,i,rmesh_x[i%2]);
+			DC_write_block("coordinates/y2d",sim->cycle,i,rmesh_y[i/2]);
 
-		DC_write_block("coordinates/x2d",sim->cycle,2,rmesh_x3);
-		DC_write_block("coordinates/y2d",sim->cycle,2,rmesh_y3);
-
-		DC_write_block("coordinates/x2d",sim->cycle,3,rmesh_x4);
-		DC_write_block("coordinates/y2d",sim->cycle,3,rmesh_y4);
+			DC_write_block("coordinates/x3d",sim->cycle,i,cmesh_x[i%2]);
+			DC_write_block("coordinates/y3d",sim->cycle,i,cmesh_y[i/2]);
+			DC_write_block("coordinates/z3d",sim->cycle,i,cmesh_z);
+		}
 		firstCall = 1;
 	}
 
