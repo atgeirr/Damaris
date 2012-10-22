@@ -284,6 +284,8 @@ void Variable::ForEach(F& f, C& c)
 			Variable::iterator copy = it;
 			f(it,end,it->get());
 			if(it == copy) it++;
+		} else {
+			it++;
 		}
 	}
 }
