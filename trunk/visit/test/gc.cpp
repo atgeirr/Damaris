@@ -12,8 +12,8 @@ struct iteration_eraser {
 		return c->GetIteration() == iteration;
 	}
 	
-	static void erase(Chunk *c) {
-		var->DetachChunk(c);
+	static void erase(Variable::iterator& it, const Variable::iterator &end, Chunk *c) {
+		it = var->DetachChunk(it);
 	}
 };
 

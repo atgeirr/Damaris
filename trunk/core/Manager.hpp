@@ -179,6 +179,15 @@ class Manager {
 		}
 
 		/**
+		 * Deletes an object using an iterator.
+		 */
+		static iterator Delete(iterator& it)
+		{
+			if(objects != NULL)
+				return objects->erase(it);
+		}
+
+		/**
 		 * Searches an object by its name, return a pointer to the object
 		 * if it exists, NULL otherwise.
 		 */
@@ -197,16 +206,15 @@ class Manager {
 		 * Applies a function to each objects of the set.
 		 * This mimics functional languages and eases the design of
 		 * procedures that have to be executed on all objects.
-		 * The template FUNCTION type must overload the operator ()
-		 * for reference over the T class. No assumption can be made
-		 * on the order of the objects.
-		 * 
-		 * An example of structure that can be used as a function:
-		 * struct function {
-		 * 		void operator()(T& t) {
-		 *			... do something with t...
-		 *		}
-		 * }
+		 * The template FUNCTION must have the following arguments:
+		 * (Manager<T>::iterator& it, const Manager<T>::iterator& end, T* obj)
+		 * If the procedure only works on the state of obj, it can use
+		 * the pointer (guaranted to be not-null). If the purpose
+		 * of the iteration is to erase objects, the iterator
+		 * provided as a first argument must be used and updated consistently.
+		 * For exemple: 
+		 * it = Manager<T>::Delete(it);
+		 * No assumption can be made on the order the objects are visited.
 		 */
 		template<typename FUNCTION>
 		static void ForEach(FUNCTION& f)
@@ -215,7 +223,7 @@ class Manager {
 
 			iterator it = Begin();
 			for(;it != End(); it++) {
-				f(*(it->get()));
+				f(it,End(),it->get());
 			}
 		}
 

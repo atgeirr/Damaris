@@ -163,6 +163,11 @@ class Variable : public Configurable<Model::Variable> {
 		bool DetachChunk(Chunk* c);
 
 		/**
+		 * Detach a chunk from a variable, for use in a loop using iterators.
+		 */
+		iterator DetachChunk(iterator& it);
+
+		/**
 		 * Delete all the chunks held by a Variable.
 		 */
 		void ClearAll();
@@ -260,23 +265,25 @@ class Variable : public Configurable<Model::Variable> {
 template<typename F>
 void Variable::ForEach(F& f)
 {
-	ChunkIndex::iterator it = chunks.get<by_any>().begin();
-	ChunkIndex::iterator end = chunks.get<by_any>().end();
+	Variable::iterator it = chunks.begin();
+	Variable::iterator end = chunks.end();
 	while(it != end) {
-		f(it->get());
-		it++;
+		Variable::iterator copy = it;
+		f(it,end,it->get());
+		if(it == copy) it++;
 	}
 }
 
 template<typename F, typename C>
 void Variable::ForEach(F& f, C& c)
 {
-	ChunkIndex::iterator it = chunks.get<by_any>().begin();
-	ChunkIndex::iterator end = chunks.get<by_any>().end();
+	Variable::iterator it = chunks.begin();
+	Variable::iterator end = chunks.end();
 	while(it != end) {
 		if(c(it->get())) {
-			f(it->get());
-			it++;
+			Variable::iterator copy = it;
+			f(it,end,it->get());
+			if(it == copy) it++;
 		}
 	}
 }

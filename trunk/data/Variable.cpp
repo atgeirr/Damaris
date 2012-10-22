@@ -135,13 +135,18 @@ bool Variable::DetachChunk(Chunk* c)
 
 	while(it != end) {
 		if(it->get() == c) {
-			chunks.get<by_any>().erase(it);
+			it = chunks.get<by_any>().erase(it);
 			return true;
 			break;
 		}
 		it++;
 	}
 	return false;
+}
+
+Variable::iterator Variable::DetachChunk(Variable::iterator& it)
+{
+	return chunks.erase(it);
 }
 
 void Variable::ClearAll()
