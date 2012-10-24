@@ -19,7 +19,7 @@ int main(int argc, char** argv)
 
 	DC_initialize(argv[1],id);	
 
-	mydata = (float*)DC_alloc(varname,0);
+	mydata = (float*)DC_alloc(varname);
 
 	if(mydata == NULL) {
 		printf("Error when allocating buffer\n");
@@ -35,8 +35,10 @@ int main(int argc, char** argv)
 	}
 	}
 		
-	DC_commit(varname,0);
-	DC_signal(event,0);
+	DC_commit(varname);
+	DC_signal(event);
+	DC_end_iteration();
+
 	DC_finalize();
 
 	return 0;

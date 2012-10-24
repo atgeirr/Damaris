@@ -73,7 +73,13 @@ namespace Damaris {
 		return false;
 	}
 
-	void* Client::alloc(const std::string & varname, int32_t iteration, bool blocking)
+	void* Client::alloc(const std::string &varname, bool blocking)
+	{
+		return alloc_block(varname,0,blocking);
+	}
+
+	void* Client::alloc_block(const std::string & varname, 
+			int32_t block, bool blocking)
 	{
 
 		// check that the variable is known in the configuration
@@ -84,17 +90,21 @@ namespace Damaris {
 					<< "\" not defined in configuration");
 			return NULL;
 		}
-
+		/*
 		if((not variable->IsTimeVarying()) && iteration != 0) {
 			WARN("Trying to write a non-time-varying variable at an iteration "
 					<< "different from 0, the variable won't be allocated");
 			return NULL;
 		}
+		*/
 
 		// the variable is known, get its layout
-		Layout* layout = variable->GetLayout();
+		//Layout* layout = variable->GetLayout();
 
-		if(layout->IsUnlimited()) {
+		// TODO : eventually all layouts should be of limited extents, so
+		// this test will be useless and the IsUnlimited function will be
+		// deprecated
+		/*if(layout->IsUnlimited()) {
 			ERROR("The layout as undefined extents or has a variable-sized type, "
 					<< "use chunk-based allocation");
 			return NULL;
@@ -105,7 +115,8 @@ namespace Damaris {
 
 		// try allocating the required memory
 		size_t size = sizeof(ChunkHeader)+cd->GetDataMemoryLength(layout->GetType());			
-		void* location = process->getSharedMemorySegment()->Allocate(size);	
+		void* location = variable->Allocate(iteration, block);
+			//process->getSharedMemorySegment()->Allocate(size);	
 
 		if(location == NULL && not blocking) {
 			ERROR("Could not allocate memory: not enough available memory");
@@ -134,24 +145,39 @@ namespace Damaris {
 
 		ChunkDescriptor::Delete(cd);
 		// return the pointer to data
-		return chunk->Data();
+		*/
+		Chunk* chunk = variable->Allocate(block,blocking);
+		if(chunk != NULL) {
+			chunk->SetDataOwnership(true);
+			return chunk->Data();
+		} else {
+			return NULL;
+		}
 	}
 
 	int Client::commit(const std::string & varname, int32_t iteration)
+	{
+		return commit_block(varname,0,iteration);
+	}
+
+	int Client::commit_block(const std::string & varname, int32_t block, int32_t iteration)
 	{		
 		Variable* v = VariableManager::Search(varname);
 		if(v == NULL)
 			return -1;
 
 		ChunkImpl* chunk = NULL;
-		// get the pointer to the allocated chunk
-		//ChunkIndexByIteration::iterator end;
-		//ChunkIndexByIteration::iterator it = v->getChunksByIteration(iteration,end);
-		int source = Process::get()->getID();
-		Chunk* c = v->GetChunk(source,iteration,0);
 
-		if(c == NULL)
+		if(iteration < 0)
+			iteration = Environment::GetLastIteration();
+		
+		int source = Process::get()->getID();
+		Chunk* c = v->GetChunk(source,iteration,block);
+
+		if(c == NULL) {
+			ERROR("Unknown block " << block << " for variable " << varname);
 			return -2;
+		}
 		try {
 			chunk = dynamic_cast<ChunkImpl*>(c);
 		} catch(std::exception &e) {
@@ -173,19 +199,20 @@ namespace Damaris {
 		DBG("Variable \"" << varname << "\" has been commited");
 
 		// we don't need to keep the chunk in the client now,
-		// so we erase it from the variable.
+		// so we erase it from the variable, but we don't erase the data.
+		chunk->SetDataOwnership(false);
 		v->DetachChunk(chunk);
 
 		return 0;
 	}
 
-	int Client::write(const std::string & varname, int32_t iteration, 
+	int Client::write(const std::string & varname, 
 			const void* data, bool blocking)
 	{
-		return write_block(varname,iteration, 0, data, blocking);
+		return write_block(varname, 0, data, blocking);
 	}
 
-	int Client::write_block(const std::string &varname, int32_t iteration, int32_t block,
+	int Client::write_block(const std::string &varname, int32_t block,
 			const void* data, bool blocking)
 	{
 		/* check that the variable is know in the configuration */
@@ -196,9 +223,7 @@ namespace Damaris {
 			return -1;
 		}
 
-		DBG("Writing block " << block << " of variable " << varname <<
-			" at iteration " << iteration);
-/*
+		/*
 		if((not variable->IsTimeVarying()) && iteration != 0) {
 			WARN("Trying to write a non-time-varying variable at an iteration "
 					<< "different from 0, the variable won't be written");
@@ -246,10 +271,10 @@ namespace Damaris {
 		// create the ChunkImpl and attach it to the variable
 		ChunkImpl chunk(process->getSharedMemorySegment(),ch);
 */
-		Chunk* chunk = variable->Allocate(block);
+		Chunk* chunk = variable->Allocate(block,blocking);
 		if(chunk == NULL) 
 		{
-			ERROR("Unable to allocat variable");
+			ERROR("Unable to allocate chunk for variable \"" << varname << "\"");
 			return -1;
 		}
 		// copy data
@@ -276,6 +301,8 @@ namespace Damaris {
 		return size;
 	}
 
+
+	// TODO : remove the following deprecated function
 	int Client::chunk_write(chunk_h chunkh, const std::string & varname, 
 			int32_t iteration, const void* data, bool blocking)
 	{
@@ -307,11 +334,11 @@ namespace Damaris {
 
 		if(location == NULL && not blocking) {
 			ERROR("Could not allocate memory: not enough available memory");
-			lost(iteration);
+			lost();
 			return -2;
 		} else if(location == NULL && blocking) {
 			while(location == NULL) {
-				clean(iteration);
+				clean();
 				if(process->getSharedMemorySegment()->WaitAvailable(size)) {
 					location = process->getSharedMemorySegment()->Allocate(size);
 				} else {
@@ -348,8 +375,9 @@ namespace Damaris {
 		return size;
 	}
 
-	int Client::signal(const std::string & signal_name, int32_t iteration)
+	int Client::signal(const std::string & signal_name)
 	{
+		int32_t iteration = Environment::GetLastIteration();
 		try {
 			Action* action = ActionManager::Search(signal_name);
 			if(action == NULL) {
@@ -367,7 +395,8 @@ namespace Damaris {
 			try {
 				process->getSharedMessageQueue()->send(&sig);
 			} catch(interprocess_exception &e) {
-				ERROR("Error while sending event \"" << signal_name << "\", " << e.what());
+				ERROR("Error while sending event \"" << 
+						signal_name << "\", " << e.what());
 				return -1;
 			}
 			DBG("Event \""<< signal_name << "\" has been sent");
@@ -389,7 +418,8 @@ namespace Damaris {
 		}
 	}
 
-	int Client::set_parameter(const std::string & paramName, const void* buffer, unsigned int size)
+	int Client::set_parameter(const std::string & paramName, const void* buffer, 
+			unsigned int size)
 	{
 		Parameter* p = ParameterManager::Search(paramName);
 		if(p != NULL) {
@@ -417,31 +447,32 @@ namespace Damaris {
 		}
 	}
 
-	int Client::clean(int iteration)
+	int Client::clean()
 	{
 		Message msg;
 		msg.type = MSG_INT;
 		msg.source = process->getID();
-		msg.iteration = iteration;
+		msg.iteration = Environment::GetLastIteration();
 		msg.object = URGENT_CLEAN;
 		process->getSharedMessageQueue()->send(&msg);
 		return 0;
 	}
 
-	int Client::lost(int iteration)
+	int Client::lost()
 	{
 		Message msg;
 		msg.type = MSG_INT;
 		msg.source = process->getID();
-		msg.iteration = iteration;
+		msg.iteration = Environment::GetLastIteration();
 		msg.object = LOST_DATA;
 		process->getSharedMessageQueue()->send(&msg);
 		return 0;	
 	}
 
-	int Client::end_iteration(int iteration)
+	int Client::end_iteration()
 	{
-		Environment::SetLastIteration(iteration);
+		int iteration = Environment::GetLastIteration();
+		Environment::SetLastIteration(iteration+1);
 		Message msg;
 		msg.type = MSG_INT;
 		msg.source = process->getID();

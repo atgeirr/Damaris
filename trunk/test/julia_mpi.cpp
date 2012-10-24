@@ -22,8 +22,8 @@
 #define PI 3.14159265358979323846
 #define ITERATIONS 100
 
-#define WIDTH  640
-#define HEIGHT 480
+int HEIGHT = 0;
+int WIDTH  = 0;
 
 // Main function that checks for convergence of the series
 // given an initial term z0 and a parameter c.
@@ -91,34 +91,27 @@ int main(int argc, char** argv)
 			return 0;
 		}
 
+		client->get_parameter("h",&HEIGHT,sizeof(int));
+		client->get_parameter("w",&WIDTH,sizeof(int));
+
 		char* fractal = new char[WIDTH*HEIGHT/4];
 		std::complex<double> c;
-	
-		// These vectors will be used to create a 2D Chunk descriptor
-		// of the data handled by each process.
-		int start[2]; 
-			start[0] = (rank/2)*WIDTH/2;
-			start[1] = (rank%2)*HEIGHT/2;
-		int end[2]; 
-			end[0] = start[0] + WIDTH/2 - 1;
-			end[1] = start[1] + HEIGHT/2 - 1;
-	
-		// Creates the chunk descriptor
-		Damaris::ChunkDescriptor* cd = Damaris::ChunkDescriptor::New(2, start, end);
+
+		int offset_x = WIDTH*(rank%2);
+		int offset_y = HEIGHT*(rank/2);
 	
 		for(int i = 0; i < ITERATIONS ; i++) {
 			c = std::polar<double>(0.3,i*2.0*PI/((float)ITERATIONS)-PI/2.0);
 			c += std::complex<double>(0.0,-0.3);
-			compute(fractal,c,start[0],start[1]);
+			compute(fractal,c,offset_x,offset_y);
 			
 			MPI_Barrier(comm);
-			client->chunk_write(cd,"images/julia",i,fractal);
-			client->signal("say_hello_from_cpp",i);
-			client->signal("draw_from_python",i);
-			client->signal("clean_from_python",i);
+			client->write("images/julia",fractal);
+			client->signal("say_hello_from_cpp");
+			client->signal("draw_from_python");
+			client->signal("clean_from_python");
+			client->end_iteration();
 		}
-	
-		Damaris::ChunkDescriptor::Delete(cd);
 	
 		client->kill_server();
 	

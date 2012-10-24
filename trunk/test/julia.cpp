@@ -77,11 +77,13 @@ int main(int argc, char** argv)
 		compute(fractal,c);
 
 		// Writes the array in shared memory and notifies Damaris		
-		client->write("images/julia",i,fractal);
+		client->write("images/julia",fractal);
 		// Sends some events
-		client->signal("say_hello_from_cpp",i);
-		client->signal("draw_from_python",i);
-		client->signal("clean_from_python",i);
+		client->signal("say_hello_from_cpp");
+		client->signal("draw_from_python");
+		client->signal("clean_from_python");
+
+		client->end_iteration();
 	}
 
 	// Request the server to exit in a clean way

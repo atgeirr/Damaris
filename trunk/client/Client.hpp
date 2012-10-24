@@ -43,7 +43,6 @@ namespace Damaris {
 
 class Initiator;
 /**
- * \class Client
  * The Client object represents a single core running the
  * simulation. It wraps a Processor object and exposes the set of
  * functions allowing a simulation to write data and send signals to
@@ -51,7 +50,7 @@ class Initiator;
  * a standalone mode (when no core is dedicated). For this purpose, see
  * the StdAloneClient class.
  */
-class Client : public Writer {
+class Client {
 
 	friend class Initiator;
 
@@ -90,44 +89,66 @@ class Client : public Writer {
 		 * \see Writer::write
 		 */
 		virtual int write(const std::string & varname, 
-				int32_t iteration, const void* data, bool blocking = false);
+				  const void* data, bool blocking = false);
 	
+		/**
+		 * \see Writer::write_block
+		 */
 		virtual int write_block(const std::string &varname,
-				int32_t iteration, int32_t block, const void* data,
+				int32_t block, const void* data,
 				bool blocking = false);
 	
 		/**
 		 * \see Writer::chunk_write
+		 * \deprecated
 		 */
 		virtual int chunk_write(chunk_h chunkh, const std::string & varname, 
-			int32_t iteration, const void* data, bool blocking = false);
+			int32_t iteration, const void* data, bool blocking = false)
+		__attribute__ ((deprecated));
 
 		/**
 		 * \see Writer::signal
 		 */
-		virtual int signal(const std::string & signame, int32_t iteration);
+		virtual int signal(const std::string & signame);
 
 		/**
 		 * \see Writer::alloc
 		 */
-		virtual void* alloc(const std::string & varname, int32_t iteration, bool blocking = false);
+		virtual void* alloc(const std::string & varname, 
+				    bool blocking = true);
+
+		/**
+		 * \see Writer::alloc_block
+		 */
+		virtual void* alloc_block(const std::string & varname,
+				int32_t block, bool blocking = true);
 
 		/** 
 		 * \see Writer::commit
 		 */
-		virtual int commit(const std::string & varname, int32_t iteration);
+		virtual int commit(const std::string & varname, int32_t iteration = -1);
+
+		/**
+		 * \see Writer::commit_block
+		 */
+		virtual int commit_block(const std::string & varname, 
+				int32_t block, int32_t iteration = -1);
 
 		/**
 		 * \see Writer::chunk_set
+		 * \deprecated
 		 */
 		virtual chunk_h chunk_set(unsigned int dimensions,
 					const std::vector<int> & startIndices, 
-					const std::vector<int> & endIndices);
+					const std::vector<int> & endIndices)
+		__attribute__ ((deprecated));
 
 		/**
 		 * \see Writer::chunk_free
+		 * \deprecated
 		 */
-		virtual void chunk_free(chunk_h chunkh);
+		virtual void chunk_free(chunk_h chunkh)
+		__attribute__ ((deprecated));
 
 		/** 
 		 * \brief Retrieves a parameter's value. 
@@ -137,7 +158,8 @@ class Client : public Writer {
 		 *
 		 * \return 0 in case of success, -1 if the parameter is not found.
 		 */
-		virtual int get_parameter(const std::string & paramName, void* buffer, unsigned int size);
+		virtual int get_parameter(const std::string & paramName, void* buffer, 
+				unsigned int size);
 
 		/**
 		 * Modify a parameter's value. Will cause all dependent layout to be
@@ -151,7 +173,8 @@ class Client : public Writer {
 		 *
 		 * \return 0 in case of success, -1 if the parameter does not exist.
 		 */
-		virtual int set_parameter(const std::string & paramName, const void* buffer, unsigned int size);
+		virtual int set_parameter(const std::string & paramName, const void* buffer, 
+				unsigned int size);
 		
 		/**
 		 * Sends a signal to the server to shut it down (all clients in node need
@@ -163,19 +186,19 @@ class Client : public Writer {
 		/**
 		 * Sends a signal to the server to try free the shared memory.
 		 */
-		virtual int clean(int iteration);
+		virtual int clean();
 
 		/**
 		 * Sends a signal to the server to notify that a client was
 		 * unable to write some expected data.
 		 */
-		virtual int lost(int iteration);
+		virtual int lost();
 
 		/**
 		 * Indicates that the iteration has terminated, this will potentially
 		 * update connected backends such as VisIt.
 		 */
-		virtual int end_iteration(int iteration);
+		virtual int end_iteration();
 
 		/**
 		 * Gets the communicator gathering clients.

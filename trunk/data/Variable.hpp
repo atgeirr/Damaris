@@ -220,8 +220,11 @@ class Variable : public Configurable<Model::Variable> {
 		 * Allocates a Chunk of a given block id.
 		 * The current iteration and the source id are retrieved
 		 * from the Environment and Process classes.
+		 * Set blocking to true if you want to wait for free memory
+		 * to be available before returning. If set to false, this
+		 * function may fail because of not enough available memory.
 		 */
-		virtual Chunk* Allocate(int block);
+		virtual Chunk* Allocate(int block, bool blocking = false);
 
 		/**
 		 * Retrieves a Chunk from a memory pointer.

@@ -25,8 +25,9 @@ int main(int argc, char** argv)
 	}
 	}
 	
-	DC_write(varname,0,mydata);
-	DC_signal(event,0);
+	DC_write(varname,mydata);
+	DC_signal(event);
+	DC_end_iteration();
 
 	DC_finalize();
 	return 0;

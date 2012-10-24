@@ -32,7 +32,7 @@ void internal_gc(const std::string& event, int32_t step, int32_t src)
 		//	c++;
 		//}
 		iteration_eraser::var = v;
-		iteration_eraser::iteration = step;
+		iteration_eraser::iteration = step-2;
 		v->ForEach(iteration_eraser::erase,
 				iteration_eraser::condition);
 	}

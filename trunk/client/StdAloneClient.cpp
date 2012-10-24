@@ -63,7 +63,8 @@ namespace Damaris {
 	{
 	}
 
-	void* StdAloneClient::alloc(const std::string & varname, int32_t iteration, bool blocking)
+/*
+	void* StdAloneClient::alloc(const std::string & varname, bool blocking)
 	{
 		// check that the variable is known in the configuration
 		Variable* variable = VariableManager::Search(varname);
@@ -74,10 +75,10 @@ namespace Damaris {
 			return NULL;
 		}
 
-		if((not variable->IsTimeVarying()) && iteration != 0) {
+		if((not variable->IsTimeVarying()) && 
+			Environment::GetLastIteration() != 0) {
 			WARN("Trying to write a non-time-varying variable at an iteration "
-					<< "different from 0, the variable won't be allocated");
-			return NULL;
+			<< "different from 0, there is a chance to generate inconsistencies");
 		}
 
 		// the variable is known, get its layout
@@ -121,8 +122,8 @@ namespace Damaris {
 		// return the pointer to data
 		return chunk->Data();
 	}
-
-	int StdAloneClient::commit(const std::string & varname, int32_t iteration)
+*/
+	int StdAloneClient::commit_block(const std::string & varname, int32_t block, int32_t iteration)
 	{		
 		Variable* v = VariableManager::Search(varname);
 		if(v == NULL)
@@ -132,7 +133,7 @@ namespace Damaris {
 		//ChunkIndexByIteration::iterator end;
 		//ChunkIndexByIteration::iterator it = v->getChunksByIteration(iteration,end);
 		int source = Process::get()->getID();
-		Chunk* chunk = v->GetChunk(source,iteration,0);
+		Chunk* chunk = v->GetChunk(source,iteration,block);
 
 		if(chunk == NULL)
 			return -2;
@@ -150,14 +151,19 @@ namespace Damaris {
 		return 0;
 	}
 
-	int StdAloneClient::write(const std::string & varname, 
-			int32_t iteration, const void* data, bool blocking)
+	int StdAloneClient::commit(const std::string &varname, int32_t iteration)
 	{
-		return write_block(varname,iteration,0,data,blocking);
+		return commit_block(varname,0,iteration);
+	}
+
+	int StdAloneClient::write(const std::string & varname, 
+		const void* data, bool blocking)
+	{
+		return write_block(varname,0,data,blocking);
 	}
 
 	int StdAloneClient::write_block(const std::string &varname,
-			int32_t iteration, int32_t block, const void* data,
+			int32_t block, const void* data,
 			bool blocking)
 	{
 		/* check that the variable is know in the configuration */
@@ -167,6 +173,7 @@ namespace Damaris {
 			return -1;
 		}
 
+		/*
 		if((not variable->IsTimeVarying()) && iteration != 0) {
 			WARN("Trying to write a non-time-varying variable at an iteration "
 					<< "different from 0, the variable won't be written");
@@ -216,7 +223,16 @@ namespace Damaris {
 		DBG("Variable \"" << varname << "\" has been written");
 
 		ChunkDescriptor::Delete(cd);
+		*/
 
+		Chunk* chunk = variable->Allocate(block,blocking);
+		if(chunk == NULL)
+		{
+			ERROR("Unable to allocate chunk for variable \"" << varname << "\"");
+			return -1;
+		}
+	
+		int size = chunk->MemCopy(data);
 		return size;
 	}
 
@@ -253,7 +269,7 @@ namespace Damaris {
 		// This piece of code changes from Client.cpp: we don't want to block
 		// if there is no way to get more memory.
 		if(location == NULL && blocking) {
-			clean(iteration);
+			clean();
 			location = process->getSharedMemorySegment()->Allocate(size);
 		}
 		if(location == NULL) {
@@ -279,7 +295,7 @@ namespace Damaris {
 		return size;
 	}
 
-	int StdAloneClient::signal(const std::string & signal_name, int32_t iteration)
+	int StdAloneClient::signal(const std::string & signal_name)
 	{
 		Action* action = ActionManager::Search(signal_name);
 		if(action == NULL) {
@@ -287,6 +303,7 @@ namespace Damaris {
 			return -2;
 		}
 
+		int iteration = Environment::GetLastIteration();
 		action->Call(iteration,process->getID());
 
 		DBG("Event \""<< signal_name << "\" has been sent");
@@ -299,10 +316,10 @@ namespace Damaris {
 		return -1;
 	}
 
-	int StdAloneClient::end_iteration(int iteration)
+	int StdAloneClient::end_iteration()
 	{
-		DBG("Ending iteration " << iteration);
-		Environment::SetLastIteration(iteration);
+		int iteration = Environment::GetLastIteration();
+		Environment::SetLastIteration(iteration+1);
 #ifdef __ENABLE_VISIT
 		int vizstt;
 		if(process->getModel()->visit().present()) {
@@ -323,8 +340,8 @@ namespace Damaris {
 		return 0;
 	}
 
-	int StdAloneClient::clean(int iteration)
+	int StdAloneClient::clean()
 	{
-		return signal("clean",iteration);
+		return signal("clean");
 	}
 }

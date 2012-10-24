@@ -46,7 +46,6 @@ class Writer  {
 		 * 
 		 * \param[in] varname : name of the variable to write. This variable should 
 		 *                      be defined in the XML configuration.
-		 * \param[in] iteration : iteration number for this write.
 		 * \param[in] data : pointer to the data to be copied to the shared memory buffer.
 		 *
 		 * \param[in] blocking : if true, waits for enough memory to be available.
@@ -56,7 +55,7 @@ class Writer  {
 		 *         -2 if the allocation of memory failed.
 		 */
 		virtual int write(const std::string & varname, 
-			int32_t iteration, const void* data, bool blocking = true) = 0;
+			const void* data, bool blocking = false) = 0;
 		
 		/**
 		 * \brief Writes a chunk of a variable.
@@ -92,7 +91,7 @@ class Writer  {
 		 *         -1 in case of failure when sending the message,
 		 *	   -2 in case the event is not defined.
 		 */
-		virtual int signal(const std::string & signame, int32_t iteration) = 0;
+		virtual int signal(const std::string & signame) = 0;
 
 		/**
 		 * \brief Allocate a buffer directly in shared memory for future writing.
@@ -102,7 +101,6 @@ class Writer  {
 		 *
 		 * \param[in] varname : name of the variable to write 
 		 *		        (must be defined in the configuration file).
-		 * \param[in] iteration : iteration at which the variable is written.
 		 * \param[in] blocking : blocks until enough memory is available, if true.
 		 *
 		 * \return a pointer to the allocated memory in case of success,

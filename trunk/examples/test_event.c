@@ -15,8 +15,10 @@ int main(int argc, char** argv)
 
 	DC_initialize(argv[1],id);
 
-	DC_signal(script,0);
-	DC_signal(event,0);
+	DC_signal(script);
+	DC_signal(event);
+
+	DC_end_iteration();
 
 	DC_finalize();
 	return 0;

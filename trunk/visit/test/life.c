@@ -393,17 +393,14 @@ void exposeDataToDamaris(simulation_data* sim) {
 	static int firstCall = 0;
 	
 	if(firstCall == 0) {
-		DC_write("coordinates/x2d",sim->cycle,sim->life.rmesh_x);
-		DC_write("coordinates/y2d",sim->cycle,sim->life.rmesh_y);
+		DC_write("coordinates/x2d",sim->life.rmesh_x);
+		DC_write("coordinates/y2d",sim->life.rmesh_y);
 		firstCall = 1;
 	}
 
-	DC_write("life/cells",sim->cycle,sim->life.true_life);
-	if(sim->cycle >= 2) {
-		DC_signal("clean",sim->cycle-2);
-	}
-
-	DC_end_iteration(sim->cycle);
+	DC_write("life/cells",sim->life.true_life);
+	DC_signal("clean");
+	DC_end_iteration();
 }
 
 /******************************************************************************

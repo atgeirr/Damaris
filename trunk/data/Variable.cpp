@@ -287,7 +287,8 @@ Variable* Variable::New(const Model::Variable& mdl, const std::string& name)
 	return new Variable(mdl,name,l);
 }
 
-Chunk* Variable::Allocate(int block)
+// TODO : implement the blocking behavior
+Chunk* Variable::Allocate(int block, bool blocking)
 {
 	if(allocator == NULL) {
 		allocator = Process::get()->getSharedMemorySegment();

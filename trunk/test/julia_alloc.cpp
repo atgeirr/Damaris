@@ -70,7 +70,7 @@ int main(int argc, char** argv)
 
 	for(int i = 0; i < ITERATIONS ; i++) {
 		// The array is allocated through Damaris' alloc function
-		fractal = (char*)client->alloc("images/julia",i);
+		fractal = (char*)client->alloc("images/julia");
 		if(fractal == NULL) {
 			std::cerr << "An error occured while allocating buffer\n";
 			break;
@@ -81,11 +81,13 @@ int main(int argc, char** argv)
 		compute(fractal,c);
 		
 		// Commit the data: the client is not supposed to touch it anymore
-		client->commit("images/julia",i);
+		client->commit("images/julia");
 		// Sends some events
-		client->signal("say_hello_from_cpp",i);
-		client->signal("draw_from_python",i);
-		client->signal("clean_from_python",i);
+		client->signal("say_hello_from_cpp");
+		client->signal("draw_from_python");
+		client->signal("clean_from_python");
+
+		client->end_iteration();
 	}
 
 	// Request the server to exit in a clean way

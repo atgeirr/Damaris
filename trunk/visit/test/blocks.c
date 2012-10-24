@@ -110,15 +110,15 @@ void exposeDataToDamaris(simulation_data* sim) {
 	if(firstCall == 0) {
 		int i;
 		for(i=0; i<4; i++) {
-			DC_write_block("coordinates/x2d",sim->cycle,i,rmesh_x[i%2]);
-			DC_write_block("coordinates/y2d",sim->cycle,i,rmesh_y[i/2]);
+			DC_write_block("coordinates/x2d",i,rmesh_x[i%2]);
+			DC_write_block("coordinates/y2d",i,rmesh_y[i/2]);
 
-			DC_write_block("coordinates/x3d",sim->cycle,i,cmesh_x[i%2]);
-			DC_write_block("coordinates/y3d",sim->cycle,i,cmesh_y[i/2]);
-			DC_write_block("coordinates/z3d",sim->cycle,i,cmesh_z);
+			DC_write_block("coordinates/x3d",i,cmesh_x[i%2]);
+			DC_write_block("coordinates/y3d",i,cmesh_y[i/2]);
+			DC_write_block("coordinates/z3d",i,cmesh_z);
 		}
 		firstCall = 1;
 	}
 
-	DC_end_iteration(sim->cycle);
+	DC_end_iteration();
 }
