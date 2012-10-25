@@ -267,7 +267,6 @@ visit_handle VisItListener::GetMesh(int domain, const char *name, void *cbdata)
 		DBG("Mesh found, exposing data, iteration is " << s->iteration);
 		
 		std::list<int> clients = Environment::GetKnownLocalClients();
-		int nbrLocalClients = Environment::CountLocalClients();
 		int nbrLocalBlocksPerClient = Environment::GetNumDomainsPerClient();
 
 		int source = domain / nbrLocalBlocksPerClient;
@@ -287,7 +286,6 @@ visit_handle VisItListener::GetVariable(int domain, const char *name, void *cbda
 	visit_handle h = VISIT_INVALID_HANDLE;
 	if(v != NULL) {
 		std::list<int> clients = Environment::GetKnownLocalClients();
-		int nbrLocalClients = Environment::CountLocalClients();
 		int nbrLocalBlocksPerClient = Environment::GetNumDomainsPerClient();
 
 		int source = domain / nbrLocalBlocksPerClient;

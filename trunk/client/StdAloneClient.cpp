@@ -38,6 +38,7 @@ namespace Damaris {
 	StdAloneClient::StdAloneClient(Process* p)
 		: Client(p)
 	{
+		Environment::SetClient(true);
 #ifdef __ENABLE_VISIT
 		if(process->getModel()->visit().present()) {
 			Viz::VisItListener::Init(Environment::getEntityComm(),
@@ -318,8 +319,7 @@ namespace Damaris {
 
 	int StdAloneClient::end_iteration()
 	{
-		int iteration = Environment::GetLastIteration();
-		Environment::SetLastIteration(iteration+1);
+		Environment::StartNextIteration();
 #ifdef __ENABLE_VISIT
 		int vizstt;
 		if(process->getModel()->visit().present()) {

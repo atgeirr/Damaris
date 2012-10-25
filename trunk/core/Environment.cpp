@@ -33,7 +33,7 @@ namespace Damaris {
 		entityComm = MPI_COMM_WORLD;
 		globalComm = MPI_COMM_NULL;
 		nodeComm   = MPI_COMM_NULL;
-		lastIteration = -1;
+		lastIteration = 0;
 	}
 
 	Environment::~Environment() 
@@ -46,6 +46,18 @@ namespace Damaris {
 			return;
 		}
 		env = new Environment(mdl);
+	}
+
+	bool Environment::IsClient()
+	{
+		if(env == NULL) return true;
+		return env->isClient;
+	}
+
+	void Environment::SetClient(bool b)
+	{
+		if(env != NULL)
+			env->isClient = b;
 	}
 
 	int Environment::getCoresPerNode() 
@@ -67,13 +79,11 @@ namespace Damaris {
 
 	void Environment::AddConnectedClient(int id)
 	{
-		INFO("");
 		std::list<int>::iterator it = env->knownClients.begin();
 		while(it != env->knownClients.end() && (*it) != id) {
 			it++;
 		}
 		if(it == env->knownClients.end()) {
-			INFO("connecting " << id);
 			env->knownClients.push_back(id);
 		}
 	}
@@ -168,24 +178,23 @@ namespace Damaris {
 
 	int Environment::GetLastIteration()
 	{
-		DBG("Getting last iteration");
 		return env->lastIteration;
 	}
 
-	bool Environment::SetLastIteration(int i)
+	bool Environment::StartNextIteration()
 	{
-		// TODO : this function is not correct
-		// for the client side
-		if(not hasServer()) {
-			env->lastIteration = i;
+		// for clients
+		if((not hasServer()) || (IsClient())) {
+			env->lastIteration++;
 			return true;
 		}
 
+		// for servers
 		static int locks = 0;
 		locks += 1;
 		if(locks == getClientsPerNode()) { 
-			DBG("Iteration " << i << " terminated");
-			env->lastIteration = i;
+			DBG("Iteration " << env->lastIteration << " terminated");
+			env->lastIteration++;
 			locks = 0;
 			return true;
 		}

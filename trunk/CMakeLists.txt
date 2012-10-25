@@ -93,7 +93,7 @@ link_directories(${XERCESC_LIBRARY_DIR})
 #-----------------------------------------------------------#
 set(PYTHON_ROOT ${EXTERNAL_ROOT})
 set(NUMPY_INCLUDE_DIR ${EXTERNAL_ROOT}/lib/python2.6/site-packages/numpy/core/include)
-#find_package(PythonLibs)
+find_package(PythonLibs)
 
 if (PYTHON_INCLUDE_PATH)
   find_package(Boost 1.49 QUIET COMPONENTS python)

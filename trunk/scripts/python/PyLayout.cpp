@@ -40,19 +40,19 @@ PyLayout::PyLayout(Layout* l)
 
 const std::string& PyLayout::name() const
 {
-	return inner->getName();
+	return inner->GetName();
 }
 
 const std::string& PyLayout::type() const
 {
-	return inner->getType();
+	return inner->GetType();
 }
 		
 bp::list PyLayout::extents() const
 {
 	bp::list result;
-	for(unsigned int i=0; i < inner->getDimensions(); i++) {
-		result.append(inner->getExtentAlongDimension(i));
+	for(unsigned int i=0; i < inner->GetDimensions(); i++) {
+		result.append(inner->GetExtentAlongDimension(i));
 	}
 	return result;
 }

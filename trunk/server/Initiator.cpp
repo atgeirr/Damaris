@@ -100,12 +100,13 @@ bool Initiator::mpi_init(const std::string& configFile, MPI_Comm globalcomm)
 			p->openSharedStructures();
 			__client = new Client(p);
 			__client->connect();
-			__client->connect();
+			Environment::SetClient(true);
 		} else {
 			DBG("Server starting, rank = " << rank);
 			p->createSharedStructures();
 			p->setID(rankInEnComm);
 			__server = new Server(p);
+			Environment::SetClient(false);
 			MPI_Barrier(globalcomm);
 		}
 	} else {
@@ -117,10 +118,12 @@ bool Initiator::mpi_init(const std::string& configFile, MPI_Comm globalcomm)
 			p->openSharedStructures();
 			__client = new StdAloneClient(p);
 			__client->connect();
+			Environment::SetClient(true);
 		} else {
 			p->setID(rank);
 			p->createSharedStructures();
 			__client = new StdAloneClient(p);
+			Environment::SetClient(true);
 			MPI_Barrier(globalcomm);
 			__client->connect();
 		}

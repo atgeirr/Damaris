@@ -46,6 +46,7 @@ namespace Damaris {
 		Process* p = Process::get();
 		p->openSharedStructures();
 		Client* c = new Client(p);
+		Environment::SetClient(true);
 		c->connect();
 		return c;
 	}
@@ -472,7 +473,7 @@ namespace Damaris {
 	int Client::end_iteration()
 	{
 		int iteration = Environment::GetLastIteration();
-		Environment::SetLastIteration(iteration+1);
+		Environment::StartNextIteration();
 		Message msg;
 		msg.type = MSG_INT;
 		msg.source = process->getID();

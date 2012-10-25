@@ -42,6 +42,7 @@ Server* Server::New(const std::string& cfgfile, int32_t id)
 	Process::initialize(cfgfile,id);
 	Process* p = Process::get();
 	p->createSharedStructures();
+	Environment::SetClient(false);
 	return new Server(p);
 }
 
@@ -167,7 +168,7 @@ void Server::processInternalSignal(int32_t object, int iteration, int source)
 		Environment::AddConnectedClient(source);
 		break;
 	case END_ITERATION:
-		if(Environment::SetLastIteration(iteration)) {
+		if(Environment::StartNextIteration()) {
 #ifdef __ENABLE_VISIT
 			Viz::VisItListener::Update();
 #endif

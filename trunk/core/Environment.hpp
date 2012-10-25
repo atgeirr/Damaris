@@ -46,7 +46,7 @@ namespace Damaris {
 		
 		std::list<int> knownClients;
 		int lastIteration;
-
+		bool isClient;
 		static Environment* env;
 
 		/**
@@ -65,6 +65,16 @@ namespace Damaris {
 		 * Initializes the environement given a model.
 		 */
 		static void Init(const Model::Simulation& mdl);
+
+		/**
+		 * Tells if the process is a client or not.
+		 */
+		static bool IsClient();
+
+		/**
+		 * Set if the process is a client of not.
+		 */
+		static void SetClient(bool b);
 
 		/**
 		 * \brief Get the name of the simulation.
@@ -168,7 +178,7 @@ namespace Damaris {
 		/**
 		 * Sets the iteration that just terminated.
 		 */
-		static bool SetLastIteration(int i);
+		static bool StartNextIteration();
 	};
 
 }
