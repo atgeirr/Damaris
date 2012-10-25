@@ -287,7 +287,6 @@ Variable* Variable::New(const Model::Variable& mdl, const std::string& name)
 	return new Variable(mdl,name,l);
 }
 
-// TODO : implement the blocking behavior
 Chunk* Variable::Allocate(int block, bool blocking)
 {
 	if(allocator == NULL) {
@@ -311,11 +310,20 @@ Chunk* Variable::Allocate(int block, bool blocking)
 	size_t size = sizeof(ChunkHeader)+cd->GetDataMemoryLength(layout->GetType());
 	void* location = allocator->Allocate(size);
 
-	if(location == NULL) {
+	if((location == NULL) && (not blocking)) {
 		ERROR("Could not allocate memory for variable \"" 
-			<< name << "\": not enough memory");
+		<< name << "\": not enough memory");
 		ChunkDescriptor::Delete(cd);
 		return NULL;
+	} else if((location == NULL) && blocking) {
+		while(location == NULL) {
+			if(allocator->WaitAvailable(size)) {
+				location = allocator->Allocate(size);
+			} else {
+				ERROR("Could not allocate memory for variable \""
+				<< name << "\": not enough memory");
+			}
+		}
 	}
 
 	ChunkHeader* ch = 
