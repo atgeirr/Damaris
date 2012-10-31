@@ -134,7 +134,9 @@ class Variable : public Configurable<Model::Variable> {
 		Chunk* GetChunk(int source, int iteration, int block=0);
 
 		/**
-		 * Counts the number of blocks for a given iteration.
+		 * Counts the number of blocks for a given iteration
+		 * (i.e. per source number of blocks, assuming all the
+		 * sources have sent the same number.)
 		 */
 		int CountLocalBlocks(int iteration) const;
 

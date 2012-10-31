@@ -58,6 +58,7 @@ class Client {
 		Process* process; /*!< The Process object holding the ActionsManager,
 				    MetadataManager, SharedMessageQueue, SharedMemorySegment */
 
+		bool errorOccured; /*!< Indicates wether an error occured during the last iteration. */
 		/** 
 		 * \brief Constructor.
 		 * Initializes the client given an already built Process object.

@@ -55,6 +55,7 @@ namespace Damaris {
 	{
 		FATAL((p == NULL),"Fatal error in Client constructor, Process pointer is NULL");
 		process = p;
+		errorOccured = false;
 	}
 
 	int Client::connect()
@@ -152,13 +153,24 @@ namespace Damaris {
 			chunk->SetDataOwnership(true);
 			return chunk->Data();
 		} else {
+			errorOccured = true;
 			return NULL;
 		}
 	}
 
 	int Client::commit(const std::string & varname, int32_t iteration)
 	{
-		return commit_block(varname,0,iteration);
+		// here we assume blocks are numbered from 0 to n-1,
+		// maybe the assumption is too strong?
+		Variable* v = VariableManager::Search(varname);
+                if(v == NULL)
+                        return -1;
+
+		int n = v->CountTotalBlocks(iteration);
+		for(int b=0; b < n; b++) {
+			commit_block(varname,b,iteration);
+		}
+		return 0;
 	}
 
 	int Client::commit_block(const std::string & varname, int32_t block, int32_t iteration)
@@ -177,12 +189,14 @@ namespace Damaris {
 
 		if(c == NULL) {
 			ERROR("Unknown block " << block << " for variable " << varname);
+			errorOccured = true;
 			return -2;
 		}
 		try {
 			chunk = dynamic_cast<ChunkImpl*>(c);
 		} catch(std::exception &e) {
 			ERROR("When doing dynamic cast: " << e.what());
+			errorOccured = true;
 			return -3;
 		}
 
@@ -276,6 +290,7 @@ namespace Damaris {
 		if(chunk == NULL) 
 		{
 			ERROR("Unable to allocate chunk for variable \"" << varname << "\"");
+			errorOccured = true;
 			return -1;
 		}
 		// copy data
@@ -335,7 +350,8 @@ namespace Damaris {
 
 		if(location == NULL && not blocking) {
 			ERROR("Could not allocate memory: not enough available memory");
-			lost();
+			//lost();
+			errorOccured = true;
 			return -2;
 		} else if(location == NULL && blocking) {
 			while(location == NULL) {
@@ -478,7 +494,13 @@ namespace Damaris {
 		msg.type = MSG_INT;
 		msg.source = process->getID();
 		msg.iteration = iteration;
-		msg.object = END_ITERATION;
+		if(not errorOccured)
+			msg.object = END_ITERATION;
+		else {
+			msg.object = END_ITERATION_NO_UPDATE;
+			errorOccured = false;
+		}
+		
 		process->getSharedMessageQueue()->send(&msg);
 		return 0;
 	}

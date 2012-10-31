@@ -95,7 +95,7 @@ int VisItListener::Connected()
 int VisItListener::EnterSyncSection(int visitstate)
 {
 	DBG("Entering Sync Section, visit state is " << visitstate);
-	sim.iteration = Environment::GetLastIteration();
+	sim.iteration = Environment::GetLastIteration()-1;
 	switch(visitstate) {
 		case 1:
 			if(VisItAttemptToCompleteConnection() == VISIT_OKAY) {
@@ -122,7 +122,7 @@ int VisItListener::EnterSyncSection(int visitstate)
 
 int VisItListener::Update()
 {
-	sim.iteration = Environment::GetLastIteration();
+	sim.iteration = Environment::GetLastIteration()-1;
 	VisItTimeStepChanged();
 	VisItUpdatePlots();
 	return 0;
@@ -330,9 +330,6 @@ visit_handle VisItListener::GetDomainList(const char* name, void* cbdata)
 		int nbrLocalBlocks = nbrLocalClients*nbrLocalBlocksPerClient;
 		int ttlClients = Environment::CountTotalClients();
 		int ttlBlocks = ttlClients*nbrLocalBlocksPerClient;
-
-		INFO("nbrLocalClients = " << nbrLocalClients << "\n"
-		<<   "nbrLocalBlocksPerClient = " << nbrLocalBlocksPerClient);
 
 		std::list<int>::const_iterator it = clients.begin();
 		iptr = (int *)malloc(sizeof(int)*nbrLocalBlocks);

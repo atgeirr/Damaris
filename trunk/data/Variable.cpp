@@ -292,7 +292,7 @@ Chunk* Variable::Allocate(int block, bool blocking)
 	if(allocator == NULL) {
 		allocator = Process::get()->getSharedMemorySegment();
 	}
-	int iteration = Environment::GetLastIteration() + 1;
+	int iteration = Environment::GetLastIteration();
 	int source = Process::get()->getID();
 
 	if(not IsTimeVarying()) {

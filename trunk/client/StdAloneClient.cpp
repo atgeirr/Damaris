@@ -154,7 +154,17 @@ namespace Damaris {
 
 	int StdAloneClient::commit(const std::string &varname, int32_t iteration)
 	{
-		return commit_block(varname,0,iteration);
+		// here we assume blocks are numbered from 0 to n-1,
+		// maybe the assumption is too strong?
+		Variable* v = VariableManager::Search(varname);
+		if(v == NULL)
+			return -1;
+
+		int n = v->CountTotalBlocks(iteration);
+		for(int b=0; b < n; b++) {
+			commit_block(varname,b,iteration);
+		}
+		return 0;
 	}
 
 	int StdAloneClient::write(const std::string & varname, 

@@ -132,7 +132,8 @@ void Server::processMessage(const Message& msg)
 //		chunk->SetDataOwnership(true);
 		Variable* v = VariableManager::Search(object);
 		if(v != NULL) {
-			DBG("Retrieving data for variable " << v->GetName());
+			DBG("Retrieving data for variable " << v->GetName() << " at iteration "
+			<< iteration << " from source " << source);
 			v->Retrieve(handle);
 		} else {
 			// the variable is unknown, we are f....
@@ -156,13 +157,15 @@ void Server::processMessage(const Message& msg)
 
 	if(msg.type == MSG_INT)
 	{
-		DBG("AAA");
 		processInternalSignal(object,iteration,source);
 	}
 }
 
 void Server::processInternalSignal(int32_t object, int iteration, int source)
 {
+
+	static bool no_update = false;
+
 	switch(object) {
 	case CLIENT_CONNECTED:
 		Environment::AddConnectedClient(source);
@@ -170,8 +173,15 @@ void Server::processInternalSignal(int32_t object, int iteration, int source)
 	case END_ITERATION:
 		if(Environment::StartNextIteration()) {
 #ifdef __ENABLE_VISIT
-			Viz::VisItListener::Update();
+			if(no_update) no_update = false;
+			else Viz::VisItListener::Update();
 #endif
+		}
+		break;
+	case END_ITERATION_NO_UPDATE:
+		no_update = true;
+		if(Environment::StartNextIteration()) {
+			if(no_update) no_update = false;
 		}
 		break;
 	case KILL_SERVER:
