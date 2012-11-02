@@ -165,6 +165,7 @@ void Server::processInternalSignal(int32_t object, int iteration, int source)
 {
 
 	static bool no_update = false;
+	static bool global_no_update = false;
 
 	switch(object) {
 	case CLIENT_CONNECTED:
@@ -172,16 +173,20 @@ void Server::processInternalSignal(int32_t object, int iteration, int source)
 		break;
 	case END_ITERATION:
 		if(Environment::StartNextIteration()) {
+			MPI_Allreduce(&no_update,&global_no_update,1,
+					MPI_BYTE,MPI_LOR, Environment::getEntityComm());
+			no_update = false;	
 #ifdef __ENABLE_VISIT
-			if(no_update) no_update = false;
-			else Viz::VisItListener::Update();
+			if(not global_no_update) Viz::VisItListener::Update();
 #endif
 		}
 		break;
 	case END_ITERATION_NO_UPDATE:
 		no_update = true;
-		if(Environment::StartNextIteration()) {
-			if(no_update) no_update = false;
+		if(Environment::StartNextIteration()) {	
+			MPI_Allreduce(&no_update,&global_no_update,1,
+					MPI_BYTE,MPI_LOR, Environment::getEntityComm());
+			no_update = false;
 		}
 		break;
 	case KILL_SERVER:

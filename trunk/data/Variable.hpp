@@ -67,7 +67,7 @@ class Variable : public Configurable<Model::Variable> {
 
 	public:
 		
-		typedef typename ChunkSet::iterator iterator;
+		typedef ChunkSet::iterator iterator;
 	
 		/**
 		 * Returns the layout of the variable.
