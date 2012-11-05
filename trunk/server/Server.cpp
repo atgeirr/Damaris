@@ -174,7 +174,7 @@ void Server::processInternalSignal(int32_t object, int iteration, int source)
 	case END_ITERATION:
 		if(Environment::StartNextIteration()) {
 			MPI_Allreduce(&no_update,&global_no_update,1,
-					MPI_BYTE,MPI_LOR, Environment::getEntityComm());
+					MPI_BYTE,MPI_BOR, Environment::getEntityComm());
 			no_update = false;	
 #ifdef __ENABLE_VISIT
 			if(not global_no_update) Viz::VisItListener::Update();
@@ -185,7 +185,7 @@ void Server::processInternalSignal(int32_t object, int iteration, int source)
 		no_update = true;
 		if(Environment::StartNextIteration()) {	
 			MPI_Allreduce(&no_update,&global_no_update,1,
-					MPI_BYTE,MPI_LOR, Environment::getEntityComm());
+					MPI_BYTE,MPI_BOR, Environment::getEntityComm());
 			no_update = false;
 		}
 		break;

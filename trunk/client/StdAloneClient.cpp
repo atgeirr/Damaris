@@ -242,7 +242,7 @@ namespace Damaris {
 			ERROR("Unable to allocate chunk for variable \"" << varname << "\"");
 			return -1;
 		}
-	
+		chunk->SetDataOwnership(true);
 		int size = chunk->MemCopy(data);
 		return size;
 	}
