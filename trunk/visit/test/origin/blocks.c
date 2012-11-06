@@ -277,14 +277,14 @@ int main(int argc, char **argv)
 visit_handle
 SimGetDomainList(const char* name, void* cbdata)
 {
-	int domains[] = {0,1,2,3};
+	int domains[] = {0,1,2,3,4};
 	visit_handle h = VISIT_INVALID_HANDLE;
 	if(VisIt_DomainList_alloc(&h) != VISIT_ERROR)
 	{
 		visit_handle hdl;
 		VisIt_VariableData_alloc(&hdl);
-		VisIt_VariableData_setDataI(hdl, VISIT_OWNER_COPY, 1, 4, domains);
-		VisIt_DomainList_setDomains(h, 4, hdl);
+		VisIt_VariableData_setDataI(hdl, VISIT_OWNER_COPY, 1, 5, domains);
+		VisIt_DomainList_setDomains(h, 5, hdl);
 	}
 	return h;
 }
@@ -328,7 +328,7 @@ SimGetMetaData(void *cbdata)
             VisIt_MeshMetaData_setYUnits(m1, "cm");
             VisIt_MeshMetaData_setXLabel(m1, "Width");
             VisIt_MeshMetaData_setYLabel(m1, "Height");
-	    VisIt_MeshMetaData_setNumDomains(m1, 4);
+	    VisIt_MeshMetaData_setNumDomains(m1, 5);
             VisIt_SimulationMetaData_addMesh(md, m1);
         }
 
@@ -405,6 +405,8 @@ SimGetMesh(int domain, const char *name, void *cbdata)
 {
     visit_handle h = VISIT_INVALID_HANDLE;
 
+	if(domain == 4) return h;
+
     if(strcmp(name, "mesh2d") == 0)
     {
         if(VisIt_RectilinearMesh_alloc(&h) != VISIT_ERROR)
@@ -412,8 +414,8 @@ SimGetMesh(int domain, const char *name, void *cbdata)
             visit_handle hxc, hyc;
             VisIt_VariableData_alloc(&hxc);
             VisIt_VariableData_alloc(&hyc);
-            VisIt_VariableData_setDataF(hxc, VISIT_OWNER_SIM, 1, rmesh_dims[0], rmesh_x[domain%2]);
-            VisIt_VariableData_setDataF(hyc, VISIT_OWNER_SIM, 1, rmesh_dims[1], rmesh_y[domain/2]);
+	    VisIt_VariableData_setDataF(hxc, VISIT_OWNER_SIM, 1, rmesh_dims[0], rmesh_x[domain%2]);
+	    VisIt_VariableData_setDataF(hyc, VISIT_OWNER_SIM, 1, rmesh_dims[1], rmesh_y[domain/2]);
             VisIt_RectilinearMesh_setCoordsXY(h, hxc, hyc);
         }
     }

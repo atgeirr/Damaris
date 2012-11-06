@@ -159,10 +159,7 @@ namespace Damaris {
 			// At this point, the 2 or 3 coordinate variables are found. 
 			// Now accessing the data.
 
-			//ChunkIndex::iterator end;
-
 			// Accessing chunk for X coordinate
-			//ChunkIndex::iterator c = vx->getChunks(source,iteration,end);
 			Chunk* c = vx->GetChunk(source,iteration,block);
 			if(c != NULL) {
 				if(VisIt_VariableData_alloc(&hxc) == VISIT_OKAY) {
@@ -172,8 +169,8 @@ namespace Damaris {
 					return false;
 				}
 			} else {
-				ERROR("Data unavailable for coordinate \"" << vx->GetName() << "\""
-						<< " for iteration " << iteration << " and source " << source);
+				VisIt_RectilinearMesh_free(*h);
+				*h = VISIT_INVALID_HANDLE;
 				return false;
 			}
 
@@ -185,11 +182,14 @@ namespace Damaris {
 				} else {
 					ERROR("While allocating data handle");
 					VisIt_VariableData_free(hxc);
+					VisIt_RectilinearMesh_free(*h);
+					*h = VISIT_INVALID_HANDLE;
 					return false;
 				}
 			} else {
-				ERROR("Data unavailable for coordinate \"" << vy->GetName() << "\"");
 				VisIt_VariableData_free(hxc);
+				VisIt_RectilinearMesh_free(*h);
+				*h = VISIT_INVALID_HANDLE;
 				return false;
 			}
 
@@ -203,12 +203,16 @@ namespace Damaris {
 						ERROR("While allocating data handle");
 						VisIt_VariableData_free(hxc);
 						VisIt_VariableData_free(hyc);
+						VisIt_RectilinearMesh_free(*h);
+						*h = VISIT_INVALID_HANDLE;
 						return false;
 					}
 				} else {
 					ERROR("Data unavailable for coordinate \"" << vz->GetName() << "\"");
 					VisIt_VariableData_free(hxc);
 					VisIt_VariableData_free(hyc);
+					VisIt_RectilinearMesh_free(*h);
+					*h = VISIT_INVALID_HANDLE;
 					return false;
 				}	
 			}

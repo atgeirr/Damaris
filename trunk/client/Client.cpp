@@ -62,7 +62,7 @@ namespace Damaris {
 	{
 		static bool connected = false;
 		if(not connected) {
-			INFO("connecting client " << Process::get()->getID());
+			DBG("connecting client " << Process::get()->getID());
 			Message msg;
 			msg.type = MSG_INT;
 			msg.source = process->getID();

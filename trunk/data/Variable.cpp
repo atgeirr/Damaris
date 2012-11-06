@@ -188,18 +188,18 @@ bool Variable::ExposeVisItDomainList(visit_handle *h, int iteration)
 
 		std::list<int> clients = Environment::GetKnownLocalClients();
 		int nbrLocalClients = Environment::CountLocalClients();
-		int nbrLocalBlocks = CountLocalBlocks(iteration);
-		int nbrLocalBlocksPerClient = nbrLocalBlocks/nbrLocalClients;
+		int nbrBlocksPerClient = Environment::GetNumDomainsPerClient();
+		int nbrBlocks = nbrLocalClients*nbrBlocksPerClient;
 		int ttlClients = Environment::CountTotalClients();
-		int ttlBlocks = ttlClients*nbrLocalBlocksPerClient;
+		int ttlBlocks = ttlClients*nbrBlocksPerClient;
 
 		DBG("nbrLocalClients = " << nbrLocalClients << " ttlClients = " << ttlClients);
 
 		std::list<int>::const_iterator it = clients.begin();
-		iptr = (int *)malloc(sizeof(int)*nbrLocalBlocks);
+		iptr = (int *)malloc(sizeof(int)*nbrBlocks);
 		for(int i = 0; i < nbrLocalClients; i++) {
-			for(int j = 0; j < nbrLocalBlocksPerClient; j++) {
-				iptr[i] = (*it)*nbrLocalBlocksPerClient + j;
+			for(int j = 0; j < nbrBlocksPerClient; j++) {
+				iptr[i*nbrBlocksPerClient + j] = (*it)*nbrBlocksPerClient + j;
 			}
 			it++;
 		}
@@ -207,7 +207,7 @@ bool Variable::ExposeVisItDomainList(visit_handle *h, int iteration)
 		if(VisIt_VariableData_alloc(&hdl) == VISIT_OKAY)
 		{
 			VisIt_VariableData_setDataI(hdl, VISIT_OWNER_VISIT, 1, 
-					nbrLocalBlocks, iptr);
+					nbrBlocks, iptr);
 			VisIt_DomainList_setDomains(*h, ttlBlocks, hdl);
 			return true;
 		} else {
@@ -220,18 +220,17 @@ bool Variable::ExposeVisItDomainList(visit_handle *h, int iteration)
 bool Variable::ExposeVisItData(visit_handle* h, int source, int iteration, int block)
 {
 	DBG("source = " << source << ", iteration = " << iteration);
-	if(VisIt_VariableData_alloc(h) == VISIT_OKAY) {
-		//ChunkIndex::iterator end;
-		//ChunkIndex::iterator it = getChunks(source, iteration, end);
-		Chunk* chunk = GetChunk(source,iteration,block);
-		if(chunk == NULL) {
-			ERROR("Chunk not found for source = " << source
-				<< ", iteration = " << iteration << ", block = " << block);
-			VisIt_VariableData_free(*h);
-			return false;
-		}
-		chunk->FillVisItDataHandle(*h);
+	Chunk* chunk = GetChunk(source,iteration,block);
+	if(chunk == NULL) {
+		*h = VISIT_INVALID_HANDLE;
 		return true;
+	} else {
+		if(VisIt_VariableData_alloc(h) == VISIT_OKAY) {
+			chunk->FillVisItDataHandle(*h);
+			return true;
+		} else {
+			ERROR("While allocating VisIt handle");
+		}
 	}
 	return false;
 }
