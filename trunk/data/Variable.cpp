@@ -175,7 +175,7 @@ bool Variable::ExposeVisItMetaData(visit_handle md, int iteration)
 		VisIt_SimulationMetaData_addVariable(md, vmd);
 		return true;
 	}
-	ERROR("Unable to allocate VisIt handle for variable \"" << name << "\"");
+	DBG("Unable to allocate VisIt handle for variable \"" << name << "\"");
 	return false;
 }
 
@@ -300,7 +300,7 @@ Chunk* Variable::Allocate(int block, bool blocking)
 
 	Chunk* chunk = GetChunk(source,iteration,block);
 	if(chunk != NULL) {
-		ERROR("Trying to overwrite an existing chunk for variable \""
+		DBG("Trying to overwrite an existing chunk for variable \""
 			<< name << "\"");
 		return NULL;
 	}
@@ -310,7 +310,7 @@ Chunk* Variable::Allocate(int block, bool blocking)
 	void* location = allocator->Allocate(size);
 
 	if((location == NULL) && (not blocking)) {
-		ERROR("Could not allocate memory for variable \"" 
+		DBG("Could not allocate memory for variable \"" 
 		<< name << "\": not enough memory");
 		ChunkDescriptor::Delete(cd);
 		return NULL;
