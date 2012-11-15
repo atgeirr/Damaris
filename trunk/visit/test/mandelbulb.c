@@ -86,6 +86,7 @@ int main(int argc, char** argv)
 	MPI_Comm_rank(comm,&rank);
 	MPI_Comm_size(comm,&nbprocs);
 
+/*
 	int size = (int)sqrt((double)nbprocs);
 	if(size*size != nbprocs) {
 		fprintf(stderr,"Number of processes must be a square\n");
@@ -94,20 +95,19 @@ int main(int argc, char** argv)
 		MPI_Finalize();
 		exit(0);
 	}
+*/
 
-	int offset_x = (rank/size)*WIDTH;
-	int offset_y = (rank%size)*HEIGHT;
-	int offset_z = 0;
+	int offset_z = rank*DEPTH;
 
-	int space[DEPTH][HEIGHT+1][WIDTH+1];
-	double coord_x[WIDTH+1];
-	double coord_y[HEIGHT+1];
-	double coord_z[DEPTH];
+	int space[DEPTH+1][HEIGHT][WIDTH];
+	double coord_x[WIDTH];
+	double coord_y[HEIGHT];
+	double coord_z[DEPTH+1];
 
 	int x,y,z;
-	for(x = 0; x < WIDTH+1; x++)  coord_x[x] = ((double)(x+offset_x))/((double)(WIDTH*size));
-        for(y = 0; y < HEIGHT+1; y++) coord_y[y] = ((double)(y+offset_y))/((double)(HEIGHT*size));
-        for(z = 0; z < DEPTH; z++)    coord_z[z] = ((double)(z+offset_z))/DEPTH;
+	for(x = 0; x < WIDTH; x++)   coord_x[x] = (double)x;
+	for(y = 0; y < HEIGHT; y++)  coord_y[y] = (double)y;
+	for(z = 0; z < DEPTH+1; z++) coord_z[z] = (double)(z+offset_z);
 
 	int i;
 	for(i=0; i < MAX_CYCLES; i++) {
@@ -115,14 +115,14 @@ int main(int argc, char** argv)
 
 		double t1 = MPI_Wtime();
 
-		for(z = 0; z < DEPTH; z++)
-		for(y = 0; y < HEIGHT+1; y++)
-		for(x = 0; x < WIDTH+1; x++)
+		for(z = 0; z < DEPTH+1; z++)
+		for(y = 0; y < HEIGHT; y++)
+		for(x = 0; x < WIDTH; x++)
 		{
 			vector v = {
-				2.0*RANGE*(x+offset_x)/(WIDTH*size)  - RANGE,
-				2.0*RANGE*(y+offset_y)/(HEIGHT*size) - RANGE,
-				2.0*RANGE*(z+offset_z)/DEPTH - RANGE
+				2.0*RANGE*x/WIDTH - RANGE,
+				2.0*RANGE*y/HEIGHT - RANGE,
+				2.0*RANGE*(z+offset_z)/(DEPTH*nbprocs) - RANGE
 			};
 			space[z][y][x] = iterate(&v,order);
 		}
