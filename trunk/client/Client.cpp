@@ -289,7 +289,7 @@ namespace Damaris {
 		Chunk* chunk = variable->Allocate(block,blocking);
 		if(chunk == NULL) 
 		{
-			ERROR("Unable to allocate chunk for variable \"" << varname << "\"");
+			DBG("Unable to allocate chunk for variable \"" << varname << "\"");
 			errorOccured = true;
 			return -1;
 		}
@@ -349,7 +349,7 @@ namespace Damaris {
 		void* location = process->getSharedMemorySegment()->Allocate(size);
 
 		if(location == NULL && not blocking) {
-			ERROR("Could not allocate memory: not enough available memory");
+			DBG("Could not allocate memory: not enough available memory");
 			//lost();
 			errorOccured = true;
 			return -2;
@@ -359,7 +359,7 @@ namespace Damaris {
 				if(process->getSharedMemorySegment()->WaitAvailable(size)) {
 					location = process->getSharedMemorySegment()->Allocate(size);
 				} else {
-					ERROR("Could not allocate memory: not enough total memory");
+					DBG("Could not allocate memory: not enough total memory");
 					return -2;
 				}
 			}
@@ -520,7 +520,7 @@ namespace Damaris {
 
 	MPI_Comm Client::mpi_get_client_comm()
 	{
-		return Environment::getEntityComm();
+		return Environment::GetEntityComm();
 	}
 
 	Client::~Client() 

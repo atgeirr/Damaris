@@ -68,7 +68,7 @@ class NodeAction : public BASE {
 				return;
 			}
 
-			if(not Environment::hasServer()) { // if the environment doesn't have a server, we don't wait for other
+			if(not Environment::HasServer()) { // if the environment doesn't have a server, we don't wait for other
 				BASE::Call(iteration,sourceID,args);
 				return;
 			}

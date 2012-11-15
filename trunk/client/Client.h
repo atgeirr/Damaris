@@ -60,20 +60,20 @@ int DC_write_block(const char* varname, int32_t block, const void* data);
  * \brief Writes a chunk of a variable.
  * \see Damaris::Client::chunk_write
  */
-int 	DC_chunk_write(DC_chunk_handle_t chunkh, const char* varname, 
-		int32_t iteration, const void* data);
+//int 	DC_chunk_write(DC_chunk_handle_t chunkh, const char* varname, 
+//		int32_t iteration, const void* data);
 
 /**
  * \brief Defines a chunk.
  * \see Damaris::Client::chunk_set
  */
-DC_chunk_handle_t DC_chunk_set(unsigned int dimensions, int* si, int* ei);
+//DC_chunk_handle_t DC_chunk_set(unsigned int dimensions, int* si, int* ei);
 
 /**
  * \brief Free a chunk handle.
  * \see Damaris::Client::chunk_free
  */
-void 	DC_chunk_free(DC_chunk_handle_t chunkh);
+//void 	DC_chunk_free(DC_chunk_handle_t chunkh);
 
 /**
  * \brief Allocates the data required for a variable to be entirely written in memory.

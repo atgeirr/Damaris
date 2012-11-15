@@ -49,24 +49,28 @@ int DC_write_block(const char* varname, int32_t block, const void* data)
 	return __client->write_block(varname_str,block,data);
 }
 
+/*
 int DC_chunk_write(DC_chunk_handle_t chunkh, const char* varname, 
 		int32_t iteration, const void* data)
 {
 	std::string varname_str(varname);
 	return __client->chunk_write((Damaris::chunk_h)chunkh,varname_str,iteration,data);
 }
-
+*/
+/*
 DC_chunk_handle_t DC_chunk_set(unsigned int dimensions, int* si, int* ei)
 {
 	std::vector<int> sti(si,si+dimensions);
 	std::vector<int> eni(ei,ei+dimensions);
 	return (DC_chunk_handle_t)__client->chunk_set(dimensions,sti,eni);
 }
-
+*/
+/*
 void DC_chunk_free(DC_chunk_handle_t chunkh)
 {
 	__client->chunk_free((Damaris::chunk_h)chunkh);
 }
+*/
 
 void* DC_alloc(const char* varname)
 {

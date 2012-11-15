@@ -46,7 +46,12 @@ MPI_Comm VisItListener::comm = MPI_COMM_NULL;
 void VisItListener::Init(MPI_Comm c, const Model::Simulation::visit_optional& mdl, 
 				const std::string& simname)
 {
-	if(mdl.present()) {
+	comm = c;
+	int rank, size;
+	MPI_Comm_rank(comm,&rank);
+	MPI_Comm_size(comm,&size);
+
+	if(mdl.present() && (rank == 0)) {
 		char* s;
 		if(mdl.get().path().present()) {
 			s = (char*)malloc(mdl.get().path().get().length()+1);
@@ -62,19 +67,22 @@ void VisItListener::Init(MPI_Comm c, const Model::Simulation::visit_optional& md
 		}
 	}
 	
-	VisItSetupEnvironment();
-	comm = c;
-
 	VisItSetBroadcastIntFunction(&BroadcastIntCallback);
 	VisItSetBroadcastStringFunction(&BroadcastStringCallback);
-
-	int rank, size;
-	MPI_Comm_rank(comm,&rank);
-	MPI_Comm_size(comm,&size);
+	VisItSetBroadcastIntFunction2(&BroadcastIntCallback2,NULL);
+	VisItSetBroadcastStringFunction2(&BroadcastStringCallback2,NULL);
 
 	VisItSetParallel(size > 1);
 	VisItSetParallelRank(rank);
 	VisItSetMPICommunicator(&comm);
+
+	char* env = NULL;
+	if(rank == 0) {
+		env = VisItGetEnvironment();
+	}
+	VisItSetupEnvironment2(env);
+	free(env);
+
 	if(rank == 0) {
 		VisItInitializeSocketAndDumpSimFile(simname.c_str(),"", "", NULL, NULL, NULL);
 	}
@@ -189,7 +197,17 @@ int VisItListener::BroadcastIntCallback(int *value, int sender)
 	return MPI_Bcast(value, 1, MPI_INT, sender, comm);
 }
 
+int VisItListener::BroadcastIntCallback2(int *value, int sender, void* s)
+{
+	return MPI_Bcast(value, 1, MPI_INT, sender, comm);
+}
+
 int VisItListener::BroadcastStringCallback(char *str, int len, int sender)
+{
+	return MPI_Bcast(str, len, MPI_CHAR, sender, comm);
+}
+
+int VisItListener::BroadcastStringCallback2(char *str, int len, int sender, void* s)
 {
 	return MPI_Bcast(str, len, MPI_CHAR, sender, comm);
 }
@@ -267,7 +285,7 @@ visit_handle VisItListener::GetMesh(int domain, const char *name, void *cbdata)
 		DBG("Mesh found, exposing data, iteration is " << s->iteration);
 		
 		std::list<int> clients = Environment::GetKnownLocalClients();
-		int nbrLocalBlocksPerClient = Environment::GetNumDomainsPerClient();
+		int nbrLocalBlocksPerClient = Environment::NumDomainsPerClient();
 
 		int source = domain / nbrLocalBlocksPerClient;
 		int block = domain % nbrLocalBlocksPerClient;
@@ -286,7 +304,7 @@ visit_handle VisItListener::GetVariable(int domain, const char *name, void *cbda
 	visit_handle h = VISIT_INVALID_HANDLE;
 	if(v != NULL) {
 		std::list<int> clients = Environment::GetKnownLocalClients();
-		int nbrLocalBlocksPerClient = Environment::GetNumDomainsPerClient();
+		int nbrLocalBlocksPerClient = Environment::NumDomainsPerClient();
 
 		int source = domain / nbrLocalBlocksPerClient;
 		int block = domain % nbrLocalBlocksPerClient;
@@ -325,8 +343,8 @@ visit_handle VisItListener::GetDomainList(const char* name, void* cbdata)
 		int *iptr = NULL;
 
 		std::list<int> clients = Environment::GetKnownLocalClients();
-		int nbrLocalClients = Environment::CountLocalClients();
-		int nbrLocalBlocksPerClient = Environment::GetNumDomainsPerClient();
+		int nbrLocalClients = Environment::HasServer() ? Environment::ClientsPerNode() : 1;
+		int nbrLocalBlocksPerClient = Environment::NumDomainsPerClient();
 		int nbrLocalBlocks = nbrLocalClients*nbrLocalBlocksPerClient;
 		int ttlClients = Environment::CountTotalClients();
 		int ttlBlocks = ttlClients*nbrLocalBlocksPerClient;

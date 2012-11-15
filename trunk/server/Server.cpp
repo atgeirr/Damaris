@@ -53,7 +53,7 @@ Server::Server(Process* p)
 #ifdef __ENABLE_VISIT
 	visitMPIlayer = NULL;
 #endif
-	needStop = Environment::getClientsPerNode();
+	needStop = Environment::ClientsPerNode();
 }
 
 
@@ -76,10 +76,10 @@ int Server::run()
 #ifdef __ENABLE_VISIT
 	int vizstt;
 	if(process->getModel()->visit().present()) {
-		Viz::VisItListener::Init(Environment::getEntityComm(),
+		Viz::VisItListener::Init(Environment::GetEntityComm(),
 			process->getModel()->visit(),
-		Environment::getSimulationName());
-		visitMPIlayer = MPILayer<int>::New(Environment::getEntityComm());
+		Environment::SimulationName());
+		visitMPIlayer = MPILayer<int>::New(Environment::GetEntityComm());
 	}
 #endif
 	
@@ -174,7 +174,7 @@ void Server::processInternalSignal(int32_t object, int iteration, int source)
 	case END_ITERATION:
 		if(Environment::StartNextIteration()) {
 			MPI_Allreduce(&no_update,&global_no_update,1,
-					MPI_BYTE,MPI_BOR, Environment::getEntityComm());
+					MPI_BYTE,MPI_BOR, Environment::GetEntityComm());
 			no_update = false;	
 #ifdef __ENABLE_VISIT
 			if(not global_no_update) Viz::VisItListener::Update();
@@ -185,7 +185,7 @@ void Server::processInternalSignal(int32_t object, int iteration, int source)
 		no_update = true;
 		if(Environment::StartNextIteration()) {	
 			MPI_Allreduce(&no_update,&global_no_update,1,
-					MPI_BYTE,MPI_BOR, Environment::getEntityComm());
+					MPI_BYTE,MPI_BOR, Environment::GetEntityComm());
 			no_update = false;
 		}
 		break;

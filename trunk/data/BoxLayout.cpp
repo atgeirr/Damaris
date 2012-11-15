@@ -152,7 +152,7 @@ namespace Damaris {
 
 		if((model.language() == Model::Language::fortran)
 				|| (model.language() == Model::Language::unknown
-					&& Environment::getDefaultLanguage() == Model::Language::fortran)) {
+					&& Environment::DefaultLanguage() == Model::Language::fortran)) {
 			std::vector<int> rdims(e.rbegin(),e.rend());
 			extents = rdims;
 		} else {

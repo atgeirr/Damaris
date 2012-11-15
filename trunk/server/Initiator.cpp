@@ -45,16 +45,16 @@ bool Initiator::mpi_init(const std::string& configFile, MPI_Comm globalcomm)
 	Process* p = Process::get();
 	/* currently thie Process object had no ID */
 	
-	Environment::setGlobalComm(globalcomm);
-	int clpn = Environment::getClientsPerNode();
-	int copn = Environment::getCoresPerNode();
+	Environment::SetGlobalComm(globalcomm);
+	int clpn = Environment::ClientsPerNode();
+	int copn = Environment::CoresPerNode();
 
 	/* Create a new communicator gathering processes of the same node */
 	int color = ProcInfo::GetNodeID();
 
 	MPI_Comm nodecomm;
 	MPI_Comm_split(globalcomm,color,rank,&nodecomm);
-	Environment::setNodeComm(nodecomm);
+	Environment::SetNodeComm(nodecomm);
 	
 	/* Get the size and rank in the node */
 	int rankInNode;
@@ -81,7 +81,7 @@ bool Initiator::mpi_init(const std::string& configFile, MPI_Comm globalcomm)
 	int is_client = (rankInNode >= clpn) ? 0 : 1;
 	MPI_Comm entitycomm;
 	MPI_Comm_split(globalcomm,is_client,rank,&entitycomm);
-	Environment::setEntityComm(entitycomm);
+	Environment::SetEntityComm(entitycomm);
 	
 	/* Get rank and size in the entity communicator */
 	int rankInEnComm, sizeOfEnComm;

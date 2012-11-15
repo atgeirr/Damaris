@@ -74,11 +74,21 @@ class VisItListener {
 		 * Helper function to broadcast integers.
 		 */
 		static int BroadcastIntCallback(int *value, int sender);
-	
+
+		/**
+		 * Helper function to broadcast integers.
+		 */
+		static int BroadcastIntCallback2(int *value, int sender, void* s);
+
 		/**
 		 * Helper function to broadcast strings.
 		 */
 		static int BroadcastStringCallback(char *str, int len, int sender);
+
+		/**
+		 * Helper function to broadcast strings.
+		 */
+		static int BroadcastStringCallback2(char* str, int len, int sender, void* s);
 
 		/**
 		 * VisIt command callback.

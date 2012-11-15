@@ -79,24 +79,28 @@ namespace Damaris {
 		/**
 		 * \brief Get the name of the simulation.
 		 */
-		static std::string getSimulationName();
+		static std::string SimulationName();
 
 		/**
 		 * \brief Get the default language for the running simulation.
 		 */
-		static Model::Language getDefaultLanguage();
+		static Model::Language DefaultLanguage();
 
 		/**
 		 * \brief Get the number of clients per node.
-		 * \deprecated
 		 */
-		static int getClientsPerNode() __attribute__ ((deprecated));
+		static int ClientsPerNode();
 
 		/**
 		 * \brief Get the number of cores per node.
-		 * \deprecated
 		 */
-		static int getCoresPerNode() __attribute__ ((deprecated));
+		static int CoresPerNode();
+
+
+		/**
+		 * Returns the number of dedicated cores.
+		 */
+		static int ServersPerNode();
 
 		/**
 		 * Returns the list of id of clients connected to the
@@ -116,16 +120,6 @@ namespace Damaris {
 		static int CountTotalServers();
 
 		/**
-		 * Returns the local number of clients
-		 */
-		static int CountLocalClients();
-		
-		/**
-		 * Returns the local number of servers
-		 */
-		static int CountLocalServers();
-
-		/**
 		 * Add the id of newly connected client.
 		 */
 		static void AddConnectedClient(int id);
@@ -133,42 +127,42 @@ namespace Damaris {
 		/**
 		 * \brief Set the communicator gathering processes of the same kind (client or server.
 		 */
-		static void setEntityComm(MPI_Comm comm);
+		static void SetEntityComm(MPI_Comm comm);
 
 		/**
 		 * \brief gets the communicator gathering processes of the same kind.
 		 */
-		static MPI_Comm getEntityComm();
+		static MPI_Comm GetEntityComm();
 
 		/**
 		 * \brief Set the global communicator (usually MPI_COMM_WORLD).
 		 */
-		static void setGlobalComm(MPI_Comm comm);
+		static void SetGlobalComm(MPI_Comm comm);
 
 		/**
 		 * \brief Gets the global communicator passed at start time.
 		 */
-		static MPI_Comm getGlobalComm();
+		static MPI_Comm GetGlobalComm();
 
 		/**
 		 * \brief Set the communicator gathering processes of the same node.
 		 */
-		static void setNodeComm(MPI_Comm comm);
+		static void SetNodeComm(MPI_Comm comm);
 		
 		/**
 		 * \brief Get the communicator gathering processes of the same node.
 		 */
-		static MPI_Comm getNodeComm();
+		static MPI_Comm GetNodeComm();
 
 		/**
 		 * \brief Tell if a dedicated core is present.
 		 */
-		static bool hasServer();
+		static bool HasServer();
 
 		/**
 		 * Returns the number of domain that each client is supposed to handle.
 		 */
-		static unsigned int GetNumDomainsPerClient();
+		static unsigned int NumDomainsPerClient();
 
 		/**
 		 * Returns the last known terminated iteration.

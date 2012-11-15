@@ -72,8 +72,8 @@ int main(int argc, char** argv)
 	__server = Damaris::Server::New(opt.getConfigFile(),id);
 
 	INFO("Setting communicators");
-	Damaris::Environment::setGlobalComm(MPI_COMM_WORLD);
-	Damaris::Environment::setEntityComm(MPI_COMM_WORLD);
+	Damaris::Environment::SetGlobalComm(MPI_COMM_WORLD);
+	Damaris::Environment::SetEntityComm(MPI_COMM_WORLD);
 
 	INFO("Starting server");
 	/* Starts the server */

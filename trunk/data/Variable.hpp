@@ -99,33 +99,33 @@ class Variable : public Configurable<Model::Variable> {
 		 * Returns the list of chunks with a specified source.
 		 * \deprecated
 		 */
-		ChunkIndexBySource::iterator getChunksBySource(int source,
-			ChunkIndexBySource::iterator& end)
-		__attribute__ ((deprecated));
+		//ChunkIndexBySource::iterator getChunksBySource(int source,
+		//	ChunkIndexBySource::iterator& end)
+		//__attribute__ ((deprecated));
 
 		/**
 		 * Returns the list of chunks with a specified iteration.
 		 * \deprecated
 		 */
-		ChunkIndexByIteration::iterator getChunksByIteration(int iteration,
-			ChunkIndexByIteration::iterator& end)
-		__attribute__ ((deprecated));
+		//ChunkIndexByIteration::iterator getChunksByIteration(int iteration,
+		//	ChunkIndexByIteration::iterator& end)
+		//__attribute__ ((deprecated));
 
 		/**
 		 * Returns an iterator of chunks with an iteration within a given range.
 		 * \deprecated
 		 */
-		ChunkIndexByIteration::iterator getChunksByIterationsRange(int itstart, int itend,
-			ChunkIndexByIteration::iterator& end)
-		__attribute__ ((deprecated));
+		//ChunkIndexByIteration::iterator getChunksByIterationsRange(int itstart, int itend,
+		//	ChunkIndexByIteration::iterator& end)
+		//__attribute__ ((deprecated));
 		
 		/**
 		 * Returns an iterator over all the chunks.
 		 * \param[out] end : a reference that will hold the end of the iterator.
 		 * \deprecated
 		 */
-		ChunkIndex::iterator getChunks(ChunkIndex::iterator &end)
-		__attribute__ ((deprecated));
+		//ChunkIndex::iterator getChunks(ChunkIndex::iterator &end)
+		//__attribute__ ((deprecated));
 
 		/**
 		 * Finds a Chunk of a given source, iteration and block.
@@ -154,8 +154,8 @@ class Variable : public Configurable<Model::Variable> {
 		 * \param[out] end : a reference that will hold the end of the iterator.
 		 * \deprecated
 		 */
-		ChunkIndex::iterator getChunks(int source, int iteration, int block, 
-			ChunkIndex::iterator &end) __attribute__ ((deprecated));
+		//ChunkIndex::iterator getChunks(int source, int iteration, int block, 
+		//	ChunkIndex::iterator &end) __attribute__ ((deprecated));
 
 		/**
 		 * Detach a chunk from a variable. Free its memory if the process owns the chunk.

@@ -47,6 +47,7 @@ bool Variable::AttachChunk(Chunk* chunk)
 	return chunks.insert(boost::shared_ptr<Chunk>(chunk)).second;
 }
 
+/*
 ChunkIndexBySource::iterator Variable::getChunksBySource(int source,
 	ChunkIndexBySource::iterator& end)
 {
@@ -54,13 +55,15 @@ ChunkIndexBySource::iterator Variable::getChunksBySource(int source,
 	end = chunks.get<by_source>().upper_bound(source);
 	return it;
 }
-
+*/
+/*
 ChunkIndexByIteration::iterator Variable::getChunksByIteration(int iteration,
 	ChunkIndexByIteration::iterator& end) 
 {
 	return getChunksByIterationsRange(iteration,iteration,end);
 }
-
+*/
+/*
 ChunkIndexByIteration::iterator Variable::getChunksByIterationsRange(int itstart, int itend,
             ChunkIndexByIteration::iterator& end)
 {
@@ -72,13 +75,15 @@ ChunkIndexByIteration::iterator Variable::getChunksByIterationsRange(int itstart
     end = chunks.get<by_iteration>().upper_bound(itend);
     return it;
 }
-
+*/
+/*
 ChunkIndex::iterator Variable::getChunks(ChunkIndex::iterator &end)
 {
 	end = chunks.get<by_any>().end();
 	return chunks.get<by_any>().begin();
 }
-
+*/
+/*
 ChunkIndex::iterator Variable::getChunks(int source, int iteration, int block, ChunkIndex::iterator &end)
 {
 	if(not model.time_varying()) {
@@ -87,7 +92,7 @@ ChunkIndex::iterator Variable::getChunks(int source, int iteration, int block, C
 	end = chunks.get<by_any>().end();
 	return chunks.get<by_any>().find(boost::make_tuple(source,iteration,block));
 }
-
+*/
 Chunk* Variable::GetChunk(int source, int iteration, int block)
 {
 	if(not model.time_varying()) {
@@ -187,8 +192,8 @@ bool Variable::ExposeVisItDomainList(visit_handle *h, int iteration)
 		int *iptr = NULL;
 
 		std::list<int> clients = Environment::GetKnownLocalClients();
-		int nbrLocalClients = Environment::CountLocalClients();
-		int nbrBlocksPerClient = Environment::GetNumDomainsPerClient();
+		int nbrLocalClients = Environment::HasServer() ? Environment::ClientsPerNode() : 1;
+		int nbrBlocksPerClient = Environment::NumDomainsPerClient();
 		int nbrBlocks = nbrLocalClients*nbrBlocksPerClient;
 		int ttlClients = Environment::CountTotalClients();
 		int ttlBlocks = ttlClients*nbrBlocksPerClient;
@@ -300,7 +305,7 @@ Chunk* Variable::Allocate(int block, bool blocking)
 
 	Chunk* chunk = GetChunk(source,iteration,block);
 	if(chunk != NULL) {
-		DBG("Trying to overwrite an existing chunk for variable \""
+		ERROR("Trying to overwrite an existing chunk for variable \""
 			<< name << "\"");
 		return NULL;
 	}
@@ -319,7 +324,7 @@ Chunk* Variable::Allocate(int block, bool blocking)
 			if(allocator->WaitAvailable(size)) {
 				location = allocator->Allocate(size);
 			} else {
-				ERROR("Could not allocate memory for variable \""
+				DBG("Could not allocate memory for variable \""
 				<< name << "\": not enough memory");
 			}
 		}

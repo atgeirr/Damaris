@@ -60,16 +60,25 @@ namespace Damaris {
 			env->isClient = b;
 	}
 
-	int Environment::getCoresPerNode() 
+	int Environment::CoresPerNode() 
 	{
 		if(env == NULL) return -1;
 		return env->model.architecture().cores().count();
 	}
 
-	int Environment::getClientsPerNode() 
+	int Environment::ClientsPerNode() 
 	{
 		if(env == NULL) return -1;
 		return env->model.architecture().cores().clients().count();
+	}
+
+	int Environment::ServersPerNode()
+	{
+		if(env == NULL) return -1;
+		if(HasServer())
+			return CoresPerNode() - ClientsPerNode();
+		else
+			return 1;
 	}
 
 	const std::list<int>& Environment::GetKnownLocalClients()
@@ -92,11 +101,10 @@ namespace Damaris {
 	{
 		int dcore = 0;
 		MPI_Comm_size(env->entityComm,&dcore);
-		if(hasServer()) {
-			return dcore*getClientsPerNode();
-		} else {
-			return dcore;
-		}
+		if(HasServer()) {
+			return dcore*ClientsPerNode();
+		} 
+		return dcore;
 	}
 
 	int Environment::CountTotalServers()
@@ -106,71 +114,60 @@ namespace Damaris {
 		return dcore;
 	}
 
-	int Environment::CountLocalClients()
-	{
-		return env->knownClients.size();
-	}
-	
-	int Environment::CountLocalServers()
-	{
-		int c = env->model.architecture().cores().count();
-		return c - CountLocalClients();
-	}
-
-	std::string Environment::getSimulationName()
+	std::string Environment::SimulationName()
 	{
 		if(env == NULL) return "unknown";
 		return env->model.name();
 	}
 
-	Model::Language Environment::getDefaultLanguage()
+	Model::Language Environment::DefaultLanguage()
 	{
 		if(env == NULL) return Model::Language::unknown;
 		return env->model.language();
 	}
 
-	void Environment::setEntityComm(MPI_Comm comm) 
+	void Environment::SetEntityComm(MPI_Comm comm) 
 	{ 
 		if(env == NULL) return;
 		env->entityComm = comm;
 	}
 
-	MPI_Comm Environment::getEntityComm() 
+	MPI_Comm Environment::GetEntityComm() 
 	{
 		if(env == NULL) return MPI_COMM_NULL;
 		return env->entityComm;
 	}
 
-	void Environment::setGlobalComm(MPI_Comm comm)
+	void Environment::SetGlobalComm(MPI_Comm comm)
 	{
 		if(env == NULL) return;
 		env->globalComm = comm;
 	}
 
-	MPI_Comm Environment::getGlobalComm()
+	MPI_Comm Environment::GetGlobalComm()
 	{
 		if(env == NULL) return MPI_COMM_NULL;
 		return env->globalComm;
 	}
 
-	void Environment::setNodeComm(MPI_Comm comm)
+	void Environment::SetNodeComm(MPI_Comm comm)
 	{
 		if(env == NULL) return;
 		env->nodeComm = comm;
 	}
 
-	MPI_Comm Environment::getNodeComm()
+	MPI_Comm Environment::GetNodeComm()
 	{
 		if(env == NULL) return MPI_COMM_NULL;
 		return env->nodeComm;
 	}
 
-	bool Environment::hasServer() 
+	bool Environment::HasServer() 
 	{
-		return (getCoresPerNode() != getClientsPerNode());
+		return (CoresPerNode() != ClientsPerNode());
 	}
 
-	unsigned int Environment::GetNumDomainsPerClient()
+	unsigned int Environment::NumDomainsPerClient()
 	{
 		if(env == NULL) return 0;
 		return env->model.architecture().cores().clients().domains();
@@ -184,7 +181,7 @@ namespace Damaris {
 	bool Environment::StartNextIteration()
 	{
 		// for clients
-		if((not hasServer()) || (IsClient())) {
+		if((not HasServer()) || (IsClient())) {
 			env->lastIteration++;
 			return true;
 		}
@@ -192,7 +189,7 @@ namespace Damaris {
 		// for servers
 		static int locks = 0;
 		locks += 1;
-		if(locks == getClientsPerNode()) { 
+		if(locks == ClientsPerNode()) { 
 			DBG("Iteration " << env->lastIteration << " terminated");
 			env->lastIteration++;
 			locks = 0;

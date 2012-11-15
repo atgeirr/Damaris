@@ -46,7 +46,7 @@ bool CurvilinearMesh::ExposeVisItMetaData(visit_handle md, int iteration) const
 		VisIt_MeshMetaData_setTopologicalDimension(m1, (int)model.topology());
 		VisIt_MeshMetaData_setSpatialDimension(m1, (int)model.coord().size());
 	
-		int nbrLocalBlocksPerClient = Environment::GetNumDomainsPerClient();
+		int nbrLocalBlocksPerClient = Environment::NumDomainsPerClient();
 		int nbrClients = Environment::CountTotalClients();
 		int numBlocks = nbrLocalBlocksPerClient*nbrClients;
 

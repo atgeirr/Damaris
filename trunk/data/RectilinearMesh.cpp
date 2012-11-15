@@ -77,7 +77,7 @@ namespace Damaris {
 				}
 			}
 
-			int nbrLocalBlocksPerClient = Environment::GetNumDomainsPerClient();
+			int nbrLocalBlocksPerClient = Environment::NumDomainsPerClient();
 			int nbrClients = Environment::CountTotalClients();
 			int numBlocks = nbrLocalBlocksPerClient*nbrClients;
 

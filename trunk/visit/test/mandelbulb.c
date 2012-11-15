@@ -6,9 +6,11 @@
 
 #define MAX_CYCLES 50
 #define MAX_ITERATION 255
-#define WIDTH  60
-#define HEIGHT 40
-#define DEPTH  160
+
+int WIDTH;
+int HEIGHT;
+int DEPTH;
+
 #define RANGE  1.2
 
 typedef struct {
@@ -77,6 +79,10 @@ int main(int argc, char** argv)
 	}
 	comm = DC_mpi_get_client_comm();
 
+	DC_parameter_get("WIDTH",&WIDTH,sizeof(int));
+	DC_parameter_get("HEIGHT",&HEIGHT,sizeof(int));
+	DC_parameter_get("DEPTH",&DEPTH,sizeof(int));
+
 	MPI_Comm_rank(comm,&rank);
 	MPI_Comm_size(comm,&nbprocs);
 
@@ -107,6 +113,8 @@ int main(int argc, char** argv)
 	for(i=0; i < MAX_CYCLES; i++) {
 		double order = 4.0 + ((double)i)*8.0/MAX_CYCLES;
 
+		double t1 = MPI_Wtime();
+
 		for(z = 0; z < DEPTH; z++)
 		for(y = 0; y < HEIGHT+1; y++)
 		for(x = 0; x < WIDTH+1; x++)
@@ -126,12 +134,16 @@ int main(int argc, char** argv)
 		}
 
 		DC_write("space",space);
+	
 		DC_signal("clean");
+
 		DC_end_iteration();
 		
 		MPI_Barrier(comm);
+
+		double t2 = MPI_Wtime();
 		if(rank == 0) {
-			printf("Iteration %d ended\n",i);
+			printf("Iteration %d done in %f seconds\n",i,(t2-t1));
 		}
 	}
 
