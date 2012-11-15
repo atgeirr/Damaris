@@ -318,11 +318,10 @@ namespace Damaris {
 	}
 
 
-	// TODO : remove the following deprecated function
-	int Client::chunk_write(chunk_h chunkh, const std::string & varname, 
+	/*int Client::chunk_write(chunk_h chunkh, const std::string & varname, 
 			int32_t iteration, const void* data, bool blocking)
 	{
-		/* check that the variable is know in the configuration */
+		// check that the variable is know in the configuration 
 		Variable* variable = VariableManager::Search(varname);
 
 		if(variable == NULL) {
@@ -391,6 +390,7 @@ namespace Damaris {
 
 		return size;
 	}
+	*/
 
 	int Client::signal(const std::string & signal_name)
 	{
@@ -505,6 +505,7 @@ namespace Damaris {
 		return 0;
 	}
 
+	/*
 	chunk_h Client::chunk_set(unsigned int dimensions,
 			const std::vector<int> & startIndices, 
 			const std::vector<int> & endIndices)
@@ -517,6 +518,7 @@ namespace Damaris {
 	{
 		ChunkDescriptor::Delete(chunkh);
 	}
+	*/
 
 	MPI_Comm Client::mpi_get_client_comm()
 	{

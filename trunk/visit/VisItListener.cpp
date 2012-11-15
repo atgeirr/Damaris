@@ -95,7 +95,7 @@ int VisItListener::Connected()
 	if(visitstate >= -5 && visitstate <= -1) {
 		ERROR("Uncaught VisIt error");
 	} else if(visitstate == 1) {
-		INFO("VisIt first attempt to connect");
+		DBG("VisIt first attempt to connect");
 	}
 	return visitstate;
 }
@@ -107,7 +107,7 @@ int VisItListener::EnterSyncSection(int visitstate)
 	switch(visitstate) {
 		case 1:
 			if(VisItAttemptToCompleteConnection() == VISIT_OKAY) {
-				INFO("VisIt connected");
+				DBG("VisIt connected");
 				VisItSetActivateTimestep(&VisItListener::TimeStepCallback,(void*)(&sim));
 				VisItSetSlaveProcessCallback(&VisItListener::SlaveProcessCallback);	
 				VisItSetGetMetaData(&VisItListener::GetMetaData,(void*)(&sim));
@@ -116,7 +116,7 @@ int VisItListener::EnterSyncSection(int visitstate)
 				VisItSetGetDomainList(&VisItListener::GetDomainList,(void*)(&sim));
 				VisItSetCommandCallback(&VisItListener::ControlCommandCallback,(void*)(&sim));
 			} else {
-				INFO("VisIt did not connect");
+				ERROR("VisIt did not connect");
 			}
 			break;
 		case 2:

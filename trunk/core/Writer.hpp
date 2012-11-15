@@ -29,7 +29,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Damaris {
 
-typedef ChunkDescriptor* chunk_h;
+//typedef ChunkDescriptor* chunk_h;
 
 /**
  * The Writer class is an abstraction for a class that
@@ -73,8 +73,8 @@ class Writer  {
 		 *         -2 if the allocation of memory failed,
 		 *         -3 if the chunk has an inapropriate shape.
 		 */
-		virtual int chunk_write(chunk_h chunkh, const std::string & varname, 
-			int32_t iteration, const void* data, bool blocking = true) = 0;
+		//virtual int chunk_write(chunk_h chunkh, const std::string & varname, 
+		//	int32_t iteration, const void* data, bool blocking = true) = 0;
 
 		/**
 		 * \brief Sends an event.
@@ -132,14 +132,14 @@ class Writer  {
 		 * \param[in] endIndices : end indices.
 		 * \return A chunk handle. Call chunk_free to free the chunk handle.
 		 */
-		virtual chunk_h chunk_set(unsigned int dimensions,
-					const std::vector<int> & startIndices, 
-					const std::vector<int> & endIndices) = 0;
+		//virtual chunk_h chunk_set(unsigned int dimensions,
+		//			const std::vector<int> & startIndices, 
+		//			const std::vector<int> & endIndices) = 0;
 
 		/**
 		 * \brief Free a chunk handle.
 		 */
-		virtual void chunk_free(chunk_h chunkh) = 0;
+		//virtual void chunk_free(chunk_h chunkh) = 0;
 
 		/**
 		 * Destructor.

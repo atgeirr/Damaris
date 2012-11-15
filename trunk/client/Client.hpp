@@ -103,9 +103,9 @@ class Client {
 		 * \see Writer::chunk_write
 		 * \deprecated
 		 */
-		virtual int chunk_write(chunk_h chunkh, const std::string & varname, 
-			int32_t iteration, const void* data, bool blocking = false)
-		__attribute__ ((deprecated));
+		//virtual int chunk_write(chunk_h chunkh, const std::string & varname, 
+		//	int32_t iteration, const void* data, bool blocking = false)
+		//__attribute__ ((deprecated));
 
 		/**
 		 * \see Writer::signal
@@ -139,17 +139,17 @@ class Client {
 		 * \see Writer::chunk_set
 		 * \deprecated
 		 */
-		virtual chunk_h chunk_set(unsigned int dimensions,
-					const std::vector<int> & startIndices, 
-					const std::vector<int> & endIndices)
-		__attribute__ ((deprecated));
+		//virtual chunk_h chunk_set(unsigned int dimensions,
+		//			const std::vector<int> & startIndices, 
+		//			const std::vector<int> & endIndices)
+		//__attribute__ ((deprecated));
 
 		/**
 		 * \see Writer::chunk_free
 		 * \deprecated
 		 */
-		virtual void chunk_free(chunk_h chunkh)
-		__attribute__ ((deprecated));
+		//virtual void chunk_free(chunk_h chunkh)
+		//__attribute__ ((deprecated));
 
 		/** 
 		 * \brief Retrieves a parameter's value. 

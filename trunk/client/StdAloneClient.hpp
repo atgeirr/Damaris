@@ -73,8 +73,8 @@ namespace Damaris {
 		/**
 		 * \see Client::chunk_write
 		 */
-		virtual int chunk_write(chunk_h chunkh, const std::string & varname, 
-				int32_t iteration, const void* data, bool blocking = true);		
+		//virtual int chunk_write(chunk_h chunkh, const std::string & varname, 
+		//		int32_t iteration, const void* data, bool blocking = true);		
 
 		/**
 		 * \see Client::signal

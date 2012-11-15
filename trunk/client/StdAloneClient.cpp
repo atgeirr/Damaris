@@ -247,10 +247,11 @@ namespace Damaris {
 		return size;
 	}
 
+	/*
 	int StdAloneClient::chunk_write(chunk_h chunkh, const std::string & varname, 
 			int32_t iteration, const void* data, bool blocking)
 	{
-		/* check that the variable is know in the configuration */
+		// check that the variable is know in the configuration /
 		Variable* variable = VariableManager::Search(varname);
 
 		if(variable == NULL) {
@@ -305,6 +306,7 @@ namespace Damaris {
 
 		return size;
 	}
+	*/
 
 	int StdAloneClient::signal(const std::string & signal_name)
 	{

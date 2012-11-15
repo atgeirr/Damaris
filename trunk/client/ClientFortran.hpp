@@ -63,25 +63,25 @@ void FC_FUNC_GLOBAL_(df_write_block,DF_WRITE)
  * \brief Define a chunk.
  * \see Damaris::Client::chunk_set
  */
-void FC_FUNC_GLOBAL_(df_chunk_set,DF_CHUNK_SET)
-	(unsigned int* dimensions, int* si, int* ei, int64_t* chunkh);
+//void FC_FUNC_GLOBAL_(df_chunk_set,DF_CHUNK_SET)
+//	(unsigned int* dimensions, int* si, int* ei, int64_t* chunkh);
 
 /**
  * \fn df_chunk_write
  * \brief Write a chunk.
  * \see Damaris::Client::chunk_write
  */
-void FC_FUNC_GLOBAL_(df_chunk_write,DF_CHUNK_WRITE)
-	(int64_t* chunkh, char* varname_f, int32_t* iteration_f, void* data_f, int32_t* ierr_f,
-	 int var_name_size);
+//void FC_FUNC_GLOBAL_(df_chunk_write,DF_CHUNK_WRITE)
+//	(int64_t* chunkh, char* varname_f, int32_t* iteration_f, void* data_f, int32_t* ierr_f,
+//	 int var_name_size);
 
 /**
  * \fn df_chunk_free
  * \brief Free a chunk handle.
  * \see Damaris::Client::chunk_free
  */
-void FC_FUNC_GLOBAL_(df_chunk_free,DF_CHUNK_FREE)
-	(int64_t* chunkh);
+//void FC_FUNC_GLOBAL_(df_chunk_free,DF_CHUNK_FREE)
+//	(int64_t* chunkh);
 
 /** 
  * \fn df_alloc(var_name, iteration, ierr)

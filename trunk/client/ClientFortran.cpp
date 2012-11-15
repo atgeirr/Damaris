@@ -74,7 +74,7 @@ void FC_FUNC_GLOBAL(df_write,DF_WRITE)
 		if(ierr_f != NULL) *ierr_f = res;
 	}
 
-void FC_FUNC_GLOBAL_(df_chunk_set,DF_CHUNK_SET)
+/*void FC_FUNC_GLOBAL_(df_chunk_set,DF_CHUNK_SET)
 	(unsigned int* dimensions, int* si, int* ei, int64_t* chunkh)
 	{
 		std::vector<int> sti(si,si+(*dimensions));
@@ -101,7 +101,7 @@ void FC_FUNC_GLOBAL(df_chunk_write,DF_WRITE)
 				var_name,*iteration_f,data_f);
 		if(ierr_f != NULL) *ierr_f = res;
 	}
-
+*/
 void* FC_FUNC_GLOBAL(df_alloc,DF_ALLOC)
         (char* var_name_f, int32_t* ierr_f, int var_name_size)
 	{
