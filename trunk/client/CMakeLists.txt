@@ -7,7 +7,8 @@ set(DAMARIS_CLIENT_SRC
 	${DAMARIS_SOURCE_DIR}/client/Definition.cpp)
 
 set(DAMARIS_MODEL_SRC
-	${DAMARIS_SOURCE_DIR}/xml/Model.cpp)
+	${DAMARIS_SOURCE_DIR}/xml/Model.cpp
+	${DAMARIS_SOURCE_DIR}/xml/BcastXML.cpp)
 
 set(DAMARIS_COMMON_SRC
 	${DAMARIS_SOURCE_DIR}/core/Process.cpp

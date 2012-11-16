@@ -22,7 +22,7 @@ xml: $(SOURCE)
 	g++ -o $@ -c $<
 
 test: $(OBJ)
-	g++ -o test test.cxx $^ -I. -I$(HOME)/deploy/include -L$(HOME)/deploy/lib -lxerces-c
+	mpicxx -o test test.cxx $^ -I. -I.. -I$(HOME)/deploy/include -L$(HOME)/deploy/lib -lxerces-c
 
 clean:
 	rm -rf *.cpp *.hpp
