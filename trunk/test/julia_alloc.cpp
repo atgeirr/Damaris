@@ -16,6 +16,7 @@
 #include <string>
 #include <complex>
 
+#include "xml/BcastXML.hpp"
 #include "include/Damaris.hpp"
 
 #define PI 3.14159265358979323846
@@ -64,7 +65,10 @@ int main(int argc, char** argv)
 
 	// Initializes the client
 	std::string config(argv[1]);
-	client = Damaris::Client::New(config,id);
+	
+	std::auto_ptr<Damaris::Model::Simulation> mdl
+		= Damaris::Model::BcastXML(MPI_COMM_WORLD,config);
+	client = Damaris::Client::New(mdl,id);
 	
 	std::complex<double> c(0.0,0.0);
 

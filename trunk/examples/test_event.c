@@ -4,7 +4,6 @@
 
 int main(int argc, char** argv) 
 {
-	int id = 0;
 	char* script = "my script";
 	char* event = "my event";
 
@@ -13,7 +12,7 @@ int main(int argc, char** argv)
 		exit(0);
 	}
 
-	DC_initialize(argv[1],id);
+	DC_initialize(MPI_COMM_WORLD,argv[1]);
 
 	DC_signal(script);
 	DC_signal(event);

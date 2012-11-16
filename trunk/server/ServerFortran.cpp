@@ -41,14 +41,14 @@ extern Damaris::Server *__server;
 extern Damaris::Client *__client;
 
 extern "C" {
-
+/*
 void FC_FUNC_GLOBAL(df_server_init,DF_SERVER_INIT)
 	(char* configFile_f, int32_t* server_id_f, int32_t* ierr_f, int32_t configFile_size)
 	{
 		std::string config_str(configFile_f,configFile_size);
 		__server = Damaris::Server::New(config_str,*server_id_f);
 	}
-
+*/
 void FC_FUNC_GLOBAL(df_mpi_init_and_start,DF_MPI_INIT_AND_START)
 	(char* configFile_f, MPI_Fint* globalcomm, int* result, int configsize)
 	{
@@ -63,11 +63,12 @@ void FC_FUNC_GLOBAL(df_mpi_init,DF_MPI_INIT)
 		MPI_Comm oc = MPI_Comm_f2c(*globalcomm);
 		*result = Damaris::Initiator::mpi_init(std::string(configFile_f,configsize),oc);
 	}
-
+/*
 void FC_FUNC_GLOBAL(df_server_start,DF_SERVER_START)
 	(int* result)
 	{
 		*result = Damaris::Initiator::start_server();
 	}
+*/
 }
 #endif

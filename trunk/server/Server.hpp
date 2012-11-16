@@ -29,6 +29,7 @@
 #include "memory/Message.hpp"
 #include "core/Process.hpp"
 #include "core/MPILayer.hpp"
+#include "xml/BcastXML.hpp"
 #include "server/Initiator.hpp"
 
 namespace Damaris {
@@ -58,7 +59,7 @@ namespace Damaris {
 			 * \param[in] cfgfile : name of the configuration file.
 			 * \param[in] id : id of the process.
 			 */
-			static Server* New(const std::string& cfgfile, int32_t id);
+			static Server* New(std::auto_ptr<Model::Simulation> mdl, int32_t id);
 
 			/**
 			 * \brief Destructor 

@@ -43,6 +43,13 @@ std::auto_ptr<Damaris::Model::Simulation> BcastXML(const MPI_Comm& comm, const s
 	if(rank == 0) {
 		std::ifstream xmlfile;
 		xmlfile.open(uri.c_str());
+		
+		if(xmlfile.fail()) {
+			ERROR("Fail to open configuration file " << uri);
+			MPI_Abort(comm,-1);
+			exit(-1);
+		}
+
 		// get length of file
 		xmlfile.seekg(0, std::ios::end);
 		length = xmlfile.tellg();

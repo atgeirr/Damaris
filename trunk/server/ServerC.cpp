@@ -32,6 +32,7 @@ extern "C" {
 
 #include "server/Server.h"
 
+/*
 	int DC_server_init(const char* configFile, int server_id)
 	{
 		std::string config_str(configFile);
@@ -41,6 +42,7 @@ extern "C" {
 		}
 		return -1;
 	}
+*/
 
 	int DC_mpi_init_and_start(const char* configFile, MPI_Comm globalcomm)
 	{
@@ -53,8 +55,10 @@ extern "C" {
 		return Damaris::Initiator::mpi_init(std::string(configFile),globalcomm);
 	}
 
+/*
 	int DC_server_start()
 	{
 		return Damaris::Initiator::start_server();
 	}
+*/
 }

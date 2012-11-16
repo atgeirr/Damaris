@@ -26,6 +26,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "core/Debug.hpp"
 #include "core/FCMangle.h"
 #include "client/ClientFortran.hpp"
+#include "xml/BcastXML.hpp"
 
 // Converts a fortran string to a cpp string and deletes any
 // blanc spaces at the end of the string
@@ -48,11 +49,16 @@ extern "C" {
 extern Damaris::Client *__client;
 
 void FC_FUNC_GLOBAL(df_initialize,DF_INITIALIZE)
-	(char* config_file_name_f, int32_t* core_id_f, int32_t* ierr_f, int config_file_name_size)
+	(MPI_Fint* fcomm, char* config_file_name_f, int32_t* ierr_f, int config_file_name_size)
 	{
 		std::string config_file_name = 
 			fortranStringToCpp(config_file_name_f, config_file_name_size);
-		__client = Damaris::Client::New(config_file_name,*core_id_f);
+		MPI_Comm cc = MPI_Comm_f2c(*fcomm);
+		std::auto_ptr<Damaris::Model::Simulation> mdl
+			= Damaris::Model::BcastXML(cc, config_file_name);
+		int core_id;
+		MPI_Comm_rank(cc,&core_id);
+		__client = Damaris::Client::New(mdl,core_id);
 		if(ierr_f != NULL) *ierr_f = 0;
 	}
 

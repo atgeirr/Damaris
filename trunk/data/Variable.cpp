@@ -294,10 +294,10 @@ Variable* Variable::New(const Model::Variable& mdl, const std::string& name)
 Chunk* Variable::Allocate(int block, bool blocking)
 {
 	if(allocator == NULL) {
-		allocator = Process::get()->getSharedMemorySegment();
+		allocator = Process::Get()->getSharedMemorySegment();
 	}
 	int iteration = Environment::GetLastIteration();
-	int source = Process::get()->getID();
+	int source = Process::Get()->getID();
 
 	if(not IsTimeVarying()) {
 		iteration = 0;
@@ -349,7 +349,7 @@ Chunk* Variable::Retrieve(void* addr)
 
 Chunk* Variable::Retrieve(handle_t h)
 {
-	allocator = Process::get()->getSharedMemorySegment();
+	allocator = Process::Get()->getSharedMemorySegment();
 
 	ChunkImpl* chunk = new ChunkImpl(allocator,h);
 

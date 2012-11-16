@@ -40,10 +40,10 @@ Damaris::Client* __client = NULL;
 
 namespace Damaris {
 
-	Client* Client::New(const std::string &cfg, int32_t id)
+	Client* Client::New(std::auto_ptr<Model::Simulation> mdl, int32_t id)
 	{
-		Process::initialize(cfg,id);
-		Process* p = Process::get();
+		Process::Init(mdl,id);
+		Process* p = Process::Get();
 		p->openSharedStructures();
 		Client* c = new Client(p);
 		Environment::SetClient(true);
@@ -184,7 +184,7 @@ namespace Damaris {
 		if(iteration < 0)
 			iteration = Environment::GetLastIteration();
 		
-		int source = Process::get()->getID();
+		int source = Process::Get()->getID();
 		Chunk* c = v->GetChunk(source,iteration,block);
 
 		if(c == NULL) {
@@ -527,7 +527,7 @@ namespace Damaris {
 
 	Client::~Client() 
 	{
-		Process::kill();
+		Process::Kill();
 		DBG("Client destroyed successfuly");
 	}
 

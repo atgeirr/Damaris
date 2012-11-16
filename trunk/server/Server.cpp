@@ -37,10 +37,10 @@ Damaris::Server *__server = NULL;
 
 namespace Damaris {
 
-Server* Server::New(const std::string& cfgfile, int32_t id)
+Server* Server::New(std::auto_ptr<Model::Simulation> mdl, int32_t id)
 {
-	Process::initialize(cfgfile,id);
-	Process* p = Process::get();
+	Process::Init(mdl,id);
+	Process* p = Process::Get();
 	p->createSharedStructures();
 	Environment::SetClient(false);
 	return new Server(p);
@@ -60,7 +60,7 @@ Server::Server(Process* p)
 /* destructor */
 Server::~Server()
 {
-	Process::kill();
+	Process::Kill();
 	DBG("Process killed successfuly");
 #ifdef __ENABLE_VISIT
 	MPILayer<int>::Delete(visitMPIlayer);

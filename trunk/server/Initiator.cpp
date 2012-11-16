@@ -27,6 +27,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "core/Process.hpp"
 #include "core/ProcInfo.hpp"
 #include "client/StdAloneClient.hpp"
+#include "xml/BcastXML.hpp"
 #include "server/Initiator.hpp"
 
 extern Damaris::Server* __server;
@@ -41,8 +42,11 @@ bool Initiator::mpi_init(const std::string& configFile, MPI_Comm globalcomm)
 	MPI_Comm_size(globalcomm,&size);
 	MPI_Comm_rank(globalcomm,&rank);
 
-	Process::initialize(configFile);
-	Process* p = Process::get();
+	std::auto_ptr<Model::Simulation> mdl
+		= Model::BcastXML(globalcomm,configFile);
+
+	Process::Init(mdl);
+	Process* p = Process::Get();
 	/* currently thie Process object had no ID */
 	
 	Environment::SetGlobalComm(globalcomm);

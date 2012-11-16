@@ -45,7 +45,7 @@ extern "C" {
  *	(0 in case of success, forces the program to stop in case of failure).
  */
 void FC_FUNC_GLOBAL_(df_initialize,DF_INITIALIZE)
-	(char* config_file_name_f, int32_t* core_id_f, int32_t* ierr_f, int config_file_name_size);
+	(MPI_Fint* fcomm, char* config_file_name_f, int32_t* ierr_f, int config_file_name_size);
 
 /** 
  * \fn df_write(var_name, iteration, data, ierr)

@@ -78,7 +78,7 @@ class Client {
 		 * \param[in] file : name of the XML file to load.
 		 * \param[in] id : id of the client. This id must be unique across all application clients.
 		 */
-		static Client* New(const std::string& file, int32_t id);
+		static Client* New(std::auto_ptr<Model::Simulation> mdl, int32_t id);
 
 
 		/**

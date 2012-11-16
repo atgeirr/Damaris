@@ -28,6 +28,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <signal.h>
 #include <mpi.h>
 
+#include "xml/BcastXML.hpp"
 #include "server/Options.hpp"
 #include "core/Debug.hpp"
 #include "core/Environment.hpp"
@@ -66,10 +67,14 @@ int main(int argc, char** argv)
 	int id;
 	MPI_Comm_rank(MPI_COMM_WORLD,&id);
 
+	std::auto_ptr<Damaris::Model::Simulation> mdl
+		= Damaris::Model::BcastXML(MPI_COMM_WORLD, opt.getConfigFile());
+
 	INFO("Initializing server");
 	/* Initializing the server with a Configuration object 
 	   pre-initialized by the Options object */
-	__server = Damaris::Server::New(opt.getConfigFile(),id);
+	
+	__server = Damaris::Server::New(mdl,id);
 
 	INFO("Setting communicators");
 	Damaris::Environment::SetGlobalComm(MPI_COMM_WORLD);

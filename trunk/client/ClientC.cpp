@@ -23,6 +23,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * Definition of the client function used in the C binding.
  */
 #include "client/Client.hpp"
+#include "xml/BcastXML.hpp"
 
 extern "C" {
 
@@ -30,10 +31,14 @@ extern "C" {
 
 extern Damaris::Client *__client;
 
-int DC_initialize(const char* configfile, int32_t core_id)
+int DC_initialize(MPI_Comm comm, const char* configfile)
 {
 	std::string config_str(configfile);
-	__client = Damaris::Client::New(config_str,core_id);
+	std::auto_ptr<Damaris::Model::Simulation> mdl
+		= Damaris::Model::BcastXML(comm,config_str);
+	int core_id;
+	MPI_Comm_rank(comm,&core_id);
+	__client = Damaris::Client::New(mdl,core_id);
 	return 0;
 }
 	

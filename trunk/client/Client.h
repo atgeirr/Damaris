@@ -36,7 +36,7 @@ typedef int64_t DC_chunk_handle_t;
  * \param[in] core_id : identifier for the client (should be unique).
  * \return 0 in case of success, forces the program to stop in case of failure.
  */
-int 	DC_initialize(const char* configfile, int32_t core_id);
+int 	DC_initialize(MPI_Comm comm, const char* configfile);
 
 /** 
  * \brief Writes a variable.

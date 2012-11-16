@@ -133,7 +133,7 @@ namespace Damaris {
 		// get the pointer to the allocated chunk
 		//ChunkIndexByIteration::iterator end;
 		//ChunkIndexByIteration::iterator it = v->getChunksByIteration(iteration,end);
-		int source = Process::get()->getID();
+		int source = Process::Get()->getID();
 		Chunk* chunk = v->GetChunk(source,iteration,block);
 
 		if(chunk == NULL)

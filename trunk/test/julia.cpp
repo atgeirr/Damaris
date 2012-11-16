@@ -63,7 +63,9 @@ int main(int argc, char** argv)
 
 	// Initializes the client
 	std::string config(argv[1]);
-	client = Damaris::Client::New(config,id);
+	std::auto_ptr<Damaris::Model::Simulation> mdl
+		= Damaris::Model::BcastXML(MPI_COMM_WORLD,config);	
+	client = Damaris::Client::New(mdl,id);
 	// Note: the use of Client::New assumes that a server is already running.
 	// Thus it cannot work in a time-partitioning mode. You may take a look at
 	// the MPI version of this program to see how to properly integrate a client

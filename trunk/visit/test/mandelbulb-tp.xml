@@ -1,16 +1,16 @@
 <?xml version="1.0"?>
 <simulation name="mandelbulb" language="c" xmlns="http://damaris.gforge.inria.fr/Damaris/Model">
 	<architecture>
-		<cores  count="8">
-			<clients count="8"/>
+		<cores  count="3">
+			<clients count="3"/>
 		</cores>
 		<buffer name="buffer" size="536870912" />
 		<queue  name="queue" size="100" />
 	</architecture>
 	<data>
-		<parameter name="WIDTH" type="int" value="112" />
-		<parameter name="HEIGHT" type="int" value="112" />
-		<parameter name="DEPTH" type="int" value="7" />
+		<parameter name="WIDTH" type="int" value="30" />
+		<parameter name="HEIGHT" type="int" value="30" />
+		<parameter name="DEPTH" type="int" value="10" />
 
 		<layout name="cells"  type="int" dimensions="DEPTH+1,HEIGHT,WIDTH" />
 		<layout name="rmeshX" type="double" dimensions="WIDTH" />
@@ -35,6 +35,6 @@
 		<event name="clean" action="clean" library="libgc.so" scope="node"/>
 	</actions>
 	<visit>
-		<path>/home/mdorier/vis</path>
+		<path>/home/mdorier/Work/Visu3/visit2.5.2/src</path>
 	</visit>
 </simulation>

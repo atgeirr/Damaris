@@ -14,7 +14,7 @@ int main(int argc, char** argv)
 		exit(0);
 	}
 
-	DC_initialize(argv[1],id);
+	DC_initialize(MPI_COMM_WORLD,argv[1]);
 
 	int i,j,k;
 	for(i = 0; i < 64; i++) {
