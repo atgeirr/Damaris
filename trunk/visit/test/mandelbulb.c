@@ -4,8 +4,7 @@
 #include <mpi.h>
 #include "include/Damaris.h"
 
-#define MAX_CYCLES 50
-#define MAX_ITERATION 255
+#define MAX_CYCLES 500
 
 int WIDTH;
 int HEIGHT;
@@ -41,7 +40,7 @@ int iterate(const vector* v0, double order)
 	vector v = *v0;
 	double n = order;
 	int i;
-	for(i=0; i < MAX_ITERATION && (v.x*v.x+v.y*v.y+v.z*v.z < 2.0); i++) {
+	for(i=0; i < MAX_CYCLES && (v.x*v.x+v.y*v.y+v.z*v.z < 2.0); i++) {
 		double r 		= do_r(&v);
 		double theta 	= do_theta(n,&v);
 		double phi 		= do_phi(n,&v);

@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file ClientFortran.cpp
- * \date February 2012
+ * \date November 2012
  * \author Matthieu Dorier
- * \version 0.4
+ * \version 0.7
  * \see Client.hpp
  * Definition of the Fortran functions.
  */
@@ -49,16 +49,14 @@ extern "C" {
 extern Damaris::Client *__client;
 
 void FC_FUNC_GLOBAL(df_initialize,DF_INITIALIZE)
-	(MPI_Fint* fcomm, char* config_file_name_f, int32_t* ierr_f, int config_file_name_size)
+	(char* config_file_name_f, MPI_Fint* fcomm, int32_t* ierr_f, int config_file_name_size)
 	{
 		std::string config_file_name = 
 			fortranStringToCpp(config_file_name_f, config_file_name_size);
 		MPI_Comm cc = MPI_Comm_f2c(*fcomm);
 		std::auto_ptr<Damaris::Model::Simulation> mdl
 			= Damaris::Model::BcastXML(cc, config_file_name);
-		int core_id;
-		MPI_Comm_rank(cc,&core_id);
-		__client = Damaris::Client::New(mdl,core_id);
+		__client = Damaris::Client::New(mdl,cc);
 		if(ierr_f != NULL) *ierr_f = 0;
 	}
 
@@ -80,34 +78,6 @@ void FC_FUNC_GLOBAL(df_write,DF_WRITE)
 		if(ierr_f != NULL) *ierr_f = res;
 	}
 
-/*void FC_FUNC_GLOBAL_(df_chunk_set,DF_CHUNK_SET)
-	(unsigned int* dimensions, int* si, int* ei, int64_t* chunkh)
-	{
-		std::vector<int> sti(si,si+(*dimensions));
-		std::vector<int> eni(ei,ei+(*dimensions));
-		// arrays in Fortran must be reversed
-		std::reverse(sti.begin(),sti.end());
-		std::reverse(eni.begin(),eni.end());
-		*chunkh = (int64_t)(__client->chunk_set(*dimensions,sti,eni));
-	}
-
-void FC_FUNC_GLOBAL_(df_chunk_free,DF_CHUNK_FREE)
-	(int64_t* chunkh)
-	{
-		__client->chunk_free((Damaris::chunk_h)(*chunkh));
-		chunkh = NULL;
-	}
-
-void FC_FUNC_GLOBAL(df_chunk_write,DF_WRITE)
-	(int64_t* chunkh, char* var_name_f, int32_t* iteration_f, 
-	void* data_f, int32_t* ierr_f, int var_name_size)
-	{
-		std::string var_name = fortranStringToCpp(var_name_f,var_name_size);
-		int res = __client->chunk_write((Damaris::chunk_h)(*chunkh),
-				var_name,*iteration_f,data_f);
-		if(ierr_f != NULL) *ierr_f = res;
-	}
-*/
 void* FC_FUNC_GLOBAL(df_alloc,DF_ALLOC)
         (char* var_name_f, int32_t* ierr_f, int var_name_size)
 	{

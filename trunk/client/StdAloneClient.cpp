@@ -16,9 +16,9 @@
  ********************************************************************/
 /**
  * \file StdAloneClient.cpp
- * \date February 2012
+ * \date November 2012
  * \author Matthieu Dorier
- * \version 0.4
+ * \version 0.7
  */
 #include <iostream>
 #include <list>
@@ -64,80 +64,18 @@ namespace Damaris {
 	{
 	}
 
-/*
-	void* StdAloneClient::alloc(const std::string & varname, bool blocking)
-	{
-		// check that the variable is known in the configuration
-		Variable* variable = VariableManager::Search(varname);
-
-		if(variable == NULL) {
-			ERROR("Variable \""<< varname
-					<< "\" not defined in configuration");
-			return NULL;
-		}
-
-		if((not variable->IsTimeVarying()) && 
-			Environment::GetLastIteration() != 0) {
-			WARN("Trying to write a non-time-varying variable at an iteration "
-			<< "different from 0, there is a chance to generate inconsistencies");
-		}
-
-		// the variable is known, get its layout
-		Layout* layout = variable->GetLayout();
-
-		if(layout->IsUnlimited()) {
-			ERROR("Trying to allocate memory for an unlimited layout");
-			return NULL;
-		}
-
-		// initialize the chunk descriptor
-		ChunkDescriptor* cd = ChunkDescriptor::New(*layout);
-
-		// try allocating the required memory
-		size_t size = sizeof(ChunkHeader)+cd->GetDataMemoryLength(layout->GetType());
-		void* location = process->getSharedMemorySegment()->Allocate(size);
-
-		// This piece of code changes from Client.cpp: we don't want to block
-		// if there is no way to get more memory.
-		if(location == NULL && blocking) {
-			clean(iteration);
-			location = process->getSharedMemorySegment()->Allocate(size);
-		}
-		if(location == NULL) {
-			ERROR("Could not allocate memory: not enough available memory");
-			ChunkDescriptor::Delete(cd);
-			return NULL;
-		}
-
-		// create the chunk header in memory
-		int source = process->getID();
-		ChunkHeader* ch = new(location) ChunkHeader(cd,layout->GetType(),iteration,source);
-
-		// create the ChunkImpl and attach it to the variable
-		ChunkImpl* chunk = new ChunkImpl(process->getSharedMemorySegment(),ch);
-		chunk->SetDataOwnership(true);
-		variable->AttachChunk(chunk);
-
-		ChunkDescriptor::Delete(cd);
-
-		// return the pointer to data
-		return chunk->Data();
-	}
-*/
-	int StdAloneClient::commit_block(const std::string & varname, int32_t block, int32_t iteration)
+	int StdAloneClient::commit_block(const std::string & varname, int32_t block, 
+			int32_t iteration)
 	{		
 		Variable* v = VariableManager::Search(varname);
 		if(v == NULL)
-			return -1;
+			return -2;
 
-		// get the pointer to the allocated chunk
-		//ChunkIndexByIteration::iterator end;
-		//ChunkIndexByIteration::iterator it = v->getChunksByIteration(iteration,end);
 		int source = Process::Get()->getID();
 		Chunk* chunk = v->GetChunk(source,iteration,block);
 
 		if(chunk == NULL)
-			return -2;
+			return -1;
 		try {
 			dynamic_cast<ChunkImpl*>(chunk);
 		} catch(std::exception &e) {
@@ -177,6 +115,12 @@ namespace Damaris {
 			int32_t block, const void* data,
 			bool blocking)
 	{
+		if(block < 0 || block >= Environment::NumDomainsPerClient())
+		{
+			ERROR("Invalid block ID");
+			return -3;
+		}
+
 		/* check that the variable is know in the configuration */
 		Variable* variable = VariableManager::Search(varname);
 
@@ -184,129 +128,16 @@ namespace Damaris {
 			return -1;
 		}
 
-		/*
-		if((not variable->IsTimeVarying()) && iteration != 0) {
-			WARN("Trying to write a non-time-varying variable at an iteration "
-					<< "different from 0, the variable won't be written");
-			return -4;
-		}
-
-		Layout* layout = variable->GetLayout();
-
-		if(layout->IsUnlimited()) {
-			ERROR("Trying to write a variable"
-					<< " with an unlimited layout (use chunk_write instead)");
-			return -3;
-		}
-
-		// initialize the chunk descriptor
-		ChunkDescriptor* cd = ChunkDescriptor::New(*layout);
-
-		// try allocating the required memory
-		size_t size = sizeof(ChunkHeader)+cd->GetDataMemoryLength(layout->GetType());
-		void* location = process->getSharedMemorySegment()->Allocate(size);
-
-		// This piece of code changes from Client.cpp: we don't want to block
-		// if there is no way to get more memory.
-		if(location == NULL && blocking) {
-			clean(iteration);
-			location = process->getSharedMemorySegment()->Allocate(size);
-		}
-		if(location == NULL) {
-			ERROR("Could not allocate memory: not enough available memory");
-			ChunkDescriptor::Delete(cd);
-			return -2;
-		}
-		// create the chunk header in memory
-		int source = process->getID();
-		ChunkHeader* ch = new(location) ChunkHeader(cd,layout->GetType(),
-							iteration,source,block);
-
-		// create the ChunkImpl and attach it to the variable
-		ChunkImpl* chunk = new ChunkImpl(process->getSharedMemorySegment(),ch);
-		chunk->SetDataOwnership(true);
-		// copy data
-		size = cd->GetDataMemoryLength(layout->GetType());
-		memcpy(chunk->Data(),data,size);
-
-		variable->AttachChunk(chunk);	
-
-		DBG("Variable \"" << varname << "\" has been written");
-
-		ChunkDescriptor::Delete(cd);
-		*/
-
 		Chunk* chunk = variable->Allocate(block,blocking);
 		if(chunk == NULL)
 		{
 			ERROR("Unable to allocate chunk for variable \"" << varname << "\"");
-			return -1;
+			return -2;
 		}
 		chunk->SetDataOwnership(true);
 		int size = chunk->MemCopy(data);
 		return size;
 	}
-
-	/*
-	int StdAloneClient::chunk_write(chunk_h chunkh, const std::string & varname, 
-			int32_t iteration, const void* data, bool blocking)
-	{
-		// check that the variable is know in the configuration /
-		Variable* variable = VariableManager::Search(varname);
-
-		if(variable == NULL) {
-			ERROR("Variable \""<< varname << "\" not defined in configuration");
-			return -1;
-		}
-
-		if((not variable->IsTimeVarying()) && iteration != 0) {
-			WARN("Trying to write a non-time-varying variable at an iteration "
-					<< "different from 0, the variable won't be written");
-			return -4;
-		}
-
-		ChunkDescriptor* cd = (ChunkDescriptor*)chunkh;
-
-		// check if the chunk matches the layout boundaries
-		Layout* layout = variable->GetLayout();
-		if(not cd->Within(*layout)) {
-			ERROR("Chunk boundaries do not match variable's layout");
-			return -3;
-		}
-
-		// allocate memory
-		size_t size = sizeof(ChunkHeader)+cd->GetDataMemoryLength(layout->GetType());
-		void* location = process->getSharedMemorySegment()->Allocate(size);
-
-		// This piece of code changes from Client.cpp: we don't want to block
-		// if there is no way to get more memory.
-		if(location == NULL && blocking) {
-			clean();
-			location = process->getSharedMemorySegment()->Allocate(size);
-		}
-		if(location == NULL) {
-			ERROR("Could not allocate memory: not enough available memory");
-			return -2;
-		}
-
-		// create the ChunkHeader
-		int source = process->getID();
-		ChunkHeader* ch = new(location) ChunkHeader(cd,layout->GetType(),iteration,source);
-
-		// create the ChunkImpl object       
-		ChunkImpl* chunk = new ChunkImpl(process->getSharedMemorySegment(),ch);
-		chunk->SetDataOwnership(true);
-
-		// copy data
-		size = cd->GetDataMemoryLength(layout->GetType());
-		memcpy(chunk->Data(),data,size);
-
-		variable->AttachChunk(chunk);	
-		DBG("Variable \"" << varname << "\" has been written");
-
-		return size;
-	}
-	*/
 
 	int StdAloneClient::signal(const std::string & signal_name)
 	{

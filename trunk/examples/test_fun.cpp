@@ -2,7 +2,7 @@
 #include <mpi.h>
 #include "include/Damaris.hpp"
 
-void hello(const std::string& name, int32_t source, int32_t iteration, const char* args)
+void hello(const std::string& name, int32_t /*source*/, int32_t /*iteration*/, const char* /*args*/)
 {
 	std::cout << "Hello world triggered by event \"" << name << "\"" << std::endl;
 } 

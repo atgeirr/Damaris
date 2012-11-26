@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Variable.cpp
- * \date February 2012
+ * \date November 2012
  * \author Matthieu Dorier
- * \version 0.4
+ * \version 0.5
  */
 #include <iterator>
 #include "core/Process.hpp"
@@ -47,52 +47,6 @@ bool Variable::AttachChunk(Chunk* chunk)
 	return chunks.insert(boost::shared_ptr<Chunk>(chunk)).second;
 }
 
-/*
-ChunkIndexBySource::iterator Variable::getChunksBySource(int source,
-	ChunkIndexBySource::iterator& end)
-{
-	ChunkIndexBySource::iterator it = chunks.get<by_source>().lower_bound(source);
-	end = chunks.get<by_source>().upper_bound(source);
-	return it;
-}
-*/
-/*
-ChunkIndexByIteration::iterator Variable::getChunksByIteration(int iteration,
-	ChunkIndexByIteration::iterator& end) 
-{
-	return getChunksByIterationsRange(iteration,iteration,end);
-}
-*/
-/*
-ChunkIndexByIteration::iterator Variable::getChunksByIterationsRange(int itstart, int itend,
-            ChunkIndexByIteration::iterator& end)
-{
-	if(not model.time_varying()) {
-		itstart = 0;
-		itend = 0;
-	}
-	ChunkIndexByIteration::iterator it = chunks.get<by_iteration>().lower_bound(itstart);
-    end = chunks.get<by_iteration>().upper_bound(itend);
-    return it;
-}
-*/
-/*
-ChunkIndex::iterator Variable::getChunks(ChunkIndex::iterator &end)
-{
-	end = chunks.get<by_any>().end();
-	return chunks.get<by_any>().begin();
-}
-*/
-/*
-ChunkIndex::iterator Variable::getChunks(int source, int iteration, int block, ChunkIndex::iterator &end)
-{
-	if(not model.time_varying()) {
-		iteration = 0;
-	}
-	end = chunks.get<by_any>().end();
-	return chunks.get<by_any>().find(boost::make_tuple(source,iteration,block));
-}
-*/
 Chunk* Variable::GetChunk(int source, int iteration, int block)
 {
 	if(not model.time_varying()) {
@@ -174,8 +128,6 @@ bool Variable::ExposeVisItMetaData(visit_handle md, int iteration)
 		}
 		VisIt_VariableMetaData_setType(vmd, VarTypeToVisIt(model.type()));
 		VisIt_VariableMetaData_setCentering(vmd, VarCenteringToVisIt(model.centering()));
-		//int numBlocks = CountTotalBlocks(iteration);
-		//VisIt_VariableMetaData_setNumDomains(vmd, numBlocks);
 
 		VisIt_SimulationMetaData_addVariable(md, vmd);
 		return true;
@@ -299,7 +251,10 @@ Chunk* Variable::Allocate(int block, bool blocking)
 	int iteration = Environment::GetLastIteration();
 	int source = Process::Get()->getID();
 
-	if(not IsTimeVarying()) {
+	if((not IsTimeVarying()) && (iteration != 0)) {
+		WARN("Trying to write a non time-varying variable at a "
+		<< " non-0 iteration, will probably leave the simulation in "
+		<< " an inconsistent state.");
 		iteration = 0;
 	}
 

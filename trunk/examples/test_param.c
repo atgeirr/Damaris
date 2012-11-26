@@ -4,7 +4,7 @@
 #include <mpi.h>
 #include "include/Damaris.h"  
 
-int client_code(int id) 
+int client_code() 
 {
 	int x = 0;
 	float y = .0;
@@ -59,7 +59,7 @@ int main(int argc, char** argv)
 		clients = DC_mpi_get_client_comm();
 		MPI_Comm_rank(clients,&rank);
 		MPI_Comm_size(clients,&size);
-		client_code(rank);
+		client_code();
 		DC_kill_server();
 		MPI_Barrier(clients);
 		DC_finalize();

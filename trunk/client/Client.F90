@@ -17,10 +17,18 @@
       module Damaris
       use iso_c_binding
       interface
-        type(c_ptr) function df_alloc(varname,it,ierr)
+
+        type(c_ptr) function df_alloc(varname,ierr)
           use iso_c_binding
           character(len=*) :: varname
           integer :: it, ierr
         end function df_alloc
+
+        type(c_ptr) function df_alloc_block(varname,block,ierr)
+          use iso_c_binding
+          character(len=*) :: varname
+          integer :: block, ierr
+        end function
+
       end interface
       end module

@@ -68,7 +68,7 @@ simulation_data_ctor(simulation_data *sim)
 }
 
 void
-simulation_data_dtor(simulation_data *sim)
+simulation_data_dtor(simulation_data* sim __attribute__((unused)))
 {
 }
 
@@ -78,7 +78,7 @@ void read_input_deck(int argc, char** argv)
         printf("Usage: %s var.xml\n",argv[0]);
         exit(0);
     }
-    DC_initialize(argv[1],0);
+    DC_initialize(argv[1],MPI_COMM_WORLD);
 }
 
 void simulate_one_timestep(simulation_data *sim)
@@ -155,7 +155,7 @@ double nodal_vector[2][3][4][3] = {
      {{60.,61.,62.},{63.,64.,65.},{66.,67.,68.},{69.,70.,71}} }
 };
 
-void exposeDataToDamaris(simulation_data* sim) {
+void exposeDataToDamaris(simulation_data* sim __attribute__((unused))) {
 	static int firstCall = 0;
 
 	if(firstCall == 0) {

@@ -85,7 +85,7 @@ life_data_dtor(life_data *life)
    A second array used during the computation, and including ghost-cells is also required.
 */
 void
-life_data_allocate(life_data *life, int par_rank, int par_size)
+life_data_allocate(life_data *life, int par_rank, int par_size __attribute__((unused)))
 {
     int i;
     float offset;

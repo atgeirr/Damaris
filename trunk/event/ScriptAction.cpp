@@ -33,7 +33,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Damaris {
 
-	ScriptAction* ScriptAction::New(const Model::Script& mdl, const std::string& name)
+	ScriptAction* ScriptAction::New(const Model::Script& mdl, const std::string& name __attribute__((unused)))
 	{
 		switch(mdl.scope()) {
 			case Model::Scope::core :

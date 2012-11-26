@@ -92,7 +92,7 @@ class Action  {
 		 * Expose the Action's metadata to VisIt.
 		 * \param[out] md : an allocated visit_handle associated with a Command metadata.
 		 */
-		bool ExposeVisItMetaData(visit_handle md, int iteration);
+		bool ExposeVisItMetaData(visit_handle md);
 #endif
 
 		/**
@@ -111,10 +111,15 @@ class Action  {
  */
 class Action::EmptyAction : public Action {
 
-	void Call(int32_t iteration, int32_t sourceID, const char* args = NULL) { }
+	void Call(int32_t /* iteration */, 
+		  int32_t /* sourceID */, 
+		  const char* /*args*/) { }
+
+	void Call(int32_t /* iteration */,
+		  int32_t /* source */) { }
 
 	public:
-		virtual ~EmptyAction() {}
+		virtual ~EmptyAction() { }
 };
 
 }

@@ -60,7 +60,7 @@ SharedMessageQueue* SharedMessageQueue::Create(Model::Queue* mdl)
 	return NULL;
 }
 
-SharedMessageQueue* SharedMessageQueue::Create(posix_shmem_t posix_shmem, 
+SharedMessageQueue* SharedMessageQueue::Create(posix_shmem_t /*posix_shmem*/, 
 		const std::string& name, size_t num_msg, size_t size_msg)
 {
 	shared_memory_object base(create_only,name.c_str(),read_write);
@@ -74,7 +74,7 @@ SharedMessageQueue* SharedMessageQueue::Create(posix_shmem_t posix_shmem,
 	return new SharedMessageQueue(region);
 }
 
-SharedMessageQueue* SharedMessageQueue::Create(sysv_shmem_t sysv_shmem, 
+SharedMessageQueue* SharedMessageQueue::Create(sysv_shmem_t /*sysv_shmem*/, 
 		const std::string& name, size_t num_msg, size_t size_msg)
 {
 	size_t size = num_msg*size_msg + sizeof(struct shm_queue_hdr);

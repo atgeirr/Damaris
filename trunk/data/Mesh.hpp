@@ -71,7 +71,7 @@ class Mesh : public Configurable<Model::Mesh> {
 		/**
 		 * Fills visit handle with metadata related to the Mesh.
 		 */
-		virtual bool ExposeVisItMetaData(visit_handle md, int iteration) const = 0;
+		virtual bool ExposeVisItMetaData(visit_handle md) const = 0;
 		
 		/**
 		 * Fills visit handle with metadata related to the Mesh.

@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Variable.hpp
- * \date February 2012
+ * \date November 2012
  * \author Matthieu Dorier
- * \version 0.4
+ * \version 0.7
  */
 #ifndef __DAMARIS_VARIABLE_H
 #define __DAMARIS_VARIABLE_H
@@ -96,38 +96,6 @@ class Variable : public Configurable<Model::Variable> {
 		bool AttachChunk(Chunk* chunk);
 
 		/**
-		 * Returns the list of chunks with a specified source.
-		 * \deprecated
-		 */
-		//ChunkIndexBySource::iterator getChunksBySource(int source,
-		//	ChunkIndexBySource::iterator& end)
-		//__attribute__ ((deprecated));
-
-		/**
-		 * Returns the list of chunks with a specified iteration.
-		 * \deprecated
-		 */
-		//ChunkIndexByIteration::iterator getChunksByIteration(int iteration,
-		//	ChunkIndexByIteration::iterator& end)
-		//__attribute__ ((deprecated));
-
-		/**
-		 * Returns an iterator of chunks with an iteration within a given range.
-		 * \deprecated
-		 */
-		//ChunkIndexByIteration::iterator getChunksByIterationsRange(int itstart, int itend,
-		//	ChunkIndexByIteration::iterator& end)
-		//__attribute__ ((deprecated));
-		
-		/**
-		 * Returns an iterator over all the chunks.
-		 * \param[out] end : a reference that will hold the end of the iterator.
-		 * \deprecated
-		 */
-		//ChunkIndex::iterator getChunks(ChunkIndex::iterator &end)
-		//__attribute__ ((deprecated));
-
-		/**
 		 * Finds a Chunk of a given source, iteration and block.
 		 * Returns NULL if this chunk doesn't exist.
 		 */
@@ -144,18 +112,6 @@ class Variable : public Configurable<Model::Variable> {
 		 * Counts the total number of blocks for a given iteration.
 		 */
 		int CountTotalBlocks(int iteration) const;
-
-		/**
-		 * Returns an iterator over all the chunks that correspond to a given
-		 * source and iteration.
-		 * \param[in] source : source wanted.
-		 * \param[in] iteration : iteration wanted.
-		 * \param[in] block : block id wanted.
-		 * \param[out] end : a reference that will hold the end of the iterator.
-		 * \deprecated
-		 */
-		//ChunkIndex::iterator getChunks(int source, int iteration, int block, 
-		//	ChunkIndex::iterator &end) __attribute__ ((deprecated));
 
 		/**
 		 * Detach a chunk from a variable. Free its memory if the process owns the chunk.

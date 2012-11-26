@@ -36,7 +36,7 @@ CurvilinearMesh* CurvilinearMesh::New(const Model::Mesh& mdl, const std::string&
 }
 
 #ifdef __ENABLE_VISIT
-bool CurvilinearMesh::ExposeVisItMetaData(visit_handle md, int iteration) const
+bool CurvilinearMesh::ExposeVisItMetaData(visit_handle md) const
 {
 	visit_handle m1 = VISIT_INVALID_HANDLE;
 	if(VisIt_MeshMetaData_alloc(&m1) == VISIT_OKAY)

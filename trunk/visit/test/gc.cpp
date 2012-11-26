@@ -12,7 +12,7 @@ struct iteration_eraser {
 		return c->GetIteration() == iteration;
 	}
 	
-	static void erase(Variable::iterator& it, const Variable::iterator &end, Chunk *c) {
+	static void erase(Variable::iterator& it, const Variable::iterator& /*end*/, Chunk* /*c*/) {
 		it = var->DetachChunk(it);
 	}
 };
@@ -22,7 +22,7 @@ int iteration_eraser::iteration = 0;
 
 extern "C" {
 
-void clean(const std::string& event, int32_t step, int32_t src)
+void clean(const std::string& /*event*/, int32_t step, int32_t /*src*/)
 {
 	Variable* v = VariableManager::Search("space");
 	if(v != NULL) {

@@ -57,7 +57,7 @@ namespace Damaris {
 		return false;
 	}
 
-	Layout* TypeLayout::New(const Model::Type& mdl, const std::string &name)
+	Layout* TypeLayout::New(const Model::Type& mdl, const std::string& /*name*/)
 	{
 		return new TypeLayout(mdl);
 	}

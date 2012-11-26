@@ -31,7 +31,7 @@ namespace Damaris {
 	}
 
 #ifdef __ENABLE_VISIT
-	bool Action::ExposeVisItMetaData(visit_handle h, int iteration)
+	bool Action::ExposeVisItMetaData(visit_handle h)
 	{
 		visit_handle cmd = VISIT_INVALID_HANDLE;
 		if(not IsExternallyVisible()) return false;

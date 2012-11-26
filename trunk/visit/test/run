@@ -1,5 +1,5 @@
 #!/bin/sh
+rm $HOME/.visit/simulations/*
+rm /dev/shm/*
 LD_LIBRARY_PATH=. \
-PYTHONPATH=$HOME/deploy/lib/python2.6 \
-PYTHONHOME=$HOME/deploy \
-../../server/server --configuration=$1
+mpirun -np 3 ./mandelbulb $1

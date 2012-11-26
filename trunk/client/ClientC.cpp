@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file ClientC.cpp
- * \date February 2012
+ * \date November 2012
  * \author Matthieu Dorier
- * \version 0.4
+ * \version 0.7
  * \see Client.hpp Client.h
  * Definition of the client function used in the C binding.
  */
@@ -31,17 +31,15 @@ extern "C" {
 
 extern Damaris::Client *__client;
 
-int DC_initialize(MPI_Comm comm, const char* configfile)
+int DC_initialize(const char* configfile, MPI_Comm comm)
 {
 	std::string config_str(configfile);
 	std::auto_ptr<Damaris::Model::Simulation> mdl
 		= Damaris::Model::BcastXML(comm,config_str);
-	int core_id;
-	MPI_Comm_rank(comm,&core_id);
-	__client = Damaris::Client::New(mdl,core_id);
+	__client = Damaris::Client::New(mdl,comm);
 	return 0;
 }
-	
+
 int DC_write(const char* varname, const void* data)
 {
 	std::string varname_str(varname);
@@ -53,29 +51,6 @@ int DC_write_block(const char* varname, int32_t block, const void* data)
 	std::string varname_str(varname);
 	return __client->write_block(varname_str,block,data);
 }
-
-/*
-int DC_chunk_write(DC_chunk_handle_t chunkh, const char* varname, 
-		int32_t iteration, const void* data)
-{
-	std::string varname_str(varname);
-	return __client->chunk_write((Damaris::chunk_h)chunkh,varname_str,iteration,data);
-}
-*/
-/*
-DC_chunk_handle_t DC_chunk_set(unsigned int dimensions, int* si, int* ei)
-{
-	std::vector<int> sti(si,si+dimensions);
-	std::vector<int> eni(ei,ei+dimensions);
-	return (DC_chunk_handle_t)__client->chunk_set(dimensions,sti,eni);
-}
-*/
-/*
-void DC_chunk_free(DC_chunk_handle_t chunkh)
-{
-	__client->chunk_free((Damaris::chunk_h)chunkh);
-}
-*/
 
 void* DC_alloc(const char* varname)
 {

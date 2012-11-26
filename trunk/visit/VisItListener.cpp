@@ -136,7 +136,7 @@ int VisItListener::Update()
 	return 0;
 }
 
-int VisItListener::TimeStepCallback(void* cbdata)
+int VisItListener::TimeStepCallback(void* cbdata __attribute__((unused)))
 {
 	DBG("Inside TimeStepCallBack");
 	//VariableManager::ForEach
@@ -197,7 +197,8 @@ int VisItListener::BroadcastIntCallback(int *value, int sender)
 	return MPI_Bcast(value, 1, MPI_INT, sender, comm);
 }
 
-int VisItListener::BroadcastIntCallback2(int *value, int sender, void* s)
+int VisItListener::BroadcastIntCallback2(int *value, int sender, 
+		void* s __attribute__((unused)))
 {
 	return MPI_Bcast(value, 1, MPI_INT, sender, comm);
 }
@@ -207,7 +208,8 @@ int VisItListener::BroadcastStringCallback(char *str, int len, int sender)
 	return MPI_Bcast(str, len, MPI_CHAR, sender, comm);
 }
 
-int VisItListener::BroadcastStringCallback2(char *str, int len, int sender, void* s)
+int VisItListener::BroadcastStringCallback2(char *str, int len, int sender, 
+		void* s __attribute__((unused)))
 {
 	return MPI_Bcast(str, len, MPI_CHAR, sender, comm);
 }
@@ -244,7 +246,7 @@ visit_handle VisItListener::GetMetaData(void *cbdata)
 			MeshManager::iterator mesh = MeshManager::Begin();
 			MeshManager::iterator end = MeshManager::End();
 			while(mesh != end) {
-				(*mesh)->ExposeVisItMetaData(md,s->iteration);
+				(*mesh)->ExposeVisItMetaData(md);
 				mesh++;
 			}
 		}
@@ -266,7 +268,7 @@ visit_handle VisItListener::GetMetaData(void *cbdata)
 			ActionManager::iterator act = ActionManager::Begin();
 			ActionManager::iterator end = ActionManager::End();
 			while(act != end) {
-				(*act)->ExposeVisItMetaData(md,s->iteration);
+				(*act)->ExposeVisItMetaData(md);
 				act++;
 			}
 		}
@@ -316,25 +318,8 @@ visit_handle VisItListener::GetVariable(int domain, const char *name, void *cbda
 	return h;
 }
 
-visit_handle VisItListener::GetDomainList(const char* name, void* cbdata)
+visit_handle VisItListener::GetDomainList(const char* /*name*/, void* /*cbdata*/)
 {
-	/* This is the code that should work when VisIt will handle
-	 * one domain list per variable... 
-	Variable* var = VariableManager::Search(std::string(name));
-	if(var == NULL) {
-		ERROR("VisIt requested domain list for an unknown variable: " << name);
-		return VISIT_INVALID_HANDLE;
-	}
-	
-	SimData *s = (SimData*)cbdata;
-	visit_handle h = VISIT_INVALID_HANDLE;
-
-	if(var->ExposeVisItDomainList(&h,s->iteration))
-		return h;
-	else
-		return VISIT_INVALID_HANDLE;
-	*/
-
 	visit_handle h = VISIT_INVALID_HANDLE;
 	
 	if(VisIt_DomainList_alloc(&h) != VISIT_ERROR)

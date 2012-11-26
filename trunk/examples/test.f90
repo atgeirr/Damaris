@@ -14,7 +14,7 @@
       end do
       end do
  
-      call df_initialize(MPI_COMM_WORLD,"config.xml",ierr)
+      call df_initialize("config.xml",MPI_COMM_WORLD,ierr)
       call df_write("my group/my variable",mydata,ierr)
       call df_signal("my event",ierr)
       call df_finalize(ierr)

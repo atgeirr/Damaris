@@ -16,9 +16,9 @@
  ********************************************************************/
 /**
  * \file StdAloneClient.hpp
- * \date February 2012
+ * \date November 2012
  * \author Matthieu Dorier
- * \version 0.5
+ * \version 0.7
  */
 #ifndef __DAMARIS_STDALONE_CLIENT_H
 #define __DAMARIS_STDALONE_CLIENT_H
@@ -71,26 +71,9 @@ namespace Damaris {
 				bool blocking = false);
 
 		/**
-		 * \see Client::chunk_write
-		 */
-		//virtual int chunk_write(chunk_h chunkh, const std::string & varname, 
-		//		int32_t iteration, const void* data, bool blocking = true);		
-
-		/**
 		 * \see Client::signal
 		 */
 		virtual int signal(const std::string & signame);
-
-		/**
-		 * \see Client::alloc
-		 */
-		//virtual void* alloc(const std::string & varname, bool blocking = true);
-
-		/**
-		 * \see Client::alloc_block
-		 */
-		//virtual void* alloc_block(const std::string & varname, int32_t block, 
-		//		bool blocking = true);
 
 		/** 
 		 * \see Client::commit
@@ -104,9 +87,9 @@ namespace Damaris {
 				int32_t iteration = -1);
 
 		/**
-		 * Sends a signal to the server to shut it down (all clients in node need
-		 * to call this function before the server is actually killed.
-		 * \return 0 in case of success, -1 in case of failure.
+		 * Overwrite the normal kill_server() function from Client,
+		 * since a StdAloneClient should ne be killed, but should terminate
+		 * itself normally.
 		 */
 		virtual int kill_server();
 

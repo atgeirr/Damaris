@@ -37,7 +37,7 @@ namespace Damaris {
 	}
 
 #ifdef __ENABLE_VISIT
-	bool RectilinearMesh::ExposeVisItMetaData(visit_handle md, int iteration) const
+	bool RectilinearMesh::ExposeVisItMetaData(visit_handle md) const
 	{
 		visit_handle m1 = VISIT_INVALID_HANDLE;
 		if(VisIt_MeshMetaData_alloc(&m1) == VISIT_OKAY)
