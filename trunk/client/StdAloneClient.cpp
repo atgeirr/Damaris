@@ -115,7 +115,7 @@ namespace Damaris {
 			int32_t block, const void* data,
 			bool blocking)
 	{
-		if(block < 0 || block >= Environment::NumDomainsPerClient())
+		if(block < (int32_t)0 || block >= (int32_t)Environment::NumDomainsPerClient())
 		{
 			ERROR("Invalid block ID");
 			return -3;

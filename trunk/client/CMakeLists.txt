@@ -21,7 +21,7 @@ set(DAMARIS_COMMON_SRC
 	${DAMARIS_SOURCE_DIR}/core/Observable.cpp
 	${DAMARIS_SOURCE_DIR}/core/Observer.cpp
 	${DAMARIS_SOURCE_DIR}/core/ProcInfo.cpp
-	${DAMARIS_SOURCE_DIR}/memory/SharedMessageQueue.cpp
+	${DAMARIS_SOURCE_DIR}/comm/SharedMessageQueue.cpp
 	${DAMARIS_SOURCE_DIR}/memory/SharedMemorySegment.cpp
 	${DAMARIS_SOURCE_DIR}/event/Action.cpp
 	${DAMARIS_SOURCE_DIR}/event/BoundAction.cpp

@@ -25,7 +25,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/interprocess/xsi_shared_memory.hpp>
 #include "core/Debug.hpp"
 #include "memory/Message.hpp"
-#include "memory/SharedMessageQueue.hpp"
+#include "comm/SharedMessageQueue.hpp"
 
 namespace Damaris {
 

@@ -29,7 +29,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "xml/Model.hpp"
 #include "core/Environment.hpp"
-#include "memory/SharedMessageQueue.hpp"
+#include "comm/SharedMessageQueue.hpp"
 #include "memory/SharedMemorySegment.hpp"
 
 namespace Damaris {
