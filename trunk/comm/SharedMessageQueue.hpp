@@ -29,7 +29,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/interprocess/mapped_region.hpp>
 #include "xml/Model.hpp"
 #include "core/Debug.hpp"
-#include "memory/Channel.hpp"
+#include "comm/Channel.hpp"
 #include "memory/SharedMemory.hpp"
 
 using namespace boost::interprocess;
@@ -136,39 +136,39 @@ namespace Damaris {
 			/**
 			 * Sends a message. Blocks if the queue is full.
 			 */
-			virtual void send(const void* buffer);
+			virtual void Send(const void* buffer);
 
 			/**
 			 * Try to send a message. Return false without blocking
 			 * if the queue is full.
 			 */
-			virtual bool trySend(const void* buffer);
+			virtual bool TrySend(const void* buffer);
 
 			/**
 			 * Receives a message from the queue. Block if the queue
 			 * is empty.
 			 */
-  			virtual void receive(void* buffer, size_t buffer_size);
+  			virtual void Receive(void* buffer, size_t buffer_size);
   
 			/**
 			 * Try getting a message. Return false if the message queue is empty.
 			 */
-			virtual bool tryReceive(void *buffer, size_t buffer_size);
+			virtual bool TryReceive(void *buffer, size_t buffer_size);
   			
 			/**
 			 * Get the maximum number of messages that que queue can hold.
 			 */
-			virtual size_t getMaxMsg() const;
+			virtual size_t MaxMsg() const;
 
 			/**
 			 * Get the size of the messages that the queue holds.
 			 */
-  			virtual size_t getMaxMsgSize() const;
+  			virtual size_t MaxMsgSize() const;
 
 			/**
 			 * Get the current number of messages in the message queue.
 			 */
-  			virtual size_t getNumMsg();
+  			virtual size_t NumMsg();
 			
 			/**
 			 * Destructor. Will not remove the shared structures.

@@ -162,7 +162,7 @@ bool SharedMessageQueue::Remove(sysv_shmem_t /*unused*/, const std::string& name
 	return xsi_shared_memory::remove(id);
 }
 
-void SharedMessageQueue::send(const void* buffer)
+void SharedMessageQueue::Send(const void* buffer)
 {
 	scoped_lock<interprocess_mutex> lock(shmq_hdr->main_lock);
 	while(shmq_hdr->numMsg == shmq_hdr->maxMsg) {
@@ -179,7 +179,7 @@ void SharedMessageQueue::send(const void* buffer)
 	shmq_hdr->cond_recv.notify_one();
 }
 
-bool SharedMessageQueue::trySend(const void* buffer)
+bool SharedMessageQueue::TrySend(const void* buffer)
 {
 	scoped_lock<interprocess_mutex> lock(shmq_hdr->main_lock);
 
@@ -195,7 +195,7 @@ bool SharedMessageQueue::trySend(const void* buffer)
 	return true;
 }
 
-void SharedMessageQueue::receive(void* buffer, size_t buffer_size)
+void SharedMessageQueue::Receive(void* buffer, size_t buffer_size)
 {
 	scoped_lock<interprocess_mutex> lock(shmq_hdr->main_lock);
 	while(shmq_hdr->numMsg == 0) {
@@ -209,7 +209,7 @@ void SharedMessageQueue::receive(void* buffer, size_t buffer_size)
 	shmq_hdr->cond_send.notify_one();	
 }
 
-bool SharedMessageQueue::tryReceive(void* buffer, 
+bool SharedMessageQueue::TryReceive(void* buffer, 
 		size_t buffer_size)
 {
 	scoped_lock<interprocess_mutex> lock(shmq_hdr->main_lock);
@@ -229,17 +229,17 @@ bool SharedMessageQueue::tryReceive(void* buffer,
 	}
 }
 
-size_t SharedMessageQueue::getMaxMsg() const
+size_t SharedMessageQueue::MaxMsg() const
 {
 	return shmq_hdr->maxMsg;
 }
 
-size_t SharedMessageQueue::getMaxMsgSize() const
+size_t SharedMessageQueue::MaxMsgSize() const
 {
 	return shmq_hdr->sizeMsg;
 }
 
-size_t SharedMessageQueue::getNumMsg()
+size_t SharedMessageQueue::NumMsg()
 {
 	scoped_lock<interprocess_mutex> lock(shmq_hdr->main_lock);
 	return shmq_hdr->numMsg;

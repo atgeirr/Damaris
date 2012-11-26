@@ -88,7 +88,7 @@ int Server::run()
 
 	while(needStop > 0) {
 		// try receiving from the shared message queue
-		received = process->getSharedMessageQueue()->tryReceive(&msg,sizeof(Message));
+		received = process->getSharedMessageQueue()->TryReceive(&msg,sizeof(Message));
 		if(received) {
 			DBG("Received a message of type " << msg.type
 				<< " iteration is "<<msg.iteration

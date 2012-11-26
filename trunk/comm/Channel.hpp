@@ -53,39 +53,39 @@ namespace Damaris {
 			/**
 			 * Sends a message. Blocks if the queue is full.
 			 */
-			virtual void send(const void* buffer) = 0;
+			virtual void Send(const void* buffer) = 0;
 
 			/**
 			 * Try to send a message. Return false without blocking
 			 * if the queue is full.
 			 */
-			virtual bool trySend(const void* buffer) = 0;
+			virtual bool TrySend(const void* buffer) = 0;
 
 			/**
 			 * Receives a message from the queue. Block if the queue
 			 * is empty.
 			 */
-  			virtual void receive(void* buffer, size_t buffer_size) = 0;
+  			virtual void Receive(void* buffer, size_t buffer_size) = 0;
   
 			/**
 			 * Try getting a message. Return false if the message queue is empty.
 			 */
-			virtual bool tryReceive(void *buffer, size_t buffer_size) = 0;
+			virtual bool TryReceive(void *buffer, size_t buffer_size) = 0;
   			
 			/**
 			 * Get the maximum number of messages that que queue can hold.
 			 */
-			virtual size_t getMaxMsg() const = 0;
+			virtual size_t MaxMsg() const = 0;
 
 			/**
 			 * Get the size of the messages that the queue holds.
 			 */
-  			virtual size_t getMaxMsgSize() const = 0;
+  			virtual size_t MaxMsgSize() const = 0;
 
 			/**
 			 * Get the current number of messages in the message queue.
 			 */
-  			virtual size_t getNumMsg() = 0;
+  			virtual size_t NumMsg() = 0;
 			
 			/**
 			 * Destructor. Will not remove the shared structures.

@@ -72,7 +72,7 @@ namespace Damaris {
 			msg.source = process->getID();
 			msg.iteration = 0;
 			msg.object = CLIENT_CONNECTED;
-			process->getSharedMessageQueue()->send(&msg);
+			process->getSharedMessageQueue()->Send(&msg);
 			connected = true;
 			return true;
 		}
@@ -161,7 +161,7 @@ namespace Damaris {
 		message.handle = chunk->GetHandle();
 		message.object = v->GetID();
 		// send message
-		process->getSharedMessageQueue()->send(&message);
+		process->getSharedMessageQueue()->Send(&message);
 		// free message
 		DBG("Variable \"" << varname << "\" has been commited");
 
@@ -215,7 +215,7 @@ namespace Damaris {
 		message.handle = chunk->GetHandle();
 
 		// send message
-		process->getSharedMessageQueue()->send(&message);
+		process->getSharedMessageQueue()->Send(&message);
 		DBG("Variable \"" << varname << "\" has been written");
 		
 		chunk->SetDataOwnership(false);
@@ -241,7 +241,7 @@ namespace Damaris {
 			sig.object = action->GetID();
 
 			try {
-				process->getSharedMessageQueue()->send(&sig);
+				process->getSharedMessageQueue()->Send(&sig);
 			} catch(interprocess_exception &e) {
 				ERROR("Error while sending event \"" << 
 						signal_name << "\", " << e.what());
@@ -287,7 +287,7 @@ namespace Damaris {
 			kill.source = process->getID();
 			kill.iteration = -1;
 			kill.object = KILL_SERVER;
-			process->getSharedMessageQueue()->send(&kill);
+			process->getSharedMessageQueue()->Send(&kill);
 			return 0;
 		} else {
 			WARN("Trying to send kill signal multiple times to the server");
@@ -302,7 +302,7 @@ namespace Damaris {
 		msg.source = process->getID();
 		msg.iteration = Environment::GetLastIteration();
 		msg.object = URGENT_CLEAN;
-		process->getSharedMessageQueue()->send(&msg);
+		process->getSharedMessageQueue()->Send(&msg);
 		return 0;
 	}
 
@@ -321,7 +321,7 @@ namespace Damaris {
 			errorOccured = false;
 		}
 		
-		process->getSharedMessageQueue()->send(&msg);
+		process->getSharedMessageQueue()->Send(&msg);
 		return 0;
 	}
 
