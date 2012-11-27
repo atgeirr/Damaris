@@ -28,7 +28,7 @@
 
 #include "memory/Message.hpp"
 #include "core/Process.hpp"
-#include "core/MPILayer.hpp"
+#include "comm/MPILayer.hpp"
 #include "xml/BcastXML.hpp"
 #include "server/Initiator.hpp"
 
