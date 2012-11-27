@@ -26,39 +26,80 @@ namespace Damaris {
 	
 void MPISendRecvQueue::update()
 {
-	// TODO
+	static char* msg = NULL;
+	static MPI_Request request;
+	static MPI_Status status;
+	static bool listening = false;
+
+	// start by deleting one request of a previously sent message
+        // if the request is obsolete, otherwise put it back in the queue
+	if(!pendingSendReq.empty()) {
+		boost::shared_ptr<MPI_Request> pending = pendingSendReq.front();
+		pendingSendReq.pop_front();
+		int done;
+		MPI_Status s;
+		MPI_Test(pending.get(),&done,&s);
+		if(!done) {
+			pendingSendReq.push_back(pending);
+		}
+	}
+
+	// if we haven't started an MPI_IRecv yet, we do it now
+	if(!listening) {
+		msg = new char[msgSize];
+		MPI_Irecv(msg, msgSize, MPI_BYTE, 
+				MPI_ANY_SOURCE, MPI_ANY_TAG, comm, &request);
+		listening = true;
+	}
+
+	// we check the status of the last MPI_Irecv request
+	int done;
+	MPI_Test(&request,&done,&status);
+	if(done) {
+		toDeliver.push_back(msg);
+		listening = false;
+	}
 }
 
-void MPISendRecvQueue::Send(const void* buffer)
+void MPISendRecvQueue::Send(void* buffer)
 {
-	MPI_Isend
+	MPI_Request* pending = new MPI_Request;
+	MPI_Isend(buffer,msgSize,MPI_BYTE,receiver,0,comm,pending);
+	pendingSendReq.push_back(boost::shared_ptr<MPI_Request>(pending));
 }
 
-bool MPISendRecvQueue::TrySend(const void* buffer)
+bool MPISendRecvQueue::TrySend(void* buffer)
 {
-	// TODO
+	Send(buffer);
+	return true;
 }
 
 void MPISendRecvQueue::Receive(void* buffer, size_t buffer_size)
 {
-	// TODO
+	while(toDeliver.empty()) {
+		update();
+	}
+	char* msg = *(toDeliver.begin());
+	memcpy(buffer,msg,std::min(buffer_size,msgSize));
+	delete msg;
+	toDeliver.pop_front();
 }
   
 bool MPISendRecvQueue::TryReceive(void *buffer, size_t buffer_size)
 {
 	update();
 	if(toDeliver.empty()) return false;
-
-	char* msg = toDeliver.pop_front();
-	memcpy(buffer,msg,min(buffer_size,msgSize));
+	char* msg = *(toDeliver.begin());
+	memcpy(buffer,msg,std::min(buffer_size,msgSize));
 	delete msg;
+	toDeliver.pop_front();
 	return true;	
 }
 
 size_t MPISendRecvQueue::NumMsg()
 {
-	// TODO
+	if(pendingSendReq.empty() && toDeliver.empty()) return 0;
+	else return 1;
 }
 
 }
-#endif

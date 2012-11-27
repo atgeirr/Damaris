@@ -162,7 +162,7 @@ bool SharedMessageQueue::Remove(sysv_shmem_t /*unused*/, const std::string& name
 	return xsi_shared_memory::remove(id);
 }
 
-void SharedMessageQueue::Send(const void* buffer)
+void SharedMessageQueue::Send(void* buffer)
 {
 	scoped_lock<interprocess_mutex> lock(shmq_hdr->main_lock);
 	while(shmq_hdr->numMsg == shmq_hdr->maxMsg) {
@@ -179,7 +179,7 @@ void SharedMessageQueue::Send(const void* buffer)
 	shmq_hdr->cond_recv.notify_one();
 }
 
-bool SharedMessageQueue::TrySend(const void* buffer)
+bool SharedMessageQueue::TrySend(void* buffer)
 {
 	scoped_lock<interprocess_mutex> lock(shmq_hdr->main_lock);
 

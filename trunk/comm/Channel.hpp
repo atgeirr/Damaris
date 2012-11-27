@@ -53,13 +53,13 @@ namespace Damaris {
 			/**
 			 * Sends a message. Blocks if the queue is full.
 			 */
-			virtual void Send(const void* buffer) = 0;
+			virtual void Send(void* buffer) = 0;
 
 			/**
 			 * Try to send a message. Return false without blocking
 			 * if the queue is full.
 			 */
-			virtual bool TrySend(const void* buffer) = 0;
+			virtual bool TrySend(void* buffer) = 0;
 
 			/**
 			 * Receives a message from the queue. Block if the queue

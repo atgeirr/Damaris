@@ -23,6 +23,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __DAMARIS_MPI_SEND_RECV_QUEUE_H
 #define __DAMARIS_MPI_SEND_RECV_QUEUE_H
 
+#include <limits>
 #include <mpi.h>
 
 #include "xml/Model.hpp"
@@ -63,13 +64,13 @@ namespace Damaris {
 			/**
 			 * Sends a message.
 			 */
-			virtual void Send(const void* buffer);
+			virtual void Send(void* buffer);
 
 			/**
 			 * Try to send a message. Return false without blocking
 			 * if the queue is full.
 			 */
-			virtual bool TrySend(const void* buffer);
+			virtual bool TrySend(void* buffer);
 
 			/**
 			 * Receives a message from the queue. Block if the queue
@@ -87,7 +88,7 @@ namespace Damaris {
 			 */
 			virtual size_t MaxMsg() const 
 			{
-				return numeric_limits<size_t>::max()
+				return std::numeric_limits<size_t>::max();
 			}
 
 			/**
