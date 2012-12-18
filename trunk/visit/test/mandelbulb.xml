@@ -1,16 +1,16 @@
 <?xml version="1.0"?>
-<simulation name="life" language="c" xmlns="http://damaris.gforge.inria.fr/Damaris/Model">
+<simulation name="mandelbulb" language="c" xmlns="http://damaris.gforge.inria.fr/Damaris/Model">
 	<architecture>
 		<cores  count="5">
-			<clients count="4"/>
+			<clients count="4" domains="1"/>
 		</cores>
-		<buffer name="buffer" size="67108864" blocks="2"/>
+		<buffer name="buffer" size="536870912" />
 		<queue  name="queue" size="100" />
 	</architecture>
 	<data>
-		<parameter name="WIDTH" type="int" value="50" />
-		<parameter name="HEIGHT" type="int" value="50" />
-		<parameter name="DEPTH" type="int" value="100" />
+		<parameter name="WIDTH" type="int"  value="40" />
+		<parameter name="HEIGHT" type="int" value="40" />
+		<parameter name="DEPTH" type="int"  value="80" />
 
 		<layout name="cells"  type="int" dimensions="DEPTH,HEIGHT+1,WIDTH+1" />
 		<layout name="rmeshX" type="double" dimensions="WIDTH+1" />
@@ -32,12 +32,9 @@
 		<variable name="space" type="scalar" layout="cells" mesh="mesh" centering="nodal" />
 	</data>
 	<actions>
+		<event name="clean" action="clean" library="libgc.so" scope="node"/>
 	</actions>
-	<python>
-		<path>/home/mdorier/visu/visit/python/2.6.4/linux-x86_64_gcc-4.4/lib/python2.6</path>
-		<home>/home/mdorier/visu/visit/python/2.6.4/linux-x86_64_gcc-4.4</home>
-	</python>
 	<visit>
-		<path>/home/mdorier/Work/Visu2/visit2.5.0/src</path>
+		<path>/home/mdorier/Work/Visu3/visit2.5.2/src</path>
 	</visit>
 </simulation>

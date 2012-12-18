@@ -36,10 +36,10 @@ namespace Damaris {
 	{
 	}
 
-	void BoundAction::call(int32_t iteration, int32_t sourceID, const char* args)
+	void BoundAction::Call(int32_t iteration, int32_t sourceID, const char* args)
 	{
 		if(function != NULL)
-			(*function)(getName(),iteration,sourceID,args);
+			(*function)(GetName(),iteration,sourceID,args);
 	}
 
 	BoundAction* BoundAction::New(fun_t f, const std::string& name)

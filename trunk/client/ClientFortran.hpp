@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file ClientFortran.hpp
- * \date February 2011
+ * \date November 2012
  * \author Matthieu Dorier
- * \version 0.4
+ * \version 0.7
  * \see Client.hpp
  * Definition of the Fortran client functions.
  */
@@ -36,57 +36,48 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 extern "C" {
 /**
- * \fn df_initialize(config_file_name, core_id, ierr)
+ * \fn df_initialize(fcomm, config_file_name, ierr)
  * \brief Initializes the client-side Fortran library.
  * \see Damaris::Client::Client
+ * \param[in] fcomm : MPI communicator of the simulation.
  * \param[in] config_file_name : name of the XML configuration file (character*).
- * \param[in] core_id : identifier for the client (should be unique).
- * \param[out] ierr : returned error 
+ * \param[out] ierr : returned error
  *	(0 in case of success, forces the program to stop in case of failure).
  */
 void FC_FUNC_GLOBAL_(df_initialize,DF_INITIALIZE)
-	(char* config_file_name_f, int32_t* core_id_f, int32_t* ierr_f, int config_file_name_size);
+	(char* config_file_name_f, MPI_Fint* fcomm, int32_t* ierr_f, int config_file_name_size);
 
 /** 
- * \fn df_write(var_name, iteration, data, ierr)
+ * \fn df_write(var_name, data, ierr)
  * \brief Writes a variable.
  * \see Damaris::Client::write
  */	
 void FC_FUNC_GLOBAL_(df_write,DF_WRITE)
-	(char* var_name_f, int32_t* iteration_f, void* data_f, int32_t* ierr_f, int var_name_size);
+	(char* var_name_f, void* data_f, int32_t* ierr_f, int var_name_size);
 
 /**
- * \fn df_chunk_set
- * \brief Define a chunk.
- * \see Damaris::Client::chunk_set
+ * \fn df_write_block(var_name, block_id, data, ierr)
+ * \brief Writes a block of variable.
+ * \see Damaris::Client::write_block
  */
-void FC_FUNC_GLOBAL_(df_chunk_set,DF_CHUNK_SET)
-	(unsigned int* dimensions, int* si, int* ei, int64_t* chunkh);
-
-/**
- * \fn df_chunk_write
- * \brief Write a chunk.
- * \see Damaris::Client::chunk_write
- */
-void FC_FUNC_GLOBAL_(df_chunk_write,DF_CHUNK_WRITE)
-	(int64_t* chunkh, char* varname_f, int32_t* iteration_f, void* data_f, int32_t* ierr_f,
-	 int var_name_size);
-
-/**
- * \fn df_chunk_free
- * \brief Free a chunk handle.
- * \see Damaris::Client::chunk_free
- */
-void FC_FUNC_GLOBAL_(df_chunk_free,DF_CHUNK_FREE)
-	(int64_t* chunkh);
+void FC_FUNC_GLOBAL_(df_write_block,DF_WRITE)
+        (char* var_name_f, int32_t* block_f, void* data_f, int32_t* ierr_f, int var_name_size);
 
 /** 
- * \fn df_alloc(var_name, iteration, ierr)
+ * \fn df_alloc(var_name, ierr)
  * \brief Allocate space for a variable.
  * \see Damaris::Client::alloc
  */
 void* FC_FUNC_GLOBAL(df_alloc,DF_ALLOC)
-	(char* var_name_f, int32_t* iteration_f, int32_t* ierr_f, int var_name_size);
+	(char* var_name_f, int32_t* ierr_f, int var_name_size);
+
+/**
+ * \fn df_alloc_block(varname, block_id, ierr)
+ * \brief Allocate space for a block of variable.
+ * \see Damaris::Client::alloc_block
+ */
+void* FC_FUNC_GLOBAL(df_alloc_block,DF_ALLOC_BLOCK)
+	(char* var_name_f, int32_t* block_f, int32_t* ierr_f, int var_name_size);
 
 /**
  * \fn df_commit
@@ -94,15 +85,24 @@ void* FC_FUNC_GLOBAL(df_alloc,DF_ALLOC)
  * \see Damaris::Client::commit
  */
 void FC_FUNC_GLOBAL(df_commit,DF_COMMIT)
-	(char* var_name_f, int32_t* iteration_f, int32_t* ierr_f, int var_name_size);
+	(char* var_name_f, int32_t* ierr_f, int var_name_size);
+
+void FC_FUNC_GLOBAL(df_commit_block,DF_COMMIT_BLOCK)
+        (char* var_name_f, int32_t* block_f, int32_t* ierr_f, int var_name_size);
+
+void FC_FUNC_GLOBAL(df_commit_iteration,DF_COMMIT_ITERATION)
+        (char* var_name_f, int32_t* iteration_f, int32_t* ierr_f, int var_name_size);
+
+void FC_FUNC_GLOBAL(df_commit_block_iteration,DF_COMMIT_BLOCK_ITERATION)
+        (char* var_name_f, int32_t* block_f, int32_t* iteration_f, int32_t* ierr_f, int var_name_size);
 
 /**
- * \fn df_signal(event_name, iteration, ierr)
+ * \fn df_signal(event_name, ierr)
  * \brief Sends an event to the dedicated core.
  * \see Damaris::Client::signal
  */	
 void FC_FUNC_GLOBAL(df_signal,DF_SIGNAL)
-	(char* event_name_f, int32_t* iteration_f, int* ierr_f, int event_name_size);
+	(char* event_name_f, int* ierr_f, int event_name_size);
 
 /**
  * \fn df_parameter_get(param_name, buffer, size, ierr)
@@ -136,11 +136,11 @@ void FC_FUNC_GLOBAL(df_kill_server,DF_KILL_SERVER)
 	(int* ierr);
 
 /**
- * \fn df_end_iteration
+ * \fn df_end_iteration(ierr)
  * \brief Notifies the server that the iteration has ended.
  */
 void FC_FUNC_GLOBAL(df_end_iteration,DF_END_ITERATION)
-    (int* it, int* ierr);
+    (int* ierr);
 
 /**
  * \fn df_finalize(ierr)

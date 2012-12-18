@@ -36,32 +36,32 @@ ChunkImpl::ChunkImpl(Buffer* b, handle_t h)
 {
 	isOwner = false;
 	buffer = b;
-	header = (ChunkHeader*)buffer->getAddressFromHandle(h);
+	header = (ChunkHeader*)buffer->GetAddressFromHandle(h);
 	addr = ((char*)header)+sizeof(ChunkHeader);
 }
 
 ChunkImpl::~ChunkImpl()
 {
 	if(isOwner) {
-		buffer->deallocate(header);
+		buffer->Deallocate(header);
 	}
 }
 
-void* ChunkImpl::data()
+void* ChunkImpl::Data()
 {
 	return addr;
 }
 
 size_t ChunkImpl::MemCopy(const void* src)
 {
-	size_t size = header->getDataMemoryLength(getType());
+	size_t size = header->GetDataMemoryLength(GetType());
 	memcpy(addr,src,size);
 	return size;
 }
 
-handle_t ChunkImpl::getHandle()
+handle_t ChunkImpl::GetHandle()
 {
-	return buffer->getHandleFromAddress(header);
+	return buffer->GetHandleFromAddress(header);
 }
 
 } // namespace Damaris

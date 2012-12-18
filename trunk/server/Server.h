@@ -32,7 +32,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  * \param[in] configFile : name of the XML configuration file.
  * \param[in] server_id : an identifier for this server.
  */
-int DC_server_init(const char* configFile, int server_id);
+//int DC_server_init(const char* configFile, int server_id);
 
 /**
  * Start clients and servers as MPI entities.
@@ -45,7 +45,7 @@ int DC_mpi_init_and_start(const char* configFile, MPI_Comm globalcomm);
 
 int DC_mpi_init(const char* configFile, MPI_Comm globalcomm);
 
-int DC_server_start();
+//int DC_server_start();
 
 //}
 

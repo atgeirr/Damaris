@@ -55,42 +55,42 @@ namespace Damaris {
 			/**
 			 * \brief Gets the ID of the process that has written the chunk.
 			 */
-			int getSource() const { return source; }
+			int GetSource() const { return source; }
 
 			/**
 			 * \brief Set the ID of the process that has written the chunk.
 			 */
-			void setSource(int src) { source = src;}
+			void SetSource(int src) { source = src;}
 
 			/**
 			 * \brief Gets the iteration at which the chunk has been written.
 			 */
-			int getIteration() const { return iteration; }
+			int GetIteration() const { return iteration; }
 
 			/**
 			 * \brief Set the iteration number.
 			 */
-			void setIteration(int i) { iteration = i; }
+			void SetIteration(int i) { iteration = i; }
 
 			/**
 			 * \brief Get the ID of the block.
 			 */
-			int getBlock() const { return block; }
+			int GetBlock() const { return block; }
 
 			/**
 			 * \brief Set the ID of the block.
 			 */
-			void setBlock(int b) { block = b; }
+			void SetBlock(int b) { block = b; }
 
 			/**
 			 * \brief Get the type of the chunk
 			 */
-			Model::Type getType() const { return type; }
+			Model::Type GetType() const { return type; }
 
 			/**
 			 * \brief Set the type.
 			 */
-			void setType(const Model::Type& t) { type = t; }
+			void SetType(const Model::Type& t) { type = t; }
 	};
 
 } // namespace Damaris

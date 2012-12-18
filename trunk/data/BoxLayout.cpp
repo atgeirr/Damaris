@@ -40,17 +40,17 @@ namespace Damaris {
 		InterpretDimensions();
 	}
 	
-	Model::Type BoxLayout::getType() const
+	Model::Type BoxLayout::GetType() const
 	{
 		return model.type();
 	}
 	
-	unsigned int BoxLayout::getDimensions() const
+	unsigned int BoxLayout::GetDimensions() const
 	{
 		return extents.size();
 	}
 
-	size_t BoxLayout::getExtentAlongDimension(unsigned int dim) const
+	size_t BoxLayout::GetExtentAlongDimension(unsigned int dim) const
 	{
 		if(dim < extents.size())
 			return (size_t)(extents[dim]);
@@ -58,7 +58,7 @@ namespace Damaris {
 			return 0;
 	}
 
-	bool BoxLayout::isUnlimited() const
+	bool BoxLayout::IsUnlimited() const
 	{
 		return (extents.size() == 1 && extents[0] == -1) 
 				|| (Types::basicTypeSize(model.type()) == -1);
@@ -152,7 +152,7 @@ namespace Damaris {
 
 		if((model.language() == Model::Language::fortran)
 				|| (model.language() == Model::Language::unknown
-					&& Environment::getDefaultLanguage() == Model::Language::fortran)) {
+					&& Environment::DefaultLanguage() == Model::Language::fortran)) {
 			std::vector<int> rdims(e.rbegin(),e.rend());
 			extents = rdims;
 		} else {

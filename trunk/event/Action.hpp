@@ -55,12 +55,12 @@ class Action  {
 		/**
 		 * \brief Gets the ID of the action.
 		 */		
-		int getID() const { return id; }
+		int GetID() const { return id; }
 
 		/**
 		 * \brief Gets the name of the action.
 		 */
-		const std::string& getName() const { return name; }	
+		const std::string& GetName() const { return name; }	
 
 		/**
 		 * \brief Operator overloaded to simplify the call to an action.
@@ -80,7 +80,7 @@ class Action  {
 		 *                     all recorded variables.
 		 * \see Damaris::Actions::operator()
 		 */
-		virtual void call(int32_t iteration, int32_t sourceID, const char *args = NULL) = 0;
+		virtual void Call(int32_t iteration, int32_t sourceID, const char *args = NULL) = 0;
 
 		/**
 		 * Indicates if the Action can be called from outside the simulation.
@@ -92,7 +92,7 @@ class Action  {
 		 * Expose the Action's metadata to VisIt.
 		 * \param[out] md : an allocated visit_handle associated with a Command metadata.
 		 */
-		bool exposeVisItMetaData(visit_handle md, int iteration);
+		bool ExposeVisItMetaData(visit_handle md);
 #endif
 
 		/**
@@ -111,10 +111,15 @@ class Action  {
  */
 class Action::EmptyAction : public Action {
 
-	void call(int32_t iteration, int32_t sourceID, const char* args = NULL) { }
+	void Call(int32_t /* iteration */, 
+		  int32_t /* sourceID */, 
+		  const char* /*args*/) { }
+
+	void Call(int32_t /* iteration */,
+		  int32_t /* source */) { }
 
 	public:
-		virtual ~EmptyAction() {}
+		virtual ~EmptyAction() { }
 };
 
 }

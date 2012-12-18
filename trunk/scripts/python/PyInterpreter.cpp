@@ -65,7 +65,7 @@ static bp::object clear()
 {
 	VariableManager::iterator it = VariableManager::Begin();
 	for(;it != VariableManager::End(); it++) {
-		it->get()->clear();
+		it->get()->ClearAll();
 	}
 	return bp::object();
 }

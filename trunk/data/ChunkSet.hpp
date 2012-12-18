@@ -45,16 +45,16 @@ typedef boost::multi_index_container<
         boost::shared_ptr<Chunk>,
         bmi::indexed_by<
                 bmi::ordered_non_unique<bmi::tag<by_source>,
-                        bmi::const_mem_fun<Chunk,int,&Chunk::getSource> >,
+                        bmi::const_mem_fun<Chunk,int,&Chunk::GetSource> >,
                 bmi::ordered_non_unique<bmi::tag<by_iteration>,
-                        bmi::const_mem_fun<Chunk,int,&Chunk::getIteration> >,
+                        bmi::const_mem_fun<Chunk,int,&Chunk::GetIteration> >,
 		bmi::ordered_non_unique<bmi::tag<by_block>,
-			bmi::const_mem_fun<Chunk,int,&Chunk::getBlock> >,
+			bmi::const_mem_fun<Chunk,int,&Chunk::GetBlock> >,
 		bmi::ordered_unique<bmi::tag<by_any>,
 			bmi::composite_key<Chunk,
-				bmi::const_mem_fun<Chunk,int,&Chunk::getSource>,
-				bmi::const_mem_fun<Chunk,int,&Chunk::getIteration>,
-				bmi::const_mem_fun<Chunk,int,&Chunk::getBlock>
+				bmi::const_mem_fun<Chunk,int,&Chunk::GetSource>,
+				bmi::const_mem_fun<Chunk,int,&Chunk::GetIteration>,
+				bmi::const_mem_fun<Chunk,int,&Chunk::GetBlock>
 			> 
 		>
         >

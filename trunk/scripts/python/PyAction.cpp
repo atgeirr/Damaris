@@ -35,17 +35,18 @@ PyAction::PyAction(const Model::Script& mdl, const std::string &name)
 {
 }
 	
-void PyAction::call(int32_t iteration, int32_t sourceID, const char* args)
+void PyAction::Call(int32_t iteration, int32_t sourceID, const char* args)
 {
 	try {
 		PyInterpreter* p = Python::PyInterpreter::getInstance();
 		if(p != NULL) {
 			p->execFile((std::string)model.file(),sourceID,iteration);
 		} else { 
-			throw(std::runtime_error("Unable to get a pointer to a Python interpreter."));
+			throw(
+			 std::runtime_error("Unable to get a pointer to a Python interpreter."));
 		}
 	} catch(std::exception &e) {
-		ERROR("in Python action \"" << getName() << "\": "<< e.what());
+		ERROR("in Python action \"" << GetName() << "\": "<< e.what());
 	}
 }
 

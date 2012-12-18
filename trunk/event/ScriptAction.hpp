@@ -55,7 +55,7 @@ class ScriptAction : public Action, public Configurable<Model::Script> {
 		 * \brief Another way of calling the inner function.
 		 * \see Damaris::Action::operator()
 		 */
-		virtual void call(int32_t iteration, int32_t sourceID, const char* args = NULL) = 0;
+		virtual void Call(int32_t iteration, int32_t sourceID, const char* args = NULL) = 0;
 
 		/**
 		 * Tells if the action can be called from outside the simulation.

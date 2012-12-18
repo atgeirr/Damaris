@@ -28,6 +28,9 @@ target_link_libraries (material_or ${VISIT_LIBRARIES})
 add_executable (mesh_or ${VISIT_TEST_DIR}/mesh.c)
 target_link_libraries (mesh_or ${VISIT_LIBRARIES})
 
+add_executable (blocks_or ${VISIT_TEST_DIR}/blocks.c)
+target_link_libraries (blocks_or ${VISIT_LIBRARIES})
+
 add_executable (point_or ${VISIT_TEST_DIR}/point.c)
 target_link_libraries (point_or ${VISIT_LIBRARIES})
 

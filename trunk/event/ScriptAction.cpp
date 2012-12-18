@@ -33,7 +33,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Damaris {
 
-	ScriptAction* ScriptAction::New(const Model::Script& mdl, const std::string& name)
+	ScriptAction* ScriptAction::New(const Model::Script& mdl, const std::string& name __attribute__((unused)))
 	{
 		switch(mdl.scope()) {
 			case Model::Scope::core :
@@ -48,13 +48,13 @@ namespace Damaris {
 				}
 				break;
 			case Model::Scope::node :
-				if(mdl.language() == Model::Language::python)
+				if(mdl.language() == Model::Language::python) {
 #ifdef __ENABLE_PYTHON
 					return NodeAction<Python::PyAction,Model::Script>::New(mdl,name,Environment::getClientsPerNode());
 #else
 					CFGERROR("Damaris has not been compiled with Python support.");
 #endif
-				else {
+				} else {
 					CFGERROR("\"" << mdl.language() << "\" is not a valid scripting language.");
 				}
 				break;

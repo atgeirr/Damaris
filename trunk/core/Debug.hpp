@@ -58,7 +58,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #define MESSAGE(out, level, message)\
     out << "[" << level << " " << boost::posix_time::microsec_clock::local_time() << "] [" \
-    << __RFILE__ << ":" << __LINE__ << ":" << __FUNCTION__ << "] " << message << std::endl
+    << __RFILE__ << ":" << __LINE__ << ":" << __FUNCTION__ << "] " << message << std::endl; \
+    out.flush()
 
 #define SIMPLE(out,level, message)\
 	out << "[" << level << " " << boost::posix_time::microsec_clock::local_time() << "] "\
@@ -125,11 +126,11 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 	}
 
 #ifdef __DEBUG_ALL
-#define DBG(message) MESSAGE(std::cout, "DEBUG", message)
+#define DBG(message) MESSAGE(std::cerr, "DEBUG", message)
 #else
 #undef DBG
 #ifdef __DEBUG
-#define DBG(message) MESSAGE(std::cout, "DEBUG", message)
+#define DBG(message) MESSAGE(std::cerr, "DEBUG", message)
 #undef __DEBUG
 #else
 #define DBG(message)

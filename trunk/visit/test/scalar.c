@@ -76,7 +76,7 @@ simulation_data_ctor(simulation_data *sim)
 }
 
 void
-simulation_data_dtor(simulation_data *sim)
+simulation_data_dtor(simulation_data* sim __attribute__((unused)))
 {
 }
 
@@ -101,7 +101,7 @@ void read_input_deck(void) { }
  *
  *****************************************************************************/
 
-void ControlCommandCallback(const char *cmd, const char *args, void *cbdata)
+void ControlCommandCallback(const char *cmd, const char* args __attribute__((unused)), void *cbdata)
 {
     simulation_data *sim = (simulation_data *)cbdata;
 
@@ -295,7 +295,7 @@ SimGetMetaData(void *cbdata)
         int i;
         visit_handle m1 = VISIT_INVALID_HANDLE, m2 = VISIT_INVALID_HANDLE;
         visit_handle vmd = VISIT_INVALID_HANDLE;
-        visit_handle cmd = VISIT_INVALID_HANDLE;
+        // visit_handle cmd = VISIT_INVALID_HANDLE;
 
         /* Set the simulation state. */
         VisIt_SimulationMetaData_setMode(md, (sim->runMode == SIM_STOPPED) ?
@@ -360,7 +360,7 @@ SimGetMetaData(void *cbdata)
 
 
         /* Add some custom commands. */
-        for(i = 0; i < sizeof(cmd_names)/sizeof(const char *); ++i)
+        for(i = 0; i < (int)(sizeof(cmd_names)/sizeof(const char *)); ++i)
         {
             visit_handle cmd = VISIT_INVALID_HANDLE;
             if(VisIt_CommandMetaData_alloc(&cmd) == VISIT_OKAY)
@@ -427,7 +427,7 @@ double nodal_vector[2][3][4][3] = {
  *****************************************************************************/
 
 visit_handle
-SimGetMesh(int domain, const char *name, void *cbdata)
+SimGetMesh(int domain, const char *name, void* cbdata __attribute__((unused)))
 {
     visit_handle h = VISIT_INVALID_HANDLE;
 
@@ -475,7 +475,7 @@ SimGetMesh(int domain, const char *name, void *cbdata)
  *****************************************************************************/
 
 visit_handle
-SimGetVariable(int domain, const char *name, void *cbdata)
+SimGetVariable(int domain, const char *name, void* cbdata __attribute__((unused)))
 {
     visit_handle h = VISIT_INVALID_HANDLE;
     int nComponents = 1, nTuples = 0;

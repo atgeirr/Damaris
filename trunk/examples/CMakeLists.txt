@@ -17,9 +17,6 @@ if(CMAKE_Fortran_COMPILER)
   add_executable (test_alloc_fortran ${DAMARIS_SOURCE_DIR}/examples/test_alloc.f90)
   target_link_libraries (test_alloc_fortran ${CLIENT_SIDE_LIBRARIES} gfortran)
 
-  add_executable (test_chunk_fortran ${DAMARIS_SOURCE_DIR}/examples/test_chunk.f90)
-  target_link_libraries (test_chunk_fortran ${CLIENT_SIDE_LIBRARIES} gfortran)
-
 endif(CMAKE_Fortran_COMPILER)
 
 add_executable (test_alloc_c ${DAMARIS_SOURCE_DIR}/examples/test_alloc.c)
@@ -30,9 +27,6 @@ target_link_libraries (test_c ${CLIENT_SIDE_LIBRARIES})
 
 add_executable (test_event_c ${DAMARIS_SOURCE_DIR}/examples/test_event.c)
 target_link_libraries (test_event_c ${CLIENT_SIDE_LIBRARIES})
-
-add_executable (test_chunk_c ${DAMARIS_SOURCE_DIR}/examples/test_chunk.c)
-target_link_libraries (test_chunk_c ${CLIENT_SIDE_LIBRARIES})
 
 add_executable (test_mpi_c ${DAMARIS_SOURCE_DIR}/examples/test_mpi.c)
 target_link_libraries (test_mpi_c ${EMB_SERVER_LIBRARIES})

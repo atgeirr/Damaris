@@ -47,24 +47,29 @@ PyChunk::PyChunk(Chunk* c)
 
 int PyChunk::source() const 
 {
-	return inner->getSource();
+	return inner->GetSource();
 }
 
 int PyChunk::iteration() const 
 {
-	return inner->getIteration();
+	return inner->GetIteration();
+}
+
+int PyChunk::block() const
+{
+	return inner->GetBlock();
 }
 
 const std::string& PyChunk::type() const
 {
-	return inner->getType();
+	return inner->GetType();
 }
 
 bp::list PyChunk::lower_bounds() const
 {
 	bp::list result;
-	for(unsigned int i = 0; i < inner->getDimensions(); i++) {
-		result.append(inner->getStartIndex((int)i));
+	for(unsigned int i = 0; i < inner->GetDimensions(); i++) {
+		result.append(inner->GetStartIndex((int)i));
 	}
 	return result;
 }
@@ -72,24 +77,24 @@ bp::list PyChunk::lower_bounds() const
 bp::list PyChunk::upper_bounds() const
 {
 	bp::list result;
-	for(unsigned int i = 0; i < inner->getDimensions(); i++) {
-		result.append(inner->getEndIndex((int)i));
+	for(unsigned int i = 0; i < inner->GetDimensions(); i++) {
+		result.append(inner->GetEndIndex((int)i));
 	}
 	return result;
 }
 
 bp::object PyChunk::data() const
 {
-	int nd = inner->getDimensions();
+	int nd = inner->GetDimensions();
 	npy_intp *dims = new npy_intp[nd];
 	for(int i = 0; i < nd; i++) {
-		dims[i] = inner->getEndIndex(i) - inner->getStartIndex(i) + 1;
+		dims[i] = inner->GetEndIndex(i) - inner->GetStartIndex(i) + 1;
 	}
-	int typenum = PyTypes::getPyTypeFromDamarisType(inner->getType());
+	int typenum = PyTypes::getPyTypeFromDamarisType(inner->GetType());
 	if(typenum == -1) {
 		throw(bp::error_already_set());
 	}
-	void *data = inner->data();
+	void *data = inner->Data();
 	if(data == NULL) return bp::object();
 	PyObject* arr = PyArray_SimpleNewFromData(nd, dims, typenum, data);
 	delete[] dims;

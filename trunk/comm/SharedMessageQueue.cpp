@@ -25,7 +25,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/interprocess/xsi_shared_memory.hpp>
 #include "core/Debug.hpp"
 #include "memory/Message.hpp"
-#include "memory/SharedMessageQueue.hpp"
+#include "comm/SharedMessageQueue.hpp"
 
 namespace Damaris {
 
@@ -60,7 +60,7 @@ SharedMessageQueue* SharedMessageQueue::Create(Model::Queue* mdl)
 	return NULL;
 }
 
-SharedMessageQueue* SharedMessageQueue::Create(posix_shmem_t posix_shmem, 
+SharedMessageQueue* SharedMessageQueue::Create(posix_shmem_t /*posix_shmem*/, 
 		const std::string& name, size_t num_msg, size_t size_msg)
 {
 	shared_memory_object base(create_only,name.c_str(),read_write);
@@ -74,7 +74,7 @@ SharedMessageQueue* SharedMessageQueue::Create(posix_shmem_t posix_shmem,
 	return new SharedMessageQueue(region);
 }
 
-SharedMessageQueue* SharedMessageQueue::Create(sysv_shmem_t sysv_shmem, 
+SharedMessageQueue* SharedMessageQueue::Create(sysv_shmem_t /*sysv_shmem*/, 
 		const std::string& name, size_t num_msg, size_t size_msg)
 {
 	size_t size = num_msg*size_msg + sizeof(struct shm_queue_hdr);
@@ -162,11 +162,11 @@ bool SharedMessageQueue::Remove(sysv_shmem_t /*unused*/, const std::string& name
 	return xsi_shared_memory::remove(id);
 }
 
-void SharedMessageQueue::send(const void* buffer)
+void SharedMessageQueue::Send(void* buffer)
 {
 	scoped_lock<interprocess_mutex> lock(shmq_hdr->main_lock);
-	while(shmq_hdr->current_num_msg() == shmq_hdr->maxMsg) {
-		INFO(shmq_hdr->current_num_msg());
+	while(shmq_hdr->numMsg == shmq_hdr->maxMsg) {
+		DBG(shmq_hdr->numMsg);
 		shmq_hdr->cond_send.wait(lock);
 	}
 
@@ -174,74 +174,75 @@ void SharedMessageQueue::send(const void* buffer)
 	std::memcpy(dst,buffer,shmq_hdr->sizeMsg);
 	shmq_hdr->tail += 1;
 	shmq_hdr->tail %= shmq_hdr->maxMsg;
+	shmq_hdr->numMsg += 1;
 
 	shmq_hdr->cond_recv.notify_one();
 }
 
-bool SharedMessageQueue::trySend(const void* buffer)
+bool SharedMessageQueue::TrySend(void* buffer)
 {
 	scoped_lock<interprocess_mutex> lock(shmq_hdr->main_lock);
 
-	if(shmq_hdr->current_num_msg() == shmq_hdr->maxMsg) return false;
+	if(shmq_hdr->numMsg == shmq_hdr->maxMsg) return false;
 
 	char* dst = data + (shmq_hdr->tail * shmq_hdr->sizeMsg);
 	std::memcpy(dst,buffer,shmq_hdr->sizeMsg);
 	shmq_hdr->tail += 1;
 	shmq_hdr->tail %= shmq_hdr->maxMsg;
-
+	shmq_hdr->numMsg += 1;
 	shmq_hdr->cond_recv.notify_one();
 
 	return true;
 }
 
-void SharedMessageQueue::receive(void* buffer, size_t buffer_size)
+void SharedMessageQueue::Receive(void* buffer, size_t buffer_size)
 {
 	scoped_lock<interprocess_mutex> lock(shmq_hdr->main_lock);
-	while(shmq_hdr->current_num_msg() == 0) {
+	while(shmq_hdr->numMsg == 0) {
 		shmq_hdr->cond_recv.wait(lock);
 	}
 	char* src = data + (shmq_hdr->head * shmq_hdr->sizeMsg);
 	std::memcpy(buffer,src,std::min((int)buffer_size,shmq_hdr->sizeMsg));
 	shmq_hdr->head += 1;
 	shmq_hdr->head %= shmq_hdr->maxMsg;
-
+	shmq_hdr->numMsg -= 1;
 	shmq_hdr->cond_send.notify_one();	
 }
 
-bool SharedMessageQueue::tryReceive(void* buffer, 
+bool SharedMessageQueue::TryReceive(void* buffer, 
 		size_t buffer_size)
 {
-	if(shmq_hdr->current_num_msg() == 0) return false;
-	
-	{
-		scoped_lock<interprocess_mutex> lock(shmq_hdr->main_lock);
+	scoped_lock<interprocess_mutex> lock(shmq_hdr->main_lock);
+	if(shmq_hdr->numMsg == 0) 
+		return false;
+	else {
 
 		char* src = data + (shmq_hdr->head * shmq_hdr->sizeMsg);
 		int s = std::min((int)buffer_size,shmq_hdr->sizeMsg);
 		std::memcpy(buffer,src,s);
 		shmq_hdr->head += 1;
 		shmq_hdr->head %= shmq_hdr->maxMsg;
-	
+		shmq_hdr->numMsg -= 1;
 		shmq_hdr->cond_send.notify_one();
 
 		return true;
 	}
 }
 
-size_t SharedMessageQueue::getMaxMsg() const
+size_t SharedMessageQueue::MaxMsg() const
 {
 	return shmq_hdr->maxMsg;
 }
 
-size_t SharedMessageQueue::getMaxMsgSize() const
+size_t SharedMessageQueue::MaxMsgSize() const
 {
 	return shmq_hdr->sizeMsg;
 }
 
-size_t SharedMessageQueue::getNumMsg()
+size_t SharedMessageQueue::NumMsg()
 {
 	scoped_lock<interprocess_mutex> lock(shmq_hdr->main_lock);
-	return shmq_hdr->current_num_msg();
+	return shmq_hdr->numMsg;
 }
 
 }

@@ -9,9 +9,9 @@
  
       id     = 42 
 
-      call df_initialize("config.xml",id,ierr)
+      call df_initialize("config.xml",MPI_COMM_WORLD,ierr)
 
-      cptr = df_alloc("my group/my variable",1,ierr)
+      cptr = df_alloc("my group/my variable",ierr)
       call c_f_pointer(cptr,mydata,[64,16,4])
  
       do i =  1, 64
@@ -24,7 +24,7 @@
  
       call df_commit("my group/my variable",1,ierr);
 
-      call df_signal("my event",1,ierr);
+      call df_signal("my event",ierr);
  
       call df_finalize(ierr)
 

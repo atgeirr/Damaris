@@ -167,27 +167,27 @@ class SharedMemorySegment : public Buffer {
 		/**
 		 * Gets an absolute address from a relative handle.
 		 */
-		virtual ptr getAddressFromHandle(handle_t h) const;
+		virtual ptr GetAddressFromHandle(handle_t h) const;
 
 		/**
 		 * Gets a relative handle from an absolute pointer.
 		 */
-		virtual handle_t getHandleFromAddress(ptr p) const;
+		virtual handle_t GetHandleFromAddress(ptr p) const;
 
 		/**
 		 * Allocates size bytes inside the shared memory segment.
 		 */
-		virtual ptr allocate(size_t size);
+		virtual ptr Allocate(size_t size);
 
 		/**
 		 * Deallocate an allocated region.
 		 */
-		virtual void deallocate(void* addr);
+		virtual void Deallocate(void* addr);
 
 		/**
 		 * Gets the amount of free memory left.
 		 */
-		virtual size_t getFreeMemory() const;
+		virtual size_t GetFreeMemory() const;
 
 		/**
 		 * Waits until enough free memory is available.
@@ -195,13 +195,13 @@ class SharedMemorySegment : public Buffer {
 		 * does not ensure that the next call to allocate will work.
 		 * Return false if the size will never be satisfied, true otherwise.
 		 */
-		virtual bool waitAvailable(size_t size);
+		virtual bool WaitAvailable(size_t size);
 
 		/**
 		 * Returns true if and only if the adress is
 		 * in the shared memory segment.
 		 */
-		virtual bool pointerBelongsToSegment(void* p) const;
+		virtual bool PointerBelongsToSegment(void* p) const;
 
 		/**
 		 * Destructor.
@@ -234,32 +234,32 @@ class SharedMemorySegment::CompositeShMem : public SharedMemorySegment {
 		/**
 		 * \see SharedMemorySegment::getAddressFromHandle
 		 */
-		virtual SharedMemorySegment::ptr getAddressFromHandle(handle_t h) const;
+		virtual SharedMemorySegment::ptr GetAddressFromHandle(handle_t h) const;
 
 		/**
 		 * \see SharedMemorySegment::getHandleFromAddress
 		 */
-		virtual handle_t getHandleFromAddress(SharedMemorySegment::ptr p) const;
+		virtual handle_t GetHandleFromAddress(SharedMemorySegment::ptr p) const;
 
 		/**
 		 * \see SharedMemorySegment::allocate
 		 */
-		virtual ptr allocate(size_t size);
+		virtual ptr Allocate(size_t size);
 
 		/**
 		 * \see SharedMemorySegment::deallocate
 		 */
-		virtual void deallocate(void* addr);
+		virtual void Deallocate(void* addr);
 
 		/**
 		 * \see SharedMemorySegment::getFreeMemory();
 		 */
-		virtual size_t getFreeMemory() const;
+		virtual size_t GetFreeMemory() const;
 
 		/**
 		 * \see SharedMemorySegment::pointerBelongsToSegment
 		 */
-		virtual bool pointerBelongsToSegment(void* p) const;
+		virtual bool PointerBelongsToSegment(void* p) const;
 
 		/**
 		 * Destructor. Free the vector of blocks after deleting

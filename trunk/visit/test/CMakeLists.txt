@@ -37,7 +37,7 @@ target_link_libraries (mandelbrot ${CLIENT_SIDE_LIBRARIES})
 set_target_properties (mandelbrot PROPERTIES LINK_FLAGS "-Wl,-export-dynamic")
 
 add_executable (mandelbulb ${VISIT_TEST_DIR}/mandelbulb.c)
-target_link_libraries (mandelbulb ${CLIENT_SIDE_LIBRARIES})
+target_link_libraries (mandelbulb ${SERVER_SIDE_LIBRARIES} ${CLIENT_SIDE_LIBRARIES})
 set_target_properties (mandelbulb PROPERTIES LINK_FLAGS "-Wl,-export-dynamic")
 
 add_executable (material ${VISIT_TEST_DIR}/material.c)
@@ -47,6 +47,10 @@ set_target_properties (material PROPERTIES LINK_FLAGS "-Wl,-export-dynamic")
 add_executable (mesh ${VISIT_TEST_DIR}/mesh.c)
 target_link_libraries (mesh ${CLIENT_SIDE_LIBRARIES})
 set_target_properties (mesh PROPERTIES LINK_FLAGS "-Wl,-export-dynamic")
+
+add_executable (blocks ${VISIT_TEST_DIR}/blocks.c)
+target_link_libraries (blocks ${CLIENT_SIDE_LIBRARIES})
+set_target_properties (blocks PROPERTIES LINK_FLAGS "-Wl,-export-dynamic")
 
 add_executable (point ${VISIT_TEST_DIR}/point.c)
 target_link_libraries (point ${CLIENT_SIDE_LIBRARIES})

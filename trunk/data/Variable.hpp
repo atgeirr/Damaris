@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Variable.hpp
- * \date February 2012
+ * \date November 2012
  * \author Matthieu Dorier
- * \version 0.4
+ * \version 0.7
  */
 #ifndef __DAMARIS_VARIABLE_H
 #define __DAMARIS_VARIABLE_H
@@ -65,26 +65,29 @@ class Variable : public Configurable<Model::Variable> {
 		 */
 		Variable(const Model::Variable& v, const std::string& name, Layout* l);
 
-	public:	
+	public:
+		
+		typedef ChunkSet::iterator iterator;
+	
 		/**
 		 * Returns the layout of the variable.
 		 */
-		Layout* getLayout() const { return layout; }
+		Layout* GetLayout() const { return layout; }
 	
 		/**
 		 * Returns the name of the variable.
 		 */
-		const std::string& getName() const { return name; }
+		const std::string& GetName() const { return name; }
 
 		/**
 		 * Returns the id of the variable, as given by the VariableManager.
 		 */
-		int getID() const { return id; }
+		int GetID() const { return id; }
 
 		/**
 		 * Returns the allocator used for chunks allocation.
 		 */
-		Buffer* getAllocator() const { return allocator; }
+		Buffer* Allocator() const { return allocator; }
 
 		/**
 		 * Attach a new chunk to the variable.
@@ -93,45 +96,15 @@ class Variable : public Configurable<Model::Variable> {
 		bool AttachChunk(Chunk* chunk);
 
 		/**
-		 * Returns the list of chunks with a specified source.
-		 * \deprecated
-		 */
-		ChunkIndexBySource::iterator getChunksBySource(int source,
-			ChunkIndexBySource::iterator& end)
-		__attribute__ ((deprecated));
-
-		/**
-		 * Returns the list of chunks with a specified iteration.
-		 * \deprecated
-		 */
-		ChunkIndexByIteration::iterator getChunksByIteration(int iteration,
-			ChunkIndexByIteration::iterator& end)
-		__attribute__ ((deprecated));
-
-		/**
-		 * Returns an iterator of chunks with an iteration within a given range.
-		 * \deprecated
-		 */
-		ChunkIndexByIteration::iterator getChunksByIterationsRange(int itstart, int itend,
-			ChunkIndexByIteration::iterator& end)
-		__attribute__ ((deprecated));
-		
-		/**
-		 * Returns an iterator over all the chunks.
-		 * \param[out] end : a reference that will hold the end of the iterator.
-		 * \deprecated
-		 */
-		ChunkIndex::iterator getChunks(ChunkIndex::iterator &end)
-		__attribute__ ((deprecated));
-
-		/**
 		 * Finds a Chunk of a given source, iteration and block.
 		 * Returns NULL if this chunk doesn't exist.
 		 */
 		Chunk* GetChunk(int source, int iteration, int block=0);
 
 		/**
-		 * Counts the number of blocks for a given iteration.
+		 * Counts the number of blocks for a given iteration
+		 * (i.e. per source number of blocks, assuming all the
+		 * sources have sent the same number.)
 		 */
 		int CountLocalBlocks(int iteration) const;
 
@@ -141,22 +114,16 @@ class Variable : public Configurable<Model::Variable> {
 		int CountTotalBlocks(int iteration) const;
 
 		/**
-		 * Returns an iterator over all the chunks that correspond to a given
-		 * source and iteration.
-		 * \param[in] source : source wanted.
-		 * \param[in] iteration : iteration wanted.
-		 * \param[in] block : block id wanted.
-		 * \param[out] end : a reference that will hold the end of the iterator.
-		 * \deprecated
-		 */
-		ChunkIndex::iterator getChunks(int source, int iteration, int block, ChunkIndex::iterator &end) __attribute__ ((deprecated));
-
-		/**
 		 * Detach a chunk from a variable. Free its memory if the process owns the chunk.
 		 * To prevent from loosing data, don't forget to unset the chunk's ownership before
 		 * detaching the chunk.
 		 */
 		bool DetachChunk(Chunk* c);
+
+		/**
+		 * Detach a chunk from a variable, for use in a loop using iterators.
+		 */
+		iterator DetachChunk(iterator& it);
 
 		/**
 		 * Delete all the chunks held by a Variable.
@@ -166,12 +133,12 @@ class Variable : public Configurable<Model::Variable> {
 		/**
 		 * Returns the variables description.
 		 */
-		std::string getDescription() const { return (std::string)model; }
+		std::string GetDescription() const { return (std::string)model; }
 
 		/**
 		 * Returns the unit of the variable.
 		 */
-		std::string getUnit() const { return model.unit(); }
+		std::string GetUnit() const { return model.unit(); }
 
 		/**
 		 * Return true if the variable is time-varying.
@@ -182,12 +149,17 @@ class Variable : public Configurable<Model::Variable> {
 		/**
 		 * Fills VisIt's metadata handle with information related to the variable.
 		 */
-		bool exposeVisItMetaData(visit_handle md, int iteration);
+		bool ExposeVisItMetaData(visit_handle md, int iteration);
 
 		/**
 		 * Fills VisIt's data handle with the proper data.
 		 */
-		bool exposeVisItData(visit_handle *md, int source, int iteration, int block);
+		bool ExposeVisItData(visit_handle *md, int source, int iteration, int block);
+
+		/**
+		 * Fills a VisIt handle to expose the domain list.
+		 */
+		bool ExposeVisItDomainList(visit_handle *md, int iteration);
 
 	private:
 		/**
@@ -206,8 +178,11 @@ class Variable : public Configurable<Model::Variable> {
 		 * Allocates a Chunk of a given block id.
 		 * The current iteration and the source id are retrieved
 		 * from the Environment and Process classes.
+		 * Set blocking to true if you want to wait for free memory
+		 * to be available before returning. If set to false, this
+		 * function may fail because of not enough available memory.
 		 */
-		virtual Chunk* Allocate(int block);
+		virtual Chunk* Allocate(int block, bool blocking = false);
 
 		/**
 		 * Retrieves a Chunk from a memory pointer.
@@ -233,6 +208,16 @@ class Variable : public Configurable<Model::Variable> {
 		void ForEach(F& f, C& c);
 
 		/**
+		 * Returns an iterator to the list of stored chunks
+		 */
+		iterator Begin();
+
+		/**
+		 * Returns an iterator to the end of the stored chunks
+		 */
+		iterator End();
+
+		/**
 		 * Creates an instance of Variable if the provided model is consistant.
 		 */
 		static Variable* New(const Model::Variable& mdl, const std::string &name);
@@ -241,22 +226,26 @@ class Variable : public Configurable<Model::Variable> {
 template<typename F>
 void Variable::ForEach(F& f)
 {
-	ChunkIndex::iterator it = chunks.get<by_any>().begin();
-	ChunkIndex::iterator end = chunks.get<by_any>().end();
+	Variable::iterator it = chunks.begin();
+	Variable::iterator end = chunks.end();
 	while(it != end) {
-		f(it->get());
-		it++;
+		Variable::iterator copy = it;
+		f(it,end,it->get());
+		if(it == copy) it++;
 	}
 }
 
 template<typename F, typename C>
 void Variable::ForEach(F& f, C& c)
 {
-	ChunkIndex::iterator it = chunks.get<by_any>().begin();
-	ChunkIndex::iterator end = chunks.get<by_any>().end();
+	Variable::iterator it = chunks.begin();
+	Variable::iterator end = chunks.end();
 	while(it != end) {
 		if(c(it->get())) {
-			f(it->get());
+			Variable::iterator copy = it;
+			f(it,end,it->get());
+			if(it == copy) it++;
+		} else {
 			it++;
 		}
 	}

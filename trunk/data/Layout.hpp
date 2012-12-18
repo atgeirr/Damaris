@@ -54,33 +54,35 @@ class Layout {
 		/**
 		 * \brief Returns the name of the Layout.
 		 */
-		virtual const std::string& getName() const;
+		virtual const std::string& GetName() const
+		{ return name; }
 
 		/**
 		 * Returns the id of the Layout.
 		 */
-		virtual int getID() const;	
+		virtual int GetID() const
+		{ return id; }
 
 		/**
 		 * \return The type of the data. 
 		 */
-		virtual Model::Type getType() const = 0;
+		virtual Model::Type GetType() const = 0;
 		
 		/**
 		 * \return the number of dimensions. 
 		 */
-		virtual unsigned int getDimensions() const = 0;
+		virtual unsigned int GetDimensions() const = 0;
 
 		/**
 		 * \return the extent along a given dimension. 
 		 */
-		virtual size_t getExtentAlongDimension(unsigned int dim) const = 0;
+		virtual size_t GetExtentAlongDimension(unsigned int dim) const = 0;
 
 		/**
 		 * \return true if the Layout has unlimited dimension 
 		 *         (defined as "?" in the configuration file).
 		 */
-		virtual bool isUnlimited() const = 0;
+		virtual bool IsUnlimited() const = 0;
 
 		/**
 		 * Destructor.

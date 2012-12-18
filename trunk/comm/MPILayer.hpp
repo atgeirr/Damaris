@@ -27,7 +27,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <mpi.h>
 #include <list>
 #include <boost/shared_ptr.hpp>
-#include "core/Communication.hpp"
+#include "comm/Communication.hpp"
 
 namespace Damaris {
 

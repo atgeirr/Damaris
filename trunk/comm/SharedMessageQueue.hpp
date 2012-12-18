@@ -29,6 +29,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/interprocess/mapped_region.hpp>
 #include "xml/Model.hpp"
 #include "core/Debug.hpp"
+#include "comm/Channel.hpp"
 #include "memory/SharedMemory.hpp"
 
 using namespace boost::interprocess;
@@ -39,7 +40,7 @@ namespace Damaris {
 	 * of a shared memory segment. Access to the queue is handled by
 	 * posix mutexes.
 	 */
-	class SharedMessageQueue {
+	class SharedMessageQueue : public Channel {
 		private:
 			/**
 			 * The SharedMessageQueue::shm_queue_hdr is a header
@@ -54,6 +55,7 @@ namespace Damaris {
 				int sizeMsg; /*!< Size of each message. */
 				int head; /*!< Index of the head. */
 				int tail; /*!< Index of the tail. */
+				int numMsg; /*!< Number of messages. */
 
 				/**
 				 * Constructor.
@@ -62,22 +64,10 @@ namespace Damaris {
 				 */
 				shm_queue_hdr(int numItems, int sizeItems) : 
 					main_lock(), cond_recv(), cond_send(),
-					maxMsg(numItems), sizeMsg(sizeItems), head(0), tail(0)
+					maxMsg(numItems), sizeMsg(sizeItems), head(0), tail(0),
+					numMsg(0)
 				{
 				};
-
-				/**
-				 * Gets the current number of stored messages.
-				 * This function doesn't lock the queue so it has to be called
-				 * from another function that first lock it.
-				 */
-				int current_num_msg()
-				{
-					if(tail >= head)
-						return (tail - head);
-					else
-						return (tail + maxMsg - head);
-				}
 
 			} *shmq_hdr; /*!< Pointer to the header of the queue in shared memory. */
 			char* data; /*!< Pointer to the data region in shared memory. */
@@ -146,39 +136,39 @@ namespace Damaris {
 			/**
 			 * Sends a message. Blocks if the queue is full.
 			 */
-			virtual void send(const void* buffer);
+			virtual void Send(void* buffer);
 
 			/**
 			 * Try to send a message. Return false without blocking
 			 * if the queue is full.
 			 */
-			virtual bool trySend(const void* buffer);
+			virtual bool TrySend(void* buffer);
 
 			/**
 			 * Receives a message from the queue. Block if the queue
 			 * is empty.
 			 */
-  			virtual void receive(void* buffer, size_t buffer_size);
+  			virtual void Receive(void* buffer, size_t buffer_size);
   
 			/**
 			 * Try getting a message. Return false if the message queue is empty.
 			 */
-			virtual bool tryReceive(void *buffer, size_t buffer_size);
+			virtual bool TryReceive(void *buffer, size_t buffer_size);
   			
 			/**
 			 * Get the maximum number of messages that que queue can hold.
 			 */
-			virtual size_t getMaxMsg() const;
+			virtual size_t MaxMsg() const;
 
 			/**
 			 * Get the size of the messages that the queue holds.
 			 */
-  			virtual size_t getMaxMsgSize() const;
+  			virtual size_t MaxMsgSize() const;
 
 			/**
 			 * Get the current number of messages in the message queue.
 			 */
-  			virtual size_t getNumMsg();
+  			virtual size_t NumMsg();
 			
 			/**
 			 * Destructor. Will not remove the shared structures.

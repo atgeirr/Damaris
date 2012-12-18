@@ -60,14 +60,19 @@ namespace bp = boost::python;
 		PyChunk();
 
 		/**
-		 * \brief Get the iteration number of the chunk (call Chunk::getIteration).
+		 * \brief Get the iteration number of the chunk (call Chunk::GetIteration).
 		 */
 		int iteration() const;
 
 		/**
-		 * \brief Get the source of the chunk (call Chunk::getSource)
+		 * \brief Get the source of the chunk (call Chunk::GetSource)
 		 */
 		int source() const;
+
+		/**
+		 * \brief Get the block number of the chunk (call Chunk::GetBlock())
+		 */
+		int block() const;
 
 		/**
 		 * \brief Get the type (as a string) of the chunk.

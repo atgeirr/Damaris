@@ -16,9 +16,9 @@
  ********************************************************************/
 /**
  * \file StdAloneClient.hpp
- * \date February 2012
+ * \date November 2012
  * \author Matthieu Dorier
- * \version 0.5
+ * \version 0.7
  */
 #ifndef __DAMARIS_STDALONE_CLIENT_H
 #define __DAMARIS_STDALONE_CLIENT_H
@@ -58,56 +58,51 @@ namespace Damaris {
 		virtual int connect();
 
 		/**
-		 * \see Writer::write
+		 * \see Client::write
 		 */
-		virtual int write(const std::string & varname, int32_t iteration, 
-				const void* data, bool blocking = true);
+		virtual int write(const std::string & varname, 
+				const void* data, bool blocking = false);
 
 		/**
-		 * \see Writer::write_block
+		 * \see Client::write_block
 		 */
 		virtual int write_block(const std::string &varname,
-				int32_t iteration, int32_t block, const void* data,
+				int32_t block, const void* data,
 				bool blocking = false);
 
 		/**
-		 * \see Writer::chunk_write
+		 * \see Client::signal
 		 */
-		virtual int chunk_write(chunk_h chunkh, const std::string & varname, 
-				int32_t iteration, const void* data, bool blocking = true);		
-
-		/**
-		 * \see Writer::signal
-		 */
-		virtual int signal(const std::string & signame, int32_t iteration);
-
-		/**
-		 * \see Writer::alloc
-		 */
-		virtual void* alloc(const std::string & varname, int32_t iteration, bool blocking = true);
+		virtual int signal(const std::string & signame);
 
 		/** 
-		 * \see Writer::commit
+		 * \see Client::commit
 		 */
-		virtual int commit(const std::string & varname, int32_t iteration);
+		virtual int commit(const std::string & varname, int32_t iteration = -1);
 
 		/**
-		 * Sends a signal to the server to shut it down (all clients in node need
-		 * to call this function before the server is actually killed.
-		 * \return 0 in case of success, -1 in case of failure.
+		 * \see Client::commit_block
+		 */
+		virtual int commit_block(const std::string & varname, int32_t block,
+				int32_t iteration = -1);
+
+		/**
+		 * Overwrite the normal kill_server() function from Client,
+		 * since a StdAloneClient should ne be killed, but should terminate
+		 * itself normally.
 		 */
 		virtual int kill_server();
 
 		/**
 		 * \see Client::clean
 		 */
-		virtual int clean(int iteration);
+		virtual int clean();
 
 		/**
 		 * Indicates that the iteration has terminated, this will potentially
 		 * update connected backends such as VisIt.
 		 */
-		virtual int end_iteration(int iteration);
+		virtual int end_iteration();
 
 		/**
 		 * \brief Destructor.

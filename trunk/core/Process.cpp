@@ -42,16 +42,16 @@ namespace Damaris {
 
 	Process* Process::_instance = NULL;
 
-	void Process::initialize(const std::string &configfile, int32_t id)
+	void Process::Init(std::auto_ptr<Model::Simulation> mdl, int32_t id)
 	{
 		if(_instance != NULL) {
 			ERROR("Calling Process:initialize() twice");
 			return;
 		}
-		_instance = new Process(configfile,id);
+		_instance = new Process(mdl,id);
 	}
 
-	Process* Process::get()
+	Process* Process::Get()
 	{
 		if(_instance == NULL) {
 			ERROR("Calling Process::get() before Process::initialize()");
@@ -60,7 +60,7 @@ namespace Damaris {
 		return _instance;
 	}
 
-	bool Process::kill()
+	bool Process::Kill()
 	{
 		if(_instance == NULL) {
 			ERROR("Calling Process::kill() twice or on an empty instance");
@@ -71,17 +71,11 @@ namespace Damaris {
 		return true;
 	}
 	
-	void Process::init(const std::string &configfile, int32_t i)
+	Process::Process(std::auto_ptr<Model::Simulation> mdl, int32_t i)
 	{
 		DBG("Starting process initialization");
-		try {
-			model = Model::simulation(configfile.c_str(),
-						xml_schema::flags::dont_validate);
-		} catch(xml_schema::exception &e) {
-			ERROR(e.what());
-			exit(-1);
-		}
-	    id = i;
+		model = mdl;
+		id = i;
 
 #ifdef __ENABLE_PYTHON
 		if(model->python().present()) {
@@ -140,11 +134,6 @@ namespace Damaris {
 			ERROR("While initializing shared memory objects:  " << ex.what());
 			exit(-1);
 		}
-	}
-
-	Process::Process(const std::string & configfile, int32_t id)
-	{
-		init(configfile, id);
 	}
 
 	Process::~Process()

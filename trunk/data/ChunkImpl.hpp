@@ -68,52 +68,52 @@ namespace Damaris {
 			/**
 			 * \brief Gets the ID of the process that has written the chunk.
 			 */
-			virtual int getSource() const { return header->getSource(); }
+			virtual int GetSource() const { return header->GetSource(); }
 
 			/**
 			 * \brief Set the ID of the process that has written the chunk.
 			 */
-			virtual void setSource(int src) { header->setSource(src); }
+			virtual void SetSource(int src) { header->SetSource(src); }
 
 			/**
 			 * \brief Gets the iteration at which the chunk has been written.
 			 */
-			virtual int getIteration() const { return header->getIteration(); }
+			virtual int GetIteration() const { return header->GetIteration(); }
 
 			/**
 			 * \brief Set the iteration number.
 			 */
-			virtual void setIteration(int i) { header->setIteration(i); }
+			virtual void SetIteration(int i) { header->SetIteration(i); }
 
 			/**
 			 * \brief Get the ID of the block.
 			 */
-			virtual int getBlock() const { return header->getBlock(); }
+			virtual int GetBlock() const { return header->GetBlock(); }
 
 			/**
 			 * \brief Set the ID of the block.
 			 */
-			virtual void setBlock(int b) { header->setBlock(b); }
+			virtual void SetBlock(int b) { header->SetBlock(b); }
 
 			/**
 			 * \brief Gets the number of dimensions.
 			 */
-			virtual unsigned int getDimensions() const { return header->getDimensions(); }
+			virtual unsigned int GetDimensions() const { return header->GetDimensions(); }
 
 			/**
 			 * \brief Gets the type of data.
 			 */
-			virtual Model::Type getType() const { return header->getType(); }
+			virtual Model::Type GetType() const { return header->GetType(); }
 
 			/**
 			 * \brief Gets a start index.
 			 */
-			virtual int getStartIndex(int i) const { return header->getStartIndex(i); }
+			virtual int GetStartIndex(int i) const { return header->GetStartIndex(i); }
 
 			/**
 			 * \brief Gets an end index.
 			 */
-			virtual int getEndIndex(int i) const { return header->getEndIndex(i); }
+			virtual int GetEndIndex(int i) const { return header->GetEndIndex(i); }
 
 			/**
 			 * \brief Retrieves a pointer to the data.
@@ -127,7 +127,7 @@ namespace Damaris {
 			 *			Thus make sure there is always eventually exactly 
 			 *			one ShmChunk instance attached to a region which is owner of the data.
 			 */
-			void* data();
+			void* Data();
 
 			/**
 			 * Indicates whether or not this instance of chunk is responsible for deleting
@@ -151,7 +151,7 @@ namespace Damaris {
 			 * Returns a relative pointer (handle) to the memory region where the 
 			 * chunk is located. Warning: this handle points to the header, not the data.
 			 */
-			handle_t getHandle();
+			handle_t GetHandle();
 
 	}; // class ShmChunk
 

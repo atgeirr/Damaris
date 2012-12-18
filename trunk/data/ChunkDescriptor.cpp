@@ -55,10 +55,10 @@ namespace Damaris {
 
 	ChunkDescriptor::ChunkDescriptor(const Layout& l)
 	{
-		dimensions = l.getDimensions();
+		dimensions = l.GetDimensions();
 		for(int i = 0; i < (int)dimensions; i++ ) {
 			lbounds[i] = 0;
-			ubounds[i] = l.getExtentAlongDimension(i)-1;
+			ubounds[i] = l.GetExtentAlongDimension(i)-1;
 		}
 	}
 
@@ -71,7 +71,7 @@ namespace Damaris {
 		memcpy(ubounds,ch.ubounds,dimensions*sizeof(int));
 	}
 
-	size_t ChunkDescriptor::getDataMemoryLength(const Model::Type &type) const
+	size_t ChunkDescriptor::GetDataMemoryLength(const Model::Type &type) const
 	{
 		size_t result = 1;
 		result *= Types::basicTypeSize(type);
@@ -82,7 +82,7 @@ namespace Damaris {
 		return result;
 	}
 
-	int ChunkDescriptor::getStartIndex(int i) const 
+	int ChunkDescriptor::GetStartIndex(int i) const 
 	{
 		if(0 <= i && i < (int)dimensions)
 			return lbounds[i];
@@ -90,7 +90,7 @@ namespace Damaris {
 			return 0;
 	}
 
-	int ChunkDescriptor::getEndIndex(int i) const
+	int ChunkDescriptor::GetEndIndex(int i) const
 	{
 		if(0 <= i && i < (int)dimensions)
 			return ubounds[i];
@@ -98,15 +98,15 @@ namespace Damaris {
 			return 0;
 	}
 
-	bool ChunkDescriptor::within(const Layout& enclosing) const
+	bool ChunkDescriptor::Within(const Layout& enclosing) const
 	{
-		if(enclosing.isUnlimited()) return true;
+		if(enclosing.IsUnlimited()) return true;
 
-		bool b = (enclosing.getDimensions() == getDimensions());
+		bool b = (enclosing.GetDimensions() == GetDimensions());
 		if(b) {
-			for(unsigned int i=0; i < getDimensions();i++) {
-				b = b && (getStartIndex(i) >= 0);
-				b = b && (getEndIndex(i) < (int)enclosing.getExtentAlongDimension(i));
+			for(unsigned int i=0; i < GetDimensions();i++) {
+				b = b && (GetStartIndex(i) >= 0);
+				b = b && (GetEndIndex(i) < (int)enclosing.GetExtentAlongDimension(i));
 			}
 		}
 		return b;

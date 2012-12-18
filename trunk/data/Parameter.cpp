@@ -24,16 +24,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Damaris {
 
-const std::string& Parameter::getName() const
-{
-	return name;
-}
-
-int Parameter::getID() const
-{
-	return id;
-}
-
 Parameter* Parameter::New(const Model::Parameter& mdl, const std::string& name)
 {
 	try {
@@ -72,7 +62,7 @@ Parameter* Parameter::New(const Model::Parameter& mdl, const std::string& name)
 	return NULL;
 }
 
-int Parameter::toBuffer(void* b, unsigned int maxsize) const
+int Parameter::ToBuffer(void* b, unsigned int maxsize) const
 {
         size_t s1 = Types::basicTypeSize(model.type());
         size_t s = std::min(s1,(size_t)maxsize);
@@ -80,7 +70,7 @@ int Parameter::toBuffer(void* b, unsigned int maxsize) const
 	return s;
 }
 
-int Parameter::fromBuffer(const void* b, unsigned int maxsize) 
+int Parameter::FromBuffer(const void* b, unsigned int maxsize) 
 {
 	size_t s1 = Types::basicTypeSize(model.type());
         size_t s = std::min(s1,(size_t)maxsize);

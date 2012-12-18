@@ -54,37 +54,37 @@ namespace Damaris {
 			/**
 			 * \brief Gets the ID of the process that has written the chunk.
 			 */
-			virtual int getSource() const = 0;
+			virtual int GetSource() const = 0;
 
 			/**
 			 * \brief Set the ID of the process that has written the chunk.
 			 */
-			virtual void setSource(int src) = 0;
+			virtual void SetSource(int src) = 0;
 
 			/**
 			 * \brief Gets the iteration at which the chunk has been written.
 			 */
-			virtual int getIteration() const = 0;
+			virtual int GetIteration() const = 0;
 
 			/**
 			 * \brief Set the iteration number.
 			 */
-			virtual void setIteration(int i) = 0;
+			virtual void SetIteration(int i) = 0;
 
 			/**
 			 * \brief Get the ID of the block.
 			 */
-			virtual int getBlock() const = 0;
+			virtual int GetBlock() const = 0;
 
 			/**
 			 * \brief Set the ID of the block.
 			 */
-			virtual void setBlock(int b) = 0;
+			virtual void SetBlock(int b) = 0;
 
 			/**
 			 * \brief Returns a pointer over the actual data (to be overloaded in child classes).
 			 */
-			virtual void* data() = 0;
+			virtual void* Data() = 0;
 
 			/**
 			 * This function let the user decide wether this instance of Chunk
@@ -106,34 +106,34 @@ namespace Damaris {
 			/**
 			 * \brief Gets the number of dimensions.
 			 */
-			virtual unsigned int getDimensions() const = 0;
+			virtual unsigned int GetDimensions() const = 0;
 
 			/**
 			 * \brief Gets the type of data.
 			 */
-			virtual Model::Type getType() const = 0;
+			virtual Model::Type GetType() const = 0;
 
 			/**
 			 * \brief Gets a start index.
 			 */
-			virtual int getStartIndex(int i) const = 0;
+			virtual int GetStartIndex(int i) const = 0;
 
 			/**
 			 * \brief Gets an end index.
 			 */
-			virtual int getEndIndex(int i) const = 0;
+			virtual int GetEndIndex(int i) const = 0;
 
 			/**
 			 * \brief Check if the chunk is within an enclosing Layout.
 			 * Note: returns false if NULL is passed.
 			 */
-			bool within(const Layout& enclosing) const;
+			bool Within(const Layout& enclosing) const;
 
 			/**
 			 * \brief Check if the chunk is within an enclosing other Chunk.
 			 * Note: returns false if NULL is passed.
 			 */
-			bool within(const Chunk& enclosing) const;
+			bool Within(const Chunk& enclosing) const;
 
 			/**
 			 * Copy data from a pointer to the Chunk.
@@ -145,7 +145,7 @@ namespace Damaris {
 			 * Returns a handle to get the Chunk from the device
 			 * that stores it (typically a shared memory segment).
 			 */
-			virtual handle_t getHandle() = 0;
+			virtual handle_t GetHandle() = 0;
 #ifdef __ENABLE_VISIT
 			/**
 			 * Fills a VisIt data handle (already allocated) to expose the data

@@ -37,17 +37,15 @@ namespace Damaris {
 	}
 
 #ifdef __ENABLE_VISIT
-	bool RectilinearMesh::exposeVisItMetaData(visit_handle md, int iteration) const
+	bool RectilinearMesh::ExposeVisItMetaData(visit_handle md) const
 	{
 		visit_handle m1 = VISIT_INVALID_HANDLE;
 		if(VisIt_MeshMetaData_alloc(&m1) == VISIT_OKAY)
 		{
-			VisIt_MeshMetaData_setName(m1, getName().c_str());
+			VisIt_MeshMetaData_setName(m1, GetName().c_str());
 			VisIt_MeshMetaData_setMeshType(m1, VISIT_MESHTYPE_RECTILINEAR);
 			VisIt_MeshMetaData_setTopologicalDimension(m1, (int)model.topology());
 			VisIt_MeshMetaData_setSpatialDimension(m1, (int)model.coord().size());
-
-			int numBlocks = CountTotalBlocks(iteration);
 
 			{ // check that all the coordinates have the same layout
 				Model::Mesh::coord_const_iterator it(model.coord().begin());
@@ -79,6 +77,10 @@ namespace Damaris {
 				}
 			}
 
+			int nbrLocalBlocksPerClient = Environment::NumDomainsPerClient();
+			int nbrClients = Environment::CountTotalClients();
+			int numBlocks = nbrLocalBlocksPerClient*nbrClients;
+
 			VisIt_MeshMetaData_setNumDomains(m1,numBlocks);
 
 			Model::Mesh::coord_const_iterator it(model.coord().begin());
@@ -104,7 +106,7 @@ namespace Damaris {
 		return false;
 	}
 
-	bool RectilinearMesh::exposeVisItData(visit_handle* h, int source, int iteration, int block) const
+	bool RectilinearMesh::ExposeVisItData(visit_handle* h, int source, int iteration, int block) const
 	{
 		DBG("In RectilinearMesh::exposeVisItData");
 		// Allocates the VisIt handle
@@ -118,11 +120,11 @@ namespace Damaris {
 			vx = VariableManager::Search(it->name());
 			if(vx == NULL) {
 				CFGERROR("Undefined coordinate \""<< it->name() <<"\" for mesh \""
-						<< getName() << "\"");
+						<< GetName() << "\"");
 				return false;
 			}
-			if(vx->getLayout()->getDimensions() != 1) {
-				CFGERROR("Wrong number of dimensions for coordinate " << vx->getName());
+			if(vx->GetLayout()->GetDimensions() != 1) {
+				CFGERROR("Wrong number of dimensions for coordinate " << vx->GetName());
 				return false;
 			}
 			it++;
@@ -131,11 +133,11 @@ namespace Damaris {
 			vy = VariableManager::Search(it->name());
 			if(vy == NULL) {
 				CFGERROR("Undefined coordinate \""<< it->name() <<"\" for mesh \""
-						<< getName() << "\"");
+						<< GetName() << "\"");
 				return false;
 			}
-			if(vy->getLayout()->getDimensions() != 1) {
-				CFGERROR("Wrong number of dimensions for coordinate " << vy->getName());
+			if(vy->GetLayout()->GetDimensions() != 1) {
+				CFGERROR("Wrong number of dimensions for coordinate " << vy->GetName());
 				return false;
 			}
 			it++;
@@ -145,11 +147,11 @@ namespace Damaris {
 				vz = VariableManager::Search(it->name());
 				if(vz == NULL) {
 					ERROR("Undefined coordinate \""<< it->name() <<"\" for mesh \""
-							<< getName() << "\"");
+							<< GetName() << "\"");
 					return false;
 				}
-				if(vz->getLayout()->getDimensions() != 1) {
-					CFGERROR("Wrong number of dimensions for coordinate " << vz->getName());
+				if(vz->GetLayout()->GetDimensions() != 1) {
+					CFGERROR("Wrong number of dimensions for coordinate " << vz->GetName());
 					return false;
 				}
 			}
@@ -157,10 +159,7 @@ namespace Damaris {
 			// At this point, the 2 or 3 coordinate variables are found. 
 			// Now accessing the data.
 
-			//ChunkIndex::iterator end;
-
 			// Accessing chunk for X coordinate
-			//ChunkIndex::iterator c = vx->getChunks(source,iteration,end);
 			Chunk* c = vx->GetChunk(source,iteration,block);
 			if(c != NULL) {
 				if(VisIt_VariableData_alloc(&hxc) == VISIT_OKAY) {
@@ -170,8 +169,8 @@ namespace Damaris {
 					return false;
 				}
 			} else {
-				ERROR("Data unavailable for coordinate \"" << vx->getName() << "\""
-						<< " for iteration " << iteration << " and source " << source);
+				VisIt_RectilinearMesh_free(*h);
+				*h = VISIT_INVALID_HANDLE;
 				return false;
 			}
 
@@ -183,11 +182,14 @@ namespace Damaris {
 				} else {
 					ERROR("While allocating data handle");
 					VisIt_VariableData_free(hxc);
+					VisIt_RectilinearMesh_free(*h);
+					*h = VISIT_INVALID_HANDLE;
 					return false;
 				}
 			} else {
-				ERROR("Data unavailable for coordinate \"" << vy->getName() << "\"");
 				VisIt_VariableData_free(hxc);
+				VisIt_RectilinearMesh_free(*h);
+				*h = VISIT_INVALID_HANDLE;
 				return false;
 			}
 
@@ -201,12 +203,16 @@ namespace Damaris {
 						ERROR("While allocating data handle");
 						VisIt_VariableData_free(hxc);
 						VisIt_VariableData_free(hyc);
+						VisIt_RectilinearMesh_free(*h);
+						*h = VISIT_INVALID_HANDLE;
 						return false;
 					}
 				} else {
-					ERROR("Data unavailable for coordinate \"" << vz->getName() << "\"");
+					ERROR("Data unavailable for coordinate \"" << vz->GetName() << "\"");
 					VisIt_VariableData_free(hxc);
 					VisIt_VariableData_free(hyc);
+					VisIt_RectilinearMesh_free(*h);
+					*h = VISIT_INVALID_HANDLE;
 					return false;
 				}	
 			}

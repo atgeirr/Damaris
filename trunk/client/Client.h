@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Client.h
- * \date February 2012 
+ * \date November 2012 
  * \author Matthieu Dorier
- * \version 0.4
+ * \version 0.7
  * Main header to include in a C client.
  */
 #ifndef __DAMARIS_CLIENT_C_H
@@ -27,16 +27,14 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdlib.h>
 #include <mpi.h>
 
-typedef int64_t DC_chunk_handle_t;
-
 /**
  * \brief Initializes the client-side C library.
  * \see Damaris::Client::Client
+ * \param[in] comm : simulation's communicator.
  * \param[in] configfile : name of the XML configuration file.
- * \param[in] core_id : identifier for the client (should be unique).
  * \return 0 in case of success, forces the program to stop in case of failure.
  */
-int 	DC_initialize(const char* configfile, int32_t core_id);
+int 	DC_initialize(const char* configfile, MPI_Comm comm);
 
 /** 
  * \brief Writes a variable.
@@ -44,53 +42,46 @@ int 	DC_initialize(const char* configfile, int32_t core_id);
  * \param[in] varname : name of the variable to write.
  * \param[in] iteration : iteration at which the variable is written.
  * \param[in] data : pointer to the data to write.
- * \return 0 in case of success,
- *         -1 if the layout or the variable is not defined,
- *         -2 if the layout has a bad size (0 or < 0),
- *         -3 if it fails to allocate shared memory to write.
+ * \return the number of bytes witten in case of success,
+ *         -1 if the variable is unknown,
+ *         -2 if the memory allocation failed,
  */
-int 	DC_write(const char* varname, int32_t iteration, const void* data);
+int 	DC_write(const char* varname, const void* data);
 
 /**
- * \brief Writes a chunk of a variable.
- * \see Damaris::Client::chunk_write
+ * \see Damaris::Client::write_block
  */
-int 	DC_chunk_write(DC_chunk_handle_t chunkh, const char* varname, 
-		int32_t iteration, const void* data);
-
-/**
- * \brief Defines a chunk.
- * \see Damaris::Client::chunk_set
- */
-DC_chunk_handle_t DC_chunk_set(unsigned int dimensions, int* si, int* ei);
-
-/**
- * \brief Free a chunk handle.
- * \see Damaris::Client::chunk_free
- */
-void 	DC_chunk_free(DC_chunk_handle_t chunkh);
+int 	DC_write_block(const char* varname, int32_t block, const void* data);
 
 /**
  * \brief Allocates the data required for a variable to be entirely written in memory.
  * \return a pointer to the allocated region in case of success, NULL in case of failure.
  * \see Damaris::Client::alloc
  */
-void* 	DC_alloc(const char* varname, int32_t iteration);
+void* 	DC_alloc(const char* varname);
+
+/**
+ * \see Damaris::Client::alloc_block
+ */
+void*	DC_alloc_block(const char* varname, int32_t block);
 
 /**
  * \brief Commits an allocated variable.
  * \see Damaris::Client::commit
  */
-int 	DC_commit(const char* varname, int32_t iteration);
+int 	DC_commit(const char* varname);
+int 	DC_commit_block(const char* varname, int32_t block);
+int	DC_commit_iteration(const char* varname, int32_t iteration);
+int	DC_commit_block_iteration(const char* varname, int32_t block, int32_t iteration);
 
 /**
  * \brief Sends an event to the dedicated core.
  * \see Damaris::Client::signal
  * \param[in] signal_name : name of the event.
- * \param[in] iteration : iteration at which the event is sent.
- * \return 0 in case of success, -1 in case of failure.
+ * \return  0 in case of success, 
+	   -1 if the action name is unknown.
  */
-int 	DC_signal(const char* signal_name, int32_t iteration);
+int 	DC_signal(const char* signal_name);
 
 /**
  * \brief Retrieve the value associated to a parameter.
@@ -130,7 +121,7 @@ int	DC_kill_server();
  * Notifies the server that the iteration has ended.
  * This will update potential external backends such as VisIt.
  */
-int DC_end_iteration(int iteration);
+int 	DC_end_iteration();
 
 /**
  * \brief Call client's destructor.

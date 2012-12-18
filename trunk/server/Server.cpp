@@ -23,7 +23,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 #include <list>
 #include "core/Debug.hpp"
-#include "core/MPILayer.hpp"
 #include "data/ChunkImpl.hpp"
 #include "data/Layout.hpp"
 #include "core/ActionManager.hpp"
@@ -37,11 +36,12 @@ Damaris::Server *__server = NULL;
 
 namespace Damaris {
 
-Server* Server::New(const std::string& cfgfile, int32_t id)
+Server* Server::New(std::auto_ptr<Model::Simulation> mdl, int32_t id)
 {
-	Process::initialize(cfgfile,id);
-	Process* p = Process::get();
+	Process::Init(mdl,id);
+	Process* p = Process::Get();
 	p->createSharedStructures();
+	Environment::SetClient(false);
 	return new Server(p);
 }
 
@@ -52,14 +52,14 @@ Server::Server(Process* p)
 #ifdef __ENABLE_VISIT
 	visitMPIlayer = NULL;
 #endif
-	needStop = Environment::getClientsPerNode();
+	needStop = Environment::ClientsPerNode();
 }
 
 
 /* destructor */
 Server::~Server()
 {
-	Process::kill();
+	Process::Kill();
 	DBG("Process killed successfuly");
 #ifdef __ENABLE_VISIT
 	MPILayer<int>::Delete(visitMPIlayer);
@@ -75,10 +75,10 @@ int Server::run()
 #ifdef __ENABLE_VISIT
 	int vizstt;
 	if(process->getModel()->visit().present()) {
-		Viz::VisItListener::Init(Environment::getEntityComm(),
+		Viz::VisItListener::Init(Environment::GetEntityComm(),
 			process->getModel()->visit(),
-		Environment::getSimulationName());
-		visitMPIlayer = MPILayer<int>::New(Environment::getEntityComm());
+		Environment::SimulationName());
+		visitMPIlayer = MPILayer<int>::New(Environment::GetEntityComm());
 	}
 #endif
 	
@@ -87,7 +87,7 @@ int Server::run()
 
 	while(needStop > 0) {
 		// try receiving from the shared message queue
-		received = process->getSharedMessageQueue()->tryReceive(&msg,sizeof(Message));
+		received = process->getSharedMessageQueue()->TryReceive(&msg,sizeof(Message));
 		if(received) {
 			DBG("Received a message of type " << msg.type
 				<< " iteration is "<<msg.iteration
@@ -131,10 +131,9 @@ void Server::processMessage(const Message& msg)
 //		chunk->SetDataOwnership(true);
 		Variable* v = VariableManager::Search(object);
 		if(v != NULL) {
-			//v->attachChunk(chunk);
-			DBG("A");
+			DBG("Retrieving data for variable " << v->GetName() << " at iteration "
+			<< iteration << " from source " << source);
 			v->Retrieve(handle);
-			DBG("B");
 		} else {
 			// the variable is unknown, we are f....
 			ERROR("Server received data for an unknown variable entry."
@@ -163,15 +162,30 @@ void Server::processMessage(const Message& msg)
 
 void Server::processInternalSignal(int32_t object, int iteration, int source)
 {
+
+	static bool no_update = false;
+	static bool global_no_update = false;
+
 	switch(object) {
 	case CLIENT_CONNECTED:
 		Environment::AddConnectedClient(source);
 		break;
 	case END_ITERATION:
-		if(Environment::SetLastIteration(iteration)) {
+		if(Environment::StartNextIteration()) {
+			MPI_Allreduce(&no_update,&global_no_update,1,
+					MPI_BYTE,MPI_BOR, Environment::GetEntityComm());
+			no_update = false;	
 #ifdef __ENABLE_VISIT
-			Viz::VisItListener::Update();
+			if(not global_no_update) Viz::VisItListener::Update();
 #endif
+		}
+		break;
+	case END_ITERATION_NO_UPDATE:
+		no_update = true;
+		if(Environment::StartNextIteration()) {	
+			MPI_Allreduce(&no_update,&global_no_update,1,
+					MPI_BYTE,MPI_BOR, Environment::GetEntityComm());
+			no_update = false;
 		}
 		break;
 	case KILL_SERVER:

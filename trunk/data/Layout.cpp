@@ -33,16 +33,6 @@ namespace Damaris {
 	{
 	}
 	
-	const std::string& Layout::getName() const
-	{
-		return name;
-	}
-
-	int Layout::getID() const
-	{
-		return id;
-	}
-	
 	Layout::~Layout()
 	{
 	}

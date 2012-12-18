@@ -23,9 +23,9 @@ int client_code(int id)
 	}
 	}
 
-	DC_write(varname,step,mydata);
-	DC_signal(event,step);
-
+	DC_write(varname,mydata);
+	DC_signal(event);
+	DC_end_iteration();
 	}
 
 	return 0;

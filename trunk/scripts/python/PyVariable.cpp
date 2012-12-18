@@ -46,7 +46,7 @@ bp::list PyVariable::select(const bp::dict &args) const
 	bp::list result;
 	if(inner == NULL) return result;
 	// gets the iteration number
-	if(args.has_key("iteration")) {
+/*	if(args.has_key("iteration")) {
 		int iteration = bp::extract<int>(args["iteration"]);
 		if(args.has_key("source")) {
 			int source = bp::extract<int>(args["source"]);
@@ -85,7 +85,9 @@ bp::list PyVariable::select(const bp::dict &args) const
 				it++;
 			}
 		}
-	}
+	} */
+	// TODO
+	ERROR("This function is deprecated");
 	return result;
 }
 
@@ -96,40 +98,39 @@ bp::list PyVariable::chunks() const
 
 std::string PyVariable::name() const
 {
-	int last_slash = inner->getName().find_last_of('/');
+	int last_slash = inner->GetName().find_last_of('/');
 	if(last_slash == 0) last_slash = -1;
-	return inner->getName().substr(last_slash+1);
+	return inner->GetName().substr(last_slash+1);
 }
 
 std::string PyVariable::description() const
 {
-	return inner->getDescription();
+	return inner->GetDescription();
 }
 
 std::string PyVariable::unit() const
 {
-	return inner->getUnit();
+	return inner->GetUnit();
 }
 
 const std::string& PyVariable::fullname() const
 {
-	return inner->getName();
+	return inner->GetName();
 }
 
 PyLayout PyVariable::layout() const
 {
-	return PyLayout(inner->getLayout());
+	return PyLayout(inner->GetLayout());
 }
 
 bool PyVariable::remove(PyChunk& pc)
 {
-	inner->detachChunk(pc.inner);
-	return false;
+	return inner->DetachChunk(pc.inner);
 }
 
 void PyVariable::clear()
 {
-	inner->clear();
+	inner->ClearAll();
 }
 
 }

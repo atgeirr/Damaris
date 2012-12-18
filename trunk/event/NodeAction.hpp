@@ -61,15 +61,15 @@ class NodeAction : public BASE {
 		 * \param[in] sourceID : ID of the client that fired the action.
 		 * \see Damaris::Action::operator()
 		 */
-		virtual void call(int32_t iteration, int32_t sourceID, const char* args = NULL)
+		virtual void Call(int32_t iteration, int32_t sourceID, const char* args = NULL)
 		{
 			if(sourceID == -1) { // case of an external call
-				BASE::call(iteration,sourceID,args);
+				BASE::Call(iteration,sourceID,args);
 				return;
 			}
 
-			if(not Environment::hasServer()) { // if the environment doesn't have a server, we don't wait for other
-				BASE::call(iteration,sourceID,args);
+			if(not Environment::HasServer()) { // if the environment doesn't have a server, we don't wait for other
+				BASE::Call(iteration,sourceID,args);
 				return;
 			}
 
@@ -78,7 +78,7 @@ class NodeAction : public BASE {
 			DBG("lock is now " << locks[iteration] << "/" << clientsPerNode);
 			if(locks[iteration] == clientsPerNode) {
 				DBG("calling base action");
-				BASE::call(iteration,sourceID,args);
+				BASE::Call(iteration,sourceID,args);
 				locks.erase(iteration);
 			}
 		}

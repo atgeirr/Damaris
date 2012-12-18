@@ -4,7 +4,6 @@
 
 int main(int argc, char** argv) 
 {
-	int id = 0;
 	float mydata[64][16][4];
 	char* varname = "my group/my variable";
 	char* event = "my script";
@@ -14,7 +13,7 @@ int main(int argc, char** argv)
 		exit(0);
 	}
 
-	DC_initialize(argv[1],id);
+	DC_initialize(argv[1],MPI_COMM_WORLD);
 
 	int i,j,k;
 	for(i = 0; i < 64; i++) {
@@ -25,8 +24,9 @@ int main(int argc, char** argv)
 	}
 	}
 	
-	DC_write(varname,0,mydata);
-	DC_signal(event,0);
+	DC_write(varname,mydata);
+	DC_signal(event);
+	DC_end_iteration();
 
 	DC_finalize();
 	return 0;

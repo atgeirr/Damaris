@@ -46,7 +46,12 @@ MPI_Comm VisItListener::comm = MPI_COMM_NULL;
 void VisItListener::Init(MPI_Comm c, const Model::Simulation::visit_optional& mdl, 
 				const std::string& simname)
 {
-	if(mdl.present()) {
+	comm = c;
+	int rank, size;
+	MPI_Comm_rank(comm,&rank);
+	MPI_Comm_size(comm,&size);
+
+	if(mdl.present() && (rank == 0)) {
 		char* s;
 		if(mdl.get().path().present()) {
 			s = (char*)malloc(mdl.get().path().get().length()+1);
@@ -62,19 +67,22 @@ void VisItListener::Init(MPI_Comm c, const Model::Simulation::visit_optional& md
 		}
 	}
 	
-	VisItSetupEnvironment();
-	comm = c;
-
 	VisItSetBroadcastIntFunction(&BroadcastIntCallback);
 	VisItSetBroadcastStringFunction(&BroadcastStringCallback);
-
-	int rank, size;
-	MPI_Comm_rank(comm,&rank);
-	MPI_Comm_size(comm,&size);
+	VisItSetBroadcastIntFunction2(&BroadcastIntCallback2,NULL);
+	VisItSetBroadcastStringFunction2(&BroadcastStringCallback2,NULL);
 
 	VisItSetParallel(size > 1);
 	VisItSetParallelRank(rank);
 	VisItSetMPICommunicator(&comm);
+
+	char* env = NULL;
+	if(rank == 0) {
+		env = VisItGetEnvironment();
+	}
+	VisItSetupEnvironment2(env);
+	free(env);
+
 	if(rank == 0) {
 		VisItInitializeSocketAndDumpSimFile(simname.c_str(),"", "", NULL, NULL, NULL);
 	}
@@ -87,7 +95,7 @@ int VisItListener::Connected()
 	if(visitstate >= -5 && visitstate <= -1) {
 		ERROR("Uncaught VisIt error");
 	} else if(visitstate == 1) {
-		INFO("VisIt first attempt to connect");
+		DBG("VisIt first attempt to connect");
 	}
 	return visitstate;
 }
@@ -95,11 +103,11 @@ int VisItListener::Connected()
 int VisItListener::EnterSyncSection(int visitstate)
 {
 	DBG("Entering Sync Section, visit state is " << visitstate);
-	sim.iteration = Environment::GetLastIteration();
+	sim.iteration = Environment::GetLastIteration()-1;
 	switch(visitstate) {
 		case 1:
 			if(VisItAttemptToCompleteConnection() == VISIT_OKAY) {
-				INFO("VisIt connected");
+				DBG("VisIt connected");
 				VisItSetActivateTimestep(&VisItListener::TimeStepCallback,(void*)(&sim));
 				VisItSetSlaveProcessCallback(&VisItListener::SlaveProcessCallback);	
 				VisItSetGetMetaData(&VisItListener::GetMetaData,(void*)(&sim));
@@ -108,7 +116,7 @@ int VisItListener::EnterSyncSection(int visitstate)
 				VisItSetGetDomainList(&VisItListener::GetDomainList,(void*)(&sim));
 				VisItSetCommandCallback(&VisItListener::ControlCommandCallback,(void*)(&sim));
 			} else {
-				INFO("VisIt did not connect");
+				ERROR("VisIt did not connect");
 			}
 			break;
 		case 2:
@@ -122,15 +130,15 @@ int VisItListener::EnterSyncSection(int visitstate)
 
 int VisItListener::Update()
 {
-	sim.iteration = Environment::GetLastIteration();
+	sim.iteration = Environment::GetLastIteration()-1;
 	VisItTimeStepChanged();
 	VisItUpdatePlots();
 	return 0;
 }
 
-int VisItListener::TimeStepCallback(void* cbdata)
+int VisItListener::TimeStepCallback(void* cbdata __attribute__((unused)))
 {
-	INFO("Inside TimeStepCallBack");
+	DBG("Inside TimeStepCallBack");
 	//VariableManager::ForEach
 	return VISIT_OKAY;
 }
@@ -189,7 +197,19 @@ int VisItListener::BroadcastIntCallback(int *value, int sender)
 	return MPI_Bcast(value, 1, MPI_INT, sender, comm);
 }
 
+int VisItListener::BroadcastIntCallback2(int *value, int sender, 
+		void* s __attribute__((unused)))
+{
+	return MPI_Bcast(value, 1, MPI_INT, sender, comm);
+}
+
 int VisItListener::BroadcastStringCallback(char *str, int len, int sender)
+{
+	return MPI_Bcast(str, len, MPI_CHAR, sender, comm);
+}
+
+int VisItListener::BroadcastStringCallback2(char *str, int len, int sender, 
+		void* s __attribute__((unused)))
 {
 	return MPI_Bcast(str, len, MPI_CHAR, sender, comm);
 }
@@ -208,7 +228,7 @@ void VisItListener::ControlCommandCallback(const char *cmd, const char *args, vo
 		ERROR("Triggering an action not externally visible: \"" << cmd << "\"");
 		return;
 	}
-	a->call(sim->iteration,-1,args);
+	a->Call(sim->iteration,-1,args);
 }
 
 visit_handle VisItListener::GetMetaData(void *cbdata)
@@ -226,7 +246,7 @@ visit_handle VisItListener::GetMetaData(void *cbdata)
 			MeshManager::iterator mesh = MeshManager::Begin();
 			MeshManager::iterator end = MeshManager::End();
 			while(mesh != end) {
-				(*mesh)->exposeVisItMetaData(md,s->iteration);
+				(*mesh)->ExposeVisItMetaData(md);
 				mesh++;
 			}
 		}
@@ -237,7 +257,7 @@ visit_handle VisItListener::GetMetaData(void *cbdata)
 			VariableManager::iterator var = VariableManager::Begin();
 			VariableManager::iterator end = VariableManager::End();
 			while(var != end) {
-				(*var)->exposeVisItMetaData(md,s->iteration);
+				(*var)->ExposeVisItMetaData(md,s->iteration);
 				var++;
 			}
 		}
@@ -248,7 +268,7 @@ visit_handle VisItListener::GetMetaData(void *cbdata)
 			ActionManager::iterator act = ActionManager::Begin();
 			ActionManager::iterator end = ActionManager::End();
 			while(act != end) {
-				(*act)->exposeVisItMetaData(md,s->iteration);
+				(*act)->ExposeVisItMetaData(md);
 				act++;
 			}
 		}
@@ -267,15 +287,12 @@ visit_handle VisItListener::GetMesh(int domain, const char *name, void *cbdata)
 		DBG("Mesh found, exposing data, iteration is " << s->iteration);
 		
 		std::list<int> clients = Environment::GetKnownLocalClients();
-		int nbrLocalClients = Environment::CountLocalClients();
-		int nbrLocalBlocks = m->CountLocalBlocks(s->iteration);
-		// TODO : here we assume each client sent the same number of blocks
-		int nbrLocalBlocksPerClient = nbrLocalBlocks/nbrLocalClients;
+		int nbrLocalBlocksPerClient = Environment::NumDomainsPerClient();
 
 		int source = domain / nbrLocalBlocksPerClient;
 		int block = domain % nbrLocalBlocksPerClient;
 
-		m->exposeVisItData(&h,source,s->iteration,block);
+		m->ExposeVisItData(&h,source,s->iteration,block);
 	}	
 	return h;	
 }
@@ -289,64 +306,57 @@ visit_handle VisItListener::GetVariable(int domain, const char *name, void *cbda
 	visit_handle h = VISIT_INVALID_HANDLE;
 	if(v != NULL) {
 		std::list<int> clients = Environment::GetKnownLocalClients();
-		int nbrLocalClients = Environment::CountLocalClients();
-		int nbrLocalBlocks = v->CountLocalBlocks(s->iteration);
-		int nbrLocalBlocksPerClient = nbrLocalBlocks/nbrLocalClients;
+		int nbrLocalBlocksPerClient = Environment::NumDomainsPerClient();
 
 		int source = domain / nbrLocalBlocksPerClient;
 		int block = domain % nbrLocalBlocksPerClient;
 
-		v->exposeVisItData(&h,source,s->iteration,block);
+		v->ExposeVisItData(&h,source,s->iteration,block);
 	} else {
 		ERROR("Variable not found: \"" << name << "\"");
 	}
 	return h;
 }
 
-visit_handle VisItListener::GetDomainList(const char* name, void* cbdata)
+visit_handle VisItListener::GetDomainList(const char* /*name*/, void* /*cbdata*/)
 {
-	Variable* var = VariableManager::Search(std::string(name));
-	if(var == NULL) {
-		ERROR("VisIt requested domain list for an unknown variable");
-		return VISIT_INVALID_HANDLE;
-	}
-	
-	SimData *s = (SimData*)cbdata;
 	visit_handle h = VISIT_INVALID_HANDLE;
-
+	
 	if(VisIt_DomainList_alloc(&h) != VISIT_ERROR)
 	{
 		visit_handle hdl;
 		int *iptr = NULL;
 
 		std::list<int> clients = Environment::GetKnownLocalClients();
-		int nbrLocalClients = Environment::CountLocalClients();
-		int nbrLocalBlocks = var->CountLocalBlocks(s->iteration);
-		int nbrLocalBlocksPerClient = nbrLocalBlocks/nbrLocalClients;
+		int nbrLocalClients = Environment::HasServer() ? Environment::ClientsPerNode() : 1;
+		int nbrLocalBlocksPerClient = Environment::NumDomainsPerClient();
+		int nbrLocalBlocks = nbrLocalClients*nbrLocalBlocksPerClient;
 		int ttlClients = Environment::CountTotalClients();
 		int ttlBlocks = ttlClients*nbrLocalBlocksPerClient;
-
-		DBG("nbrClients = " << nbrClients << " ttlClients = " << ttlClients);
 
 		std::list<int>::const_iterator it = clients.begin();
 		iptr = (int *)malloc(sizeof(int)*nbrLocalBlocks);
 		for(int i = 0; i < nbrLocalClients; i++) {
 			for(int j = 0; j < nbrLocalBlocksPerClient; j++) {
-				iptr[i] = (*it)*nbrLocalBlocksPerClient + j;
+				iptr[i*nbrLocalBlocksPerClient+j] 
+					= (*it)*nbrLocalBlocksPerClient + j;
 			}
 			it++;
 		}
 
 		if(VisIt_VariableData_alloc(&hdl) == VISIT_OKAY)
 		{
-			VisIt_VariableData_setDataI(hdl, VISIT_OWNER_VISIT, 1, nbrLocalBlocks, iptr);
+			VisIt_VariableData_setDataI(hdl, VISIT_OWNER_VISIT, 1,
+					nbrLocalBlocks, iptr);
+			DBG(nbrLocalBlocks);
 			VisIt_DomainList_setDomains(h, ttlBlocks, hdl);
+			DBG(ttlBlocks);
 		} else {
 			free(iptr);
+			return VISIT_INVALID_HANDLE;
 		}
 	}
 	return h;
 }
-
 }
 }

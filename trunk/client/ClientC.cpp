@@ -16,13 +16,14 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file ClientC.cpp
- * \date February 2012
+ * \date November 2012
  * \author Matthieu Dorier
- * \version 0.4
+ * \version 0.7
  * \see Client.hpp Client.h
  * Definition of the client function used in the C binding.
  */
 #include "client/Client.hpp"
+#include "xml/BcastXML.hpp"
 
 extern "C" {
 
@@ -30,54 +31,67 @@ extern "C" {
 
 extern Damaris::Client *__client;
 
-int DC_initialize(const char* configfile, int32_t core_id)
+int DC_initialize(const char* configfile, MPI_Comm comm)
 {
 	std::string config_str(configfile);
-	__client = Damaris::Client::New(config_str,core_id);
+	std::auto_ptr<Damaris::Model::Simulation> mdl
+		= Damaris::Model::BcastXML(comm,config_str);
+	__client = Damaris::Client::New(mdl,comm);
 	return 0;
 }
-	
-int DC_write(const char* varname, int32_t iteration, const void* data)
+
+int DC_write(const char* varname, const void* data)
 {
 	std::string varname_str(varname);
-	return __client->write(varname_str,iteration,data);
+	return __client->write(varname_str,data);
 }
 
-int DC_chunk_write(DC_chunk_handle_t chunkh, const char* varname, 
-		int32_t iteration, const void* data)
+int DC_write_block(const char* varname, int32_t block, const void* data)
 {
 	std::string varname_str(varname);
-	return __client->chunk_write((Damaris::chunk_h)chunkh,varname_str,iteration,data);
+	return __client->write_block(varname_str,block,data);
 }
 
-DC_chunk_handle_t DC_chunk_set(unsigned int dimensions, int* si, int* ei)
-{
-	std::vector<int> sti(si,si+dimensions);
-	std::vector<int> eni(ei,ei+dimensions);
-	return (DC_chunk_handle_t)__client->chunk_set(dimensions,sti,eni);
-}
-
-void DC_chunk_free(DC_chunk_handle_t chunkh)
-{
-	__client->chunk_free((Damaris::chunk_h)chunkh);
-}
-
-void* DC_alloc(const char* varname, int32_t iteration)
+void* DC_alloc(const char* varname)
 {
 	std::string varname_str(varname);
-	return __client->alloc(varname_str,iteration);
+	return __client->alloc(varname_str);
 }
 
-int DC_commit(const char* varname, int32_t iteration)
+void* DC_alloc_block(const char* varname, int32_t block)
+{
+	std::string varname_str(varname);
+	return __client->alloc_block(varname_str,block);
+}
+
+int DC_commit(const char* varname)
+{
+	std::string varname_str(varname);
+	return __client->commit(varname_str);
+}
+
+int DC_commit_block(const char* varname, int32_t block)
+{
+	std::string varname_str(varname);
+	return __client->commit_block(varname_str,block);
+}
+
+int DC_commit_iteration(const char* varname, int32_t iteration)
 {
 	std::string varname_str(varname);
 	return __client->commit(varname_str,iteration);
 }
 
-int DC_signal(const char* signal_name, int32_t iteration)
+int DC_commit_block_iteration(const char* varname, int32_t block, int32_t iteration)
+{
+	std::string varname_str(varname);
+	return __client->commit_block(varname_str,block,iteration);
+}
+
+int DC_signal(const char* signal_name)
 {
 	std::string signal_name_str(signal_name);
-	return __client->signal(signal_name_str,iteration);
+	return __client->signal(signal_name_str);
 }
 
 int DC_parameter_get(const char* param_name, void* buffer, unsigned int size)
@@ -102,9 +116,9 @@ int DC_kill_server()
 	return __client->kill_server();
 }
 
-int DC_end_iteration(int i)
+int DC_end_iteration()
 {
-	return __client->end_iteration(i);
+	return __client->end_iteration();
 }
 
 int DC_finalize()

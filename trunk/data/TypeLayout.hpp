@@ -48,23 +48,23 @@ class TypeLayout : public Layout, public Configurable<Model::Type> {
 		/**
 		 * \return The type of the data. 
 		 */
-		virtual Model::Type getType() const;
+		virtual Model::Type GetType() const;
 		
 		/**
 		 * \return the number of dimensions. 
 		 */
-		virtual unsigned int getDimensions() const;
+		virtual unsigned int GetDimensions() const;
 
 		/**
 		 * \return the extent along a given dimension. 
 		 */
-		virtual size_t getExtentAlongDimension(unsigned int dim) const;
+		virtual size_t GetExtentAlongDimension(unsigned int dim) const;
 
 		/**
 		 * \return true if the Layout has unlimited dimension 
 		 *         (defined as "?" in the configuration file).
 		 */
-		virtual bool isUnlimited() const;
+		virtual bool IsUnlimited() const;
 
 		/**
 		 * Tries to create a new Layout from a model and a name.

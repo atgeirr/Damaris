@@ -9,34 +9,28 @@ struct iteration_eraser {
 	static int iteration;
 
 	static bool condition(Chunk* c) {
-		return c->getIteration() == iteration;
+		return c->GetIteration() == iteration;
 	}
 	
-	static void erase(Chunk *c) {
-		var->DetachChunk(c);
+	static void erase(Variable::iterator& it, const Variable::iterator& /*end*/, Chunk* /*c*/) {
+		it = var->DetachChunk(it);
 	}
 };
 
+Variable* iteration_eraser::var = NULL;
+int iteration_eraser::iteration = 0;
+
 extern "C" {
 
-void internal_gc(const std::string& event, int32_t step, int32_t src)
+void clean(const std::string& /*event*/, int32_t step, int32_t /*src*/)
 {
-//	int x = 0;
-	Variable* v = VariableManager::Search("life/cells");
+	Variable* v = VariableManager::Search("space");
 	if(v != NULL) {
-		//ChunkIndexByIteration::iterator end;
-		//ChunkIndexByIteration::iterator c = v->getChunksByIteration(step, end);
-		//while(c != end) {
-		//	v->DetachChunk(c->get());
-		//	x++;
-		//	c++;
-		//}
 		iteration_eraser::var = v;
-		iteration_eraser::iteration = step;
+		iteration_eraser::iteration = step-2;
 		v->ForEach(iteration_eraser::erase,
 				iteration_eraser::condition);
 	}
-//	INFO("successfully deleted " << x << " chunks");
 }
 
 }

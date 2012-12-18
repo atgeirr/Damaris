@@ -2,7 +2,7 @@
 #include <mpi.h>
 #include "include/Damaris.hpp"
 
-void hello(const std::string& name, int32_t source, int32_t iteration, const char* args)
+void hello(const std::string& name, int32_t /*source*/, int32_t /*iteration*/, const char* /*args*/)
 {
 	std::cout << "Hello world triggered by event \"" << name << "\"" << std::endl;
 } 
@@ -27,7 +27,8 @@ int main(int argc, char** argv)
 		MPI_Comm_rank(clients,&rank);
 		MPI_Comm_size(clients,&size);
 		
-		DC_signal("my event",0);
+		DC_signal("my event");
+		DC_end_iteration();
 
 		DC_kill_server();
 		MPI_Barrier(clients);
