@@ -16,3 +16,7 @@ target_link_libraries (julia_alloc_cpp ${CLIENT_SIDE_LIBRARIES})
 add_executable (julia_mpi_cpp ${DAMARIS_SOURCE_DIR}/test/julia_mpi.cpp)
 target_link_libraries (julia_mpi_cpp ${EMB_SERVER_LIBRARIES})
 set_target_properties (julia_mpi_cpp PROPERTIES LINK_FLAGS "-Wl,-export-dynamic")
+
+#add_executable (test_asio ${DAMARIS_SOURCE_DIR}/test/test_asio.cpp)
+#target_link_libraries (test_asio ${EMB_SERVER_LIBRARIES})
+#set_target_properties (test_asio PROPERTIES LINK_FLAGS "-Wl,-export-dynamic")

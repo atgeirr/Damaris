@@ -172,6 +172,7 @@ void Server::processInternalSignal(int32_t object, int iteration, int source)
 		break;
 	case END_ITERATION:
 		if(Environment::StartNextIteration()) {
+			INFO("Starting new iteration");
 			MPI_Allreduce(&no_update,&global_no_update,1,
 					MPI_BYTE,MPI_BOR, Environment::GetEntityComm());
 			no_update = false;	
@@ -182,7 +183,8 @@ void Server::processInternalSignal(int32_t object, int iteration, int source)
 		break;
 	case END_ITERATION_NO_UPDATE:
 		no_update = true;
-		if(Environment::StartNextIteration()) {	
+		if(Environment::StartNextIteration()) {
+			INFO("Starting new iteration");
 			MPI_Allreduce(&no_update,&global_no_update,1,
 					MPI_BYTE,MPI_BOR, Environment::GetEntityComm());
 			no_update = false;

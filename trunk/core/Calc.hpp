@@ -60,10 +60,10 @@ struct Calc : qi::grammar<Iterator, std::vector<int>(), ascii::space_type>
 			qi::_1_type _1;
 			qi::uint_type uint_;
 
-			qmark   = qi::char_('?')[qi::_val = -1];
+			//qmark   = qi::char_('?')[qi::_val = -1];
 
-			list_expr = qmark 
-						| (expression % ',');
+			list_expr = //qmark | 
+					(expression % ',');
 
 			expression =
 					term                            [_val = _1]
@@ -96,7 +96,7 @@ struct Calc : qi::grammar<Iterator, std::vector<int>(), ascii::space_type>
 		qi::rule<Iterator, int(), ascii::space_type> expression, term, factor;
 		qi::rule<Iterator, int(SymTable), ascii::space_type> value;
 		qi::rule<Iterator, std::vector<int>(), ascii::space_type> list_expr;
-		qi::rule<Iterator, int(), ascii::space_type> qmark;
+		//qi::rule<Iterator, int(), ascii::space_type> qmark;
 };
 
 }
