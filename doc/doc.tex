@@ -71,10 +71,10 @@
 
 \title{\Huge{ 
 	 Getting Started with \Damaris{}} \\
-	\normalsize{} version 0.6}
+	\normalsize{} version 0.7}
 
 \author{\textbf{Matthieu Dorier}}
-\date{August 2012}
+\date{December 2012}
 \maketitle
 
 \setcounter{tocdepth}{1}
@@ -152,7 +152,7 @@ make install
 
 \subsection{Boost}
 
-Download Boost (version 1.49 or higher). Configure and compile it:
+Download Boost (version 1.51 or higher). Configure and compile it:
 
 \begin{verbatim}
 ./bootstrap.sh --prefix=$HOME/local --with-python-root=$HOME/local \
@@ -199,8 +199,8 @@ You're done!
    Line & Variable & Content \\
    \hline
    \hline
-   13 &  & Name of the C MPI compiler. \\
-   14 &  & Name of the C++ MPI compiler. \\
+   13 &  & Name of the C++ MPI compiler. \\
+   14 &  & Name of the C MPI compiler. \\
    15 &  & Name of the Fortran MPI compiler (uncomment if needed). \\
    27 & EXTERNAL\_ROOT & Prefix path where dependencies have been installed. \\
    47 & BGP & Uncomment if you run on BlueGene/P. \\
@@ -292,16 +292,22 @@ Listings~\ref{InitAndFinitC} and~\ref{InitAndFinitF90} present the minimal code 
 for a C and a Fortran code respectively. All \Damaris{} function calls must be placed after a first call to the
 \function{DC\_initialize} function (resp. \function{df\_initialize} in Fortran). This function
 takes as parameter an XML configuration file 
-and a process rank. The user should make sure that each client process provides a unique rank, 
-its MPI rank in the MPI\_COMM\_WORLD communicator in MPI applications.
-The call to \function{DC\_initialize} should be placed after the MPI initialization.
+and a MPI communicator.
+The call to \function{DC\_initialize} should be placed after the MPI initialization, as it uses
+MPI functions. \function{DC\_initialize} involves collective MPI communications: process 0 in
+the provided communicator will load the XML file and broadcast its content to other processes
+in the communicator, thus all the processes in the involved communicator should call this function.
 
 Symmetrically a call
 to \function{DC\_finalize} (resp. \function{df\_finalize}) ends all interactions with \Damaris{} before
 the simulation finishes. Inside the simulation's main loop, a call to \function{DC\_end\_iteration}
-(reps. \function{df\_end\_iteration}) will inform the dedicated cores that the iteration $i$ has finished.
-This will update potential backends such as VisIt, and give more information to \Damaris{} about
-the average durations of an iteration.
+(reps. \function{df\_end\_iteration}) will inform the dedicated cores that the current iteration has finished.
+\Damaris{} keeps track of the iteration number internally: this number before the first call
+to \function{DC\_end\_iteration} is 0.
+A call to \function{DC\_end\_iteration} will update potential backends such as VisIt, 
+and give more information to \Damaris{} about the average durations of an iteration.
+As it involves collective communications in the dedicated cores, all the clients have to call
+this function.
 These three main functions are summarized in Table~\ref{tab:initFunctions}.
 
 \begin{table}
@@ -311,16 +317,16 @@ These three main functions are summarized in Table~\ref{tab:initFunctions}.
    \textbf{C functions} \\
    \hline
    \hline
-   \function{int DC\_initialize(char* configfile, int rank)}  \\
-   \function{int DC\_end\_iteration(int iteration)}  \\
+   \function{int DC\_initialize(char* configfile, MPI\_Comm comm)}  \\
+   \function{int DC\_end\_iteration()}  \\
    \function{int DC\_finalize()} \\
    \hline
    \hline
    \textbf{Fortran functions} \\
    \hline
    \hline
-   \function{df\_initialize(character* configfile, integer rank, integer ierr)} \\
-   \function{df\_end\_iteration(integer iteration, integer ierr)} \\
+   \function{df\_initialize(character* configfile, MPI\_Fint comm, integer ierr)} \\
+   \function{df\_end\_iteration(integer ierr)} \\
    \function{df\_finalize(integer ierr)} \\
    \hline
 \end{tabular}\caption{Main \Damaris{} functions}\label{tab:initFunctions}
@@ -338,7 +344,7 @@ These three main functions are summarized in Table~\ref{tab:initFunctions}.
 
 \textbf{Note:} \Damaris{} is not thread-safe yet. If your application uses an hybrid model
 where different threads run on the same node, only one call to \function{DC\_initialize} should be
-made and all the threads one a node should act as one single client (the XML configuration file
+made and all the threads on a node should act as one single client (the XML configuration file
 should also reflect this situation by setting the clients count accordingly).
 
 \subsubsection{Compiling}
@@ -349,7 +355,7 @@ provided, as well as the dependencies headers. The following options must be pas
 \begin{verbatim}
 -I/path/to/damaris -I/path/to/dependencies/include
 \end{verbatim}
-Fortran program do not need any headers for now.
+Fortran program do not need any headers.
 The linker will need the client library file \file{libdamaris.a} as well as other dependent libraries.
 The following provides the necessary options for the linker:
 \begin{verbatim}
@@ -365,7 +371,8 @@ The following provides the necessary options for the linker:
 
 The \texttt{-rdynamic} option instructs the linker to add all symbols, not only used ones, 
 to the dynamic symbol table. 
-This option is needed for some uses of dlopen in \Damaris{}.
+This option is needed for some uses of dlopen in \Damaris{}. It is possible that the option
+differs on some linkers.
 Remove the Python-related dependencies if you didn't enabled the Python support.
 Remove the simV2 line if you didn't enabled the VisIt support.
 
@@ -402,7 +409,8 @@ on the same node! \Damaris{} is not yet able to handle multiple dedicated cores.
 When killing the servers, MPI implementations usually send a kill -9 signal, which cannot be caught by
 the servers. Thus, it may happen that shared memory objects remain opened and you have to delete them
 manually (by deleting the corresponding files in /dev/shm for POSIX shared memory, or using ipcrm for
-SYS-V shared memory).
+SYS-V shared memory). Many platforms automatically clean resources allocated by the user's program
+such as shared memory objects.
 
 \clearpage
 \subsection{Integration in an MPI application}
@@ -413,9 +421,9 @@ An easier way of deploying an application using \Damaris{} consists in embedding
 directly within the simulation. Listings~\ref{InitMPIC} and \ref{InitMPIF90} show how to instrument
 the code for this purpose.
 
-The main different with the decoupled version is the use of \function{DC\_mpi\_init\_and\_start} instead of
+The main difference with the decoupled version is the use of \function{DC\_mpi\_init\_and\_start} instead of
 \function{DC\_initialize}. This function takes a communicator (typically MPI\_COMM\_WORLD)
-and splits it such that the lower rank on each node runs the server. Therefor, this
+and splits it such that the lowest rank on each node runs the server. Therefor, this
 function does not returns for these ranks. It returns 1 for client processes, which enter the \emph{if}
 statement. Clients then have to get back a valid communicator to communicate between each other.
 This is possible thanks to the \function{DC\_mpi\_get\_client\_comm}.
@@ -455,15 +463,16 @@ The \Damaris{} library will take care of starting one server per node. This time
 contain each hostname as many times as the number of cores in a node.
 
 \textbf{Note:} \Damaris{} doesn't use any a priori knowledge about rank-to-cores binding and is able
-to start one server per node even if process ranks are not consecutive in the node.
+to start one server per node even if process ranks are not consecutive in the node. It leverages the processor's
+name to group processes, or platform specific information such as the host's personality on BG/P.
 
 %==============================================================================%
 %==============================================================================%
 \section{Describing and Writing data}
 
-Now that we have a working simulation instrumented with \Damaris{}, it's time to write data.
+Now that we have a working simulation instrumented with \Damaris{}, it is time to write data.
 This section explains how to describe data in the XML file and how to send it to the dedicated cores.
-All the data items must be describes in the XML configuration within the \texttt{<data>} section.
+All the data items must be described in the XML configuration within the \texttt{<data>} section.
 
 \subsection{Parameters}
 
@@ -488,7 +497,7 @@ Appendix~\ref{sec:types}. The provided \texttt{value} must be acceptable for the
 
 Listing~\ref{parameterC} and~\ref{parameterF} show how to get and set parameters at run time
 from the simulation. \textbf{Note:} when a process modifies a parameter, this modification is local and
-not visible to other processes or to dedicated cores. The use is responsible for synchronizing all
+not visible to other processes or to dedicated cores. The user is responsible for synchronizing all
 processes when a parameter has to be globally changed.
 
 \noindent\begin{minipage}{\textwidth}
@@ -508,7 +517,7 @@ processes when a parameter has to be globally changed.
 Layouts describe the shape of the data. \Damaris{} separates this description from the description
 of the variables themselves since several variables can have the same layout.
 A layout is characterized by a \texttt{name}, a basic \texttt{type} and a list of \texttt{dimensions}.
-Three examples are given in Listing~\ref{layoutXML}. These descriptions
+Two examples are given in Listing~\ref{layoutXML}. These descriptions
 must be placed at the root of the \texttt{<data>} section, not in a nested group.
 
 The \texttt{name} of a layout can be any string (may include special characters, white spaces, numbers, etc. even
@@ -516,14 +525,9 @@ though we advise to keep it simple and use classic C identifiers).
 The \texttt{type} should be one of the basic types listed in Appendix~\ref{sec:types}.
 Finally the list of dimensions is a comma-separated list of arithmetical expression featuring
 +, -, *, /, \%, numbers and any defined parameters.
+In the following examples, the first layout has three dimensions, the second one has two dimensions.
 
-In the following examples, the first layout has three dimensions, the last one has two dimensions.
-The second one, however, is an unlimited layout. The "?" dimension is a special dimension descriptor
-used for this purpose. This descriptor cannot be used in multi-dimensional layout, e.g. \texttt{dimensions="3,4,?"}
-is not valid. The only purpose of a "?" layout is to offer more freedom to the user when the data is completely
-unstructured and cannot be described with a multi-dimensional layout.
-
-When a layout depends on parameters, any modification on the parameter will automatically modify
+When a layout depends on parameters, any modification on the parameters will automatically modify
 the layout. Like parameters, the layout is only locally affected and the modification is not propagated to
 other processes. Making a layout depend on a parameter can be very useful for particle-based simulations,
 where the number of particles is different at each process.
@@ -535,8 +539,7 @@ where the number of particles is different at each process.
 \end{minipage}
 
 \textbf{Note:} \texttt{string} and \texttt{label} data types are variable-length types, thus
-it is not possible to create a well-dimensioned layout for these types and only the unlimited layout descriptor "?"
-is valid.
+the dimension of the layout corresponds to the number of character that the variable can store.
 
 \subsection{Variables and groups}
 
@@ -547,9 +550,11 @@ allow to build a hierarchy of variables. An example is given in Listing~\ref{var
 Each variable must be given a \texttt{name}, and be associated to a defined \texttt{layout}.
 These are the two mandatory attributes. The \texttt{time-varying} attributes indicates whether
 a variable is expected to be written at every iteration, or just once at the beginning of the
-simulation. The \texttt{visualizable} attribute indicates whether a variable can be accessed
-by visualization backends. In the following example, we expect the \texttt{x\_coordinates} variable
-to be the coordinate of points in a rectilinear grid. This data is not itself visualization, however
+simulation (i.e. before the first call to \function{DC\_end\_iteration}). 
+The \texttt{visualizable} attribute indicates whether a variable is a primary object visualizable
+by visualization backends (for instance, coordinate arrays are not visualizable). 
+In the following example, we expect the \texttt{x\_coordinates} variable
+to be the coordinate of points in a rectilinear grid. This data is not itself visualizable, however
 the rectilinear grid (later described in Chapter~\ref{chap:VisIt}) will be a visualizable object.
 Note that you can use a basic type instead of a layout, as for the \texttt{simple\_var} variable: 
 basic types are already interpreted as layouts.
@@ -585,37 +590,38 @@ cannot guess its size: use \function{DC\_chunk\_write} instead.
 \lstinputlisting[language=Fortran]{listings/write.f90}
 \end{minipage}
 
-\subsubsection{Writing chunks of variables}
+\subsubsection{Writing multiple domaines}
 
-It may be necessary to write chunks of variables instead of full variables. 
-For well-dimensioned layout, a chunk
-must have the same numbers of dimensions than the variable's layout, and its boundaries
-must fall within the extents of the layout.
-Listings~\ref{writingChunkC} and~\ref{writingChunkF90} show how to define a chunk handle,
-which packs together the number of dimensions and the boundaries.
-In the example, the chunk extent along the first dimension is $4 - 2 + 1 = 3$ (the last index is included
-in the chunk).
-A chunk handle is not attached to any particular variable and can be used in several calls 
-to \function{DC\_chunk\_write}.
-
-Chunks are also the only mean to write on a variable that have an unlimited layout, in which case
-the dimensionality of the chunk must be 1.
+It may be necessary to write multiple domaines of variables instead of full variables. 
+In order to do so, you have to specify the number of domains that a client is expected to
+write, in the \texttt{clients} node of the XML file, as shown in Listing~\ref{writingBlocksXML}.
 
 \noindent\begin{minipage}{\textwidth}
 \vspace{0.5cm}
-\lstset{language=C,caption={Writing a chunk of variable to \Damaris{} in C},label=writingChunkC}
-\lstinputlisting[language=C]{listings/chunk.c}
+\lstset{language=XML,caption={Specifying multiple domains per client},label=writingBlocksXML}
+\lstinputlisting[language=XML]{listings/blocks.xml}
+\end{minipage}
+
+This number is a maximum, a client may write less domains, but not more. Besides, if a client
+writes $N$ domains, it must identify them $0$ to $N-1$.
+Listings~\ref{writingBlocksC} and~\ref{writingBlocksF90} show how to write multiple blocks.
+Each block is expected to have the size and shaped defined in the layout associated with the variable.
+
+\noindent\begin{minipage}{\textwidth}
+\vspace{0.5cm}
+\lstset{language=C,caption={Writing a chunk of variable to \Damaris{} in C},label=writingBlocksC}
+\lstinputlisting[language=C]{listings/blocks.c}
 \end{minipage}
 
 \noindent\begin{minipage}{\textwidth}
 %\vspace{0.5cm}
-\lstset{language=Fortran,caption={Writing a chunk of variable to \Damaris{} in Fortran},label=writingChunkF90}
-\lstinputlisting[language=Fortran]{listings/chunk.f90}
+\lstset{language=Fortran,caption={Writing a chunk of variable to \Damaris{} in Fortran},label=writingBlocksF90}
+\lstinputlisting[language=Fortran]{listings/blocks.f90}
 \end{minipage}
 
 \subsubsection{Direct access to the shared memory}
 
-The API presented above has the disadvantage to copy local data into the shared memory.
+The API presented above has the disadvantage of copying local data into the shared memory.
 A more efficient way of proceeding consists in getting direct access to the shared memory.
 Listings~\ref{allocateC} and~\ref{allocateF90} present this capability.
 
@@ -624,7 +630,8 @@ to an allocated region of shared memory is returned. In Fortran, \function{df\_a
 to 0 in case of failure, to non-zero otherwise.
 After writing the data to the returned buffer, a call to \function{DC\_commit} will notify the server
 of the presence of new data. After this call, the user is not expected to read or write the data anymore.
-Equivalent functions to allocate chunks have not been yet implemented in \Damaris{}.
+Equivalent functions (\function{DC\_alloc\_block} and \function{df\_alloc\_block}) exist to allocate blocks
+when each client handles multiple domains.
 
 \noindent\begin{minipage}{\textwidth}
 \vspace{0.5cm}
@@ -643,7 +650,19 @@ The \Damaris{} module should be used (this module is located in the \file{client
 source tree). An additional call to \function{c\_f\_pointer} is mandatory to convert the returned C pointer
 to a valid Fortran array. This function takes a shape array to provide the extents along each dimensions.
 
+Note that it can be desirable,
+in order to implement efficient double-buffering, that a client waits some iterations before actually committing 
+a variable. Different version of the function are available:
+\begin{itemize}
+\item \function{DC\_commit(const char* varname)} : \\ commits all the blocks of the current iteration;
+\item \function{DC\_commit\_block(const char* varname, int32\_t block)} : \\ commit one specific block of the current iteration;
+\item \function{DC\_commit\_iteration(const char* varname, int32\_t iteration)} : \\ commit all the block of a specific iteration;
+\item \function{DC\_commit\_block\_iteration(const char* varname, int32\_t block, int32\_t iteration)} : \\ commit one specific block of a specific iteration.
+\end{itemize}
 
+Equivalent function are available in Fortran: \function{df\_commit},
+\function{df\_commit\_block}, \function{df\_commit\_iteration} and \function{df\_commit\_block\_iteration}.
+All take an \emph{ierr} integer in addition to the same parameters as the C functions.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -761,7 +780,7 @@ dynamically link your simulation when compiling it.
 
 To send events from the simulation, use the \function{DC\_signal} function (in C) or \function{df\_signal}
 (in Fortran). These functions takes the name of an event as parameter; this name should correspond to
-an event described in the configuration file. The second parameter is the iteration within the simulation.
+an event described in the configuration file.
 
 \noindent\begin{minipage}{\textwidth}
 \vspace{0.5cm}
@@ -808,8 +827,8 @@ calling \texttt{DC\_mpi\_init\_and\_start}, and in the \emph{same order} if mult
 The first argument to this function is the name of the event to define,
 the second one is the pointer to a function that has the same signature than previously defined plugins.
 
-This method is currently only available in C, and allows only a ``core'' scope. Besides, the event
-\emph{should not} be already defined in the configuration file.
+This method is experimental, currently only available in C, and allows only a ``core'' scope. 
+Besides, the event \emph{should not} be already defined in the configuration file.
 
 %==============================================================================%
 %==============================================================================%
@@ -817,8 +836,10 @@ This method is currently only available in C, and allows only a ``core'' scope. 
 
 In order to access the data from within a plugin, you will have to used \Damaris{}' data structures.
 The main structure is the \texttt{VariableManager}, which can be used to access \texttt{Variable} instances
-and, from there, \texttt{Chunk} instances. We invite the reader to refer to the Doxygen documentation of
-\Damaris{}, which is complete enough to understand how to retrieve data.
+and, from there, \texttt{Chunk} instances (which correspond to our notion of ``domains''). 
+We invite the reader to refer to the Doxygen documentation of
+\Damaris{}, which we hope is complete enough to understand how to retrieve data,
+and to post requests on the \Damaris{} mailing list if you need any help.
 
 
 %==============================================================================%
