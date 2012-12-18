@@ -12,7 +12,6 @@
 		<parameter name="x" type="int" value="64" />
 		<parameter name="y" type="int" value="16" />
 		<parameter name="z" type="int" value="2"  />
-		<layout name="test unlimited" type="int" dimensions="?" />
 		<layout name="my layout" type="float" dimensions="x,y,z+2" />
 		<group name="my group" enabled="true">
 			<variable name="my variable" layout="my layout"> 
