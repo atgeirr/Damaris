@@ -50,7 +50,7 @@ namespace Damaris {
 			case Model::Scope::node :
 				if(mdl.language() == Model::Language::python) {
 #ifdef __ENABLE_PYTHON
-					return NodeAction<Python::PyAction,Model::Script>::New(mdl,name,Environment::getClientsPerNode());
+					return NodeAction<Python::PyAction,Model::Script>::New(mdl,name,Environment::ClientsPerNode());
 #else
 					CFGERROR("Damaris has not been compiled with Python support.");
 #endif

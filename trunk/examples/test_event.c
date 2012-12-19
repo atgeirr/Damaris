@@ -12,7 +12,7 @@ int main(int argc, char** argv)
 		exit(0);
 	}
 
-	DC_initialize(MPI_COMM_WORLD,argv[1]);
+	DC_initialize(argv[1],MPI_COMM_WORLD);
 
 	DC_signal(script);
 	DC_signal(event);

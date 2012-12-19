@@ -3,7 +3,6 @@
 
 int main(int argc, char** argv) 
 {
-	int id = 0;
 	float* mydata = NULL;
 	int x = 64;
 	int y = 16;
