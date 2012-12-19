@@ -1,2 +1,1 @@
-int iteration;
-DC_signal("my_event",iteration);
+DC_signal("my_event");

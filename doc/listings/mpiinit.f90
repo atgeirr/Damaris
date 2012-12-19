@@ -1,6 +1,6 @@
 program sim
       include 'mpif.h'
-      integer :: ierr,id
+      integer :: ierr
       integer :: comm
       integer :: is_client
       call MPI_INIT(ierr)
@@ -20,6 +20,6 @@ subroutine sim_main_loop(comm)
        integer :: i, ierr
        do i = 1, 100
          ! do something
-         call df_end_iteration(i,ierr)
+         call df_end_iteration(ierr)
        end do
 end subroutine

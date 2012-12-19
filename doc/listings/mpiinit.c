@@ -5,7 +5,7 @@ void sim_main_loop(MPI_Comm c)
 	int i;
 	for(i=0;i<100;i++) {
 		// do something
-		DC_end_iteration(i);
+		DC_end_iteration();
 	}
 }
  
