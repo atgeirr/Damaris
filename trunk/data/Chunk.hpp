@@ -82,7 +82,7 @@ namespace Damaris {
 			virtual void SetBlock(int b) = 0;
 
 			/**
-			 * \brief Returns a pointer over the actual data (to be overloaded in child classes).
+			 * Returns a pointer over the actual data (to be overloaded in child classes).
 			 */
 			virtual void* Data() = 0;
 

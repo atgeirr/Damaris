@@ -28,6 +28,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "core/ActionManager.hpp"
 #include "core/VariableManager.hpp"
 #include "server/Server.hpp"
+#include "comm/MPILayer.hpp"
+#include "comm/RPC.hpp"
 #ifdef __ENABLE_VISIT
 #include "visit/VisItListener.hpp"
 #endif
@@ -49,9 +51,8 @@ Server* Server::New(std::auto_ptr<Model::Simulation> mdl, int32_t id)
 Server::Server(Process* p)
 {
 	process = p;
-#ifdef __ENABLE_VISIT
-	visitMPIlayer = NULL;
-#endif
+	commLayer = NULL;
+	rpcLayer = NULL;
 	needStop = Environment::ClientsPerNode();
 }
 
@@ -61,24 +62,25 @@ Server::~Server()
 {
 	Process::Kill();
 	DBG("Process killed successfuly");
-#ifdef __ENABLE_VISIT
-	MPILayer<int>::Delete(visitMPIlayer);
+	MPILayer<int>::Delete(commLayer);
 	DBG("VisIt MPI layer deleted successfuly");
-#endif
 }
 	
 /* starts the server and enter the main loop */
 int Server::run()
 {
 	DBG("Successfully entered in \"run\" mode");
+	commLayer = MPILayer<int>::New(Environment::GetEntityComm());
+	rpcLayer  = CollectiveRPC<void (*)(void)>::New(commLayer);
 
-#ifdef __ENABLE_VISIT
-	int vizstt;
+	void (*f)(void) = &Viz::VisItListener::EnterSyncSection;
+	rpcLayer->RegisterCollective(f,(int)RPC_VISIT_CONNECTED);
+
+#if __ENABLE_VISIT
 	if(process->getModel()->visit().present()) {
 		Viz::VisItListener::Init(Environment::GetEntityComm(),
 			process->getModel()->visit(),
 		Environment::SimulationName());
-		visitMPIlayer = MPILayer<int>::New(Environment::GetEntityComm());
 	}
 #endif
 	
@@ -86,6 +88,9 @@ int Server::run()
 	bool received;
 
 	while(needStop > 0) {
+		// update the comm layer
+		commLayer->Update();
+
 		// try receiving from the shared message queue
 		received = process->getSharedMessageQueue()->TryReceive(&msg,sizeof(Message));
 		if(received) {
@@ -100,14 +105,9 @@ int Server::run()
 			// try receiving from VisIt (only for rank 0)
 	
 			if(process->getID() == 0) {
-				if((vizstt = Viz::VisItListener::Connected()) > 0) {
-					visitMPIlayer->bcast(&vizstt);
+				if(Viz::VisItListener::Connected()) {
+					rpcLayer->Call(RPC_VISIT_CONNECTED);
 				}
-			}
-
-			// try receiving from the VisIt callback communication layer
-			if(visitMPIlayer->deliver(&vizstt)) {
-				Viz::VisItListener::EnterSyncSection(vizstt);
 			}
 		}
 #endif
@@ -127,8 +127,6 @@ void Server::processMessage(const Message& msg)
 	if(msg.type == MSG_VAR)
 	{
 		try {
-//		ChunkImpl* chunk = new ChunkImpl(process->getSharedMemorySegment(),handle);
-//		chunk->SetDataOwnership(true);
 		Variable* v = VariableManager::Search(object);
 		if(v != NULL) {
 			DBG("Retrieving data for variable " << v->GetName() << " at iteration "
@@ -140,7 +138,6 @@ void Server::processMessage(const Message& msg)
 			<< " This is a very uncommon error considering all the client-side checking."
 			<< " Be sure that from now on, your program will not behave as expected and"
 			<< " will be subject to possibly huge memory leaks.");
-			//delete chunk;
 		}
 		} catch(std::exception &e) {
 			ERROR(e.what());
@@ -191,7 +188,8 @@ void Server::processInternalSignal(int32_t object, int iteration, int source)
 		}
 		break;
 	case KILL_SERVER:
-		needStop--; // TODO: check that each client has sent the event instead of checking the number
+		needStop--; 
+		// TODO: check that each client has sent the event instead of checking the number
 		break;
 	case URGENT_CLEAN:
 		DBG("Received a \"clean\" message");

@@ -170,14 +170,10 @@ namespace Damaris {
 			// try receiving from VisIt (only for rank 0)
 
 			if(process->getID() == 0) {
-				vizstt = Viz::VisItListener::Connected();
-				DBG("In end_iteration for process 0, stat is " << vizstt);
+				Viz::VisItListener::Connected();
 			}		
-			MPI_Bcast(&vizstt,1,MPI_INT,0, Environment::GetEntityComm());
 			// try receiving from the VisIt callback communication layer
-			if(vizstt > 0) {
-				Viz::VisItListener::EnterSyncSection(vizstt);
-			}
+			Viz::VisItListener::EnterSyncSection();
 		}
 #endif
 		return 0;

@@ -29,6 +29,7 @@
 #include "memory/Message.hpp"
 #include "core/Process.hpp"
 #include "comm/MPILayer.hpp"
+#include "comm/CollectiveRPC.hpp"
 #include "xml/BcastXML.hpp"
 #include "server/Initiator.hpp"
 
@@ -39,9 +40,9 @@ namespace Damaris {
 
 		private:
 			Process* process;
-#ifdef __ENABLE_VISIT
-			MPILayer<int>* visitMPIlayer;
-#endif
+			MPILayer<int>* commLayer;
+			CollectiveRPC<void (*)(void)>* rpcLayer;
+
 			/**
 			 * \brief Constructor.
 			 * Used when starting a server from an external program.
@@ -63,7 +64,8 @@ namespace Damaris {
 
 			/**
 			 * \brief Destructor 
-			 * Delete all related objects (configuration, environment, shared memory objects).
+			 * Delete all related objects 
+			 * (configuration, environment, shared memory objects).
 			 */
 			~Server();
 

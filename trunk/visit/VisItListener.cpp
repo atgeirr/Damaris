@@ -42,6 +42,7 @@ namespace Viz {
 
 VisItListener::SimData VisItListener::sim = {0};
 MPI_Comm VisItListener::comm = MPI_COMM_NULL;
+int VisItListener::visitstate = -1;
 
 void VisItListener::Init(MPI_Comm c, const Model::Simulation::visit_optional& mdl, 
 				const std::string& simname)
@@ -88,44 +89,45 @@ void VisItListener::Init(MPI_Comm c, const Model::Simulation::visit_optional& md
 	}
 }
 
-int VisItListener::Connected()
+bool VisItListener::Connected()
 {
 	//int visitstate = VisItDetectInputWithTimeout(0,1000,-1);
 	int visitstate = VisItDetectInput(0,-1);
 	if(visitstate >= -5 && visitstate <= -1) {
 		ERROR("Uncaught VisIt error");
+		return false;
 	} else if(visitstate == 1) {
 		DBG("VisIt first attempt to connect");
 	}
-	return visitstate;
+	return visitstate > 0;
 }
 
-int VisItListener::EnterSyncSection(int visitstate)
+void VisItListener::EnterSyncSection()
 {
+	MPI_Bcast(&visitstate,1,MPI_INT,0,comm);
 	DBG("Entering Sync Section, visit state is " << visitstate);
 	sim.iteration = Environment::GetLastIteration()-1;
 	switch(visitstate) {
-		case 1:
-			if(VisItAttemptToCompleteConnection() == VISIT_OKAY) {
-				DBG("VisIt connected");
-				VisItSetActivateTimestep(&VisItListener::TimeStepCallback,(void*)(&sim));
-				VisItSetSlaveProcessCallback(&VisItListener::SlaveProcessCallback);	
-				VisItSetGetMetaData(&VisItListener::GetMetaData,(void*)(&sim));
-				VisItSetGetMesh(&VisItListener::GetMesh,(void*)(&sim));
-				VisItSetGetVariable(&VisItListener::GetVariable,(void*)(&sim));
-				VisItSetGetDomainList(&VisItListener::GetDomainList,(void*)(&sim));
-				VisItSetCommandCallback(&VisItListener::ControlCommandCallback,(void*)(&sim));
-			} else {
-				ERROR("VisIt did not connect");
-			}
-			break;
-		case 2:
-			if(!ProcessVisItCommand()) {
-				VisItDisconnect();
-			}
-			break;
+	case 1:
+		if(VisItAttemptToCompleteConnection() == VISIT_OKAY) {
+			DBG("VisIt connected");
+			VisItSetActivateTimestep(&VisItListener::TimeStepCallback,(void*)(&sim));
+			VisItSetSlaveProcessCallback(&VisItListener::SlaveProcessCallback);	
+			VisItSetGetMetaData(&VisItListener::GetMetaData,(void*)(&sim));
+			VisItSetGetMesh(&VisItListener::GetMesh,(void*)(&sim));
+			VisItSetGetVariable(&VisItListener::GetVariable,(void*)(&sim));
+			VisItSetGetDomainList(&VisItListener::GetDomainList,(void*)(&sim));
+			VisItSetCommandCallback(&VisItListener::ControlCommandCallback,(void*)(&sim));
+		} else {
+			ERROR("VisIt did not connect");
+		}
+		break;
+	case 2:
+		if(!ProcessVisItCommand()) {
+			VisItDisconnect();
+		}
+		break;
 	}
-	return 0;
 }
 
 int VisItListener::Update()

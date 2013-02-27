@@ -4,7 +4,7 @@
 #define RPC_F 1
 #define RPC_G 2
 
-typedef void (rpc_method)(void);
+typedef void (*rpc_method)(void);
 
 void f(void) {
 	std::cout << "inside F\n";
@@ -23,13 +23,13 @@ int main(int argc, char** argv)
 	Damaris::MPILayer<int>* layer = Damaris::MPILayer<int>::New(MPI_COMM_WORLD);
 	Damaris::CollectiveRPC<rpc_method>* crpc = Damaris::CollectiveRPC<rpc_method>::New(layer);
 
-//	crpc->RegisterMulti(&f, RPC_F);
-	crpc->RegisterCollective(&g, RPC_G);
-	
-//	if(rank == 0) {
-//		crpc->Call(RPC_F);
-//	}
-	crpc->Call(RPC_G);
+	crpc->RegisterMulti(f, RPC_F);
+	crpc->RegisterCollective(g, RPC_G);
+
+	crpc->Call(RPC_G);	
+	if(rank == 0) {
+		crpc->Call(RPC_F);
+	}
 
 	while(true) {
 		std::cout << ".\n";

@@ -39,6 +39,11 @@ namespace Damaris {
  * The template parameter provides the function type.
  * This should be a function taking no argument, or an object
  * with an implementation of operator()(void).
+ *
+ * Note: The implementation ensures that two calls of a Multi-RPC
+ * from a same process will be executed in the same order,
+ * but no order can be assumed for Collective RPC or between
+ * a Collective RPC and a Multi RPC.
  */
 template<typename F>
 class CollectiveRPC {
@@ -49,7 +54,7 @@ class CollectiveRPC {
 		 */
 		enum rpc_type { RPC_MULTI, RPC_COLLECTIVE };
 
-		std::map<int,std::pair<rpc_type,F*> > rpcs; 
+		std::map<int,std::pair<rpc_type,F> > rpcs; 
 		/*!< Map associating RPC ids to a pair (type of RPC, function pointer). */
 
 		Communication<int>* commLayer; /*!< Communication layer. */
@@ -87,14 +92,14 @@ class CollectiveRPC {
 		 * particular id. Will overwrite any function previously
 		 * registered with this same id.
 		 */
-		virtual void RegisterMulti(F* rpc, int id);
+		virtual void RegisterMulti(F rpc, int id);
 
 		/**
 		 * Register a function a collective-RPC and associate it with a
 		 * particular id. Will overwrite any function previously
 		 * registerd with this same id.
 		 */
-		virtual void RegisterCollective(F* rpc, int id);
+		virtual void RegisterCollective(F rpc, int id);
 
 		/**
 		 * Call a given RPC specified by its id.
@@ -127,10 +132,10 @@ void CollectiveRPC<F>::Update()
 	commLayer->Update(10);
 	int msg;
 	if(commLayer->Deliver(&msg)) {
-		typename std::map<int,std::pair<rpc_type,F*> >::iterator it = rpcs.find(msg);
+		typename std::map<int,std::pair<rpc_type,F> >::iterator it = rpcs.find(msg);
 		if(it != rpcs.end()) {
-			F* f = it->second.second;
-			(*f)();
+			F f = it->second.second;
+			f();
 		}
 	}
 }
@@ -138,7 +143,7 @@ void CollectiveRPC<F>::Update()
 template<typename F>
 void CollectiveRPC<F>::Call(int id)
 {
-	typename std::map<int,std::pair<rpc_type,F*> >::iterator it = rpcs.find(id);
+	typename std::map<int,std::pair<rpc_type,F> >::iterator it = rpcs.find(id);
 	if(it != rpcs.end()) {
 		switch(it->second.first) {
 		case RPC_MULTI:
@@ -152,15 +157,15 @@ void CollectiveRPC<F>::Call(int id)
 }
 
 template<typename F>
-void CollectiveRPC<F>::RegisterMulti(F* rpc, int id)
+void CollectiveRPC<F>::RegisterMulti(F rpc, int id)
 {
-	rpcs[id] = std::pair<rpc_type,F*>(RPC_MULTI,rpc);
+	rpcs[id] = std::pair<rpc_type,F>(RPC_MULTI,rpc);
 }
 
 template<typename F>
-void CollectiveRPC<F>::RegisterCollective(F* rpc, int id)
+void CollectiveRPC<F>::RegisterCollective(F rpc, int id)
 {
-	rpcs[id] = std::pair<rpc_type,F*>(RPC_COLLECTIVE,rpc);
+	rpcs[id] = std::pair<rpc_type,F>(RPC_COLLECTIVE,rpc);
 }
 
 }

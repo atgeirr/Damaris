@@ -46,6 +46,7 @@ class VisItListener {
 			int iteration;
 		};
 
+		static int visitstate; /*<! Last state of VisIt. */
 		static SimData sim; /*!< Single instance of SimData passed to VisIt's callbacks. */
 		static MPI_Comm comm; /*< Main communicator to use when working in parallel. */
 
@@ -128,14 +129,13 @@ class VisItListener {
 		 * This integer should be passed to EnterSyncSection after having synchronized
 		 * all the concerned processes.
 		 */
-		static int Connected();
+		static bool Connected();
 
 		/**
 		 * This function must be called by all the VisIt engines at the same time,
-		 * so a synchronization is required prior to calling it. It should be given
-		 * a visitstat, which is the value returned by Connected.
+		 * so a synchronization is required prior to calling it.
 		 */
-		static int EnterSyncSection(int visitstat);
+		static void EnterSyncSection();
 
 		/**
 		 * This function must be called when the iteration has changed. It updates

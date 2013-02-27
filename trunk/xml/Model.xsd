@@ -513,9 +513,9 @@
             </xs:enumeration>
 			<xs:enumeration value="global"> 
                 <xs:annotation><xs:documentation>
-                    Not implemented yet. 
-                    Indicates that the dedicated core must wait for all the clients of the simulation
-                    to have sent the event before all dedicated cores can trigger a common, synchronized action.
+                    Indicates that the dedicated core must wait for all the clients 
+		    of the simulation to have sent the event before all dedicated 
+		    cores can trigger a common, synchronized action.
                 </xs:documentation></xs:annotation>
             </xs:enumeration>
 		</xs:restriction>
