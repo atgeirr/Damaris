@@ -28,32 +28,50 @@ namespace Damaris {
 
 /**
  * This class represents an asynchronous communication layer.
+ * Such a layer should be used for distributed algorithms but
+ * not to transmit large amounts of data (use directly MPI for that).
+ * The MSG template parameter should be a small type (int, double, etc.)
+ * providing an implementation of the operators == and <.
+ * Additionally it should be copy-contructible.
  */
 template<typename MSG>
 class Communication {
 	public:
 		/**
-		 * Updates the communication layer.
+		 * Updates the communication layer by checking
+		 * at most n requests (default n = 1).
 		 */
-		virtual void update() = 0;
+		virtual void Update(unsigned int n=1) = 0;
 
 		/**
 		 * Sends a message (non-blocking). The message will be eventually
 		 * delevered by the process identifyed by its ID.
+		 * This function should use FIFO channels: two messages A and B
+		 * sent to the same process should be received in the same order.
 		 */
-		virtual void send(int receiver, MSG *m) = 0;
+		virtual void Send(int receiver, MSG m) = 0;
 
 		/**
 		 * Delivers the next message in the queue. If there is no message,
 		 * returns false.
 		 */
-		virtual bool deliver(MSG* m) = 0;
+		virtual bool Deliver(MSG* m) = 0;
 
 		/**
 		 * Broadcast a message to all processes in the communication layer.
 		 * The message will be eventually delivered by all processes.
+		 * This primitive must implement a uniform broadcast: if a process
+		 * delivers message A then message B (sent from different sources),
+		 * then all processes should deliver A then B.
 		 */
-		virtual void bcast(MSG* m) = 0;
+		virtual void Bcast(MSG m) = 0;
+
+		/**
+		 * This primitive ensures that the passed message will be delivered
+		 * to all processes only when all processes have sent it. This is
+		 * a way of implementing a non-blocking barrier.
+		 */
+		virtual void Sync(MSG m) = 0;
 };
 
 }

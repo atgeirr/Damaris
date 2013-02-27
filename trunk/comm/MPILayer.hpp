@@ -16,9 +16,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file MPILayer.hpp
- * \date April 2012
+ * \date February 2013
  * \author Matthieu Dorier
- * \version 0.5
+ * \version 0.7.1
  */
 
 #ifndef __DAMARIS_MPI_LAYER_H
@@ -26,24 +26,97 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <mpi.h>
 #include <list>
+#include <set>
 #include <boost/shared_ptr.hpp>
 #include "comm/Communication.hpp"
+#include "core/Debug.hpp"
 
 namespace Damaris {
 
 /**
  * This class represents an asynchronous communication layer using MPI.
+ * In particular it provides some functions that are missing from the
+ * MPI-2 standard, such as non-blocking broadcast.
  */
 template<typename MSG>
 class MPILayer : public Communication<MSG> {
 
 	private:
-		static const int TAG_SEND  = 0; /*!< MPI tag indicating that the message is sent. */
-		static const int TAG_BCAST = 1;	/*!< MPI tag indicating that the message is broadcasted. */
+		enum tag { TAG_SEND    = 0, /*!< the message is sent. */
+			   TAG_BCAST   = 1, /*!< the message is broadcasted. */
+			   TAG_FWBCAST = 2, /*!< the message is forwarded to rank 0 for broadcast. */ 
+			   TAG_SYNC    = 3};/*!< the message is a synchronization message. */ 
+
+		/**
+		 * This structure is used to store messages received by other processes
+		 * in the Sync algorithm.
+		 */
+		struct sync_msg {
+			MSG msg; /*!< the message to synchronize. */
+			int lc; /*!< number of sync requests sent by the left child in the tree. */
+			int rc; /*!< number of sync requests sent by the right child in the tree. */
+			int me; /*!< number of sync requested by this process. */
+
+			/**
+			 * Constructor from a MSG.
+			 */
+			sync_msg(const MSG& m) 
+			: msg(m), lc(0), rc(0), me(0) {}
+
+			/**
+			 * Copy constructor.
+			 */
+			sync_msg(const sync_msg& sm)
+			: msg(sm.msg), lc(sm.lc), rc(sm.rc), me(sm.me) {}
+
+			/**
+			 * Implementation of == so that only messages are compared.
+			 */
+			bool operator==(const sync_msg& sm) const
+			{
+				return msg == sm.msg;
+			}
+
+			/**
+			 * Implementation of < so that only messages are compared.
+			 */
+			bool operator<(const sync_msg& sm) const
+			{
+				return msg < sm.msg;
+			}
+	
+			/**
+			 * Return true is the synchronization is ready to be
+			 * forwarded to the parent in the tree.
+			 */
+			bool ready() const {
+				return (lc > 0) && (rc > 0) && (me > 0);
+			}
+
+			/**
+			 * Decrease the synchronization requests. Should be called
+			 * when the request is ready.
+			 */
+			void decrease() {
+				lc--; rc--, me--;
+			}
+	
+			/**
+			 * A request is dead if nobody requested to sync, in which case
+			 * it can be deleted from the set of current sync requests.
+			 */
+			bool dead() const {
+				return (lc == 0) && (rc == 0) && (me == 0);
+			}
+		};
 
 		MPI_Comm comm; /*!< Communicator through which sending messages. */
 		std::list<MSG> toDeliver; /*!< List of messages ready to be delivered. */
-		std::list<boost::shared_ptr<MPI_Request> > pendingSendReq; /*!< List of requests associated to message sent. */
+		std::list<boost::shared_ptr<MPI_Request> > 
+			pendingSendReq; /*!< List of requests associated to message sent. */
+		std::set<sync_msg> 
+			pendingBarriers; /*!< Messages associated to current non-bocking barriers. */
+
 		int rank; /*!< Rank of the process in the communicator. */
 		int size; /*!< Size of the communicator. */
 
@@ -69,28 +142,29 @@ class MPILayer : public Communication<MSG> {
 		static void Delete(MPILayer* l);
 
 		/**
-		 * Update (try receiving messages from other processes and put them in
-		 * the toDeliver queue).
+		 * \see Communication::Update
 		 */
-		void update();
+		void Update(unsigned int n = 1);
 
 		/**
-		 * Sends a message (non-blocking). The message will be eventually
-		 * delevered by the process identifyed by its ID.
+		 * \see Communication::Send
 		 */
-		void send(int receiver, MSG *m);
+		void Send(int receiver, MSG m);
 
 		/**
-		 * Delivers the next message in the queue. If there is no message,
-		 * returns false.
+		 * \see Communication::Deliver
 		 */
-		bool deliver(MSG* m);
+		bool Deliver(MSG* m);
 
 		/**
-		 * Broadcast a message to all processes in the communication layer.
-		 * The message will be eventually delivered by all processes.
+		 * \see Communication::Bcast
 		 */
-		void bcast(MSG* m);
+		void Bcast(MSG m);
+	
+		/**
+		 * \see Communication::Sync
+		 */
+		void Sync(MSG m);
 };
 
 
@@ -123,7 +197,7 @@ MPILayer<MSG>::~MPILayer()
 }
 
 template<typename MSG>
-void MPILayer<MSG>::update()
+void MPILayer<MSG>::Update(unsigned int n)
 {
 	static MSG m;
 	static MPI_Request request;
@@ -153,8 +227,8 @@ void MPILayer<MSG>::update()
 	int done;
 	MPI_Test(&request,&done,&status);
 	if(done) {
-		// if the tag is a TAG_BCAST, forward to child processes
-		if(status.MPI_TAG == TAG_BCAST) {
+		// if the tag is a TAG_BCAST or TAG_FWBCAST, forward to child processes
+		if(status.MPI_TAG == TAG_BCAST || status.MPI_TAG == TAG_FWBCAST) {
 			int c1 = rank*2 + 1;
 			int c2 = rank*2 + 2;
 			if(c1 < size) {
@@ -167,25 +241,73 @@ void MPILayer<MSG>::update()
 				MPI_Isend(&m,sizeof(MSG),MPI_BYTE, c2, TAG_BCAST, comm, pending);
 				pendingSendReq.push_back(boost::shared_ptr<MPI_Request>(pending));
 			}
+			toDeliver.push_back(m);
 		}
-		// in any case, deliver it
-		toDeliver.push_back(m);
+
+		// if the tag is TAG_SEND
+		if(status.MPI_TAG == TAG_SEND) {
+			toDeliver.push_back(m);
+		}
+
+		// if the tag is TAG_SYNC
+		if(status.MPI_TAG == TAG_SYNC) {
+			int parent = (rank-1)/2;
+			// node process, search for a valid entry in pending barriers
+			typename std::set<sync_msg>::iterator it = pendingBarriers.find(sync_msg(m));
+			if(it == pendingBarriers.end()) {
+				sync_msg sm(m);
+				if(2*(rank+1) >= size) sm.rc++;
+				pendingBarriers.insert(sm);
+			}
+			// here we are sure a sync_msg is present in the set for this barrier
+			it = pendingBarriers.find(sync_msg(m));
+			sync_msg sm = *it;
+			pendingBarriers.erase(it);
+			// increment the number of sync calls from child process
+			if(status.MPI_SOURCE == 2*(rank+1)) sm.rc++;
+			if(status.MPI_SOURCE == 2*rank+1) sm.lc++;
+			// check if the sync barrier is ready on this process
+			if(sm.ready()) {
+				sm.decrease();
+				// if we have reached rank 0, broadcast the message
+				if(rank == 0) {
+					Bcast(sm.msg);
+				} else {
+					// otherwise, send to parent
+					MPI_Request* pending = new MPI_Request;
+					MPI_Isend(&m,sizeof(MSG),MPI_BYTE,parent, TAG_SYNC, comm, pending);
+					pendingSendReq.push_back(boost::shared_ptr<MPI_Request>(pending));
+				}
+				// if the barrier is not dead,  put it back in the set
+				if(!sm.dead()) {
+					pendingBarriers.insert(sm);
+				}
+			} else {
+				pendingBarriers.insert(sm);
+			}
+		}
 		listening = false;
+
+		if(n > 1) Update(n-1);
 	}
 }
 
 template<typename MSG>
-void MPILayer<MSG>::send(int recvid, MSG *m)
+void MPILayer<MSG>::Send(int recvid, MSG m)
 {
-	MPI_Request* pending = new MPI_Request;
-	MPI_Isend(m,sizeof(MSG),MPI_BYTE, recvid, TAG_SEND, comm, pending);
-	pendingSendReq.push_back(boost::shared_ptr<MPI_Request>(pending));
+	if(recvid == rank) {
+		toDeliver.push_back(m);
+	} else {
+		MPI_Request* pending = new MPI_Request;
+		MPI_Isend(&m,sizeof(MSG),MPI_BYTE, recvid, TAG_SEND, comm, pending);
+		pendingSendReq.push_back(boost::shared_ptr<MPI_Request>(pending));
+	}
 }
 
 template<typename MSG>
-bool MPILayer<MSG>::deliver(MSG* m)
+bool MPILayer<MSG>::Deliver(MSG* m)
 {
-	update();
+	Update();
 	if(toDeliver.empty()) {
 		return false;
 	} else {
@@ -197,24 +319,74 @@ bool MPILayer<MSG>::deliver(MSG* m)
 }
 
 template<typename MSG>
-void MPILayer<MSG>::bcast(MSG* m)
+void MPILayer<MSG>::Bcast(MSG m)
 {
 	DBG("entering bcast");
+
+	// a non-0 rank will send its message to be broadcasted by rank 0
+	if(rank != 0) {
+		MPI_Request* pending = new MPI_Request;
+		MPI_Isend(&m,sizeof(MSG),MPI_BYTE, 0, TAG_FWBCAST, comm, pending);
+		pendingSendReq.push_back(boost::shared_ptr<MPI_Request>(pending));
+		return;
+	}
+
+	// only rank 0 executes this
 	int c1 = rank*2 + 1;
 	int c2 = rank*2 + 2;
 	if(c1 < size) {
 		MPI_Request* pending = new MPI_Request;
-		MPI_Isend(m,sizeof(MSG),MPI_BYTE, c1, TAG_BCAST, comm, pending);
+		MPI_Isend(&m,sizeof(MSG),MPI_BYTE, c1, TAG_BCAST, comm, pending);
 		pendingSendReq.push_back(boost::shared_ptr<MPI_Request>(pending));
 		DBG("message sent to child " << c1);
 	}
 	if(c2 < size) {
 		MPI_Request* pending = new MPI_Request;
-		MPI_Isend(m,sizeof(MSG),MPI_BYTE, c2, TAG_BCAST, comm, pending);
+		MPI_Isend(&m,sizeof(MSG),MPI_BYTE, c2, TAG_BCAST, comm, pending);
 		pendingSendReq.push_back(boost::shared_ptr<MPI_Request>(pending));
 		DBG("message sent to child " << c2);
 	}
-	toDeliver.push_back(*m);
+	toDeliver.push_back(m);
+}
+
+template<typename MSG>
+void MPILayer<MSG>::Sync(MSG m)
+{
+	int parent = (rank-1)/2;
+	// node process, search for a valid entry in pending barriers
+	typename std::set<sync_msg>::iterator it = pendingBarriers.find(sync_msg(m));
+	if(it != pendingBarriers.end()) {
+		sync_msg sm = *it;
+		pendingBarriers.erase(it);
+		sm.me++;
+		pendingBarriers.insert(sm);
+	} else {
+		sync_msg sm(m);
+		sm.me++;
+		if(2*(rank+1) >= size) sm.rc++;
+		if(2*rank+1 >= size) sm.lc++;
+		pendingBarriers.insert(sm);
+	}
+	// here we are sure a sync_msg is present in the set for this barrier
+	it = pendingBarriers.find(sync_msg(m));
+	sync_msg sm = *it;
+	if(sm.ready()) {
+		pendingBarriers.erase(it);
+		sm.decrease();
+		// if we have reached rank 0, broadcast the message
+		if(rank == 0) {
+			Bcast(sm.msg);
+		} else {
+			// otherwise, send to parent
+			MPI_Request* pending = new MPI_Request;
+			MPI_Isend(&m,sizeof(MSG),MPI_BYTE,parent, TAG_SYNC, comm, pending);
+			pendingSendReq.push_back(boost::shared_ptr<MPI_Request>(pending));
+		}
+		// if the barrier is dead, delete it
+		if(!sm.dead()) {
+			pendingBarriers.insert(sm);
+		}
+	}
 }
 
 }
