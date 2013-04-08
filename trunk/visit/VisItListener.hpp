@@ -50,7 +50,6 @@ class VisItListener {
 		static SimData sim; /*!< Single instance of SimData passed to VisIt's callbacks. */
 		static MPI_Comm comm; /*< Main communicator to use when working in parallel. */
 
-
 		/**
 		 * This function is called at every time-step,
 		 * it contains the collective communications required to

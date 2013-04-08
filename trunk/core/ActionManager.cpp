@@ -40,7 +40,7 @@ void ActionManager::Init(const Model::Actions& model)
 	}
 }
 
-void ActionManager::reactToUserSignal(const std::string &sig,
+void ActionManager::ReactToUserSignal(const std::string &sig,
 				int32_t iteration, int32_t sourceID)
 {
 	Action* a = Search(sig);
@@ -54,7 +54,7 @@ void ActionManager::reactToUserSignal(const std::string &sig,
 	}
 }
 
-void ActionManager::reactToUserSignal(int id,
+void ActionManager::ReactToUserSignal(int id,
 				int32_t iteration, int32_t sourceID)
 {
     Action* a = Search(id);

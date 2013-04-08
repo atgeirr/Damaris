@@ -73,10 +73,12 @@ int Server::run()
 	commLayer = MPILayer<int>::New(Environment::GetEntityComm());
 	rpcLayer  = CollectiveRPC<void (*)(void)>::New(commLayer);
 
+
 	void (*f)(void) = &Viz::VisItListener::EnterSyncSection;
 	rpcLayer->RegisterCollective(f,(int)RPC_VISIT_CONNECTED);
 
 #if __ENABLE_VISIT
+	// initializing environment
 	if(process->getModel()->visit().present()) {
 		Viz::VisItListener::Init(Environment::GetEntityComm(),
 			process->getModel()->visit(),
@@ -88,9 +90,6 @@ int Server::run()
 	bool received;
 
 	while(needStop > 0) {
-		// update the comm layer
-		commLayer->Update();
-
 		// try receiving from the shared message queue
 		received = process->getSharedMessageQueue()->TryReceive(&msg,sizeof(Message));
 		if(received) {
@@ -111,6 +110,8 @@ int Server::run()
 			}
 		}
 #endif
+		// update the RPC layer
+		rpcLayer->Update();
 	}
 	
 	return 0;
@@ -135,8 +136,10 @@ void Server::processMessage(const Message& msg)
 		} else {
 			// the variable is unknown, we are f....
 			ERROR("Server received data for an unknown variable entry."
-			<< " This is a very uncommon error considering all the client-side checking."
-			<< " Be sure that from now on, your program will not behave as expected and"
+			<< " This is a very uncommon error considering all the"
+			<< " client-side checking. "
+			<< " Be sure that from now on, your program will not"
+			<< " behave as expected and"
 			<< " will be subject to possibly huge memory leaks.");
 		}
 		} catch(std::exception &e) {
@@ -147,7 +150,7 @@ void Server::processMessage(const Message& msg)
 	
 	if(msg.type == MSG_SIG)
 	{
-		ActionManager::reactToUserSignal(object,iteration,source);
+		ActionManager::ReactToUserSignal(object,iteration,source);
 		return;
 	}
 
@@ -193,11 +196,11 @@ void Server::processInternalSignal(int32_t object, int iteration, int source)
 		break;
 	case URGENT_CLEAN:
 		DBG("Received a \"clean\" message");
-		ActionManager::reactToUserSignal("#clean",iteration,source);
+		ActionManager::ReactToUserSignal("#clean",iteration,source);
 		break;
 	case LOST_DATA:
 		DBG("Received a \"lost data\" message");
-		ActionManager::reactToUserSignal("#lost",iteration,source);
+		ActionManager::ReactToUserSignal("#lost",iteration,source);
 		break;
 	}
 }

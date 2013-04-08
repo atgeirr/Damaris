@@ -92,7 +92,7 @@ void VisItListener::Init(MPI_Comm c, const Model::Simulation::visit_optional& md
 bool VisItListener::Connected()
 {
 	//int visitstate = VisItDetectInputWithTimeout(0,1000,-1);
-	int visitstate = VisItDetectInput(0,-1);
+	visitstate = VisItDetectInput(0,-1);
 	if(visitstate >= -5 && visitstate <= -1) {
 		ERROR("Uncaught VisIt error");
 		return false;
