@@ -77,6 +77,9 @@ int Server::run()
 	void (*f)(void) = &Viz::VisItListener::EnterSyncSection;
 	rpcLayer->RegisterCollective(f,(int)RPC_VISIT_CONNECTED);
 
+	void (*g)(void) = &Viz::VisItListener::Update;
+	rpcLayer->RegisterCollective(g,(int)RPC_VISIT_UPDATE);
+
 #if __ENABLE_VISIT
 	// initializing environment
 	if(process->getModel()->visit().present()) {
@@ -163,44 +166,25 @@ void Server::processMessage(const Message& msg)
 void Server::processInternalSignal(int32_t object, int iteration, int source)
 {
 
-	static bool no_update = false;
-	static bool global_no_update = false;
-
 	switch(object) {
 	case CLIENT_CONNECTED:
 		Environment::AddConnectedClient(source);
 		break;
 	case END_ITERATION:
 		if(Environment::StartNextIteration()) {
-			INFO("Starting new iteration");
-			MPI_Allreduce(&no_update,&global_no_update,1,
-					MPI_BYTE,MPI_BOR, Environment::GetEntityComm());
-			no_update = false;	
 #ifdef __ENABLE_VISIT
-			if(not global_no_update) Viz::VisItListener::Update();
+			if(process->getID() == 0) 
+				rpcLayer->Call(RPC_VISIT_UPDATE);
 #endif
 		}
 		break;
-	case END_ITERATION_NO_UPDATE:
-		no_update = true;
-		if(Environment::StartNextIteration()) {
-			INFO("Starting new iteration");
-			MPI_Allreduce(&no_update,&global_no_update,1,
-					MPI_BYTE,MPI_BOR, Environment::GetEntityComm());
-			no_update = false;
-		}
+	case ITERATION_HAS_ERROR:
+		Environment::StartNextIteration();
 		break;
 	case KILL_SERVER:
 		needStop--; 
-		// TODO: check that each client has sent the event instead of checking the number
-		break;
-	case URGENT_CLEAN:
-		DBG("Received a \"clean\" message");
-		ActionManager::ReactToUserSignal("#clean",iteration,source);
-		break;
-	case LOST_DATA:
-		DBG("Received a \"lost data\" message");
-		ActionManager::ReactToUserSignal("#lost",iteration,source);
+		// TODO: check that each client has sent 
+		// the event instead of checking the number
 		break;
 	}
 }

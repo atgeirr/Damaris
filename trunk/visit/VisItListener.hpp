@@ -140,7 +140,7 @@ class VisItListener {
 		 * This function must be called when the iteration has changed. It updates
 		 * the plots on the viewer side.
 		 */
-		static int Update();
+		static void Update();
 };
 
 }

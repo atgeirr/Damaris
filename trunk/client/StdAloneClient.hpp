@@ -94,11 +94,6 @@ namespace Damaris {
 		virtual int kill_server();
 
 		/**
-		 * \see Client::clean
-		 */
-		virtual int clean();
-
-		/**
 		 * Indicates that the iteration has terminated, this will potentially
 		 * update connected backends such as VisIt.
 		 */

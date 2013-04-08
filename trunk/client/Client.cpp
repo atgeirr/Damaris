@@ -87,7 +87,10 @@ namespace Damaris {
 	void* Client::alloc_block(const std::string & varname, 
 			int32_t block, bool blocking)
 	{
-		if(block < (int32_t)0 || block >= (int32_t)Environment::NumDomainsPerClient())
+		if(errorOccured) return NULL;
+
+		if(block < (int32_t)0 
+			|| block >= (int32_t)Environment::NumDomainsPerClient())
 		{
 			ERROR("Invalid block ID");
 			return NULL;
@@ -182,6 +185,8 @@ namespace Damaris {
 	int Client::write_block(const std::string &varname, int32_t block,
 			const void* data, bool blocking)
 	{
+		if(errorOccured) return -4;
+
 		if(block < (int32_t)0 || block >= (int32_t)Environment::NumDomainsPerClient())
 		{
 			ERROR("Invalid block ID");
@@ -295,17 +300,6 @@ namespace Damaris {
 		}
 	}
 
-	int Client::clean()
-	{
-		Message msg;
-		msg.type = MSG_INT;
-		msg.source = process->getID();
-		msg.iteration = Environment::GetLastIteration();
-		msg.object = URGENT_CLEAN;
-		process->getSharedMessageQueue()->Send(&msg);
-		return 0;
-	}
-
 	int Client::end_iteration()
 	{
 		int iteration = Environment::GetLastIteration();
@@ -314,10 +308,15 @@ namespace Damaris {
 		msg.type = MSG_INT;
 		msg.source = process->getID();
 		msg.iteration = iteration;
-		if(not errorOccured)
+	
+		// do a reduction to know if any process had an error
+		int has_error;
+		MPI_Allreduce (&errorOccured, &has_error,1, 
+				MPI_INT, MPI_BOR, Environment::GetEntityComm());
+		if(not has_error)
 			msg.object = END_ITERATION;
 		else {
-			msg.object = END_ITERATION_NO_UPDATE;
+			msg.object = ITERATION_HAS_ERROR;
 			errorOccured = false;
 		}
 		

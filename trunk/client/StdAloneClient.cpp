@@ -164,11 +164,9 @@ namespace Damaris {
 	{
 		Environment::StartNextIteration();
 #ifdef __ENABLE_VISIT
-		int vizstt;
 		if(process->getModel()->visit().present()) {
 			Viz::VisItListener::Update();
 			// try receiving from VisIt (only for rank 0)
-
 			if(process->getID() == 0) {
 				Viz::VisItListener::Connected();
 			}		
@@ -177,10 +175,5 @@ namespace Damaris {
 		}
 #endif
 		return 0;
-	}
-
-	int StdAloneClient::clean()
-	{
-		return signal("clean");
 	}
 }

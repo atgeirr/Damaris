@@ -130,12 +130,11 @@ void VisItListener::EnterSyncSection()
 	}
 }
 
-int VisItListener::Update()
+void VisItListener::Update()
 {
 	sim.iteration = Environment::GetLastIteration()-1;
 	VisItTimeStepChanged();
 	VisItUpdatePlots();
-	return 0;
 }
 
 int VisItListener::TimeStepCallback(void* cbdata __attribute__((unused)))
