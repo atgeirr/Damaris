@@ -1847,6 +1847,70 @@ namespace Damaris
     }
 
 
+    // Exception
+    // 
+
+    const Exception::event_optional& Exception::
+    event () const
+    {
+      return this->event_;
+    }
+
+    Exception::event_optional& Exception::
+    event ()
+    {
+      return this->event_;
+    }
+
+    void Exception::
+    event (const event_type& x)
+    {
+      this->event_.set (x);
+    }
+
+    void Exception::
+    event (const event_optional& x)
+    {
+      this->event_ = x;
+    }
+
+    void Exception::
+    event (::std::auto_ptr< event_type > x)
+    {
+      this->event_.set (x);
+    }
+
+    const Exception::script_optional& Exception::
+    script () const
+    {
+      return this->script_;
+    }
+
+    Exception::script_optional& Exception::
+    script ()
+    {
+      return this->script_;
+    }
+
+    void Exception::
+    script (const script_type& x)
+    {
+      this->script_.set (x);
+    }
+
+    void Exception::
+    script (const script_optional& x)
+    {
+      this->script_ = x;
+    }
+
+    void Exception::
+    script (::std::auto_ptr< script_type > x)
+    {
+      this->script_.set (x);
+    }
+
+
     // VisitParam
     // 
 
@@ -2000,6 +2064,24 @@ namespace Damaris
     script (const script_sequence& s)
     {
       this->script_ = s;
+    }
+
+    const Actions::error_sequence& Actions::
+    error () const
+    {
+      return this->error_;
+    }
+
+    Actions::error_sequence& Actions::
+    error ()
+    {
+      return this->error_;
+    }
+
+    void Actions::
+    error (const error_sequence& s)
+    {
+      this->error_ = s;
     }
 
 
@@ -4417,11 +4499,11 @@ namespace Damaris
       ::xsd::cxx::tree::enum_comparator< char > c (_xsd_Scope_literals_);
       const value* i (::std::lower_bound (
                         _xsd_Scope_indexes_,
-                        _xsd_Scope_indexes_ + 3,
+                        _xsd_Scope_indexes_ + 4,
                         *this,
                         c));
 
-      if (i == _xsd_Scope_indexes_ + 3 || _xsd_Scope_literals_[*i] != *this)
+      if (i == _xsd_Scope_indexes_ + 4 || _xsd_Scope_literals_[*i] != *this)
       {
         throw ::xsd::cxx::tree::unexpected_enumerator < char > (*this);
       }
@@ -4430,16 +4512,18 @@ namespace Damaris
     }
 
     const char* const Scope::
-    _xsd_Scope_literals_[3] =
+    _xsd_Scope_literals_[4] =
     {
       "core",
       "node",
-      "global"
+      "global",
+      "bcast"
     };
 
     const Scope::value Scope::
-    _xsd_Scope_indexes_[3] =
+    _xsd_Scope_indexes_[4] =
     {
+      ::Damaris::Model::Scope::bcast,
       ::Damaris::Model::Scope::core,
       ::Damaris::Model::Scope::global,
       ::Damaris::Model::Scope::node
@@ -4739,6 +4823,84 @@ namespace Damaris
     {
     }
 
+    // Exception
+    //
+
+    Exception::
+    Exception ()
+    : ::xml_schema::type (),
+      event_ (::xml_schema::flags (), this),
+      script_ (::xml_schema::flags (), this)
+    {
+    }
+
+    Exception::
+    Exception (const Exception& x,
+               ::xml_schema::flags f,
+               ::xml_schema::container* c)
+    : ::xml_schema::type (x, f, c),
+      event_ (x.event_, f, this),
+      script_ (x.script_, f, this)
+    {
+    }
+
+    Exception::
+    Exception (const ::xercesc::DOMElement& e,
+               ::xml_schema::flags f,
+               ::xml_schema::container* c)
+    : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+      event_ (f, this),
+      script_ (f, this)
+    {
+      if ((f & ::xml_schema::flags::base) == 0)
+      {
+        ::xsd::cxx::xml::dom::parser< char > p (e, false, true);
+        this->parse (p, f);
+      }
+    }
+
+    void Exception::
+    parse (::xsd::cxx::xml::dom::parser< char >& p,
+           ::xml_schema::flags f)
+    {
+      while (p.more_attributes ())
+      {
+        const ::xercesc::DOMAttr& i (p.next_attribute ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        if (n.name () == "event" && n.namespace_ ().empty ())
+        {
+          ::std::auto_ptr< event_type > r (
+            event_traits::create (i, f, this));
+
+          this->event_.set (r);
+          continue;
+        }
+
+        if (n.name () == "script" && n.namespace_ ().empty ())
+        {
+          ::std::auto_ptr< script_type > r (
+            script_traits::create (i, f, this));
+
+          this->script_.set (r);
+          continue;
+        }
+      }
+    }
+
+    Exception* Exception::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class Exception (*this, f, c);
+    }
+
+    Exception::
+    ~Exception ()
+    {
+    }
+
     // VisitParam
     //
 
@@ -4941,7 +5103,8 @@ namespace Damaris
     Actions ()
     : ::xml_schema::type (),
       event_ (::xml_schema::flags (), this),
-      script_ (::xml_schema::flags (), this)
+      script_ (::xml_schema::flags (), this),
+      error_ (::xml_schema::flags (), this)
     {
     }
 
@@ -4951,7 +5114,8 @@ namespace Damaris
              ::xml_schema::container* c)
     : ::xml_schema::type (x, f, c),
       event_ (x.event_, f, this),
-      script_ (x.script_, f, this)
+      script_ (x.script_, f, this),
+      error_ (x.error_, f, this)
     {
     }
 
@@ -4961,7 +5125,8 @@ namespace Damaris
              ::xml_schema::container* c)
     : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
       event_ (f, this),
-      script_ (f, this)
+      script_ (f, this),
+      error_ (f, this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
       {
@@ -4999,6 +5164,17 @@ namespace Damaris
             script_traits::create (i, f, this));
 
           this->script_.push_back (r);
+          continue;
+        }
+
+        // error
+        //
+        if (n.name () == "error" && n.namespace_ () == "http://damaris.gforge.inria.fr/Damaris/Model")
+        {
+          ::std::auto_ptr< error_type > r (
+            error_traits::create (i, f, this));
+
+          this->error_.push_back (r);
           continue;
         }
 
