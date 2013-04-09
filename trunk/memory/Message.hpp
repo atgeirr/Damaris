@@ -42,12 +42,15 @@ namespace Damaris {
  * The internal events naming.
  */
 	enum int_msg_e {
-		CLIENT_CONNECTED, 	/*!< Indicates that a new client connected. */
-		END_ITERATION,		/*!< Indicates that a client reached the end of an iteration. */
-		END_ITERATION_NO_UPDATE, /*!< An error occured during the previous iteration, backends should not be updated. */
-		KILL_SERVER,		/*!< Indicates that a client wants to shut down the server. */
-		URGENT_CLEAN,		/*!< Indicates that a client wants to make space in memory. */
-		LOST_DATA			/*!< Indicates that a client lost data because of the low memory. */
+		CLIENT_CONNECTED, 	/*!< Indicates that a new 
+					  client connected. */
+		END_ITERATION,		/*!< Indicates that a client reached 
+					  the end of an iteration. */
+		ITERATION_HAS_ERROR,    /*!< An error occured during the 
+					  previous iteration, backends should 
+					  not be updated. */
+		KILL_SERVER,		/*!< Indicates that a client wants 
+					  to shut down the server. */
 	};
 
 /**

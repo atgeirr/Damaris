@@ -66,9 +66,8 @@ include_directories(${DAMARIS_SOURCE_DIR}/include)
 #-----------------------------------------------------------#
 set(BOOST_ROOT ${EXTERNAL_ROOT})
 find_package(Boost REQUIRED)
-set(BOOST_LIB boost_filesystem boost_system boost_program_options)
-include_directories(${BOOST_INCLUDE_DIR})
-link_directories(${BOOST_LIBRARY_DIR})
+find_package(Boost 1.51.0 COMPONENTS filesystem system program_options)
+include_directories(${Boost_INCLUDE_DIRS})
 
 #-----------------------------------------------------------#
 # Set everything related to the XSD libraries
@@ -82,37 +81,32 @@ include_directories(${XSD_INCLUDE_DIR})
 # Set everything related to the Xerces-C library
 #-----------------------------------------------------------#
 set(XERCESC_ROOT ${EXTERNAL_ROOT})
-set(XERCESC_LIBRARY_DIR "${XERCESC_ROOT}/lib")
-set(XERCESC_INCLUDE_DIR "${XERCESC_ROOT}/include")
-set(XERCESC_LIB xerces-c)
+find_package(XercesC REQUIRED)
 include_directories(${XERCESC_INCLUDE_DIR})
-link_directories(${XERCESC_LIBRARY_DIR})
 
 #-----------------------------------------------------------#
 # Set everything related to Python
 #-----------------------------------------------------------#
 set(PYTHON_ROOT ${EXTERNAL_ROOT})
-set(NUMPY_INCLUDE_DIR ${EXTERNAL_ROOT}/lib/python2.6/site-packages/numpy/core/include)
-#find_package(PythonLibs)
-
-if (PYTHON_INCLUDE_PATH)
-  find_package(Boost 1.49 QUIET COMPONENTS python)
-    if (Boost_PYTHON_LIBRARY)
+set(NUMPY_INCLUDE_DIR 
+	${EXTERNAL_ROOT}/lib/python2.6/site-packages/numpy/core/include)
+find_package(PythonLibs)
+if (PYTHONLIBS_FOUND)
+  find_package(Boost 1.51.0 QUIET COMPONENTS python)
+  if (Boost_PYTHON_LIBRARY)
 	message(STATUS "Building Python support. Python lib: ${Boost_PYTHON_LIBRARY}")
 	message(STATUS "Python include: ${PYTHON_INCLUDE_PATH}")
-    include_directories(${PYTHON_INCLUDE_PATH})
-	include_directories(${NUMPY_INCLUDE_DIR})
-    link_directories(${PYTHON_LIBRARY_DIR})
-    add_definitions(-D__ENABLE_PYTHON)
-    # add the Boost Python library to the current Boost libraries
-    set(BOOST_LIB ${BOOST_LIB} boost_python)
-    set(PYTHON_LIB python2.6 util)
+    	if (NUMPY_INCLUDE_DIR)
+		include_directories(${PYTHON_INCLUDE_DIRS})
+		include_directories(${NUMPY_INCLUDE_DIR})
+		add_definitions(-D__ENABLE_PYTHON)
+    	endif (NUMPY_INCLUDE_DIR)
   else (Boost_PYTHON_LIBRARY)
     message(STATUS "Boost Python not found. Python support will not be built.")
   endif (Boost_PYTHON_LIBRARY)
-else (PYTHON_INCLUDE_PATH)
+else (PYTHONLIBS_FOUND)
   message(STATUS "Python headers not found. Python support will not be built.")
-endif (PYTHON_INCLUDE_PATH)
+endif (PYTHONLIBS_FOUND)
 
 #-----------------------------------------------------------#
 # Set everything related to the HDF5 library 

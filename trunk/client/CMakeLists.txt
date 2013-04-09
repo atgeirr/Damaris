@@ -42,7 +42,7 @@ set(DAMARIS_COMMON_SRC
 	${DAMARIS_SOURCE_DIR}/data/Parameter.cpp)
 
 
-if(PYTHON_LIB)
+if(PYTHONLIBS_FOUND)
   set(DAMARIS_SCRIPTS_SRC
 		${DAMARIS_SCRIPTS_SRC}
 		${DAMARIS_SOURCE_DIR}/scripts/python/PyInterpreter.cpp
@@ -51,7 +51,7 @@ if(PYTHON_LIB)
 		${DAMARIS_SOURCE_DIR}/scripts/python/PyChunk.cpp
 		${DAMARIS_SOURCE_DIR}/scripts/python/PyLayout.cpp
 		${DAMARIS_SOURCE_DIR}/scripts/python/PyTypes.cpp)
-endif(PYTHON_LIB)
+endif(PYTHONLIBS_FOUND)
 
 if(VISIT_ROOT)
 	set(DAMARIS_VISIT_SRC

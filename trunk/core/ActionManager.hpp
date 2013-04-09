@@ -50,13 +50,13 @@ namespace Damaris {
 		/**
 		 * Trigger a particular action identified by its name.
 		 */
-		static void reactToUserSignal(const std::string &sig,
+		static void ReactToUserSignal(const std::string &sig,
 				int32_t iteration, int32_t sourceID);
 
 		/**
 		 * Trigger a particular action identified by its id.
 		 */
-		static void reactToUserSignal(int id,
+		static void ReactToUserSignal(int id,
 				int32_t iteration, int32_t sourceID);
 	};
 }

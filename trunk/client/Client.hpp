@@ -213,11 +213,6 @@ namespace Damaris {
 		virtual int kill_server();
 
 		/**
-		 * Sends a signal to the server to try free the shared memory.
-		 */
-		virtual int clean();
-
-		/**
 		 * Indicates that the iteration has terminated, this will potentially
 		 * update connected backends such as VisIt.
 		 */
