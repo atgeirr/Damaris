@@ -136,8 +136,7 @@ Python, then come back to this main installation process).
 \subsection{XSD codesynthesis}
 
 Download the XSD sources for your platform.
-Untar/unzip it and install it by copying it into the \installdir directory. 
-(Only the headers are required, you should copy the \texttt{cxx} folder into \installdir{/include}).
+Untar/unzip it and install it by copying it into the \installdir directory.
 
 \subsection{Xerces-C}
 
@@ -205,11 +204,11 @@ You're done!
    27 & EXTERNAL\_ROOT & Prefix path where dependencies have been installed. \\
    47 & BGP & Uncomment if you run on BlueGene/P. \\
    67 & BOOST\_ROOT & Boost library location. \\
-   77 & XSD\_ROOT & XSD library location. \\
-   84 & XERCESC\_ROOT & Xerces-C library location. \\
-   94 & PYTHON\_ROOT & Python library location. \\
-   95 & NUMPY\_INCLUDE\_DIR & Location of the NumPy headers. \\
-   134 & VISIT\_ROOT & Location of VisIt. Comment if you don't need VisIt support. \\
+   76 & XSD\_ROOT & XSD library location. \\
+   83 & XERCESC\_ROOT & Xerces-C library location. \\
+   90 & PYTHON\_ROOT & Python library location. \\
+   91 & NUMPY\_INCLUDE\_DIR & Location of the NumPy headers. \\
+   128 & VISIT\_ROOT & Location of VisIt. Comment if you don't need VisIt support. \\
    \hline
 \end{tabular}\caption{CMakeLists.txt modifications before compiling \Damaris{}}\label{tab:cmake}
 \end{table}
@@ -664,6 +663,18 @@ Equivalent function are available in Fortran: \function{df\_commit},
 \function{df\_commit\_block}, \function{df\_commit\_iteration} and \function{df\_commit\_block\_iteration}.
 All take an \emph{ierr} integer in addition to the same parameters as the C functions.
 
+\subsubsection{Error handling}\label{sec:error}
+
+Since \function{DC\_write} and \function{DC\_alloc} (and corresponding functions for writing or
+allocating blocks) both require to allocate a portion of shared memory, a call may fail if the shared memory
+is full. If such a case happens \emph{all subsequent calls to \function{DC\_write} or \function{DC\_alloc}
+up to the next call to \function{DC\_end\_iteration} will return with an error without attempting
+to allocate memory}. A special signal will be send to all the dedicated cores will be sent when
+calling \function{DC\_end\_iteration}, which informs the dedicated cores that some data is missing
+for this iteration. By default, the dedicated cores will not update potentially connected visualization backends,
+and will delete from memory the data that has been written successfully for this iteration.
+Overwriting this default behavior will be covered in the next chapter.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -702,11 +713,14 @@ Finally one important characteristic of events is the \texttt{scope}:
 	the same event (at the same iteration) before triggering the action. If the 16 processes
 	send the event, the action is triggered only one. If one of the processes does not send the
 	event, the corresponding action is never triggered.
-	\item \textbf{"global"} (not yet implement) induces a particular behavior: each \Damaris{} 
+	\item \textbf{"global"} (not implemented yet) induces a particular behavior: each \Damaris{} 
 	server will wait for all the clients of its node to send the event. It will then synchronize with
 	all other dedicated cores to ensure that, eventually when all the clients of the simulation
 	have sent the event, all the dedicated cores trigger the same action at the same time.
 	Within a function called through a "global" event, MPI communications can safely be used.
+	\item \textbf{"bcast"} (not implemented yet) indicates that if one client send this signal, then all the dedicated
+	cores will perform the corresponding action, not only the dedicated core responsible for this
+	client. MPI communications can safely be used within an action triggered by such an event.
 \end{itemize}
 
 \noindent\begin{minipage}{\textwidth}
@@ -878,6 +892,28 @@ Thus, "core", "node" and "global" scopes are not differentiated anymore.
 Additionally, it is expected that if one process triggers a "global" action, all the process do,
 since in a synchronous mode there is no way for a process to know whether other processes
 will trigger the same action.
+
+\section{Error handling through events}
+
+As explained in Section~\ref{sec:error}, if the simulation did not manage to write all its data for a
+given iteration, a special signal is send to all the dedicated cores to ask them not to update
+visualization backends and to erase all remaining data for this iteration instead.
+This behavior can be overwritten by attaching an error handler to an event or a script 
+(scripts will be covered in the next chapter), 
+as exemplified in the following XML codes. The event or script \emph{must} have a \textbf{``core''} scope,
+and the event or script must be defined somewhere in the configuration file.
+
+\noindent\begin{minipage}{\textwidth}
+\vspace{0.5cm}
+\lstset{language=XML,caption={XML information to attach an event to errors.},label=errorXML}
+\lstinputlisting[language=XML]{listings/errorevent.xml}
+\end{minipage}
+
+\noindent\begin{minipage}{\textwidth}
+\vspace{0.5cm}
+\lstset{language=XML,caption={XML information to attach a script to errors.},label=errorscriptXML}
+\lstinputlisting[language=XML]{listings/errorscript.xml}
+\end{minipage}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
