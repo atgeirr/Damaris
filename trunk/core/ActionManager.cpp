@@ -22,6 +22,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "core/Debug.hpp"
 #include "core/ActionManager.hpp"
+#include "core/GarbageCollector.hpp"
+
 
 namespace Damaris {
 
@@ -52,7 +54,7 @@ void ActionManager::Init(const Model::Actions& model)
 			<< "only the first one will be registered.");
 		}
 	} else {
-		// TODO install default handler
+		Add(new GarbageCollector());
 	}
 
 	// build events

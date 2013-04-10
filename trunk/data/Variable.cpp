@@ -113,6 +113,19 @@ void Variable::ClearAll()
 	chunks.get<by_any>().clear();
 }
 
+void Variable::Clear(int iteration)
+{
+	iterator it = chunks.begin();
+	iterator end = chunks.end();
+	while(it != end) {
+		if(it->get()->GetIteration() == iteration) {
+			it = DetachChunk(it);
+		} else {
+			it++;
+		}
+	}
+}
+
 #ifdef __ENABLE_VISIT
 bool Variable::ExposeVisItMetaData(visit_handle md, int iteration)
 {

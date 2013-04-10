@@ -79,7 +79,7 @@ int Server::run()
 	rpcLayer->RegisterMulti(f,(int)RPC_VISIT_CONNECTED);
 
 	void (*g)(void) = &Viz::VisItListener::Update;
-	rpcLayer->RegisterMulti(g,(int)RPC_VISIT_UPDATE);
+	rpcLayer->RegisterCollective(g,(int)RPC_VISIT_UPDATE);
 
 	// initializing environment
 	if(process->getModel()->visit().present()) {
@@ -173,13 +173,14 @@ void Server::processInternalSignal(int32_t object, int iteration, int source)
 	case END_ITERATION:
 		if(Environment::StartNextIteration()) {
 #ifdef __ENABLE_VISIT
-			if(process->getID() == 0) 
-				rpcLayer->Call(RPC_VISIT_UPDATE);
+			rpcLayer->Call(RPC_VISIT_UPDATE);
 #endif
 		}
 		break;
 	case ITERATION_HAS_ERROR:
-		Environment::StartNextIteration();
+		if(Environment::StartNextIteration()) {
+			ActionManager::ReactToUserSignal("#clean",iteration,source);
+		}
 		break;
 	case KILL_SERVER:
 		needStop--; 
