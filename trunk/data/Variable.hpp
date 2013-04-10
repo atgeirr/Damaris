@@ -131,6 +131,11 @@ class Variable : public Configurable<Model::Variable> {
 		void ClearAll();
 
 		/**
+		 * Clears all the chunks for a given iteration.
+		 */
+		void Clear(int iteration);
+
+		/**
 		 * Returns the variables description.
 		 */
 		std::string GetDescription() const { return (std::string)model; }

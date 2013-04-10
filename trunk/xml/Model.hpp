@@ -262,6 +262,7 @@ namespace Damaris
     class Scope;
     class Event;
     class Script;
+    class Exception;
     class VisitParam;
     class PythonParam;
     class Actions;
@@ -2009,7 +2010,8 @@ namespace Damaris
       {
         core,
         node,
-        global
+        global,
+        bcast
       };
 
       Scope (value v);
@@ -2055,8 +2057,8 @@ namespace Damaris
       _xsd_Scope_convert () const;
 
       public:
-      static const char* const _xsd_Scope_literals_[3];
-      static const value _xsd_Scope_indexes_[3];
+      static const char* const _xsd_Scope_literals_[4];
+      static const value _xsd_Scope_indexes_[4];
     };
 
     class Event: public ::xml_schema::type
@@ -2318,6 +2320,82 @@ namespace Damaris
       ::xsd::cxx::tree::one< external_type > external_;
     };
 
+    class Exception: public ::xml_schema::type
+    {
+      public:
+      // event
+      // 
+      typedef ::xml_schema::string event_type;
+      typedef ::xsd::cxx::tree::optional< event_type > event_optional;
+      typedef ::xsd::cxx::tree::traits< event_type, char > event_traits;
+
+      const event_optional&
+      event () const;
+
+      event_optional&
+      event ();
+
+      void
+      event (const event_type& x);
+
+      void
+      event (const event_optional& x);
+
+      void
+      event (::std::auto_ptr< event_type > p);
+
+      // script
+      // 
+      typedef ::xml_schema::string script_type;
+      typedef ::xsd::cxx::tree::optional< script_type > script_optional;
+      typedef ::xsd::cxx::tree::traits< script_type, char > script_traits;
+
+      const script_optional&
+      script () const;
+
+      script_optional&
+      script ();
+
+      void
+      script (const script_type& x);
+
+      void
+      script (const script_optional& x);
+
+      void
+      script (::std::auto_ptr< script_type > p);
+
+      // Constructors.
+      //
+      Exception ();
+
+      Exception (const ::xercesc::DOMElement& e,
+                 ::xml_schema::flags f = 0,
+                 ::xml_schema::container* c = 0);
+
+      Exception (const Exception& x,
+                 ::xml_schema::flags f = 0,
+                 ::xml_schema::container* c = 0);
+
+      virtual Exception*
+      _clone (::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0) const;
+
+      virtual 
+      ~Exception ();
+
+      // Implementation.
+      //
+      protected:
+      void
+      parse (::xsd::cxx::xml::dom::parser< char >&,
+             ::xml_schema::flags);
+
+      protected:
+      event_optional event_;
+      script_optional script_;
+    };
+
     class VisitParam: public ::xml_schema::type
     {
       public:
@@ -2500,6 +2578,23 @@ namespace Damaris
       void
       script (const script_sequence& s);
 
+      // error
+      // 
+      typedef ::Damaris::Model::Exception error_type;
+      typedef ::xsd::cxx::tree::sequence< error_type > error_sequence;
+      typedef error_sequence::iterator error_iterator;
+      typedef error_sequence::const_iterator error_const_iterator;
+      typedef ::xsd::cxx::tree::traits< error_type, char > error_traits;
+
+      const error_sequence&
+      error () const;
+
+      error_sequence&
+      error ();
+
+      void
+      error (const error_sequence& s);
+
       // Constructors.
       //
       Actions ();
@@ -2529,6 +2624,7 @@ namespace Damaris
       protected:
       event_sequence event_;
       script_sequence script_;
+      error_sequence error_;
     };
 
     class Simulation: public ::xml_schema::type

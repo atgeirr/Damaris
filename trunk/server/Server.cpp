@@ -73,14 +73,14 @@ int Server::run()
 	commLayer = MPILayer<int>::New(Environment::GetEntityComm());
 	rpcLayer  = CollectiveRPC<void (*)(void)>::New(commLayer);
 
+#ifdef __ENABLE_VISIT
 
 	void (*f)(void) = &Viz::VisItListener::EnterSyncSection;
-	rpcLayer->RegisterCollective(f,(int)RPC_VISIT_CONNECTED);
+	rpcLayer->RegisterMulti(f,(int)RPC_VISIT_CONNECTED);
 
 	void (*g)(void) = &Viz::VisItListener::Update;
 	rpcLayer->RegisterCollective(g,(int)RPC_VISIT_UPDATE);
 
-#if __ENABLE_VISIT
 	// initializing environment
 	if(process->getModel()->visit().present()) {
 		Viz::VisItListener::Init(Environment::GetEntityComm(),
@@ -173,13 +173,14 @@ void Server::processInternalSignal(int32_t object, int iteration, int source)
 	case END_ITERATION:
 		if(Environment::StartNextIteration()) {
 #ifdef __ENABLE_VISIT
-			if(process->getID() == 0) 
-				rpcLayer->Call(RPC_VISIT_UPDATE);
+			rpcLayer->Call(RPC_VISIT_UPDATE);
 #endif
 		}
 		break;
 	case ITERATION_HAS_ERROR:
-		Environment::StartNextIteration();
+		if(Environment::StartNextIteration()) {
+			ActionManager::ReactToUserSignal("#clean",iteration,source);
+		}
 		break;
 	case KILL_SERVER:
 		needStop--; 

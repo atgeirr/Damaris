@@ -22,22 +22,61 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "core/Debug.hpp"
 #include "core/ActionManager.hpp"
+#include "core/GarbageCollector.hpp"
+
 
 namespace Damaris {
 
 void ActionManager::Init(const Model::Actions& model)
 {
+	// find the handler's name
+	std::string handler_name;
+	bool handler_is_event = true;
+
+	Model::Actions::error_const_iterator r(model.error().begin());
+	if(r != model.error().end()) {
+		// build the action for error handling
+		if(r->event().present() && r->script().present()) {
+			WARN("Error handler should be attached to either "
+			<< "an event or a script.");
+		}
+		if(r->event().present()) {
+			handler_name = r->event().get();
+			handler_is_event = true;
+		}
+		if(r->script().present()) {
+			handler_name = r->script().get();
+			handler_is_event = false;
+		}
+		r++;
+		if(r != model.error().end()) {
+			WARN("Multiple definition of error handlers, "
+			<< "only the first one will be registered.");
+		}
+	} else {
+		Add(new GarbageCollector());
+	}
+
 	// build events
 	Model::Actions::event_const_iterator e(model.event().begin());
 	for(; e != model.event().end(); e++) {
 		Create<DynamicAction>(*e,(std::string)e->name());
+		if(handler_is_event && ((std::string)e->name() == handler_name))
+		{
+			Create<DynamicAction>(*e,"#error");
+		}
 	}
 
 	// build scripts
 	Model::Actions::script_const_iterator s(model.script().begin());
 	for(; s != model.script().end(); s++) {
 		Create<ScriptAction>(*s,(std::string)s->name());
+		if(!handler_is_event && (std::string)s->name() == handler_name) 
+		{
+			Create<ScriptAction>(*s,"#error");
+		}
 	}
+
 }
 
 void ActionManager::ReactToUserSignal(const std::string &sig,
