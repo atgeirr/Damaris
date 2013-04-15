@@ -125,9 +125,9 @@ bool Initiator::mpi_init(const std::string& configFile, MPI_Comm globalcomm)
 		} else {
 			p->setID(rank);
 			p->createSharedStructures();
+			MPI_Barrier(globalcomm);
 			__client = new StdAloneClient(p);
 			Environment::SetClient(true);
-			MPI_Barrier(globalcomm);
 			__client->connect();
 		}
 	}
