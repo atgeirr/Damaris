@@ -1,2 +1,0 @@
-/usr/bin/ar cr libdamaris-server.a  CMakeFiles/damaris-server.dir/Initiator.cpp.o CMakeFiles/damaris-server.dir/Server.cpp.o CMakeFiles/damaris-server.dir/ServerC.cpp.o CMakeFiles/damaris-server.dir/ServerFortran.cpp.o CMakeFiles/damaris-server.dir/Options.cpp.o
-/usr/bin/ranlib libdamaris-server.a
