@@ -1,5 +1,6 @@
 #include "core/Debug.hpp"
 #include "core/VariableManager.hpp"
+#include "core/ParameterManager.hpp"
 
 using namespace Damaris;
 /*
@@ -24,7 +25,10 @@ extern "C" {
 
 void clean(const std::string& /*event*/, int32_t step, int32_t /*src*/)
 {
+	std::cout << "hello " << std::endl;
 	Variable* v = VariableManager::Search("space");
+	Parameter* p = ParameterManager::Search("WIDTH");
+	if(p == NULL) std::cout << "parameter not found\n";
 	if(v != NULL) {
 //		iteration_eraser::var = v;
 //		iteration_eraser::iteration = step-2;

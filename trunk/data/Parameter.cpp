@@ -62,6 +62,11 @@ Parameter* Parameter::New(const Model::Parameter& mdl, const std::string& name)
 	return NULL;
 }
 
+Model::Type Parameter::GetType() const 
+{
+	return model.type();
+}
+
 int Parameter::ToBuffer(void* b, unsigned int maxsize) const
 {
         size_t s1 = Types::basicTypeSize(model.type());

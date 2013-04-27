@@ -17,8 +17,9 @@
 		</group>
 	</data>
 	<actions>
+		<event name="my event" action="my_function" library="libPlugin.so" />
 		<event  name="say_hello_from_cpp"   action="hello_world" library="libhello.so" />
-		<script name="draw_from_python"     file="draw.py"  language="python" scope="node" />
-		<script name="clean_from_python"    file="clean.py" language="python" scope="node" />
+<!--		<script name="draw_from_python"     file="draw.py"  language="python" scope="node" /> -->
+<!-- <script name="clean_from_python"    file="clean.py" language="python" scope="node" /> -->
 	</actions>
 </simulation>

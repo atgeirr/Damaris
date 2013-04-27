@@ -37,7 +37,7 @@ class GarbageCollector  : public Action {
 		/**
 		 * \brief Constructor. 
 		 */
-		GarbageCollector() : Action("#clean") {}
+		GarbageCollector() : Action("#error") {}
 		
 		virtual void Call(int32_t iteration, int32_t sourceID, const char *args = NULL)
 		{

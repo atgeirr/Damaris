@@ -3,6 +3,7 @@ set(CLIENT_SIDE_LIBRARIES damaris ${Boost_LIBRARIES} ${PYTHON_LIBRARIES}
 set(EMB_SERVER_LIBRARIES damaris-server ${CLIENT_SIDE_LIBRARIES})
 
 add_library(hello SHARED hello.cpp)
+#set_target_properties(hello PROPERTIES LINK_FLAGS "-Wl,--whole-archive")
 
 IF( CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" )
   SET_TARGET_PROPERTIES(hello PROPERTIES COMPILE_FLAGS "-fPIC")

@@ -179,7 +179,7 @@ void Server::processInternalSignal(int32_t object, int iteration, int source)
 		break;
 	case ITERATION_HAS_ERROR:
 		if(Environment::StartNextIteration()) {
-			ActionManager::ReactToUserSignal("#clean",iteration,source);
+			ActionManager::ReactToUserSignal("#error",iteration,source);
 		}
 		break;
 	case KILL_SERVER:

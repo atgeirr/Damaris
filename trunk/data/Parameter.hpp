@@ -80,6 +80,11 @@ namespace Damaris {
 			T GetValue() const;
 
 			/**
+			 * Get the type of the parameter.
+			 */
+			Model::Type GetType() const;
+
+			/**
 			 * Sets the value of the parameter.
 			 */
 			template<typename T>
