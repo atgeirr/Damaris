@@ -46,7 +46,7 @@ namespace Damaris {
 		public:
 			ChunkHeader(const ChunkDescriptor* ch, const Model::Type& t, 
 					int it, int src, int b = 0) 
-				: ChunkDescriptor(*ch), 
+				: ChunkDescriptor(*ch),
 				source(src), 
 				iteration(it), 
 				block(b), 

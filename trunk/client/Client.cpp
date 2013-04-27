@@ -176,6 +176,26 @@ namespace Damaris {
 		return 0;
 	}
 
+	int Client::set_position(const std::string& varname, 
+		const int* position)
+	{
+		return set_block_position(varname,position,0);
+	}
+
+	int Client::set_block_position(const std::string& varname, 
+		const int* position, int32_t block_id)
+	{
+		Variable* v = VariableManager::Search(varname);
+		if(v == NULL) return -1;
+		
+		Position* p = v->GetBlockPosition(block_id);
+		int dim = v->GetLayout()->GetDimensions();
+		for(int i = 0; i < dim; i++) {
+			p->SetOffset(i,position[i]);
+		}
+		return 0;
+	}
+
 	int Client::write(const std::string & varname, 
 			const void* data, bool blocking)
 	{

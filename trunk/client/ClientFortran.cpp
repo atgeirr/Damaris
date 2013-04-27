@@ -163,6 +163,24 @@ void FC_FUNC_GLOBAL(df_parameter_set,DF_PARAMETER_SET)
 		if(ierr_f != NULL) *ierr_f = res;
 	}
 
+void FC_FUNC_GLOBAL(df_set_position,DF_SET_POSITION)
+	(char* var_name_f, int32_t* position_f, int* ierr_f, int varname_size)
+	{	
+		std::string varName = fortranStringToCpp(var_name_f,varname_size);
+		int res = __client->set_position(varName,position_f);
+		if(ierr_f != NULL) *ierr_f = res;
+	}
+
+void FC_FUNC_GLOBAL(df_set_block_position,DF_SET_BLOCK_POSITION)
+	(char* var_name_f, int32_t* position_f,
+	 int32_t* block_id_f, int* ierr_f, int varname_size)
+	{
+		std::string varName = fortranStringToCpp(var_name_f,varname_size);
+		int res = __client->set_block_position(varName,
+			position_f,*block_id_f);
+		if(ierr_f != NULL) *ierr_f = res;
+	}
+
 void FC_FUNC_GLOBAL(df_mpi_get_client_comm,DF_GET_MPI_CLIENT_COMM)
         (MPI_Fint* fcomm)
 	{

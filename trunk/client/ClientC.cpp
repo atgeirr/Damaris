@@ -100,6 +100,18 @@ int DC_parameter_get(const char* param_name, void* buffer, unsigned int size)
 	return __client->get_parameter(paramName,buffer,size);
 }
 
+int DC_set_position(const char* var_name, const int* position)
+{
+	std::string varname(var_name);
+	return __client->set_position(varname,position);
+}
+
+int DC_set_block_position(const char* var_name, const int* position, int32_t block)
+{
+	std::string varname(var_name);
+	return __client->set_block_position(varname,position,block);
+}
+
 int DC_parameter_set(const char* param_name, const void* buffer, unsigned int size)
 {
 	std::string paramName(param_name);

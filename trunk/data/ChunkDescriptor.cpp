@@ -98,6 +98,16 @@ namespace Damaris {
 			return 0;
 	}
 
+	void ChunkDescriptor::Move(const Position* p)
+	{
+		for(unsigned int i = 0; i<dimensions; i++) {
+			int l = lbounds[i];
+			int dl = p->GetOffset(i) - l;
+			lbounds[i] += dl;
+			ubounds[i] += dl;
+		}
+	}
+
 	bool ChunkDescriptor::Within(const Layout& enclosing) const
 	{
 		if(enclosing.IsUnlimited()) return true;

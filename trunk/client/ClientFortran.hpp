@@ -104,6 +104,14 @@ void FC_FUNC_GLOBAL(df_commit_block_iteration,DF_COMMIT_BLOCK_ITERATION)
 void FC_FUNC_GLOBAL(df_signal,DF_SIGNAL)
 	(char* event_name_f, int* ierr_f, int event_name_size);
 
+
+void FC_FUNC_GLOBAL(df_set_position,DF_SET_POSITION)
+	(char* var_name_f, int32_t* position_f, int* ierr_f, int varname_size);
+
+void FC_FUNC_GLOBAL(df_set_block_position,DF_SET_BLOCK_POSITION)
+	(char* var_name_f, int32_t* position_f, 
+	 int32_t* block_id_f, int* ierr_f, int varname_size);
+
 /**
  * \fn df_parameter_get(param_name, buffer, size, ierr)
  * \brief Retrieve the value associated to a parameter.

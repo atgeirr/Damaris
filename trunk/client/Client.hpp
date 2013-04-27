@@ -179,13 +179,35 @@ namespace Damaris {
 		virtual int commit_block(const std::string & varname, 
 				int32_t block, int32_t iteration = -1);
 
+		/**
+		 * Set the position of a variable within a global space.
+		 * \see set_block_position
+		 */
+		virtual int set_position(const std::string& varname,
+				const int* position);
+
+		/**
+		 * Set the position of a variable within a global space.
+		 * \param[in] varname : name of the variable.
+		 * \param[in] position : an array of offsets (should contain as
+		 *		many items as the variable has dimensions).
+		 * \param[in] block : id of the block.
+		 *
+		 * \return 0 in case of success, 
+		 *         -1 if the variable is not known.
+		 */
+		virtual int set_block_position(const std::string& varname,
+				const int* position, int32_t block);
+
 		/** 
 		 * \brief Retrieves a parameter's value. 
 		 * 
 		 * \param[in] paramName : name of the parameter to retrieve.
-		 * \param[out] buffer : pointer to the memory where to copy the parameter's value.
+		 * \param[out] buffer : pointer to the memory where to copy the 
+		 * 	parameter's value.
 		 *
-		 * \return 0 in case of success, -1 if the parameter is not found.
+		 * \return 0 in case of success, 
+		 *         -1 if the parameter is not found.
 		 */
 		virtual int get_parameter(const std::string & paramName, void* buffer, 
 				unsigned int size);

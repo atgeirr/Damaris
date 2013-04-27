@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include "xml/Model.hpp"
 #include "data/Layout.hpp"
+#include "data/Position.hpp"
 #include "data/Types.hpp"
 
 namespace Damaris {
@@ -94,6 +95,11 @@ namespace Damaris {
 			 * \brief Gets an end index.
 			 */
 			int GetEndIndex(int i) const;
+
+			/**
+			 * \breif Set start index.
+			 */
+			void Move(const Position* p);
 
 			/**
 			 * \brief Check if the chunk is within an enclosing Layout.

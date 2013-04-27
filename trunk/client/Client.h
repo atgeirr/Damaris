@@ -104,6 +104,13 @@ int 	DC_parameter_get(const char* param_name, void* buffer, unsigned int size);
 int 	DC_parameter_set(const char* param_name, const void* buffer, unsigned int size);
 
 /**
+ * Set the position of blocks in a virtual space.
+ * \see Damaris::Client::set_position and Damaris::Client::set_block_position.
+ */
+int 	DC_set_position(const char* var_name, const int* position);
+int	DC_set_block_position(const char* var_name, const int* position, int32_t block);
+
+/**
  * \brief Get the communicator gathering all clients.
  * The program must have been started through the start_mpi_entity function.
  * \return the communicator.

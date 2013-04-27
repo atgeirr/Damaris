@@ -37,6 +37,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "data/ChunkSet.hpp"
 #include "data/Layout.hpp"
 #include "core/Manager.hpp"
+#include "data/Position.hpp"
 
 namespace Damaris {
 
@@ -57,6 +58,8 @@ class Variable : public Configurable<Model::Variable> {
 		Buffer* allocator;	/*!< Allocator to use for chunks. */
 		std::string name; 	/*!< Name of the variable. */
 		int id;			/*!< id of the variable, given by the VariableManager. */
+		std::map<int,boost::shared_ptr<Position> > positions;
+					/*! Map of positions to use for placing blocks. */
 	
 		/**
 		 * \brief Constructor. 
@@ -198,6 +201,11 @@ class Variable : public Configurable<Model::Variable> {
 		 * Retrieves a Chunk from a handle to the internal allocator.
 		 */
 		virtual Chunk* Retrieve(handle_t h);
+
+		/**
+		 * Get the position for a chunk. This position can be changed.
+		 */
+		virtual Position* GetBlockPosition(int block_id = 0);
 
 		/**
 		 * Iterates on all Chunks stored.

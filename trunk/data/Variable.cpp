@@ -79,6 +79,14 @@ int Variable::CountTotalBlocks(int iteration) const
 	return nbrServer*CountLocalBlocks(iteration);
 }
 
+Position* Variable::GetBlockPosition(int block_id) 
+{
+	if(positions.count(block_id) == 0) {
+		positions[block_id] = boost::shared_ptr<Position>(new Position());
+	}
+	return positions[block_id].get();
+}
+
 bool Variable::DetachChunk(Chunk* c)
 {
 	int iteration = c->GetIteration();
@@ -279,6 +287,10 @@ Chunk* Variable::Allocate(int block, bool blocking)
 	}
 
 	ChunkDescriptor* cd = ChunkDescriptor::New(*layout);
+	if(positions.count(block) == 1) {
+		Position* p = GetBlockPosition(block);
+		cd->Move(p);
+	}
 	size_t size = sizeof(ChunkHeader)+cd->GetDataMemoryLength(layout->GetType());
 	void* location = allocator->Allocate(size);
 
@@ -298,7 +310,8 @@ Chunk* Variable::Allocate(int block, bool blocking)
 		}
 	}
 
-	ChunkHeader* ch = 
+	
+	ChunkHeader* ch =
 		new(location) ChunkHeader(cd,layout->GetType(),
 					iteration,source, block);
 	
