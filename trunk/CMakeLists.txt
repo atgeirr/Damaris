@@ -12,7 +12,7 @@ enable_language (Fortran OPTIONAL)
 include(CMakeForceCompiler)
 CMAKE_FORCE_CXX_COMPILER(mpicxx "MPI C++ Compiler")
 CMAKE_FORCE_C_COMPILER(mpicc "MPI C Compiler")
-#CMAKE_FORCE_FORTRAN_COMPILER(mpif90 "Fortran Compiler")
+CMAKE_FORCE_FORTRAN_COMPILER(mpif90 "Fortran Compiler")
 
 #-----------------------------------------------------------#
 # Starting project definition
@@ -24,7 +24,7 @@ project(DAMARIS)
 # indicate where are all the required libraries. By default
 # CMake will look for libraries in this directory.
 #-----------------------------------------------------------#
-set(EXTERNAL_ROOT ~/deploy)
+set(EXTERNAL_ROOT /usr/local/lib)
 
 #-----------------------------------------------------------#
 add_definitions (-g -O2 -Wall -rdynamic)
@@ -38,7 +38,7 @@ add_definitions (-g -O2 -Wall -rdynamic)
 add_definitions (-D__INFO)
 #add_definitions (-D__TRACE)
 #add_definitions (-D__DEBUG_ALL)
-add_definitions (-D__BENCHMARK)
+#add_definitions (-D__BENCHMARK)
 
 #-----------------------------------------------------------#
 # Check if we are on BlueGene/P
@@ -64,7 +64,7 @@ include_directories(${DAMARIS_SOURCE_DIR}/include)
 #-----------------------------------------------------------#
 # Set everything related to the Boost libraries
 #-----------------------------------------------------------#
-set(BOOST_ROOT ${EXTERNAL_ROOT})
+set(BOOST_ROOT /home/cata/INRIA/Libs/boost_1_53_0)
 find_package(Boost REQUIRED)
 set(BOOST_LIB boost_filesystem boost_system boost_program_options)
 find_package(Boost 1.51.0 COMPONENTS filesystem system program_options)
@@ -87,6 +87,8 @@ set(XERCESC_LIBRARY_DIR "${XERCESC_ROOT}/lib")
 set(XERCESC_INCLUDE_DIR "${XERCESC_ROOT}/include")
 set(XERCESC_LIBRARIES xerces-c)
 include_directories(${XERCESC_INCLUDE_DIR})
+include_directories("/usr/local/hdf5/include")
+link_directories("/usr/local/hdf5/lib")
 link_directories(${XERCESC_LIBRARY_DIR})
 
 #-----------------------------------------------------------#
@@ -117,23 +119,9 @@ else (PYTHON_INCLUDE_PATH)
 endif (PYTHON_INCLUDE_PATH)
 
 #-----------------------------------------------------------#
-# Set everything related to the HDF5 library 
-# Just comment the first line if you don't want HDF5 support
-#-----------------------------------------------------------#
-#set(HDF5_ROOT ${EXTERNAL_ROOT})
-set(HDF5_LIBRARY_DIR "${HDF5_ROOT}/lib")
-set(HDF5_INCLUDE_DIR "${HDF5_ROOT}/include")
-set(HDF5_LIB hdf5)
-if(HDF5_ROOT)
-  include_directories(${HDF5_INCLUDE_DIR})
-  link_directories(${HDF5_LIBRARY_DIR})
-  add_definitions(-D__ENABLE_HDF5)
-endif(HDF5_ROOT)
-
-#-----------------------------------------------------------#
 # Set everything related to VisIt 
 #-----------------------------------------------------------#
-set(VISIT_ROOT "~/Work/Visu3/visit2.5.2/src")
+#set(VISIT_ROOT "~/Work/Visu3/visit2.5.2/src")
 if(VISIT_ROOT)
   set(VISIT_INCLUDE_DIR "${VISIT_ROOT}/sim/V2/lib")
   set(VISIT_LIBRARY_DIR "${VISIT_ROOT}/lib")
