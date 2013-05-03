@@ -16,6 +16,8 @@
 			<variable name="julia" layout="plan"> Julia set </variable>
 		</group>
 	</data>
+	<storage>
+	</storage>
 	<actions>
 		<event  name="say_hello_from_cpp"   action="hello_world" library="libhello.so" />
 		<script name="draw_from_python"     file="draw_no_server.py"  language="python" scope="core" />
