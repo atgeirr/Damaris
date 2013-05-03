@@ -266,6 +266,7 @@ namespace Damaris
     class VisitParam;
     class PythonParam;
     class Actions;
+    class Storage;
     class Simulation;
   }
 }
@@ -2627,6 +2628,38 @@ namespace Damaris
       error_sequence error_;
     };
 
+    class Storage: public ::xml_schema::type
+    {
+      public:
+      // Constructors.
+      //
+      Storage ();
+
+      Storage (const ::xercesc::DOMElement& e,
+               ::xml_schema::flags f = 0,
+               ::xml_schema::container* c = 0);
+
+      Storage (const ::xercesc::DOMAttr& a,
+               ::xml_schema::flags f = 0,
+               ::xml_schema::container* c = 0);
+
+      Storage (const ::std::string& s,
+               const ::xercesc::DOMElement* e,
+               ::xml_schema::flags f = 0,
+               ::xml_schema::container* c = 0);
+
+      Storage (const Storage& x,
+               ::xml_schema::flags f = 0,
+               ::xml_schema::container* c = 0);
+
+      virtual Storage*
+      _clone (::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0) const;
+
+      virtual 
+      ~Storage ();
+    };
+
     class Simulation: public ::xml_schema::type
     {
       public:
@@ -2663,6 +2696,23 @@ namespace Damaris
 
       void
       data (::std::auto_ptr< data_type > p);
+
+      // storage
+      // 
+      typedef ::Damaris::Model::Storage storage_type;
+      typedef ::xsd::cxx::tree::traits< storage_type, char > storage_traits;
+
+      const storage_type&
+      storage () const;
+
+      storage_type&
+      storage ();
+
+      void
+      storage (const storage_type& x);
+
+      void
+      storage (::std::auto_ptr< storage_type > p);
 
       // actions
       // 
@@ -2764,11 +2814,13 @@ namespace Damaris
       //
       Simulation (const architecture_type&,
                   const data_type&,
+                  const storage_type&,
                   const actions_type&,
                   const name_type&);
 
       Simulation (::std::auto_ptr< architecture_type >&,
                   ::std::auto_ptr< data_type >&,
+                  const storage_type&,
                   ::std::auto_ptr< actions_type >&,
                   const name_type&);
 
@@ -2797,6 +2849,7 @@ namespace Damaris
       protected:
       ::xsd::cxx::tree::one< architecture_type > architecture_;
       ::xsd::cxx::tree::one< data_type > data_;
+      ::xsd::cxx::tree::one< storage_type > storage_;
       ::xsd::cxx::tree::one< actions_type > actions_;
       python_optional python_;
       visit_optional visit_;

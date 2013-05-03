@@ -650,6 +650,11 @@
 		</xs:sequence>
 	</xs:complexType>
 
+	<!-- Storage node -->
+	<xs:complexType name="Storage">
+
+	</xs:complexType>
+
 	<!-- Simulation node -->
 	<xs:complexType name="Simulation">
 		<xs:sequence>
@@ -663,6 +668,11 @@
                     All data definitions (variables, parameters, layouts, etc.).
                 </xs:documentation></xs:annotation>
             </xs:element>
+		<xs:element name="storage" type="mdl:Storage" maxOccurs="1">
+			<xs:annotation><xs:documentation>
+		Storage hints
+			</xs:documentation></xs:annotation>
+		</xs:element>
 			<xs:element name="actions" type="mdl:Actions" maxOccurs="1">
                 <xs:annotation><xs:documentation>
                     All actions definitions.

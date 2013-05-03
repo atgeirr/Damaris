@@ -2085,6 +2085,10 @@ namespace Damaris
     }
 
 
+    // Storage
+    // 
+
+
     // Simulation
     // 
 
@@ -2134,6 +2138,30 @@ namespace Damaris
     data (::std::auto_ptr< data_type > x)
     {
       this->data_.set (x);
+    }
+
+    const Simulation::storage_type& Simulation::
+    storage () const
+    {
+      return this->storage_.get ();
+    }
+
+    Simulation::storage_type& Simulation::
+    storage ()
+    {
+      return this->storage_.get ();
+    }
+
+    void Simulation::
+    storage (const storage_type& x)
+    {
+      this->storage_.set (x);
+    }
+
+    void Simulation::
+    storage (::std::auto_ptr< storage_type > x)
+    {
+      this->storage_.set (x);
     }
 
     const Simulation::actions_type& Simulation::
@@ -5194,6 +5222,60 @@ namespace Damaris
     {
     }
 
+    // Storage
+    //
+
+    Storage::
+    Storage ()
+    : ::xml_schema::type ()
+    {
+    }
+
+    Storage::
+    Storage (const Storage& x,
+             ::xml_schema::flags f,
+             ::xml_schema::container* c)
+    : ::xml_schema::type (x, f, c)
+    {
+    }
+
+    Storage::
+    Storage (const ::xercesc::DOMElement& e,
+             ::xml_schema::flags f,
+             ::xml_schema::container* c)
+    : ::xml_schema::type (e, f, c)
+    {
+    }
+
+    Storage::
+    Storage (const ::xercesc::DOMAttr& a,
+             ::xml_schema::flags f,
+             ::xml_schema::container* c)
+    : ::xml_schema::type (a, f, c)
+    {
+    }
+
+    Storage::
+    Storage (const ::std::string& s,
+             const ::xercesc::DOMElement* e,
+             ::xml_schema::flags f,
+             ::xml_schema::container* c)
+    : ::xml_schema::type (s, e, f, c)
+    {
+    }
+
+    Storage* Storage::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class Storage (*this, f, c);
+    }
+
+    Storage::
+    ~Storage ()
+    {
+    }
+
     // Simulation
     //
 
@@ -5203,11 +5285,13 @@ namespace Damaris
     Simulation::
     Simulation (const architecture_type& architecture,
                 const data_type& data,
+                const storage_type& storage,
                 const actions_type& actions,
                 const name_type& name)
     : ::xml_schema::type (),
       architecture_ (architecture, ::xml_schema::flags (), this),
       data_ (data, ::xml_schema::flags (), this),
+      storage_ (storage, ::xml_schema::flags (), this),
       actions_ (actions, ::xml_schema::flags (), this),
       python_ (::xml_schema::flags (), this),
       visit_ (::xml_schema::flags (), this),
@@ -5219,11 +5303,13 @@ namespace Damaris
     Simulation::
     Simulation (::std::auto_ptr< architecture_type >& architecture,
                 ::std::auto_ptr< data_type >& data,
+                const storage_type& storage,
                 ::std::auto_ptr< actions_type >& actions,
                 const name_type& name)
     : ::xml_schema::type (),
       architecture_ (architecture, ::xml_schema::flags (), this),
       data_ (data, ::xml_schema::flags (), this),
+      storage_ (storage, ::xml_schema::flags (), this),
       actions_ (actions, ::xml_schema::flags (), this),
       python_ (::xml_schema::flags (), this),
       visit_ (::xml_schema::flags (), this),
@@ -5239,6 +5325,7 @@ namespace Damaris
     : ::xml_schema::type (x, f, c),
       architecture_ (x.architecture_, f, this),
       data_ (x.data_, f, this),
+      storage_ (x.storage_, f, this),
       actions_ (x.actions_, f, this),
       python_ (x.python_, f, this),
       visit_ (x.visit_, f, this),
@@ -5254,6 +5341,7 @@ namespace Damaris
     : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
       architecture_ (f, this),
       data_ (f, this),
+      storage_ (f, this),
       actions_ (f, this),
       python_ (f, this),
       visit_ (f, this),
@@ -5301,6 +5389,20 @@ namespace Damaris
           if (!data_.present ())
           {
             this->data_.set (r);
+            continue;
+          }
+        }
+
+        // storage
+        //
+        if (n.name () == "storage" && n.namespace_ () == "http://damaris.gforge.inria.fr/Damaris/Model")
+        {
+          ::std::auto_ptr< storage_type > r (
+            storage_traits::create (i, f, this));
+
+          if (!storage_.present ())
+          {
+            this->storage_.set (r);
             continue;
           }
         }
@@ -5361,6 +5463,13 @@ namespace Damaris
       {
         throw ::xsd::cxx::tree::expected_element< char > (
           "data",
+          "http://damaris.gforge.inria.fr/Damaris/Model");
+      }
+
+      if (!storage_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_element< char > (
+          "storage",
           "http://damaris.gforge.inria.fr/Damaris/Model");
       }
 
