@@ -11,7 +11,7 @@
 		<parameter name="w" type="int" value="640" />
 		<parameter name="h" type="int" value="480" />
 
-		<layout name="plan" type="char" dimensions="w,h" />
+		<layout name="plan" type="char" dimensions="w/2,h/2" />
 		<group name="images">
 			<variable name="julia" layout="plan"> Julia set </variable>
 		</group>
@@ -22,4 +22,7 @@
 <!--		<script name="draw_from_python"     file="draw.py"  language="python" scope="node" /> -->
 <!-- <script name="clean_from_python"    file="clean.py" language="python" scope="node" /> -->
 	</actions>
+	<visit>
+		<path>/home/mdorier/Work/Visu3/visit2.5.2/src</path>
+	</visit>
 </simulation>

@@ -97,8 +97,14 @@ int main(int argc, char** argv)
 		char* fractal = new char[WIDTH*HEIGHT/4];
 		std::complex<double> c;
 
-		int offset_x = WIDTH*(rank%2);
-		int offset_y = HEIGHT*(rank/2);
+		int offset_x = WIDTH*(rank%2)/2;
+		int offset_y = HEIGHT*(rank/2)/2;
+
+		int position[2];
+		position[0] = offset_x;
+		position[1] = offset_y;
+
+		client->set_position("images/julia",position);
 	
 		for(int i = 0; i < ITERATIONS ; i++) {
 			c = std::polar<double>(0.3,i*2.0*PI/((float)ITERATIONS)-PI/2.0);
