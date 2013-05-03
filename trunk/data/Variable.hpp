@@ -38,6 +38,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "data/Layout.hpp"
 #include "core/Manager.hpp"
 #include "data/Position.hpp"
+#include "data/Mesh.hpp"
 
 namespace Damaris {
 
@@ -234,6 +235,7 @@ class Variable : public Configurable<Model::Variable> {
 		 * Creates an instance of Variable if the provided model is consistant.
 		 */
 		static Variable* New(const Model::Variable& mdl, const std::string &name);
+
 };
 
 template<typename F>

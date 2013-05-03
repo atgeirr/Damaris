@@ -37,20 +37,6 @@ int Chunk::NbrOfItems() const
 	return acc;
 }
 
-bool Chunk::Within(const Layout& enclosing) const
-{
-    if(enclosing.IsUnlimited()) return true;
-
-    bool b = (enclosing.GetDimensions() == GetDimensions());
-    if(b) {
-        for(unsigned int i=0; i < GetDimensions();i++) {
-            b = b && (GetStartIndex(i) >= 0);
-            b = b && (GetEndIndex(i) < (int)enclosing.GetExtentAlongDimension(i));
-        }
-    }
-    return b;
-}
-
 bool Chunk::Within(const Chunk& enclosing) const
 {
     bool b = (enclosing.GetDimensions() == GetDimensions());

@@ -137,7 +137,7 @@ void Variable::Clear(int iteration)
 #ifdef __ENABLE_VISIT
 bool Variable::ExposeVisItMetaData(visit_handle md, int iteration)
 {
-	if(not model.visualizable()) {
+	if((not model.visualizable()) || (model.mesh() == "#")) {
 		return false;
 	}
 

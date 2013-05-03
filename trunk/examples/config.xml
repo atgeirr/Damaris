@@ -19,6 +19,8 @@
 			</variable>
 		</group>
 	</data>
+	<storage>
+	</storage>
 	<actions>
 		<event name="my event" action="my_function" library="hello.so"/>
 		<script name="my script" file="script.py" language="python"/>

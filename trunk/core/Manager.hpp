@@ -153,7 +153,8 @@ class Manager {
 
 		/**
 		 * Adds in the manager an object that has already been created externally.
-		 * The object is not added is another object already exists with the same name.
+		 * The object is not added if another object already exists with the same name.
+		 * Adding into the manager will alter the object's id.
 		 */
 		template<typename SUBCLASS>
 		static bool Add(SUBCLASS *t)
@@ -166,6 +167,8 @@ class Manager {
 
 			std::pair<typename ObjectSet::iterator,bool> ret
 				= objects->insert(boost::shared_ptr<T>(t));
+			if(ret.second) t->id = NumObjects()-1;
+
 			return ret.second;
 		}
 

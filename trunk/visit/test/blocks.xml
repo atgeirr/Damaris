@@ -36,6 +36,8 @@
 			<variable name="z3d" layout="cmesh" visualizable="false"  time-varying="false" />
 		</group>
 	</data>
+	<storage>
+	</storage>
 	<actions>
 	</actions>
 	<visit>

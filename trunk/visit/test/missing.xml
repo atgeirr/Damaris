@@ -4,7 +4,7 @@
 		<cores  count="3">
 			<clients count="2"/>
 		</cores>
-		<buffer name="buffer" size="536870912" />
+		<buffer name="buffer" size="300000" />
 		<queue  name="queue" size="100" />
 	</architecture>
 	<data>
@@ -34,7 +34,9 @@
 	<storage>
 	</storage>
 	<actions>
-		<event name="clean" action="clean" library="libgc.so" scope="node"/>
+<!--		<event name="clean" action="clean" library="libgc.so" scope="node"/>  -->
+		<event name="test" action="clean" library="libgc.so" scope="core"/>
+		<error event="test"/>
 	</actions>
 	<visit>
 		<path>/home/mdorier/Work/Visu3/visit2.5.2/src</path>

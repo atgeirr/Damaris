@@ -31,7 +31,7 @@
 		<mesh name="mesh3d" type="curvilinear" topology="3">
 			<coord name="coordinates/x3d" unit="cm" label="Width"/>
 			<coord name="coordinates/y3d" unit="cm" label="Height"/>
-			<coord name="coordinates/z3d" unit="cm" label="Depth"/>		
+			<coord name="coordinates/z3d" unit="cm" label="Depth"/>	
 		</mesh>
 
 		<group name="coordinates">
@@ -54,6 +54,8 @@
 			<variable name="vector" layout="nodal_v_layout" type="vector" centering="nodal" mesh="mesh3d"/>
 		</group>
 	</data>
+	<storage>
+	</storage>
 	<actions>
 	</actions>
 	<visit>

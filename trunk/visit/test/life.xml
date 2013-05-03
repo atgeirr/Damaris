@@ -31,6 +31,8 @@
 			<variable name="cells" type="scalar" layout="cells" mesh="mesh2d" centering="zonal" />
 		</group>
 	</data>
+	<storage>
+	</storage>
 	<actions>
 		<event name="clean" action="internal_gc" library="libgc.so" scope="node"/>
 	</actions>

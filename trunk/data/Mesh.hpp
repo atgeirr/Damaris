@@ -80,16 +80,6 @@ class Mesh : public Configurable<Model::Mesh> {
 #endif
 
 		/**
-		 * Count the number of local blocks required to build the mesh.
-		 */
-		//virtual int CountLocalBlocks(int iteration) const;
-
-		/**
-		 * Count the total number of blocks for this mesh across all processes.
-		 */
-		//virtual int CountTotalBlocks(int iteration) const;
-
-		/**
 		 * Creates an instance of a child class of Mesh according to the Mesh model.
 		 */
 		static Mesh* New(const Model::Mesh& mdl, const std::string& name);

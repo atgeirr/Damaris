@@ -9,6 +9,8 @@
 	</architecture>
 	<data>
 	</data>
+	<storage>
+	</storage>
 	<actions>
 		<event name="say_hello1" action="hello_world" library="libhello.so" external="true"/>
 		<script name="say_hello2" file="cmd.py" language="python" external="true"/>

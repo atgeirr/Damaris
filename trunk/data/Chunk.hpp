@@ -124,12 +124,6 @@ namespace Damaris {
 			virtual int GetEndIndex(int i) const = 0;
 
 			/**
-			 * \brief Check if the chunk is within an enclosing Layout.
-			 * Note: returns false if NULL is passed.
-			 */
-			bool Within(const Layout& enclosing) const;
-
-			/**
 			 * \brief Check if the chunk is within an enclosing other Chunk.
 			 * Note: returns false if NULL is passed.
 			 */
