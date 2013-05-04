@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<simulation name="point" language="c" xmlns="http://damaris.gforge.inria.fr/Damaris/Model">
+	<architecture>
+		<cores  count="2">
+			<clients count="1"/>
+		</cores>
+		<buffer name="buffer" size="67108864" />
+		<queue  name="queue" size="100" />
+	</architecture>
+	<data>
+		<parameter name="NPTS"  type="int" value="1000" />
+
+		<layout name="pts" type="float" dimensions="NPTS" />
+
+		<mesh name="point3d" type="point">
+			<coord name="coordinates/px" unit="cm" label="Width"/>
+			<coord name="coordinates/py" unit="cm" label="Height"/>
+			<coord name="coordinates/pz" unit="cm" label="Depth"/>		
+		</mesh>
+
+		<group name="coordinates">
+			<variable name="px" layout="pts" visualizable="false" time-varying="true" />
+			<variable name="py" layout="pts" visualizable="false" time-varying="true" />
+			<variable name="pz" layout="pts" visualizable="false" time-varying="true" />
+		</group>
+	</data>
+	<storage>
+	</storage>
+	<actions>
+	</actions>
+	<visit>
+		<path>/home/mdorier/Work/Visu3/visit2.5.2/src</path>
+	</visit>
+</simulation>
