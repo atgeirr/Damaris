@@ -16,17 +16,59 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Chunk.cpp
- * \date February 2012
+ * \date Oct. 2012
  * \author Matthieu Dorier
- * \version 0.4
+ * \version 0.7
  */
-
-#include <string.h>
- 
-#include "core/Debug.hpp"
 #include "data/Chunk.hpp"
 
 namespace Damaris {
+
+Chunk::Chunk(Buffer* b, ChunkHeader* ch) 
+{
+	isOwner = false;
+	buffer = b;
+	header = ch;
+	void* addr = ((char*)header)+sizeof(ChunkHeader);
+	size_t size = header->GetDataMemoryLength(GetType());
+	space = new DataSpace(addr,size);
+}
+
+Chunk::Chunk(Buffer* b, handle_t h)
+{
+	isOwner = false;
+	buffer = b;
+	header = (ChunkHeader*)buffer->GetAddressFromHandle(h);
+	void* addr = ((char*)header)+sizeof(ChunkHeader);
+	size_t size = header->GetDataMemoryLength(GetType());
+	space = new DataSpace(addr,size);
+}
+
+Chunk::~Chunk()
+{
+	if(isOwner) {
+		buffer->Deallocate(header);
+	}
+}
+
+void* Chunk::Data()
+{
+	return space->Data();
+}
+
+/*
+size_t Chunk::MemCopy(const void* src)
+{
+	size_t size = header->GetDataMemoryLength(GetType());
+	memcpy(addr,src,size);
+	return size;
+}
+*/
+
+handle_t Chunk::GetHandle()
+{
+	return buffer->GetHandleFromAddress(header);
+}
 
 int Chunk::NbrOfItems() const
 {

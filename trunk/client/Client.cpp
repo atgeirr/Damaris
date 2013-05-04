@@ -28,7 +28,6 @@
 #include <exception>
 
 #include "core/Debug.hpp"
-#include "data/ChunkImpl.hpp"
 #include "memory/Message.hpp"
 #include "client/Client.hpp"
 
@@ -134,26 +133,27 @@ namespace Damaris {
 		if(v == NULL)
 			return -1;
 
-		ChunkImpl* chunk = NULL;
+		Chunk* chunk = NULL;
 
 		if(iteration < 0)
 			iteration = Environment::GetLastIteration();
 		
 		int source = Process::Get()->getID();
-		Chunk* c = v->GetChunk(source,iteration,block);
+		chunk = v->GetChunk(source,iteration,block);
 
-		if(c == NULL) {
+		if(chunk == NULL) {
 			ERROR("Unknown block " << block << " for variable " << varname);
 			errorOccured = true;
 			return -2;
 		}
+		/*
 		try {
 			chunk = dynamic_cast<ChunkImpl*>(c);
 		} catch(std::exception &e) {
 			ERROR("When doing dynamic cast: " << e.what());
 			errorOccured = true;
 			return -3;
-		}
+		}*/
 
 		// create notification message
 		Message message;
@@ -228,7 +228,7 @@ namespace Damaris {
 			errorOccured = true;
 			return -2;
 		}
-		int size = chunk->MemCopy(data);
+		int size = chunk->GetDataSpace()->MemCopy(data);
 
 		// create message
 		Message message;

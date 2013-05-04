@@ -23,7 +23,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 #include <list>
 #include "core/Debug.hpp"
-#include "data/ChunkImpl.hpp"
 #include "data/Layout.hpp"
 #include "core/ActionManager.hpp"
 #include "core/VariableManager.hpp"

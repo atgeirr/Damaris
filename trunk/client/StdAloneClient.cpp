@@ -24,7 +24,6 @@
 #include <list>
 #include "core/Debug.hpp"
 #include "memory/Message.hpp"
-#include "data/ChunkImpl.hpp"
 #include "data/Layout.hpp"
 #include "core/VariableManager.hpp"
 #include "core/ActionManager.hpp"
@@ -76,12 +75,14 @@ namespace Damaris {
 
 		if(chunk == NULL)
 			return -1;
+
+		/**
 		try {
 			dynamic_cast<ChunkImpl*>(chunk);
 		} catch(std::exception &e) {
 			ERROR("When doing dynamic cast: " << e.what());
 			return -3;
-		}
+		}*/
 
 		// nothing to do actually, the server already knows the variable
 
@@ -135,7 +136,7 @@ namespace Damaris {
 			return -2;
 		}
 		chunk->SetDataOwnership(true);
-		int size = chunk->MemCopy(data);
+		int size = chunk->GetDataSpace()->MemCopy(data);
 		return size;
 	}
 

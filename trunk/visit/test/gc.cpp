@@ -25,7 +25,6 @@ extern "C" {
 
 void clean(const std::string& /*event*/, int32_t step, int32_t /*src*/)
 {
-	std::cout << "hello " << std::endl;
 	Variable* v = VariableManager::Search("space");
 	Parameter* p = ParameterManager::Search("WIDTH");
 	if(p == NULL) std::cout << "parameter not found\n";

@@ -16,15 +16,14 @@
  ********************************************************************/
 /**
  * \file Chunk.hpp
- * \date February 2012
+ * \date Oct. 2012
  * \author Matthieu Dorier
- * \version 0.4
+ * \version 0.7
  */
 #ifndef __DAMARIS_CHUNK_H
 #define __DAMARIS_CHUNK_H
 
 #include <stdlib.h>
-
 #ifdef __ENABLE_VISIT
 #include <VisItDataInterface_V2.h>
 #endif
@@ -33,113 +32,145 @@
 #include "memory/SharedMemory.hpp"
 #include "data/Types.hpp"
 #include "data/Layout.hpp"
+#include "data/ChunkHeader.hpp"
+#include "memory/Buffer.hpp"
+#include "data/DataSpace.hpp"
 
 namespace Damaris {
+
 	/**
-	 * The Chunk class is an abstract class defining
-	 * the extents and types of a chunk of variable.
-	 * It inherits from Serializable so its representation
-	 * can be written into a buffer (used to pass this
-	 * representation from a process to another using
-	 * shared memory).
 	 */
 	class Chunk {
-		public:	
+
+		private:
+			bool isOwner; /*!< Indicates if this instance is the owner of the data
+					(multiple instances can hold a pointer to the same data. */
+			Buffer* buffer; /*!< Pointer to the shared memory 
+							segment containing the data. */
+			ChunkHeader* header; /*!< Pointer to header. */
+			//void* addr; /*!< Pointer to the actual data. */
+			DataSpace* space;
+		public:
 
 			/**
-			 * Destructor (does nothing since it's an abstract class)
+			 * Initialize a ShmChunk from a SharedMemorySegment and
+			 * a pointer to an existing header in the process's memory.
 			 */
-			virtual ~Chunk() {}
+			Chunk(Buffer* b, ChunkHeader* ch);
+
+			/**
+			 * Initialize a ShmChunk from a SharedMemorySegment and
+			 * a pointer to an existing header in the process's memory,
+			 * given as a handle.
+			 */
+			Chunk(Buffer* b, handle_t ch);
+
+			/**
+			 * \brief Destructor.
+			 * If this instance is the owner of the data, the data will be deleted.
+			 */
+			virtual ~Chunk();
 
 			/**
 			 * \brief Gets the ID of the process that has written the chunk.
 			 */
-			virtual int GetSource() const = 0;
+			virtual int GetSource() const { return header->GetSource(); }
 
 			/**
 			 * \brief Set the ID of the process that has written the chunk.
 			 */
-			virtual void SetSource(int src) = 0;
+			virtual void SetSource(int src) { header->SetSource(src); }
 
 			/**
 			 * \brief Gets the iteration at which the chunk has been written.
 			 */
-			virtual int GetIteration() const = 0;
+			virtual int GetIteration() const { return header->GetIteration(); }
 
 			/**
 			 * \brief Set the iteration number.
 			 */
-			virtual void SetIteration(int i) = 0;
+			virtual void SetIteration(int i) { header->SetIteration(i); }
 
 			/**
 			 * \brief Get the ID of the block.
 			 */
-			virtual int GetBlock() const = 0;
+			virtual int GetBlock() const { return header->GetBlock(); }
 
 			/**
 			 * \brief Set the ID of the block.
 			 */
-			virtual void SetBlock(int b) = 0;
-
-			/**
-			 * Returns a pointer over the actual data (to be overloaded in child classes).
-			 */
-			virtual void* Data() = 0;
-
-			/**
-			 * This function let the user decide wether this instance of Chunk
-			 * can or cannot destroy its associated data when deleted.
-			 */
-			virtual void SetDataOwnership(bool isOwner) = 0;
-
-			/**
-			 * Return true if this instance is the owner of its data or
-			 * if it just points to it.
-			 */
-			virtual bool GetDataOwnership() = 0;
-
-			/**
-			 * Gives the number of items contained in the Chunk.
-			 */
-			int NbrOfItems() const;
+			virtual void SetBlock(int b) { header->SetBlock(b); }
 
 			/**
 			 * \brief Gets the number of dimensions.
 			 */
-			virtual unsigned int GetDimensions() const = 0;
+			virtual unsigned int GetDimensions() const { return header->GetDimensions(); }
 
 			/**
 			 * \brief Gets the type of data.
 			 */
-			virtual Model::Type GetType() const = 0;
+			virtual Model::Type GetType() const { return header->GetType(); }
 
 			/**
 			 * \brief Gets a start index.
 			 */
-			virtual int GetStartIndex(int i) const = 0;
+			virtual int GetStartIndex(int i) const { return header->GetStartIndex(i); }
 
 			/**
 			 * \brief Gets an end index.
 			 */
-			virtual int GetEndIndex(int i) const = 0;
+			virtual int GetEndIndex(int i) const { return header->GetEndIndex(i); }
 
 			/**
-			 * \brief Check if the chunk is within an enclosing other Chunk.
-			 * Note: returns false if NULL is passed.
+			 * \brief Retrieves a pointer to the data.
+			 */
+			void* Data();
+
+			/**
+			 * Get the DataSpace in the Chunk.
+			 */
+			DataSpace* GetDataSpace() const { return space; }
+
+			/**
+			 * Set the DataSpace associated to the Chunk.
+			 * Will try to delete any previously attached DataSpace.
+			 */
+			void SetDataSpace(DataSpace* ds) {
+				if(space != NULL) {
+					delete space;
+				}
+				space = ds;
+			}
+
+			/**
+			 * Gives the number of items contained in the Chunk. 
+			 */
+			int NbrOfItems() const;
+
+			/**
+			 * \brief Check if the chunk is within an enclosing other Chunk. 
 			 */
 			bool Within(const Chunk& enclosing) const;
 
 			/**
-			 * Copy data from a pointer to the Chunk.
-			 * Returns the size of the copied data.
+			 * Indicates whether or not this instance of chunk is responsible for deleting
+			 * the data it points to.
 			 */
-			virtual size_t MemCopy(const void* addr) = 0;
+			virtual void SetDataOwnership(bool b)
+			{ isOwner = b; }
 
 			/**
-			 * Returns a handle to get the Chunk from the device
-			 * that stores it (typically a shared memory segment).
+			 * Returns the data ownership of this instance of chunk.
 			 */
-			virtual handle_t GetHandle() = 0;
+			virtual bool GetDataOwnership()
+			{ return isOwner; }
+
+			/**
+			 * Returns a relative pointer (handle) to the memory region where the 
+			 * chunk is located. Warning: this handle points to the header, not the data.
+			 */
+			handle_t GetHandle();
+
 #ifdef __ENABLE_VISIT
 			/**
 			 * Fills a VisIt data handle (already allocated) to expose the data
@@ -153,3 +184,4 @@ namespace Damaris {
 } // namespace Damaris
 
 #endif
+
