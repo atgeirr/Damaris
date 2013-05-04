@@ -24,6 +24,7 @@
 #include "core/VariableManager.hpp"
 #include "data/CurvilinearMesh.hpp"
 #include "data/RectilinearMesh.hpp"
+#include "data/PointMesh.hpp"
 #include "core/Debug.hpp"
 
 namespace Damaris {
@@ -41,8 +42,9 @@ namespace Damaris {
 				return RectilinearMesh::New(mdl,name);
 			case Model::MeshType::curvilinear :
 				return CurvilinearMesh::New(mdl,name);
-			case Model::MeshType::unstructured :
 			case Model::MeshType::point :
+				return PointMesh::New(mdl,name);
+			case Model::MeshType::unstructured :
 			case Model::MeshType::csg :
 			case Model::MeshType::amr :
 			case Model::MeshType::unknown :

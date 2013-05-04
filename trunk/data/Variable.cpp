@@ -26,7 +26,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "data/Variable.hpp"
 #include "data/ChunkDescriptor.hpp"
 #include "data/ChunkHeader.hpp"
-#include "data/ChunkImpl.hpp"
 #include "core/Debug.hpp"
 
 namespace Damaris {
@@ -315,7 +314,7 @@ Chunk* Variable::Allocate(int block, bool blocking)
 		new(location) ChunkHeader(cd,layout->GetType(),
 					iteration,source, block);
 	
-	chunk = new ChunkImpl(allocator,ch);
+	chunk = new Chunk(allocator,ch);
 	AttachChunk(chunk);
 
 	ChunkDescriptor::Delete(cd);
@@ -332,7 +331,7 @@ Chunk* Variable::Retrieve(handle_t h)
 {
 	allocator = Process::Get()->getSharedMemorySegment();
 
-	ChunkImpl* chunk = new ChunkImpl(allocator,h);
+	Chunk* chunk = new Chunk(allocator,h);
 
 	int iteration = chunk->GetIteration();
 	int source = chunk->GetSource();
