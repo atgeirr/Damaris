@@ -40,7 +40,7 @@ namespace Damaris {
 
 		private:
 			Process* process;
-			MPILayer<int>* commLayer;
+			MPILayer<CollectiveRPC<void (*)(void)>::rpc_id>* commLayer;
 			CollectiveRPC<void (*)(void)>* rpcLayer;
 
 			/**

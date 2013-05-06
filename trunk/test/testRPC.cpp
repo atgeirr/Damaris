@@ -20,15 +20,16 @@ int main(int argc, char** argv)
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD,&rank);
 
-	Damaris::MPILayer<int>* layer = Damaris::MPILayer<int>::New(MPI_COMM_WORLD);
+	Damaris::MPILayer<Damaris::CollectiveRPC<rpc_method>::rpc_id>* layer 
+		= Damaris::MPILayer<Damaris::CollectiveRPC<rpc_method>::rpc_id>::New(MPI_COMM_WORLD);
 	Damaris::CollectiveRPC<rpc_method>* crpc = Damaris::CollectiveRPC<rpc_method>::New(layer);
 
-	crpc->RegisterMulti(f, RPC_F);
-	crpc->RegisterCollective(g, RPC_G);
+	crpc->RegisterMulti(f,0, RPC_F);
+	crpc->RegisterCollective(g,0, RPC_G);
 
-	crpc->Call(RPC_G);	
+	crpc->Call(0,RPC_G);	
 	if(rank == 0) {
-		crpc->Call(RPC_F);
+		crpc->Call(0,RPC_F);
 	}
 
 	while(true) {
@@ -38,7 +39,7 @@ int main(int argc, char** argv)
 	}
 
 	Damaris::CollectiveRPC<rpc_method>::Delete(crpc);
-	Damaris::MPILayer<int>::Delete(layer);
+	Damaris::MPILayer<Damaris::CollectiveRPC<rpc_method>::rpc_id>::Delete(layer);
 
 	MPI_Finalize();
 	return 0;

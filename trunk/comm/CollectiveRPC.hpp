@@ -48,16 +48,23 @@ namespace Damaris {
 template<typename F>
 class CollectiveRPC {
 
-	private:
+	public:
 		/**
 		 * Types of RPC (Multi of Collective).
 		 */
 		enum rpc_type { RPC_MULTI, RPC_COLLECTIVE };
+	
+		/**
+		 * Id of an RPC function, first field is the
+		 * channel number, second field is the RPC id.
+		 */
+		typedef std::pair<int,int> rpc_id;
 
-		std::map<int,std::pair<rpc_type,F> > rpcs; 
+	private:
+		std::map<rpc_id, std::pair<rpc_type,F> > rpcs; 
 		/*!< Map associating RPC ids to a pair (type of RPC, function pointer). */
 
-		Communication<int>* commLayer; /*!< Communication layer. */
+		Communication<rpc_id>* commLayer; /*!< Communication layer. */
 
 		/**
 		 * Constructor, private. Use CollectiveRPC::New to create a CollectiveRPC object.
@@ -74,7 +81,7 @@ class CollectiveRPC {
 		 * Creates a new CollectiveRPC object based on the
 		 * provided communication layer.
 		 */
-		static CollectiveRPC* New(Communication<int>* comm);
+		static CollectiveRPC* New(Communication<rpc_id>* comm);
 
 		/**
 		 * Deletes the CollectiveRPC object.
@@ -92,25 +99,25 @@ class CollectiveRPC {
 		 * particular id. Will overwrite any function previously
 		 * registered with this same id.
 		 */
-		virtual void RegisterMulti(F rpc, int id);
+		virtual void RegisterMulti(F rpc, int channel, int id);
 
 		/**
 		 * Register a function a collective-RPC and associate it with a
 		 * particular id. Will overwrite any function previously
 		 * registerd with this same id.
 		 */
-		virtual void RegisterCollective(F rpc, int id);
+		virtual void RegisterCollective(F rpc, int channel, int id);
 
 		/**
 		 * Call a given RPC specified by its id.
 		 */
-		virtual void Call(int id);
+		virtual void Call(int channel, int id);
 
 };
 
 
 template<typename F>
-CollectiveRPC<F>* CollectiveRPC<F>::New(Communication<int>* comm)
+CollectiveRPC<F>* CollectiveRPC<F>::New(Communication<CollectiveRPC::rpc_id>* comm)
 {
 	CollectiveRPC<F>* c = new CollectiveRPC<F>();
 	c->commLayer = comm;
@@ -130,9 +137,9 @@ template<typename F>
 void CollectiveRPC<F>::Update()
 {
 	commLayer->Update(10);
-	int msg;
+	rpc_id msg;
 	if(commLayer->Deliver(&msg)) {
-		typename std::map<int,std::pair<rpc_type,F> >::iterator it = rpcs.find(msg);
+		typename std::map<rpc_id,std::pair<rpc_type,F> >::iterator it = rpcs.find(msg);
 		if(it != rpcs.end()) {
 			F f = it->second.second;
 			f();
@@ -141,31 +148,32 @@ void CollectiveRPC<F>::Update()
 }
 
 template<typename F>
-void CollectiveRPC<F>::Call(int id)
+void CollectiveRPC<F>::Call(int channel, int id)
 {
-	typename std::map<int,std::pair<rpc_type,F> >::iterator it = rpcs.find(id);
+	typename std::map<rpc_id,std::pair<rpc_type,F> >::iterator it 
+		= rpcs.find(rpc_id(channel,id));
 	if(it != rpcs.end()) {
 		switch(it->second.first) {
 		case RPC_MULTI:
-			commLayer->Bcast(id);
+			commLayer->Bcast(rpc_id(channel,id));
 			break;
 		case RPC_COLLECTIVE:
-			commLayer->Sync(id);
+			commLayer->Sync(rpc_id(channel,id));
 			break;
 		}
 	}
 }
 
 template<typename F>
-void CollectiveRPC<F>::RegisterMulti(F rpc, int id)
+void CollectiveRPC<F>::RegisterMulti(F rpc, int channel, int id)
 {
-	rpcs[id] = std::pair<rpc_type,F>(RPC_MULTI,rpc);
+	rpcs[rpc_id(channel,id)] = std::pair<rpc_type,F>(RPC_MULTI,rpc);
 }
 
 template<typename F>
-void CollectiveRPC<F>::RegisterCollective(F rpc, int id)
+void CollectiveRPC<F>::RegisterCollective(F rpc, int channel, int id)
 {
-	rpcs[id] = std::pair<rpc_type,F>(RPC_COLLECTIVE,rpc);
+	rpcs[rpc_id(channel,id)] = std::pair<rpc_type,F>(RPC_COLLECTIVE,rpc);
 }
 
 }

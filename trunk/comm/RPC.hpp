@@ -26,9 +26,14 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Damaris {
 
-enum RPC {
+enum VISIT_RPC_T {
 	RPC_VISIT_CONNECTED,
 	RPC_VISIT_UPDATE
+};
+
+enum RPC_CHANNEL_T {
+	VISIT_CHANNEL,
+	EVENT_CHANNEL
 };
 
 }
