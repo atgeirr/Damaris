@@ -1090,6 +1090,24 @@ namespace Damaris
       this->mesh_ = s;
     }
 
+    const Group::curve_sequence& Group::
+    curve () const
+    {
+      return this->curve_;
+    }
+
+    Group::curve_sequence& Group::
+    curve ()
+    {
+      return this->curve_;
+    }
+
+    void Group::
+    curve (const curve_sequence& s)
+    {
+      this->curve_ = s;
+    }
+
     const Group::name_type& Group::
     name () const
     {
@@ -1260,88 +1278,88 @@ namespace Damaris
     }
 
 
-    // MeshCoord
+    // Coord
     // 
 
-    const MeshCoord::name_type& MeshCoord::
+    const Coord::name_type& Coord::
     name () const
     {
       return this->name_.get ();
     }
 
-    MeshCoord::name_type& MeshCoord::
+    Coord::name_type& Coord::
     name ()
     {
       return this->name_.get ();
     }
 
-    void MeshCoord::
+    void Coord::
     name (const name_type& x)
     {
       this->name_.set (x);
     }
 
-    void MeshCoord::
+    void Coord::
     name (::std::auto_ptr< name_type > x)
     {
       this->name_.set (x);
     }
 
-    const MeshCoord::unit_type& MeshCoord::
+    const Coord::unit_type& Coord::
     unit () const
     {
       return this->unit_.get ();
     }
 
-    MeshCoord::unit_type& MeshCoord::
+    Coord::unit_type& Coord::
     unit ()
     {
       return this->unit_.get ();
     }
 
-    void MeshCoord::
+    void Coord::
     unit (const unit_type& x)
     {
       this->unit_.set (x);
     }
 
-    void MeshCoord::
+    void Coord::
     unit (::std::auto_ptr< unit_type > x)
     {
       this->unit_.set (x);
     }
 
-    const MeshCoord::unit_type& MeshCoord::
+    const Coord::unit_type& Coord::
     unit_default_value ()
     {
       return unit_default_value_;
     }
 
-    const MeshCoord::label_type& MeshCoord::
+    const Coord::label_type& Coord::
     label () const
     {
       return this->label_.get ();
     }
 
-    MeshCoord::label_type& MeshCoord::
+    Coord::label_type& Coord::
     label ()
     {
       return this->label_.get ();
     }
 
-    void MeshCoord::
+    void Coord::
     label (const label_type& x)
     {
       this->label_.set (x);
     }
 
-    void MeshCoord::
+    void Coord::
     label (::std::auto_ptr< label_type > x)
     {
       this->label_.set (x);
     }
 
-    const MeshCoord::label_type& MeshCoord::
+    const Coord::label_type& Coord::
     label_default_value ()
     {
       return label_default_value_;
@@ -1442,6 +1460,52 @@ namespace Damaris
     }
 
 
+    // Curve
+    // 
+
+    const Curve::coord_sequence& Curve::
+    coord () const
+    {
+      return this->coord_;
+    }
+
+    Curve::coord_sequence& Curve::
+    coord ()
+    {
+      return this->coord_;
+    }
+
+    void Curve::
+    coord (const coord_sequence& s)
+    {
+      this->coord_ = s;
+    }
+
+    const Curve::name_type& Curve::
+    name () const
+    {
+      return this->name_.get ();
+    }
+
+    Curve::name_type& Curve::
+    name ()
+    {
+      return this->name_.get ();
+    }
+
+    void Curve::
+    name (const name_type& x)
+    {
+      this->name_.set (x);
+    }
+
+    void Curve::
+    name (::std::auto_ptr< name_type > x)
+    {
+      this->name_.set (x);
+    }
+
+
     // Data
     // 
 
@@ -1533,6 +1597,24 @@ namespace Damaris
     mesh (const mesh_sequence& s)
     {
       this->mesh_ = s;
+    }
+
+    const Data::curve_sequence& Data::
+    curve () const
+    {
+      return this->curve_;
+    }
+
+    Data::curve_sequence& Data::
+    curve ()
+    {
+      return this->curve_;
+    }
+
+    void Data::
+    curve (const curve_sequence& s)
+    {
+      this->curve_ = s;
     }
 
 
@@ -3756,6 +3838,7 @@ namespace Damaris
       variable_ (::xml_schema::flags (), this),
       group_ (::xml_schema::flags (), this),
       mesh_ (::xml_schema::flags (), this),
+      curve_ (::xml_schema::flags (), this),
       name_ (name, ::xml_schema::flags (), this),
       enabled_ (enabled_default_value (), ::xml_schema::flags (), this)
     {
@@ -3769,6 +3852,7 @@ namespace Damaris
       variable_ (x.variable_, f, this),
       group_ (x.group_, f, this),
       mesh_ (x.mesh_, f, this),
+      curve_ (x.curve_, f, this),
       name_ (x.name_, f, this),
       enabled_ (x.enabled_, f, this)
     {
@@ -3782,6 +3866,7 @@ namespace Damaris
       variable_ (f, this),
       group_ (f, this),
       mesh_ (f, this),
+      curve_ (f, this),
       name_ (f, this),
       enabled_ (f, this)
     {
@@ -3832,6 +3917,17 @@ namespace Damaris
             mesh_traits::create (i, f, this));
 
           this->mesh_.push_back (r);
+          continue;
+        }
+
+        // curve
+        //
+        if (n.name () == "curve" && n.namespace_ () == "http://damaris.gforge.inria.fr/Damaris/Model")
+        {
+          ::std::auto_ptr< curve_type > r (
+            curve_traits::create (i, f, this));
+
+          this->curve_.push_back (r);
           continue;
         }
 
@@ -4114,17 +4210,17 @@ namespace Damaris
       ::Damaris::Model::MeshType::unstructured
     };
 
-    // MeshCoord
+    // Coord
     //
 
-    const MeshCoord::unit_type MeshCoord::unit_default_value_ (
+    const Coord::unit_type Coord::unit_default_value_ (
       "#");
 
-    const MeshCoord::label_type MeshCoord::label_default_value_ (
+    const Coord::label_type Coord::label_default_value_ (
       "#");
 
-    MeshCoord::
-    MeshCoord (const name_type& name)
+    Coord::
+    Coord (const name_type& name)
     : ::xml_schema::type (),
       name_ (name, ::xml_schema::flags (), this),
       unit_ (unit_default_value (), ::xml_schema::flags (), this),
@@ -4132,10 +4228,10 @@ namespace Damaris
     {
     }
 
-    MeshCoord::
-    MeshCoord (const MeshCoord& x,
-               ::xml_schema::flags f,
-               ::xml_schema::container* c)
+    Coord::
+    Coord (const Coord& x,
+           ::xml_schema::flags f,
+           ::xml_schema::container* c)
     : ::xml_schema::type (x, f, c),
       name_ (x.name_, f, this),
       unit_ (x.unit_, f, this),
@@ -4143,10 +4239,10 @@ namespace Damaris
     {
     }
 
-    MeshCoord::
-    MeshCoord (const ::xercesc::DOMElement& e,
-               ::xml_schema::flags f,
-               ::xml_schema::container* c)
+    Coord::
+    Coord (const ::xercesc::DOMElement& e,
+           ::xml_schema::flags f,
+           ::xml_schema::container* c)
     : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
       name_ (f, this),
       unit_ (f, this),
@@ -4159,7 +4255,7 @@ namespace Damaris
       }
     }
 
-    void MeshCoord::
+    void Coord::
     parse (::xsd::cxx::xml::dom::parser< char >& p,
            ::xml_schema::flags f)
     {
@@ -4215,15 +4311,15 @@ namespace Damaris
       }
     }
 
-    MeshCoord* MeshCoord::
+    Coord* Coord::
     _clone (::xml_schema::flags f,
             ::xml_schema::container* c) const
     {
-      return new class MeshCoord (*this, f, c);
+      return new class Coord (*this, f, c);
     }
 
-    MeshCoord::
-    ~MeshCoord ()
+    Coord::
+    ~Coord ()
     {
     }
 
@@ -4357,6 +4453,102 @@ namespace Damaris
     {
     }
 
+    // Curve
+    //
+
+    Curve::
+    Curve (const name_type& name)
+    : ::xml_schema::type (),
+      coord_ (::xml_schema::flags (), this),
+      name_ (name, ::xml_schema::flags (), this)
+    {
+    }
+
+    Curve::
+    Curve (const Curve& x,
+           ::xml_schema::flags f,
+           ::xml_schema::container* c)
+    : ::xml_schema::type (x, f, c),
+      coord_ (x.coord_, f, this),
+      name_ (x.name_, f, this)
+    {
+    }
+
+    Curve::
+    Curve (const ::xercesc::DOMElement& e,
+           ::xml_schema::flags f,
+           ::xml_schema::container* c)
+    : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+      coord_ (f, this),
+      name_ (f, this)
+    {
+      if ((f & ::xml_schema::flags::base) == 0)
+      {
+        ::xsd::cxx::xml::dom::parser< char > p (e, true, true);
+        this->parse (p, f);
+      }
+    }
+
+    void Curve::
+    parse (::xsd::cxx::xml::dom::parser< char >& p,
+           ::xml_schema::flags f)
+    {
+      for (; p.more_elements (); p.next_element ())
+      {
+        const ::xercesc::DOMElement& i (p.cur_element ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        // coord
+        //
+        if (n.name () == "coord" && n.namespace_ () == "http://damaris.gforge.inria.fr/Damaris/Model")
+        {
+          ::std::auto_ptr< coord_type > r (
+            coord_traits::create (i, f, this));
+
+          this->coord_.push_back (r);
+          continue;
+        }
+
+        break;
+      }
+
+      while (p.more_attributes ())
+      {
+        const ::xercesc::DOMAttr& i (p.next_attribute ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        if (n.name () == "name" && n.namespace_ ().empty ())
+        {
+          ::std::auto_ptr< name_type > r (
+            name_traits::create (i, f, this));
+
+          this->name_.set (r);
+          continue;
+        }
+      }
+
+      if (!name_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_attribute< char > (
+          "name",
+          "");
+      }
+    }
+
+    Curve* Curve::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class Curve (*this, f, c);
+    }
+
+    Curve::
+    ~Curve ()
+    {
+    }
+
     // Data
     //
 
@@ -4367,7 +4559,8 @@ namespace Damaris
       layout_ (::xml_schema::flags (), this),
       variable_ (::xml_schema::flags (), this),
       group_ (::xml_schema::flags (), this),
-      mesh_ (::xml_schema::flags (), this)
+      mesh_ (::xml_schema::flags (), this),
+      curve_ (::xml_schema::flags (), this)
     {
     }
 
@@ -4380,7 +4573,8 @@ namespace Damaris
       layout_ (x.layout_, f, this),
       variable_ (x.variable_, f, this),
       group_ (x.group_, f, this),
-      mesh_ (x.mesh_, f, this)
+      mesh_ (x.mesh_, f, this),
+      curve_ (x.curve_, f, this)
     {
     }
 
@@ -4393,7 +4587,8 @@ namespace Damaris
       layout_ (f, this),
       variable_ (f, this),
       group_ (f, this),
-      mesh_ (f, this)
+      mesh_ (f, this),
+      curve_ (f, this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
       {
@@ -4464,6 +4659,17 @@ namespace Damaris
             mesh_traits::create (i, f, this));
 
           this->mesh_.push_back (r);
+          continue;
+        }
+
+        // curve
+        //
+        if (n.name () == "curve" && n.namespace_ () == "http://damaris.gforge.inria.fr/Damaris/Model")
+        {
+          ::std::auto_ptr< curve_type > r (
+            curve_traits::create (i, f, this));
+
+          this->curve_.push_back (r);
           continue;
         }
 

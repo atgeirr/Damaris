@@ -15,50 +15,50 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
- * \file MeshManager.cpp
- * \date February 2012
+ * \file CurveManager.cpp
+ * \date May 2013
  * \author Matthieu Dorier
- * \version 0.4
+ * \version 0.8
  */
 #include "core/Debug.hpp"
-#include "core/MeshManager.hpp"
+#include "core/CurveManager.hpp"
 
 namespace Damaris {
 
-void MeshManager::Init(const Model::Data& model)
+void CurveManager::Init(const Model::Data& model)
 {
-	Model::Data::mesh_const_iterator m(model.mesh().begin());
-	for(; m != model.mesh().end(); m++)
+	Model::Data::curve_const_iterator m(model.curve().begin());
+	for(; m != model.curve().end(); m++)
 	{
-		if(Create<Mesh>(*m,(const std::string&)m->name()) != NULL) {
-			DBG("Mesh " << m->name() << " successfuly created");
+		if(Create<Curve>(*m,(const std::string&)m->name()) != NULL) {
+			DBG("Curve " << m->name() << " successfuly created");
 		}
 	}
 
 	// build all variables in sub-groups
 	Model::Data::group_const_iterator g(model.group().begin());
 	for(; g != model.group().end(); g++)
-		readMeshesInSubGroup(*g,(std::string)(g->name()));
+		readCurvesInSubGroup(*g,(std::string)(g->name()));
 }
 
-void MeshManager::readMeshesInSubGroup(const Model::Group &g,
+void CurveManager::readCurvesInSubGroup(const Model::Group &g,
                         const std::string& groupName)
 {
 	// first check if the group is enabled
 	if(!(g.enabled())) return;
 	// build recursively all variable in the subgroup
-	Model::Data::mesh_const_iterator m(g.mesh().begin());
-	for(; m != g.mesh().end(); m++)
+	Model::Data::curve_const_iterator m(g.curve().begin());
+	for(; m != g.curve().end(); m++)
 	{
 		std::string name = (std::string)(m->name());
 		std::string varName = groupName+"/"+name;
-		Create<Mesh>(*m,varName);
+		Create<Curve>(*m,varName);
 	}
 
 	// build recursively all the subgroups
 	Model::Data::group_const_iterator subg(g.group().begin());
 	for(; subg != g.group().end(); subg++)
-		readMeshesInSubGroup(*subg,groupName
+		readCurvesInSubGroup(*subg,groupName
 				+ "/" + (std::string)(subg->name()));
 }
 

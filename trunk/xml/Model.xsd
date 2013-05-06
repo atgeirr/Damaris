@@ -332,10 +332,16 @@
                     </xs:documentation></xs:annotation>
                 </xs:element>
 				<xs:element name="mesh"     type="mdl:Mesh"> 
-                    <xs:annotation><xs:documentation>
-                        List of mesh elements.
-                    </xs:documentation></xs:annotation>
-                </xs:element>
+				<xs:annotation><xs:documentation>
+				List of mesh elements.
+				</xs:documentation></xs:annotation>
+				</xs:element>
+
+				<xs:element name="curve"     type="mdl:Curve">
+				<xs:annotation><xs:documentation>
+				List of curves.
+				</xs:documentation></xs:annotation>
+				</xs:element>
 			</xs:choice>
 		</xs:sequence>
 		<xs:attribute name="name"    type="xs:string"  use="required"> 
@@ -415,8 +421,8 @@
 		</xs:restriction>
 	</xs:simpleType>
 
-	<!-- Mesh Coordinates -->
-	<xs:complexType name="MeshCoord">
+	<!-- Coordinates (for curves and meshes) -->
+	<xs:complexType name="Coord">
 		<xs:attribute name="name"  type="xs:string" use="required"> 
             <xs:annotation><xs:documentation>
                 Name of the variable to use as coordinate. The name must correspond to an existing
@@ -440,7 +446,7 @@
 	<!-- Mesh node -->
 	<xs:complexType name="Mesh">
 		<xs:sequence>
-			<xs:element name="coord" type="mdl:MeshCoord" minOccurs="2" maxOccurs="3">
+			<xs:element name="coord" type="mdl:Coord" minOccurs="2" maxOccurs="3">
                 <xs:annotation><xs:documentation>
                     Coordinates of the mesh.
                 </xs:documentation></xs:annotation>
@@ -448,7 +454,7 @@
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string"    use="required">
             <xs:annotation><xs:documentation>
-                Name of the mesh. Every mesh within a same group must have the same name.
+                Name of the mesh.
             </xs:documentation></xs:annotation>
         </xs:attribute>
 		<xs:attribute name="type" type="mdl:MeshType" use="required">
@@ -463,6 +469,21 @@
         </xs:attribute>
 	</xs:complexType>
 
+	<xs:complexType name="Curve">
+		<xs:sequence>
+			<xs:element name="coord" type="mdl:Coord" minOccurs="2" maxOccurs="2">
+				<xs:annotation><xs:documentation>
+					Coordinates of the curve
+				</xs:documentation></xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string"    use="required">
+			<xs:annotation><xs:documentation>
+				Name of the curve.
+			</xs:documentation></xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+
 	<!-- Data node -->
 	<xs:complexType name="Data">
 		<xs:sequence>
@@ -472,26 +493,31 @@
                     List of parameters.
                 </xs:documentation></xs:annotation>
             </xs:element>
-			<xs:element name="layout"    type="mdl:Layout"> 
+	    <xs:element name="layout"    type="mdl:Layout"> 
                 <xs:annotation><xs:documentation>
                     List of layouts.
                 </xs:documentation></xs:annotation>
             </xs:element>
-			<xs:element name="variable"  type="mdl:Variable">
+	    	<xs:element name="variable"  type="mdl:Variable">
                 <xs:annotation><xs:documentation>
                     List of variables.
                 </xs:documentation></xs:annotation>
             </xs:element>
-			<xs:element name="group"     type="mdl:Group">
+	    <xs:element name="group"     type="mdl:Group">
                 <xs:annotation><xs:documentation>
                     List of groups.
                 </xs:documentation></xs:annotation>
             </xs:element>
-			<xs:element name="mesh"		 type="mdl:Mesh">
+	    	<xs:element name="mesh"		 type="mdl:Mesh">
                 <xs:annotation><xs:documentation>
                     List of meshes.
                 </xs:documentation></xs:annotation>
             </xs:element>
+		<xs:element name="curve" type="mdl:Curve">
+			<xs:annotation><xs:documentation>
+			List of curves
+			</xs:documentation></xs:annotation>
+		</xs:element>
 		</xs:choice>
 		</xs:sequence>
 	</xs:complexType>

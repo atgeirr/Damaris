@@ -256,8 +256,9 @@ namespace Damaris
     class Group;
     class Parameter;
     class MeshType;
-    class MeshCoord;
+    class Coord;
     class Mesh;
+    class Curve;
     class Data;
     class Scope;
     class Event;
@@ -1451,6 +1452,23 @@ namespace Damaris
       void
       mesh (const mesh_sequence& s);
 
+      // curve
+      // 
+      typedef ::Damaris::Model::Curve curve_type;
+      typedef ::xsd::cxx::tree::sequence< curve_type > curve_sequence;
+      typedef curve_sequence::iterator curve_iterator;
+      typedef curve_sequence::const_iterator curve_const_iterator;
+      typedef ::xsd::cxx::tree::traits< curve_type, char > curve_traits;
+
+      const curve_sequence&
+      curve () const;
+
+      curve_sequence&
+      curve ();
+
+      void
+      curve (const curve_sequence& s);
+
       // name
       // 
       typedef ::xml_schema::string name_type;
@@ -1515,6 +1533,7 @@ namespace Damaris
       variable_sequence variable_;
       group_sequence group_;
       mesh_sequence mesh_;
+      curve_sequence curve_;
       ::xsd::cxx::tree::one< name_type > name_;
       ::xsd::cxx::tree::one< enabled_type > enabled_;
     };
@@ -1683,7 +1702,7 @@ namespace Damaris
       static const value _xsd_MeshType_indexes_[7];
     };
 
-    class MeshCoord: public ::xml_schema::type
+    class Coord: public ::xml_schema::type
     {
       public:
       // name
@@ -1745,22 +1764,22 @@ namespace Damaris
 
       // Constructors.
       //
-      MeshCoord (const name_type&);
+      Coord (const name_type&);
 
-      MeshCoord (const ::xercesc::DOMElement& e,
-                 ::xml_schema::flags f = 0,
-                 ::xml_schema::container* c = 0);
+      Coord (const ::xercesc::DOMElement& e,
+             ::xml_schema::flags f = 0,
+             ::xml_schema::container* c = 0);
 
-      MeshCoord (const MeshCoord& x,
-                 ::xml_schema::flags f = 0,
-                 ::xml_schema::container* c = 0);
+      Coord (const Coord& x,
+             ::xml_schema::flags f = 0,
+             ::xml_schema::container* c = 0);
 
-      virtual MeshCoord*
+      virtual Coord*
       _clone (::xml_schema::flags f = 0,
               ::xml_schema::container* c = 0) const;
 
       virtual 
-      ~MeshCoord ();
+      ~Coord ();
 
       // Implementation.
       //
@@ -1782,7 +1801,7 @@ namespace Damaris
       public:
       // coord
       // 
-      typedef ::Damaris::Model::MeshCoord coord_type;
+      typedef ::Damaris::Model::Coord coord_type;
       typedef ::xsd::cxx::tree::sequence< coord_type > coord_sequence;
       typedef coord_sequence::iterator coord_iterator;
       typedef coord_sequence::const_iterator coord_const_iterator;
@@ -1882,6 +1901,74 @@ namespace Damaris
       ::xsd::cxx::tree::one< topology_type > topology_;
     };
 
+    class Curve: public ::xml_schema::type
+    {
+      public:
+      // coord
+      // 
+      typedef ::Damaris::Model::Coord coord_type;
+      typedef ::xsd::cxx::tree::sequence< coord_type > coord_sequence;
+      typedef coord_sequence::iterator coord_iterator;
+      typedef coord_sequence::const_iterator coord_const_iterator;
+      typedef ::xsd::cxx::tree::traits< coord_type, char > coord_traits;
+
+      const coord_sequence&
+      coord () const;
+
+      coord_sequence&
+      coord ();
+
+      void
+      coord (const coord_sequence& s);
+
+      // name
+      // 
+      typedef ::xml_schema::string name_type;
+      typedef ::xsd::cxx::tree::traits< name_type, char > name_traits;
+
+      const name_type&
+      name () const;
+
+      name_type&
+      name ();
+
+      void
+      name (const name_type& x);
+
+      void
+      name (::std::auto_ptr< name_type > p);
+
+      // Constructors.
+      //
+      Curve (const name_type&);
+
+      Curve (const ::xercesc::DOMElement& e,
+             ::xml_schema::flags f = 0,
+             ::xml_schema::container* c = 0);
+
+      Curve (const Curve& x,
+             ::xml_schema::flags f = 0,
+             ::xml_schema::container* c = 0);
+
+      virtual Curve*
+      _clone (::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0) const;
+
+      virtual 
+      ~Curve ();
+
+      // Implementation.
+      //
+      protected:
+      void
+      parse (::xsd::cxx::xml::dom::parser< char >&,
+             ::xml_schema::flags);
+
+      protected:
+      coord_sequence coord_;
+      ::xsd::cxx::tree::one< name_type > name_;
+    };
+
     class Data: public ::xml_schema::type
     {
       public:
@@ -1970,6 +2057,23 @@ namespace Damaris
       void
       mesh (const mesh_sequence& s);
 
+      // curve
+      // 
+      typedef ::Damaris::Model::Curve curve_type;
+      typedef ::xsd::cxx::tree::sequence< curve_type > curve_sequence;
+      typedef curve_sequence::iterator curve_iterator;
+      typedef curve_sequence::const_iterator curve_const_iterator;
+      typedef ::xsd::cxx::tree::traits< curve_type, char > curve_traits;
+
+      const curve_sequence&
+      curve () const;
+
+      curve_sequence&
+      curve ();
+
+      void
+      curve (const curve_sequence& s);
+
       // Constructors.
       //
       Data ();
@@ -2002,6 +2106,7 @@ namespace Damaris
       variable_sequence variable_;
       group_sequence group_;
       mesh_sequence mesh_;
+      curve_sequence curve_;
     };
 
     class Scope: public ::xml_schema::string

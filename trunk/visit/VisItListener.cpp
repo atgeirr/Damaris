@@ -27,6 +27,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <VisItControlInterface_V2.h>
 #include "core/Debug.hpp"
 #include "core/MeshManager.hpp"
+#include "core/CurveManager.hpp"
 #include "core/VariableManager.hpp"
 #include "core/ActionManager.hpp"
 #include "core/Environment.hpp"
@@ -115,6 +116,7 @@ void VisItListener::EnterSyncSection()
 			VisItSetSlaveProcessCallback(&VisItListener::SlaveProcessCallback);	
 			VisItSetGetMetaData(&VisItListener::GetMetaData,(void*)(&sim));
 			VisItSetGetMesh(&VisItListener::GetMesh,(void*)(&sim));
+			VisItSetGetCurve(&VisItListener::GetCurve,(void*)(&sim));
 			VisItSetGetVariable(&VisItListener::GetVariable,(void*)(&sim));
 			VisItSetGetDomainList(&VisItListener::GetDomainList,(void*)(&sim));
 			VisItSetCommandCallback(&VisItListener::ControlCommandCallback,(void*)(&sim));
@@ -253,6 +255,17 @@ visit_handle VisItListener::GetMetaData(void *cbdata)
 		}
 		DBG("Mesh exposed successfuly");
 
+		// expose Curves
+		if(not CurveManager::IsEmpty()) {
+			CurveManager::iterator curve = CurveManager::Begin();
+			CurveManager::iterator end = CurveManager::End();
+			while(curve != end) {
+				(*curve)->ExposeVisItMetaData(md);
+				curve++;
+			}
+		}
+		DBG("Curve exposed successfuly");
+
 		// expose Variables
 		if(not VariableManager::IsEmpty()) { 
 			VariableManager::iterator var = VariableManager::Begin();
@@ -296,6 +309,17 @@ visit_handle VisItListener::GetMesh(int domain, const char *name, void *cbdata)
 		m->ExposeVisItData(&h,source,s->iteration,block);
 	}	
 	return h;	
+}
+
+visit_handle VisItListener::GetCurve(const char *name, void *cbdata)
+{
+	SimData *s = (SimData*)cbdata;
+	Curve* c = CurveManager::Search(std::string(name));
+	visit_handle h = VISIT_INVALID_HANDLE;
+	if(c != NULL) {
+		c->ExposeVisItData(&h,s->iteration);
+	}
+	return h;
 }
 
 visit_handle VisItListener::GetVariable(int domain, const char *name, void *cbdata)

@@ -30,6 +30,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "core/Debug.hpp"
 #include "core/VariableManager.hpp"
 #include "core/MeshManager.hpp"
+#include "core/CurveManager.cpp"
 #include "core/LayoutManager.hpp"
 #include "core/ParameterManager.hpp"
 #include "core/ActionManager.hpp"
@@ -89,6 +90,7 @@ namespace Damaris {
 		LayoutManager::Init(model->data());
 		VariableManager::Init(model->data());
 		MeshManager::Init(model->data());
+		CurveManager::Init(model->data());
 		DBG("Data Managers initialized");
 		ActionManager::Init(model->actions());
 		DBG("ActionsManager initialized");

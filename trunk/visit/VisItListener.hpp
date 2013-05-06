@@ -103,6 +103,12 @@ class VisItListener {
 		 * VisIt Mesh data callback.
 		 */
 		static visit_handle GetMesh(int domain, const char *name, void *cbdata);
+
+		/**
+		 * VisIt Curve data callback.
+		 */
+		static visit_handle GetCurve(const char* name, void* cbdata);
+
 		/**
 		 * VisIt Variable data callback.
 		 */

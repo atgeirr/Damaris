@@ -16,6 +16,7 @@ set(DAMARIS_COMMON_SRC
 	${DAMARIS_SOURCE_DIR}/core/Environment.cpp
 	${DAMARIS_SOURCE_DIR}/core/VariableManager.cpp
 	${DAMARIS_SOURCE_DIR}/core/MeshManager.cpp
+	${DAMARIS_SOURCE_DIR}/core/CurveManager.cpp
 	${DAMARIS_SOURCE_DIR}/core/LayoutManager.cpp
 	${DAMARIS_SOURCE_DIR}/core/ActionManager.cpp
 	${DAMARIS_SOURCE_DIR}/core/Observable.cpp
@@ -30,6 +31,7 @@ set(DAMARIS_COMMON_SRC
 	${DAMARIS_SOURCE_DIR}/event/ScriptAction.cpp
 	${DAMARIS_SOURCE_DIR}/data/Variable.cpp
 	${DAMARIS_SOURCE_DIR}/data/Mesh.cpp
+	${DAMARIS_SOURCE_DIR}/data/Curve.cpp
 	${DAMARIS_SOURCE_DIR}/data/RectilinearMesh.cpp
 	${DAMARIS_SOURCE_DIR}/data/CurvilinearMesh.cpp
 	${DAMARIS_SOURCE_DIR}/data/PointMesh.cpp
