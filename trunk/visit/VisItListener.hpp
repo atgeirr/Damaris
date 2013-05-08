@@ -140,13 +140,13 @@ class VisItListener {
 		 * This function must be called by all the VisIt engines at the same time,
 		 * so a synchronization is required prior to calling it.
 		 */
-		static void EnterSyncSection();
+		static void EnterSyncSection(int iteration);
 
 		/**
 		 * This function must be called when the iteration has changed. It updates
 		 * the plots on the viewer side.
 		 */
-		static void Update();
+		static void Update(int iteration);
 };
 
 }

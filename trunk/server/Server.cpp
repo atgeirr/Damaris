@@ -61,7 +61,7 @@ Server::~Server()
 {
 	Process::Kill();
 	DBG("Process killed successfuly");
-	MPILayer<CollectiveRPC<void (*)(void)>::rpc_id>::Delete(commLayer);
+	MPILayer<CollectiveRPC<void (*)(int)>::rpc_msg>::Delete(commLayer);
 	DBG("VisIt MPI layer deleted successfuly");
 }
 	
@@ -69,15 +69,15 @@ Server::~Server()
 int Server::run()
 {
 	DBG("Successfully entered in \"run\" mode");
-	commLayer = MPILayer<CollectiveRPC<void (*)(void)>::rpc_id>::New(Environment::GetEntityComm());
-	rpcLayer  = CollectiveRPC<void (*)(void)>::New(commLayer);
+	commLayer = MPILayer<CollectiveRPC<void (*)(int)>::rpc_msg>::New(Environment::GetEntityComm());
+	rpcLayer  = CollectiveRPC<void (*)(int)>::New(commLayer);
 
 #ifdef __ENABLE_VISIT
 
-	void (*f)(void) = &Viz::VisItListener::EnterSyncSection;
+	void (*f)(int) = &Viz::VisItListener::EnterSyncSection;
 	rpcLayer->RegisterMulti(f,(int)VISIT_CHANNEL,(int)RPC_VISIT_CONNECTED);
 
-	void (*g)(void) = &Viz::VisItListener::Update;
+	void (*g)(int) = &Viz::VisItListener::Update;
 	rpcLayer->RegisterCollective(g,(int)VISIT_CHANNEL,(int)RPC_VISIT_UPDATE);
 
 	// initializing environment
@@ -107,7 +107,8 @@ int Server::run()
 	
 			if(process->getID() == 0) {
 				if(Viz::VisItListener::Connected()) {
-					rpcLayer->Call(VISIT_CHANNEL,RPC_VISIT_CONNECTED);
+					int it = Environment::GetLastIteration();
+					rpcLayer->Call(it,VISIT_CHANNEL,RPC_VISIT_CONNECTED);
 				}
 			}
 		}
@@ -172,7 +173,8 @@ void Server::processInternalSignal(int32_t object, int iteration, int source)
 	case END_ITERATION:
 		if(Environment::StartNextIteration()) {
 #ifdef __ENABLE_VISIT
-			rpcLayer->Call(VISIT_CHANNEL, RPC_VISIT_UPDATE);
+			int it = Environment::GetLastIteration();
+			rpcLayer->Call(it,VISIT_CHANNEL, RPC_VISIT_UPDATE);
 #endif
 		}
 		break;

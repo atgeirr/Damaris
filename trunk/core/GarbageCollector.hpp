@@ -44,7 +44,10 @@ class GarbageCollector  : public Action {
 			VariableManager::iterator it = VariableManager::Begin();
 			VariableManager::iterator end = VariableManager::End();
 			while(it != end) {
-				it->get()->Clear(iteration);
+				// we don't erase non-time-varying data
+				if(it->get()->IsTimeVarying()) {
+					it->get()->Clear(iteration);
+				}
 				it++;
 			}
 		}

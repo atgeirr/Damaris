@@ -330,14 +330,14 @@ namespace Damaris {
 		msg.iteration = iteration;
 	
 		// do a reduction to know if any process had an error
-		int has_error;
-		MPI_Allreduce (&errorOccured, &has_error,1, 
-				MPI_INT, MPI_BOR, Environment::GetEntityComm());
-		if(not has_error)
+		int nb_errors;
+		MPI_Allreduce (&errorOccured, &nb_errors,1, 
+				MPI_INT, MPI_SUM, Environment::GetEntityComm());
+		if(nb_errors == 0)
 			msg.object = END_ITERATION;
 		else {
 			msg.object = ITERATION_HAS_ERROR;
-			errorOccured = false;
+			errorOccured = 0;
 		}
 		
 		process->getSharedMessageQueue()->Send(&msg);

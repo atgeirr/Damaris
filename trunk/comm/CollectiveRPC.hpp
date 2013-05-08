@@ -58,13 +58,50 @@ class CollectiveRPC {
 		 * Id of an RPC function, first field is the
 		 * channel number, second field is the RPC id.
 		 */
-		typedef std::pair<int,int> rpc_id;
+		struct rpc_id {
+			int channel;
+			int id;
+
+			rpc_id() {}
+	
+			rpc_id(int c, int i)
+			: channel(c), id(i) {}
+
+			bool operator==(const rpc_id& r) const {
+				return r.channel == channel &&
+					r.id == id;
+			}
+
+			bool operator<(const rpc_id& r) const {
+				return (channel < r.channel) 
+					|| (channel == r.channel && id < r.id);
+			}
+		};
+
+		struct rpc_msg {
+			rpc_id id;
+			int iteration;
+		
+			rpc_msg() {}
+
+			rpc_msg(int it, const rpc_id& i)
+			: id(i), iteration(it) {}
+
+			bool operator==(const rpc_msg& m) const {
+				return id == m.id && iteration == m.iteration;
+			}
+
+			bool operator<(const rpc_msg& m) const {
+				return (iteration < m.iteration)
+					|| (iteration == m.iteration && id < m.id);
+			}
+		};
 
 	private:
 		std::map<rpc_id, std::pair<rpc_type,F> > rpcs; 
 		/*!< Map associating RPC ids to a pair (type of RPC, function pointer). */
 
-		Communication<rpc_id>* commLayer; /*!< Communication layer. */
+		Communication<rpc_msg>* commLayer; /*!< Communication layer. */
 
 		/**
 		 * Constructor, private. Use CollectiveRPC::New to create a CollectiveRPC object.
@@ -81,7 +118,7 @@ class CollectiveRPC {
 		 * Creates a new CollectiveRPC object based on the
 		 * provided communication layer.
 		 */
-		static CollectiveRPC* New(Communication<rpc_id>* comm);
+		static CollectiveRPC* New(Communication<rpc_msg>* comm);
 
 		/**
 		 * Deletes the CollectiveRPC object.
@@ -111,13 +148,13 @@ class CollectiveRPC {
 		/**
 		 * Call a given RPC specified by its id.
 		 */
-		virtual void Call(int channel, int id);
+		virtual void Call(int iteration, int channel, int id);
 
 };
 
 
 template<typename F>
-CollectiveRPC<F>* CollectiveRPC<F>::New(Communication<CollectiveRPC::rpc_id>* comm)
+CollectiveRPC<F>* CollectiveRPC<F>::New(Communication<CollectiveRPC::rpc_msg>* comm)
 {
 	CollectiveRPC<F>* c = new CollectiveRPC<F>();
 	c->commLayer = comm;
@@ -137,28 +174,28 @@ template<typename F>
 void CollectiveRPC<F>::Update()
 {
 	commLayer->Update(10);
-	rpc_id msg;
+	rpc_msg msg;
 	if(commLayer->Deliver(&msg)) {
-		typename std::map<rpc_id,std::pair<rpc_type,F> >::iterator it = rpcs.find(msg);
+		typename std::map<rpc_id,std::pair<rpc_type,F> >::iterator it = rpcs.find(msg.id);
 		if(it != rpcs.end()) {
 			F f = it->second.second;
-			f();
+			f(msg.iteration);
 		}
 	}
 }
 
 template<typename F>
-void CollectiveRPC<F>::Call(int channel, int id)
+void CollectiveRPC<F>::Call(int iteration, int channel, int id)
 {
 	typename std::map<rpc_id,std::pair<rpc_type,F> >::iterator it 
 		= rpcs.find(rpc_id(channel,id));
 	if(it != rpcs.end()) {
 		switch(it->second.first) {
 		case RPC_MULTI:
-			commLayer->Bcast(rpc_id(channel,id));
+			commLayer->Bcast(rpc_msg(iteration,rpc_id(channel,id)));
 			break;
 		case RPC_COLLECTIVE:
-			commLayer->Sync(rpc_id(channel,id));
+			commLayer->Sync(rpc_msg(iteration,rpc_id(channel,id)));
 			break;
 		}
 	}

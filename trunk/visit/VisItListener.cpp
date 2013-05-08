@@ -103,7 +103,7 @@ bool VisItListener::Connected()
 	return visitstate > 0;
 }
 
-void VisItListener::EnterSyncSection()
+void VisItListener::EnterSyncSection(int iteration)
 {
 	MPI_Bcast(&visitstate,1,MPI_INT,0,comm);
 	DBG("Entering Sync Section, visit state is " << visitstate);
@@ -132,9 +132,9 @@ void VisItListener::EnterSyncSection()
 	}
 }
 
-void VisItListener::Update()
+void VisItListener::Update(int iteration)
 {
-	sim.iteration = Environment::GetLastIteration()-1;
+	sim.iteration = iteration-1;
 	VisItTimeStepChanged();
 	VisItUpdatePlots();
 }

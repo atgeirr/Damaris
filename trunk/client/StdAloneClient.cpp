@@ -164,15 +164,16 @@ namespace Damaris {
 	int StdAloneClient::end_iteration()
 	{
 		Environment::StartNextIteration();
+		int it = Environment::GetLastIteration();
 #ifdef __ENABLE_VISIT
 		if(process->getModel()->visit().present()) {
-			Viz::VisItListener::Update();
+			Viz::VisItListener::Update(it);
 			// try receiving from VisIt (only for rank 0)
 			if(process->getID() == 0) {
 				Viz::VisItListener::Connected();
 			}		
 			// try receiving from the VisIt callback communication layer
-			Viz::VisItListener::EnterSyncSection();
+			Viz::VisItListener::EnterSyncSection(it);
 		}
 #endif
 		return 0;
