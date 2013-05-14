@@ -222,7 +222,9 @@ class Variable : public Configurable<Model::Variable> {
 		void ForEach(F& f, C& c);
 
 		/**
-		 * Returns an iterator to the list of stored chunks
+		 * Returns an iterator to the list of stored chunks.
+		 * This iterator will not be valid anymore if chunks are
+		 * inserted to the variable or removed from it.
 		 */
 		iterator Begin();
 
@@ -233,19 +235,33 @@ class Variable : public Configurable<Model::Variable> {
 
 		/**
 		 * Gives an iterator to all chunks corresponding to a specified
-		 * iteration.
+		 * iteration. These iterators will not be valid anymore if
+		 * some chunks are inserted or removed from the variable.
 		 */
 		void GetChunksByIteration(int iteration,
 			ChunkIndexByIteration::iterator& begin, 
-			ChunkIndexByIteration::iterator& end);
+			ChunkIndexByIteration::iterator& end) const;
 
 		/**
 		 * Gives an iterator to all chunks corresponding to a specified
-		 * source.
+		 * source. These iterators will not be valid anymore if some
+		 * chunks are inserted or removed from the variable.
 		 */
 		void GetChunksBySource(int source,
 			ChunkIndexBySource::iterator& begin,
-			ChunkIndexBySource::iterator& end);
+			ChunkIndexBySource::iterator& end) const;
+
+		/**
+		 * Get the lowest and biggest iteration number.
+		 * Returns false if the variable is empty.
+		 */
+		bool GetIterationRange(int& lowest, int& biggest) const;
+
+		/**
+		 * Get the lowest and biggest source number.
+		 * Returns false if the variable is empty.
+		 */
+		bool GetSourceRange(int& lowest, int& biggest) const;
 
 		/**
 		 * Creates an instance of Variable if the provided model is consistant.

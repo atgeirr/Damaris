@@ -368,7 +368,7 @@ Variable::iterator Variable::End()
 
 void Variable::GetChunksByIteration(int iteration,
 	ChunkIndexByIteration::iterator& begin,
-	ChunkIndexByIteration::iterator& end) 
+	ChunkIndexByIteration::iterator& end) const
 {
 	begin = chunks.get<by_iteration>().lower_bound(iteration);
 	end = chunks.get<by_iteration>().upper_bound(iteration);
@@ -376,9 +376,30 @@ void Variable::GetChunksByIteration(int iteration,
 
 void Variable::GetChunksBySource(int source,
 	ChunkIndexBySource::iterator& begin,
-	ChunkIndexBySource::iterator& end)
+	ChunkIndexBySource::iterator& end) const
 {
 	begin = chunks.get<by_source>().lower_bound(source);
 	end = chunks.get<by_source>().upper_bound(source);
 }
+
+bool Variable::GetIterationRange(int& lowest, int& biggest) const
+{
+	if(chunks.size() == 0)
+		return false;
+
+	lowest  = chunks.get<by_iteration>().begin()->get()->GetIteration();
+	biggest = chunks.get<by_iteration>().rbegin()->get()->GetIteration();
+	return true;
+}
+
+bool Variable::GetSourceRange(int& lowest, int& biggest) const 
+{
+	if(chunks.size() == 0)
+		return false;
+
+	lowest  = chunks.get<by_source>().begin()->get()->GetSource();
+	biggest = chunks.get<by_source>().rbegin()->get()->GetSource();
+	return true;
+}
+
 }
