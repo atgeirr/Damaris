@@ -2170,6 +2170,30 @@ namespace Damaris
     // Storage
     // 
 
+    const Storage::basename_type& Storage::
+    basename () const
+    {
+      return this->basename_.get ();
+    }
+
+    Storage::basename_type& Storage::
+    basename ()
+    {
+      return this->basename_.get ();
+    }
+
+    void Storage::
+    basename (const basename_type& x)
+    {
+      this->basename_.set (x);
+    }
+
+    void Storage::
+    basename (::std::auto_ptr< basename_type > x)
+    {
+      this->basename_.set (x);
+    }
+
 
     // Simulation
     // 
@@ -5432,8 +5456,9 @@ namespace Damaris
     //
 
     Storage::
-    Storage ()
-    : ::xml_schema::type ()
+    Storage (const basename_type& basename)
+    : ::xml_schema::type (),
+      basename_ (basename, ::xml_schema::flags (), this)
     {
     }
 
@@ -5441,7 +5466,8 @@ namespace Damaris
     Storage (const Storage& x,
              ::xml_schema::flags f,
              ::xml_schema::container* c)
-    : ::xml_schema::type (x, f, c)
+    : ::xml_schema::type (x, f, c),
+      basename_ (x.basename_, f, this)
     {
     }
 
@@ -5449,25 +5475,42 @@ namespace Damaris
     Storage (const ::xercesc::DOMElement& e,
              ::xml_schema::flags f,
              ::xml_schema::container* c)
-    : ::xml_schema::type (e, f, c)
+    : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+      basename_ (f, this)
     {
+      if ((f & ::xml_schema::flags::base) == 0)
+      {
+        ::xsd::cxx::xml::dom::parser< char > p (e, false, true);
+        this->parse (p, f);
+      }
     }
 
-    Storage::
-    Storage (const ::xercesc::DOMAttr& a,
-             ::xml_schema::flags f,
-             ::xml_schema::container* c)
-    : ::xml_schema::type (a, f, c)
+    void Storage::
+    parse (::xsd::cxx::xml::dom::parser< char >& p,
+           ::xml_schema::flags f)
     {
-    }
+      while (p.more_attributes ())
+      {
+        const ::xercesc::DOMAttr& i (p.next_attribute ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
 
-    Storage::
-    Storage (const ::std::string& s,
-             const ::xercesc::DOMElement* e,
-             ::xml_schema::flags f,
-             ::xml_schema::container* c)
-    : ::xml_schema::type (s, e, f, c)
-    {
+        if (n.name () == "basename" && n.namespace_ ().empty ())
+        {
+          ::std::auto_ptr< basename_type > r (
+            basename_traits::create (i, f, this));
+
+          this->basename_.set (r);
+          continue;
+        }
+      }
+
+      if (!basename_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_attribute< char > (
+          "basename",
+          "");
+      }
     }
 
     Storage* Storage::
@@ -5509,7 +5552,7 @@ namespace Damaris
     Simulation::
     Simulation (::std::auto_ptr< architecture_type >& architecture,
                 ::std::auto_ptr< data_type >& data,
-                const storage_type& storage,
+                ::std::auto_ptr< storage_type >& storage,
                 ::std::auto_ptr< actions_type >& actions,
                 const name_type& name)
     : ::xml_schema::type (),

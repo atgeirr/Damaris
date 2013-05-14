@@ -678,7 +678,11 @@
 
 	<!-- Storage node -->
 	<xs:complexType name="Storage">
-
+	<xs:attribute name="basename"     type="xs:string" use="required">
+		<xs:annotation><xs:documentation>
+		Base directory in which the storage has to read/write.
+		</xs:documentation></xs:annotation>
+	</xs:attribute>
 	</xs:complexType>
 
 	<!-- Simulation node -->

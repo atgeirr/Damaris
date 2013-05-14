@@ -197,4 +197,14 @@ namespace Damaris {
 		}
 		return false;
 	}
+
+	const std::string& Environment::GetMagicNumber()
+	{
+		return env->magicNumber;
+	}
+
+	void Environment::SetMagicNumber(const std::string& mgcnbr)
+	{
+		env->magicNumber = mgcnbr;
+	}
 }

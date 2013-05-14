@@ -26,6 +26,7 @@
 
 #include <list>
 #include <iostream>
+#include <string>
 #include <mpi.h>
 
 #include "xml/Model.hpp"
@@ -47,6 +48,7 @@ namespace Damaris {
 		std::list<int> knownClients;
 		int lastIteration;
 		bool isClient;
+		std::string magicNumber;
 		static Environment* env;
 
 		/**
@@ -173,6 +175,17 @@ namespace Damaris {
 		 * Sets the iteration that just terminated.
 		 */
 		static bool StartNextIteration();
+
+		/**
+		 * Gets the magic number for this simulation (supposed to
+		 * uniquely identify a run of a simulation).
+		 */
+		static const std::string& GetMagicNumber();
+
+		/**
+		 * Sets the magic number for this simulation.
+		 */
+		static void SetMagicNumber(const std::string& mgcnbr);
 	};
 
 }

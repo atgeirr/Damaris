@@ -7,13 +7,15 @@
 
 #ifndef READER_H
 #define	READER_H
+
+
 namespace Damaris{
     class Reader {
         public:
             Reader();
-            Reader(const Reader& orig);
             virtual ~Reader();
-            virtual bool Read(Damaris::Chunk* c)=0;
+            virtual bool Read() = 0;
+	    virtual bool Read(int iteration) = 0;
         private:
 
     };

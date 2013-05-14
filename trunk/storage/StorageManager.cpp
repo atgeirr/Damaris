@@ -9,32 +9,24 @@
 #include "mpi.h"
 #include "SimpleWriter.h"
 
-StorageManager::StorageManager(const Damaris::Model::Storage& s)
-                : Configurable<Model::Storage>(mdl)
+namespace Damaris {
+
+void StorageManager::Init(const Model::Storage& s)
 {
     
 }
 
-StorageManager::StorageManager(const StorageManager& orig) {
-}
-
-StorageManager::~StorageManager() {
-}
-
-StorageManager::Init(const Damaris::Model::Storage& s){
-    
-}
-
-StorageManager::GetReaderFor(Damaris::Variable* v){
-    Damaris::Reader reader;
+Reader* StorageManager::GetReaderFor(Variable* v)
+{
+    Reader* reader = NULL; // TODO create an instance of SimpleReader
     
     return reader;
     
 }
 
-StorageManager::GetWriterFor(Damaris::Variable* v){
-    Damaris::SimpleWriter w;
-    //w.Write(v);
+Writer* StorageManager::GetWriterFor(Variable* v)
+{
+    Writer* w = NULL; // TODO create an instance of SimpleWriter
     return w;
 }
 
@@ -55,3 +47,5 @@ StorageManager::GetWriterFor(Damaris::Variable* v){
 	}
 	return VISIT_VARTYPE_SCALAR;
 }*/
+
+}

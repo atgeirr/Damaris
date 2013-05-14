@@ -2736,20 +2736,28 @@ namespace Damaris
     class Storage: public ::xml_schema::type
     {
       public:
+      // basename
+      // 
+      typedef ::xml_schema::string basename_type;
+      typedef ::xsd::cxx::tree::traits< basename_type, char > basename_traits;
+
+      const basename_type&
+      basename () const;
+
+      basename_type&
+      basename ();
+
+      void
+      basename (const basename_type& x);
+
+      void
+      basename (::std::auto_ptr< basename_type > p);
+
       // Constructors.
       //
-      Storage ();
+      Storage (const basename_type&);
 
       Storage (const ::xercesc::DOMElement& e,
-               ::xml_schema::flags f = 0,
-               ::xml_schema::container* c = 0);
-
-      Storage (const ::xercesc::DOMAttr& a,
-               ::xml_schema::flags f = 0,
-               ::xml_schema::container* c = 0);
-
-      Storage (const ::std::string& s,
-               const ::xercesc::DOMElement* e,
                ::xml_schema::flags f = 0,
                ::xml_schema::container* c = 0);
 
@@ -2763,6 +2771,16 @@ namespace Damaris
 
       virtual 
       ~Storage ();
+
+      // Implementation.
+      //
+      protected:
+      void
+      parse (::xsd::cxx::xml::dom::parser< char >&,
+             ::xml_schema::flags);
+
+      protected:
+      ::xsd::cxx::tree::one< basename_type > basename_;
     };
 
     class Simulation: public ::xml_schema::type
@@ -2925,7 +2943,7 @@ namespace Damaris
 
       Simulation (::std::auto_ptr< architecture_type >&,
                   ::std::auto_ptr< data_type >&,
-                  const storage_type&,
+                  ::std::auto_ptr< storage_type >&,
                   ::std::auto_ptr< actions_type >&,
                   const name_type&);
 

@@ -35,6 +35,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "core/ParameterManager.hpp"
 #include "core/ActionManager.hpp"
 #include "core/Process.hpp"
+#include "storage/StorageManager.h"
 #ifdef __ENABLE_PYTHON
 #include "scripts/python/PyInterpreter.hpp"
 #endif
@@ -93,6 +94,7 @@ namespace Damaris {
 		CurveManager::Init(model->data());
 		DBG("Data Managers initialized");
 		ActionManager::Init(model->actions());
+		StorageManager::Init(model->storage());
 		DBG("ActionsManager initialized");
 		segment = NULL;
 		msgQueue = NULL;	

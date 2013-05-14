@@ -7,13 +7,14 @@
 
 #ifndef WRITER_H
 #define	WRITER_H
+
 namespace Damaris{
     class Writer {
     public:
         Writer();
-        Writer(const Writer& orig);
         virtual ~Writer();
-        virtual bool Write(Damaris::Variable* v)=0;
+        virtual bool Write()=0;
+	virtual bool Write(int iteration) = 0;
     private:
 
     };
