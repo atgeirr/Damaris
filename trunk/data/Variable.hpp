@@ -232,6 +232,22 @@ class Variable : public Configurable<Model::Variable> {
 		iterator End();
 
 		/**
+		 * Gives an iterator to all chunks corresponding to a specified
+		 * iteration.
+		 */
+		void GetChunksByIteration(int iteration,
+			ChunkIndexByIteration::iterator& begin, 
+			ChunkIndexByIteration::iterator& end);
+
+		/**
+		 * Gives an iterator to all chunks corresponding to a specified
+		 * source.
+		 */
+		void GetChunksBySource(int source,
+			ChunkIndexBySource::iterator& begin,
+			ChunkIndexBySource::iterator& end);
+
+		/**
 		 * Creates an instance of Variable if the provided model is consistant.
 		 */
 		static Variable* New(const Model::Variable& mdl, const std::string &name);

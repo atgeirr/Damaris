@@ -365,4 +365,20 @@ Variable::iterator Variable::End()
 {
 	return chunks.end();
 }
+
+void Variable::GetChunksByIteration(int iteration,
+	ChunkIndexByIteration::iterator& begin,
+	ChunkIndexByIteration::iterator& end) 
+{
+	begin = chunks.get<by_iteration>().lower_bound(iteration);
+	end = chunks.get<by_iteration>().upper_bound(iteration);
+}
+
+void Variable::GetChunksBySource(int source,
+	ChunkIndexBySource::iterator& begin,
+	ChunkIndexBySource::iterator& end)
+{
+	begin = chunks.get<by_source>().lower_bound(source);
+	end = chunks.get<by_source>().upper_bound(source);
+}
 }
