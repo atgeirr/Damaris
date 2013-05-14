@@ -53,6 +53,14 @@ bool Initiator::mpi_init(const std::string& configFile, MPI_Comm globalcomm)
 	int clpn = Environment::ClientsPerNode();
 	int copn = Environment::CoresPerNode();
 
+	/* Compute the magic number of the simulation */
+	time_t mgnbr;
+	time(&mgnbr);
+	MPI_Bcast(&mgnbr,sizeof(time_t),MPI_BYTE,0,globalcomm);
+	std::ostringstream oss;
+	oss << mgnbr;
+	Environment::SetMagicNumber(oss.str());
+
 	/* Create a new communicator gathering processes of the same node */
 	int color = ProcInfo::GetNodeID();
 

@@ -76,6 +76,14 @@ int main(int argc, char** argv)
 	
 	__server = Damaris::Server::New(mdl,id);
 
+	/* Compute the magic number of the simulation */
+	time_t mgnbr;
+	time(&mgnbr);
+	MPI_Bcast(&mgnbr,sizeof(time_t),MPI_BYTE,0,MPI_COMM_WORLD);
+	std::ostringstream oss;
+	oss << mgnbr;
+	Damaris::Environment::SetMagicNumber(oss.str());
+
 	INFO("Setting communicators");
 	Damaris::Environment::SetGlobalComm(MPI_COMM_WORLD);
 	Damaris::Environment::SetEntityComm(MPI_COMM_WORLD);
