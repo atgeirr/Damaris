@@ -2753,9 +2753,12 @@ namespace Damaris
       void
       basename (::std::auto_ptr< basename_type > p);
 
+      static const basename_type&
+      basename_default_value ();
+
       // Constructors.
       //
-      Storage (const basename_type&);
+      Storage ();
 
       Storage (const ::xercesc::DOMElement& e,
                ::xml_schema::flags f = 0,
@@ -2781,6 +2784,7 @@ namespace Damaris
 
       protected:
       ::xsd::cxx::tree::one< basename_type > basename_;
+      static const basename_type basename_default_value_;
     };
 
     class Simulation: public ::xml_schema::type

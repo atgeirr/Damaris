@@ -2194,6 +2194,12 @@ namespace Damaris
       this->basename_.set (x);
     }
 
+    const Storage::basename_type& Storage::
+    basename_default_value ()
+    {
+      return basename_default_value_;
+    }
+
 
     // Simulation
     // 
@@ -5455,10 +5461,13 @@ namespace Damaris
     // Storage
     //
 
+    const Storage::basename_type Storage::basename_default_value_ (
+      ".");
+
     Storage::
-    Storage (const basename_type& basename)
+    Storage ()
     : ::xml_schema::type (),
-      basename_ (basename, ::xml_schema::flags (), this)
+      basename_ (basename_default_value (), ::xml_schema::flags (), this)
     {
     }
 
@@ -5507,9 +5516,7 @@ namespace Damaris
 
       if (!basename_.present ())
       {
-        throw ::xsd::cxx::tree::expected_attribute< char > (
-          "basename",
-          "");
+        this->basename_.set (basename_default_value ());
       }
     }
 
