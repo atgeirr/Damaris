@@ -12,10 +12,10 @@
 namespace Damaris{
     class Reader {
         public:
-            Reader();
-            virtual ~Reader();
+            Reader(){}
+            virtual ~Reader(){}
             virtual bool Read() = 0;
-	    virtual bool Read(int iteration) = 0;
+	   // virtual bool Read(int iteration) = 0;
         private:
 
     };

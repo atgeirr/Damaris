@@ -20,7 +20,7 @@
 #include "include/Damaris.hpp"
 
 #define PI 3.14159265358979323846
-#define ITERATIONS 100
+#define ITERATIONS 2
 
 int HEIGHT = 0;
 int WIDTH  = 0;
@@ -113,9 +113,10 @@ int main(int argc, char** argv)
 			
 			MPI_Barrier(comm);
 			client->write("images/julia",fractal);
-			client->signal("say_hello_from_cpp");
-			client->signal("draw_from_python");
-			client->signal("clean_from_python");
+			//client->signal("say_hello_from_cpp");
+			//client->signal("draw_from_python");
+			//client->signal("clean_from_python");
+                        client->signal("write var");
 			client->end_iteration();
 		}
 	

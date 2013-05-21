@@ -4,7 +4,7 @@
 #include <mpi.h>
 #include "include/Damaris.h"
 
-#define MAX_CYCLES 500
+#define MAX_CYCLES 3
 
 int WIDTH;
 int HEIGHT;
@@ -63,6 +63,7 @@ int iterate(const vector* v0, double order)
 
 int main(int argc, char** argv)
 {
+        char* event = "write";
 	if(argc != 2)
 	{
 		fprintf(stderr,"Usage: %s <config.xml>\n",argv[0]);
@@ -135,6 +136,7 @@ int main(int argc, char** argv)
 		DC_write("space",space);
 	
 		DC_signal("clean");
+                DC_signal(event);
 
 		DC_end_iteration();
 		

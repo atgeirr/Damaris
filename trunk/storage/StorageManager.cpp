@@ -9,11 +9,14 @@
 #include "mpi.h"
 #include "SimpleWriter.h"
 
+
 namespace Damaris {
 
+    std::string StorageManager::basename;
 void StorageManager::Init(const Model::Storage& s)
 {
-    
+    basename = s.basename();
+  
 }
 
 Reader* StorageManager::GetReaderFor(Variable* v)
@@ -26,26 +29,11 @@ Reader* StorageManager::GetReaderFor(Variable* v)
 
 Writer* StorageManager::GetWriterFor(Variable* v)
 {
-    Writer* w = NULL; // TODO create an instance of SimpleWriter
+    Writer* w = new SimpleWriter(v); // TODO create an instance of SimpleWriter
+    
     return w;
 }
 
-/*static MPI_Datatype StorageManager::DamTypeToMPI(const Damaris::Model::Type& t) 
-{
-	switch(v) {
-		case Model::Type::int :
-			return MPI_INT;
-                case Model::Type::short:
-			return MPI_SHORT;
-                case Model::Type::float :
-			return MPI_FLOAT;
-		case Model::Type::long :
-			return MPI_LONG;
-		case Model::Type::char :
-			return MPI_CHAR;
-		
-	}
-	return VISIT_VARTYPE_SCALAR;
-}*/
+
 
 }

@@ -16,12 +16,13 @@
 namespace Damaris {
     class StorageManager {
 	private:
-	StorageManager() {}
-	
+                              
+                StorageManager() {}	
 	public:
-        static void Init(const Model::Storage& s);
-        static Writer* GetWriterFor(Variable* v);
-        static Reader* GetReaderFor(Variable* v);
+                static std::string basename; 
+                static void Init(const Model::Storage& s);               
+                static Writer* GetWriterFor(Variable* v);
+                static Reader* GetReaderFor(Variable* v);
 
     };
 

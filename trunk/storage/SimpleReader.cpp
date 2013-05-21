@@ -6,17 +6,19 @@
  */
 
 #include "SimpleReader.h"
+#include "data/Chunk.hpp"
+namespace Damaris{
+    SimpleReader::SimpleReader() {
+    }
 
-SimpleReader::SimpleReader() {
-}
+    SimpleReader::SimpleReader(const SimpleReader& orig) {
+    }
 
-SimpleReader::SimpleReader(const SimpleReader& orig) {
-}
+    SimpleReader::~SimpleReader() {
+    }
 
-SimpleReader::~SimpleReader() {
-}
+    /*SimpleReader::Read(Damaris::Chunk* c){
 
-SimpleReader::Read(Damaris::Variable * v){
-    
 
+    }*/
 }

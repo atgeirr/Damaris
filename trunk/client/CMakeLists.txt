@@ -26,6 +26,8 @@ set(DAMARIS_COMMON_SRC
 	${DAMARIS_SOURCE_DIR}/comm/MPISendRecvQueue.cpp
 	${DAMARIS_SOURCE_DIR}/memory/SharedMemorySegment.cpp
 	${DAMARIS_SOURCE_DIR}/storage/StorageManager.cpp
+        ${DAMARIS_SOURCE_DIR}/storage/SimpleWriter.cpp
+        ${DAMARIS_SOURCE_DIR}/storage/SimpleReader.cpp    
 	${DAMARIS_SOURCE_DIR}/event/Action.cpp
 	${DAMARIS_SOURCE_DIR}/event/BoundAction.cpp
 	${DAMARIS_SOURCE_DIR}/event/DynamicAction.cpp

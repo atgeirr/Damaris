@@ -11,8 +11,8 @@
 namespace Damaris{
     class Writer {
     public:
-        Writer();
-        virtual ~Writer();
+        Writer(){}
+        virtual ~Writer(){}
         virtual bool Write()=0;
 	virtual bool Write(int iteration) = 0;
     private:

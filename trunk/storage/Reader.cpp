@@ -15,6 +15,6 @@ Reader::Reader(const Reader& orig) {
 
 Reader::~Reader() {
 }
-Reader::Read(Damaris::Chunk* c){
+/*Reader::Read(Damaris::Chunk* c){
     
-}
+}*/

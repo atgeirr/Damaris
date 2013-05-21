@@ -7,8 +7,19 @@
 
 #include "SimpleWriter.h"
 #include "mpi.h"
+#include "data/Variable.hpp"
+#include "core/Environment.hpp"
+#include "core/Process.hpp"
+#include "StorageManager.h"
+#include <boost/filesystem.hpp>
 
-SimpleWriter::SimpleWriter() {
+namespace Damaris{
+    
+   int SimpleWriter::lastIteration = 0;
+
+SimpleWriter::SimpleWriter(Variable* v) {
+  
+    this->var = v;
 }
 
 SimpleWriter::SimpleWriter(const SimpleWriter& orig) {
@@ -17,42 +28,84 @@ SimpleWriter::SimpleWriter(const SimpleWriter& orig) {
 SimpleWriter::~SimpleWriter() {
 }
 
-SimpleWriter::Write(Damaris::Variable * v){
+bool SimpleWriter::Write() {
+
     
-    
-    int typeSize,iteration;
-    unsigned int dimensions;    
+    int typeSize, iteration;
+    unsigned int dimensions;
     MPI_File damarisFile;
     MPI_Status status;
     
+
+    ChunkIndexByIteration::iterator begin,end, it;
+
     /*Open file*/
-    MPI_File_open(MPI_COMM_SELF, "write",MPI_MODE_RDWR | MPI_MODE_CREATE,&damarisFile);
-     
-    Damaris::Variable::iterator it = v->Begin();
+    std::string path = getPath();
     
-    for (;it!= v->End();it++){
-        
+    std::ostringstream processID;   
+    processID<<Process::Get()->getID();
+    
+    boost::filesystem::create_directories(boost::filesystem::path(path.c_str()));  
+    std::string fileName = path + "/" + processID.str();
+    
+    MPI_File_open(MPI_COMM_SELF, fileName.c_str(), MPI_MODE_RDWR | MPI_MODE_CREATE,MPI_INFO_NULL, &damarisFile);
+
+    this->var->GetChunksByIteration(lastIteration,begin,end);
+    
+    for (it=begin; it != end; it++) {
+
         Damaris::Chunk *chunk = it->get();
-        
-        dimensions = chunk->GetDimensions(); 
+
+        dimensions = chunk->NbrOfItems();
         iteration = chunk->GetIteration();
-        void* data = dataSpace->Data();  
-        Damaris::DataSpace* dataSpace= chunk->GetDataSpace();   
-        Model::Type t = v->GetLayout()->GetType();
-        typeSize = Damaris::Types::basicTypeSize(&t);
-        //write the variable ID
-        MPI_File_write (damarisFile,&v->GetID(),1,MPI_INT,status);
-        //write the iteration number
-        MPI_File_write (damarisFile,&iteration,1,MPI_INT,status);
-        //write data size
-        MPI_File_write(damarisFile, &(dimensions*typeSize),1,MPI_INT, status);
-        //write the data
-        MPI_File_write(damarisFile, data, dimensions*typeSize, MPI_BYTE ,status);
+        Model::Type t = this->var->GetLayout()->GetType();
+        typeSize = Types::basicTypeSize(t);
+        Damaris::DataSpace* dataSpace = chunk->GetDataSpace();
+        void* data = dataSpace->Data();       
+        //MPI_File_write(damarisFile, data, sizeof (char)*dimensions, MPI_CHAR, &status);
+        ChunkInfo chunkInfo;
+        createChunkStructure(chunkInfo,this->var->GetID(), iteration, dimensions*typeSize, data);
+        MPI_File_write(damarisFile, &chunkInfo, sizeof (ChunkInfo), MPI_BYTE, &status);
+
+        if (status.MPI_ERROR != MPI_SUCCESS) {
+            MPI_File_close(&damarisFile);
+            return false;
+        }
+
     }
-  
-    /* Close the file */
-    MPI_File_close(&myfile);
-    
-    
+
+
+
+    MPI_File_close(&damarisFile);
+    return true;
+
+
 }
+
+bool SimpleWriter::Write(int interation){
+   return true; 
+}
+
+void SimpleWriter::createChunkStructure(ChunkInfo &chunkInfo,int id, int iteration, int size, void*data) {
+
+    
+    chunkInfo.id = id;
+    chunkInfo.iteration = iteration;
+    chunkInfo.size = size;
+    chunkInfo.data = data;   
+
+}
+
+std::string SimpleWriter::getPath() {  
+    std::string path = StorageManager::basename + "/"+ Environment::GetMagicNumber() + "/" + this->var->GetName();    
+    return path;
+}
+
+}
+
+
+
+
+
+
 
