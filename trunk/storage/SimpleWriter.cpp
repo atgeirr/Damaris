@@ -10,12 +10,11 @@
 #include "data/Variable.hpp"
 #include "core/Environment.hpp"
 #include "core/Process.hpp"
-#include "StorageManager.h"
 #include <boost/filesystem.hpp>
 
 namespace Damaris{
     
-   int SimpleWriter::lastIteration = 0;
+int SimpleWriter::lastIteration = 0;
 
 SimpleWriter::SimpleWriter(Variable* v) {
   
@@ -62,11 +61,12 @@ bool SimpleWriter::Write() {
         typeSize = Types::basicTypeSize(t);
         Damaris::DataSpace* dataSpace = chunk->GetDataSpace();
         void* data = dataSpace->Data();       
-        //MPI_File_write(damarisFile, data, sizeof (char)*dimensions, MPI_CHAR, &status);
+       
         ChunkInfo chunkInfo;
-        createChunkStructure(chunkInfo,this->var->GetID(), iteration, dimensions*typeSize, data);
+        createChunkStructure(chunkInfo,this->var->GetID(), iteration, dimensions*typeSize);
         MPI_File_write(damarisFile, &chunkInfo, sizeof (ChunkInfo), MPI_BYTE, &status);
-
+        MPI_File_write(damarisFile, data, typeSize*dimensions, MPI_BYTE, &status);
+        
         if (status.MPI_ERROR != MPI_SUCCESS) {
             MPI_File_close(&damarisFile);
             return false;
@@ -86,14 +86,12 @@ bool SimpleWriter::Write(int interation){
    return true; 
 }
 
-void SimpleWriter::createChunkStructure(ChunkInfo &chunkInfo,int id, int iteration, int size, void*data) {
-
-    
+void SimpleWriter::createChunkStructure(ChunkInfo &chunkInfo,int id, int iteration, int size) {
+  
     chunkInfo.id = id;
     chunkInfo.iteration = iteration;
     chunkInfo.size = size;
-    chunkInfo.data = data;   
-
+    
 }
 
 std::string SimpleWriter::getPath() {  

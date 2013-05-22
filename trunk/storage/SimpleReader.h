@@ -7,15 +7,22 @@
 
 #ifndef SIMPLEREADER_H
 #define	SIMPLEREADER_H
+
 #include "Reader.h"
+#include "data/Variable.hpp"
+#include "StorageManager.h"
+
 namespace Damaris{
     class SimpleReader : public Reader {
     public:
-        SimpleReader();
+        Variable* var;
+        SimpleReader(Variable* v);
         SimpleReader(const SimpleReader& orig);
         virtual ~SimpleReader();
-        //bool Read(Damaris::Variable *v);
+        bool Read(int iteration,Chunk* chunk);        
     private:
+        std::string getPath();       
+       
 
     };
 }

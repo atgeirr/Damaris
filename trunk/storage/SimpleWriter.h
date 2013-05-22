@@ -11,12 +11,7 @@
 #include "data/Variable.hpp"
 #include "Writer.h"
 #include "stdio.h"
-typedef struct {
-              int id;
-              int iteration;
-              int size;
-              void *data;              
-}ChunkInfo;
+#include "StorageManager.h"
 namespace Damaris{
  
     class SimpleWriter : public Writer { 
@@ -30,7 +25,7 @@ namespace Damaris{
       private:
           static int lastIteration;         
           std::string getPath();       
-          void createChunkStructure(ChunkInfo &chunkInfo,int id,int iteration,int size,void*data);
+          void createChunkStructure(ChunkInfo &chunkInfo,int id,int iteration,int size);
 
     };
 }

@@ -8,11 +8,12 @@
 #include "StorageManager.h"
 #include "mpi.h"
 #include "SimpleWriter.h"
+#include "SimpleReader.h"
 
 
 namespace Damaris {
 
-    std::string StorageManager::basename;
+std::string StorageManager::basename;
 void StorageManager::Init(const Model::Storage& s)
 {
     basename = s.basename();
@@ -21,7 +22,7 @@ void StorageManager::Init(const Model::Storage& s)
 
 Reader* StorageManager::GetReaderFor(Variable* v)
 {
-    Reader* reader = NULL; // TODO create an instance of SimpleReader
+    Reader* reader = new SimpleReader(v); // TODO create an instance of SimpleReader
     
     return reader;
     

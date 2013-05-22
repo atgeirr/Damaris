@@ -13,6 +13,12 @@
 #include "storage/Reader.h"
 #include "storage/Writer.h"
 
+typedef struct {
+              int id;
+              int iteration;
+              int size;                     
+}ChunkInfo;
+
 namespace Damaris {
     class StorageManager {
 	private:
