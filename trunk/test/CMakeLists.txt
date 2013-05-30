@@ -5,6 +5,7 @@ set(EMB_SERVER_LIBRARIES damaris-server ${CLIENT_SIDE_LIBRARIES})
 #add_library(Plugin SHARED pluginHello.cpp)
 add_library(gc SHARED gc.cpp)
 add_library(Write SHARED writePlugin.cpp)
+add_library(Read SHARED readPlugin.cpp)
 
 #set_target_properties(hello PROPERTIES LINK_FLAGS "-Wl,--whole-archive")
 

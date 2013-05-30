@@ -27,5 +27,6 @@
 		<event name="my event" action="my_function" library="hello.so"/>
 		<script name="my script" file="script.py" language="python" scope="node"/>
                 <event name="write var" action="writeVar" library="libWrite.so" />
+                <event name="read var" action="readVar" library="libRead.so" />
 	</actions>
 </simulation>

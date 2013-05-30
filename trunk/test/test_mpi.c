@@ -8,7 +8,8 @@ int client_code(int id)
 {
 	char mydata[64][16][4];
 	char* varname = "my_group/my_variable";
-	char* event = "write var";
+	char* write = "write var";
+        char* read = "read var";
 
 	int step;
         int a;
@@ -26,7 +27,8 @@ int client_code(int id)
 	}
         
 	DC_write(varname,mydata);
-	DC_signal(event);
+	DC_signal(write);
+        DC_signal(read);
       
 	DC_end_iteration();
 	}

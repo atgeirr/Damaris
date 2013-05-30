@@ -11,12 +11,13 @@
 #include "StorageManager.h"
 #include "core/Environment.hpp"
 #include "core/Process.hpp"
-#include <boost/filesystem.hpp>
+
 
 namespace Damaris{
     
     SimpleReader::SimpleReader(Variable* v) {
         this->var = v;
+        
     }
 
     SimpleReader::SimpleReader(const SimpleReader& orig) {
@@ -27,29 +28,27 @@ namespace Damaris{
 
     bool SimpleReader::Read(int iteration, Chunk *chunk){
         
-        int ok;               
-        MPI_Offset fileSize,currentOffset;
+        int ok = 0,error;               
+        MPI_Offset fileSize,currentOffset=0;
         MPI_File damarisFile;
         void *data;
         MPI_Status status;   
         Damaris::DataSpace* dataSpace;
-        ChunkInfo readChunk;  
-     
-
-        ok = 1;
-        currentOffset = 0;
-        
+        ChunkInfo readChunk;     
+          
         /*Open file*/
         std::string path = getPath();
         std::ostringstream processID;   
         processID<<Process::Get()->getID();
     
-        boost::filesystem::create_directories(boost::filesystem::path(path.c_str()));  
         std::string fileName = path + "/" + processID.str();
     
-        MPI_File_open(MPI_COMM_SELF, fileName.c_str(), MPI_MODE_RDWR | MPI_MODE_CREATE,MPI_INFO_NULL, &damarisFile);
+        error=MPI_File_open(MPI_COMM_SELF, fileName.c_str(), MPI_MODE_RDWR | MPI_MODE_CREATE,MPI_INFO_NULL, &damarisFile);
        
-        //set the file cursor at 0
+        if (error != MPI_SUCCESS)
+                return false;
+        
+        //set the file cursor at 0        
         MPI_File_seek( damarisFile, 0, MPI_SEEK_SET );
         //get the file size
         MPI_File_get_size(damarisFile, &fileSize);
@@ -64,6 +63,12 @@ namespace Damaris{
                data = malloc(readChunk.size);
                MPI_File_read(damarisFile,data,readChunk.size,MPI_BYTE,&status);
                ok =0;
+               
+               //Print some info
+                //std::cout<<readChunk.id<<" ";             
+                //std::cout<<readChunk.size<<" ";              
+                //std::cout<<readChunk.iteration<<" ";           
+                //std::cout<<(char*) data;
                
                //set chunk               
                chunk->SetIteration(iteration);
@@ -82,8 +87,7 @@ namespace Damaris{
             
         }
         
-        this->var->AttachChunk(chunk);
-  
+        this->var->AttachChunk(chunk);  
         MPI_File_close(&damarisFile);     
         
         return true;
