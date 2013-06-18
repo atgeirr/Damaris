@@ -10,12 +10,10 @@
 
 extern "C" {
 void writeVar(const std::string& eventName, int32_t step, 
-	int32_t source, const char* args) {
-	
+	int32_t source, const char* args) {	
         Damaris::Variable* v = Damaris::VariableManager::Search("my_group/my_variable");
-	Damaris::Writer* w = Damaris::StorageManager::GetWriterFor(v);      
-        w->Write();
-       
+	Damaris::Writer* w = Damaris::StorageManager::GetWriterFor(v);          
+        w->Write();   
       
 }
 }

@@ -7,13 +7,15 @@
 
 #include "StorageManager.h"
 #include "mpi.h"
-#include "SimpleWriter.h"
 #include "SimpleReader.h"
-
+#include "SimpleWriter.h"
 
 namespace Damaris {
 
 std::string StorageManager::basename;
+std::map<int,Writer*> StorageManager::writersMap;
+std::map<int,Reader*> StorageManager::readersMap;
+
 void StorageManager::Init(const Model::Storage& s)
 {
     basename = s.basename();
@@ -22,7 +24,14 @@ void StorageManager::Init(const Model::Storage& s)
 
 Reader* StorageManager::GetReaderFor(Variable* v)
 {
-    Reader* reader = new SimpleReader(v); // TODO create an instance of SimpleReader
+    Reader* reader;
+    std::map<int,Reader*>::iterator it = readersMap.find(v->GetID());
+    
+    if(it!=readersMap.end()){
+       return it->second;
+    }
+    reader = new SimpleReader(v);
+    readersMap[v->GetID()] = reader;
     
     return reader;
     
@@ -30,9 +39,18 @@ Reader* StorageManager::GetReaderFor(Variable* v)
 
 Writer* StorageManager::GetWriterFor(Variable* v)
 {
-    Writer* w = new SimpleWriter(v); // TODO create an instance of SimpleWriter
+    Writer* writer;
+    std::map<int,Writer*>::iterator it = writersMap.find(v->GetID());
     
-    return w;
+    if(it!=writersMap.end()){      
+      return it->second;      
+    }
+    writer = new SimpleWriter(v);
+    writersMap[v->GetID()] = writer;
+   
+    return writer; 
+    
+   
 }
 
 

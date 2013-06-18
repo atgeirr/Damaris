@@ -5,7 +5,7 @@
 		<cores  count="5">
 			<clients count="4"/>
 		</cores>
-		<buffer name="buffer" size="80000" />
+		<buffer name="buffer" size="8000000" />
 		<queue  name="queue" size="100" />
 	</architecture>
 	<data>
@@ -26,7 +26,7 @@
 	<actions>
 		<event name="my event" action="my_function" library="hello.so"/>
 		<script name="my script" file="script.py" language="python" scope="node"/>
-                <event name="write var" action="writeVar" library="libWrite.so" />
-                <event name="read var" action="readVar" library="libRead.so" />
+                <event name="write var" action="writeVar" library="libWrite.so" scope="node" />
+                <event name="read var" action="readVar" library="libRead.so" scope="node" />
 	</actions>
 </simulation>

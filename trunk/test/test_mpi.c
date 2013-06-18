@@ -9,8 +9,8 @@ int client_code(int id)
 	char mydata[64][16][4];
 	char* varname = "my_group/my_variable";
 	char* write = "write var";
-        char* read = "read var";
-
+        char* read = "read var"; 
+                
 	int step;
         int a;
 	for(step = 0; step < 10; step++) {
@@ -25,8 +25,8 @@ int client_code(int id)
 	}
 	}
 	}
-        
-	DC_write(varname,mydata);
+       
+	DC_write(varname,mydata);      
 	DC_signal(write);
         DC_signal(read);
       
@@ -51,6 +51,7 @@ int main(int argc, char** argv)
 	if(DC_mpi_init_and_start(argv[1],all)) {
 		clients = DC_mpi_get_client_comm();
 		MPI_Comm_rank(clients,&rank);
+                srand(rank);
 		MPI_Comm_size(clients,&size);
 		client_code(rank);
 		DC_kill_server();
