@@ -20,10 +20,11 @@
 #include "include/Damaris.hpp"
 
 #define PI 3.14159265358979323846
-#define ITERATIONS 2
+#define ITERATIONS 3
 
 int HEIGHT = 0;
 int WIDTH  = 0;
+bool COMPARE = false;
 
 // Main function that checks for convergence of the series
 // given an initial term z0 and a parameter c.
@@ -61,11 +62,16 @@ int main(int argc, char** argv)
 	// Initialize MPI
 	MPI_Init (&argc, &argv);
 
-	if(argc != 2) {
-		std::cout << "Usage: mpirun -np <np> " << argv[0] << " <config.xml>" << std::endl;
+	if(argc < 2 || argc > 3) {
+            
+		std::cout << "Usage: mpirun -np <np> " << argv[0] << " <config.xml>" <<" [-c]" <<std::endl;
 		exit(0);
 	}
-
+        if(argc == 3)
+                if (strcmp(argv[2],"-c")==0)           
+                        COMPARE = true;
+            
+        
 	// Initialize Damaris
 	// The servers will block on this function call. When they return,
 	// they return NULL.
@@ -109,9 +115,14 @@ int main(int argc, char** argv)
 		for(int i = 0; i < ITERATIONS ; i++) {
 			c = std::polar<double>(0.3,i*2.0*PI/((float)ITERATIONS)-PI/2.0);
 			c += std::complex<double>(0.0,-0.3);
-			compute(fractal,c,offset_x,offset_y);
-			
+			compute(fractal,c,offset_x,offset_y);                        
 			MPI_Barrier(comm);
+                        
+                        // compareIterations before writing it
+                        if (COMPARE == true)                           
+                            client->signal("compareIterations");
+                        
+                        
 			client->write("images/julia",fractal);
 			//client->signal("say_hello_from_cpp");
 			//client->signal("draw_from_python");

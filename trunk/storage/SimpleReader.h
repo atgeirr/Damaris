@@ -19,13 +19,13 @@ namespace Damaris{
     public:
         Variable* var;
         MPI_File damarisFile;
-        SimpleReader(Variable* v);
+        SimpleReader(Variable* v,std::string magicNumber);
         SimpleReader(const SimpleReader& orig);
         virtual ~SimpleReader();
-        DataSpace* Read(int iteration);  
+        std::vector<DataSpace*> Read(int iteration);  
       
     private:
-        std::string getPath();  
+        std::string getPath(std::string magicNumber);  
         ChunkInfo* jumpBackwards(int iteration);
         ChunkInfo* jumpForward(int iteration);
         int lastIteration; 

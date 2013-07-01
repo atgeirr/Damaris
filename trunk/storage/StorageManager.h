@@ -15,6 +15,7 @@
 #include "data/Variable.hpp"
 #include "storage/Reader.h"
 #include "storage/Writer.h"
+#include <string.h>
 
 
 typedef struct {
@@ -33,7 +34,8 @@ namespace Damaris {
                 static std::string basename;                
                 static void Init(const Model::Storage& s);               
                 static Writer* GetWriterFor(Variable* v);
-                static Reader* GetReaderFor(Variable* v);
+                static Reader* GetReaderFor(Variable* v,std::string magicNumber);
+                static long int GetPreviousMagicNumber();
 
     };
 

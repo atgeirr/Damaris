@@ -53,6 +53,10 @@ namespace Damaris {
 			virtual void* Data() {
 				return address;
 			}
+                        
+                        virtual size_t Size() {
+				return size;
+			}
 
 			/**
 			 * Copy data from a pointer to the DataSpace.

@@ -18,8 +18,8 @@ namespace Damaris{
 SimpleWriter::SimpleWriter(Variable* v) {
   
     this->var = v;
-    
-     /*Create the file directory*/
+    this->lastIteration = 0;
+    /*Create the file directory*/
     std::string path = getPath();
     boost::filesystem::create_directories(boost::filesystem::path(path.c_str()));
      
@@ -50,6 +50,7 @@ bool SimpleWriter::Write() {
     ChunkIndexByIteration::iterator begin,end, it;    
     
     if (Environment::GetLastIteration()<lastIteration){
+        std::cout<<Environment::GetLastIteration()<<" "<<lastIteration<<std::endl;
         WARN("You are trying to write the same iteration twice");
         return false;
     }     
@@ -60,14 +61,14 @@ bool SimpleWriter::Write() {
        
         ChunkInfo chunkInfo;
         chunk = it->get();      
-        std::cout<<chunk->GetSource()<<" "<<chunk->GetIteration();
+        //std::cout<<chunk->GetSource()<<" "<<chunk->GetIteration();
         dimensions = chunk->NbrOfItems();
         iteration = chunk->GetIteration();        
         Model::Type t = this->var->GetLayout()->GetType();
         typeSize = Types::basicTypeSize(t);             
         createChunkStructure(chunkInfo,this->var->GetID(), iteration, dimensions*typeSize);        
         error=MPI_File_write(damarisFile, &chunkInfo, sizeof (ChunkInfo), MPI_BYTE, &status);
-        std::cout<<"Writing it"<<chunkInfo.iteration;
+        //std::cout<<"Writing it"<<chunkInfo.iteration<<" "<<chunkInfo.size<<" ";
         if (error != MPI_SUCCESS ){   
             ERROR("Error writing to file");        
             return false;
@@ -82,7 +83,9 @@ bool SimpleWriter::Write() {
        
 
     }
-    lastIteration++;      
+    
+    lastIteration++;    
+    std::cout<<lastIteration<<std::endl;
     return true;
 }
 

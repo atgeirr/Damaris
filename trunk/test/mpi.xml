@@ -28,5 +28,6 @@
 		<script name="my script" file="script.py" language="python" scope="node"/>
                 <event name="write var" action="writeVar" library="libWrite.so" scope="node" />
                 <event name="read var" action="readVar" library="libRead.so" scope="node" />
+                <event name="compareIterations" action="compareIterations" library="libCompare.so" scope="node" />
 	</actions>
 </simulation>
