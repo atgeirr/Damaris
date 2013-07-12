@@ -5,10 +5,12 @@
  * Created on May 6, 2013, 1:02 PM
  */
 
-#include "StorageManager.h"
+#include "StorageManager.hpp"
 #include "mpi.h"
-#include "SimpleReader.h"
-#include "SimpleWriter.h"
+#include "SimpleReader.hpp"
+#include "SimpleWriter.hpp"
+#include "DifferentialReader.hpp"
+#include "DifferentialWriter.hpp"
 #include "core/Environment.hpp"
 #include <boost/filesystem.hpp>
 #include <boost/regex.hpp>

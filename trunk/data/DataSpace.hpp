@@ -24,7 +24,7 @@
 #define __DAMARIS_DATASPACE_H
 
 #include <stdlib.h>
-
+#include <string.h>
 namespace Damaris {
 	/**
 	 */

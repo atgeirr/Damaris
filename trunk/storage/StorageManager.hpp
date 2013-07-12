@@ -13,16 +13,29 @@
 
 #include "xml/Model.hpp"
 #include "data/Variable.hpp"
-#include "storage/Reader.h"
-#include "storage/Writer.h"
+#include "storage/Reader.hpp"
+#include "storage/Writer.hpp"
 #include <string.h>
 
 
 typedef struct {
+              //TODO?? remove the id; 
               int id;
               int iteration;
               unsigned int size;                     
 }ChunkInfo;
+
+typedef struct {
+    //source
+    int pid;
+    //iteration number;
+    int iteration;
+    //chunk size;
+    int size;
+    //block id;
+    int bid;
+    int uncompressedSize;
+}DifferentialChunk;
 
 namespace Damaris {
     class StorageManager {

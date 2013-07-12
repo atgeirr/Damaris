@@ -4,8 +4,8 @@
 #include <string>
 
 #include "core/VariableManager.hpp"
-#include "storage/Writer.h"
-#include "storage/StorageManager.h"
+#include "storage/Writer.hpp"
+#include "storage/StorageManager.hpp"
 
 
 extern "C" {

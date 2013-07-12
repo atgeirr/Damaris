@@ -4,9 +4,8 @@
  * 
  * Created on May 7, 2013, 1:33 AM
  */
-
+#include "SimpleReader.hpp"
 #include "core/Debug.hpp"
-#include "SimpleReader.h"
 #include "data/Chunk.hpp"
 #include "core/Environment.hpp"
 #include "core/Process.hpp"
@@ -45,7 +44,7 @@ namespace Damaris{
         
         void *data;
         MPI_Status status;   
-        Damaris::DataSpace* dataSpace;
+        //Damaris::DataSpace* dataSpace;
         std::vector<DataSpace*> dataSpaceArray;
         ChunkInfo* readChunk = (ChunkInfo*)calloc(1,sizeof(ChunkInfo));    
         int error;

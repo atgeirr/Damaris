@@ -35,7 +35,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "core/ParameterManager.hpp"
 #include "core/ActionManager.hpp"
 #include "core/Process.hpp"
-#include "storage/StorageManager.h"
+#include "storage/StorageManager.hpp"
 #ifdef __ENABLE_PYTHON
 #include "scripts/python/PyInterpreter.hpp"
 #endif

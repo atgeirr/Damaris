@@ -6,7 +6,7 @@
  */
 
 #include "core/Debug.hpp"
-#include "SimpleWriter.h"
+#include "SimpleWriter.hpp"
 #include "data/Variable.hpp"
 #include "core/Environment.hpp"
 #include "core/Process.hpp"
@@ -49,8 +49,7 @@ bool SimpleWriter::Write() {
     MPI_Status status;
     ChunkIndexByIteration::iterator begin,end, it;    
     
-    if (Environment::GetLastIteration()<lastIteration){
-        std::cout<<Environment::GetLastIteration()<<" "<<lastIteration<<std::endl;
+    if (Environment::GetLastIteration()<lastIteration){        
         WARN("You are trying to write the same iteration twice");
         return false;
     }     
@@ -85,11 +84,9 @@ bool SimpleWriter::Write() {
     }
     
     lastIteration++;    
-    std::cout<<lastIteration<<std::endl;
+  
     return true;
 }
-
-
 
 bool SimpleWriter::Write(int interation){
    return true; 
@@ -98,13 +95,12 @@ bool SimpleWriter::Write(int interation){
 void SimpleWriter::createChunkStructure(ChunkInfo &chunkInfo,int id, int iteration, int size) {  
     chunkInfo.id = id;
     chunkInfo.iteration = iteration;
-    chunkInfo.size = size;
-    
+    chunkInfo.size = size;    
 }
 
 std::string SimpleWriter::getPath() {  
     std::string path = StorageManager::basename + "/"+ Environment::GetMagicNumber() + "/" + this->var->GetName();    
-    return path;
+    return path ;
 }
 
 }

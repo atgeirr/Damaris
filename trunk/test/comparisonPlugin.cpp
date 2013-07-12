@@ -3,7 +3,8 @@
 #include <iostream>
 #include <string>
 #include <stdlib.h>
-#include "storage/StorageManager.h"
+#include <functional>
+#include "storage/StorageManager.hpp"
 #include "core/Debug.hpp"
 #include "core/VariableManager.hpp"
 #include "core/Environment.hpp"
@@ -46,16 +47,14 @@ void compareIterations(const std::string& eventName, int32_t step,
        Damaris::DataSpace* previousDataSpace = previousDataSpaceVector[i];
        
        void* data = dataSpace->Data();
-       void* data1= previousDataSpace->Data();
+       void* data1= previousDataSpace->Data();     
       
-      
-       std::cout<<" "<<dataSpace->Size()<<" ";
-       std::cout<<" "<<previousDataSpace->Size()<<std::endl;
+       //std::hash
        
-      for(size_t j=0;j<dataSpace->Size();j++){
+       for(size_t j=0;j<dataSpace->Size();j++){
           // TODO: generic cast
-          int* a = (int*)data;
-          int* b = (int*)data1;
+         int* a = (int*)data;
+         int* b = (int*)data1;
           
           //some random output for control
           /*if (j==2){
@@ -63,12 +62,12 @@ void compareIterations(const std::string& eventName, int32_t step,
               std::cout<<*(b+j)<<std::endl;
           }
            */
-          if(*(a+j)!=*(b+j)){
-               ok=0;
-               break;
+         if(*(a+j)!=*(b+j)){
+              ok=0;
+              break;
           }
           
-       }   
+        }   
        
    }
    if(ok==0){
