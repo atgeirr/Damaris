@@ -11,10 +11,10 @@
 #define	SIMPLEWRITER_H  
 
 #include "data/Variable.hpp"
-#include "Writer.h"
+#include "Writer.hpp"
 #include "stdio.h"
 #include "mpi.h"
-#include "StorageManager.h"
+#include "StorageManager.hpp"
 
 namespace Damaris{
  
