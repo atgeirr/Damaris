@@ -22,9 +22,7 @@ void compareIterations(const std::string& eventName, int32_t step,
     //convert from long int to string
     std::stringstream ss;
     ss << magicNumber;  
-    std::string previousIteration=ss.str();
-    
-    std::cout<<previousIteration;
+    std::string previousIteration=ss.str(); 
     
     Damaris::Variable* v = Damaris::VariableManager::Search("images/julia");
     Damaris::Reader* previousRun = Damaris::StorageManager::GetReaderFor(v, previousIteration);
@@ -49,25 +47,26 @@ void compareIterations(const std::string& eventName, int32_t step,
        void* data = dataSpace->Data();
        void* data1= previousDataSpace->Data();     
       
-       //std::hash
-       
+       if (dataSpace->Size()!= previousDataSpace->Size())
+           std::cout<<"different size"<<std::endl;
        for(size_t j=0;j<dataSpace->Size();j++){
           // TODO: generic cast
          int* a = (int*)data;
          int* b = (int*)data1;
-          
+        
           //some random output for control
           /*if (j==2){
               std::cout<<*(a+j)<<std::endl;
               std::cout<<*(b+j)<<std::endl;
           }
            */
-         if(*(a+j)!=*(b+j)){
+         /*if(*(a+j)!=*(b+j)){
               ok=0;
               break;
-          }
+          }*/
           
-        }   
+        }
+        std::cout<<"compare"<<std::endl; 
        
    }
    if(ok==0){

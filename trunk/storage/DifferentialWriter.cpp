@@ -20,8 +20,8 @@ namespace Damaris{
         /*Create the file directory*/
         std::string path = getPath();
         boost::filesystem::create_directories(boost::filesystem::path(path.c_str()));
-
-         /*Open file*/   
+        
+        /*Open file*/   
         std::ostringstream processID;   
         processID<<Process::Get()->getID();
         std::string fileName = path + "/" + processID.str();
@@ -58,7 +58,7 @@ namespace Damaris{
         
         this->var->GetChunksByIteration(lastIteration,begin,end);
         
-        
+       
         for (it=begin; it != end; it++) {
             DifferentialChunk chunkInfo;
             chunk = it->get();
@@ -72,11 +72,11 @@ namespace Damaris{
             int bid = chunk->GetBlock();
             
             int compressedSize = compressBound(dimensions*typeSize);
-           
+            
             if (lastIteration == 0)
-                createChunkStructure(chunkInfo,pid, iteration, compressedSize,bid,dimensions*typeSize);  
+                createChunkStructure(chunkInfo,pid,iteration,compressedSize,bid,dimensions*typeSize);  
             else
-                createChunkStructure(chunkInfo,pid, iteration, dimensions*typeSize,bid,dimensions*typeSize); 
+                createChunkStructure(chunkInfo,pid,iteration,dimensions*typeSize,bid,dimensions*typeSize); 
             
             error=MPI_File_write(damarisFile, &chunkInfo, sizeof (ChunkInfo), MPI_BYTE, &status);
            
@@ -85,30 +85,34 @@ namespace Damaris{
                 return false;
             }
             //TODO: check the errors;
-            if (lastIteration == 0)
+            if (lastIteration != 0)
                 writeXorData (chunk, pid, (uLongf) compressedSize);
             else{
+               
                 void* data = chunk->GetDataSpace()->Data();
                 error=MPI_File_write(damarisFile, data, typeSize*dimensions, MPI_BYTE, &status); 
             }
             
+            
+            
         }
         
         lastChunks.clear();
-        
+       
         for (it = begin; it!=end;it++){
            
             chunk = it->get();
             LastWrittenChunk* last = (LastWrittenChunk*)malloc (sizeof(LastWrittenChunk));
             last->size = chunk->GetDataSpace()->Size();
             last->data = chunk->GetDataSpace()->Data();
+            last->pid = chunk->GetSource();
             lastChunks.push_back(last);
         } 
        lastIteration++;        
        return true;
     }
     
-    void createChunkStructure(DifferentialChunk &chunkInfo,int pid,int iteration,int size, int bid, int uncompressedSize){
+    void DifferentialWriter::createChunkStructure(DifferentialChunk &chunkInfo,int pid,int iteration,int size, int bid, int uncompressedSize){
         chunkInfo.pid = pid;
         chunkInfo.iteration = iteration;
         chunkInfo.size = size;
@@ -124,10 +128,13 @@ namespace Damaris{
     //write and compress the xor between two chunks
     void DifferentialWriter::writeXorData (Chunk* chunk, int pid, uLongf sizeDest){
         MPI_Status status;
+       
         Bytef* data = (Bytef*) chunk->GetDataSpace()->Data();
+      
         LastWrittenChunk* last = getLastBlock(pid);
+       
         Bytef* data1 = (Bytef*)last->data;
-        
+       
         int size = chunk->GetDataSpace()->Size();
         Bytef* newData = (Bytef*)malloc(size);
        
@@ -146,8 +153,10 @@ namespace Damaris{
     }
     
     LastWrittenChunk* DifferentialWriter::getLastBlock (int pid){
+        
          for(std::vector<LastWrittenChunk*>::size_type i = 0; i !=lastChunks.size(); i++){
-             LastWrittenChunk *lastChunk = lastChunks[i];
+            
+             LastWrittenChunk *lastChunk = lastChunks[i];            
              if(lastChunk->pid == pid)
                  return lastChunk;
          }

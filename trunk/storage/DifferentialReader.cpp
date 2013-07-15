@@ -39,7 +39,8 @@ namespace Damaris{
     }
     
     std::vector<DataSpace*> DifferentialReader::Read(int iteration){
-        
+        std::cout<<iteration<<std::endl;
+       
         Bytef *compressedData,*uncompressedData,*newData;
         MPI_Status status;  
         int error;
@@ -62,6 +63,8 @@ namespace Damaris{
             lastIteration++;   
             
         }
+        
+        std::cout<<"here";
         if (readChunk == NULL){
             WARN("readChunk is null");
             return dataSpaceArray;
@@ -102,6 +105,7 @@ namespace Damaris{
             LastReadChunk* last = (LastReadChunk*)malloc (sizeof(LastReadChunk));
             last->size = readChunk->uncompressedSize;
             last->data = uncompressedData;
+            last->pid = readChunk->pid;
             lastChunks.push_back(last);
             
             free(uncompressedData); 
@@ -110,7 +114,8 @@ namespace Damaris{
            
         }
         
-        MPI_File_seek(damarisFile,offBack,MPI_SEEK_SET);                 
+        MPI_File_seek(damarisFile,offBack,MPI_SEEK_SET); 
+        std::cout<<"end"<<std::endl;
         return dataSpaceArray;   
     }
 

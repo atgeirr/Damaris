@@ -36,7 +36,8 @@ Reader* StorageManager::GetReaderFor(Variable* v,std::string magicNumber)
     if(it!=readersMap.end()){
        return it->second;
     }
-    reader = new SimpleReader(v,magicNumber);
+    //reader = new SimpleReader(v,magicNumber);
+    reader = new DifferentialReader(v,magicNumber);
     readersMap[v->GetID()] = reader;
     
     return reader;
@@ -51,7 +52,8 @@ Writer* StorageManager::GetWriterFor(Variable* v)
     if(it!=writersMap.end()){      
       return it->second;      
     }
-    writer = new SimpleWriter(v);
+    //writer = new SimpleWriter(v);
+    writer = new DifferentialWriter(v);
     writersMap[v->GetID()] = writer;
    
     return writer; 
