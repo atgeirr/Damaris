@@ -34,6 +34,7 @@ typedef struct {
     int size;
     //block id;
     int bid;
+    //uncompressed size
     int uncompressedSize;
 }DifferentialChunk;
 
