@@ -28,7 +28,7 @@ SimpleWriter::SimpleWriter(Variable* v) {
     processID<<Process::Get()->getID();
     std::string fileName = path + "/" + processID.str();
     
-    int error=MPI_File_open(MPI_COMM_SELF, fileName.c_str(), MPI_MODE_RDWR | MPI_MODE_CREATE,MPI_INFO_NULL, &damarisFile);
+    int error=MPI_File_open(MPI_COMM_SELF, (char*)fileName.c_str(), MPI_MODE_RDWR | MPI_MODE_CREATE,MPI_INFO_NULL, &damarisFile);
    
     if (error != MPI_SUCCESS)
         ERROR("Error opening file");

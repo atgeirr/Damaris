@@ -16,59 +16,17 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 /**
  * \file Chunk.cpp
- * \date Oct. 2012
+ * \date February 2012
  * \author Matthieu Dorier
- * \version 0.7
+ * \version 0.4
  */
+
+#include <string.h>
+ 
+#include "core/Debug.hpp"
 #include "data/Chunk.hpp"
 
 namespace Damaris {
-
-Chunk::Chunk(Buffer* b, ChunkHeader* ch) 
-{
-	isOwner = false;
-	buffer = b;
-	header = ch;
-	void* addr = ((char*)header)+sizeof(ChunkHeader);
-	size_t size = header->GetDataMemoryLength(GetType());
-	space = new DataSpace(addr,size);
-}
-
-Chunk::Chunk(Buffer* b, handle_t h)
-{
-	isOwner = false;
-	buffer = b;
-	header = (ChunkHeader*)buffer->GetAddressFromHandle(h);
-	void* addr = ((char*)header)+sizeof(ChunkHeader);
-	size_t size = header->GetDataMemoryLength(GetType());
-	space = new DataSpace(addr,size);
-}
-
-Chunk::~Chunk()
-{
-	if(isOwner) {
-		buffer->Deallocate(header);
-	}
-}
-
-void* Chunk::Data()
-{
-	return space->Data();
-}
-
-/*
-size_t Chunk::MemCopy(const void* src)
-{
-	size_t size = header->GetDataMemoryLength(GetType());
-	memcpy(addr,src,size);
-	return size;
-}
-*/
-
-handle_t Chunk::GetHandle()
-{
-	return buffer->GetHandleFromAddress(header);
-}
 
 int Chunk::NbrOfItems() const
 {
@@ -117,53 +75,5 @@ bool Chunk::FillVisItDataHandle(visit_handle hdl)
 	return false;
 }
 #endif
-
-//static void CopyCorners(const void* src, void* dst, int dim, const int* lb, const int* up, size_t typesize);
-
-static void CopyCorners(const char* src, char* dst, int dim, const int* lb, const int* ub, size_t typesize)
-{
-	if(dim == 1) {
-		memcpy(dst,src,typesize);
-		memcpy(dst+typesize,src+typesize*(ub[0]-lb[0]),typesize);
-	} else {
-		CopyCorners(src,dst,dim-1,lb+1,ub+1,typesize);
-		int src_shift = typesize*(ub[0]-lb[0]);
-		int dst_shift = typesize;
-		for(int i=1; i<dim;i++) {
-			src_shift *= (ub[i]-lb[i]+1);
-			dst_shift *= 2;
-		}
-		CopyCorners(src+src_shift,dst+dst_shift,dim-1,lb+1,ub+1,typesize);
-	}
-}
-
-void Chunk::DownScaleToLimits()
-{
-	int* lb = new int[GetDimensions()];
-	int* ub = new int[GetDimensions()];
-	for(int i=0; i < (int)GetDimensions(); i++) { 
-		lb[i] = 0;
-		ub[i] = 1;
-	}
-	size_t s = Types::basicTypeSize(GetType())*2*GetDimensions();
-	ChunkDescriptor* cd = ChunkDescriptor::New(GetDimensions(),lb,ub);
-	void* location = buffer->Allocate(s+sizeof(ChunkHeader));
-	ChunkHeader* ch = new(location) ChunkHeader(cd,GetType(),
-					GetIteration(),GetSource(), GetBlock());
-	ChunkDescriptor::Delete(cd);
-
-	char* data = (char*)location + sizeof(ChunkHeader);
-	
-	CopyCorners((const char*)space->Data(),data,GetDimensions(),
-		lb,ub,Types::basicTypeSize(GetType()));
-
-	if(isOwner) {
-		buffer->Deallocate(header);
-	}
-	isOwner = true;
-	delete space;
-	space = new DataSpace(data,s);
-	header = ch;
-}
 
 } // namespace Damaris

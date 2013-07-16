@@ -179,6 +179,8 @@ namespace Damaris {
 			bool FillVisItDataHandle(visit_handle hdl);
 #endif
 
+			virtual void DownScaleToLimits();
+
 	}; // class Chunk
 
 } // namespace Damaris
