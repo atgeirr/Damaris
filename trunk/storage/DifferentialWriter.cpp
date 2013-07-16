@@ -37,6 +37,7 @@ namespace Damaris{
 
     DifferentialWriter::~DifferentialWriter() {
          MPI_File_close(&damarisFile);
+         //TODO: free memory;
     }
     
     bool DifferentialWriter::Write(int iteration){
@@ -107,7 +108,7 @@ namespace Damaris{
             last->data = chunk->GetDataSpace()->Data();
             last->pid = chunk->GetSource();
             lastChunks.push_back(last);
-        } 
+       } 
        lastIteration++;        
        return true;
     }
@@ -142,7 +143,7 @@ namespace Damaris{
             newData[i] = data[i] ^ data1[i];
         }
         Bytef* dest = (Bytef*)malloc(size*sizeof(Bytef));
-        int error = compress2(dest, &sizeDest, (Bytef *) newData, size, 9);
+        int error = compress2(dest, &sizeDest, (Bytef *) newData, size, 4);
         
         if(error!= Z_OK)
             ERROR ("Error on compression");

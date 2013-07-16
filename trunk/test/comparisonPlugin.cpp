@@ -60,6 +60,7 @@ void compareIterations(const std::string& eventName, int32_t step,
               std::cout<<*(b+j)<<std::endl;
           }
            */
+         std::cout<<*(b+j);
          /*if(*(a+j)!=*(b+j)){
               ok=0;
               break;
