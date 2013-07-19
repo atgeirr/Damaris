@@ -33,6 +33,7 @@ namespace Damaris {
             std::vector<DataSpace*> Read(int iteration);             
         private:
             std::vector<LastReadChunk*> lastChunks;
+            std::vector<LastReadChunk*> partialLastChunks;
             std::string getPath(std::string magicNumber);  
             DifferentialChunk* jumpBackwards(int iteration);
             DifferentialChunk* jumpForward(int iteration);

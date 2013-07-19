@@ -1,6 +1,6 @@
 /* 
  * File:   DifferentialWriter.cpp
- * Author: cata
+ * Author: Catalina
  * 
  * Created on July 5, 2013, 5:36 PM
  */
@@ -49,9 +49,8 @@ namespace Damaris{
         MPI_Status status;
         ChunkIndexByIteration::iterator begin,end, it;    
         Chunk *chunk ;
-        int error, typeSize,iteration;
-        unsigned int dimensions;
-        
+        int error;
+              
         if (Environment::GetLastIteration()<lastIteration){        
             WARN("You are trying to write the same iteration twice");
             return false;
@@ -59,42 +58,26 @@ namespace Damaris{
         
         this->var->GetChunksByIteration(lastIteration,begin,end);
         
-       
         for (it=begin; it != end; it++) {
-            DifferentialChunk chunkInfo;
-            chunk = it->get();
-            
-            dimensions = chunk->NbrOfItems();
-            iteration = chunk->GetIteration();        
-            Model::Type t = this->var->GetLayout()->GetType();
-            typeSize = Types::basicTypeSize(t);  
+            DifferentialChunk chunkInfo,readChunk;
+            chunk = it->get();          
             
             int pid = chunk->GetSource();
             int bid = chunk->GetBlock();
-            
-            int compressedSize = compressBound(dimensions*typeSize);
-            
-            if (lastIteration == 0)
-                createChunkStructure(chunkInfo,pid,iteration,compressedSize,bid,dimensions*typeSize);  
-            else
-                createChunkStructure(chunkInfo,pid,iteration,dimensions*typeSize,bid,dimensions*typeSize); 
-            
-            error=MPI_File_write(damarisFile, &chunkInfo, sizeof (ChunkInfo), MPI_BYTE, &status);
+            int iteration = chunk->GetIteration();
+            unsigned int uncompressedSize = chunk->GetDataSpace()->Size();
            
-            if (error != MPI_SUCCESS ){   
-                ERROR("Error writing to file");        
-                return false;
-            }
-            //TODO: check the errors;
-            if (lastIteration != 0)
-                writeXorData (chunk, pid, (uLongf) compressedSize);
+            if (lastIteration != 0) 
+                writeXorData (chunk, chunkInfo, uncompressedSize );           
             else{
-               
-                void* data = chunk->GetDataSpace()->Data();
-                error=MPI_File_write(damarisFile, data, typeSize*dimensions, MPI_BYTE, &status); 
-            }
-            
-            
+                std::cout<<pid<<" "<<iteration<<" "<<uncompressedSize<<" "<<bid<<" "<<uncompressedSize<<std::endl;
+                createChunkStructure(chunkInfo,pid,iteration,uncompressedSize,bid,uncompressedSize);     
+                std::cout<<chunkInfo.pid<<" "<<chunkInfo.iteration<<" "<<chunkInfo.uncompressedSize<<" "<<chunkInfo.bid<<" "<<chunkInfo.uncompressedSize<<std::endl;
+                error=MPI_File_write(damarisFile, &chunkInfo, sizeof (DifferentialChunk), MPI_BYTE, &status);
+                // error=MPI_File_read(damarisFile,&readChunk,sizeof(DifferentialChunk), MPI_BYTE, &status );                 
+                void* data = chunk->GetDataSpace()->Data();                
+                error=MPI_File_write(damarisFile, data, uncompressedSize, MPI_BYTE, &status); 
+            }         
             
         }
         
@@ -126,37 +109,57 @@ namespace Damaris{
         return path ;
     } 
    
-    //write and compress the xor between two chunks
-    void DifferentialWriter::writeXorData (Chunk* chunk, int pid, uLongf sizeDest){
-        MPI_Status status;
-       
+    // writeXorData (chunk, chunkInfo,iteration, uncompressedSize );
+    
+    bool DifferentialWriter::writeXorData (Chunk* chunk, DifferentialChunk chunkInfo, unsigned int uncompressedSize){
+        
+        MPI_Status status;        
         Bytef* data = (Bytef*) chunk->GetDataSpace()->Data();
       
-        LastWrittenChunk* last = getLastBlock(pid);
-       
-        Bytef* data1 = (Bytef*)last->data;
-       
+        int pid = chunk->GetSource();
+        int bid = chunk->GetBlock(); 
+        int iteration = chunk->GetIteration(); 
+        uLongf compressedSize = compressBound(uncompressedSize);
         int size = chunk->GetDataSpace()->Size();
+        
+        LastWrittenChunk* last = getLastBlock(pid);       
+        Bytef* data1 = (Bytef*)last->data;       
         Bytef* newData = (Bytef*)malloc(size);
        
-        for (int i=0; i<size;i++){
+        for (int i=0; i<size;i++)
             newData[i] = data[i] ^ data1[i];
-        }
-        Bytef* dest = (Bytef*)malloc(size*sizeof(Bytef));
-        int error = compress2(dest, &sizeDest, (Bytef *) newData, size, 4);
         
-        if(error!= Z_OK)
+        std::cout<<compressedSize<<" ";
+        Bytef* dest = (Bytef*)malloc(compressedSize*sizeof(Bytef));
+        int error = compress2(dest, &compressedSize, (Bytef *) newData, size, 4);
+               
+        if(error!= Z_OK){
             ERROR ("Error on compression");
+            return false;
+        }
+        std::cout<<(int)compressedSize<<std::endl;
+        createChunkStructure(chunkInfo,pid,iteration,(int)compressedSize,bid,uncompressedSize);        
+        error=MPI_File_write(damarisFile, &chunkInfo, sizeof (DifferentialChunk), MPI_BYTE, &status);
+           
+        if (error != MPI_SUCCESS ){   
+                ERROR("Error writing to file");        
+                return false;
+        }
+        error=MPI_File_write(damarisFile, dest, (int)compressedSize, MPI_BYTE, &status);   
         
-        error=MPI_File_write(damarisFile, dest, sizeDest, MPI_BYTE, &status);     
+        if (error != MPI_SUCCESS ){   
+                ERROR("Error writing to file");        
+                return false;
+        }
+        
+        return true;
             
        
     }
     
     LastWrittenChunk* DifferentialWriter::getLastBlock (int pid){
         
-         for(std::vector<LastWrittenChunk*>::size_type i = 0; i !=lastChunks.size(); i++){
-            
+         for(std::vector<LastWrittenChunk*>::size_type i = 0; i !=lastChunks.size(); i++){            
              LastWrittenChunk *lastChunk = lastChunks[i];            
              if(lastChunk->pid == pid)
                  return lastChunk;

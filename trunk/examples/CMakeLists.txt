@@ -7,7 +7,7 @@ include_directories(${DAMARIS_SOURCE_DIR}/include)
 
 if(CMAKE_Fortran_COMPILER)
   add_executable (test_fortran ${DAMARIS_SOURCE_DIR}/examples/test.f90)
-  target_link_libraries (test_fortran ${CLIENT_SIDE_LIBRARIES} gfortran)
+  target_link_libraries (test_fortran ${CLIENT_SIDE_LIBRARIES} gfortran z)
 
 #  the following two lines are supposed to compile the fortran alloc test,
 #  which requires a module. Yet CMake is not able to find the module itself,
@@ -16,32 +16,32 @@ if(CMAKE_Fortran_COMPILER)
 #  "make" again.
 
   add_executable (test_alloc_fortran ${DAMARIS_SOURCE_DIR}/examples/test_alloc.f90)
-  target_link_libraries (test_alloc_fortran ${CLIENT_SIDE_LIBRARIES} gfortran)
+  target_link_libraries (test_alloc_fortran ${CLIENT_SIDE_LIBRARIES} gfortran z)
 
 endif(CMAKE_Fortran_COMPILER)
 
 add_executable (test_alloc_c ${DAMARIS_SOURCE_DIR}/examples/test_alloc.c)
-target_link_libraries (test_alloc_c ${CLIENT_SIDE_LIBRARIES})
+target_link_libraries (test_alloc_c ${CLIENT_SIDE_LIBRARIES} z)
 
 add_executable (test_c ${DAMARIS_SOURCE_DIR}/examples/test.c)
-target_link_libraries (test_c ${CLIENT_SIDE_LIBRARIES})
+target_link_libraries (test_c ${CLIENT_SIDE_LIBRARIES} z)
 
 add_executable (test_event_c ${DAMARIS_SOURCE_DIR}/examples/test_event.c)
-target_link_libraries (test_event_c ${CLIENT_SIDE_LIBRARIES})
+target_link_libraries (test_event_c ${CLIENT_SIDE_LIBRARIES} z)
 
 add_executable (test_mpi_c ${DAMARIS_SOURCE_DIR}/examples/test_mpi.c)
-target_link_libraries (test_mpi_c ${EMB_SERVER_LIBRARIES})
+target_link_libraries (test_mpi_c ${EMB_SERVER_LIBRARIES} z)
 set_target_properties (test_mpi_c PROPERTIES LINK_FLAGS "-Wl,-export-dynamic")
 
 add_executable (test_param_c ${DAMARIS_SOURCE_DIR}/examples/test_param.c)
-target_link_libraries (test_param_c ${EMB_SERVER_LIBRARIES})
+target_link_libraries (test_param_c ${EMB_SERVER_LIBRARIES} z)
 set_target_properties (test_param_c PROPERTIES LINK_FLAGS "-Wl,-export-dynamic")
 
 add_executable (test_fun_cpp ${DAMARIS_SOURCE_DIR}/examples/test_fun.cpp)
-target_link_libraries (test_fun_cpp ${EMB_SERVER_LIBRARIES})
+target_link_libraries (test_fun_cpp ${EMB_SERVER_LIBRARIES} z)
 
 if(CMAKE_Fortran_COMPILER)
   add_executable (test_mpi_fortran ${DAMARIS_SOURCE_DIR}/examples/test_mpi.f90)
-  target_link_libraries (test_mpi_fortran ${EMB_SERVER_LIBRARIES} gfortran)
+  target_link_libraries (test_mpi_fortran ${EMB_SERVER_LIBRARIES} gfortran z)
   set_target_properties (test_mpi_fortran PROPERTIES LINK_FLAGS "-Wl,-export-dynamic")
 endif(CMAKE_Fortran_COMPILER)

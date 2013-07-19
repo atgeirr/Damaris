@@ -39,7 +39,7 @@ namespace Damaris{
             int lastIteration;
             std::string getPath();
             LastWrittenChunk* getLastBlock (int pid);
-            void writeXorData (Chunk* chunk, int pid, uLongf sizeDest);
+            bool writeXorData (Chunk* chunk, DifferentialChunk chunkInfo, unsigned int uncompressedSize);
             void createChunkStructure(DifferentialChunk &chunkInfo,int pid,int iteration,int size, int bid,int uncompressedSize);
     };
 }

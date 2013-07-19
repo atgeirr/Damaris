@@ -8,6 +8,7 @@
 #include "core/Debug.hpp"
 #include "core/VariableManager.hpp"
 #include "core/Environment.hpp"
+#include "zlib.h"
 
 
 extern "C" {
@@ -49,10 +50,11 @@ void compareIterations(const std::string& eventName, int32_t step,
       
        if (dataSpace->Size()!= previousDataSpace->Size())
            std::cout<<"different size"<<std::endl;
-       for(size_t j=0;j<dataSpace->Size();j++){
+     
+      for(size_t j=0;j<dataSpace->Size();j++){
           // TODO: generic cast
-         int* a = (int*)data;
-         int* b = (int*)data1;
+         Bytef* a = (Bytef*)data;
+         Bytef* b = (Bytef*)data1;
         
           //some random output for control
           /*if (j==2){
@@ -60,16 +62,20 @@ void compareIterations(const std::string& eventName, int32_t step,
               std::cout<<*(b+j)<<std::endl;
           }
            */
-         std::cout<<*(b+j);
-         /*if(*(a+j)!=*(b+j)){
+        
+         if(*(a+j)!=*(b+j)){
               ok=0;
+              std::cout<<j<<" "<<std::endl;
+              std::cout<<*(a+j)<<std::endl;
+              std::cout<<*(b+j)<<std::endl;
               break;
-          }*/
+         }
           
         }
         std::cout<<"compare"<<std::endl; 
        
    }
+   
    if(ok==0){
         std::cout<<"Differences found"<<std::endl;
         exit(0); //drop the simulation
