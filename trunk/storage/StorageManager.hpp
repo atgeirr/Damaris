@@ -36,6 +36,8 @@ typedef struct {
     int bid;
     //uncompressed size
     int uncompressedSize;
+    //type size
+    int typeSize;
 }DifferentialChunk;
 
 namespace Damaris {
@@ -43,7 +45,8 @@ namespace Damaris {
 	private:                              
                 StorageManager() {}
                 static std::map<int,Writer*> writersMap;
-                static std::map<int,Reader*> readersMap;
+                //static std::map<int,Reader*> readersMap;
+                static std::map<std::string,Reader*>readersMap;
 	public:
                 static std::string basename;                
                 static void Init(const Model::Storage& s);               

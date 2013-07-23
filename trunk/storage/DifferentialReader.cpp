@@ -19,14 +19,16 @@ namespace Damaris{
     DifferentialReader::DifferentialReader(Variable* v,std::string magicNumber) {
             this->var = v;
             this->lastIteration = 0;
+            int error=0;
             std::string path = getPath(magicNumber);
             std::ostringstream processID;   
             processID<<Process::Get()->getID();    
-            std::string fileName = path + "/" + processID.str();    
-            int error=MPI_File_open(MPI_COMM_SELF, (char*)fileName.c_str(), MPI_MODE_RDWR | MPI_MODE_CREATE,MPI_INFO_NULL, &damarisFile);
+            std::string fileName = path + "/" + processID.str();   
+       
+            error=MPI_File_open(MPI_COMM_SELF, (char*)fileName.c_str(), MPI_MODE_RDWR | MPI_MODE_CREATE,MPI_INFO_NULL, &damarisFile);
 
             if (error != MPI_SUCCESS){
-                ERROR("Error opening file");
+                ERROR("Error opening file");               
                 exit(0);
             }
     }
@@ -39,14 +41,15 @@ namespace Damaris{
           //TODO: free memory
     }
     
-    std::vector<DataSpace*> DifferentialReader::Read(int iteration){
-        
-       
-        Bytef *uncompressedData,*newData;
+    std::map<int,DataSpace*> DifferentialReader::Read(int iteration){
+               
+        Bytef* uncompressedData,*newData;
         Bytef* compressedData;
+        LastReadChunk* last;
         MPI_Status status;  
         int error;
-        std::vector<DataSpace*> dataSpaceArray;
+        //std::vector<DataSpace*> dataSpaceArray;
+        std::map<int,DataSpace*> dataSpaceArray;
         DifferentialChunk* readChunk = (DifferentialChunk*)calloc(1,sizeof(DifferentialChunk));    
         MPI_Offset off=0,offBack=0;
         MPI_Offset sizeFile;
@@ -55,17 +58,14 @@ namespace Damaris{
             readChunk = jumpBackwards(iteration); 
         if (iteration > lastIteration)
             readChunk = jumpForward(iteration);
-        if (iteration == lastIteration){
-           
+        if (iteration == lastIteration){           
             error=MPI_File_read(damarisFile,readChunk,sizeof(DifferentialChunk), MPI_BYTE, &status ); 
            
             if (error != MPI_SUCCESS){  
                  WARN("EMPTY");
                  return dataSpaceArray;
-            }
-                    
-            lastIteration++;   
-            
+            }                    
+            lastIteration++;              
         }
         
        
@@ -73,66 +73,63 @@ namespace Damaris{
             WARN("readChunk is null");
             return dataSpaceArray;
         }
-        
-      
+              
         MPI_File_get_size(damarisFile,&sizeFile);
         MPI_File_get_position(damarisFile,&off);
        
        
         //reading multiple chunks for the same iteration
         while(readChunk->iteration == iteration && off<sizeFile){
-            
-                 
+                         
             uncompressedData = (Bytef*)malloc(readChunk->uncompressedSize);    
             compressedData = (Bytef*) malloc(readChunk->size);
             MPI_File_read(damarisFile,compressedData,readChunk->size,MPI_BYTE,&status);
+            LastReadChunk* replace = (LastReadChunk*)malloc (sizeof(LastReadChunk));
+            replace->size = readChunk->uncompressedSize;
+            replace->pid = readChunk->pid;  
             
-       
             if (iteration!=0){
-                
                 uLongf destLen = (uLongf) readChunk->uncompressedSize;               
                 error = uncompress(uncompressedData,&destLen,compressedData,(uLong)readChunk->size);
-             
-                LastReadChunk* last = getLastBlock(readChunk->pid);  
-                
-                Bytef* lastData = (Bytef*) last->data;
-                Bytef* newData = (Bytef*) malloc(readChunk->uncompressedSize);
-       
-                for (int i=0; i<readChunk->uncompressedSize;i++){
-                     newData[i] = uncompressedData[i] ^ lastData[i];
-                }
-               
-                std::cout<<"Adding dataSpace with size "<<readChunk->uncompressedSize<<std::endl;
-                dataSpaceArray.push_back(new DataSpace(newData, readChunk->uncompressedSize));   
+                last = getLastBlock(readChunk->pid);                
+                //char* lastData = (char*) last->data;
+                newData = (Bytef*) malloc(readChunk->uncompressedSize);                
+                for (int i=0; i<readChunk->uncompressedSize;i++)
+                    newData[i] = uncompressedData[i] ^ last->data[i];            
+                 
+                replace->data = newData;   
+                std::cout<<"Inserting at"<<readChunk->pid<<std::endl;
+                //dataSpaceArray.push_back(new DataSpace(newData, readChunk->uncompressedSize));   
+                //dataSpaceArray.insert(dataSpaceArray.begin() + readChunk->pid,new DataSpace(newData, readChunk->uncompressedSize));
+                dataSpaceArray[readChunk->pid] = new DataSpace(newData, readChunk->uncompressedSize);
             }
-            else {
-                std::cout<<"Adding dataSpace with size: "<<readChunk->uncompressedSize<<std::endl;
-                dataSpaceArray.push_back(new DataSpace(compressedData, readChunk->uncompressedSize));  
-                
-            }
-           
-            LastReadChunk* last = (LastReadChunk*)malloc (sizeof(LastReadChunk));
-            last->size = readChunk->uncompressedSize;
-            last->data = uncompressedData;
-            last->pid = readChunk->pid;
-            partialLastChunks.push_back(last);            
-            
+            else{                
+                //dataSpaceArray.push_back(new DataSpace(compressedData, readChunk->uncompressedSize));
+                std::cout<<"Inserting at"<<readChunk->pid<<std::endl;
+                //std::cout<<"Vector size"<<dataSpaceArray.size()<<std::endl;
+                //dataSpaceArray.insert(dataSpaceArray.begin() + readChunk->pid,new DataSpace(compressedData, readChunk->uncompressedSize));
+                dataSpaceArray[readChunk->pid] = new DataSpace(compressedData, readChunk->uncompressedSize);
+                std::cout<<"Reading at iteration 0: "<<(int)compressedData[0]<<" "<<readChunk->pid<<std::endl;
+                replace->data = compressedData;                
+            } 
+                    
+            partialLastChunks.push_back(replace);         
             
             MPI_File_get_position(damarisFile,&offBack);
             MPI_File_read(damarisFile,readChunk,sizeof(DifferentialChunk),MPI_BYTE,&status);
             MPI_File_get_position(damarisFile,&off);     
                   
+           
+            //free(uncompressedData); 
+            //free(compressedData);
           
-            free(uncompressedData); 
-            free(compressedData);
-            
            
         }
-       
-        lastChunks.clear();
-        lastChunks = partialLastChunks;
-    
+        
+        lastChunks.clear();        
+        lastChunks = partialLastChunks;    
         partialLastChunks.clear();
+        
         MPI_File_seek(damarisFile,offBack,MPI_SEEK_SET); 
        
         return dataSpaceArray;   
@@ -160,7 +157,7 @@ namespace Damaris{
              MPI_File_seek(damarisFile,currentOffset,MPI_SEEK_CUR);
              error=MPI_File_read(damarisFile,readChunk,sizeof(DifferentialChunk), MPI_BYTE, &status );
              if (error != MPI_SUCCESS)               
-                     return NULL;
+                return NULL;
         }
 
         return readChunk;
@@ -186,7 +183,7 @@ namespace Damaris{
              MPI_File_seek(damarisFile,currentOffset,MPI_SEEK_CUR);
              error=MPI_File_read(damarisFile,readChunk,sizeof(DifferentialChunk), MPI_BYTE, &status );        
              if (error != MPI_SUCCESS)               
-                     return NULL;
+                return NULL;
         }
 
         return readChunk;
@@ -200,8 +197,10 @@ namespace Damaris{
              if(lastChunk->pid == pid)
                  return lastChunk;
          }
-        
+         std::cout<<"return null"<<std::endl;
          return NULL;
     }
+    
+    
 }
 

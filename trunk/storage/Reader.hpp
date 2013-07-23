@@ -9,6 +9,7 @@
 #define	READER_H
 #include "data/DataSpace.hpp"
 #include <vector>
+#include <map>
 
 namespace Damaris{
     class Reader {
@@ -16,7 +17,8 @@ namespace Damaris{
             Reader(){}
             virtual ~Reader(){}
             //virtual bool Read()=0;
-            virtual std::vector<DataSpace*> Read(int iteration) = 0;
+            //virtual std::vector<DataSpace*> Read(int iteration) = 0;
+            virtual std::map<int,DataSpace*> Read(int iteration) = 0;
         private:
 
         };

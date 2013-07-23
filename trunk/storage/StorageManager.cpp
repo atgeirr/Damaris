@@ -20,7 +20,8 @@ namespace Damaris {
 
 std::string StorageManager::basename;
 std::map<int,Writer*> StorageManager::writersMap;
-std::map<int,Reader*> StorageManager::readersMap;
+//std::map<int,Reader*> StorageManager::readersMap;
+std::map<std::string,Reader*> StorageManager::readersMap;
 
 void StorageManager::Init(const Model::Storage& s)
 {
@@ -31,14 +32,21 @@ void StorageManager::Init(const Model::Storage& s)
 Reader* StorageManager::GetReaderFor(Variable* v,std::string magicNumber)
 {
     Reader* reader;
-    std::map<int,Reader*>::iterator it = readersMap.find(v->GetID());
-    
+    //std::map<int,Reader*>::iterator it = readersMap.find(v->GetID());
+    std::stringstream ss;
+    std::string token;
+    ss << v->GetID();
+    token = ss.str();
+    token = token + magicNumber;
+    std::cout<<"Here  "<<token<<std::endl;
+    std::map<std::string,Reader*>::iterator it = readersMap.find(token);
     if(it!=readersMap.end()){
        return it->second;
     }
     //reader = new SimpleReader(v,magicNumber);
     reader = new DifferentialReader(v,magicNumber);
-    readersMap[v->GetID()] = reader;
+   
+    readersMap[token] = reader;
     
     return reader;
     

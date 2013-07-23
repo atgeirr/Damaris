@@ -13,12 +13,13 @@
 #include "data/DataSpace.hpp"
 #include "mpi.h"
 #include "StorageManager.hpp"
+#include "zlib.h"
 
 typedef struct {             
               int size;
               int iteration;
               int pid;
-              void* data;
+              Bytef* data;
                            
 }LastReadChunk;
 
@@ -30,7 +31,8 @@ namespace Damaris {
             DifferentialReader(Variable* v,std::string magicNumber);
             DifferentialReader(const DifferentialReader& orig);
             virtual ~DifferentialReader();
-            std::vector<DataSpace*> Read(int iteration);             
+            std::map<int,DataSpace*> Read(int iteration);    
+            //td::vector<DataSpace*> Read(int iteration);    
         private:
             std::vector<LastReadChunk*> lastChunks;
             std::vector<LastReadChunk*> partialLastChunks;

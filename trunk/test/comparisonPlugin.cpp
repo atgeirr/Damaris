@@ -27,47 +27,49 @@ void compareIterations(const std::string& eventName, int32_t step,
     
     Damaris::Variable* v = Damaris::VariableManager::Search("images/julia");
     Damaris::Reader* previousRun = Damaris::StorageManager::GetReaderFor(v, previousIteration);
-    Damaris::Reader* currentRun = Damaris::StorageManager::GetReaderFor(v,Damaris::Environment::GetMagicNumber());
-    std::vector<Damaris::DataSpace*> previousDataSpaceVector;  
-    std::vector<Damaris::DataSpace*> dataSpaceVector;      
-        
+    Damaris::Reader* currentRun = Damaris::StorageManager::GetReaderFor(v, Damaris::Environment::GetMagicNumber());
+    //std::vector<Damaris::DataSpace*> previousDataSpaceVector;  
+    //std::vector<Damaris::DataSpace*> dataSpaceVector;      
+    std::map<int,Damaris::DataSpace*> previousDataSpaceVector;
+    std::map<int,Damaris::DataSpace*> dataSpaceVector;
+    
+    std::cout<<"Previous Read"<<std::endl;    
     previousDataSpaceVector=previousRun->Read(step);
+    std::cout<<"Current Read"<<std::endl;
     dataSpaceVector = currentRun->Read(step);
     
+    std::cout<<previousDataSpaceVector.size()<<" "<<dataSpaceVector.size()<<std::endl;
     if(previousDataSpaceVector.empty()==true || dataSpaceVector.empty()==true){
         WARN("Eroare la citire");
         exit(0);
     }
     
         
-   for(std::vector<Damaris::DataSpace*>::size_type i = 0; i != dataSpaceVector.size(); i++) {
+   for(std::map<int,Damaris::DataSpace*>::iterator i = dataSpaceVector.begin(); i != dataSpaceVector.end(); i++) {
        ok=1;
-       Damaris::DataSpace* dataSpace = dataSpaceVector[i];
-       Damaris::DataSpace* previousDataSpace = previousDataSpaceVector[i];
+       int key = i->first;
+       std::map<int,Damaris::DataSpace*>::iterator it = previousDataSpaceVector.find(key);
+      
+       Damaris::DataSpace* dataSpace = i->second;
+       Damaris::DataSpace* previousDataSpace =it->second;
        
        void* data = dataSpace->Data();
-       void* data1= previousDataSpace->Data();     
+       void* previousData= previousDataSpace->Data();     
       
        if (dataSpace->Size()!= previousDataSpace->Size())
            std::cout<<"different size"<<std::endl;
-     
+       
       for(size_t j=0;j<dataSpace->Size();j++){
           // TODO: generic cast
          Bytef* a = (Bytef*)data;
-         Bytef* b = (Bytef*)data1;
-        
-          //some random output for control
-          /*if (j==2){
-              std::cout<<*(a+j)<<std::endl;
-              std::cout<<*(b+j)<<std::endl;
-          }
-           */
-        
+         Bytef* b = (Bytef*)previousData;
+         
+              
          if(*(a+j)!=*(b+j)){
               ok=0;
-              std::cout<<j<<" "<<std::endl;
-              std::cout<<*(a+j)<<std::endl;
-              std::cout<<*(b+j)<<std::endl;
+              std::cout<<"J:"<<j<<" "<<std::endl;
+              std::cout<<"A:"<<(int)*(a+j)<<std::endl;
+              std::cout<<"B:"<<(int)*(b+j)<<std::endl;
               break;
          }
           
@@ -77,11 +79,11 @@ void compareIterations(const std::string& eventName, int32_t step,
    }
    
    if(ok==0){
-        std::cout<<"Differences found"<<std::endl;
-        exit(0); //drop the simulation
+       std::cout<<"Differences found"<<std::endl;
+       exit(0); //drop the simulation
    }
    else
-        std::cout<<"Success"<<std::endl;
+       std::cout<<"Success"<<std::endl;
 }
 }
 

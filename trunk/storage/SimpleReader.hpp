@@ -22,8 +22,8 @@ namespace Damaris{
             SimpleReader(Variable* v,std::string magicNumber);
             SimpleReader(const SimpleReader& orig);
             virtual ~SimpleReader();
-            std::vector<DataSpace*> Read(int iteration);  
-
+            //std::vector<DataSpace*> Read(int iteration);  
+            std::map<int,DataSpace*> Read(int iteration) = 0;
         private:
             std::string getPath(std::string magicNumber);  
             ChunkInfo* jumpBackwards(int iteration);

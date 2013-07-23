@@ -16,7 +16,7 @@ void readVar(const std::string& eventName, int32_t step,
         Damaris::Variable* v = Damaris::VariableManager::Search("images/julia");
 	Damaris::Reader* w = Damaris::StorageManager::GetReaderFor(v, Damaris::Environment::GetMagicNumber());  
         //Damaris::DataSpace* dataSpace;
-        std::vector<Damaris::DataSpace*> dataSpaceVector;
+        std::map<int,Damaris::DataSpace*> dataSpaceVector;
         
         //int iteration = atoi (&args[0]);
         //TODO: test it: w->Read(iteration,chunk)       
@@ -30,7 +30,7 @@ void readVar(const std::string& eventName, int32_t step,
         else
             std::cout<<"success"<<std::endl;
         
-        for (std::vector<Damaris::DataSpace*>::iterator it = dataSpaceVector.begin() ; it != dataSpaceVector.end(); ++it){
+        for (std::map<int,Damaris::DataSpace*>::iterator it = dataSpaceVector.begin() ; it != dataSpaceVector.end(); ++it){
             ;
         }
         /*if(dataSpaceVector ==  NULL)

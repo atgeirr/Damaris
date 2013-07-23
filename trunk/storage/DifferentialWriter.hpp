@@ -18,8 +18,8 @@
 typedef struct {             
               int size;
               int iteration;
-              int pid;
-              void* data;
+              int pid;            
+              Bytef* data;
                            
 }LastWrittenChunk;
 
@@ -39,8 +39,8 @@ namespace Damaris{
             int lastIteration;
             std::string getPath();
             LastWrittenChunk* getLastBlock (int pid);
-            bool writeXorData (Chunk* chunk, DifferentialChunk chunkInfo, unsigned int uncompressedSize);
-            void createChunkStructure(DifferentialChunk &chunkInfo,int pid,int iteration,int size, int bid,int uncompressedSize);
+            bool writeXorData (Chunk* chunk, DifferentialChunk chunkInfo, unsigned int uncompressedSize, int typeSize);
+            void createChunkStructure(DifferentialChunk &chunkInfo,int pid,int iteration,int size, int bid,int uncompressedSize, int typeSize);
     };
 }
 

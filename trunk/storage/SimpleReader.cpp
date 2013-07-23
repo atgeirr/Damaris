@@ -40,7 +40,7 @@ namespace Damaris{
       MPI_File_close(&damarisFile);
     }
 
-    std::vector<DataSpace*> SimpleReader::Read(int iteration){
+    /*std::vector<DataSpace*> SimpleReader::Read(int iteration){
         
         void *data;
         MPI_Status status;   
@@ -96,9 +96,12 @@ namespace Damaris{
         return dataSpaceArray;                  
       
 
-    }
+    }*/
     
-
+std::map<int,DataSpace*> Read(int iteration){
+     std::map<int,DataSpace*> dataSpaceArray;
+     return dataSpaceArray;
+}
 
 std::string SimpleReader::getPath(std::string magicNumber) {  
     std::string path = StorageManager::basename + "/"+ magicNumber + "/" + this->var->GetName();    

@@ -20,7 +20,7 @@
 #include "include/Damaris.hpp"
 
 #define PI 3.14159265358979323846
-#define ITERATIONS 3
+#define ITERATIONS 4
 
 int HEIGHT = 0;
 int WIDTH  = 0;
@@ -116,18 +116,17 @@ int main(int argc, char** argv)
 			c = std::polar<double>(0.3,i*2.0*PI/((float)ITERATIONS)-PI/2.0);
 			c += std::complex<double>(0.0,-0.3);
 			compute(fractal,c,offset_x,offset_y);                        
-			MPI_Barrier(comm);
-                        
-                        // compareIterations before writing it
-                        if (COMPARE == true)                           
-                            client->signal("compareIterations");
-                        
+			MPI_Barrier(comm);       
                         
 			client->write("images/julia",fractal);
 			//client->signal("say_hello_from_cpp");
 			//client->signal("draw_from_python");
 			//client->signal("clean_from_python");
                         client->signal("write var");
+                        
+                        // compareIterations before writing it 
+                        if (COMPARE == true)                           
+                            client->signal("compareIterations");
 			client->end_iteration();
 		}
 	
