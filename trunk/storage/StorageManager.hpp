@@ -16,16 +16,18 @@
 #include "storage/Reader.hpp"
 #include "storage/Writer.hpp"
 #include <string.h>
+#include "data.hpp"
 
 
-typedef struct {
+/*typedef struct {
               //TODO?? remove the id; 
               int id;
               int iteration;
-              unsigned int size;                     
-}ChunkInfo;
+              unsigned int size;  
+              int pid;
+}ChunkInfo;*/
 
-typedef struct {
+/*typedef struct {
     //source
     int pid;
     //iteration number;
@@ -38,14 +40,13 @@ typedef struct {
     int uncompressedSize;
     //type size
     int typeSize;
-}DifferentialChunk;
+}DifferentialChunk;*/
 
 namespace Damaris {
     class StorageManager {
 	private:                              
                 StorageManager() {}
-                static std::map<int,Writer*> writersMap;
-                //static std::map<int,Reader*> readersMap;
+                static std::map<int,Writer*> writersMap;                
                 static std::map<std::string,Reader*>readersMap;
 	public:
                 static std::string basename;                
@@ -53,6 +54,8 @@ namespace Damaris {
                 static Writer* GetWriterFor(Variable* v);
                 static Reader* GetReaderFor(Variable* v,std::string magicNumber);
                 static long int GetPreviousMagicNumber();
+                //static std::string getPath(std::string magicNumber);
+                //static void init(std::string magicNumber, MPI_File damarisFile);
 
     };
 

@@ -20,17 +20,17 @@ namespace Damaris{
  
     class SimpleWriter : public Writer { 
      public:              
-          Damaris::Variable* var;  
-          MPI_File damarisFile;
+          //Damaris::Variable* var;  
+          //MPI_File damarisFile;
           SimpleWriter(Variable* v);
           SimpleWriter(const SimpleWriter& orig);
           virtual ~SimpleWriter();        
           bool Write(); 
           bool Write(int iteration);               
       private:    
-          int lastIteration; 
-          std::string getPath();       
-          void createChunkStructure(ChunkInfo &chunkInfo,int id,int iteration,int size);
+          //int lastIteration; 
+          //std::string getPath();       
+          void createChunkStructure(ChunkInfo &chunkInfo,int id,int iteration,int size,int pid);
 
     };
 }

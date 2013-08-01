@@ -12,24 +12,18 @@
 #include "data/Variable.hpp"
 #include "data/DataSpace.hpp"
 #include "mpi.h"
-#include "StorageManager.hpp"
+
 
 namespace Damaris{
     class SimpleReader : public Reader {
         public:
-            Variable* var;
-            MPI_File damarisFile;
-            SimpleReader(Variable* v,std::string magicNumber);
-            SimpleReader(const SimpleReader& orig);
-            virtual ~SimpleReader();
-            //std::vector<DataSpace*> Read(int iteration);  
-            std::map<int,DataSpace*> Read(int iteration) = 0;
-        private:
-            std::string getPath(std::string magicNumber);  
+            SimpleReader(Variable* v,std::string magicNumber) ;            
+            virtual ~SimpleReader();             
+            std::map<int,DataSpace*> Read(int iteration);
+        private:             
             ChunkInfo* jumpBackwards(int iteration);
             ChunkInfo* jumpForward(int iteration);
-            int lastIteration; 
-
+            //int lastIteration;
 
         };
 }

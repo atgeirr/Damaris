@@ -15,6 +15,7 @@
 #include "StorageManager.hpp"
 #include "zlib.h"
 
+
 typedef struct {             
               int size;
               int iteration;
@@ -27,7 +28,7 @@ typedef struct {
 namespace Damaris{
     class DifferentialWriter : public Writer{
         public:
-            Variable *var;
+            //Variable *var;
             MPI_File damarisFile;
             DifferentialWriter(Variable* v);
             DifferentialWriter(const DifferentialWriter& orig);
@@ -36,8 +37,8 @@ namespace Damaris{
             bool Write(int iteration);
         private:
             std::vector<LastWrittenChunk*> lastChunks;
-            int lastIteration;
-            std::string getPath();
+            //int lastIteration;
+            //std::string getPath();
             LastWrittenChunk* getLastBlock (int pid);
             bool writeXorData (Chunk* chunk, DifferentialChunk chunkInfo, unsigned int uncompressedSize, int typeSize);
             void createChunkStructure(DifferentialChunk &chunkInfo,int pid,int iteration,int size, int bid,int uncompressedSize, int typeSize);
