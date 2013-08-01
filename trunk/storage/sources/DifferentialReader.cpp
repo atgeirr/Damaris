@@ -5,7 +5,7 @@
  * Created on July 5, 2013, 5:36 PM
  */
 
-#include "DifferentialReader.hpp"
+#include "storage/DifferentialReader.hpp"
 #include "core/Debug.hpp"
 #include "data/Chunk.hpp"
 #include "core/Environment.hpp"
@@ -16,26 +16,13 @@
 
 
 namespace Damaris{
+
+
     DifferentialReader::DifferentialReader(Variable* v,std::string magicNumber) {
-            this->var = v;
-            this->lastIteration = 0;
-            int error=0;
-            std::string path = getPath(magicNumber);
-            std::ostringstream processID;   
-            processID<<Process::Get()->getID();    
-            std::string fileName = path + "/" + processID.str();   
-       
-            error=MPI_File_open(MPI_COMM_SELF, (char*)fileName.c_str(), MPI_MODE_RDWR | MPI_MODE_CREATE,MPI_INFO_NULL, &damarisFile);
-
-            if (error != MPI_SUCCESS){
-                ERROR("Error opening file");               
-                exit(0);
-            }
+        this->var = v;
+        this->lastIteration = 0;
+        initFile(magicNumber);
     }
-
-    DifferentialReader::DifferentialReader(const DifferentialReader& orig) {
-    }
-
     DifferentialReader::~DifferentialReader() {
           MPI_File_close(&damarisFile);
           //TODO: free memory
@@ -48,7 +35,7 @@ namespace Damaris{
         LastReadChunk* last;
         MPI_Status status;  
         int error;
-        //std::vector<DataSpace*> dataSpaceArray;
+        
         std::map<int,DataSpace*> dataSpaceArray;
         DifferentialChunk* readChunk = (DifferentialChunk*)calloc(1,sizeof(DifferentialChunk));    
         MPI_Offset off=0,offBack=0;
@@ -92,24 +79,16 @@ namespace Damaris{
                 uLongf destLen = (uLongf) readChunk->uncompressedSize;               
                 error = uncompress(uncompressedData,&destLen,compressedData,(uLong)readChunk->size);
                 last = getLastBlock(readChunk->pid);                
-                //char* lastData = (char*) last->data;
-                newData = (Bytef*) malloc(readChunk->uncompressedSize);                
+                newData = (Bytef*) malloc(readChunk->uncompressedSize);
+                
                 for (int i=0; i<readChunk->uncompressedSize;i++)
                     newData[i] = uncompressedData[i] ^ last->data[i];            
                  
-                replace->data = newData;   
-                std::cout<<"Inserting at"<<readChunk->pid<<std::endl;
-                //dataSpaceArray.push_back(new DataSpace(newData, readChunk->uncompressedSize));   
-                //dataSpaceArray.insert(dataSpaceArray.begin() + readChunk->pid,new DataSpace(newData, readChunk->uncompressedSize));
+                replace->data = newData;                
                 dataSpaceArray[readChunk->pid] = new DataSpace(newData, readChunk->uncompressedSize);
             }
-            else{                
-                //dataSpaceArray.push_back(new DataSpace(compressedData, readChunk->uncompressedSize));
-                std::cout<<"Inserting at"<<readChunk->pid<<std::endl;
-                //std::cout<<"Vector size"<<dataSpaceArray.size()<<std::endl;
-                //dataSpaceArray.insert(dataSpaceArray.begin() + readChunk->pid,new DataSpace(compressedData, readChunk->uncompressedSize));
+            else{             
                 dataSpaceArray[readChunk->pid] = new DataSpace(compressedData, readChunk->uncompressedSize);
-                std::cout<<"Reading at iteration 0: "<<(int)compressedData[0]<<" "<<readChunk->pid<<std::endl;
                 replace->data = compressedData;                
             } 
                     
@@ -135,10 +114,7 @@ namespace Damaris{
         return dataSpaceArray;   
     }
 
-    std::string DifferentialReader::getPath(std::string magicNumber) {  
-        std::string path = StorageManager::basename + "/"+ magicNumber + "/" + this->var->GetName();    
-        return path;
-    }
+   
 
     DifferentialChunk* DifferentialReader::jumpBackwards(int iteration){
 
@@ -196,8 +172,7 @@ namespace Damaris{
              LastReadChunk *lastChunk = lastChunks[i];            
              if(lastChunk->pid == pid)
                  return lastChunk;
-         }
-         std::cout<<"return null"<<std::endl;
+         }       
          return NULL;
     }
     
