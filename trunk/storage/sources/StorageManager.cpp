@@ -5,12 +5,12 @@
  * Created on May 6, 2013, 1:02 PM
  */
 
-#include "StorageManager.hpp"
+#include "storage/StorageManager.hpp"
 #include "mpi.h"
-#include "SimpleReader.hpp"
-#include "SimpleWriter.hpp"
-#include "DifferentialReader.hpp"
-#include "DifferentialWriter.hpp"
+#include "storage/SimpleReader.hpp"
+#include "storage/SimpleWriter.hpp"
+#include "storage/DifferentialReader.hpp"
+#include "storage/DifferentialWriter.hpp"
 #include "core/Environment.hpp"
 #include <boost/filesystem.hpp>
 #include <boost/regex.hpp>
@@ -20,7 +20,8 @@ namespace Damaris {
 
 std::string StorageManager::basename;
 std::map<int,Writer*> StorageManager::writersMap;
-std::map<int,Reader*> StorageManager::readersMap;
+//std::map<int,Reader*> StorageManager::readersMap;
+std::map<std::string,Reader*> StorageManager::readersMap;
 
 void StorageManager::Init(const Model::Storage& s)
 {
@@ -31,14 +32,20 @@ void StorageManager::Init(const Model::Storage& s)
 Reader* StorageManager::GetReaderFor(Variable* v,std::string magicNumber)
 {
     Reader* reader;
-    std::map<int,Reader*>::iterator it = readersMap.find(v->GetID());
+    
+    std::stringstream ss;
+    std::string token;
+    ss << v->GetID();
+    token = ss.str();
+    token = token + magicNumber;   
+    std::map<std::string,Reader*>::iterator it = readersMap.find(token);
     
     if(it!=readersMap.end()){
        return it->second;
-    }
-    //reader = new SimpleReader(v,magicNumber);
-    reader = new DifferentialReader(v,magicNumber);
-    readersMap[v->GetID()] = reader;
+    }    
+    reader = new SimpleReader(v,magicNumber);
+    //reader = new DifferentialReader(v,magicNumber);    
+    readersMap[token] = reader;
     
     return reader;
     
@@ -52,8 +59,8 @@ Writer* StorageManager::GetWriterFor(Variable* v)
     if(it!=writersMap.end()){      
       return it->second;      
     }
-    //writer = new SimpleWriter(v);
-    writer = new DifferentialWriter(v);
+    writer = new SimpleWriter(v);
+    // writer = new DifferentialWriter(v);
     writersMap[v->GetID()] = writer;
    
     return writer; 

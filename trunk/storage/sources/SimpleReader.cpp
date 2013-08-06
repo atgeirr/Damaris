@@ -4,7 +4,7 @@
  * 
  * Created on May 7, 2013, 1:33 AM
  */
-#include "SimpleReader.hpp"
+#include "storage/SimpleReader.hpp"
 #include "core/Debug.hpp"
 #include "data/Chunk.hpp"
 #include "core/Environment.hpp"
@@ -15,37 +15,22 @@
 
 namespace Damaris{   
     
-    
-    SimpleReader::SimpleReader(Variable* v,std::string magicNumber) {
-        
+    SimpleReader::SimpleReader(Variable* v,std::string magicNumber){
         this->var = v;
         this->lastIteration = 0;
-        std::string path = getPath(magicNumber);
-        std::ostringstream processID;   
-        processID<<Process::Get()->getID();    
-        std::string fileName = path + "/" + processID.str();    
-        int error=MPI_File_open(MPI_COMM_SELF, (char*)fileName.c_str(), MPI_MODE_RDWR | MPI_MODE_CREATE,MPI_INFO_NULL, &damarisFile);
-        
-        if (error != MPI_SUCCESS){
-            
-            ERROR("Error opening file");
-            exit(0);
-        }
-    }
-
-    SimpleReader::SimpleReader(const SimpleReader& orig) {
-    }
+        initFile(magicNumber);
+    }   
 
     SimpleReader::~SimpleReader(){
       MPI_File_close(&damarisFile);
     }
 
-    std::vector<DataSpace*> SimpleReader::Read(int iteration){
+    std::map<int,DataSpace*> SimpleReader::Read(int iteration){
         
         void *data;
         MPI_Status status;   
-        //Damaris::DataSpace* dataSpace;
-        std::vector<DataSpace*> dataSpaceArray;
+      
+        std::map<int,DataSpace*> dataSpaceArray;
         ChunkInfo* readChunk = (ChunkInfo*)calloc(1,sizeof(ChunkInfo));    
         int error;
         MPI_Offset off=0,offBack=0;
@@ -62,8 +47,7 @@ namespace Damaris{
                  return dataSpaceArray;
             }
           
-           
-            lastIteration++;   
+           lastIteration++;   
             
         }
         if (readChunk == NULL){
@@ -80,8 +64,8 @@ namespace Damaris{
             
                     
             data = malloc(readChunk->size);             
-            MPI_File_read(damarisFile,data,readChunk->size,MPI_BYTE,&status);  
-            dataSpaceArray.push_back(new DataSpace(data, readChunk->size));   
+            MPI_File_read(damarisFile,data,readChunk->size,MPI_BYTE,&status);               
+            dataSpaceArray[readChunk->pid] = new DataSpace(data, readChunk->size);
             MPI_File_get_position(damarisFile,&offBack);
             MPI_File_read(damarisFile,readChunk,sizeof(ChunkInfo),MPI_BYTE,&status);
             MPI_File_get_position(damarisFile,&off);     
@@ -99,11 +83,6 @@ namespace Damaris{
     }
     
 
-
-std::string SimpleReader::getPath(std::string magicNumber) {  
-    std::string path = StorageManager::basename + "/"+ magicNumber + "/" + this->var->GetName();    
-    return path;
-}
 
 ChunkInfo* SimpleReader::jumpBackwards(int iteration){
     

@@ -25,11 +25,13 @@ set(DAMARIS_COMMON_SRC
 	${DAMARIS_SOURCE_DIR}/comm/SharedMessageQueue.cpp
 	${DAMARIS_SOURCE_DIR}/comm/MPISendRecvQueue.cpp
 	${DAMARIS_SOURCE_DIR}/memory/SharedMemorySegment.cpp
-	${DAMARIS_SOURCE_DIR}/storage/StorageManager.cpp
-        ${DAMARIS_SOURCE_DIR}/storage/SimpleWriter.cpp
-        ${DAMARIS_SOURCE_DIR}/storage/SimpleReader.cpp  
-        ${DAMARIS_SOURCE_DIR}/storage/DifferentialWriter.cpp  
-        ${DAMARIS_SOURCE_DIR}/storage/DifferentialReader.cpp  
+	${DAMARIS_SOURCE_DIR}/storage/sources/StorageManager.cpp
+        ${DAMARIS_SOURCE_DIR}/storage/sources/SimpleWriter.cpp
+        ${DAMARIS_SOURCE_DIR}/storage/sources/SimpleReader.cpp  
+        ${DAMARIS_SOURCE_DIR}/storage/sources/DifferentialWriter.cpp  
+        ${DAMARIS_SOURCE_DIR}/storage/sources/DifferentialReader.cpp  
+        ${DAMARIS_SOURCE_DIR}/storage/sources/Reader.cpp  
+        ${DAMARIS_SOURCE_DIR}/storage/sources/Writer.cpp
 	${DAMARIS_SOURCE_DIR}/event/Action.cpp
 	${DAMARIS_SOURCE_DIR}/event/BoundAction.cpp
 	${DAMARIS_SOURCE_DIR}/event/DynamicAction.cpp

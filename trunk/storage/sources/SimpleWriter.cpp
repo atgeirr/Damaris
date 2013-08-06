@@ -6,7 +6,7 @@
  */
 
 #include "core/Debug.hpp"
-#include "SimpleWriter.hpp"
+#include "storage/SimpleWriter.hpp"
 #include "data/Variable.hpp"
 #include "core/Environment.hpp"
 #include "core/Process.hpp"
@@ -16,22 +16,12 @@ namespace Damaris{
     
 
 SimpleWriter::SimpleWriter(Variable* v) {
-  
+        
     this->var = v;
     this->lastIteration = 0;
-    /*Create the file directory*/
-    std::string path = getPath();
-    boost::filesystem::create_directories(boost::filesystem::path(path.c_str()));
-     
-     /*Open file*/   
-    std::ostringstream processID;   
-    processID<<Process::Get()->getID();
-    std::string fileName = path + "/" + processID.str();
-    
-    int error=MPI_File_open(MPI_COMM_SELF, (char*)fileName.c_str(), MPI_MODE_RDWR | MPI_MODE_CREATE,MPI_INFO_NULL, &damarisFile);
+    initFile();
    
-    if (error != MPI_SUCCESS)
-        ERROR("Error opening file");
+    
 }
 
 SimpleWriter::SimpleWriter(const SimpleWriter& orig) {
@@ -44,7 +34,7 @@ SimpleWriter::~SimpleWriter() {
 bool SimpleWriter::Write() {
 
     
-    int typeSize, iteration,error;
+    int typeSize, iteration,error,pid;
     unsigned int dimensions;   
     MPI_Status status;
     ChunkIndexByIteration::iterator begin,end, it;    
@@ -62,10 +52,11 @@ bool SimpleWriter::Write() {
         chunk = it->get();      
         //std::cout<<chunk->GetSource()<<" "<<chunk->GetIteration();
         dimensions = chunk->NbrOfItems();
-        iteration = chunk->GetIteration();        
+        iteration = chunk->GetIteration(); 
+        pid = chunk->GetSource();
         Model::Type t = this->var->GetLayout()->GetType();
         typeSize = Types::basicTypeSize(t);             
-        createChunkStructure(chunkInfo,this->var->GetID(), iteration, dimensions*typeSize);        
+        createChunkStructure(chunkInfo,this->var->GetID(), iteration, dimensions*typeSize,pid);        
         error=MPI_File_write(damarisFile, &chunkInfo, sizeof (ChunkInfo), MPI_BYTE, &status);
         //std::cout<<"Writing it"<<chunkInfo.iteration<<" "<<chunkInfo.size<<" ";
         if (error != MPI_SUCCESS ){   
@@ -83,8 +74,7 @@ bool SimpleWriter::Write() {
 
     }
     
-    lastIteration++;    
-  
+    lastIteration++;      
     return true;
 }
 
@@ -92,16 +82,17 @@ bool SimpleWriter::Write(int interation){
    return true; 
 }
 
-void SimpleWriter::createChunkStructure(ChunkInfo &chunkInfo,int id, int iteration, int size) {  
+void SimpleWriter::createChunkStructure(ChunkInfo &chunkInfo,int id, int iteration, int size,int pid) {  
     chunkInfo.id = id;
     chunkInfo.iteration = iteration;
-    chunkInfo.size = size;    
+    chunkInfo.size = size;   
+    chunkInfo.pid = pid;
 }
 
-std::string SimpleWriter::getPath() {  
+/*std::string SimpleWriter::getPath() {  
     std::string path = StorageManager::basename + "/"+ Environment::GetMagicNumber() + "/" + this->var->GetName();    
     return path ;
-}
+}*/
 
 }
 

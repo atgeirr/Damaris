@@ -8,18 +8,26 @@
 #ifndef READER_H
 #define	READER_H
 #include "data/DataSpace.hpp"
+#include "data/Variable.hpp"
 #include <vector>
+#include <map>
+#include <mpi.h>
+#include "data.hpp"
 
 namespace Damaris{
     class Reader {
         public:
-            Reader(){}
-            virtual ~Reader(){}
-            //virtual bool Read()=0;
-            virtual std::vector<DataSpace*> Read(int iteration) = 0;
-        private:
+            Variable* var;
+            MPI_File damarisFile;   
+            Reader(){};
+            virtual ~Reader(){}              
+            virtual std::map<int,DataSpace*> Read(int iteration) = 0;            
+        protected:
+            std::string getPath(std::string magicNumber);                          
+            int lastIteration; 
+            void initFile(std::string magicNumber);              
 
-        };
+   };
 }
 
 
