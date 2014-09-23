@@ -1,10 +1,9 @@
 <?xml version="1.0"?>
 <simulation name="my simulation" 
-	language="fortran" xmlns="http://damaris.gforge.inria.fr/Damaris/Model">
+	language="fortran" xmlns="http://damaris.gforge.inria.fr/damaris/model">
 	<architecture>
-		<cores  count="2">
-			<clients count="1"/>
-		</cores>
+        <domains count="1"/>
+        <dedicated cores="1" nodes="0"/>
 		<buffer name="buffer" size="67108864" />
 		<queue  name="queue" size="100" />
 	</architecture>

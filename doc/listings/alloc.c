@@ -1,4 +1,9 @@
 float* data;
-data = DC_alloc("my group/temperature");
+int err;
+err = damaris_alloc("my group/temperature",&data);
 ...
-int err = DC_commit("my group/temperature");
+// done writing data for this iteration
+err = damaris_commit("my group/temperature");
+...
+// done accessing data for this iteration
+err = damaris_clear("my group/temperature");

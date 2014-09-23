@@ -1,0 +1,39 @@
+This chapter presents the different modes that \Damaris{} can use: dedicated cores, dedicated nodes
+and synchronous mode.
+
+\section{Enabling different modes}
+
+Different modes can be enabled simply by setting the number of dedicated cores or dedicated nodes
+in the XML file, as exemplified in Listing~\ref{synchronousXML}.
+
+\noindent\begin{minipage}{\textwidth}
+\vspace{0.5cm}
+\lstset{language=XML,caption={Setting the number of dedicated cores or dedicated nodes.},label=synchronousXML}
+\lstinputlisting[language=XML]{listings/synch.xml}
+\end{minipage}
+
+\section{Synchronous mode}
+
+The synchronous mode, or ``time-partitioning'', is used when cores=``0'' and nodes=``0''. In this configuration,
+all actions will be executed by the clients themselves. In other words, a client is its own server.
+Their is thus no distinction between the ``core'' and the ``group'' scope, and \textbf{``bcast'' events
+are not executed} (because their is no application logic to asynchronously receive the event
+in other clients, and they can be replaced by simple MPI\_Bcast logics).
+
+\section{Dedicated cores}
+
+When the \emph{cores} field has a value $N > 0$, dedicated cores are used. This number of dedicated
+cores must divide the number of cores in a node. When $N=1$, all clients in a node are connected to
+a server running on a dedicated core of the same node. When $N > 1$, the client cores in a node
+are gathered into $N$ groups, and each group is connected to a server on a dedicated core.
+Note that whatever the number of servers, only one shared-memory buffer is created, with a size
+specified in the XML file.
+
+\section{Dedicated nodes}
+
+When the \emph{cores} field is set to 0 or unspecified, and the \emph{nodes} field is set to $N > 0$,
+then $N$ nodes will be dedicated to run servers. $N$ must divide the total number of nodes of the
+application. On each of the dedicated nodes, \Damaris{} will spawn as many
+server instances as cores. Each dedicated node holds a single buffer of the specified size for all
+its servers. The clients will be gathered in equally-sized groups and each group will be connected to
+a server.
