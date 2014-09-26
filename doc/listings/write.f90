@@ -1,4 +1,4 @@
 real, dimension(:) :: mydata
 integer :: ierr
 ...
-call df_write("my group/temperature",mydata,ierr)
+call damaris_write_f("my group/temperature",mydata,ierr)

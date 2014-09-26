@@ -4,5 +4,5 @@
 	<group name="my group">
 		<variable name="temperature" layout="some other layout" />
 	</group>
-    <variable name="simple_var" layout="int" />
+    <variable name="simple var" layout="int" />
 </data>

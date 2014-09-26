@@ -1,1 +1,1 @@
-DC_signal("my_event");
+damaris_signal("my_event");

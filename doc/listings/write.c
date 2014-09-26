@@ -1,3 +1,3 @@
 float* data;
 ...
-int err = DC_write("my group/temperature",data);
+int err = damaris_write("my group/temperature",data);

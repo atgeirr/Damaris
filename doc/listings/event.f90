@@ -1,2 +1,2 @@
 integer :: ierr
-call df_signal("my_event",iteration,ierr)
+call damaris_signal_f("my_event",ierr)

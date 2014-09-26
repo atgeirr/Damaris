@@ -1,6 +1,4 @@
 <architecture>
-    <cores  count="16">
-        <clients count="16"/>
-    </cores>
+    <dedicated cores="2" nodes="0" />
     ...
 </architecture>
