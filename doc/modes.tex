@@ -15,10 +15,11 @@ in the XML file, as exemplified in Listing~\ref{synchronousXML}.
 \section{Synchronous mode}
 
 The synchronous mode, or ``time-partitioning'', is used when cores=``0'' and nodes=``0''. In this configuration,
-all actions will be executed by the clients themselves. In other words, a client is its own server.
+all actions are executed by the clients themselves. In other words, a client is its own server.
 Their is thus no distinction between the ``core'' and the ``group'' scope, and \textbf{``bcast'' events
 are not executed} (because their is no application logic to asynchronously receive the event
-in other clients, and they can be replaced by simple MPI\_Bcast logics).
+in other clients, and they can be replaced by simple MPI\_Bcast logics from within a normal, ``core'' event).
+Note that in this mode, the shared-memory buffer is not used and thus, not created.
 
 \section{Dedicated cores}
 
@@ -28,6 +29,21 @@ a server running on a dedicated core of the same node. When $N > 1$, the client 
 are gathered into $N$ groups, and each group is connected to a server on a dedicated core.
 Note that whatever the number of servers, only one shared-memory buffer is created, with a size
 specified in the XML file.
+
+\subsection*{Disabling shared memory}
+
+By default, the dedicated-cores mode leverage a shared-memory buffer of the size specified in
+the configuration file. Yet it is possible to replace the communication through shared memory with
+communication through MPI. To do so, add \verb+enabled="false"+ as attribute in the buffer's definition.
+
+In general, the shared-memory communication layer reduces the number of copies of data that are
+performed. A dedicated core can indeed work from variables that have been placed in shared memory by the
+clients. It is thus preferable to use shared memory if the simulation already requires a large amount of memory,
+and in particular if the simulation has been optimized to use \texttt{damaris\_alloc} instead of \texttt{damaris\_write}.
+It is also preferable to used shared memory to properly bound the amount of data transferred from clients to servers,
+in particular if servers are executing plugins that take a long time to complete. By disabling the shared memory,
+clients will keep issuing send requests even though the server is too busy answering them, leading to potential
+buffer overflow within MPI.
 
 \section{Dedicated nodes}
 
