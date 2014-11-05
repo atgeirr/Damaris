@@ -1,0 +1,76 @@
+DEVELOPMENT GUIDE
+
+The development of Damaris follows a set of rules that all developers have
+to respect. These rules concern naming conventions and design patterns usage.
+
+================================================================================
+Naming conventions
+================================================================================
+
+- The main namespace is called "damaris". Nothing should be defined outside this
+namespace. It is possible to create sub-namespaces within this namespace, in
+which case it should be named with lower-case letters only (ex: damaris::viz).
+
+- Class names use the Java naming convention, i.e. all words of the name 
+starting with a capital letter, no underscore (ex: damaris::VariableManager).
+
+- Member functions use the same naming conventions than classes
+(ex: damaris::VariableManager::Search()).
+
+- Instance attributes are lower-case only, using underscore and terminating with
+an underscore (ex: my_attribute_).
+
+- Static attributes follow the same naming convention than instance attributes
+but have to start with an underscore (ex: _my_static_attribute_).
+
+================================================================================
+Comments
+================================================================================
+
+- All classes must be doxygen-documented.
+
+================================================================================
+Pointerless implementation
+================================================================================
+
+- Damaris tries to use a pointerless convention, i.e. avoiding the use of a raw
+pointer (int*, Variable*, etc.). Instead, it uses shared_ptr and weak_ptr.
+
+- To use shared_ptr and weak_ptr, one must not directly include the 
+corresponding boost headers, but include "util/Pointers.hpp", then use add
+USING_POINTER; before the class definition.
+
+- One must not use the boost:: prefix in front of shared_ptr and weak_ptr, the
+goal being to clearly decouple the implementation from boost (Pointers.hpp may
+be filled with other implementations of shared_ptr or weak_ptr in the future).
+
+- If the use of boost::enable_shared_from_this is necessary, include
+"util/Pointers.hpp" and declare your class the following way:
+class MyClass : public ENABLE_SHARED_FROM_THIS(MyClass) { ...
+In a class member function, do not use directly the shared_from_this() function 
+but use its corresponding macro definition SHARED_FROM_THIS(). The goal here 
+again is to decouple the code from boost.
+
+- By default, use shared_ptr. All use of a weak_ptr instead of shared_ptr must
+be justified in the comment of the corresponding section of code (usually
+weak_ptr are only used to break cyclic dependencies).
+
+- All use of a raw pointer should be carefully considered and well justified in
+the comments of the corresponding section of the code (usually a raw pointer
+will be used to actuall point to a raw memory area that will be given to the
+user of Damaris, on the application side).
+
+- All instanciable classes must have private (or at least protected)
+constructors and destructors, and instead provide a New(...) static function to 
+create a shared_ptr to a new instance of the corresponding object (only place
+in the code where a raw pointer to a class is to be used is in these kinds of
+functions).
+
+================================================================================
+Tests
+================================================================================
+
+- As much as possible, provide a Test class in the test directory for every new
+class added to Damaris, and modify the CppUnit test chain accordingly in the
+CMakeLists.txt.
+

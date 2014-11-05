@@ -1,157 +1,211 @@
 cmake_minimum_required (VERSION 2.8)
 
-#-----------------------------------------------------------#
+#----------------------------------------------------------------------------#
 # Enabling Fortran
-#-----------------------------------------------------------#
+#----------------------------------------------------------------------------#
 enable_language (Fortran OPTIONAL)
 
-#-----------------------------------------------------------#
+#----------------------------------------------------------------------------#
 # Force MPI compilers
 #   starting from Damaris 0.4, MPI compiler is mandatory
-#-----------------------------------------------------------#
+#----------------------------------------------------------------------------#
 include(CMakeForceCompiler)
-CMAKE_FORCE_CXX_COMPILER(mpicxx "MPI C++ Compiler")
-CMAKE_FORCE_C_COMPILER(mpicc "MPI C Compiler")
-CMAKE_FORCE_FORTRAN_COMPILER(mpif90 "Fortran Compiler")
+	CMAKE_FORCE_CXX_COMPILER(mpicxx "MPI C++ Compiler")
+	CMAKE_FORCE_C_COMPILER(mpicc "MPI C Compiler")
+#CMAKE_FORCE_FORTRAN_COMPILER(mpif90 "Fortran Compiler")
 
-#-----------------------------------------------------------#
+#----------------------------------------------------------------------------#
 # Starting project definition
-#-----------------------------------------------------------#
+#----------------------------------------------------------------------------#
 project(DAMARIS)
 
-#-----------------------------------------------------------#
+#----------------------------------------------------------------------------#
 # EXTERNAL_ROOT is a variable set once and for all to
 # indicate where are all the required libraries. By default
 # CMake will look for libraries in this directory.
-#-----------------------------------------------------------#
-set(EXTERNAL_ROOT /usr/local/lib)
+#----------------------------------------------------------------------------#
+set(EXTERNAL_ROOT ~/local)
+set(XERCESC_ROOT ${EXTERNAL_ROOT})
+set(XSD_ROOT	 ${EXTERNAL_ROOT})
+set(BOOST_ROOT	 ${EXTERNAL_ROOT})
+set(VisIt_ROOT	 ${EXTERNAL_ROOT}/visit) # optional
+set(CppUnit_ROOT ${EXTERNAL_ROOT}) # optional
+#set(PYTHON_ROOT ${EXTERNAL_ROOT}) # not supported anymore 
 
-#-----------------------------------------------------------#
-add_definitions (-g -O2 -Wall -rdynamic)
-#add_definitions (-Wextra) # for development only
-#-----------------------------------------------------------#
+#----------------------------------------------------------------------------#
+# Installation directory, /usr/local by default
+#----------------------------------------------------------------------------#
+if(NOT DEFINED CMAKE_INSTALL_PREFIX)
+	set(CMAKE_INSTALL_PREFIX /usr/local)
+endif(NOT DEFINED CMAKE_INSTALL_PREFIX)
+message(STATUS "Damaris will be installed in ${CMAKE_INSTALL_PREFIX}")
 
-#-----------------------------------------------------------#
+#----------------------------------------------------------------------------#
+add_definitions (-g -O2 -Wno-unused-variable -Wno-unused-parameter -Wall -rdynamic)
+add_definitions (-Wextra) # for development only
+#----------------------------------------------------------------------------#
+
+#----------------------------------------------------------------------------#
 # Some variables to set the level of debugging informations.
 # Recommanded : -D__INFO
-#-----------------------------------------------------------#
+#----------------------------------------------------------------------------#
 add_definitions (-D__INFO)
 #add_definitions (-D__TRACE)
 #add_definitions (-D__DEBUG_ALL)
 #add_definitions (-D__BENCHMARK)
 
-#-----------------------------------------------------------#
+#----------------------------------------------------------------------------#
 # Check if we are on BlueGene/P
 # uncomment the following line (set(BGP)) if you run on BGP.
-#-----------------------------------------------------------#
+#----------------------------------------------------------------------------#
 #set(BGP "yes")
 if(BGP)
-  set(BGP_FLOOR "/bgsys/drivers/ppcfloor")
-  include_directories(${BGP_FLOOR}/arch/include)
-  add_definitions(-DBGP)
+	set(BGP_FLOOR "/bgsys/drivers/ppcfloor")
+	include_directories(${BGP_FLOOR}/arch/include)
+	add_definitions(-DBGP)
 endif(BGP)
 
-#-----------------------------------------------------------#
+#----------------------------------------------------------------------------#
 # Set the location of CMake Modules
-#-----------------------------------------------------------#
+#----------------------------------------------------------------------------#
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} 
 		"${DAMARIS_SOURCE_DIR}/cmake/Modules/")
 
-#-----------------------------------------------------------#
-include_directories(${DAMARIS_SOURCE_DIR})
+#----------------------------------------------------------------------------#
 include_directories(${DAMARIS_SOURCE_DIR}/include)
+include_directories(${DAMARIS_SOURCE_DIR}/include/damaris)
 
-#-----------------------------------------------------------#
+#----------------------------------------------------------------------------#
 # Set everything related to the Boost libraries
-#-----------------------------------------------------------#
-set(BOOST_ROOT /home/cata/INRIA/Libs/boost_1_53_0)
+#----------------------------------------------------------------------------#
+set(Boost_USE_STATIC_LIBS ON)
+SET(Boost_ADDITIONAL_VERSIONS "1.51.0" "1.52.0" 
+			"1.53.0" "1.54.0" "1.55.0" "1.56.0" "1.57.0" "1.58.0"
+			"1.60.0" "1.61.0" "1.61.0" "1.62.0" "1.63.0" "1.64.0")
 find_package(Boost REQUIRED)
-set(BOOST_LIB boost_filesystem boost_system boost_program_options)
-find_package(Boost 1.51.0 COMPONENTS filesystem system program_options)
-include_directories(${BOOST_INCLUDE_DIR})
-link_directories(${BOOST_LIBRARY_DIR})
+find_package(Boost 1.51.0 COMPONENTS filesystem system date_time)
+include_directories(${Boost_INCLUDE_DIRS})
+link_directories(${Boost_LIBRARY_DIRS})
+list(APPEND DEP_LIBRARIES ${Boost_LIBRARIES})
 
-#-----------------------------------------------------------#
+#----------------------------------------------------------------------------#
 # Set everything related to the XSD libraries
 #   (actually only include directory required)
-#-----------------------------------------------------------#
+#----------------------------------------------------------------------------#
 set(XSD_ROOT ${EXTERNAL_ROOT})
-set(XSD_INCLUDE_DIR "${XSD_ROOT}/include")
+find_package(XSD REQUIRED)
 include_directories(${XSD_INCLUDE_DIR})
 
-#-----------------------------------------------------------#
+#----------------------------------------------------------------------------#
 # Set everything related to the Xerces-C library
-#-----------------------------------------------------------#
+#----------------------------------------------------------------------------#
 set(XERCESC_ROOT ${EXTERNAL_ROOT})
-set(XERCESC_LIBRARY_DIR "${XERCESC_ROOT}/lib")
-set(XERCESC_INCLUDE_DIR "${XERCESC_ROOT}/include")
-set(XERCESC_LIBRARIES xerces-c)
+find_package(XercesC REQUIRED)
 include_directories(${XERCESC_INCLUDE_DIR})
-include_directories("/usr/local/hdf5/include")
-link_directories("/usr/local/hdf5/lib")
-link_directories(${XERCESC_LIBRARY_DIR})
+list(APPEND DEP_LIBRARIES ${XERCESC_LIBRARY})
 
-#-----------------------------------------------------------#
+#----------------------------------------------------------------------------#
 # Set everything related to Python
-#-----------------------------------------------------------#
-set(PYTHON_ROOT ${EXTERNAL_ROOT})
-set(NUMPY_INCLUDE_DIR ${EXTERNAL_ROOT}/lib/python2.6/site-packages/numpy/core/include)
-#find_package(PythonLibs)
+#----------------------------------------------------------------------------#
+if(PYTHON_ROOT) # Python is disabled for now
 
-if (PYTHON_INCLUDE_PATH)
-  find_package(Boost 1.49 QUIET COMPONENTS python)
-    if (Boost_PYTHON_LIBRARY)
-	message(STATUS "Building Python support. Python lib: ${Boost_PYTHON_LIBRARY}")
-	message(STATUS "Python include: ${PYTHON_INCLUDE_PATH}")
-    include_directories(${PYTHON_INCLUDE_PATH})
-	include_directories(${NUMPY_INCLUDE_DIR})
-    link_directories(${PYTHON_LIBRARY_DIR})
-    add_definitions(-D__ENABLE_PYTHON)
-    # add the Boost Python library to the current Boost libraries
-    set(BOOST_LIB ${BOOST_LIB} boost_python)
-    set(PYTHON_LIBRARIES python2.6 util)
-    set(PYTHONLIBS_FOUND true)
-  else (Boost_PYTHON_LIBRARY)
-    message(STATUS "Boost Python not found. Python support will not be built.")
-  endif (Boost_PYTHON_LIBRARY)
-else (PYTHON_INCLUDE_PATH)
-  message(STATUS "Python headers not found. Python support will not be built.")
-endif (PYTHON_INCLUDE_PATH)
+find_package(PythonLibs)
+if (PYTHONLIBS_FOUND)
+	find_package(NumPy)
+endif (PYTHONLIBS_FOUND)
 
-#-----------------------------------------------------------#
+if (NUMPY_FOUND) 
+	find_package(Boost 1.51 QUIET COMPONENTS python)
+	if(Boost_PYTHON_LIBRARY)
+		message(STATUS 
+			"Building Python support (${Boost_PYTHON_LIBRARY})")
+		message(STATUS "Python include: ${PYTHON_INCLUDE_PATH}")
+		message(STATUS "NumPy include: ${NUMPY_INCLUDE_DIRS}")
+		include_directories(${PYTHON_INCLUDE_DIRS})
+		include_directories(${NUMPY_INCLUDE_DIRS})
+		add_definitions(-D__ENABLE_PYTHON)
+		# add the Boost Python library to the current Boost libraries
+		#    set(PYTHON_LIBRARIES python2.6 util)
+		list(APPEND DEP_LIBRARIES ${Boost_PYTHON_LIBRARY} python2.6 util)
+	else (Boost_PYTHON_LIBRARY)
+		message(STATUS "Boost Python not found.")
+	endif(Boost_PYTHON_LIBRARY)
+else (NUMPY_FOUND)
+	message(STATUS "Python headers not found.")
+endif (NUMPY_FOUND)
+
+endif(PYTHON_ROOT)
+
+#----------------------------------------------------------------------------#
 # Set everything related to VisIt 
-#-----------------------------------------------------------#
-#set(VISIT_ROOT "~/Work/Visu3/visit2.5.2/src")
-if(VISIT_ROOT)
-  set(VISIT_INCLUDE_DIR "${VISIT_ROOT}/sim/V2/lib")
-  set(VISIT_LIBRARY_DIR "${VISIT_ROOT}/lib")
-  include_directories(${VISIT_INCLUDE_DIR})
-  link_directories(${VISIT_LIBRARY_DIR})
-  add_definitions(-D__ENABLE_VISIT)
-  set(VISIT_LIB simV2)
-endif(VISIT_ROOT)
-#-----------------------------------------------------------#
+#----------------------------------------------------------------------------#
+find_package(VisIt)
+if(VisIt_FOUND)
+	include_directories(${VisIt_INCLUDE_DIRS})
+	message(STATUS "VisIt found: ${VisIt_INCLUDE_DIRS}")
+	list(APPEND DEP_LIBRARIES ${VisIt_LIBRARIES})
+        set(HAVE_VISIT_ENABLED 1)
+else(VisIt_FOUND)
+	message(STATUS "VisIt not found")
+endif(VisIt_FOUND)
+
+#----------------------------------------------------------------------------#
+# Set everything related to CppUnit 
+#----------------------------------------------------------------------------#
+find_package(CppUnit)
+if(CPPUNIT_FOUND)
+	message(STATUS "CppUnit found, unit tests will be compiled")
+	include_directories(${CPPUNIT_INCLUDE_DIR})
+	enable_testing()
+else(CPPUNIT_FOUND)
+	message(STATUS "CppUnit not found, unit tests will not be compiled")
+endif(CPPUNIT_FOUND)
+
+#----------------------------------------------------------------------------#
 # Set everything related to Fortran
-#-----------------------------------------------------------#
+#----------------------------------------------------------------------------#
 if(CMAKE_Fortran_COMPILER)
-  include(FortranCInterface)
-  FortranCInterface_HEADER(${DAMARIS_SOURCE_DIR}/core/FCMangle.h
-			   MACRO_NAMESPACE "FC_FUNC_"
-                           SYMBOL_NAMESPACE "FC_SYM_")
-  add_definitions(-D__ENABLE_FORTRAN)
-  message(STATUS "Fortran binding will be enabled, compiler is ${CMAKE_Fortran_COMPILER}")
+	include(FortranCInterface)
+	FortranCInterface_HEADER(${DAMARIS_SOURCE_DIR}/include/DamarisFCMangle.h
+			MACRO_NAMESPACE "FC_FUNC_"
+			SYMBOL_NAMESPACE "FC_SYM_")
+	add_definitions(-D__ENABLE_FORTRAN)
+	message(STATUS "Fortran binding enabled (${CMAKE_Fortran_COMPILER})")
 else(CMAKE_Fortran_COMPILER)
-  message(STATUS "Fortran binding will not be build")
+	message(STATUS "Fortran binding will not be build")
 endif(CMAKE_Fortran_COMPILER)
 
-#-----------------------------------------------------------#
-# Add the proper subdirectories
-#-----------------------------------------------------------#
-add_subdirectory (client)
-add_subdirectory (server)
-add_subdirectory (test)
-add_subdirectory (examples)
 
-if(VISIT_ROOT)
-  add_subdirectory (visit/test)
-endif(VISIT_ROOT)
+list(APPEND DEP_LIBRARIES "stdc++" "rt" "dl")
+
+
+function(add_executable TARGET) 
+	_ADD_EXECUTABLE(${TARGET} ${ARGN})
+	set_target_properties(${TARGET} 
+			PROPERTIES LINK_FLAGS "-Wl,-export-dynamic")
+endfunction() 
+
+#----------------------------------------------------------------------------#
+# Configure Damaris
+#----------------------------------------------------------------------------#
+CONFIGURE_FILE(${DAMARIS_SOURCE_DIR}/include/Damaris.h.in 
+	       ${DAMARIS_SOURCE_DIR}/include/Damaris.h)
+
+#----------------------------------------------------------------------------#
+# Add the proper subdirectories
+#----------------------------------------------------------------------------#
+add_subdirectory (lib)
+add_subdirectory (examples)
+if(CPPUNIT_FOUND)
+	add_subdirectory (test)
+endif(CPPUNIT_FOUND)
+
+#----------------------------------------------------------------------------#
+# Installation process
+#----------------------------------------------------------------------------#
+install(FILES "include/Damaris.h" DESTINATION include)
+install(FILES "lib/libdamaris.a" DESTINATION lib)
+install(DIRECTORY "include/damaris" DESTINATION include)
+if(CMAKE_Fortran_COMPILE)
+	install(FILES "lib/damaris.mod" DESTINATION include)
+endif(CMAKE_Fortran_COMPILE)

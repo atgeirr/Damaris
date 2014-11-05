@@ -1,0 +1,70 @@
+#include <iostream>
+#include <set>
+#include <cppunit/TestFixture.h>
+#include <cppunit/TestAssert.h>
+#include <cppunit/TestCaller.h>
+#include <cppunit/TestSuite.h>
+#include <cppunit/TestCase.h>
+
+#include "model/Model.hpp"
+#include "model/BcastXML.hpp"
+#include "action/ActionManager.hpp"
+#include "env/Environment.hpp"
+
+extern "C" void my_function(const char* name, int32_t source, int32_t /*iteration*/,
+		const char* args)
+{
+	CPPUNIT_ASSERT(std::string(name) == "test_event");
+	CPPUNIT_ASSERT(source == 1);
+	std::cout << "hello world !" << std::endl;
+}
+
+namespace damaris {
+
+using namespace std;
+	
+USING_POINTERS;
+
+class TestAction : public CppUnit::TestFixture {
+	
+private:
+	static bool initialized;
+public:
+	TestAction() {
+		if(not initialized) {
+			Environment::Init("test.xml",MPI_COMM_WORLD);
+			initialized = true;
+		}
+	}
+
+	virtual ~TestAction() {
+		Environment::Finalize();
+		initialized = false;
+	}
+
+	static CppUnit::Test* GetTestSuite() {
+		CppUnit::TestSuite *suiteOfTests = 
+			new CppUnit::TestSuite("Action");
+		
+		suiteOfTests->addTest(new CppUnit::TestCaller<TestAction>(
+				"Calls an action",
+				&TestAction::CallAction));
+		
+		return suiteOfTests;
+	}
+
+protected:
+	
+	void CallAction() {
+		if(Environment::IsClient()) {
+			shared_ptr<Action> a 
+				= ActionManager::Search("test_event");
+			CPPUNIT_ASSERT(a);
+			a->Call(1,2,NULL);
+		}
+	}
+};
+
+bool TestAction::initialized = false;
+
+}
