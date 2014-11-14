@@ -3,8 +3,8 @@
 	<architecture>
 		<domains count="1" />
 		<dedicated count="1" nodes="0" />
-		<buffer name="buffer" size="536870912" />
-		<queue  name="queue" size="100" />
+		<buffer name="damaris-buffer" size="536870912" />
+		<queue  name="damaris-queue" size="100" />
 	</architecture>
 	<data>
 		<parameter name="WIDTH" type="int" value="30" />
@@ -30,8 +30,6 @@
 	
 		<variable name="space" type="scalar" layout="cells" mesh="mesh" centering="nodal" />
 	</data>
-	<storage>
-	</storage>
 	<actions>
 	</actions>
 	<visit>
