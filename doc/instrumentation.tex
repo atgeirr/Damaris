@@ -93,7 +93,7 @@ has finished. \Damaris{} keeps track of the iteration number internally:
 this number is equal to 0 before the first call to \function{damaris\_end\_iteration}.
 A call to \function{damaris\_end\_iteration} will update potentially connected backends such as VisIt.
 As it involves collective communications, all the clients have to call this function.
-These five main functions are summarized in Table~\ref{tab:initFunctions}.
+These main functions are summarized in Table~\ref{tab:initFunctions}.
 
 \begin{table}
 \centering
@@ -104,7 +104,7 @@ These five main functions are summarized in Table~\ref{tab:initFunctions}.
    \hline
    \function{int damaris\_initialize(const char* configfile, MPI\_Comm comm)}  \\
    \function{int damaris\_start(int* is\_client)} \\
-   \function{int damaris\_client\_comm\_get(MPI\_Comm* comm)}
+   \function{int damaris\_client\_comm\_get(MPI\_Comm* comm)} \\
    \function{int damaris\_end\_iteration()}  \\
    \function{int damaris\_stop()} \\
    \function{int damaris\_finalize()} \\
