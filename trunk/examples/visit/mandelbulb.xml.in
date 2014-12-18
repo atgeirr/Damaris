@@ -2,7 +2,7 @@
 <simulation name="mandelbulb" language="c" xmlns="http://damaris.gforge.inria.fr/damaris/model">
 	<architecture>
 		<domains count="1" />
-		<dedicated count="1" nodes="0" />
+		<dedicated cores="1" nodes="0" />
 		<buffer name="damaris-buffer" size="536870912" />
 		<queue  name="damaris-queue" size="100" />
 	</architecture>
