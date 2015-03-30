@@ -10,8 +10,8 @@ enable_language (Fortran OPTIONAL)
 #   starting from Damaris 0.4, MPI compiler is mandatory
 #----------------------------------------------------------------------------#
 include(CMakeForceCompiler)
-	CMAKE_FORCE_CXX_COMPILER(mpicxx "MPI C++ Compiler")
-	CMAKE_FORCE_C_COMPILER(mpicc "MPI C Compiler")
+CMAKE_FORCE_CXX_COMPILER(mpicxx "MPI C++ Compiler")
+CMAKE_FORCE_C_COMPILER(mpicc "MPI C Compiler")
 #CMAKE_FORCE_FORTRAN_COMPILER(mpif90 "Fortran Compiler")
 
 #----------------------------------------------------------------------------#
@@ -24,12 +24,29 @@ project(DAMARIS)
 # indicate where are all the required libraries. By default
 # CMake will look for libraries in this directory.
 #----------------------------------------------------------------------------#
-set(EXTERNAL_ROOT ~/local)
-set(XERCESC_ROOT ${EXTERNAL_ROOT})
-set(XSD_ROOT	 ${EXTERNAL_ROOT})
-set(BOOST_ROOT	 ${EXTERNAL_ROOT})
-set(VisIt_ROOT	 ${EXTERNAL_ROOT}/visit) # optional
-set(CppUnit_ROOT ${EXTERNAL_ROOT}) # optional
+if(NOT DEFINED EXTERNAL_ROOT)
+    set(EXTERNAL_ROOT ~/local)
+endif(NOT DEFINED EXTERNAL_ROOT)
+
+if(NOT DEFINED XERCESC_ROOT)
+    set(XERCESC_ROOT ${EXTERNAL_ROOT})
+endif(NOT DEFINED XERCESC_ROOT)
+
+if(NOT DEFINED XSD_ROOT)
+    set(XSD_ROOT ${EXTERNAL_ROOT})
+endif(NOT DEFINED XSD_ROOT)
+
+if(NOT DEFINED BOOST_ROOT)
+    set(BOOST_ROOT ${EXTERNAL_ROOT})
+endif(NOT DEFINED BOOST_ROOT)
+
+if(NOT DEFINED VisIt_ROOT)
+    set(VisIt_ROOT ${EXTERNAL_ROOT}/visit) # optional
+endif(NOT DEFINED VisIt_ROOT)
+
+if(NOT DEFINED CppUnit_ROOT)
+    set(CppUnit_ROOT ${EXTERNAL_ROOT}) # optional
+endif(NOT DEFINED CppUnit_ROOT)
 #set(PYTHON_ROOT ${EXTERNAL_ROOT}) # not supported anymore 
 
 #----------------------------------------------------------------------------#
@@ -146,7 +163,14 @@ if(VisIt_FOUND)
 	list(APPEND DEP_LIBRARIES ${VisIt_LIBRARIES})
         set(HAVE_VISIT_ENABLED 1)
 else(VisIt_FOUND)
-	message(STATUS "VisIt not found")
+    if(DEFINED VISIT_INCLUDE) # this is for when VisIt installs Damaris
+    # the user is not supposed to set VISIT_INCLUDE himself; it is set by
+    # the build_visit script
+        message(STATUS "VisIt not found, but include dir forced to ${VISIT_INCLUDE}")
+        include_directories(${VISIT_INCLUDE})
+    else(DEFINED VISIT_INCLUDE)	
+        message(STATUS "VisIt not found")
+    endif(DEFINED VISIT_INCLUDE)
 endif(VisIt_FOUND)
 
 #----------------------------------------------------------------------------#
@@ -195,10 +219,19 @@ CONFIGURE_FILE(${DAMARIS_SOURCE_DIR}/include/Damaris.h.in
 # Add the proper subdirectories
 #----------------------------------------------------------------------------#
 add_subdirectory (lib)
-add_subdirectory (examples)
-if(CPPUNIT_FOUND)
+
+if(NOT DEFINED ENABLE_EXAMPLES)
+   set(ENABLE_EXAMPLES true)
+endif(NOT DEFINED ENABLE_EXAMPLES)
+if(ENABLE_EXAMPLES)
+        message(STATUS "Examples are enabled, will be built")
+	add_subdirectory (examples)
+endif(ENABLE_EXAMPLES)
+
+if(CPPUNIT_FOUND AND ENABLE_TESTS)
+        message(STATUS "Unit tests are enabled, will be built")
 	add_subdirectory (test)
-endif(CPPUNIT_FOUND)
+endif(CPPUNIT_FOUND AND ENABLE_TESTS)
 
 #----------------------------------------------------------------------------#
 # Installation process
