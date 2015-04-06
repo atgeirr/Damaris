@@ -10,8 +10,13 @@ enable_language (Fortran OPTIONAL)
 #   starting from Damaris 0.4, MPI compiler is mandatory
 #----------------------------------------------------------------------------#
 include(CMakeForceCompiler)
-CMAKE_FORCE_CXX_COMPILER(mpicxx "MPI C++ Compiler")
-CMAKE_FORCE_C_COMPILER(mpicc "MPI C Compiler")
+if(NOT DEFINED PAR_CXX_COMPILER)
+    CMAKE_FORCE_CXX_COMPILER(mpicxx "MPI C++ Compiler")
+    CMAKE_FORCE_C_COMPILER(mpicc "MPI C Compiler")
+else(NOT DEFINED PAR_CXX_COMPILER)
+    CMAKE_FORCE_CXX_COMPILER(${PAR_CXX_COMPILER} "MPI C++ Compiler")
+    message(STATUS "CXX compiler set to ${PAR_CXX_COMPILER}")
+endif(NOT DEFINED PAR_CXX_COMPILER)
 #CMAKE_FORCE_FORTRAN_COMPILER(mpif90 "Fortran Compiler")
 
 #----------------------------------------------------------------------------#
@@ -109,16 +114,14 @@ list(APPEND DEP_LIBRARIES ${Boost_LIBRARIES})
 # Set everything related to the XSD libraries
 #   (actually only include directory required)
 #----------------------------------------------------------------------------#
-set(XSD_ROOT ${EXTERNAL_ROOT})
 find_package(XSD REQUIRED)
 include_directories(${XSD_INCLUDE_DIR})
 
 #----------------------------------------------------------------------------#
 # Set everything related to the Xerces-C library
 #----------------------------------------------------------------------------#
-set(XERCESC_ROOT ${EXTERNAL_ROOT})
 find_package(XercesC REQUIRED)
-include_directories(${XERCESC_INCLUDE_DIR})
+include_directories(${XERCESC_INCLUDE})
 list(APPEND DEP_LIBRARIES ${XERCESC_LIBRARY})
 
 #----------------------------------------------------------------------------#
@@ -168,6 +171,7 @@ else(VisIt_FOUND)
     # the build_visit script
         message(STATUS "VisIt not found, but include dir forced to ${VISIT_INCLUDE}")
         include_directories(${VISIT_INCLUDE})
+	set(HAVE_VISIT_ENABLED 1)
     else(DEFINED VISIT_INCLUDE)	
         message(STATUS "VisIt not found")
     endif(DEFINED VISIT_INCLUDE)
