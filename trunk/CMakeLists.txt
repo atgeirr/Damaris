@@ -241,7 +241,7 @@ endif(CPPUNIT_FOUND AND ENABLE_TESTS)
 # Installation process
 #----------------------------------------------------------------------------#
 install(FILES "include/Damaris.h" DESTINATION include)
-install(FILES "lib/libdamaris.a" DESTINATION lib)
+install(FILES "${CMAKE_BINARY_DIR}/lib/libdamaris.a" DESTINATION lib)
 install(DIRECTORY "include/damaris" DESTINATION include)
 if(CMAKE_Fortran_COMPILE)
 	install(FILES "lib/damaris.mod" DESTINATION include)
