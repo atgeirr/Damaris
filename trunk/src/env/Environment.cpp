@@ -66,7 +66,6 @@ bool Environment::Init(const std::string& configFile,
 	_baseModel_ = model::BcastXML(world,configFile);
 	_globalComm_ = world;
 	_lastIteration_ = 0;
-	_globalProcessID_ = rank;
 	_initialized_ = true;
 
 	/* Compute the magic number of the simulation */
@@ -85,6 +84,7 @@ bool Environment::Init(const std::string& configFile,
 	MPI_Comm orderedComm;
 	MPI_Comm_split(_globalComm_,0,node_id,&orderedComm);
 	_globalComm_ = orderedComm;
+	MPI_Comm_rank(_globalComm_,&_globalProcessID_);
 
 	/* Get the size of the node */
 	MPI_Comm_size(_nodeComm_,&_coresPerNode_);
