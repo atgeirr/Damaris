@@ -82,7 +82,7 @@ class DynamicAction : public BoundAction, public Configurable<model::Event> {
 	 * Return true if the action can be called from outside the 
 	 * simulation (typically from VisIt).
 	 */
-	virtual bool IsExternallyVisible() { 
+	virtual bool IsExternallyVisible() const { 
 		return GetModel().external();
 	}
 

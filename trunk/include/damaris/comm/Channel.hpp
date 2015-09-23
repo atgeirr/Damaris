@@ -361,7 +361,7 @@ class Channel : public ENABLE_SHARED_FROM_THIS(Channel) {
 		int size;
 		MPI_Comm_size(c,&size);
 		if(((endpoint >= size) || (endpoint < 0)) 
-			&& (not endpoint == MPI_ANY_SOURCE)) {
+			&& (not (endpoint == MPI_ANY_SOURCE))) {
 			return shared_ptr<Channel>();
 		}
 		

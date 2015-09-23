@@ -69,8 +69,8 @@ class DataSpace
 	shared_ptr<bool> data_owner_;	/*!< true if Deallocate should be called
 						when ref_count_ == 0 */
 
-	void * operator new   (size_t) { return NULL; }
-	void * operator new[] (size_t) { return NULL; }
+	void * operator new   (size_t) throw() { return NULL; }
+	void * operator new[] (size_t) throw() { return NULL; }
 	void operator delete   (void*) {}
 	void operator delete[] (void*) {}
 		
