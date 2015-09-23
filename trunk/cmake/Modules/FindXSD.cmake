@@ -5,6 +5,7 @@
 #
 FIND_PROGRAM( XSD_EXECUTABLE xsd
 		   	  HINTS ${RWSL_DEPS}/xsd/bin $ENV{XSD_ROOT}/bin
+			  ${XSD_ROOT}/bin
 			  PATHS /usr/local/xsd-3.2.0-i686-macosx/bin
 			  		/usr/local/xsd-3.2.0-x86_64-linux-gnu/bin
 			  		/usr/local/bin

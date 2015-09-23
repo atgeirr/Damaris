@@ -52,6 +52,8 @@ add_library (damaris 	${DAMARIS_SRC}
 			${DAMARIS_VISIT_SRC} 
 			${DAMARIS_FORTRAN_MODULE})
 
+if(NOT (MODEL_PRESENT EQUAL 1))
+
 set_source_files_properties(
 		${CMAKE_BINARY_DIR}/src/model/Model.cpp
 		PROPERTIES GENERATED 1)
@@ -72,3 +74,4 @@ add_custom_command(OUTPUT ${DAMARIS_SOURCE_DIR}/src/model/Model.cpp
 		DEPENDS ${DAMARIS_SOURCE_DIR}/src/model/Model.xsd
 		COMMENT "Generating C++/XML mapping")
 
+endif()

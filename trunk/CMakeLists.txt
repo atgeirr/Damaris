@@ -18,6 +18,7 @@ else(NOT DEFINED PAR_CXX_COMPILER)
     message(STATUS "CXX compiler set to ${PAR_CXX_COMPILER}")
 endif(NOT DEFINED PAR_CXX_COMPILER)
 #CMAKE_FORCE_FORTRAN_COMPILER(mpif90 "Fortran Compiler")
+include(CheckIncludeFiles)
 
 #----------------------------------------------------------------------------#
 # Starting project definition
@@ -114,7 +115,25 @@ list(APPEND DEP_LIBRARIES ${Boost_LIBRARIES})
 # Set everything related to the XSD libraries
 #   (actually only include directory required)
 #----------------------------------------------------------------------------#
-find_package(XSD REQUIRED)
+if(EXISTS "${DAMARIS_SOURCE_DIR}/include/damaris/model/Model.hpp")
+	set(MODEL_PRESENT 1)
+endif()
+
+if(NOT (MODEL_PRESENT EQUAL 1))
+	message(STATUS "XSD model not generated, searching for XSD binary...")
+	find_package(XSD REQUIRED)
+else()
+	message(STATUS "XSD model present, searching for XSD headers...")
+	if(NOT DEFINED XSD_INCLUDE_DIR)
+		set(XSD_INCLUDE_DIR ${XSD_ROOT}/include)
+		message(STATUS "XSD include dir is ${XSD_INCLUDE_DIR}")
+	endif()
+endif()
+
+if(NOT EXISTS "${XSD_INCLUDE_DIR}/xsd/cxx/config.hxx")
+	message(FATAL_ERROR "XSD headers not found.")
+endif()
+
 include_directories(${XSD_INCLUDE_DIR})
 
 #----------------------------------------------------------------------------#
