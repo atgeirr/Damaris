@@ -20,7 +20,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "damaris/util/Debug.hpp"
 #include "damaris/util/Pointers.hpp"
-#include "damaris/util/TypeWrapper.hpp"
+//#include "damaris/util/TypeWrapper.hpp"
 
 namespace damaris {
 	
@@ -58,7 +58,7 @@ USING_POINTERS;
 template<class OWNER, typename T = void>
 class DataSpace
 {
-	friend class TypeWrapper<OWNER>::type;
+//	friend class TypeWrapper<OWNER>::type;
 
 	private:
 

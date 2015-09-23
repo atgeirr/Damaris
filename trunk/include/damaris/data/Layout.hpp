@@ -22,7 +22,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 
 #include "damaris/util/Pointers.hpp"
-#include "damaris/util/TypeWrapper.hpp"
+//#include "damaris/util/TypeWrapper.hpp"
 #include "damaris/util/ForwardDcl.hpp"
 #include "damaris/util/Deleter.hpp"
 

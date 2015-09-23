@@ -18,7 +18,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __DAMARIS_DELETER_H
 #define __DAMARIS_DELETER_H
 
-#include "damaris/util/TypeWrapper.hpp"
+//#include "damaris/util/TypeWrapper.hpp"
 
 namespace damaris 
 {
@@ -31,9 +31,9 @@ namespace damaris
 template<typename T>
 class Deleter
 {
-	friend class TypeWrapper<T>::type;
+//	friend class TypeWrapper<T>::type;
 	
-	private:
+	public:
 		
 	/**
 	 * Private constructor, only the class for which the Deleter is defined

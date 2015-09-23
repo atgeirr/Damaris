@@ -21,7 +21,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "Damaris.h"
 
 #include "damaris/util/Pointers.hpp"
-#include "damaris/util/TypeWrapper.hpp"
+//#include "damaris/util/TypeWrapper.hpp"
 #include "damaris/util/ForwardDcl.hpp"
 #include "damaris/util/Deleter.hpp"
 
