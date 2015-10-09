@@ -59,10 +59,12 @@ Download Boost (version 1.51 or higher). Configure and compile it:
 
 Download the XSD sources for your platform.
 Untar/unzip it and install it by copying it into the \installdir directory.
-Make sure that the \texttt{xsd} executable is properly located in the \installdir/bin
-directory and that this directory is in the PATH environment variable (this is required
-when compiling \Damaris{} to generate the XML parser). Make sure that the \texttt{xsd} directory
-in the XSD distribution is copied into the \installdir/include directory.
+Starting from Damaris 1.0.1, the \texttt{xsd} executable is not required, only the header
+files are. Make sure that the XSD headers are copies in the \installdir/include directory.
+
+If you use the trunk version of Damaris, from the GIT repository, you will need the \texttt{xsd}
+executable to be installed as well in \installdir/bin. Make sure also that this directory is in the PATH environment variable
+so that \texttt{xsd} can be called.
 
 %==============================================================================%
 %==============================================================================%
