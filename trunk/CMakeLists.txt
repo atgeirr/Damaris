@@ -20,6 +20,7 @@ endif(NOT DEFINED PAR_CXX_COMPILER)
 #CMAKE_FORCE_FORTRAN_COMPILER(mpif90 "Fortran Compiler")
 include(CheckIncludeFiles)
 
+
 #----------------------------------------------------------------------------#
 # Starting project definition
 #----------------------------------------------------------------------------#
@@ -31,7 +32,7 @@ project(DAMARIS)
 # CMake will look for libraries in this directory.
 #----------------------------------------------------------------------------#
 if(NOT DEFINED EXTERNAL_ROOT)
-    set(EXTERNAL_ROOT ~/local)
+    set(EXTERNAL_ROOT $ENV{HOME}/local)
 endif(NOT DEFINED EXTERNAL_ROOT)
 
 if(NOT DEFINED XERCESC_ROOT)
