@@ -31,6 +31,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "client/StandaloneClient.hpp"
 #include "client/RemoteClient.hpp"
 
+using namespace damaris::model;
+
 namespace damaris {
 
 bool				Environment::_initialized_;
@@ -52,6 +54,7 @@ std::string 			Environment::_magicNumber_;
 shared_ptr<Buffer> 		Environment::_defaultBuffer_;
 shared_ptr<Client>		Environment::_client_;
 shared_ptr<Server>		Environment::_server_;
+shared_ptr<EventLogger> Environment::_eventLogger_;
 bool				Environment::_sharedStructuresOwner_;
 
 bool Environment::Init(const std::string& configFile,
@@ -89,6 +92,16 @@ bool Environment::Init(const std::string& configFile,
 	/* Get the size of the node */
 	MPI_Comm_size(_nodeComm_,&_coresPerNode_);
 
+	/* Initialize the logger single instance */
+	string file_name = _baseModel_->log().get().FileName();
+	int rotation_size = _baseModel_->log().get().RotationSize();
+    string log_format = _baseModel_->log().get().LogFormat();
+	LogLevelType::value log_level = _baseModel_->log().get().LogLevel();
+
+	_eventLogger_ = EventLogger::New();
+	_eventLogger_->Init(rank , file_name , rotation_size , log_format , log_level);
+	_eventLogger_->LogInfo("EventLogger initiated successfully\n");
+
 	/* If there are dedicated nodes */
 	if(_baseModel_->architecture().dedicated().nodes() > 0) {
 		/* There are dedicated nodes */
@@ -102,6 +115,8 @@ bool Environment::Init(const std::string& configFile,
 
 bool Environment::InitDedicatedCores(MPI_Comm global)
 {
+	_eventLogger_->LogInfo("InitDedicatedCores started ... ");
+
 	// NOTE: in the future we may call this function from InitDedicatedNodes
 	// and pass a communicator that is different from _globalComm_;
 
@@ -197,6 +212,8 @@ bool Environment::InitDedicatedCores(MPI_Comm global)
 
 bool Environment::InitDedicatedNodes()
 {
+	_eventLogger_->LogInfo("InitDedicatedNodes started ... ");
+
 	/* Get the number of dedicated nodes */
 	int dn = _baseModel_->architecture().dedicated().nodes();
 	// Get the size of the global communicator and the rank of this process

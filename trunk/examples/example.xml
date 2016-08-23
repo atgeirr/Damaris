@@ -41,4 +41,5 @@
 		<event name="test_bcast_event" action="bcasted_event" />
 		<script name="test_script" language="python" file="test.py" />
 	</actions>
+  	<log FileName="log/damaris" RotationSize="5" LogFormat="[%TimeStamp%]: %Message%" LogLevel="info" />
 </simulation>

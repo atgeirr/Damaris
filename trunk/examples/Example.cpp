@@ -49,8 +49,6 @@ int main(int argc, char** argv)
 		
 		// We stop the servers.
 		damaris_stop();
-		
-		
 	}
 	
 	// Everybody executes this, servers are restarted.

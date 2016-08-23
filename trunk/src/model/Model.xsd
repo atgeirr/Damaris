@@ -303,6 +303,26 @@
 	<xs:attribute name="basename" type="xs:string" default="."/>
 	</xs:complexType>
 
+	<!-- LogDepth Type -->
+	<xs:simpleType name="LogLevelType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="trace" />
+			<xs:enumeration value="debug" />
+			<xs:enumeration value="info" />
+			<xs:enumeration value="warning" />
+			<xs:enumeration value="error" />
+			<xs:enumeration value="fatal" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<!-- log config node -->
+	<xs:complexType name="Log">
+		<xs:attribute name="FileName" type="xs:string"      use="required"/>
+		<xs:attribute name="RotationSize" type="xs:unsignedInt" use="required"/>
+		<xs:attribute name="LogFormat" type="xs:string" use="required"/>
+		<xs:attribute name="LogLevel" type="mdl:LogLevelType" use="required"/>
+	</xs:complexType>
+
 	<!-- Simulation node -->
 	<xs:complexType name="Simulation">
 		<xs:sequence>
@@ -312,6 +332,7 @@
 			<xs:element name="actions" type="mdl:Actions" maxOccurs="1"/>
 			<xs:element name="python" type="mdl:PythonParam" maxOccurs="1" minOccurs="0"/>
 			<xs:element name="visit" type="mdl:VisitParam" maxOccurs="1" minOccurs="0"/>
+			<xs:element name="log" type="mdl:Log" maxOccurs="1" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string" use="required"/>
 		<xs:attribute name="language" type="mdl:Language" use="optional" default="unknown"/>

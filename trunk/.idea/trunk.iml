@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="CPP_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/action/Action.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/action/DynamicAction.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/action/ActionManager.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/data/LayoutManager.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/data/RectilinearMesh.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/data/VariableManager.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/data/CurvilinearMesh.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/data/Variable.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/data/Curve.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/data/Type.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/data/Parameter.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/data/Block.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/data/CurveManager.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/data/Mesh.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/data/ParameterManager.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/data/MeshManager.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/data/PointMesh.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/data/BoxLayout.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/comm/MPI2Reactor.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/comm/Reactor.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/log/EventLogger.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/model/Model.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/model/BcastXML.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/model/Model.hpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/msg/Signals.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/util/Observer.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/server/Server.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/main/Damaris.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/main/DamarisFortran.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/main/Damaris.F90" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/env/Environment.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/env/Hardware.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/client/RemoteClient.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/client/StandaloneClient.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/client/Client.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/buffer/SharedMemorySegment.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/include/Damaris.h.in" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/lib/CMakeLists.txt" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/examples/visit/blocks.xml.in" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/examples/visit/point.c" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/examples/visit/life.c" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/examples/visit/mesh.xml.in" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/examples/visit/var.xml.in" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/examples/visit/var.c" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/examples/visit/curve.xml.in" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/examples/visit/blocks.c" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/examples/visit/mesh.c" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/examples/visit/life.xml.in" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/examples/visit/CMakeLists.txt" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/examples/visit/point.xml.in" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/examples/visit/mandelbulb.c" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/examples/visit/curve.c" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/examples/visit/mandelbulb.xml.in" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/examples/Example.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/examples/CMakeLists.txt" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/cmake/Modules/FindBoost.cmake" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/cmake/Modules/FindVisIt.cmake" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/cmake/Modules/FindCppUnit.cmake" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/cmake/Modules/FindXercesC.cmake" isTestSource="false" />
+    </content>
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module-library">
+      <library name="Header Search Paths">
+        <CLASSES>
+          <root url="file:///usr/include" />
+          <root url="file:///usr/lib/gcc/x86_64-redhat-linux/4.8.5/include" />
+          <root url="file:///usr/local/include" />
+          <root url="file://$USER_HOME$/.CLion2016.1/system/cmake/generated/trunk-e0bf5860/e0bf5860/Release" />
+          <root url="file://$USER_HOME$/.CLion2016.1/system/cmake/generated/trunk-e0bf5860/e0bf5860/Debug" />
+          <root url="file://$USER_HOME$/.CLion2016.1/system/cmake/generated/trunk-e0bf5860/e0bf5860/RelWithDebInfo" />
+          <root url="file://$USER_HOME$/.CLion2016.1/system/cmake/generated/trunk-e0bf5860/e0bf5860/MinSizeRel" />
+          <root url="file://$USER_HOME$/local/include" />
+        </CLASSES>
+        <SOURCES>
+          <root url="file:///usr/include" />
+          <root url="file:///usr/lib/gcc/x86_64-redhat-linux/4.8.5/include" />
+          <root url="file:///usr/local/include" />
+          <root url="file://$USER_HOME$/.CLion2016.1/system/cmake/generated/trunk-e0bf5860/e0bf5860/Release" />
+          <root url="file://$USER_HOME$/.CLion2016.1/system/cmake/generated/trunk-e0bf5860/e0bf5860/Debug" />
+          <root url="file://$USER_HOME$/.CLion2016.1/system/cmake/generated/trunk-e0bf5860/e0bf5860/RelWithDebInfo" />
+          <root url="file://$USER_HOME$/.CLion2016.1/system/cmake/generated/trunk-e0bf5860/e0bf5860/MinSizeRel" />
+          <root url="file://$USER_HOME$/local/include" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+  </component>
+</module>

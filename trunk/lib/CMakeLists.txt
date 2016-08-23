@@ -34,6 +34,7 @@ set(DAMARIS_SRC
 	${DAMARIS_SOURCE_DIR}/src/buffer/SharedMemorySegment.cpp
 	${DAMARIS_SOURCE_DIR}/src/model/Model.cpp
 	${DAMARIS_SOURCE_DIR}/src/model/BcastXML.cpp
+	${DAMARIS_SOURCE_DIR}/src/log/EventLogger.cpp
 	)
 
 if(VisIt_FOUND)

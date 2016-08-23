@@ -102,12 +102,15 @@ include_directories(${DAMARIS_SOURCE_DIR}/include/damaris)
 #----------------------------------------------------------------------------#
 # Set everything related to the Boost libraries
 #----------------------------------------------------------------------------#
+#ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
 set(Boost_USE_STATIC_LIBS ON)
-SET(Boost_ADDITIONAL_VERSIONS "1.51.0" "1.52.0" 
-			"1.53.0" "1.54.0" "1.55.0" "1.56.0" "1.57.0" "1.58.0"
-			"1.60.0" "1.61.0" "1.61.0" "1.62.0" "1.63.0" "1.64.0")
+set(Boost_USE_MULTITHREADED ON)
+SET(Boost_ADDITIONAL_VERSIONS "1.51.0" "1.52.0"
+		"1.53.0" "1.54.0" "1.55.0" "1.56.0" "1.57.0" "1.58.0"
+		"1.60.0" "1.61.0" "1.61.0" "1.62.0" "1.63.0" "1.64.0")
+find_package(Threads)
 find_package(Boost REQUIRED)
-find_package(Boost 1.51.0 COMPONENTS filesystem system date_time)
+find_package(Boost 1.56.0 COMPONENTS thread log log_setup filesystem system date_time)
 include_directories(${Boost_INCLUDE_DIRS})
 link_directories(${Boost_LIBRARY_DIRS})
 list(APPEND DEP_LIBRARIES ${Boost_LIBRARIES})

@@ -39,6 +39,8 @@ int damaris_initialize(const char* configfile, MPI_Comm comm)
 
 int damaris_finalize()
 {
+	Environment::GetEventLogger()->LogInfo("damaris_finalize method started.");
+
 	if(not Environment::Initialized()) {
 		return DAMARIS_NOT_INITIALIZED;
 	}
@@ -52,6 +54,8 @@ int damaris_finalize()
 
 int damaris_start(int* is_client)
 {
+	Environment::GetEventLogger()->LogInfo("damaris_start method started.");
+
 	if(not Environment::Initialized()) {
 		return DAMARIS_NOT_INITIALIZED;
 	}
@@ -74,6 +78,8 @@ int damaris_start(int* is_client)
 
 int damaris_stop()
 {
+	Environment::GetEventLogger()->LogInfo("damaris_stop method started.");
+
 	if(not Environment::Initialized()) {
 		return DAMARIS_NOT_INITIALIZED;
 	}
@@ -86,16 +92,18 @@ int damaris_stop()
 	}
 }
 
-
 int damaris_write(const char* varname, const void* data)
 {
+	Environment::GetEventLogger()->LogInfo("damaris_write method started.");
+
 	damaris_write_block(varname,0,data);
 	return DAMARIS_OK;
 }
 
-
 int damaris_write_block(const char* varname, int32_t block, const void* data)
 {
+	Environment::GetEventLogger()->LogInfo("damaris_write_block method started.");
+
 	if(not Environment::Initialized()) {
 		return DAMARIS_NOT_INITIALIZED;
 	}
@@ -109,11 +117,15 @@ int damaris_write_block(const char* varname, int32_t block, const void* data)
 
 int damaris_alloc(const char* varname, void** ptr)
 {
+	Environment::GetEventLogger()->LogInfo("damaris_alloc method started.");
+
 	return damaris_alloc_block(varname,0,ptr);
 }
 
 int damaris_alloc_block(const char* varname, int32_t block, void** ptr)
 {
+	Environment::GetEventLogger()->LogInfo("damaris_alloc_block method started.");
+
 	if(not Environment::Initialized()) {
 		return DAMARIS_NOT_INITIALIZED;
 	}
@@ -122,24 +134,32 @@ int damaris_alloc_block(const char* varname, int32_t block, void** ptr)
 
 int damaris_commit(const char* varname)
 {
+	Environment::GetEventLogger()->LogInfo("damaris_commit method started.");
+
 	int iteration = Environment::GetLastIteration();
 	return damaris_commit_block_iteration(varname,0,iteration);
 }
 
 int damaris_commit_block(const char* varname, int32_t block)
 {
+	Environment::GetEventLogger()->LogInfo("damaris_commit_block method started.");
+
 	int iteration = Environment::GetLastIteration();
 	return damaris_commit_block_iteration(varname,block,iteration);
 }
 
 int damaris_commit_iteration(const char* varname, int32_t iteration)
 {
+	Environment::GetEventLogger()->LogInfo("damaris_commit_iteration method started.");
+
 	return damaris_commit_block_iteration(varname,0,iteration);
 }
 
 int damaris_commit_block_iteration(const char* varname, 
 	int32_t block, int32_t iteration)
 {
+	Environment::GetEventLogger()->LogInfo("damaris_commit_block method II started.");
+
 	if(not Environment::Initialized()) {
 		return DAMARIS_NOT_INITIALIZED;
 	}
@@ -148,24 +168,32 @@ int damaris_commit_block_iteration(const char* varname,
 
 int damaris_clear(const char* varname)
 {
+	Environment::GetEventLogger()->LogInfo("damaris_clear method started.");
+
 	int iteration = Environment::GetLastIteration();
 	return damaris_clear_block_iteration(varname,0,iteration);
 }
 
 int damaris_clear_block(const char* varname, int32_t block)
 {
+	Environment::GetEventLogger()->LogInfo("damaris_clear_block method started.");
+
 	int iteration = Environment::GetLastIteration();
 	return damaris_clear_block_iteration(varname,block,iteration);
 }
 
 int damaris_clear_iteration(const char* varname, int32_t iteration)
 {
+	Environment::GetEventLogger()->LogInfo("damaris_clear_iteartion method II started.");
+
 	return damaris_clear_block_iteration(varname,0,iteration);
 }
 
 int damaris_clear_block_iteration(const char* varname, int32_t block, 
 	int32_t iteration)
 {
+	Environment::GetEventLogger()->LogInfo("damaris_clear_block_iteration method II started.");
+
 	if(not Environment::Initialized()) {
 		return DAMARIS_NOT_INITIALIZED;
 	}
@@ -175,6 +203,8 @@ int damaris_clear_block_iteration(const char* varname, int32_t block,
 
 int damaris_signal(const char* signal_name)
 {
+	Environment::GetEventLogger()->LogInfo("damaris_signal method started.");
+
 	if(not Environment::Initialized()) {
 		return DAMARIS_NOT_INITIALIZED;
 	}
@@ -184,6 +214,8 @@ int damaris_signal(const char* signal_name)
 
 int damaris_bind(const char* signal_name, signal_t sig)
 {
+	Environment::GetEventLogger()->LogInfo("damaris_bind method started.");
+
 	if(not Environment::Initialized()) {
 		return DAMARIS_NOT_INITIALIZED;
 	}
@@ -199,6 +231,8 @@ int damaris_bind(const char* signal_name, signal_t sig)
 int damaris_parameter_get(const char* name, 
 	void* buffer, unsigned int size)
 {
+	Environment::GetEventLogger()->LogInfo("damaris_parameter_get method started.");
+
 	if(not Environment::Initialized()) {
 		return DAMARIS_NOT_INITIALIZED;
 	}
@@ -210,6 +244,8 @@ int damaris_parameter_get(const char* name,
 int damaris_parameter_set(const char* name, 
 	const void* buffer, unsigned int size)
 {
+	Environment::GetEventLogger()->LogInfo("damaris_parameter_set method started.");
+
 	if(not Environment::Initialized()) {
 		return DAMARIS_NOT_INITIALIZED;
 	}
@@ -223,12 +259,16 @@ int damaris_parameter_set(const char* name,
 
 int damaris_set_position(const char* var_name, const int64_t* position)
 {
+	Environment::GetEventLogger()->LogInfo("damaris_set_position method started.");
+
 	return damaris_set_block_position(var_name,0,position);
 }
 
 int damaris_set_block_position(const char* var_name, int32_t block,
 	const int64_t* position)
 {
+	Environment::GetEventLogger()->LogInfo("damaris_set_block_position method started.");
+
 	if(not Environment::Initialized()) {
 		return DAMARIS_NOT_INITIALIZED;
 	}
@@ -238,6 +278,8 @@ int damaris_set_block_position(const char* var_name, int32_t block,
 
 int damaris_client_comm_get(MPI_Comm* comm)
 {
+	Environment::GetEventLogger()->LogInfo("damaris_client_comm_get method started.");
+
 	if(Environment::Initialized()) {
 		*comm = Environment::GetEntityComm();
 		return DAMARIS_OK;
@@ -248,6 +290,8 @@ int damaris_client_comm_get(MPI_Comm* comm)
 
 int damaris_end_iteration()
 {
+	Environment::GetEventLogger()->LogInfo("damaris_end_iteration method started.");
+
 	if(not Environment::Initialized()) {
 		return DAMARIS_NOT_INITIALIZED;
 	}
@@ -257,6 +301,8 @@ int damaris_end_iteration()
 
 int damaris_get_iteration(int* iteration)
 {
+	Environment::GetEventLogger()->LogInfo("damaris_get_iteration method started.");
+
 	if(not Environment::Initialized()) {
 		return DAMARIS_NOT_INITIALIZED;
 	}

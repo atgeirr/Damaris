@@ -28,6 +28,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "damaris/buffer/Buffer.hpp"
 #include "damaris/client/Client.hpp"
 #include "damaris/server/Server.hpp"
+#include "damaris/log/EventLogger.hpp"
 
 namespace damaris {
 	
@@ -75,6 +76,8 @@ private:
 		Not-null only if _isDedicatedCore_ or _isDedicatedNode is true. */
 	static shared_ptr<Buffer> _defaultBuffer_; /*!< Default buffer for
 					variables to allocate into. */
+	static shared_ptr<EventLogger> _eventLogger_; /*!< The single instance of the EventLogger
+					object used for logging damaris events. */
 	static bool _sharedStructuresOwner_; /*!< True if this process is
 			Responsible for freeing the shared memory. */
 	
@@ -349,6 +352,13 @@ public:
 	 */
 	static shared_ptr<Buffer> GetDefaultBuffer() {
 		return _defaultBuffer_;
+	}
+
+	/**
+    * Returns the singleton event logger.
+    */
+	static shared_ptr<EventLogger> GetEventLogger() {
+		return _eventLogger_;
 	}
 };
 
