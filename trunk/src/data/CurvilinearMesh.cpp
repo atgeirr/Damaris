@@ -81,58 +81,42 @@ bool CurvilinearMesh::ExposeVisItData(visit_handle* h,
 	int source, int iteration, int block) 
 {
 	DBG("In CurvilinearMesh::ExposeVisItData");
-	//const model::Mesh& model = GetModel();
 	// Allocates the VisIt handle
 	if(VisIt_CurvilinearMesh_alloc(h) != VISIT_ERROR) {
 		visit_handle hxc, hyc, hzc = VISIT_INVALID_HANDLE;
 		shared_ptr<Variable> vx, vy, vz;
 
-		//model::Mesh::coord_const_iterator it(model.coord().begin());
-
 		// Search for the X coordinate, checks that it has 1 dimenion
-		vx = GetCoord(0); //Manager<Variable>::Search(it->name());
+		vx = GetCoord(0); 
 		if(not vx) {
-			//CFGERROR("Undefined coordinate \""
-			//		<< it->name() << "\" for mesh \""
-			//		<< GetName() << "\"");
 			return false;
 		}
-		if(vx->GetLayout()->GetDimensions() != 3) {
+		if(vx->GetLayout()->GetDimensions() != GetNumCoord()) {
 			CFGERROR("Wrong number of dimensions for coordinate " 
 				<< vx->GetName());
 			return false;
 		}
-		//it++;
 
 		// Search for the Y coordinate, checks that it has 1 dimension
-		vy = GetCoord(1); //Manager<Variable>::Search(it->name());
+		vy = GetCoord(1);
 		if(not vy) {
-			//CFGERROR("Undefined coordinate \""
-			//	<< it->name() <<"\" for mesh \""
-			//	<< GetName() << "\"");
 			return false;
 		}
-		if(vy->GetLayout()->GetDimensions() != 3) {
+		if(vy->GetLayout()->GetDimensions() != GetNumCoord()) {
 			CFGERROR("Wrong number of dimensions for coordinate " 
-				<< vx->GetName());
+				<< vy->GetName());
 			return false;
 		}
-		//it++;
 
 		// Search for the Z coordinate if there is one, 
-		// checks that it has 1 dimension
-		//if(model.coord().size() == 3) {
 		if(GetNumCoord() == 3) {
-			vz = GetCoord(2); //Manager<Variable>::Search(it->name());
+			vz = GetCoord(2);
 			if(not vz) {
-				//ERROR("Undefined coordinate \"" 
-				//	<< it->name() << "\" for mesh \""
-				//	<< GetName() << "\"");
 				return false;
 			}
-			if(vz->GetLayout()->GetDimensions() != 3) {
+			if(vz->GetLayout()->GetDimensions() != GetNumCoord()) {
 				CFGERROR("Wrong number of dimensions for coordinate " 
-					<< vx->GetName());
+					<< vz->GetName());
 				return false;
 			}
 		}
@@ -151,8 +135,9 @@ bool CurvilinearMesh::ExposeVisItData(visit_handle* h,
 					1 + c->GetEndIndex(0) - c->GetStartIndex(0);
 				cmesh_dims[1] = 
 					1 + c->GetEndIndex(1) - c->GetStartIndex(1);
-				cmesh_dims[2] = 
-					1 + c->GetEndIndex(2) - c->GetStartIndex(2);
+				if(GetNumCoord() == 3)
+					cmesh_dims[2] = 
+						1 + c->GetEndIndex(2) - c->GetStartIndex(2);
 			} else {
 				ERROR("While allocating data handle");
 				VisIt_CurvilinearMesh_free(*h);
@@ -172,7 +157,7 @@ bool CurvilinearMesh::ExposeVisItData(visit_handle* h,
 				c->FillVisItDataHandle(hyc);
 				if((cmesh_dims[0] != 1 + c->GetEndIndex(0) - c->GetStartIndex(0))
 				|| (cmesh_dims[1] != 1 + c->GetEndIndex(1) - c->GetStartIndex(1))
-				|| (cmesh_dims[2] != 1 + c->GetEndIndex(2) - c->GetStartIndex(2))) {
+				|| ( GetNumCoord() == 3 && (cmesh_dims[2] != 1 + c->GetEndIndex(2) - c->GetStartIndex(2)))) {
 					ERROR("Unmatching chunk sizes between coordinate variables");
 					VisIt_VariableData_free(hxc);
 					VisIt_VariableData_free(hyc);
@@ -193,7 +178,7 @@ bool CurvilinearMesh::ExposeVisItData(visit_handle* h,
 			*h = VISIT_INVALID_HANDLE;
 			return false;
 		}
-		
+
 		// Accessing chunk for Z coordinate we we need to
 		if(GetNumCoord() == 3) {
 			c = vz->GetBlock(source,iteration,block);
@@ -202,7 +187,7 @@ bool CurvilinearMesh::ExposeVisItData(visit_handle* h,
 					c->FillVisItDataHandle(hzc);
 					if((cmesh_dims[0] != 1 + c->GetEndIndex(0) - c->GetStartIndex(0))
 					|| (cmesh_dims[1] != 1 + c->GetEndIndex(1) - c->GetStartIndex(1))
-					|| (cmesh_dims[2] != 1 + c->GetEndIndex(2) - c->GetStartIndex(2))) {
+					|| ( GetNumCoord() == 3 && (cmesh_dims[2] != 1 + c->GetEndIndex(2) - c->GetStartIndex(2)))) {
 						ERROR("Unmatching chunk sizes between coordinate variables");
 						VisIt_VariableData_free(hxc);
 						VisIt_VariableData_free(hyc);
