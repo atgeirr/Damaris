@@ -25,6 +25,10 @@ target_link_libraries(TestActionManager damaris ${DEP_LIBRARIES} ${CPPUNIT_LIBRA
 add_executable(TestAction TestAction.cpp)
 target_link_libraries(TestAction damaris ${DEP_LIBRARIES} ${CPPUNIT_LIBRARIES})
 
+add_executable(TestEventLogger TestEventLogger.cpp)
+target_link_libraries(TestEventLogger damaris ${DEP_LIBRARIES} ${CPPUNIT_LIBRARIES})
+
+
 add_test(NAME "TestDataSpace"       COMMAND ${DAMARIS_SOURCE_DIR}/test/TestDataSpace)
 add_test(NAME "TestVariableManager" COMMAND ${DAMARIS_SOURCE_DIR}/test/TestVariableManager)
 add_test(NAME "TestLayoutManager"   COMMAND ${DAMARIS_SOURCE_DIR}/test/TestLayoutManager)
@@ -34,3 +38,4 @@ add_test(NAME "TestBuffer"          COMMAND mpirun -np 2 ${DAMARIS_SOURCE_DIR}/t
 add_test(NAME "TestVariable"        COMMAND mpirun -np 3 ${DAMARIS_SOURCE_DIR}/test/TestVariable)
 add_test(NAME "TestActionManager"   COMMAND mpirun -np 1 ${DAMARIS_SOURCE_DIR}/test/TestActionManager)
 add_test(NAME "TestAction"          COMMAND mpirun -np 3 ${DAMARIS_SOURCE_DIR}/test/TestAction)
+add_test(NAME "TestEventLogger"     COMMAND ${DAMARIS_SOURCE_DIR}/test/TestEventLogger)

@@ -256,7 +256,7 @@ if(ENABLE_EXAMPLES)
 endif(ENABLE_EXAMPLES)
 
 if(CPPUNIT_FOUND AND ENABLE_TESTS)
-        message(STATUS "Unit tests are enabled, will be built")
+    message(STATUS "Unit tests are enabled, will be built")
 	add_subdirectory (test)
 endif(CPPUNIT_FOUND AND ENABLE_TESTS)
 
@@ -269,3 +269,4 @@ install(DIRECTORY "include/damaris" DESTINATION include)
 if(CMAKE_Fortran_COMPILER)
 	install(FILES "${CMAKE_BINARY_DIR}/lib/damaris.mod" DESTINATION include)
 endif(CMAKE_Fortran_COMPILER)
+
