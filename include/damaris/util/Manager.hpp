@@ -178,10 +178,11 @@ class Manager {
 	static bool Add(const shared_ptr<SUBCLASS>& t)
 	{
 		if(not (bool)t) return false;
-
+		int32_t backup = t->id_;
+		t->id_ = GetNumObjects();
 		std::pair<typename ObjectSet::iterator,bool> ret
-			= _objects_.insert(boost::shared_ptr<T>(t));
-		if(ret.second) t->id_ = GetNumObjects()-1;
+				= _objects_.insert(boost::shared_ptr<T>(t));
+		if(!ret.second) t->id_ = backup;
 
 		return ret.second;
 	}
