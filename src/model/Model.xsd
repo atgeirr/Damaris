@@ -332,7 +332,7 @@
 			<xs:element name="actions" type="mdl:Actions" maxOccurs="1"/>
 			<xs:element name="python" type="mdl:PythonParam" maxOccurs="1" minOccurs="0"/>
 			<xs:element name="visit" type="mdl:VisitParam" maxOccurs="1" minOccurs="0"/>
-			<xs:element name="log" type="mdl:Log" maxOccurs="1" minOccurs="0"/>
+			<xs:element name="log" type="mdl:Log" maxOccurs="1" minOccurs="1"/>
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string" use="required"/>
 		<xs:attribute name="language" type="mdl:Language" use="optional" default="unknown"/>
