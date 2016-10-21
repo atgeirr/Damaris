@@ -227,7 +227,7 @@ else(CMAKE_Fortran_COMPILER)
 endif(CMAKE_Fortran_COMPILER)
 
 
-list(APPEND DEP_LIBRARIES "stdc++" "rt" "dl")
+list(APPEND DEP_LIBRARIES "stdc++" "rt" "dl" "pthread")
 
 
 function(add_executable TARGET) 
