@@ -76,7 +76,6 @@ friend class Deleter<Server>;
 	void OnCallAction(const shared_ptr<Channel>& ch, int source);
 	void OnBcastAction(const shared_ptr<Channel>& ch, int source);
 	void OnWrite(const shared_ptr<Channel>& ch, int source);
-	//orc: TODO
 	void OnRemoteWrite(const shared_ptr<Channel>& ch, int source);
 	void OnCommit(const shared_ptr<Channel>& ch, int source);
 	void OnClear(const shared_ptr<Channel>& ch, int source);

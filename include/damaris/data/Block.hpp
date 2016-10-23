@@ -56,6 +56,8 @@ class Block //: public ENABLE_SHARED_FROM_THIS(Block)
 	weak_ptr<Variable> variable_; 	/*!< variable owning this block */
 	std::vector<int64_t> lower_bounds_;	/*!< list of lower bounds */
 	std::vector<int64_t> upper_bounds_; /*!< list of upper bounds */
+	std::vector<size_t> global_dims_; /*!< global dimensions at the moment of creation */
+	std::vector<std::pair<size_t,size_t> > ghosts_; /*!< Size of ghost zones */
 	DataSpace<Buffer> dataspace_;	/*!< Dataspace holding the data */
 	Handle handle_;			/*!< Handle to the data */
 	bool read_only_;		/*!< true if the Block should not be
@@ -180,13 +182,37 @@ class Block //: public ENABLE_SHARED_FROM_THIS(Block)
 	}
 
 	/**
+	 * Returns the ghost zones along the desired dimension.
+	 */
+	virtual std::pair<size_t,size_t> GetGhost(unsigned int i) const {
+		if(i >= ghosts_.size()) {
+			return std::make_pair<size_t,size_t>(0,0);
+		}
+		return ghosts_[i];
+	}
+
+	/**
+	 * Returns the global extent along the desired dimension
+	 * at the moment of creation.
+	 */
+	virtual size_t GetGlobalExtent(unsigned int i) const {
+		return global_dims_[i];
+	}
+
+	/**
 	 * Gives the number of items contained in the Block. 
 	 */
-	virtual int NbrOfItems() const {
+	virtual int NbrOfItems(bool withGhost=true) const {
 		if(upper_bounds_.size() == 0) return 0;
 		int result = 1;
 		for(unsigned int i = 0; i < upper_bounds_.size(); i++) {
-			result *= (upper_bounds_[i] - lower_bounds_[i] + 1);
+			if(withGhost) {
+				result *= (upper_bounds_[i] - lower_bounds_[i] + 1);
+			} else {
+				result *=
+					(upper_bounds_[i] - lower_bounds_[i] + 1
+					- ghosts_[i].first - ghosts_[i].second);
+			}
 		}
 		return result;
 	}

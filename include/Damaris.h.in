@@ -21,6 +21,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <mpi.h>
 
 #cmakedefine HAVE_VISIT_ENABLED
+#cmakedefine HAVE_HDF5_ENABLED
 
 #ifdef __cplusplus
 extern "C" {

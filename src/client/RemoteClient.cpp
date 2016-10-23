@@ -76,6 +76,9 @@ int RemoteClient::Write(const std::string & varname,
 		for(int i = 0; i < rwm.dim_; i++) {
 			rwm.lbounds_[i] = 0;
 			rwm.ubounds_[i] = l->GetExtentAlong(i)-1;
+			rwm.gbounds_[i] = l->GetGlobalExtentAlong(i);
+			rwm.ghosts_[2*i]   = l->GetGhostAlong(i).first;
+			rwm.ghosts_[2*i+1] = l->GetGhostAlong(i).second;
 		}
 
 		err = ch2server_->AsyncSend(DAMARIS_SIG_BODY,&rwm,sizeof(rwm));
@@ -176,6 +179,9 @@ int RemoteClient::Commit(const std::string & varname,
 	for(int i = 0; i < rwm.dim_; i++) {
 		rwm.lbounds_[i] = b->GetStartIndex(i);
 		rwm.ubounds_[i] = b->GetEndIndex(i);
+		rwm.gbounds_[i] = b->GetGlobalExtent(i);
+		rwm.ghosts_[2*i]   = b->GetGhost(i).first;
+		rwm.ghosts_[2*i+1] = b->GetGhost(i).second;
 	}
 
 	err = ch2server_->AsyncSend(DAMARIS_SIG_BODY,&rwm,sizeof(rwm));

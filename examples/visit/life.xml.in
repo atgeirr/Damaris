@@ -2,7 +2,7 @@
 <simulation name="life" language="c" xmlns="http://damaris.gforge.inria.fr/damaris/model">
 	<architecture>
 		<domains count="1"/>
-		<dedicated cores="1" nodes="0" />
+		<dedicated cores="0" nodes="0" />
 		<buffer name="buffer" size="200000" enabled="false"/>
 		<queue  name="queue" size="100" />
 	</architecture>
@@ -11,10 +11,12 @@
 		<parameter name="NCOL" type="int" value="96" />
 		<parameter name="size" type="int" value="2" />
 
-		<layout name="rmeshX" type="float" dimensions="1+NCOL" />
-		<layout name="rmeshY" type="float" dimensions="1+NROW/size" />
+		<layout name="rmeshX" type="float" dimensions="1+NCOL" global="1+NCOL" ghosts="0:0" />
+		<layout name="rmeshY" type="float" dimensions="1+NROW/size" 
+						   global="1+NROW" ghosts="0:0" />
 
-		<layout name="cells" type="int" dimensions="NCOL,NROW/size" />
+		<layout name="cells" type="int" dimensions="NCOL,NROW/size" 
+						global="NCOL,NROW" ghosts="0:0,0:0" />
 
 		<mesh name="mesh2d" type="rectilinear" topology="2">
 			<coord name="coordinates/x2d" unit="cm" label="Width"/>
@@ -27,14 +29,19 @@
 		</group>
 	
 		<group name="life">
-			<variable name="cells" type="scalar" layout="cells" mesh="mesh2d" centering="zonal" />
+			<variable name="cells" type="scalar" layout="cells" mesh="mesh2d"
+				  centering="zonal" store="MyStore" />
 		</group>
 	</data>
 	<storage>
+		<store name="MyStore" type="null">
+			<option key="myKey">MyValue</option>
+		</store>
 	</storage>
 	<actions>
 	</actions>
 	<visit>
 		<path>@VisIt_ROOT@</path>
 	</visit>
+	<log FileName="log/damaris" RotationSize="5" LogFormat="[%TimeStamp%]: %Message%" LogLevel="info" />
 </simulation>

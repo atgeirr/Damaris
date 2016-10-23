@@ -23,6 +23,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "env/Environment.hpp"
 #include "action/ActionManager.hpp"
 #include "data/VariableManager.hpp"
+#include "storage/StorageManager.hpp"
 #include "server/Server.hpp"
 
 #ifdef HAVE_VISIT_ENABLED
@@ -127,15 +128,18 @@ void Server::EndOfIterationCallback(int tag, int source,
 				BIND(&Server::OnHeader,this,_1,_2,_3,_4));
 	}
 
+	int iteration = Environment::GetLastIteration()-1;
+
 #ifdef HAVE_VISIT_ENABLED
 	if(Environment::GetModel()->visit().present()) {
-		int iteration = Environment::GetLastIteration()-1;
 		int frequency = VisItListener::UpdateFrequency();
 		if((frequency > 0) && (iteration % frequency == 0)) {
 			VisItListener::Update();
 		}
 	}
 #endif
+
+	StorageManager::Update(iteration);
 }
 
 void Server::OnHeader(int UNUSED(tag), int rk,
@@ -261,6 +265,8 @@ void Server::OnWrite(const shared_ptr<Channel>& ch, int source)
 	shared_ptr<Block> b = v->Retrieve(source, iteration, bid, 
 			std::vector<int64_t>(wr.lbounds_,wr.lbounds_+wr.dim_),
 			std::vector<int64_t>(wr.ubounds_,wr.ubounds_+wr.dim_),
+			std::vector<int64_t>(wr.gbounds_,wr.gbounds_+wr.dim_),
+			std::vector<size_t>(wr.ghosts_,wr.ghosts_+(2*wr.dim_)),
 			h);
 	if(b) { 
 		b->GainDataOwnership(); 
@@ -285,20 +291,17 @@ void Server::OnRemoteWrite(const shared_ptr<Channel>& ch, int source)
 	bool blocking = true ;
 	shared_ptr<Block> b 
 		= v->AllocateFixedSize(source, iteration, block,
-				rwm.lbounds_, rwm.ubounds_, blocking);
+				std::vector<int64_t>(rwm.lbounds_,rwm.lbounds_+rwm.dim_), 
+				std::vector<int64_t>(rwm.ubounds_,rwm.ubounds_+rwm.dim_), 
+				std::vector<int64_t>(rwm.gbounds_,rwm.gbounds_+rwm.dim_),
+				std::vector<size_t>(rwm.ghosts_,rwm.ghosts_+(2*rwm.dim_)),
+				blocking);
 
 	if(not b) {
 		//errorOccured_ = 1;
 		ERROR("Could not allocated block for variable on dedicated node "<< v->GetName());
 		return ;
-//DAMARIS_ALLOCATION_ERROR;
 	}
-
-/*	for(int i =0; i < rwm.dim_; i++) {
-		b->SetStartIndex(i, rwm.lbounds_[i]);
-		b->SetEndIndex(i, rwm.ubounds_[i]);
-        }
-*/
 
 	DataSpace<Buffer> ds = b->GetDataSpace();
 
@@ -331,6 +334,8 @@ void Server::OnCommit(const shared_ptr<Channel>& ch, int source)
 	shared_ptr<Block> b = v->Retrieve(source, iteration, bid, 
 			std::vector<int64_t>(wr.lbounds_,wr.lbounds_+wr.dim_),
 			std::vector<int64_t>(wr.ubounds_,wr.ubounds_+wr.dim_),
+			std::vector<int64_t>(wr.gbounds_,wr.gbounds_+wr.dim_),
+			std::vector<size_t>(wr.ghosts_,wr.ghosts_+(2*wr.dim_)),
 			h);
 	
 	if(not b) {

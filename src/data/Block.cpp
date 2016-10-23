@@ -48,11 +48,16 @@ shared_ptr<Block> Block::New(int source, int iteration, int id,
 	unsigned int d = layout->GetDimensions();
 	block->lower_bounds_.resize(d);
 	block->upper_bounds_.resize(d);
+	block->global_dims_.resize(d);
+	block->ghosts_.resize(d);
 
 	for(unsigned int i = 0; i < d; i++) {
 		block->lower_bounds_[i] = 0;
 		block->upper_bounds_[i] = layout->GetExtentAlong(i)-1;
+		block->global_dims_[i]  = layout->GetGlobalExtentAlong(i);
+		block->ghosts_[i] 	= layout->GetGhostAlong(i);
 	}
+
 	return block;
 }
 

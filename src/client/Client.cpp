@@ -88,6 +88,9 @@ int Client::Write(const std::string & varname,
 	for(int i = 0; i < wm.dim_; i++) {
 		wm.lbounds_[i] = b->GetStartIndex(i);
 		wm.ubounds_[i] = b->GetEndIndex(i);
+		wm.gbounds_[i] = b->GetGlobalExtent(i);
+		wm.ghosts_[2*i]   = b->GetGhost(i).first;
+		wm.ghosts_[2*i+1] = b->GetGhost(i).second;
 	}
 	
 	err = ch2server_->AsyncSend(DAMARIS_SIG_BODY,&wm,sizeof(wm));
@@ -201,6 +204,9 @@ int Client::Commit(const std::string & varname,
 	for(int i = 0; i < m.dim_; i++) {
 		m.lbounds_[i] = b->GetStartIndex(i);
 		m.ubounds_[i] = b->GetEndIndex(i);
+		m.gbounds_[i] = b->GetGlobalExtent(i);
+		m.ghosts_[2*i]   = b->GetGhost(i).first;
+		m.ghosts_[2*i+1] = b->GetGhost(i).second;
 	}
 	
 	err = ch2server_->AsyncSend(DAMARIS_SIG_BODY,&m,sizeof(m));

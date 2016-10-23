@@ -201,11 +201,14 @@ class Variable : public ENABLE_SHARED_FROM_THIS(Variable),
 	/**
 	 * Same as Allocate but tries to allocate a block that has
 	 * fixed size (not according to layout). Intended use for dedicated nodes.
-		 * \see Allocate
-		 */
+	 * \see Allocate
+	 */
 
 	shared_ptr<Block> AllocateFixedSize(int source, int iteration, int bid,
-						const int64_t* lbounds, const int64_t* ubounds,
+						const std::vector<int64_t>& lbounds, 
+						const std::vector<int64_t>& ubounds,
+						const std::vector<int64_t>& gbounds,
+						const std::vector<size_t>& ghosts,
 						bool blocking=false);
 	/**
 	 * Same as Allocate but tries to allocate a memory region that is
@@ -245,11 +248,15 @@ class Variable : public ENABLE_SHARED_FROM_THIS(Variable),
 	 * \param[in] bid : domain id of the block.
 	 * \param[in] lbounds : lower bounds of the block.
 	 * \param[in] ubounds : upper bounds of the block.
+	 * \param[in] gbounds : global bounds of the block.
+	 * \param[in] ghosts : ghost zones of the block.
 	 * \param[in] h : handle to get the address in memory.
 	 */
 	shared_ptr<Block> Retrieve(int source, int iteration, int bid,
 					const std::vector<int64_t>& lbounds,
 					const std::vector<int64_t>& ubounds,
+					const std::vector<int64_t>& gbounds,
+					const std::vector<size_t>& ghosts,
 					const Handle& h);
 	
 	/**

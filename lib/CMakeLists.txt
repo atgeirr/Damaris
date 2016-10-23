@@ -35,6 +35,8 @@ set(DAMARIS_SRC
 	${DAMARIS_SOURCE_DIR}/src/model/Model.cpp
 	${DAMARIS_SOURCE_DIR}/src/model/BcastXML.cpp
 	${DAMARIS_SOURCE_DIR}/src/log/EventLogger.cpp
+	${DAMARIS_SOURCE_DIR}/src/storage/StorageManager.cpp
+	${DAMARIS_SOURCE_DIR}/src/storage/NullStore.cpp
 	)
 
 if(VisIt_FOUND)
@@ -43,6 +45,12 @@ set(DAMARIS_VISIT_SRC
 	)
 endif(VisIt_FOUND)
 
+if(HDF5_FOUND)
+set(DAMARIS_HDF5_SRC
+	${DAMARIS_SOURCE_DIR}/src/storage/HDF5Store.cpp
+	)
+endif(HDF5_FOUND)
+
 if(CMAKE_Fortran_COMPILER)
 set(DAMARIS_FORTRAN_MODULE 
 	${DAMARIS_SOURCE_DIR}/src/main/Damaris.F90
@@ -50,7 +58,8 @@ set(DAMARIS_FORTRAN_MODULE
 endif(CMAKE_Fortran_COMPILER)
 
 add_library (damaris 	${DAMARIS_SRC} 
-			${DAMARIS_VISIT_SRC} 
+			${DAMARIS_VISIT_SRC}
+#			${DAMARIS_HDF5_SRC} 
 			${DAMARIS_FORTRAN_MODULE})
 
 if(NOT (MODEL_PRESENT EQUAL 1))

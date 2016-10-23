@@ -181,7 +181,11 @@ shared_ptr<Block> Variable::Allocate(int source, int iteration, int bid,
 }
 
 shared_ptr<Block> Variable::AllocateFixedSize(int source, int iteration, int bid,
-			const int64_t* lbounds, const int64_t* ubounds, bool blocking)
+			const std::vector<int64_t>& lbounds,
+			const std::vector<int64_t>& ubounds, 
+			const std::vector<int64_t>& gbounds,
+			const std::vector<size_t>& ghosts, 
+			bool blocking)
 {
 	if(not buffer_) {
 		GetBuffer();
@@ -211,6 +215,8 @@ shared_ptr<Block> Variable::AllocateFixedSize(int source, int iteration, int bid
 	for(unsigned int i=0; i<GetLayout()->GetDimensions(); i++) {
 		block->SetStartIndex(i,lbounds[i]);
 		block->SetEndIndex(i,ubounds[i]);
+		block->global_dims_[i] = gbounds[i];
+		block->ghosts_[i] = std::make_pair(ghosts[2*i],ghosts[2*i+1]);
 	}
 
 	DataSpace<Buffer> ds;
@@ -339,6 +345,8 @@ shared_ptr<Block> Variable::Retrieve(int source, int iteration, int bid,
 shared_ptr<Block> Variable::Retrieve(int source, int iteration, int bid,
 					const std::vector<int64_t>& lbounds,
 					const std::vector<int64_t>& ubounds,
+					const std::vector<int64_t>& gbounds,
+					const std::vector<size_t>&  ghosts,
 					const Handle& h)
 {
 	if(lbounds.size() != GetLayout()->GetDimensions()
@@ -363,6 +371,8 @@ shared_ptr<Block> Variable::Retrieve(int source, int iteration, int bid,
 	for(int i = 0; i < b->GetDimensions(); i++) {
 		b->SetStartIndex(i,lbounds[i]);
 		b->SetEndIndex(i,ubounds[i]);
+		b->global_dims_[i] = gbounds[i];
+		b->ghosts_[i] = std::make_pair(ghosts[2*i],ghosts[2*i+1]);
 	}
 	
 	return b;

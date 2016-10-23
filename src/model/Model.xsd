@@ -20,6 +20,15 @@
 	</xs:complexType>
 <!-- End deprecated -->
 
+        <xs:complexType name="KeyVal">
+		<xs:simpleContent>
+		<xs:extension base="xs:string">
+			<xs:attribute name="key" type="xs:string" />
+		</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+
 	<xs:complexType name="Dedicated">
 		<xs:attribute name="cores" type="xs:unsignedInt" use="optional" default="0" />
 		<xs:attribute name="nodes" type="xs:unsignedInt" use="optional" default="0"/>
@@ -97,11 +106,13 @@
 	<xs:complexType name="Layout">
 		<xs:simpleContent>
 		<xs:extension base="xs:string">
-			<xs:attribute name="name"       type="xs:string" use="required"/>
-			<xs:attribute name="type"       type="mdl:Type" use="required"/>
-			<xs:attribute name="dimensions" type="xs:string" use="required" />
-			<xs:attribute name="language"   type="mdl:Language" use="optional" default="unknown"/>
-			<xs:attribute name="visualizable" type="xs:boolean" use="optional" default="true"/>
+			<xs:attribute name="name"         type="xs:string" use="required"/>
+			<xs:attribute name="type"         type="mdl:Type"  use="required"/>
+			<xs:attribute name="dimensions"   type="xs:string" use="required" />
+			<xs:attribute name="global"	  type="xs:string"    use="optional" default="#"/>
+			<xs:attribute name="ghosts"	  type="xs:string"    use="optional" default="#"/>
+			<xs:attribute name="language"     type="mdl:Language" use="optional" default="unknown"/>
+			<xs:attribute name="visualizable" type="xs:boolean"   use="optional" default="true"/>
 		</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
@@ -143,6 +154,7 @@
 			<xs:attribute name="centering" type="mdl:VarCentering" use="optional" default="zonal"/>
 			<xs:attribute name="visualizable" type="xs:boolean" use="optional" default="true"/>
 			<xs:attribute name="time-varying" type="xs:boolean" use="optional" default="true"/>
+			<xs:attribute name="store"	type="xs:string" use="optional" default="#"/>
 		</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
@@ -160,6 +172,7 @@
 		</xs:sequence>
 		<xs:attribute name="name"    type="xs:string"  use="required"/>
 		<xs:attribute name="enabled" type="xs:boolean" use="optional" default="true" />
+		<xs:attribute name="store"   type="xs:string"  use="optional" default="#"/>
 	</xs:complexType>
 
 	<!-- Parameter node -->
@@ -298,9 +311,33 @@
 		</xs:sequence>
 	</xs:complexType>
 
+	<!-- Store type node -->
+	<xs:simpleType name="StoreType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="null" />
+			<xs:enumeration value="HDF5" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<!-- Store node -->
+	<xs:complexType name="Store">
+		<xs:sequence>
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="option" type="mdl:KeyVal"/>
+		</xs:choice>
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string" use="required" />
+		<xs:attribute name="type" type="mdl:StoreType" use="required" />
+		<xs:attribute name="frequency" type="xs:unsignedInt" use="optional" default="1" />
+	</xs:complexType>
+
 	<!-- Storage node -->
 	<xs:complexType name="Storage">
-	<xs:attribute name="basename" type="xs:string" default="."/>
+		<xs:sequence>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="store" type="mdl:Store"/>
+			</xs:choice>
+		</xs:sequence>
 	</xs:complexType>
 
 	<!-- LogDepth Type -->

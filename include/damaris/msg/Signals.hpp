@@ -85,6 +85,8 @@ struct WriteMessage {
 	int64_t dim_; /*!< number of dimensions. */
 	int64_t ubounds_[MAX_DIMENSIONS]; /*!< upper bounds of the block. */
 	int64_t lbounds_[MAX_DIMENSIONS]; /*!< lower bounds of the block. */
+	int64_t gbounds_[MAX_DIMENSIONS]; /*!< global bounds at time of creation. */
+	size_t  ghosts_[2*MAX_DIMENSIONS]; /*!< ghost zones */
 	Handle handle_; /*!< Handle in shared memory where the data is. */
 };
 
@@ -100,6 +102,8 @@ struct RemoteWriteMessage{
 	int64_t dim_; /*!< number of dimensions. */
 	int64_t ubounds_[MAX_DIMENSIONS]; /*!< upper bounds of the block. */
 	int64_t lbounds_[MAX_DIMENSIONS]; /*!< lower bounds of the block. */
+	int64_t gbounds_[MAX_DIMENSIONS]; /*!< global bounds at time of creation. */
+	size_t  ghosts_[2*MAX_DIMENSIONS]; /*!< ghost zones */
 	size_t size_; //size of the data that will sent to dedicated node
 };
 

@@ -52,6 +52,8 @@ class BoxLayout : public Layout,
 			  
 private:
 	std::vector<int> extents_;	/*!< Extents along each dimension. */
+	std::vector<int> global_extents_; /*!< Global extents along each dimension. */
+	std::vector<std::pair<size_t,size_t> > ghosts_; /*!< Ghost zones along each dimension. */
 
 	typedef Calc<std::string::const_iterator,
 			ParameterManager::ParameterMap<int> > CalcType;
@@ -118,15 +120,43 @@ private:
 		else
 			return 1;
 	}
+
+	/**
+	 * \see Layout::GetGlobalExtentAlong
+	 */
+	virtual size_t GetGlobalExtentAlong(unsigned int dim) const {
+		if(dim < GetDimensions())
+			return global_extents_[dim];
+		else
+			return 1;
+	}
+
+	/**
+	 * \see Layout::GetGhostAlong
+	 */
+	virtual std::pair<size_t,size_t> GetGhostAlong(unsigned int dim) const {
+		if(dim < GetDimensions())
+			return ghosts_[dim];
+		else
+			return std::make_pair<size_t,size_t>(0,0);
+	}
 	
 	/**
 	 * Get the size (in bytes) of the memory required to store a block
 	 * following this layout.
 	 */
-	virtual size_t GetRequiredMemory() const {
+	virtual size_t GetRequiredMemory(bool withGhost=true) const {
 		size_t s = TypeSize(GetModel().type());
 		for(unsigned int i=0; i<extents_.size(); i++) {
-			s *= GetExtentAlong(i);
+			if(withGhost) {
+				s *= GetExtentAlong(i);
+			} else {
+				size_t e = GetExtentAlong(i);
+				std::pair<size_t,size_t> g = GetGhostAlong(i);
+				e -= g.first;
+				e -= g.second;
+				s *= e;
+			}
 		}
 		return s;
 	}

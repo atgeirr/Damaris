@@ -25,6 +25,7 @@
 #include "data/ParameterManager.hpp"
 #include "action/ActionManager.hpp"
 #include "data/VariableManager.hpp"
+#include "storage/StorageManager.hpp"
 #include "buffer/Mode.hpp"
 
 #ifdef HAVE_VISIT_ENABLED
@@ -213,12 +214,12 @@ namespace damaris {
 				MPI_INT, MPI_SUM, Environment::GetEntityComm());
 
 		Environment::StartNextIteration();
+		int iteration = Environment::GetLastIteration()-1;
 
 #ifdef HAVE_VISIT_ENABLED
 		if(Environment::GetModel()->visit().present()) {
 			if(errorOccured_ == 0) {
 
-				int iteration = Environment::GetLastIteration()-1;
 				int frequency = VisItListener::UpdateFrequency();
 				if((frequency > 0) && (iteration % frequency == 0)) {
 					VisItListener::Update();
@@ -232,7 +233,8 @@ namespace damaris {
 		}
 	}
 #endif
-	
+	StorageManager::Update(iteration);
+
 	errorOccured_ = 0;
 	return DAMARIS_OK;
 }

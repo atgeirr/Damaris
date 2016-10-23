@@ -51,6 +51,10 @@ if(NOT DEFINED VisIt_ROOT)
     set(VisIt_ROOT ${EXTERNAL_ROOT}/visit) # optional
 endif(NOT DEFINED VisIt_ROOT)
 
+if(NOT DEFINED HDF5_ROOT)
+    set(HDF5_ROOT ${EXTERNAL_ROOT}) # optional
+endif(NOT DEFINED HDF5_ROOT)
+
 if(NOT DEFINED CppUnit_ROOT)
     set(CppUnit_ROOT ${EXTERNAL_ROOT}) # optional
 endif(NOT DEFINED CppUnit_ROOT)
@@ -199,6 +203,19 @@ else(VisIt_FOUND)
         message(STATUS "VisIt not found")
     endif(DEFINED VISIT_INCLUDE)
 endif(VisIt_FOUND)
+
+#----------------------------------------------------------------------------#
+# Set everything related to HDF5
+#----------------------------------------------------------------------------#
+find_package(HDF5)
+if(HDF5_FOUND)
+	message(STATUS "HDF5 found")
+	set(HAVE_HDF5_ENABLED 1)
+	list(APPEND DEP_LIBRARIES ${HDF5_LIBRARIES})
+	include_directories(${HDF5_INCLUDE_DIRS})
+else(HDF5_FOUND)
+	message(STATUS "HDF5 not found")
+endif(HDF5_FOUND)
 
 #----------------------------------------------------------------------------#
 # Set everything related to CppUnit 

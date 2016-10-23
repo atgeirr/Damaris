@@ -90,11 +90,25 @@ class Layout
 	 * \param[in] dim : dimension along which to get the extent.
 	 */
 	virtual size_t GetExtentAlong(unsigned int dim) const = 0;
+
+	/**
+	 * Returns the global extent along a given dimension.
+	 *
+	 * \param[in] dim : dimension along which to get the extent.
+	 */
+	virtual size_t GetGlobalExtentAlong(unsigned int dim) const = 0;
+
+	/**
+	 * Returns the pair of ghost regions along a given dimension.
+	 *
+	 * \param[in] dim : dimension along which to get the ghost.
+	 */
+	virtual std::pair<size_t,size_t> GetGhostAlong(unsigned int dim) const = 0;
 	
 	/**
 	 * Returns the size in memory of a dataset following this layout.
 	 */
-	virtual size_t GetRequiredMemory() const = 0;
+	virtual size_t GetRequiredMemory(bool includeGhost=true) const = 0;
 		
 }; // class Layout
 

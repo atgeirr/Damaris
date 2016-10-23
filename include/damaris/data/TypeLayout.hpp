@@ -81,11 +81,25 @@ class TypeLayout : public Layout,
 	virtual size_t GetExtentAlong(unsigned int UNUSED(dim)) const {
 		return 1;
 	}
+
+	/**
+	 * \see Layout::GetGlobalExtentAlong
+	 */
+	virtual size_t GetGlobalExtentAlong(unsigned int dim) const {
+		return 1;
+	}
+
+	/**
+	 * \see Layout::GetGhostAlong
+	 */
+	virtual std::pair<size_t,size_t> GetGhostAlong(unsigned int dim) const {
+		return std::make_pair<size_t,size_t>(0,0);
+	}
 	
 	/**
 	 * \see Layout::GetRequiredMemory()
 	 */
-	virtual size_t GetRequiredMemory() const {
+	virtual size_t GetRequiredMemory(bool withGhost=true) const {
 		return TypeSize(GetModel());
 	}
 		
