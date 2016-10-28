@@ -95,6 +95,13 @@ class Mesh : public Configurable<model::Mesh> {
 			return GetModel().coord().size();
 		}
 
+		/**
+		 * Returns the topological dimension.
+		 */
+		unsigned int GetTopology() const {
+			return GetModel().topology();
+		}
+
 #ifdef HAVE_VISIT_ENABLED
 		/**
 		 * Fills visit handle with metadata related to the Mesh.

@@ -91,7 +91,7 @@ bool CurvilinearMesh::ExposeVisItData(visit_handle* h,
 		if(not vx) {
 			return false;
 		}
-		if(vx->GetLayout()->GetDimensions() != GetNumCoord()) {
+		if(vx->GetLayout()->GetDimensions() != GetTopology()) {
 			CFGERROR("Wrong number of dimensions for coordinate " 
 				<< vx->GetName());
 			return false;
@@ -102,7 +102,7 @@ bool CurvilinearMesh::ExposeVisItData(visit_handle* h,
 		if(not vy) {
 			return false;
 		}
-		if(vy->GetLayout()->GetDimensions() != GetNumCoord()) {
+		if(vy->GetLayout()->GetDimensions() != GetTopology()) {
 			CFGERROR("Wrong number of dimensions for coordinate " 
 				<< vy->GetName());
 			return false;
@@ -112,9 +112,10 @@ bool CurvilinearMesh::ExposeVisItData(visit_handle* h,
 		if(GetNumCoord() == 3) {
 			vz = GetCoord(2);
 			if(not vz) {
+				CFGERROR("Z dimension not found");
 				return false;
 			}
-			if(vz->GetLayout()->GetDimensions() != GetNumCoord()) {
+			if(vz->GetLayout()->GetDimensions() != GetTopology()) {
 				CFGERROR("Wrong number of dimensions for coordinate " 
 					<< vz->GetName());
 				return false;
@@ -135,7 +136,7 @@ bool CurvilinearMesh::ExposeVisItData(visit_handle* h,
 					1 + c->GetEndIndex(0) - c->GetStartIndex(0);
 				cmesh_dims[1] = 
 					1 + c->GetEndIndex(1) - c->GetStartIndex(1);
-				if(GetNumCoord() == 3)
+				if(GetTopology() == 3)
 					cmesh_dims[2] = 
 						1 + c->GetEndIndex(2) - c->GetStartIndex(2);
 			} else {
@@ -147,6 +148,7 @@ bool CurvilinearMesh::ExposeVisItData(visit_handle* h,
 		} else {
 			VisIt_CurvilinearMesh_free(*h);
 			*h = VISIT_INVALID_HANDLE;
+			ERROR("Data unavailable for coordinate \"" << vx->GetName() << "\"");
 			return false;
 		}
 
@@ -157,7 +159,7 @@ bool CurvilinearMesh::ExposeVisItData(visit_handle* h,
 				c->FillVisItDataHandle(hyc);
 				if((cmesh_dims[0] != 1 + c->GetEndIndex(0) - c->GetStartIndex(0))
 				|| (cmesh_dims[1] != 1 + c->GetEndIndex(1) - c->GetStartIndex(1))
-				|| ( GetNumCoord() == 3 && (cmesh_dims[2] != 1 + c->GetEndIndex(2) - c->GetStartIndex(2)))) {
+				|| ( GetTopology() == 3 && (cmesh_dims[2] != 1 + c->GetEndIndex(2) - c->GetStartIndex(2)))) {
 					ERROR("Unmatching chunk sizes between coordinate variables");
 					VisIt_VariableData_free(hxc);
 					VisIt_VariableData_free(hyc);
@@ -187,7 +189,7 @@ bool CurvilinearMesh::ExposeVisItData(visit_handle* h,
 					c->FillVisItDataHandle(hzc);
 					if((cmesh_dims[0] != 1 + c->GetEndIndex(0) - c->GetStartIndex(0))
 					|| (cmesh_dims[1] != 1 + c->GetEndIndex(1) - c->GetStartIndex(1))
-					|| ( GetNumCoord() == 3 && (cmesh_dims[2] != 1 + c->GetEndIndex(2) - c->GetStartIndex(2)))) {
+					|| ( GetTopology() == 3 && (cmesh_dims[2] != 1 + c->GetEndIndex(2) - c->GetStartIndex(2)))) {
 						ERROR("Unmatching chunk sizes between coordinate variables");
 						VisIt_VariableData_free(hxc);
 						VisIt_VariableData_free(hyc);
@@ -204,6 +206,7 @@ bool CurvilinearMesh::ExposeVisItData(visit_handle* h,
 					return false;
 				}
 			} else {
+				ERROR("Data unavailable for coordinate \"" << vz->GetName() << "\"");
 				VisIt_VariableData_free(hxc);
 				VisIt_VariableData_free(hyc);
 				VisIt_CurvilinearMesh_free(*h);
@@ -218,15 +221,20 @@ bool CurvilinearMesh::ExposeVisItData(visit_handle* h,
 		
 		// for some unknown reason, 
 		// the mesh dimensions must be interchanged...
-		if(GetNumCoord() == 2) {
+		if(GetTopology() == 2) {
 			int t = cmesh_dims[0];
 			cmesh_dims[0] = cmesh_dims[1];
 			cmesh_dims[1] = t;
-			VisIt_CurvilinearMesh_setCoordsXY(*h, cmesh_dims, hxc, hyc);
-		} else if (GetNumCoord() == 3) {
+			cmesh_dims[2] = 1;
+		} else if (GetTopology() == 3) {
 			int t = cmesh_dims[0];
 			cmesh_dims[0] = cmesh_dims[2];
 			cmesh_dims[2] = t;
+		}
+
+		if(GetNumCoord() == 2) {
+			VisIt_CurvilinearMesh_setCoordsXY(*h, cmesh_dims, hxc, hyc);
+		} else if(GetNumCoord() == 3) {
 			VisIt_CurvilinearMesh_setCoordsXYZ(*h, cmesh_dims, hxc, hyc, hzc);
 		} else {
 			CFGERROR("How could you possibly reach this point???");

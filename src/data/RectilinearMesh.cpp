@@ -32,7 +32,8 @@ bool RectilinearMesh::ExposeVisItMetaData(visit_handle md)
 	{
 		VisIt_MeshMetaData_setName(m1, GetName().c_str());
 		VisIt_MeshMetaData_setMeshType(m1, VISIT_MESHTYPE_RECTILINEAR);
-		VisIt_MeshMetaData_setTopologicalDimension(m1, (int)model.topology());
+		//VisIt_MeshMetaData_setTopologicalDimension(m1, (int)model.topology());
+		// topological dimension is not relevant in the context of a rectilinear mesh
 		VisIt_MeshMetaData_setSpatialDimension(m1, (int)model.coord().size());
 
 		// check that the coordinate exist
