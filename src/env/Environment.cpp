@@ -43,9 +43,9 @@ MPI_Comm 			Environment::_globalComm_;
 MPI_Comm 			Environment::_nodeComm_;
 std::list<int> 			Environment::_knownClients_;
 int 				Environment::_lastIteration_;
-bool 				Environment::_isClient_;
-bool				Environment::_isDedicatedCore_;
-bool				Environment::_isDedicatedNode_;
+bool 				Environment::_isClient_ 	= false;
+bool				Environment::_isDedicatedCore_ 	= false;
+bool				Environment::_isDedicatedNode_ 	= false;
 int 				Environment::_globalProcessID_;
 int				Environment::_entityProcessID_;
 int				Environment::_clientsPerNode_;
@@ -127,8 +127,6 @@ bool Environment::InitDedicatedCores(MPI_Comm global)
 
 	int dcpn = _baseModel_->architecture().dedicated().cores();
 
-	_isDedicatedNode_ = false;
-
 	_clientsPerNode_ = _coresPerNode_ - dcpn;
 	//orc:added for compatibility with dedicated nodes
 	_serversPerNode_ =  dcpn ;
@@ -181,6 +179,7 @@ bool Environment::InitDedicatedCores(MPI_Comm global)
 		_client_->SetChannelToServer(channel2server);
 		_client_->Connect();
 	} else {
+		_isDedicatedCore_ = true;
 		if(bufEnabled) {
 			if(rankInNode == _clientsPerNode_) { // first server on node only
 				CreateSharedStructures();
@@ -203,7 +202,6 @@ bool Environment::InitDedicatedCores(MPI_Comm global)
 				_baseModel_->architecture().queue().size());
 			_server_->AddChannelToClient(channel2client);
 		}
-		_isDedicatedCore_ = true;
 		MPI_Barrier(_globalComm_);
 	}
 
@@ -272,6 +270,7 @@ bool Environment::InitDedicatedNodes()
 		_client_->SetChannelToServer(channel2server);
 		_client_->Connect();
 	} else { //orc:if server
+		_isDedicatedNode_ = true;
 		CreateLocalStructures();
 		InitManagers();
 		_server_ = Server::New(_entityComm_);
@@ -289,7 +288,6 @@ bool Environment::InitDedicatedNodes()
 
 			_server_->AddChannelToClient(channel2client);
 		}
-		_isDedicatedNode_ = true;
 		MPI_Barrier(_globalComm_);
 	}
 
@@ -387,8 +385,9 @@ bool Environment::InitManagers()
 	CurveManager::Init(_baseModel_->data());
 	ActionManager::Init(_baseModel_->actions());
 	if((_isDedicatedCore_ || _isDedicatedNode_ || (_serversPerNode_ == 0))
-	&& (_baseModel_->storage().present()))
+	&& (_baseModel_->storage().present())) {
 		StorageManager::Init(_baseModel_->storage().get());
+	}
 	return true;
 }
 
