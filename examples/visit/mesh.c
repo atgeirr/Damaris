@@ -144,16 +144,35 @@ float cmesh_z[2][3][4] = {
 int cmesh_dims[] = {4, 3, 2};
 int cmesh_ndims = 3;
 
+
+float cmesh2_x[10][10];
+float cmesh2_y[10][10];
+float cmesh2_z[10][10];
+
 void exposeDataToDamaris(simulation_data* sim __attribute__((unused))) {
 	static int firstCall = 0;
 	
 	if(firstCall == 0) {
+
+		int i,j;
+		for(i=0; i<10; i++) {
+		for(j=0; j<10; j++) {
+			cmesh2_x[i][j] = i;
+			cmesh2_y[i][j] = j;
+			cmesh2_z[i][j] = i+j;
+		}
+		}
+
 		damaris_write("coordinates/x2d",rmesh_x);
 		damaris_write("coordinates/y2d",rmesh_y);
 	
 		damaris_write("coordinates/x3d",cmesh_x);
 		damaris_write("coordinates/y3d",cmesh_y);
 		damaris_write("coordinates/z3d",cmesh_z);
+
+		damaris_write("coordinates/x3d2",cmesh2_x);
+		damaris_write("coordinates/y3d2",cmesh2_y);
+		damaris_write("coordinates/z3d2",cmesh2_z);
 		firstCall = 1;
 	}
 

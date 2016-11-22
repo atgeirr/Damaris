@@ -16,6 +16,8 @@
 
 		<layout name="cmesh" type="float" dimensions="w,h,d" />
 
+		<layout name="cmesh2" type="float" dimensions="10,10" />
+
 		<mesh name="mesh2d" type="rectilinear" topology="2">
 			<coord name="coordinates/x2d" unit="cm" label="Width"/>
 			<coord name="coordinates/y2d" unit="cm" label="Height"/>
@@ -27,6 +29,12 @@
 			<coord name="coordinates/z3d" unit="cm" label="Depth"/>
 		</mesh>
 
+		<mesh name="mesh3d2" type="curvilinear" topology="2">
+			<coord name="coordinates/x3d2" unit="cm" label="Width"/>
+			<coord name="coordinates/y3d2" unit="cm" label="Height"/>
+			<coord name="coordinates/z3d2" unit="cm" label="Depth"/>
+		</mesh>
+
 		<group name="coordinates">
 			<variable name="x2d" layout="rmeshX" visualizable="false" time-varying="false" />
 			<variable name="y2d" layout="rmeshY" visualizable="false" time-varying="false" />
@@ -34,6 +42,10 @@
 			<variable name="x3d" layout="cmesh" visualizable="false"  time-varying="false" />
 			<variable name="y3d" layout="cmesh" visualizable="false"  time-varying="false" />
 			<variable name="z3d" layout="cmesh" visualizable="false"  time-varying="false" />
+
+			<variable name="x3d2" layout="cmesh2" visualizable="false"  time-varying="false" />
+			<variable name="y3d2" layout="cmesh2" visualizable="false"  time-varying="false" />
+			<variable name="z3d2" layout="cmesh2" visualizable="false"  time-varying="false" />
 		</group>
 	</data>
 	<storage>
