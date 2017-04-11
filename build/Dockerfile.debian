@@ -1,0 +1,5 @@
+FROM gcc:5.2
+COPY ./env_prep.sh /home/
+COPY ./visit-req-debian.sh /home/
+RUN /home/visit-req-debian.sh
+RUN /home/env_prep.sh

@@ -1,0 +1,7 @@
+FROM opensuse:42.2
+ENV LANG en_US.UTF-8
+# ENV LC_ALL en_US.UTF-8
+COPY ./env_prep.sh /home/
+COPY ./visit-req-suse.sh /home/
+RUN /home/visit-req-suse.sh
+RUN /home/env_prep.sh
