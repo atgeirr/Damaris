@@ -59,7 +59,7 @@ endif(CMAKE_Fortran_COMPILER)
 
 add_library (damaris 	${DAMARIS_SRC} 
 			${DAMARIS_VISIT_SRC}
-#			${DAMARIS_HDF5_SRC} 
+			${DAMARIS_HDF5_SRC} 
 			${DAMARIS_FORTRAN_MODULE})
 
 if(NOT (MODEL_PRESENT EQUAL 1))

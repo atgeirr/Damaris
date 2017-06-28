@@ -207,7 +207,7 @@ endif(VisIt_FOUND)
 #----------------------------------------------------------------------------#
 # Set everything related to HDF5
 #----------------------------------------------------------------------------#
-find_package(HDF5)
+find_package(HDF5 COMPONENTS C)
 if(HDF5_FOUND)
 	message(STATUS "HDF5 found")
 	set(HAVE_HDF5_ENABLED 1)

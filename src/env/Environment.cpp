@@ -385,7 +385,7 @@ bool Environment::InitManagers()
 	CurveManager::Init(_baseModel_->data());
 	ActionManager::Init(_baseModel_->actions());
 	if((_isDedicatedCore_ || _isDedicatedNode_ || (_serversPerNode_ == 0))
-	&& (_baseModel_->storage().present())) {
+	   && (_baseModel_->storage().present())) {
 		StorageManager::Init(_baseModel_->storage().get());
 	}
 	return true;

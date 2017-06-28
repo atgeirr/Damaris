@@ -22,7 +22,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "storage/Store.hpp"
 #include "storage/NullStore.hpp"
 #ifdef HAVE_HDF5_ENABLED
-//#include "storage/HDF5Store.hpp"
+#include "storage/HDF5Store.hpp"
 #endif
 
 namespace damaris {
@@ -36,7 +36,7 @@ void StorageManager::Init(const model::Storage& mdl)
 			Create<NullStore>(*s); break;
 		case model::StoreType::HDF5 :
 #ifdef HAVE_HDF5_ENABLED
-//			Create<HDF5Store>(*s); break;
+			Create<HDF5Store>(*s); break;
 #else
 			CFGERROR("Requesting the creation of HDF5 store \""
 			<< s->name() << "\" but HDF5 is not enabled");
