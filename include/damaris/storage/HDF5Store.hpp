@@ -43,13 +43,14 @@ class HDF5Store : public Store {
 	virtual ~HDF5Store() {}
 
 private:
-    enum FileMode {FilePerCore , FilePerNode , SingleFile};
+    enum FileMode {FilePerCore , FilePerNode , Collective};
     enum XdmfMode {NoIteration, FirstIteration, EveryIteration};
 
 	FileMode fileMode_;
 	XdmfMode xdmfMode_;
 	std::string path_;
 
+	string GetOutputFileName(int32_t iteration);
     /**
     * This function gets a type from the model type and retuns its equivalient HDF5 type as the output parameter.
     * If the type could not be found, the return value is false, otherwise it is true.
@@ -61,6 +62,18 @@ private:
     * initializes the corresponding values in the class.
     */
     bool ReadKeyValues(const model::Store& mdl);
+
+	/**
+	* This function writes the data of an iteration into a single HDF5 file using collective I/O.
+	* Parallel HDF5 has been used as an I/O midlleware here.
+	*/
+	void OutputCollective(int32_t iteration);
+
+	/**
+	* This function writes the data of an iteration into multiple files in a file-per-dedicated-core manner.
+	* No collective I/O is used in this case.
+	*/
+	void OutputPerCore(int32_t iteration);
 
 		
 public:
