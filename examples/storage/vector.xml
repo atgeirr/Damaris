@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<simulation name="vector" language="c" xmlns="http://damaris.gforge.inria.fr/damaris/model">
+	<architecture>
+		<domains count="1" />
+		<dedicated cores="2" nodes="0" />
+		<buffer name="damaris-buffer" size="536870912" />
+		<queue  name="damaris-queue" size="100" />
+	</architecture>
+	<data>
+		<parameter name="LENGTH"  type="int" value="256" />
+		<parameter name="size"	 type="int" value="4"  />
+
+
+		<layout name="pipe"  type="float" dimensions="LENGTH/size" global="LENGTH" ghosts="0:0" />
+
+		<variable name="bar" type="scalar" layout="pipe" centering="nodal" store="MyStore" />
+	</data>
+	<storage>
+		<store name="MyStore" type="HDF5">
+			<option key="FileMode">Collective</option>
+			<option key="XDMFMode">NoIteration</option>
+			<option key="FilesPath">h5results/</option>
+		</store>
+	</storage>
+	<actions>
+	</actions>
+	<log FileName="log/vector" RotationSize="5" LogFormat="[%TimeStamp%]: %Message%" LogLevel="info" />
+</simulation>

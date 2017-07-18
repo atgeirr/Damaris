@@ -50,6 +50,13 @@ private:
 	XdmfMode xdmfMode_;
 	std::string path_;
 
+	/**
+    * Returns the full name of the variable, including the groups (separated by a "/")
+    */
+	string GetVariableFullName(shared_ptr<Variable> v , shared_ptr<Block> *b = NULL);
+	/**
+	* Returns the output file name of the result .h5 file.
+	*/
 	string GetOutputFileName(int32_t iteration);
     /**
     * This function gets a type from the model type and retuns its equivalient HDF5 type as the output parameter.

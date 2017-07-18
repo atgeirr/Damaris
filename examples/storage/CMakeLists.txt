@@ -8,3 +8,15 @@ set_target_properties (mandelbulb-hdf5 PROPERTIES LINK_FLAGS "-Wl,-export-dynami
 add_executable (2dmesh 2dmesh.c)
 target_link_libraries (2dmesh damaris ${DEP_LIBRARIES})
 set_target_properties (2dmesh PROPERTIES LINK_FLAGS "-Wl,-export-dynamic")
+
+add_executable (3dmesh 3dmesh.c)
+target_link_libraries (3dmesh damaris ${DEP_LIBRARIES})
+set_target_properties (3dmesh PROPERTIES LINK_FLAGS "-Wl,-export-dynamic")
+
+add_executable (vector vector.c)
+target_link_libraries (vector damaris ${DEP_LIBRARIES})
+set_target_properties (vector PROPERTIES LINK_FLAGS "-Wl,-export-dynamic")
+
+add_executable (life-hdf5 life-hdf5.c)
+target_link_libraries (life-hdf5 damaris ${DEP_LIBRARIES})
+set_target_properties (life-hdf5 PROPERTIES LINK_FLAGS "-Wl,-export-dynamic")

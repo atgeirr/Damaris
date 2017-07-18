@@ -41,8 +41,6 @@ int main(int argc, char** argv)
         MPI_Comm_rank(comm , &rank);
         MPI_Comm_size(comm , &size);
 
-        printf("size is: %d rank is: %d \n",size,rank);
-
 
         int local_width      = WIDTH/size;
 		int local_height     = HEIGHT;
@@ -98,6 +96,10 @@ int main(int argc, char** argv)
 			MPI_Barrier(comm);
 
 			double t2 = MPI_Wtime();
+
+			if(rank == 0) {
+				printf("Iteration %d done in %f seconds\n",i,(t2-t1));
+			}
 		}
 
 		damaris_stop();

@@ -65,7 +65,7 @@ int main(int argc, char** argv)
 {
 	if(argc != 2)
 	{
-		fprintf(stderr,"Usage: %s <config.xml>\n",argv[0]);
+		fprintf(stderr,"Usage: %s <mandelbulb-hdf5.xml>\n",argv[0]);
 		exit(0);
 	}
 
@@ -73,7 +73,7 @@ int main(int argc, char** argv)
 	
 	damaris_initialize(argv[1],MPI_COMM_WORLD);
 
-	int nbprocs, rank;
+	int size, rank;
 
 	int is_client;
 	int err = damaris_start(&is_client);
@@ -88,11 +88,11 @@ int main(int argc, char** argv)
 		damaris_parameter_get("DEPTH",&DEPTH,sizeof(int));
 
                 MPI_Comm_rank(comm,&rank);
-                MPI_Comm_size(comm,&nbprocs);
+                MPI_Comm_size(comm,&size);
 
 		int local_width         = WIDTH;
 		int local_height        = HEIGHT;
-		int local_depth         = DEPTH/nbprocs;
+		int local_depth         = DEPTH/size;
 
 		int offset_z = rank*local_depth;
 
@@ -124,7 +124,7 @@ int main(int argc, char** argv)
 				vector v = {
 					2.0*RANGE*x/local_width - RANGE,
 					2.0*RANGE*y/local_height - RANGE,
-					2.0*RANGE*(z+offset_z)/(local_depth*nbprocs) - RANGE
+					2.0*RANGE*(z+offset_z)/(local_depth*size) - RANGE
 				};
 				space[z][y][x] = iterate(&v,order);
 			}

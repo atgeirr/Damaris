@@ -25,6 +25,9 @@
 int NROW = 96;
 int NCOL = 96;
 
+
+
+
 MPI_Comm comm;
 
 typedef enum {RANDOM = 0, GLIDER=1, ACORN=2, DIEHARD=3} BCtype;
@@ -355,6 +358,20 @@ simulation_data_dtor(simulation_data *sim)
  ******************************************************************************
  *****************************************************************************/
 
+void simulate_one_more_step(simulation_data *sim)
+{
+    //for(int j=1; j <= sim->life.Nrows; j++)
+    //int offset = sim->par_rank * (NROW/sim->par_size);
+
+
+    for(int i=1; i <= sim->life.Nrows; i++)
+        sim->life.rmesh_y[i] = sim->par_rank;
+
+
+    ++sim->cycle;
+    sim->time += 1;
+}
+
 void
 simulate_one_timestep(simulation_data *sim)
 {
@@ -387,23 +404,40 @@ void mainloop(simulation_data *sim)
 	if(r == 0) printf("Starting the main loop\n");
 	do {
 		if(r == 0) printf(" -- Simulating time step %d\n",i);
-		simulate_one_timestep(sim);
+		//simulate_one_timestep(sim);
+        simulate_one_more_step(sim);
 		exposeDataToDamaris(sim);
-		sleep(5);
+		sleep(1);
 		i++;
-	} while(!sim->done);
+	} while(!sim->done && (i<=10));
 }
 
 void exposeDataToDamaris(simulation_data* sim) {
 	static int firstCall = 0;
-	
+
+    int64_t position_life[2];
+    int64_t position_y2d[1];
+
+    position_life[1] = NROW/sim->par_size;
+    position_life[0] = NCOL;
+
+
+
 	if(firstCall == 0) {
-		damaris_write("coordinates/x2d",sim->life.rmesh_x);
+        position_y2d[0] = sim->par_rank * (NROW/sim->par_size);
+
+        printf("Position for y2d is: %d -- rank is: %d\n" , position_y2d[0] , sim->par_rank);
+
+        //damaris_set_position("coordinates/y2d",position_y2d);
+
+        damaris_write("coordinates/x2d",sim->life.rmesh_x);
 		damaris_write("coordinates/y2d",sim->life.rmesh_y);
 		firstCall = 1;
 	}
 
-	damaris_write("life/cells",sim->life.true_life);
+    damaris_set_position("life/cells",position_life);
+
+    damaris_write("life/cells",sim->life.true_life);
 	damaris_end_iteration();
 }
 

@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
-<simulation name="mandelbulb" language="c" xmlns="http://damaris.gforge.inria.fr/damaris/model">
+<simulation name="mandelbulb-hdf5" language="c" xmlns="http://damaris.gforge.inria.fr/damaris/model">
 	<architecture>
 		<domains count="1" />
-		<dedicated cores="2" nodes="0" />
+		<dedicated cores="1" nodes="0" />
 		<buffer name="damaris-buffer" size="536870912" />
 		<queue  name="damaris-queue" size="100" />
 	</architecture>
@@ -37,9 +37,9 @@
 	</data>
 	<storage>
 		<store name="MyStore" type="HDF5">
-			<option key="FileMode">FilePerCore</option>
+			<option key="FileMode">Collective</option>
 			<option key="XDMFMode">NoIteration</option>
-			<option key="FilesPath">/home/hadi/local/</option>
+			<option key="FilesPath"></option>
 		</store>
 	</storage>
 	<actions>
