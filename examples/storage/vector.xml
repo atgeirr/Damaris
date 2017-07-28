@@ -1,17 +1,17 @@
 <?xml version="1.0"?>
 <simulation name="vector" language="c" xmlns="http://damaris.gforge.inria.fr/damaris/model">
 	<architecture>
-		<domains count="1" />
+		<domains count="8" />
 		<dedicated cores="2" nodes="0" />
 		<buffer name="damaris-buffer" size="536870912" />
 		<queue  name="damaris-queue" size="100" />
 	</architecture>
 	<data>
 		<parameter name="LENGTH"  type="int" value="256" />
-		<parameter name="size"	 type="int" value="4"  />
+		<parameter name="size"	 type="int" value="4" />
+		<parameter name="domains"	type="int" value="8"  />
 
-
-		<layout name="pipe"  type="float" dimensions="LENGTH/size" global="LENGTH" ghosts="0:0" />
+		<layout name="pipe"  type="float" dimensions="LENGTH/size/domains" global="LENGTH" ghosts="0:0" />
 
 		<variable name="bar" type="scalar" layout="pipe" centering="nodal" store="MyStore" />
 	</data>

@@ -115,6 +115,27 @@ namespace damaris {
 
     }
 
+    bool HDF5Store::UpdateGhostZones(shared_ptr<Variable> v , hid_t &memSpace , hsize_t* localDim){
+
+        int varDimention = v->GetLayout()->GetDimensions();
+        hsize_t* offset = new hsize_t[varDimention];
+
+        for(int i=0; i<varDimention ; i++) {
+            int g1 = v->GetLayout()->GetGhostAlong(i).first;
+            int g2 = v->GetLayout()->GetGhostAlong(i).second;
+
+            offset[i] = g1;
+            localDim[i] = localDim[i] - g1 - g2;
+        }
+
+        if ((H5Sselect_hyperslab(memSpace, H5S_SELECT_SET, offset, NULL, localDim , NULL)) < 0){
+            ERROR("Hyperslab on memory buffer failed.");
+            return false;
+        }
+
+        return true;
+    }
+
     string HDF5Store::GetOutputFileName(int32_t iteration) {
         stringstream fileName;
         int processId;
@@ -146,7 +167,7 @@ namespace damaris {
         if (numDomains == 1){
             varName << v->GetName() << "/P" << (*b)->GetSource(); // e.g. varName/P2
         } else {// more than one domain
-            varName << v->GetName() << "/P" << (*b)->GetSource() << "/B" << (*b)->GetID(); // e.g. varName/P3/B2
+            varName << v->GetName() << "/P" << (*b)->GetSource() << "/B" << (*b)->GetID(); // e.g. varName/P2/B3
         }
 
         return  varName.str();
@@ -263,16 +284,76 @@ namespace damaris {
         H5Fclose(fileId);
     }
 
+    bool HDF5Store::OutputBlocksCollective(int iteration , shared_ptr<Variable> v , hsize_t* localDim , hid_t dsetId ,
+                                           hid_t dtypeId , hid_t plistId){
+
+        BlocksByIteration::iterator begin;
+        BlocksByIteration::iterator end;
+        hsize_t *memOffset;
+        hsize_t *memDim;
+        hid_t fileSpace;
+        hid_t memSpace;
+        int varDimention;
+
+        v->GetBlocksByIteration(iteration, begin, end);
+        varDimention = v->GetLayout()->GetDimensions();
+
+        memOffset = new (nothrow) hsize_t[varDimention];
+        memDim = new (nothrow) hsize_t[varDimention];
+
+        if ((memOffset == NULL) || (memDim == NULL)) {
+            ERROR("HDF5: Failed to allocate memDim and memOffset memory ");
+            return false;
+        }
+
+        for(BlocksByIteration::iterator bid = begin; bid != end; bid ++) {
+            shared_ptr<Block> b = *bid;
+
+            // Obtain the starting indices of the hyperslab
+            for(int i = 0; i < varDimention; i++) {
+                memOffset[i] = b->GetStartIndex(i);
+                memDim[i] = localDim[i];
+            }
+
+            // create memory data space
+            memSpace = H5Screate_simple(varDimention, memDim , NULL);
+
+            // Update ghost zones
+            UpdateGhostZones(v , memSpace , memDim);
+
+            // Select hyperslab in the file.
+            fileSpace = H5Dget_space(dsetId);
+            H5Sselect_hyperslab(fileSpace, H5S_SELECT_SET, memOffset, NULL, memDim , NULL);
+
+            // Create property list for collective dataset write.
+            plistId = H5Pcreate(H5P_DATASET_XFER);
+            H5Pset_dxpl_mpio(plistId, H5FD_MPIO_COLLECTIVE);
+
+            void* ptr = b->GetDataSpace().GetData();
+
+            if (H5Dwrite(dsetId, dtypeId, memSpace, fileSpace, plistId, ptr) < 0) {
+                ERROR("HDF5: Writing Data Failed !");
+                return false;
+            }
+
+            H5Sclose(fileSpace);
+            H5Sclose(memSpace);
+            H5Pclose(plistId);
+        } // for the blocks loop
+        delete [] memOffset;
+        delete [] memDim;
+
+        return true;
+    }
+
     void HDF5Store::OutputCollective(int32_t iteration) {
         hid_t fileId;
         hid_t lcplId;
         hid_t dsetId;
         hid_t dtypeId = -1;
         hid_t fileSpace;
-        hid_t memSpace;
         hid_t plistId = H5P_DEFAULT;
         string fileName;
-
 
         // Initializing variables
         vector<weak_ptr<Variable> >::const_iterator w = GetVariables().begin();
@@ -298,7 +379,7 @@ namespace damaris {
         for(; w != GetVariables().end(); w++) {
 	        shared_ptr<Variable> v = w->lock();
 
-            // write time varying variables only in first iteration
+            // write time-varying variables only in first iteration
             if ((not v->IsTimeVarying()) && (iteration > 0))
                     continue;
 
@@ -334,49 +415,13 @@ namespace damaris {
 
             H5Sclose(fileSpace);
 
-            BlocksByIteration::iterator begin;
-            BlocksByIteration::iterator end;
-            v->GetBlocksByIteration(iteration, begin, end);
+            if (not OutputBlocksCollective(iteration, v , localDim , dsetId , dtypeId , plistId))
+                ERROR("Writing blocks to the file failed. ");
 
-            for(BlocksByIteration::iterator bid = begin; bid != end; bid ++) {
-                shared_ptr<Block> b = *bid;
-
-                hsize_t *offset;
-
-                offset = new (nothrow) hsize_t[varDimention];
-                if (offset == NULL)
-                    ERROR("HDF5:Failed to allocate memory ");
-
-                // Obtain the starting indices of the hyperslab
-                for(int i = 0; i < varDimention; i++) {
-                    offset[i] = b->GetStartIndex(i);
-                }
-
-                memSpace = H5Screate_simple(varDimention, localDim , NULL);
-
-                // Select hyperslab in the file.
-                fileSpace = H5Dget_space(dsetId);
-                H5Sselect_hyperslab(fileSpace, H5S_SELECT_SET, offset, NULL, localDim , NULL);
-
-                // Create property list for collective dataset write.
-                plistId = H5Pcreate(H5P_DATASET_XFER);
-                H5Pset_dxpl_mpio(plistId, H5FD_MPIO_COLLECTIVE);
-
-                void* ptr = b->GetDataSpace().GetData();
-
-                if (H5Dwrite(dsetId, dtypeId, memSpace, fileSpace, plistId, ptr) < 0)
-                    ERROR("HDF5: Writing Data Failed !");
-
-                H5Sclose(fileSpace);
-                H5Sclose(memSpace);
-                H5Pclose(plistId);
-
-                delete [] offset;
-            } // for the blocks loop
             delete [] localDim;
             delete [] globalDim;
             H5Dclose(dsetId);
-        } // for the variables loop
+        } // for loop
     }
 }
 

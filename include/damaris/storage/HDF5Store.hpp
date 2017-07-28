@@ -51,6 +51,10 @@ private:
 	std::string path_;
 
 	/**
+	* Updates the memory space and the dimentions according to ghost zones.
+	*/
+	bool UpdateGhostZones(shared_ptr<Variable> v , hid_t &memSpace , hsize_t* localDim);
+	/**
     * Returns the full name of the variable, including the groups (separated by a "/")
     */
 	string GetVariableFullName(shared_ptr<Variable> v , shared_ptr<Block> *b = NULL);
@@ -70,7 +74,14 @@ private:
     */
     bool ReadKeyValues(const model::Store& mdl);
 
-	/**
+
+    /**
+    * This function writes all the blocks of a variable a single HDF5 file using collective I/O.
+    * Parallel HDF5 has been used as an I/O midlleware here.
+    */
+    bool OutputBlocksCollective(int iteration , shared_ptr<Variable> v , hsize_t* localDim , hid_t dsetId , hid_t dtypeId , hid_t plistId);
+
+    /**
 	* This function writes the data of an iteration into a single HDF5 file using collective I/O.
 	* Parallel HDF5 has been used as an I/O midlleware here.
 	*/
