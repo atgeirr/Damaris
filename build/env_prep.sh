@@ -8,7 +8,8 @@
 
 
 
-install_visit=1
+install_visit=0
+install_hdf5=0
 
 mpi_impl=mpich  # either mpich or openmpi
 
@@ -57,7 +58,7 @@ fi
 echo -e "--- COMPILING & INSTALLING XERCESS ---------------------------------------------------------------\n"
 # Installing xerces-c
 cd $tempdir
-wget http://mirrors.ircam.fr/pub/apache//xerces/c/3/sources/xerces-c-3.1.4.tar.gz
+wget --no-check-certificate https://archive.apache.org/dist/xerces/c/3/sources/xerces-c-3.1.4.tar.gz
 tar -xzf xerces-c-3.1.4.tar.gz
 cd xerces-c-3.1.4
 ./configure --prefix=$install_path --disable-threads --disable-network
@@ -98,7 +99,19 @@ make
 make install
 
 
-# echo -e "--- COMPILING & INSTALLING VISIT -----------------------------------------------------------------\n"
+echo -e "--- COMPILING & INSTALLING HDF5 ---------------------------------------------------------------\n"
+# Installing HDF5 1.10
+if [ $install_hdf5 = 1 ]; then
+    cd $tempdir
+    wget --no-check-certificate https://support.hdfgroup.org/ftp/HDF5/current18/src/hdf5-1.8.19.tar
+    tar -xvf hdf5-1.8.19.tar
+    cd hdf5-1.8.19
+    ./configure --enable-parallel --prefix=$install_path
+    make
+    make install
+fi
+
+echo -e "--- COMPILING & INSTALLING VISIT -----------------------------------------------------------------\n"
 # Installling Visit
 if [ $install_visit = 1 ]; then
   cd $tempdir
@@ -112,9 +125,9 @@ fi
 
 # echo -e "--- COMPILING & INSTALLING DAMARIS ---------------------------------------------------------------\n"
 # compiling and installing Damaris
-cd $tempdir
-git clone https://scm.gforge.inria.fr/anonscm/git/damaris/damaris.git 
-cd damaris
+#cd $tempdir
+#git clone https://scm.gforge.inria.fr/anonscm/git/damaris/damaris.git
+cd ..
 # cd trunk
 cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX:PATH=$install_path
 make
