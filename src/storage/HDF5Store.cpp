@@ -102,6 +102,9 @@ namespace damaris {
 
     void HDF5Store::Output(int32_t iteration){
 
+        // If there is no data to write, return
+        // If (IterationIsEmpty(iteration)) return;
+
         switch(fileMode_) {
             case FilePerCore:
                 OutputPerCore(iteration);
@@ -119,6 +122,7 @@ namespace damaris {
 
         int varDimention = v->GetLayout()->GetDimensions();
         hsize_t* offset = new hsize_t[varDimention];
+        bool retVal = true;
 
         for(int i=0; i<varDimention ; i++) {
             int g1 = v->GetLayout()->GetGhostAlong(i).first;
@@ -130,10 +134,11 @@ namespace damaris {
 
         if ((H5Sselect_hyperslab(memSpace, H5S_SELECT_SET, offset, NULL, localDim , NULL)) < 0){
             ERROR("Hyperslab on memory buffer failed.");
-            return false;
+            retVal = false;
         }
 
-        return true;
+        delete [] offset;
+        return retVal;
     }
 
     string HDF5Store::GetOutputFileName(int32_t iteration) {
@@ -161,6 +166,7 @@ namespace damaris {
         baseName = Environment::GetSimulationName();
         numDomains = Environment::NumDomainsPerClient();
 
+        // (b == NULL) means that there is no access to block data, i.e. in file-per-core mode or future modes.
         if ((fileMode_ == Collective) || (b == NULL))
             return v->GetName();
 
@@ -217,7 +223,7 @@ namespace damaris {
 
             for (int i = 0; i < varDimention; i++) {
                 globalDims[i] = v->GetLayout()->GetGlobalExtentAlong(i);
-                localDims[i] = v->GetLayout()->GetExtentAlong(i);
+                localDims[i] = v->GetLayout()->GetExtentAlong(i, false);
             }
 
             // create the file space
@@ -260,9 +266,13 @@ namespace damaris {
                 // Create memory data space
                 memSpace = H5Screate_simple(blockDimention, blockDim , NULL);
 
+                // Update ghost zones
+                UpdateGhostZones(v , memSpace , blockDim);
+
                 // Select hyperslab in the file.
                 fileSpace = H5Dget_space(dsetId);
                 H5Sselect_all(fileSpace);
+                //H5Sselect_hyperslab(fileSpace, H5S_SELECT_SET, memOffset, NULL, blockDim , NULL);
 
                 // Getting the data
                 void *ptr = b->GetDataSpace().GetData();

@@ -75,10 +75,10 @@ class TypeLayout : public Layout,
 	}
 
 	/**
-	 * Returns the extent along a given dimension.
-	 * For this class, the returned value is always 1.
-	 */
-	virtual size_t GetExtentAlong(unsigned int UNUSED(dim)) const {
+ 	* Returns the extent along a given dimension.
+ 	* For this class, the returned value is always 1.
+ 	*/
+	virtual size_t GetExtentAlong(unsigned int UNUSED(dim) , bool includeGhost = true) const {
 		return 1;
 	}
 

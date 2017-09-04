@@ -16,10 +16,6 @@ add_executable (vector vector.c)
 target_link_libraries (vector damaris ${DEP_LIBRARIES})
 set_target_properties (vector PROPERTIES LINK_FLAGS "-Wl,-export-dynamic")
 
-add_executable (life-hdf5 life-hdf5.c)
-target_link_libraries (life-hdf5 damaris ${DEP_LIBRARIES})
-set_target_properties (life-hdf5 PROPERTIES LINK_FLAGS "-Wl,-export-dynamic")
-
 add_executable (blocks-hdf5 blocks-hdf5.c)
 target_link_libraries (blocks-hdf5 damaris ${DEP_LIBRARIES})
 set_target_properties (blocks-hdf5 PROPERTIES LINK_FLAGS "-Wl,-export-dynamic")

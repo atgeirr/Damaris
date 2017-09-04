@@ -93,15 +93,17 @@ bool Environment::Init(const std::string& configFile,
 	/* Get the size of the node */
 	MPI_Comm_size(_nodeComm_,&_coresPerNode_);
 
-	/* Initialize the logger single instance */
-	string file_name = _baseModel_->log().get().FileName();
-	int rotation_size = _baseModel_->log().get().RotationSize();
-    string log_format = _baseModel_->log().get().LogFormat();
-	LogLevelType::value log_level = _baseModel_->log().get().LogLevel();
+    if (_baseModel_->log().present()) {
+        /* Initialize the logger single instance */
+        string file_name = _baseModel_->log().get().FileName();
+        int rotation_size = _baseModel_->log().get().RotationSize();
+        string log_format = _baseModel_->log().get().LogFormat();
+        LogLevelType::value log_level = _baseModel_->log().get().LogLevel();
 
-	_eventLogger_ = EventLogger::New();
-	_eventLogger_->Init(rank , file_name , rotation_size , log_format , log_level);
-	_eventLogger_->LogInfo("EventLogger initiated successfully\n");
+        _eventLogger_ = EventLogger::New();
+        _eventLogger_->Init(rank, file_name, rotation_size, log_format, log_level);
+        _eventLogger_->Log("EventLogger initiated successfully\n" , EventLogger::Info);
+    }
 
 	/* If there are dedicated nodes */
 	if(_baseModel_->architecture().dedicated().nodes() > 0) {
@@ -116,7 +118,7 @@ bool Environment::Init(const std::string& configFile,
 
 bool Environment::InitDedicatedCores(MPI_Comm global)
 {
-	_eventLogger_->LogInfo("InitDedicatedCores started ... ");
+	Log("InitDedicatedCores started ... " , EventLogger::Info);
 
 	// NOTE: in the future we may call this function from InitDedicatedNodes
 	// and pass a communicator that is different from _globalComm_;
@@ -211,7 +213,7 @@ bool Environment::InitDedicatedCores(MPI_Comm global)
 
 bool Environment::InitDedicatedNodes()
 {
-	_eventLogger_->LogInfo("InitDedicatedNodes started ... ");
+	Log("InitDedicatedNodes started ... " , EventLogger::Info);
 
 	/* Get the number of dedicated nodes */
 	int dn = _baseModel_->architecture().dedicated().nodes();

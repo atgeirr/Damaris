@@ -26,6 +26,7 @@ int ghost_value = 666;
 void normalWrite(int iteration , int* array) {
 
     int (*parray)[total_height] =  (int (*)[total_height]) array;
+    int x,y;
 
     int offset_width = rank*local_width;
     int offset_height = 0;
@@ -35,10 +36,10 @@ void normalWrite(int iteration , int* array) {
     position_space[0] = offset_width;
     position_space[1] = offset_height;
 
-    for(int x = 0; x < total_width; x++)
-        for(int y = 0; y < total_height; y++){
+    for(x = 0; x < total_width; x++)
+        for(y = 0; y < total_height; y++){
 
-            if ((x < GX0) || (y < GX0))
+            if ((x < GX0) || (y < GY0))
                 parray[x][y] = ghost_value;
             else if ((x >= total_width - GX1) || (y >= total_height - GY1))
                 parray[x][y] = ghost_value;
@@ -55,19 +56,21 @@ void normalWrite(int iteration , int* array) {
 void blockWrite(int iteration , int* array){
 
     int (*parray)[total_height] =  (int (*)[total_height]) array;
+    int dom;
 
-    for(int dom=0; dom<domains ; dom++) {
+    for(dom=0; dom<domains ; dom++) {
         int offset_width = rank * local_width;
         int offset_height = dom * local_height;
 
         int64_t position_space[2];
+        int x,y;
 
         position_space[0] = offset_width;
         position_space[1] = offset_height;
 
-        for (int x = 0; x < total_width; x++) {
-            for (int y = 0; y < total_height; y++) {
-                if ((x < GX0) || (y < GX0))
+        for (x = 0; x < total_width; x++) {
+            for (y = 0; y < total_height; y++) {
+                if ((x < GX0) || (y < GY0))
                     parray[x][y] = ghost_value;
                 else if ((x >= total_width - GX1) || (y >= total_height - GY1))
                     parray[x][y] = ghost_value;
@@ -121,8 +124,9 @@ int main(int argc, char** argv)
         total_height = local_height + GY0 + GY1; // GY:GY
 
         int (*space)[total_height] = malloc((total_height)*(total_width)*sizeof(int));
+        int i,j;
 
-		for(int i=0; i < MAX_CYCLES; i++) {
+		for(i=0; i < MAX_CYCLES; i++) {
 			double t1 = MPI_Wtime();
 
             if (domains == 1)
@@ -142,8 +146,8 @@ int main(int argc, char** argv)
         if (rank == 0)
         {
             printf("\nTotal array for rank 0 is: \n");
-            for (int i = 0; i < total_width; i++) {
-                for (int j = 0; j < total_height; j++)
+            for (i = 0; i < total_width; i++) {
+                for (j = 0; j < total_height; j++)
                     printf("%3d ", space[i][j]);
 
                 printf("\n");

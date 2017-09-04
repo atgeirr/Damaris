@@ -21,12 +21,6 @@
 		<layout name="rmeshZ" type="double" dimensions="DEPTH/size+1" 
 			global="DEPTH+1" ghost="0:1" />
 
-		<mesh name="mesh" type="rectilinear" topology="3">
-			<coord name="coord/x" label="x"/>
-			<coord name="coord/y" label="y"/>
-			<coord name="coord/z" label="z"/>
-		</mesh>
-
 		<group name="coord">
 			<variable name="x" layout="rmeshX" visualizable="false" time-varying="false" store="MyStore" />
 			<variable name="y" layout="rmeshY" visualizable="false" time-varying="false" store="MyStore" />
@@ -37,7 +31,7 @@
 	</data>
 	<storage>
 		<store name="MyStore" type="HDF5">
-			<option key="FileMode">Collective</option>
+			<option key="FileMode">FilePerCore</option>
 			<option key="XDMFMode">NoIteration</option>
 			<option key="FilesPath"></option>
 		</store>

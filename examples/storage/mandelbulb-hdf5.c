@@ -87,8 +87,8 @@ int main(int argc, char** argv)
 		damaris_parameter_get("HEIGHT",&HEIGHT,sizeof(int));
 		damaris_parameter_get("DEPTH",&DEPTH,sizeof(int));
 
-                MPI_Comm_rank(comm,&rank);
-                MPI_Comm_size(comm,&size);
+        MPI_Comm_rank(comm,&rank);
+        MPI_Comm_size(comm,&size);
 
 		int local_width         = WIDTH;
 		int local_height        = HEIGHT;

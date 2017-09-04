@@ -2,7 +2,7 @@
 <simulation name="3dmesh" language="c" xmlns="http://damaris.gforge.inria.fr/damaris/model">
 	<architecture>
 		<domains count="1" />
-		<dedicated cores="16" nodes="0" />
+		<dedicated cores="4" nodes="0" />
 		<buffer name="damaris-buffer" size="536870912" />
 		<queue  name="damaris-queue" size="100" />
 	</architecture>
@@ -19,9 +19,9 @@
 	</data>
 	<storage>
 		<store name="MyStore" type="HDF5">
-			<option key="FileMode">Collective</option>
+			<option key="FileMode">FilePerCore</option>
 			<option key="XDMFMode">NoIteration</option>
-			<option key="FilesPath">h5results/</option>
+			<option key="FilesPath"></option>
 		</store>
 	</storage>
 	<actions>

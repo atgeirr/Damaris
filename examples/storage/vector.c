@@ -4,7 +4,7 @@
 #include <mpi.h>
 #include "Damaris.h"
 
-#define MAX_CYCLES 3
+#define MAX_CYCLES 10
 
 int LENGTH;
 int domains; // change the domain in .xml file (both in the domain tag and the domains parameter)
@@ -25,7 +25,6 @@ int main(int argc, char** argv)
 	int size, rank;
 	int is_client;
 
-
 	int err = damaris_start(&is_client);
 	
 	if((err == DAMARIS_OK || err == DAMARIS_NO_SERVER) && is_client) {
@@ -45,22 +44,22 @@ int main(int argc, char** argv)
 
 		float* bar = (float*)malloc(local_length* sizeof(float));
 
-		int x,y;
+		int i,x,y,z;
 		int64_t position[1];
 
-		for(int i=0; i < MAX_CYCLES; i++) {
+		for(i=0; i < MAX_CYCLES; i++) {
 			double t1 = MPI_Wtime();
 
             if (domains == 1){
-                for(int z = 0; z < local_length; z++)
+                for(z = 0; z < local_length; z++)
                     bar[z] = rank;
 
                 position[0] = process_offset;
                 damaris_set_position("bar",position);
                 damaris_write("bar",bar);
             } else {
-                for(int y=0; y<domains ; y++){
-                    for(int z = 0; z < local_length; z++)
+                for(y=0; y<domains ; y++){
+                    for(z = 0; z < local_length; z++)
                         bar[z] = rank*10 + y;
 
                     block_offset = y*(local_length/domains);
@@ -83,7 +82,6 @@ int main(int argc, char** argv)
 
 		damaris_stop();
         free(bar);
-
     }
 
 	damaris_finalize();

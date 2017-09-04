@@ -339,7 +339,7 @@ void Server::OnCommit(const shared_ptr<Channel>& ch, int source)
 			h);
 	
 	if(not b) {
-		ERROR("Failed at retrieving data commited by client.");
+		ERROR("Failed at retrieving data committed by client.");
 	}
 	
 	b->SetReadOnly(true);
@@ -365,6 +365,7 @@ void Server::OnClear(const shared_ptr<Channel>& ch, int source)
 	}
 	
 	b->SetReadOnly(false);
+    b->GainDataOwnership();
 }
 
 void Server::BcastEventCallback(int tag, int source, const void* buf, int count)

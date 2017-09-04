@@ -355,10 +355,13 @@ public:
 	}
 
 	/**
-    * Returns the singleton event logger.
+    * Logs Events.
     */
-	static shared_ptr<EventLogger> GetEventLogger() {
-		return _eventLogger_;
+	static void Log(string message , EventLogger::LogLevel logLevel) {
+		if (!_eventLogger_)
+			return;
+
+		_eventLogger_->Log(message , logLevel);
 	}
 };
 

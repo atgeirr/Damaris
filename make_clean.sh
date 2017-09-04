@@ -22,7 +22,6 @@ rm examples/storage/cmake_install.cmake
 rm examples/storage/vector
 rm examples/storage/2dmesh
 rm examples/storage/3dmesh
-rm examples/storage/life-hdf5
 rm examples/storage/blocks-hdf5
 rm examples/storage/mandelbulb-hdf5
 rm examples/visit/cmake_install.cmake 

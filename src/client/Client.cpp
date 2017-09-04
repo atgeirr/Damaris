@@ -229,6 +229,7 @@ int Client::Clear(const std::string & varname,
 	
 	if(not b) return DAMARIS_BLOCK_NOT_FOUND;
 	b->SetReadOnly(false);
+	b->LoseDataOwnership();
 	v->DetachBlock(b);
 	
 	// sends the header message

@@ -24,6 +24,8 @@ using namespace logging::trivial;
 namespace damaris
 {
 
+// We should always make sure that the serverity_level enum has the same items as LogLevel enum, othewise
+// the below casts are not valid anymore.
 void EventLogger::Init(int processId , string file_name , int rotation_size , string log_format , int log_level)
 {
     stringstream logFileName;
@@ -42,46 +44,12 @@ void EventLogger::Init(int processId , string file_name , int rotation_size , st
     logging::add_common_attributes();
 }
 
-void EventLogger::LogTrace(string message)
-{
+void EventLogger::Log(string message , LogLevel logLevel) {
+
     src::severity_logger <severity_level> lg;
+    logging::trivial::severity_level severity = (logging::trivial::severity_level)logLevel;
 
-    BOOST_LOG_SEV(lg, trace) << message;
-}
-
-void EventLogger::LogDebug(string message)
-{
-    src::severity_logger <severity_level> lg;
-
-    BOOST_LOG_SEV(lg, debug) << message;
-}
-
-void EventLogger::LogInfo(string message)
-{
-    src::severity_logger <severity_level> lg;
-
-    BOOST_LOG_SEV(lg, info) << message;
-}
-
-void EventLogger::LogWarning(string message)
-{
-    src::severity_logger <severity_level> lg;
-
-    BOOST_LOG_SEV(lg, warning) << message;
-}
-
-void EventLogger::LogError(string message)
-{
-    src::severity_logger <severity_level> lg;
-
-    BOOST_LOG_SEV(lg, error) << message;
-}
-
-void EventLogger::LogFatal(string message)
-{
-    src::severity_logger <severity_level> lg;
-
-    BOOST_LOG_SEV(lg, fatal) << message;
+    BOOST_LOG_SEV(lg, severity) << message;
 }
 
 } //namespace damaris

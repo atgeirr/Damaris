@@ -93,7 +93,6 @@ private:
 	*/
 	void OutputPerCore(int32_t iteration);
 
-		
 public:
 	
 	/**

@@ -7,6 +7,8 @@
 
 #include "Damaris.h"
 
+int MAX_CYCLES = 10;
+
 typedef struct
 {
     int     cycle;
@@ -31,7 +33,7 @@ void simulate_one_timestep(simulation_data *sim)
 {
     ++sim->cycle;
     sim->time += 0.0134;
-    printf("Simulating time step: cycle=%d, time=%lg\n", sim->cycle, sim->time);
+    printf("Blocks simulator - time step: cycle=%d, time=%lg\n", sim->cycle, sim->time);
     sleep(1);
 }
 
@@ -42,10 +44,11 @@ void mainloop(void)
     /* Set up some simulation data. */
     simulation_data sim;
     simulation_data_ctor(&sim);
+
     int i;
-    for(i=0; i<60; i++) {
-	simulate_one_timestep(&sim);
-	exposeDataToDamaris(&sim);
+    for(i=0; i < MAX_CYCLES ; i++) {
+	    simulate_one_timestep(&sim);
+	    exposeDataToDamaris(&sim);
     }
     simulation_data_dtor(&sim);
 }

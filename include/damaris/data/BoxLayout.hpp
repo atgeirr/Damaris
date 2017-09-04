@@ -114,12 +114,16 @@ private:
 	 *
 	 * \param[in] dim : dimension along which to get the extent.
 	 */
-	virtual size_t GetExtentAlong(unsigned int dim) const {
+	virtual size_t GetExtentAlong(unsigned int dim , bool includeGhost = true) const {
 		if(dim < GetDimensions())
-			return extents_[dim];
+            if (includeGhost)
+			    return extents_[dim];
+            else
+                return extents_[dim] - ghosts_[dim].first - ghosts_[dim].second;
 		else
 			return 1;
 	}
+
 
 	/**
 	 * \see Layout::GetGlobalExtentAlong

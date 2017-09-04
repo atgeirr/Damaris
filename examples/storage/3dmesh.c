@@ -69,8 +69,8 @@ int main(int argc, char** argv)
 
 			for(x = 0; x < local_width; x++)
 				for(y = 0; y < local_height; y++)
-                    for (z=0; z< local_depth ; z++)
-					    cube[x][y][z] = rank +i;
+                    for (z=0; z < local_depth ; z++)
+					    cube[x][y][z] = rank + i;
 
 
 			damaris_write("cube" , cube);

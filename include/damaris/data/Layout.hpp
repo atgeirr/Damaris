@@ -89,7 +89,7 @@ class Layout
 	 *
 	 * \param[in] dim : dimension along which to get the extent.
 	 */
-	virtual size_t GetExtentAlong(unsigned int dim) const = 0;
+	virtual size_t GetExtentAlong(unsigned int dim , bool includeGhost=true) const = 0;
 
 	/**
 	 * Returns the global extent along a given dimension.

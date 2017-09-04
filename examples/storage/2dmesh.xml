@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <simulation name="2dmesh" language="c" xmlns="http://damaris.gforge.inria.fr/damaris/model">
 	<architecture>
-		<domains count="8" />
+		<domains count="1" />
 		<dedicated cores="4" nodes="0" />
 		<buffer name="damaris-buffer" size="536870912" />
 		<queue  name="damaris-queue" size="100" />
@@ -10,10 +10,10 @@
 		<parameter name="WIDTH"  type="int" value="16" />
 		<parameter name="HEIGHT" type="int" value="16" />
 		<parameter name="size"	 type="int" value="8"  />
-		<parameter name="domains"	 type="int" value="8"  />
+		<parameter name="domains"	 type="int" value="1"  />
 		<parameter name="GX0"	 type="int" value="2"  />
-		<parameter name="GY0"	 type="int" value="2"  />
-		<parameter name="GX1"	 type="int" value="3"  />
+		<parameter name="GY0"	 type="int" value="3"  />
+		<parameter name="GX1"	 type="int" value="1"  />
 		<parameter name="GY1"	 type="int" value="4"  />
 
 		<layout name="cells"  type="int" dimensions="(WIDTH/size)+(GX0+GX1),(HEIGHT/domains)+(GY0+GY1)"
@@ -23,9 +23,9 @@
 	</data>
 	<storage>
 		<store name="MyStore" type="HDF5">
-			<option key="FileMode">Collective</option>
+			<option key="FileMode">FilePerCore</option>
 			<option key="XDMFMode">NoIteration</option>
-			<option key="FilesPath">h5results/</option>
+			<option key="FilesPath"></option>
 		</store>
 	</storage>
 	<actions>

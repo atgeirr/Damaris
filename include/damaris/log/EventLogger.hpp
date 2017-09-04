@@ -71,6 +71,8 @@ protected:
 
 public:
 
+    enum LogLevel{Trace, Debug, Info, Warning, Error, Fatal};
+
     /**
     * creates the singleton object.
     */
@@ -83,13 +85,10 @@ public:
 
     void Init(int processId , string file_name , int rotation_size , string log_format , int log_level);
 
-    // Logging Methods
-    void LogTrace(string message);
-    void LogDebug(string message);
-    void LogInfo(string message);
-    void LogWarning(string message);
-    void LogError(string message);
-    void LogFatal(string message);
+    /**
+    * Logs the message basaed on the logLevel severity mode
+    */
+    void Log(string message , LogLevel logLevel);
 };
 
 }
