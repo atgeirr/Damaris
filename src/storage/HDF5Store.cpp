@@ -102,8 +102,8 @@ namespace damaris {
 
     void HDF5Store::Output(int32_t iteration){
 
-        // If there is no data to write, return
-        // If (IterationIsEmpty(iteration)) return;
+        if (IterationIsEmpty(iteration))
+            return;
 
         switch(fileMode_) {
             case FilePerCore:
@@ -112,10 +112,9 @@ namespace damaris {
             case Collective:
                 OutputCollective(iteration);
                 break;
-            default: // i.e. File per node
+            default: // e.g. file per dedicated node
                 ERROR("FileMode is not supported!!!");
         }
-
     }
 
     bool HDF5Store::UpdateGhostZones(shared_ptr<Variable> v , hid_t &memSpace , hsize_t* localDim){

@@ -91,6 +91,25 @@ class Store : public Configurable<model::Store> {
 	 * and is meant to output all variables into files.
 	 */
 	virtual void Output(int32_t iteration) = 0;
+
+	/**
+ 	* This function checks to see if there is any data to be written into an store object or not.
+ 	* If there is no data, the Update function in each store will return. <Maybe set it as configuratble at future>
+ 	*/
+	virtual bool IterationIsEmpty(int iteration){
+		vector<weak_ptr<Variable> >::const_iterator w;
+		w = GetVariables().begin();
+
+		// for each variable ...
+		for (; w != GetVariables().end(); w++) {
+			shared_ptr<Variable> v = w->lock();
+
+			if (v->CountTotalBlocks(iteration) > 0)
+				return false;
+		}
+
+		return true;
+	}
 };
 
 }

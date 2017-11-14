@@ -125,10 +125,9 @@ fi
 
 # echo -e "--- COMPILING & INSTALLING DAMARIS ---------------------------------------------------------------\n"
 # compiling and installing Damaris
-#cd $tempdir
-#git clone https://scm.gforge.inria.fr/anonscm/git/damaris/damaris.git
+cd $tempdir
 cd ..
-# cd trunk
+cd ..
 cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX:PATH=$install_path
 make
 make install

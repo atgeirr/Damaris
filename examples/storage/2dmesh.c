@@ -143,7 +143,7 @@ int main(int argc, char** argv)
 			}
 		}
 
-        if (rank == 0)
+        /*if (rank == 0)
         {
             printf("\nTotal array for rank 0 is: \n");
             for (i = 0; i < total_width; i++) {
@@ -152,7 +152,7 @@ int main(int argc, char** argv)
 
                 printf("\n");
             }
-        }
+        }*/
 
 		damaris_stop();
         free(space);
