@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<simulation name="cube" language="c" xmlns="http://damaris.gforge.inria.fr/damaris/model">
+	<architecture>
+		<domains count="1" />
+		<dedicated cores="1" nodes="0" />
+		<buffer name="damaris-buffer" size="536870912" />
+		<queue  name="damaris-queue" size="100" />
+	</architecture>
+	<data>
+		<parameter name="size"	 type="int" value="1"  />
+
+		<layout name="cells"  type="float" dimensions="100,100,100" global="100,100,100" />
+		<layout name="rmeshX" type="float" dimensions="101" global="101" />
+		<layout name="rmeshY" type="float" dimensions="101" global="101" />
+		<layout name="rmeshZ" type="float" dimensions="101" global="101" />
+
+		<mesh name="3dmesh" type="rectilinear" topology="3">
+			<coord name="coord/x" unit="cm" label="Width"/>
+			<coord name="coord/y" unit="cm" label="Height"/>
+			<coord name="coord/z" unit="cm" label="Depth"/>
+		</mesh>
+		<group name="coord">
+			<variable name="x" layout="rmeshX" visualizable="false" time-varying="false"  />
+			<variable name="y" layout="rmeshY" visualizable="false" time-varying="false"  />
+			<variable name="z" layout="rmeshZ" visualizable="false" time-varying="false"  />
+		</group>
+		<variable name="space" type="scalar" layout="cells" mesh="3dmesh" centering="zonal" store="MyStore"/>
+	</data>
+	<storage>
+		<store name="MyStore" type="HDF5">
+			<option key="FileMode">Collective</option>
+			<option key="XDMFMode">NoIteration</option>
+			<option key="FilesPath"></option>
+		</store>
+	</storage>
+	<actions>
+	</actions>
+	<visit>
+		<path>@VisIt_ROOT@</path>
+	</visit>
+	<log FileName="log/cube" RotationSize="5" LogFormat="[%TimeStamp%]: %Message%" LogLevel="info" />
+</simulation>
+
