@@ -9,9 +9,6 @@
 
 namespace damaris {
 
-using namespace std;
-	
-USING_POINTERS;
 
 class TestDataSpace : public CppUnit::TestFixture {
 	
@@ -72,7 +69,7 @@ protected:
 	}
 	
 	void LinkOneDataSpace() {
-		shared_ptr<TestOwner> owner(new TestOwner);
+		std::shared_ptr<TestOwner> owner(new TestOwner);
 		{
 			DataSpace<TestOwner> ds;
 			owner->LinkDataSpace(ds);
@@ -85,7 +82,7 @@ protected:
 	}
 	
 	void CopyDataSpaces() {
-		shared_ptr<TestOwner> owner(new TestOwner);
+		std::shared_ptr<TestOwner> owner(new TestOwner);
 		{
 			DataSpace<TestOwner> ds1;
 			owner->LinkDataSpace(ds1);

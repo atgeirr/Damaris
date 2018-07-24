@@ -84,7 +84,7 @@ class ScriptAction : public Action, public Configurable<model::Script> {
 	 * according to the "language" field in the description.
 	 */
 	template<typename SUPER>
-	static shared_ptr<SUPER> New(const model::Script& mdl, 
+	static std::shared_ptr<SUPER> New(const model::Script& mdl, 
 				     const std::string& name) {
 		switch(mdl.scope()) {
 		case model::Scope::core :
@@ -118,11 +118,11 @@ class ScriptAction : public Action, public Configurable<model::Script> {
 			}
 			break;
 		}
-		return shared_ptr<SUPER>();
+		return std::shared_ptr<SUPER>();
 	}
 
 	template<typename SUPER>
-	static shared_ptr<SUPER> New(const model::Script& mdl)
+	static std::shared_ptr<SUPER> New(const model::Script& mdl)
 	{
 		return New<SUPER>(mdl,mdl.name());
 	}

@@ -88,14 +88,14 @@ class GroupAction : public BASE {
 		}
 	}
 
-	static shared_ptr<BASE> New(const MODEL& mdl)
+	static std::shared_ptr<BASE> New(const MODEL& mdl)
 	{
-		return shared_ptr<BASE>(
+		return std::shared_ptr<BASE>(
 				new GroupAction<BASE,MODEL>(mdl),
 				Deleter<GroupAction<BASE,MODEL> >());
 	}
 
-	static shared_ptr<BASE> New(const MODEL& mdl, const std::string& name)
+	static std::shared_ptr<BASE> New(const MODEL& mdl, const std::string& name)
 	{
 		return New(mdl);
 	}

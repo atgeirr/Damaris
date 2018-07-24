@@ -36,7 +36,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 namespace damaris 
 {
 
-USING_POINTERS;
 
 /**
  * The Channel class is a wrapper to MPI send/recv functions to be used with
@@ -52,7 +51,7 @@ class Channel : public ENABLE_SHARED_FROM_THIS(Channel) {
 	MPI_Comm comm_; /*!< Communicator linking the 
 			two entities of the channel. */
 	int endpoint_;	/*!< Rank of the destination in the communicator. */
-	weak_ptr<Reactor> reactor_; /*!< Pointer to the reactor that handles the
+	std::weak_ptr<Reactor> reactor_; /*!< Pointer to the reactor that handles the
 			asynchronous callbacks. Uses a weak_ptr to avoid cyclic
 			references. */
 	int max_async_; /*< Maximum number of pending async send. */
@@ -117,7 +116,7 @@ class Channel : public ENABLE_SHARED_FROM_THIS(Channel) {
 	int SimpleAsyncSend(int tag, const void* buf, int count, F f) {
 		if(max_async_ == 0) return DAMARIS_CHANNEL_ERROR;		
 
-		shared_ptr<Reactor> r = reactor_.lock();
+		std::shared_ptr<Reactor> r = reactor_.lock();
 		if(not r) return DAMARIS_REACTOR_NOT_FOUND;
 		
 		// if queue is full, run the reactor until there is some space
@@ -127,7 +126,7 @@ class Channel : public ENABLE_SHARED_FROM_THIS(Channel) {
 		}
 		
 		if(endpoint_ == MPI_ANY_SOURCE) return DAMARIS_CHANNEL_ERROR;
-		shared_ptr<Callback> cb = Callback::New(f);
+		std::shared_ptr<Callback> cb = Callback::New(f);
 		MPI_Request req;
 		int err = MPI_Isend((void*)buf,count,MPI_BYTE,endpoint_,
 				tag,comm_,&req);
@@ -191,9 +190,9 @@ class Channel : public ENABLE_SHARED_FROM_THIS(Channel) {
 	 */
 	template<typename F>
 	int SimpleAsyncRecv(int tag, void* buf, int count, F f) {
-		shared_ptr<Reactor> r = reactor_.lock();
+		std::shared_ptr<Reactor> r = reactor_.lock();
 		if(not r) return DAMARIS_REACTOR_NOT_FOUND;
-		shared_ptr<Callback> cb = Callback::New(f);
+		std::shared_ptr<Callback> cb = Callback::New(f);
 		MPI_Request req;
 		int err = MPI_Irecv(buf,count,MPI_BYTE,endpoint_,
 				tag,comm_,&req);
@@ -220,7 +219,7 @@ class Channel : public ENABLE_SHARED_FROM_THIS(Channel) {
 	/**
 	 * Returns the Reactor used to create the Channel.
 	 */
-	shared_ptr<Reactor> GetReactor() const {
+    std::shared_ptr<Reactor> GetReactor() const {
 		return reactor_.lock();
 	}
 	
@@ -354,18 +353,18 @@ class Channel : public ENABLE_SHARED_FROM_THIS(Channel) {
 	 * \param[in] c : communicator to use for communications.
 	 * \param[in] endpoint : remote endpoint.
 	 */
-	static shared_ptr<Channel> New(const shared_ptr<Reactor>& reactor,
+	 static std::shared_ptr<Channel> New(const std::shared_ptr<Reactor>& reactor,
 					MPI_Comm c, int endpoint, int max_async)
 	{
-		if(not reactor) return shared_ptr<Channel>();
+        if(not reactor) return std::shared_ptr<Channel>();
 		int size;
 		MPI_Comm_size(c,&size);
 		if(((endpoint >= size) || (endpoint < 0)) 
 			&& (not (endpoint == MPI_ANY_SOURCE))) {
-			return shared_ptr<Channel>();
+	 	 return std::shared_ptr<Channel>();
 		}
 		
-		shared_ptr<Channel> p(new Channel(), Deleter<Channel>());
+        std::shared_ptr<Channel> p(new Channel(), Deleter<Channel>());
 		p->comm_ = c;
 		p->endpoint_ = endpoint;
 		p->reactor_ = reactor;

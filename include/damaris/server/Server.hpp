@@ -31,8 +31,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "damaris/comm/Reactor.hpp"
 
 namespace damaris {
-	
-USING_POINTERS;
+
 
 class Server {
 	
@@ -40,8 +39,8 @@ friend class Deleter<Server>;
 
 	private:
 		
-	shared_ptr<Reactor> reactor_; /*!< Reactor gathering servers. */
-	std::map<int,shared_ptr<Channel> > clients_; /*!< Channels to 
+	std::shared_ptr<Reactor> reactor_; /*!< Reactor gathering servers. */
+	std::map<int,std::shared_ptr<Channel> > clients_; /*!< Channels to 
 						communicate with clients. */
 	
 	std::map<int,HeaderMessage> headerMsg_; /*!< Headers sent from clients. */
@@ -73,12 +72,12 @@ friend class Deleter<Server>;
 	void OnStop(int source);
 	void OnNextIteration(int source);
 	void OnNextIterationWithErrors(int source);
-	void OnCallAction(const shared_ptr<Channel>& ch, int source);
-	void OnBcastAction(const shared_ptr<Channel>& ch, int source);
-	void OnWrite(const shared_ptr<Channel>& ch, int source);
-	void OnRemoteWrite(const shared_ptr<Channel>& ch, int source);
-	void OnCommit(const shared_ptr<Channel>& ch, int source);
-	void OnClear(const shared_ptr<Channel>& ch, int source);
+	void OnCallAction(const std::shared_ptr<Channel>& ch, int source);
+	void OnBcastAction(const std::shared_ptr<Channel>& ch, int source);
+	void OnWrite(const std::shared_ptr<Channel>& ch, int source);
+	void OnRemoteWrite(const std::shared_ptr<Channel>& ch, int source);
+	void OnCommit(const std::shared_ptr<Channel>& ch, int source);
+	void OnClear(const std::shared_ptr<Channel>& ch, int source);
 
 	// Callbacks associated to interactions with other servers
 	static void BcastEventCallback(
@@ -91,7 +90,7 @@ friend class Deleter<Server>;
 	/**
 	 * Returns the reactor connecting all servers.
 	 */
-	shared_ptr<Reactor> GetReactor() const {
+	std::shared_ptr<Reactor> GetReactor() const {
 		return reactor_;
 	}
 		
@@ -101,7 +100,7 @@ friend class Deleter<Server>;
 	 *
 	 * \param[in] ch : Channel to add.
 	 */
-	bool AddChannelToClient(const shared_ptr<Channel>& ch);
+	bool AddChannelToClient(const std::shared_ptr<Channel>& ch);
 
 	/** 
 	 * Enters in the server main loop. Won't stop until Stop() is called.
@@ -126,8 +125,8 @@ friend class Deleter<Server>;
 	 *
 	 * \param[in] comm : MPI communicator gathering all servers.
 	 */
-	static shared_ptr<Server> New(MPI_Comm comm) {
-		shared_ptr<Server> s(new Server(), Deleter<Server>());
+	static std::shared_ptr<Server> New(MPI_Comm comm) {
+		std::shared_ptr<Server> s(new Server(), Deleter<Server>());
 		s->reactor_ = Reactor::New(comm);
 		return s;
 	}

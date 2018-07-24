@@ -18,7 +18,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <sstream>
 #include "log/EventLogger.hpp"
 
-using namespace std;
+
 using namespace logging::trivial;
 
 namespace damaris
@@ -26,9 +26,9 @@ namespace damaris
 
 // We should always make sure that the serverity_level enum has the same items as LogLevel enum, othewise
 // the below casts are not valid anymore.
-void EventLogger::Init(int processId , string file_name , int rotation_size , string log_format , int log_level)
+void EventLogger::Init(int processId , std::string file_name , int rotation_size , std::string log_format , int log_level)
 {
-    stringstream logFileName;
+    std::stringstream logFileName;
     logFileName << file_name << "_P" << processId << "_%N.log";
 
     logging::add_file_log(
@@ -44,7 +44,7 @@ void EventLogger::Init(int processId , string file_name , int rotation_size , st
     logging::add_common_attributes();
 }
 
-void EventLogger::Log(string message , LogLevel logLevel) {
+void EventLogger::Log(std::string message , EventLogger::LogLevel logLevel) {
 
     src::severity_logger <severity_level> lg;
     logging::trivial::severity_level severity = (logging::trivial::severity_level)logLevel;

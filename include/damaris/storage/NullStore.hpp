@@ -49,8 +49,8 @@ class NullStore : public Store {
 	virtual void Output(int32_t iteration);
 
 	template<typename SUPER>
-	static shared_ptr<SUPER> New(const model::Store& mdl, const std::string& name) {
-		return shared_ptr<SUPER>(new NullStore(mdl), Deleter<NullStore>());
+	static std::shared_ptr<SUPER> New(const model::Store& mdl, const std::string& name) {
+		return std::shared_ptr<SUPER>(new NullStore(mdl), Deleter<NullStore>());
 	}
 };
 

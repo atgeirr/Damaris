@@ -57,7 +57,7 @@ class ParameterManager : public Manager<Parameter> {
 		 */
 		T operator[](const std::string& n)
 		{
-			shared_ptr<Parameter> p = ParameterManager::Search(n);
+			std::shared_ptr<Parameter> p = ParameterManager::Search(n);
 			if(not p) {
 				ERROR("Parameter \"" << n << "\" not found");
 				return T();

@@ -40,8 +40,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "damaris/data/Block.hpp"
 
 namespace damaris {
-	
-USING_POINTERS;
+
 
 /**
  * The Variable object is used for describing a variable within a metadata 
@@ -63,12 +62,12 @@ class Variable : public ENABLE_SHARED_FROM_THIS(Variable),
 	std::string name_; /*!< name of the Variable. 
 			(full name, including the groups) */
 	BlockIndex blocks_; /*!< Blocks container. */
-	shared_ptr<Layout> layout_; /*!< Layout of the variable. */
-	shared_ptr<Buffer> buffer_; /*!< Buffer in which to allocate 
+	std::shared_ptr<Layout> layout_; /*!< Layout of the variable. */
+	std::shared_ptr<Buffer> buffer_; /*!< Buffer in which to allocate 
 					blocks of the variable. */
 	std::map<int32_t, std::vector<int64_t> > positions_; /*!< Positions of
 		each domain within a global description of the Variable.*/
-	//shared_ptr<Storage> storage_;
+	//std::shared_ptr<Storage> storage_;
 	
 	/**
 	 * Constructor.
@@ -136,14 +135,14 @@ class Variable : public ENABLE_SHARED_FROM_THIS(Variable),
 	/**
 	 * Returns the Layout of this variable.
 	 */
-	virtual shared_ptr<Layout> GetLayout() const {
+	virtual std::shared_ptr<Layout> GetLayout() const {
 		return layout_;
 	}
 	
 	/**
 	 * Returns the buffer associated to the variable.
 	 */
-	virtual shared_ptr<Buffer> GetBuffer() {
+	virtual std::shared_ptr<Buffer> GetBuffer() {
 		if(not buffer_) {
 			buffer_ = Environment::GetDefaultBuffer();
 		}
@@ -173,16 +172,16 @@ class Variable : public ENABLE_SHARED_FROM_THIS(Variable),
 	 * 
 	 * \param[in] block : block to attach.
 	 */
-	bool AttachBlock(const shared_ptr<Block>& block);
+	bool AttachBlock(const std::shared_ptr<Block>& block);
 	
 	/**
 	 * Removes a block from the Variable. Will NOT delete the data
-	 * until all instances of the shared_ptr have disappeared and
+	 * until all instances of the std::shared_ptr have disappeared and
 	 * all the instances of dataspace.
 	 * 
 	 * \param[in] block : block to detach.
 	 */
-	bool DetachBlock(const shared_ptr<Block>& block);
+	bool DetachBlock(const std::shared_ptr<Block>& block);
 	
 	/**
 	 * Creates a Block, allocates memory for it in the Variable's buffer
@@ -194,7 +193,7 @@ class Variable : public ENABLE_SHARED_FROM_THIS(Variable),
 	 * \param[in] bid : domain id.
 	 * \param[in] blocking : whether or not to block if the memory is full.
 	 */
-	shared_ptr<Block> Allocate(int source, int iteration, int bid, 
+	std::shared_ptr<Block> Allocate(int source, int iteration, int bid, 
 					bool blocking=false);
 			
 
@@ -204,7 +203,7 @@ class Variable : public ENABLE_SHARED_FROM_THIS(Variable),
 	 * \see Allocate
 	 */
 
-	shared_ptr<Block> AllocateFixedSize(int source, int iteration, int bid,
+	std::shared_ptr<Block> AllocateFixedSize(int source, int iteration, int bid,
 						const std::vector<int64_t>& lbounds, 
 						const std::vector<int64_t>& ubounds,
 						const std::vector<int64_t>& gbounds,
@@ -215,7 +214,7 @@ class Variable : public ENABLE_SHARED_FROM_THIS(Variable),
 	 * aligned with the memory page size.
 	 * \see Allocate
 	 */
-	shared_ptr<Block> AllocateAligned(int source, int iteration, int bid, 
+	std::shared_ptr<Block> AllocateAligned(int source, int iteration, int bid, 
 					bool blocking=false);
 	
 	/**
@@ -232,7 +231,7 @@ class Variable : public ENABLE_SHARED_FROM_THIS(Variable),
 	 * \param[in] h : handle to get the address in memory.
 	 * \param[in] size : size of the data to retrieve.
 	 */
-	shared_ptr<Block> Retrieve(int source, int iteration, int bid,
+	std::shared_ptr<Block> Retrieve(int source, int iteration, int bid,
 					const Handle& h, size_t size);
 	
 	/**
@@ -252,7 +251,7 @@ class Variable : public ENABLE_SHARED_FROM_THIS(Variable),
 	 * \param[in] ghosts : ghost zones of the block.
 	 * \param[in] h : handle to get the address in memory.
 	 */
-	shared_ptr<Block> Retrieve(int source, int iteration, int bid,
+	std::shared_ptr<Block> Retrieve(int source, int iteration, int bid,
 					const std::vector<int64_t>& lbounds,
 					const std::vector<int64_t>& ubounds,
 					const std::vector<int64_t>& gbounds,
@@ -316,7 +315,7 @@ class Variable : public ENABLE_SHARED_FROM_THIS(Variable),
 	 * \param[in] iteration : iteration of the block to find.
 	 * \param[in] id : domain id of the block to find.
 	 */
-	shared_ptr<Block> GetBlock(int source, int iteration, int id) const;
+	std::shared_ptr<Block> GetBlock(int source, int iteration, int id) const;
 	
 	/**
 	 * Returns an iterator over the set of Blocks.
@@ -393,24 +392,24 @@ class Variable : public ENABLE_SHARED_FROM_THIS(Variable),
 	bool GetIDRange(int& lowest, int& biggest) const;
 	
 	/**
-	 * Static method to build a new Variable. Constructs a shared_ptr.
+	 * Static method to build a new Variable. Constructs a std::shared_ptr.
 	 *
 	 * \param[in] mdl : model from which to build the Variable.
 	 * \param[in] name : name for the object.
 	 */
 	template<typename SUPER>
-	static shared_ptr<SUPER> New(const model::Variable& mdl, 
+	static std::shared_ptr<SUPER> New(const model::Variable& mdl, 
 				     const std::string& name)
 	{
 
 		if(mdl.name().find("/") != std::string::npos) {                 
 			CFGERROR("Variable " << mdl.name() << " cannot have a '/' character.");
-			return shared_ptr<SUPER>();                
+			return std::shared_ptr<SUPER>();                
 		}
 	
 		std::string layoutName = mdl.layout();
 
-		shared_ptr<Layout> l;
+		std::shared_ptr<Layout> l;
 		bool layoutIsAbsolute = (layoutName.find("/") != std::string::npos);
 
 		if(layoutIsAbsolute) {
@@ -443,22 +442,22 @@ class Variable : public ENABLE_SHARED_FROM_THIS(Variable),
 			CFGERROR("Layout \"" << mdl.layout() 
 				<< "\" not found for variable \"" 
 				<< mdl.name() << "\"");
-			return shared_ptr<SUPER>();
+			return std::shared_ptr<SUPER>();
 		}
 
-		shared_ptr<SUPER> v(new Variable(mdl), Deleter<Variable>());
+		std::shared_ptr<SUPER> v(new Variable(mdl), Deleter<Variable>());
 		v->layout_ = l;
 		v->name_ = name;
 		return v;
 	}
 
 	/**
-	 * Static method to build a new Variable. Constructs a shared_ptr.
+	 * Static method to build a new Variable. Constructs a std::shared_ptr.
 	 * 
 	 * \param[in] mdl : model from which to build the Variable.
 	 */
 	template<typename SUPER>
-	static shared_ptr<SUPER> New(const model::Variable& mdl)
+	static std::shared_ptr<SUPER> New(const model::Variable& mdl)
 	{
 		return New<SUPER>(mdl,mdl.name());
 	}

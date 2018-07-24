@@ -58,7 +58,7 @@ private:
 	typedef Calc<std::string::const_iterator,
 			ParameterManager::ParameterMap<int> > CalcType;
 
-	static shared_ptr<CalcType> _calc_; /*!< This object calculates the
+	static std::shared_ptr<CalcType> _calc_; /*!< This object calculates the
 		layout from a string representation that includes parameters. */
 
 	/**
@@ -180,23 +180,23 @@ private:
 	 * \param[in] mdl : base model from which to create the layout.
 	 */
 	template<typename SUPER>
-	static shared_ptr<SUPER> New(const model::Layout& mdl, 
+	static std::shared_ptr<SUPER> New(const model::Layout& mdl, 
 				     const std::string& name) {
 
 		if(mdl.name().find("/") != std::string::npos) {                 
 			CFGERROR("Layout " << mdl.name() << " cannot have a '/' character.");
-			return shared_ptr<SUPER>();                
+			return std::shared_ptr<SUPER>();                
 		}
 
-		shared_ptr<BoxLayout> p 
-			= shared_ptr<BoxLayout>(new BoxLayout(mdl), 
+		std::shared_ptr<BoxLayout> p 
+			= std::shared_ptr<BoxLayout>(new BoxLayout(mdl), 
 					 Deleter<BoxLayout>());
 		p->name_ = name;
 		if(not p->ObserveDependentParameters()) {
-			return shared_ptr<SUPER>();
+			return std::shared_ptr<SUPER>();
 		}
 		p->InterpretDimensions();
-		return shared_ptr<SUPER>(p);
+		return std::shared_ptr<SUPER>(p);
 	}
 	
 }; // class Layout

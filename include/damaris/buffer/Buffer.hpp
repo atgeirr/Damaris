@@ -27,14 +27,13 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace damaris {
 
-USING_POINTERS;
 
 /**
  * The Buffer class is an abstract class that gives direct access to a (usually
  * shared) segment of memory. It is one of the few classes in Damaris that 
- * works with raw pointers instead of shared_ptr, because it is supposed to
+ * works with raw pointers instead of std::shared_ptr, because it is supposed to
  * allocate data that stays in shared memory until another process removes it,
- * something that is prevented by shared_ptr.
+ * something that is prevented by std::shared_ptr.
  */
 class Buffer : public ENABLE_SHARED_FROM_THIS(Buffer)
 {

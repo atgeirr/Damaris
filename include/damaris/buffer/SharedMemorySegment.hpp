@@ -77,8 +77,8 @@ protected:
 			size(initSize), max(initSize) {};
 	} *size_manager_;
 	
-	shared_ptr<mapped_region> region_; /*!< mapped_region object. */
-	shared_ptr<managed_protected_external_buffer> buffer_; 
+    std::shared_ptr<mapped_region> region_; /*!< mapped_region object. */
+    std::shared_ptr<managed_protected_external_buffer> buffer_;
 		/*!< pointer to the managed buffer. */
 
 	/**
@@ -88,8 +88,8 @@ protected:
 	 * \param[in] r : pointer to a mapped_region (boost object).
 	 * \param[in] b : pointer to the managed external buffer (boost object).
 	 */
-	SharedMemorySegment(const shared_ptr<mapped_region>& r, 
-		const shared_ptr<managed_protected_external_buffer>& b);
+    SharedMemorySegment(const std::shared_ptr<mapped_region>& r,
+        const std::shared_ptr<managed_protected_external_buffer>& b);
 	
 	/**
 	 * Destructor.
@@ -103,7 +103,7 @@ public:
 	 * 
 	 * \param[in] model : base model from configuration file.
 	 */
-	static shared_ptr<SharedMemorySegment> Create(
+    static std::shared_ptr<SharedMemorySegment> Create(
 				const model::Buffer& model);
 
 	/**
@@ -114,7 +114,7 @@ public:
 	 * \param[in] name : name of the shared memory segment.
 	 * \param[in] size : size of the shared memory segment.
 	 */
-	static shared_ptr<SharedMemorySegment> Create(posix_shmem_t posix_shmem,
+    static std::shared_ptr<SharedMemorySegment> Create(posix_shmem_t posix_shmem,
 		const std::string& name, size_t size);
 
 	/**
@@ -125,7 +125,7 @@ public:
 	 * \param[in] name : name of the shared memory segment.
 	 * \param[in] size : size of the shared memory segment.
 	 */
-	static shared_ptr<SharedMemorySegment> Create(sysv_shmem_t sysv_shmem,
+    static std::shared_ptr<SharedMemorySegment> Create(sysv_shmem_t sysv_shmem,
 		const std::string& name, size_t size);
 
 private:
@@ -136,7 +136,7 @@ private:
 	 * 
 	 * \param[in] model : model from configuration file.
 	 */
-	static shared_ptr<SharedMemorySegment> CreateMultiBlock(
+    static std::shared_ptr<SharedMemorySegment> CreateMultiBlock(
 			const model::Buffer& model);
 
 public:
@@ -146,7 +146,7 @@ public:
 	 * 
 	 * \param[in] model : base model from configuration file.
 	 */	
-	static shared_ptr<SharedMemorySegment> Open(const model::Buffer& model);
+    static std::shared_ptr<SharedMemorySegment> Open(const model::Buffer& model);
 
 	/**
 	 * Opens a POSIX-based shared memory segment.
@@ -158,7 +158,7 @@ public:
 	 * \param[in] name : name of the shared memory segment.
 	 * \param[in] size : size of the shared memory segment.
 	 */
-	static shared_ptr<SharedMemorySegment> Open(posix_shmem_t posix_shmem,
+    static std::shared_ptr<SharedMemorySegment> Open(posix_shmem_t posix_shmem,
 		const std::string &name, size_t size = 0);
 
 	/**
@@ -171,7 +171,7 @@ public:
 	 * \param[in] name : name of the shared memory segment.
 	 * \param[in] size : size of the shared memory segment.
 	 */
-	static shared_ptr<SharedMemorySegment> Open(sysv_shmem_t sysv_shmem,
+    static std::shared_ptr<SharedMemorySegment> Open(sysv_shmem_t sysv_shmem,
 		const std::string& name, size_t size = 0);
 
 private:
@@ -180,7 +180,7 @@ private:
 	 * 
 	 * \param[in] model : base model from configuration file.
 	 */
-	static shared_ptr<SharedMemorySegment> OpenMultiBlock(
+    static std::shared_ptr<SharedMemorySegment> OpenMultiBlock(
 			const model::Buffer& model);
 
 public:
@@ -293,7 +293,7 @@ class SharedMemorySegment::CompositeShMem : public SharedMemorySegment {
 	friend class Deleter<CompositeShMem>;
 	
 private:
-	std::vector<shared_ptr<SharedMemorySegment> > blocks_; 
+    std::vector<std::shared_ptr<SharedMemorySegment> > blocks_;
 		/*!< pointers to blocks of shared memory. */
 	int nbseg_; /*!< number of blocks. */
 
@@ -304,7 +304,7 @@ public:
 	 * shared memory segments.
 	 */
 	CompositeShMem(int count, 
-		const std::vector<shared_ptr<SharedMemorySegment> >& segments);
+        const std::vector<std::shared_ptr<SharedMemorySegment> >& segments);
 
 	/**
 	 * \see Buffer::GetAddressFromHandle

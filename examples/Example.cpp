@@ -6,6 +6,7 @@
 
 #include "Damaris.h"
 
+
 int main(int argc, char** argv)
 {
 	MPI_Init(&argc,&argv);
@@ -15,7 +16,8 @@ int main(int argc, char** argv)
 	MPI_Comm_size(MPI_COMM_WORLD,&size);
 	
 	int NROW, NCOL;
-	
+
+
 /*	if(size != 3) {
 		if(rank == 0) {
 			fprintf(stderr,
@@ -110,20 +112,19 @@ int main(int argc, char** argv)
 
 #include "data/VariableManager.hpp"
 
-USING_POINTERS;
 using namespace damaris;
 
 // function called as a Damaris plugin
 extern "C" void my_function(const char* /*name*/, int source, int iteration,
 				const char* /*args*/) {
-	shared_ptr<Variable> v = VariableManager::Search("life/cells");
+    std::shared_ptr<Variable> v = VariableManager::Search("life/cells");
 	
 	if(v) printf("Variable found, ");
 	else return;
 	
 	printf("iteration = %d, source = %d, ", iteration, source);
 	
-	shared_ptr<Block> b = v->GetBlock(source, iteration, 0);
+    std::shared_ptr<Block> b = v->GetBlock(source, iteration, 0);
 	if(b) printf("block found, writable = %d\n",not b->IsReadOnly());
 	else printf("\n");
 }

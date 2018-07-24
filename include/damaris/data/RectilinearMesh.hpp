@@ -24,7 +24,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace damaris {
 
-USING_POINTERS;
 
 /**
  * RectilinearMesh is a particular type of Mesh.
@@ -59,19 +58,19 @@ class RectilinearMesh : public Mesh {
 	 * \param[in] mdl : base model from which to 
 	 */
 	template<typename SUPER>
-	static shared_ptr<SUPER> New(const model::Mesh& mdl,
+	static std::shared_ptr<SUPER> New(const model::Mesh& mdl,
 				     const std::string &name)
 	{
 
 		if(mdl.name().find("/") != std::string::npos) {                 
 			CFGERROR("Mesh " << mdl.name() << " cannot have a '/' character.");
-			return shared_ptr<SUPER>();                
+			return std::shared_ptr<SUPER>();                
 		}
 
 		if(mdl.type() != model::MeshType::rectilinear) {
-			return shared_ptr<RectilinearMesh>();
+			return std::shared_ptr<RectilinearMesh>();
 		}
-		shared_ptr<RectilinearMesh> m = shared_ptr<RectilinearMesh>(
+		std::shared_ptr<RectilinearMesh> m = std::shared_ptr<RectilinearMesh>(
 				new RectilinearMesh(mdl),
 				Deleter<RectilinearMesh>());
 		m->name_ = name;

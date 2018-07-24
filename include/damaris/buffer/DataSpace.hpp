@@ -24,7 +24,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace damaris {
 	
-USING_POINTERS;
 
 /**
  * The DataSpace class looks like a smart pointer that counts the
@@ -62,11 +61,11 @@ class DataSpace
 
 	private:
 
-	weak_ptr<OWNER> owner_; 	/*!< owner object */
+    std::weak_ptr<OWNER> owner_; 	/*!< owner object */
 	T* address_;			/*!< address of the data */
 	size_t size_;			/*!< size of the memory region */
-	shared_ptr<int> ref_count_;	/*!< count of references */
-	shared_ptr<bool> data_owner_;	/*!< true if Deallocate should be called
+	std::shared_ptr<int> ref_count_;	/*!< count of references */
+	std::shared_ptr<bool> data_owner_;	/*!< true if Deallocate should be called
 						when ref_count_ == 0 */
 
 	void * operator new   (size_t) throw() { return NULL; }
@@ -85,8 +84,8 @@ class DataSpace
 	{
 		address_ = NULL;
 		size_ = 0;
-		ref_count_ = shared_ptr<int>(new int(1));
-		data_owner_ = shared_ptr<bool>(new bool(false));
+		ref_count_ = std::shared_ptr<int>(new int(1));
+		data_owner_ = std::shared_ptr<bool>(new bool(false));
 	}
 
 	/**
@@ -97,7 +96,7 @@ class DataSpace
 	 * \param[in] addr : address of the actual data.
 	 * \param[in] size : size (in bytes) of the data.
 	 */
-	DataSpace(const shared_ptr<OWNER>& owner, void* addr, size_t size) 
+	DataSpace(const std::shared_ptr<OWNER>& owner, void* addr, size_t size) 
 	: owner_(owner), address_(addr), 
 	  size_(size), ref_count_(new int(0)), data_owner_(new bool(true)) {
 		if(addr != 0) {
@@ -176,7 +175,7 @@ class DataSpace
 	 * \param[in] addr : address of the data.
 	 * \param[in] size : size (in bytes) of the data.
 	 */
-	virtual bool Link(const shared_ptr<OWNER>& owner, 
+	virtual bool Link(const std::shared_ptr<OWNER>& owner, 
 			void* addr, size_t size = 0)
 	{
 		Unlink();
@@ -184,9 +183,9 @@ class DataSpace
 		address_ = addr;
 		size_ = size;
 		ref_count_.reset();
-		ref_count_ = shared_ptr<int>(new int(1));
+		ref_count_ = std::shared_ptr<int>(new int(1));
 		data_owner_.reset();
-		data_owner_ = shared_ptr<bool>(new bool(true));
+		data_owner_ = std::shared_ptr<bool>(new bool(true));
 		return true;
 	}
 
@@ -219,8 +218,8 @@ class DataSpace
 	/**
 	 * Returns a pointer to the owner of this DataSpace.
 	 */
-	virtual shared_ptr<OWNER> GetOwner() const {
-		if(owner_.expired()) return shared_ptr<OWNER>();
+	virtual std::shared_ptr<OWNER> GetOwner() const {
+		if(owner_.expired()) return std::shared_ptr<OWNER>();
 		return owner_.lock();
 	}
 

@@ -31,8 +31,8 @@ static size_t alignment =
 	bi::rbtree_best_fit<boost::interprocess::mutex_family>::Alignment;
 
 SharedMemorySegment::SharedMemorySegment(
-	const shared_ptr<mapped_region>& r, 
-	const shared_ptr<managed_protected_external_buffer>& b)
+	const std::shared_ptr<mapped_region>& r, 
+	const std::shared_ptr<managed_protected_external_buffer>& b)
 {
 	// The header of the region is initialized in the Create function
 	// that called this constructor. No need to initialize it.
@@ -42,7 +42,7 @@ SharedMemorySegment::SharedMemorySegment(
 	size_manager_ = (struct size_manager_s*)(region_->get_address());
 }
 
-shared_ptr<SharedMemorySegment> 
+std::shared_ptr<SharedMemorySegment> 
 	SharedMemorySegment::Create(const model::Buffer& model)
 {
 	const std::string& name = model.name();
@@ -51,7 +51,7 @@ shared_ptr<SharedMemorySegment>
 	size_t size = model.size();
 
 	if(count > 1) {
-		shared_ptr<SharedMemorySegment> shmbuffer 
+		std::shared_ptr<SharedMemorySegment> shmbuffer 
 			= CreateMultiBlock(model);
 		shmbuffer->name_ = name;
 		BufferManager::Add(shmbuffer);
@@ -67,10 +67,10 @@ shared_ptr<SharedMemorySegment>
 	}
 
 	ERROR("Unknown shared memory type \"" << type << "\"");
-	return shared_ptr<SharedMemorySegment>();
+	return std::shared_ptr<SharedMemorySegment>();
 }
 
-shared_ptr<SharedMemorySegment> SharedMemorySegment::Create(posix_shmem_t /*unused*/,
+std::shared_ptr<SharedMemorySegment> SharedMemorySegment::Create(posix_shmem_t /*unused*/,
 		const std::string &name, size_t size)
 {
 	try {
@@ -78,7 +78,7 @@ shared_ptr<SharedMemorySegment> SharedMemorySegment::Create(posix_shmem_t /*unus
 		size_t s = size + sizeof(struct size_manager_s);
 		base.truncate(s);
 
-		shared_ptr<mapped_region> region(
+		std::shared_ptr<mapped_region> region(
 			new mapped_region(base,read_write,0,s));
 		void* addr = region->get_address();
 
@@ -89,11 +89,11 @@ shared_ptr<SharedMemorySegment> SharedMemorySegment::Create(posix_shmem_t /*unus
 
 		new (addr) size_manager_s(buff_size);
 
-		shared_ptr<managed_protected_external_buffer> buffer(
+		std::shared_ptr<managed_protected_external_buffer> buffer(
 				new managed_protected_external_buffer(
 					create_only, buff_addr, buff_size));
 
-		shared_ptr<SharedMemorySegment> shmbuffer(
+		std::shared_ptr<SharedMemorySegment> shmbuffer(
 				new SharedMemorySegment(region,buffer),
 				Deleter<SharedMemorySegment>());
 				
@@ -106,17 +106,17 @@ shared_ptr<SharedMemorySegment> SharedMemorySegment::Create(posix_shmem_t /*unus
 		ERROR(e.what());
 	}
 
-	return shared_ptr<SharedMemorySegment>();
+	return std::shared_ptr<SharedMemorySegment>();
 }
 
-shared_ptr<SharedMemorySegment> SharedMemorySegment::Create(sysv_shmem_t /*unused*/,
+std::shared_ptr<SharedMemorySegment> SharedMemorySegment::Create(sysv_shmem_t /*unused*/,
 		const std::string &name, size_t size)
 {
 	try {
 		size_t s = size + sizeof(struct size_manager_s);
 		xsi_shared_memory base(create_only,xsi_key(name.c_str(),1),s);
 
-		shared_ptr<mapped_region> region(
+		std::shared_ptr<mapped_region> region(
 			new mapped_region(base,read_write,0,s));
 		void* addr = region->get_address();
 		
@@ -127,11 +127,11 @@ shared_ptr<SharedMemorySegment> SharedMemorySegment::Create(sysv_shmem_t /*unuse
 		size_t buff_size = s - ((size_t)(buff_addr)-(size_t)(addr));
 
 		new (addr) size_manager_s(buff_size);
-		shared_ptr<managed_protected_external_buffer> buffer(
+		std::shared_ptr<managed_protected_external_buffer> buffer(
 			new managed_protected_external_buffer(
 				create_only, buff_addr, buff_size));
 
-		shared_ptr<SharedMemorySegment> shmbuffer(
+		std::shared_ptr<SharedMemorySegment> shmbuffer(
 			new SharedMemorySegment(region,buffer),
 			Deleter<SharedMemorySegment>());
 		
@@ -143,10 +143,10 @@ shared_ptr<SharedMemorySegment> SharedMemorySegment::Create(sysv_shmem_t /*unuse
 	} catch(interprocess_exception &e) {
 		ERROR(e.what());
 	}
-	return shared_ptr<SharedMemorySegment>();
+	return std::shared_ptr<SharedMemorySegment>();
 }
 
-shared_ptr<SharedMemorySegment> SharedMemorySegment::Open(const model::Buffer& model)
+std::shared_ptr<SharedMemorySegment> SharedMemorySegment::Open(const model::Buffer& model)
 {
 	const std::string& name = model.name();
 	const model::ShmType& type = model.type();
@@ -154,7 +154,7 @@ shared_ptr<SharedMemorySegment> SharedMemorySegment::Open(const model::Buffer& m
 	size_t size = model.size();
 
 	if(count > 1) {
-		shared_ptr<SharedMemorySegment> shmbuffer 
+		std::shared_ptr<SharedMemorySegment> shmbuffer 
 			= OpenMultiBlock(model);
 		
 		shmbuffer->name_ = name;
@@ -172,10 +172,10 @@ shared_ptr<SharedMemorySegment> SharedMemorySegment::Open(const model::Buffer& m
 	}
 
 	ERROR("Unknown shared memory type \"" << type << "\"");
-	return shared_ptr<SharedMemorySegment>();
+	return std::shared_ptr<SharedMemorySegment>();
 }
 
-shared_ptr<SharedMemorySegment> SharedMemorySegment::Open(posix_shmem_t /*unused*/,
+std::shared_ptr<SharedMemorySegment> SharedMemorySegment::Open(posix_shmem_t /*unused*/,
 	const std::string &name, size_t size)
 {
 	try {
@@ -183,7 +183,7 @@ shared_ptr<SharedMemorySegment> SharedMemorySegment::Open(posix_shmem_t /*unused
 		size_t s = size + sizeof(struct size_manager_s);
 		base.truncate(s);
 
-		shared_ptr<mapped_region> region(
+		std::shared_ptr<mapped_region> region(
 			new mapped_region(base,read_write,0,s));
 		void* addr = region->get_address();
 
@@ -192,11 +192,11 @@ shared_ptr<SharedMemorySegment> SharedMemorySegment::Open(posix_shmem_t /*unused
 			: (char*)buff_addr + alignment - (((size_t)buff_addr) % alignment);
 		size_t buff_size = s - ((size_t)(buff_addr)-(size_t)(addr));
 
-		shared_ptr<managed_protected_external_buffer> buffer(
+		std::shared_ptr<managed_protected_external_buffer> buffer(
 				new managed_protected_external_buffer(
 					open_only, buff_addr, buff_size));
 
-		shared_ptr<SharedMemorySegment> shmbuffer(
+		std::shared_ptr<SharedMemorySegment> shmbuffer(
 				new SharedMemorySegment(region,buffer),
 				Deleter<SharedMemorySegment>());
 		
@@ -209,17 +209,17 @@ shared_ptr<SharedMemorySegment> SharedMemorySegment::Open(posix_shmem_t /*unused
 		ERROR(e.what());
 	}
 
-	return shared_ptr<SharedMemorySegment>();
+	return std::shared_ptr<SharedMemorySegment>();
 }
 
-shared_ptr<SharedMemorySegment> SharedMemorySegment::Open(sysv_shmem_t /*unused*/,
+std::shared_ptr<SharedMemorySegment> SharedMemorySegment::Open(sysv_shmem_t /*unused*/,
 	const std::string &name, size_t size)
 {
 	try {
 		size_t s = size + sizeof(struct size_manager_s);
 		xsi_shared_memory base(open_only,xsi_key(name.c_str(),1));
 
-		shared_ptr<mapped_region> region(
+		std::shared_ptr<mapped_region> region(
 			new mapped_region(base,read_write,0,s));
 
 		void* addr = region->get_address();
@@ -228,11 +228,11 @@ shared_ptr<SharedMemorySegment> SharedMemorySegment::Open(sysv_shmem_t /*unused*
 			: (char*)buff_addr + alignment - (((size_t)buff_addr) % alignment);
 		size_t buff_size = s - ((size_t)(buff_addr)-(size_t)(addr));
 
-		shared_ptr<managed_protected_external_buffer> buffer(
+		std::shared_ptr<managed_protected_external_buffer> buffer(
 			new managed_protected_external_buffer(
 				open_only, buff_addr, buff_size));
 
-		shared_ptr<SharedMemorySegment> shmbuffer(
+		std::shared_ptr<SharedMemorySegment> shmbuffer(
 			new SharedMemorySegment(region,buffer),
 			Deleter<SharedMemorySegment>());
 		
@@ -244,7 +244,7 @@ shared_ptr<SharedMemorySegment> SharedMemorySegment::Open(sysv_shmem_t /*unused*
 	} catch(interprocess_exception &e) {
 		ERROR(e.what());
 	}
-	return shared_ptr<SharedMemorySegment>();
+	return std::shared_ptr<SharedMemorySegment>();
 }
 
 bool SharedMemorySegment::Remove(const model::Buffer& model)
@@ -254,7 +254,7 @@ bool SharedMemorySegment::Remove(const model::Buffer& model)
 	const unsigned int& count = model.blocks();
 
 	if(count > 1) {
-		shared_ptr<Buffer> b = BufferManager::Search(name);
+		std::shared_ptr<Buffer> b = BufferManager::Search(name);
 		BufferManager::Delete(b);
 		return RemoveMultiBlock(model);
 	}
@@ -273,7 +273,7 @@ bool SharedMemorySegment::Remove(posix_shmem_t /*unused*/,
 	const std::string &name)
 {
 	try {
-		shared_ptr<Buffer> b = BufferManager::Search(name);
+		std::shared_ptr<Buffer> b = BufferManager::Search(name);
 		BufferManager::Delete(b);
 		return shared_memory_object::remove(name.c_str());
 	} catch(...) {
@@ -285,7 +285,7 @@ bool SharedMemorySegment::Remove(sysv_shmem_t /*unused*/,
 	const std::string &name)
 {
 	try {
-		shared_ptr<Buffer> b = BufferManager::Search(name);
+		std::shared_ptr<Buffer> b = BufferManager::Search(name);
 		BufferManager::Delete(b);
 		int id = shmget(xsi_key(name.c_str(),0).get_key(),0,0600);
 		return xsi_shared_memory::remove(id);
@@ -392,7 +392,7 @@ bool SharedMemorySegment::WaitAvailable(const size_t& size)
 	return true;
 }
 
-shared_ptr<SharedMemorySegment> 
+std::shared_ptr<SharedMemorySegment> 
 	SharedMemorySegment::CreateMultiBlock(const model::Buffer& model)
 {
 	int count = model.blocks();
@@ -400,7 +400,7 @@ shared_ptr<SharedMemorySegment>
 	const std::string &name = model.name();
 	const model::ShmType &type = model.type();
 
-	std::vector<shared_ptr<SharedMemorySegment> > v(count);
+	std::vector<std::shared_ptr<SharedMemorySegment> > v(count);
 
 	for(int i=0; i < count; i++) {
 		std::stringstream ss;
@@ -413,7 +413,7 @@ shared_ptr<SharedMemorySegment>
 				ERROR("While opening composite segment " << i);
 				WARN("Other shared memory structures "
 					<< "may be left open");
-				return shared_ptr<SharedMemorySegment>();
+				return std::shared_ptr<SharedMemorySegment>();
 			}
 			break;
 		case model::ShmType::sysv :
@@ -423,19 +423,19 @@ shared_ptr<SharedMemorySegment>
 				ERROR("While opening composite segment " << i);
 				WARN("Other shared memory structures "
 					<< "may be left open");
-				return shared_ptr<SharedMemorySegment>();
+				return std::shared_ptr<SharedMemorySegment>();
 			}
 			break;
 		default:
 			ERROR("Undefined shared memory type " << type);
-			return shared_ptr<SharedMemorySegment>();
+			return std::shared_ptr<SharedMemorySegment>();
 		}
 	}
-	return shared_ptr<SharedMemorySegment>(new CompositeShMem(count,v),
+	return std::shared_ptr<SharedMemorySegment>(new CompositeShMem(count,v),
 						Deleter<SharedMemorySegment>());
 }
 
-shared_ptr<SharedMemorySegment> 
+std::shared_ptr<SharedMemorySegment> 
 	SharedMemorySegment::OpenMultiBlock(const model::Buffer& model)
 {
 	const int& count = model.blocks();
@@ -443,7 +443,7 @@ shared_ptr<SharedMemorySegment>
 	const std::string &name = model.name();
 	const model::ShmType &type = model.type();
 	
-	std::vector<shared_ptr<SharedMemorySegment> > v(count);
+	std::vector<std::shared_ptr<SharedMemorySegment> > v(count);
 
 	for(int i=0; i < count; i++) {
 		std::stringstream ss;
@@ -456,7 +456,7 @@ shared_ptr<SharedMemorySegment>
 				ERROR("While opening composite segment " << i);
 				WARN("Other shared memory structures"
 					<< " may be left open");
-				return shared_ptr<SharedMemorySegment>();
+				return std::shared_ptr<SharedMemorySegment>();
 			}
 			break;
 		case model::ShmType::sysv :
@@ -466,20 +466,20 @@ shared_ptr<SharedMemorySegment>
 				ERROR("While opening composite segment " << i);
 				WARN("Other shared memory structures"
 					<< " may be left open");
-				return shared_ptr<SharedMemorySegment>();
+				return std::shared_ptr<SharedMemorySegment>();
 			}
 			break;
 		default:
 			ERROR("Undefined shared memory type " << type);
-			return shared_ptr<SharedMemorySegment>();
+			return std::shared_ptr<SharedMemorySegment>();
 		}
 	} 
-	return shared_ptr<SharedMemorySegment>(new CompositeShMem(count,v),
+	return std::shared_ptr<SharedMemorySegment>(new CompositeShMem(count,v),
 						Deleter<SharedMemorySegment>());
 }
 
 SharedMemorySegment::CompositeShMem::CompositeShMem(int count, 
-	const std::vector<shared_ptr<SharedMemorySegment> >& v)
+	const std::vector<std::shared_ptr<SharedMemorySegment> >& v)
 	: SharedMemorySegment(v[0]->region_,v[0]->buffer_)
 	// calling the parent's constructor will ensure that size_manager points
 	// to the size_manager of the first block. The other size managers will 

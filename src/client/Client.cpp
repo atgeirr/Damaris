@@ -29,13 +29,12 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace damaris {
 
-USING_POINTERS;
 
 
 int Client::Write(const std::string & varname, 
 	int32_t block, const void* data, bool blocking)
 {
-	shared_ptr<Variable> v = VariableManager::Search(varname);
+	std::shared_ptr<Variable> v = VariableManager::Search(varname);
 	if(not v) return DAMARIS_UNDEFINED_VARIABLE;
 	
 	if(block < 0 || block >= (int32_t)Environment::NumDomainsPerClient()) {
@@ -45,7 +44,7 @@ int Client::Write(const std::string & varname,
 	int source = Environment::GetEntityProcessID();
 	int iteration = Environment::GetLastIteration();
 	
-	shared_ptr<Block> b = v->Allocate(source, iteration, block, blocking);
+	std::shared_ptr<Block> b = v->Allocate(source, iteration, block, blocking);
 	
 	if(not b) {
 		errorOccured_ = 1;
@@ -100,7 +99,7 @@ int Client::Write(const std::string & varname,
 
 int Client::Signal(const std::string & signame)
 {
-	shared_ptr<Action> a = ActionManager::Search(signame);
+	std::shared_ptr<Action> a = ActionManager::Search(signame);
 	if(not a) {
 		return DAMARIS_UNDEFINED_ACTION;
 	}
@@ -136,7 +135,7 @@ int Client::Signal(const std::string & signame)
 int Client::Alloc(const std::string & varname,
 	int32_t block, void** buffer, bool blocking)
 {
-	shared_ptr<Variable> v = VariableManager::Search(varname);
+	std::shared_ptr<Variable> v = VariableManager::Search(varname);
 	if(not v) return DAMARIS_UNDEFINED_VARIABLE;
 	
 	if(block < 0 || block >= (int32_t)Environment::NumDomainsPerClient()) {
@@ -146,7 +145,7 @@ int Client::Alloc(const std::string & varname,
 	int source = Environment::GetEntityProcessID();
 	int iteration = Environment::GetLastIteration();
 	
-	shared_ptr<Block> b = v->AllocateAligned(source, 
+	std::shared_ptr<Block> b = v->AllocateAligned(source, 
 					iteration, block, blocking);
 	
 	if(not b) {
@@ -165,7 +164,7 @@ int Client::Alloc(const std::string & varname,
 int Client::Commit(const std::string & varname, 
 	int32_t block, int32_t iteration)
 {
-	shared_ptr<Variable> v = VariableManager::Search(varname);
+	std::shared_ptr<Variable> v = VariableManager::Search(varname);
 	if(not v) return DAMARIS_UNDEFINED_VARIABLE;
 	
 	if(block < 0 || block >= (int32_t)Environment::NumDomainsPerClient()) {
@@ -173,7 +172,7 @@ int Client::Commit(const std::string & varname,
 	}
 	
 	int source = Environment::GetEntityProcessID();
-	shared_ptr<Block> b = v->GetBlock(source,iteration,block);
+	std::shared_ptr<Block> b = v->GetBlock(source,iteration,block);
 	
 	if(not b) return DAMARIS_BLOCK_NOT_FOUND;
 	
@@ -217,7 +216,7 @@ int Client::Commit(const std::string & varname,
 int Client::Clear(const std::string & varname, 
 	int32_t block, int32_t iteration)
 {
-	shared_ptr<Variable> v = VariableManager::Search(varname);
+	std::shared_ptr<Variable> v = VariableManager::Search(varname);
 	if(not v) return DAMARIS_UNDEFINED_VARIABLE;
 	
 	if(block < 0 || block >= (int32_t)Environment::NumDomainsPerClient()) {
@@ -225,7 +224,7 @@ int Client::Clear(const std::string & varname,
 	}
 	
 	int source = Environment::GetEntityProcessID();
-	shared_ptr<Block> b = v->GetBlock(source,iteration,block);
+	std::shared_ptr<Block> b = v->GetBlock(source,iteration,block);
 	
 	if(not b) return DAMARIS_BLOCK_NOT_FOUND;
 	b->SetReadOnly(false);
@@ -257,7 +256,7 @@ int Client::Clear(const std::string & varname,
 int Client::SetPosition(const std::string& varname, int32_t block,
 	const int64_t* position)
 {
-	shared_ptr<Variable> v = VariableManager::Search(varname);
+	std::shared_ptr<Variable> v = VariableManager::Search(varname);
 	if(not v) return DAMARIS_UNDEFINED_VARIABLE;
 	
 	if(block < 0 || block >= (int32_t)Environment::NumDomainsPerClient()) {

@@ -35,8 +35,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 namespace damaris {
-	
-USING_POINTERS;
+
 
 /**
  * A Block is the main entry point for data; it is characterized by
@@ -53,7 +52,7 @@ class Block //: public ENABLE_SHARED_FROM_THIS(Block)
 	int iteration_; /*!< iteration at which the block has been generated */
 	int id_; /*!< domain id of the block */
 	
-	weak_ptr<Variable> variable_; 	/*!< variable owning this block */
+	std::weak_ptr<Variable> variable_; 	/*!< variable owning this block */
 	std::vector<int64_t> lower_bounds_;	/*!< list of lower bounds */
 	std::vector<int64_t> upper_bounds_; /*!< list of upper bounds */
 	std::vector<size_t> global_dims_; /*!< global dimensions at the moment of creation */
@@ -71,7 +70,7 @@ class Block //: public ENABLE_SHARED_FROM_THIS(Block)
 	 * \param[in] variable : owner of the block.
 	 */
 	Block(	int source, int iteration, int id,
-		const shared_ptr<Variable> & variable);
+		const std::shared_ptr<Variable> & variable);
 
 	/**
 	 * Destructor.
@@ -107,11 +106,11 @@ class Block //: public ENABLE_SHARED_FROM_THIS(Block)
 	}
 	
 	/**
-	 * Static method to build a new Block. Constructs a shared_ptr.
+	 * Static method to build a new Block. Constructs a std::shared_ptr.
 	 * See contructor fot the meaning of the parameters.
 	 */
-	static shared_ptr<Block> New(int source, int iteration, int id,
-					const shared_ptr<Variable>& variable);
+	static std::shared_ptr<Block> New(int source, int iteration, int id,
+					const std::shared_ptr<Variable>& variable);
 	
 	public:
 	

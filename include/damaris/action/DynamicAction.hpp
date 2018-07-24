@@ -92,11 +92,11 @@ class DynamicAction : public BoundAction, public Configurable<model::Event> {
 	 * \param[in] ev : model from the XML file.
 	 */
 	template<typename SUPER>
-	static shared_ptr<SUPER> New(const model::Event& ev, 
+	static std::shared_ptr<SUPER> New(const model::Event& ev, 
 					const std::string& name) {
-		shared_ptr<SUPER> a;
+		std::shared_ptr<SUPER> a;
 		if(ev.scope() != model::Scope::group) {
-			a = shared_ptr<SUPER>(
+			a = std::shared_ptr<SUPER>(
 					new DynamicAction(ev),
 					Deleter<DynamicAction>());
 

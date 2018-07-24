@@ -32,7 +32,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 namespace damaris
 {
 
-USING_POINTERS;
 	
 class MPI2Reactor : public Reactor {
 	
@@ -44,9 +43,9 @@ private:
 	// attributes necessary for the broadcast/sync tree
 	// -------------------------------------------------------------- //
 	int radix_;	// number of children in the communication tree
-	std::map<int,shared_ptr<Channel> > children_;
-	shared_ptr<Channel> leader_; // leader of the communicator
-	shared_ptr<Channel> parent_; // parent in the broadcast tree
+	std::map<int,std::shared_ptr<Channel> > children_;
+	std::shared_ptr<Channel> leader_; // leader of the communicator
+	std::shared_ptr<Channel> parent_; // parent in the broadcast tree
 	std::map<int,std::vector<char> > bcast_buffers_; 
 					// keeps buffers used in broadcasts
 	std::set<int> sync_tags_; // tags currently waiting for a sync
@@ -99,13 +98,13 @@ public:
 	 * accross the processes of the communicator, it will duplicate the
 	 * communicator.
 	 */
-	static shared_ptr<Reactor> New(MPI_Comm comm, int radix=2) {
+	static std::shared_ptr<Reactor> New(MPI_Comm comm, int radix=2) {
 		MPI_Comm c;
 		MPI_Comm_dup(comm,&c);
-		shared_ptr<Reactor> reactor;
+		std::shared_ptr<Reactor> reactor;
 		if(radix > 0) {
 			MPI2Reactor* r = new MPI2Reactor();
-			reactor = shared_ptr<Reactor>(r, 
+			reactor = std::shared_ptr<Reactor>(r, 
 						Deleter<MPI2Reactor>());
 			if(not r->Init(c,radix)) {
 				reactor.reset();

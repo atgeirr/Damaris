@@ -76,6 +76,7 @@ set(XSD_ARGS 	--output-dir ${DAMARIS_SOURCE_DIR}/src/model
 		--type-naming knr 
 		--hxx-suffix .hpp 
 		--cxx-suffix .cpp 
+                --std       c++11
 		${DAMARIS_SOURCE_DIR}/src/model/Model.xsd) 
 
 add_custom_command(OUTPUT ${DAMARIS_SOURCE_DIR}/src/model/Model.cpp

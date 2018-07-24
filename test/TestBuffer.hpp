@@ -12,16 +12,13 @@
 
 namespace damaris {
 
-using namespace std;
-	
-USING_POINTERS;
 
 class TestBuffer : public CppUnit::TestFixture {
 	
 private:
 	int rank, size;
-	static shared_ptr<Buffer> buffer;
-	static shared_ptr<model::Simulation> mdl;
+	static std::shared_ptr<Buffer> buffer;
+	static std::shared_ptr<model::Simulation> mdl;
 public:
 	TestBuffer() {
 		MPI_Comm_size(MPI_COMM_WORLD,&size);
@@ -132,7 +129,7 @@ protected:
 	}
 };
 
-shared_ptr<Buffer> TestBuffer::buffer;
-shared_ptr<model::Simulation> TestBuffer::mdl;
+std::shared_ptr<Buffer> TestBuffer::buffer;
+std::shared_ptr<model::Simulation> TestBuffer::mdl;
 
 }

@@ -36,7 +36,7 @@ namespace bmi = boost::multi_index;
  * source, by iteration and by id within a Variable object.
  */
 typedef boost::multi_index_container<
-        boost::shared_ptr<Block>,
+        std::shared_ptr<Block>,
         bmi::indexed_by<
                 bmi::ordered_non_unique<bmi::tag<by_source>,
                         bmi::const_mem_fun<Block,int,&Block::GetSource> >,

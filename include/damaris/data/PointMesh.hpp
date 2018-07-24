@@ -22,8 +22,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "damaris/data/Mesh.hpp"
 
 namespace damaris {
-	
-USING_POINTERS;
+
 
 /**
  * PointMesh is a particular type of Mesh that handles a cloud of non-linked
@@ -59,23 +58,23 @@ public:
 	 * \param[in] mdl : model from which to create the PointMesh.
 	 */
 	template<typename SUPER>
-	static shared_ptr<SUPER> New(const model::Mesh& mdl,
+	static std::shared_ptr<SUPER> New(const model::Mesh& mdl,
 					const std::string& name)
 	{
 
 		if(mdl.name().find("/") != std::string::npos) { 
 			CFGERROR("Mesh " << mdl.name() << " cannot have a '/' character.");
-			return shared_ptr<SUPER>();
+			return std::shared_ptr<SUPER>();
 		}
 
 		if(mdl.type() == model::MeshType::point) {
-			shared_ptr<PointMesh> m = 
-				shared_ptr<PointMesh>(new PointMesh(mdl),
+			std::shared_ptr<PointMesh> m = 
+				std::shared_ptr<PointMesh>(new PointMesh(mdl),
 				Deleter<PointMesh>());
 			m->name_ = name;
 			return m;
 		} else {
-			return shared_ptr<SUPER>();
+			return std::shared_ptr<SUPER>();
 		}
 	}
 

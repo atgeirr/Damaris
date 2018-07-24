@@ -14,14 +14,11 @@
 
 namespace damaris {
 
-using namespace std;
-	
-USING_POINTERS;
 
 class TestVariableManager : public CppUnit::TestFixture {
 	
 private:
-	static shared_ptr<model::Simulation> mdl;
+	static std::shared_ptr<model::Simulation> mdl;
 public:
 	TestVariableManager() {
 		if(not mdl) {
@@ -66,10 +63,10 @@ protected:
 		// initialization
 		VariableManager::Init(mdl->data());
 		// search an existing variable
-		shared_ptr<Variable> v1 
+		std::shared_ptr<Variable> v1 
 			= VariableManager::Search("coordinates/x2d");
 		// search a non-existing variable
-		shared_ptr<Variable> v2
+		std::shared_ptr<Variable> v2
 			= VariableManager::Search("something/undefined");
 		// the first variable should be valid
 		CPPUNIT_ASSERT((bool)v1);
@@ -80,7 +77,7 @@ protected:
 		// the number of objects should go down to 0
 		CPPUNIT_ASSERT(VariableManager::GetNumObjects() == 0);
 		CPPUNIT_ASSERT(VariableManager::IsEmpty());
-		// the instance v1 should still exist thanks to shared_ptr
+		// the instance v1 should still exist thanks to std::shared_ptr
 		CPPUNIT_ASSERT((bool)v1);
 		// now search again for v1
 		v1 = VariableManager::Search("coordinates/x2d");
@@ -89,6 +86,6 @@ protected:
 	}
 };
 
-shared_ptr<model::Simulation> TestVariableManager::mdl;
+std::shared_ptr<model::Simulation> TestVariableManager::mdl;
 
 }

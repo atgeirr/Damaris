@@ -55,7 +55,7 @@ void StorageManager::Init(const model::Storage& mdl)
 		
 		std::vector<std::string>::iterator s = stores.begin();
 		for(; s != stores.end(); s++) {
-			shared_ptr<Store> st = Search(*s);
+			std::shared_ptr<Store> st = Search(*s);
 			if(st) {
 				st->AddVariable(*v);
 			} else {

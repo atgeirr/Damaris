@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 2.8)
+cmake_minimum_required (VERSION 3.1)
 
 #----------------------------------------------------------------------------#
 # Enabling Fortran
@@ -11,8 +11,8 @@ enable_language (Fortran OPTIONAL)
 #----------------------------------------------------------------------------#
 include(CMakeForceCompiler)
 if(NOT DEFINED PAR_CXX_COMPILER)
-    CMAKE_FORCE_CXX_COMPILER(mpicxx "MPI C++ Compiler")
-    CMAKE_FORCE_C_COMPILER(mpicc "MPI C Compiler")
+    set(CMAKE_CXX_COMPILER mpicxx)
+    set(CMAKE_C_COMPILER  mpicc)
 else(NOT DEFINED PAR_CXX_COMPILER)
     CMAKE_FORCE_CXX_COMPILER(${PAR_CXX_COMPILER} "MPI C++ Compiler")
     message(STATUS "CXX compiler set to ${PAR_CXX_COMPILER}")
@@ -25,6 +25,13 @@ include(CheckIncludeFiles)
 # Starting project definition
 #----------------------------------------------------------------------------#
 project(DAMARIS)
+
+#----------------------------------------------------------------------------#
+# Setting the C++ compiler options
+#----------------------------------------------------------------------------#
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 #----------------------------------------------------------------------------#
 # EXTERNAL_ROOT is a variable set once and for all to
@@ -69,8 +76,8 @@ endif(NOT DEFINED CMAKE_INSTALL_PREFIX)
 message(STATUS "Damaris will be installed in ${CMAKE_INSTALL_PREFIX}")
 
 #----------------------------------------------------------------------------#
-add_definitions (-g -O2 -Wno-unused-variable -Wno-unused-parameter -Wall -rdynamic)
-add_definitions (-Wextra) # for development only
+set(CMAKE_CXX_FLAGS "-g -O2 -Wno-unused-variable -Wno-unused-parameter -Wall -rdynamic")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra") # for development only
 #----------------------------------------------------------------------------#
 
 #----------------------------------------------------------------------------#
@@ -115,9 +122,16 @@ SET(Boost_ADDITIONAL_VERSIONS "1.51.0" "1.52.0"
 find_package(Threads)
 find_package(Boost REQUIRED)
 find_package(Boost 1.56.0 COMPONENTS thread log log_setup filesystem system date_time)
-include_directories(${Boost_INCLUDE_DIRS})
-link_directories(${Boost_LIBRARY_DIRS})
-list(APPEND DEP_LIBRARIES ${Boost_LIBRARIES})
+if(Boost_FOUND)
+    include_directories(${Boost_INCLUDE_DIRS})
+    message(STATUS "Boost Include directory: ${Boost_INCLUDE_DIRS}")
+    link_directories(${Boost_LIBRARY_DIRS})
+    message(STATUS "Boost lib directory: ${Boost_LIBRARIES}")
+    list(APPEND DEP_LIBRARIES ${Boost_LIBRARIES})
+else()
+    message(STATUS "Boost library cannot be found.")
+endif()
+
 
 #----------------------------------------------------------------------------#
 # Set everything related to the XSD libraries

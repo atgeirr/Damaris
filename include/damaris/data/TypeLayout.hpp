@@ -109,10 +109,10 @@ class TypeLayout : public Layout,
 	 * \param[in] mdl : model from which to create the TypeLayout.
 	 */
 	template<typename SUPER>
-	static shared_ptr<SUPER> New(const model::Type& mdl, 
+	static std::shared_ptr<SUPER> New(const model::Type& mdl, 
 			const std::string& UNUSED(name)) 
 	{
-		return shared_ptr<SUPER>(new TypeLayout(mdl), 
+		return std::shared_ptr<SUPER>(new TypeLayout(mdl), 
 					 Deleter<TypeLayout>());
 	}
 	

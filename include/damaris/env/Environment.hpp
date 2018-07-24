@@ -31,8 +31,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "damaris/log/EventLogger.hpp"
 
 namespace damaris {
-	
-USING_POINTERS;
+
 
 /** 
  * The class Environment holds all local informations related to this process,
@@ -43,7 +42,7 @@ class Environment {
 private:
 	
 	static bool _initialized_;
-	static shared_ptr<model::Simulation> _baseModel_;
+	static std::shared_ptr<model::Simulation> _baseModel_;
 
 	/* Main communicators */
 	static MPI_Comm _entityComm_; /*!< clients or servers communicator 
@@ -70,13 +69,13 @@ private:
 	static int	_coresPerNode_;	/*!< number of cores per node. */
 	static int _serversPerNode_; //orc:number of servers per node
 
-	static shared_ptr<Client> _client_; /*!< Pointer to the Client object
+	static std::shared_ptr<Client> _client_; /*!< Pointer to the Client object
 		that serves for the API. not-null only if _isClient_ is true. */
-	static shared_ptr<Server> _server_; /*!< Pointer to the Server object.
+	static std::shared_ptr<Server> _server_; /*!< Pointer to the Server object.
 		Not-null only if _isDedicatedCore_ or _isDedicatedNode is true. */
-	static shared_ptr<Buffer> _defaultBuffer_; /*!< Default buffer for
+	static std::shared_ptr<Buffer> _defaultBuffer_; /*!< Default buffer for
 					variables to allocate into. */
-	static shared_ptr<EventLogger> _eventLogger_; /*!< The single instance of the EventLogger
+	static std::shared_ptr<EventLogger> _eventLogger_; /*!< The single instance of the EventLogger
 					object used for logging damaris events. */
 	static bool _sharedStructuresOwner_; /*!< True if this process is
 			Responsible for freeing the shared memory. */
@@ -119,7 +118,7 @@ public:
 	/**
 	 * Returns the model that was used to initialize the Enrvironment.
 	 */
-	static shared_ptr<model::Simulation> GetModel() {
+	static std::shared_ptr<model::Simulation> GetModel() {
 		return _baseModel_;
 	}
 
@@ -159,14 +158,14 @@ public:
 	/**
 	 * Returns the instance of Client.
 	 */
-	static shared_ptr<Client> GetClient() {
+	static std::shared_ptr<Client> GetClient() {
 		return _client_;
 	}
 	
 	/**
 	 * Returns the instance of Server.
 	 */
-	static shared_ptr<Server> GetServer() {
+	static std::shared_ptr<Server> GetServer() {
 		return _server_;
 	}
 
@@ -350,14 +349,14 @@ public:
 	/**
 	 * Returns the default buffer of the simulation.
 	 */
-	static shared_ptr<Buffer> GetDefaultBuffer() {
+	static std::shared_ptr<Buffer> GetDefaultBuffer() {
 		return _defaultBuffer_;
 	}
 
 	/**
     * Logs Events.
     */
-	static void Log(string message , EventLogger::LogLevel logLevel) {
+    static void Log(std::string message , EventLogger::LogLevel logLevel) {
 		if (!_eventLogger_)
 			return;
 

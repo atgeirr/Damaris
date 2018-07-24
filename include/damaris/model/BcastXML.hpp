@@ -24,7 +24,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 namespace damaris {
 namespace model {
 
-USING_POINTERS;
 
 /**
  * Loads an XML file in the rank 0 of the given MPI communicator, broadcast
@@ -34,14 +33,14 @@ USING_POINTERS;
 	that need to load the XML file.
  * \param[in] uri : path of the XML file.
  */
-shared_ptr<Simulation> BcastXML(const MPI_Comm& comm, const std::string& uri);
+std::shared_ptr<Simulation> BcastXML(const MPI_Comm& comm, const std::string& uri);
 
 /**
  * Loads the XML file without involving any other processes.
  *
  * \param[in] uri : path of the XML file.
  */
-shared_ptr<Simulation> LoadXML(const std::string& uri);
+std::shared_ptr<Simulation> LoadXML(const std::string& uri);
 
 }
 }

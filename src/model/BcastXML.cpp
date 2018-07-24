@@ -26,7 +26,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 namespace damaris {
 namespace model {
 
-shared_ptr<Simulation> BcastXML(const MPI_Comm& comm, const std::string& uri) 
+std::shared_ptr<Simulation> BcastXML(const MPI_Comm& comm, const std::string& uri) 
 {
 	int rank;
 	MPI_Comm_rank(comm,&rank);
@@ -69,7 +69,7 @@ shared_ptr<Simulation> BcastXML(const MPI_Comm& comm, const std::string& uri)
 	// create an istreamstring
 	std::istringstream stream(content);
 	// create the XML data
-	std::auto_ptr<Simulation> model;
+	std::shared_ptr<Simulation> model;
 	try {
 		model = model::simulation(stream,
 				xml_schema::flags::dont_validate);
@@ -78,12 +78,13 @@ shared_ptr<Simulation> BcastXML(const MPI_Comm& comm, const std::string& uri)
 		exit(-1);
 	}
 	
-	return shared_ptr<Simulation>(model);
+	return model;
 }
 
-shared_ptr<Simulation> LoadXML(const std::string& uri)
+std::shared_ptr<Simulation> LoadXML(const std::string& uri)
 {
-	std::auto_ptr<Simulation> model;
+    std::unique_ptr<Simulation> model;
+
 	try {
 		std::ifstream xmlfile;
 		xmlfile.open(uri.c_str());
@@ -94,7 +95,7 @@ shared_ptr<Simulation> LoadXML(const std::string& uri)
 		ERROR(e.what());
 		exit(-1);
 	}
-	return shared_ptr<Simulation>(model);
+	return std::shared_ptr<Simulation>(std::move(model));
 }
 
 }

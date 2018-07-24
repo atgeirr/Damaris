@@ -23,26 +23,26 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 namespace damaris {
 
 Block::Block(int source, int iteration, int id, 
-		const shared_ptr<Variable> & variable)
+		const std::shared_ptr<Variable> & variable)
 : source_(source), iteration_(iteration), id_(id), variable_(variable),
   read_only_(false)
 {
 }
 
-shared_ptr<Block> Block::New(int source, int iteration, int id,
-				const shared_ptr<Variable>& v)
+std::shared_ptr<Block> Block::New(int source, int iteration, int id,
+				const std::shared_ptr<Variable>& v)
 {
 	if(not v) {
 		ERROR("Invalid Variable when building Block instance");
-		return shared_ptr<Block>();
+		return std::shared_ptr<Block>();
 	}
-	shared_ptr<Layout> layout = v->GetLayout();
+	std::shared_ptr<Layout> layout = v->GetLayout();
 	if(not layout) {
 		ERROR("Invalid Layout when building Block instance");
-		return shared_ptr<Block>();
+		return std::shared_ptr<Block>();
 	}
 	
-	shared_ptr<Block> block(new Block(source,iteration,id,v),
+	std::shared_ptr<Block> block(new Block(source,iteration,id,v),
 				 Deleter<Block>());
 	
 	unsigned int d = layout->GetDimensions();
@@ -65,7 +65,7 @@ void Block::SetReadOnly(bool ro)
 {
 	void* addr = dataspace_.GetData();
 	size_t size = dataspace_.GetSize();
-	shared_ptr<Variable> v = variable_.lock();
+	std::shared_ptr<Variable> v = variable_.lock();
 	if(not v || addr == NULL) return;
 		
 	if(ro && not read_only_) {
@@ -91,7 +91,7 @@ bool Block::FillVisItDataHandle(visit_handle hdl)
 	if(variable_.expired()) {
 		return false;
 	}
-	shared_ptr<Variable> v = variable_.lock();
+	std::shared_ptr<Variable> v = variable_.lock();
 	DataSpace<Buffer> ds = GetDataSpace();
 	
 	DBG("source is " << GetSource() << ", iteration is " << GetIteration());

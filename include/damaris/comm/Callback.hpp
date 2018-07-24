@@ -24,7 +24,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace damaris {
 
-USING_POINTERS;
 
 template<typename F>
 class CallbackImpl;
@@ -70,9 +69,9 @@ class Callback {
 	 * \param[in] f : function or object to wrap.
 	 */
 	template<typename F>
-	static shared_ptr<Callback> New(F f) 
+    static std::shared_ptr<Callback> New(F f)
 	{
-		return shared_ptr<Callback>(new CallbackImpl<F>(f),
+        return std::shared_ptr<Callback>(new CallbackImpl<F>(f),
 					Deleter<Callback>());
 	}
 };

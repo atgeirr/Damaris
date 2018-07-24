@@ -21,14 +21,14 @@
 
 namespace damaris {
 
-shared_ptr<Variable> Curve::GetCoord(unsigned int n)
+std::shared_ptr<Variable> Curve::GetCoord(unsigned int n)
 {
 	if(coords_.size() == 0) { // first time access coordinates
 		model::Curve::coord_const_iterator
 			it(GetModel().coord().begin());
 		for(; it != GetModel().coord().end(); it++) {
 			
-			shared_ptr<Variable> v;
+			std::shared_ptr<Variable> v;
 			std::string coordName = it->name();
 			bool coordIsAbsolute =
 				(coordName.find("/") != std::string::npos);
@@ -72,7 +72,7 @@ shared_ptr<Variable> Curve::GetCoord(unsigned int n)
 	if(n < coords_.size()) {
 		return coords_[n];
 	} else {
-		return shared_ptr<Variable>();
+		return std::shared_ptr<Variable>();
 	}
 }
 
@@ -86,8 +86,8 @@ bool Curve::ExposeVisItMetaData(visit_handle md)
 		VisIt_CurveMetaData_setName(m1, GetName().c_str());
 		
 		// check that the coordinate exist
-		shared_ptr<Variable> vx = GetCoord(0);
-		shared_ptr<Variable> vy = GetCoord(1);
+		std::shared_ptr<Variable> vx = GetCoord(0);
+		std::shared_ptr<Variable> vy = GetCoord(1);
 		if((not vx) || (not vy)) {
 			VisIt_CurveMetaData_free(m1);
 			return false;
@@ -121,7 +121,7 @@ bool Curve::ExposeVisItData(visit_handle* h, int iteration)
 	// Allocates the VisIt handle
 	if(VisIt_CurveData_alloc(h) != VISIT_ERROR) {
 		visit_handle hxc, hyc = VISIT_INVALID_HANDLE;
-		shared_ptr<Variable> vx, vy;
+		std::shared_ptr<Variable> vx, vy;
 		
 		//model::Curve::coord_const_iterator 
 		//	it(GetModel().coord().begin());
@@ -158,7 +158,7 @@ bool Curve::ExposeVisItData(visit_handle* h, int iteration)
 		//it++;
 
 		// Accessing chunk for X coordinate
-		shared_ptr<Block> b = vx->GetBlock(0,iteration,0);
+		std::shared_ptr<Block> b = vx->GetBlock(0,iteration,0);
 		if(b) {
 			if(VisIt_VariableData_alloc(&hxc) == VISIT_OKAY) {
 				b->FillVisItDataHandle(hxc);

@@ -23,7 +23,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace damaris {
 
-shared_ptr< BoxLayout::CalcType > BoxLayout::_calc_;
+std::shared_ptr< BoxLayout::CalcType > BoxLayout::_calc_;
 
 bool BoxLayout::ObserveDependentParameters()
 {
@@ -50,7 +50,7 @@ bool BoxLayout::ObserveDependentParameters()
 				reading = false;
 				buffer[j] = '\0';
 				std::string param(&(buffer[0]));
-				shared_ptr<Parameter> p 
+				std::shared_ptr<Parameter> p 
 					= ParameterManager::Search(param);
 				if(p) {
 					p->AddObserver(
@@ -68,7 +68,7 @@ bool BoxLayout::ObserveDependentParameters()
 void BoxLayout::InterpretDimensions()
 {
 	if(not _calc_) {
-		_calc_ = shared_ptr<BoxLayout::CalcType>
+		_calc_ = std::shared_ptr<BoxLayout::CalcType>
 				(new BoxLayout::CalcType(
 					ParameterManager::ParameterMap<int>()));
 	}

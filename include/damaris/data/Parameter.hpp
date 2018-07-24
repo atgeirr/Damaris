@@ -37,7 +37,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace damaris {
 
-USING_POINTERS;
 	
 /**
  * The Parameter class  holds any type of data and associate it with a name.
@@ -78,7 +77,7 @@ class Parameter : public Configurable<model::Parameter>,
 	 * \param[in] mdl : model from which to initialize the parameter.
 	 */
 	template <typename SUPER>
-	static shared_ptr<SUPER> New(const model::Parameter& mdl,
+	static std::shared_ptr<SUPER> New(const model::Parameter& mdl,
 					const std::string& name);
 
 	/**
@@ -185,54 +184,54 @@ void Parameter::SetValue(const T& v)
 }
 
 template<typename SUPER>
-shared_ptr<SUPER> Parameter::New(const model::Parameter& mdl, 
+std::shared_ptr<SUPER> Parameter::New(const model::Parameter& mdl, 
 				const std::string& UNUSED(name))
 {
 	try {
 
 	switch(mdl.type()) {
 		case model::Type::short_:
-			return shared_ptr<SUPER>(
+			return std::shared_ptr<SUPER>(
 				new Parameter(mdl,
 				boost::lexical_cast<short>(mdl.value())),
 				Deleter<Parameter>());
 		case model::Type::int_:
-			return shared_ptr<SUPER>(
+			return std::shared_ptr<SUPER>(
 				new Parameter(mdl,
 				boost::lexical_cast<int>(mdl.value())),
 				Deleter<Parameter>());
 		case model::Type::integer:
-			return shared_ptr<SUPER>(
+			return std::shared_ptr<SUPER>(
 				new Parameter(mdl,
 				boost::lexical_cast<int>(mdl.value())),
 				Deleter<Parameter>());
 		case model::Type::long_:
-			return shared_ptr<SUPER>(
+			return std::shared_ptr<SUPER>(
 				new Parameter(mdl,
 				boost::lexical_cast<long>(mdl.value())),
 				Deleter<Parameter>());
 		case model::Type::float_:
-			return shared_ptr<SUPER>(
+			return std::shared_ptr<SUPER>(
 				new Parameter(mdl,
 				boost::lexical_cast<float>(mdl.value())),
 				Deleter<Parameter>());
 		case model::Type::real :
-			return shared_ptr<SUPER>(
+			return std::shared_ptr<SUPER>(
 				new Parameter(mdl,
 				boost::lexical_cast<float>(mdl.value())),
 				Deleter<Parameter>());
 		case model::Type::double_:
-			return shared_ptr<SUPER>(
+			return std::shared_ptr<SUPER>(
 				new Parameter(mdl,
 				boost::lexical_cast<double>(mdl.value())),
 				Deleter<Parameter>());
 		case model::Type::char_:
-			return shared_ptr<SUPER>(
+			return std::shared_ptr<SUPER>(
 				new Parameter(mdl,
 				boost::lexical_cast<char>(mdl.value())),
 				Deleter<Parameter>());
 		case model::Type::character:
-			return shared_ptr<SUPER>(
+			return std::shared_ptr<SUPER>(
 				new Parameter(mdl,
 				boost::lexical_cast<char>(mdl.value())),
 				Deleter<Parameter>());
@@ -247,7 +246,7 @@ shared_ptr<SUPER> Parameter::New(const model::Parameter& mdl,
 			<< mdl.value() << "\" " 
 			<< "for parameter \"" << mdl.name() << "\"");
 	}
-	return shared_ptr<SUPER>();
+	return std::shared_ptr<SUPER>();
 }
 
 }

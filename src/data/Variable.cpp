@@ -24,7 +24,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace damaris {
 
-bool Variable::AttachBlock(const shared_ptr<Block>& block)
+bool Variable::AttachBlock(const std::shared_ptr<Block>& block)
 {
 	if(not block) return false;
 	if(not IsTimeVarying()) {
@@ -33,7 +33,7 @@ bool Variable::AttachBlock(const shared_ptr<Block>& block)
 	return blocks_.insert(block).second;
 }
 
-shared_ptr<Block> Variable::GetBlock(int source, int iteration, int block) const
+std::shared_ptr<Block> Variable::GetBlock(int source, int iteration, int block) const
 {
 	if(not IsTimeVarying()) {
 		iteration = 0;
@@ -41,7 +41,7 @@ shared_ptr<Block> Variable::GetBlock(int source, int iteration, int block) const
 	const Blocks::iterator& end = blocks_.get<by_any>().end();
 	Blocks::iterator begin = blocks_.get<by_any>().find(
 			boost::make_tuple(source,iteration,block));
-	if(begin == end) return shared_ptr<Block>();
+	if(begin == end) return std::shared_ptr<Block>();
 	return *begin;
 }
 
@@ -67,7 +67,7 @@ int Variable::CountTotalBlocks(int iteration) const
 	return nbrServer*CountLocalBlocks(iteration);
 }
 
-bool Variable::DetachBlock(const shared_ptr<Block>& c)
+bool Variable::DetachBlock(const std::shared_ptr<Block>& c)
 {
 	if(not c) return true;
         Blocks::iterator end 
@@ -126,12 +126,12 @@ void Variable::ClearId(int id)
 	blocks_.get<by_id>().erase(begin,end);
 }
 
-shared_ptr<Block> Variable::Allocate(int source, int iteration, int bid, 
+std::shared_ptr<Block> Variable::Allocate(int source, int iteration, int bid, 
 			bool blocking)
 {
 	if(not buffer_) {
 		GetBuffer();
-		if(not buffer_) return shared_ptr<Block>();
+		if(not buffer_) return std::shared_ptr<Block>();
 	}
 
 	if((not IsTimeVarying()) && (iteration != 0)) {
@@ -141,11 +141,11 @@ shared_ptr<Block> Variable::Allocate(int source, int iteration, int bid,
 		iteration = 0;
 	}
 
-	shared_ptr<Block> block = GetBlock(source,iteration,bid);
+	std::shared_ptr<Block> block = GetBlock(source,iteration,bid);
 	if(block) {
 		ERROR("Trying to overwrite an existing chunk for variable \""
 			<< name_ << "\"");
-		return shared_ptr<Block>();
+		return std::shared_ptr<Block>();
 	}
 
 	block = Block::New(source,iteration,bid,SHARED_FROM_THIS());
@@ -165,7 +165,7 @@ shared_ptr<Block> Variable::Allocate(int source, int iteration, int bid,
 				buffer_->WaitAvailable(size);
 			}
 		} else {
-			return shared_ptr<Block>();
+			return std::shared_ptr<Block>();
 		}
 	}
 
@@ -180,7 +180,7 @@ shared_ptr<Block> Variable::Allocate(int source, int iteration, int bid,
 	return block;
 }
 
-shared_ptr<Block> Variable::AllocateFixedSize(int source, int iteration, int bid,
+std::shared_ptr<Block> Variable::AllocateFixedSize(int source, int iteration, int bid,
 			const std::vector<int64_t>& lbounds,
 			const std::vector<int64_t>& ubounds, 
 			const std::vector<int64_t>& gbounds,
@@ -189,7 +189,7 @@ shared_ptr<Block> Variable::AllocateFixedSize(int source, int iteration, int bid
 {
 	if(not buffer_) {
 		GetBuffer();
-		if(not buffer_) return shared_ptr<Block>();
+		if(not buffer_) return std::shared_ptr<Block>();
 	}
 
 	if((not IsTimeVarying()) && (iteration != 0)) {
@@ -199,11 +199,11 @@ shared_ptr<Block> Variable::AllocateFixedSize(int source, int iteration, int bid
 		iteration = 0;
 	}
 
-	shared_ptr<Block> block = GetBlock(source,iteration,bid);
+	std::shared_ptr<Block> block = GetBlock(source,iteration,bid);
 	if(block) {
 		ERROR("Trying to overwrite an existing chunk for variable \""
 			<< name_ << "\"");
-		return shared_ptr<Block>();
+		return std::shared_ptr<Block>();
 	}
 
 	block = Block::New(source,iteration,bid,SHARED_FROM_THIS());
@@ -232,7 +232,7 @@ shared_ptr<Block> Variable::AllocateFixedSize(int source, int iteration, int bid
 				buffer_->WaitAvailable(size);
 			}
 		} else {
-			return shared_ptr<Block>();
+			return std::shared_ptr<Block>();
 		}
 	}
 
@@ -248,12 +248,12 @@ shared_ptr<Block> Variable::AllocateFixedSize(int source, int iteration, int bid
 	return block;
 }
 
-shared_ptr<Block> Variable::AllocateAligned(int source, int iteration, int bid, 
+std::shared_ptr<Block> Variable::AllocateAligned(int source, int iteration, int bid, 
 			bool blocking)
 {
 	if(not buffer_) {
 		GetBuffer();
-		if(not buffer_) return shared_ptr<Block>();
+		if(not buffer_) return std::shared_ptr<Block>();
 	}
 
 	if((not IsTimeVarying()) && (iteration != 0)) {
@@ -263,11 +263,11 @@ shared_ptr<Block> Variable::AllocateAligned(int source, int iteration, int bid,
 		iteration = 0;
 	}
 
-	shared_ptr<Block> block = GetBlock(source,iteration,bid);
+	std::shared_ptr<Block> block = GetBlock(source,iteration,bid);
 	if(block) {
 		ERROR("Trying to overwrite an existing chunk for variable \""
 			<< name_ << "\"");
-		return shared_ptr<Block>();
+		return std::shared_ptr<Block>();
 	}
 
 	block = Block::New(source,iteration,bid,SHARED_FROM_THIS());
@@ -287,7 +287,7 @@ shared_ptr<Block> Variable::AllocateAligned(int source, int iteration, int bid,
 				buffer_->WaitAvailable(size);
 			}
 		} else {
-			return shared_ptr<Block>();
+			return std::shared_ptr<Block>();
 		}
 	}
 
@@ -302,20 +302,20 @@ shared_ptr<Block> Variable::AllocateAligned(int source, int iteration, int bid,
 	return block;
 }
 
-shared_ptr<Block> Variable::Retrieve(int source, int iteration, int bid,
+std::shared_ptr<Block> Variable::Retrieve(int source, int iteration, int bid,
 					const Handle& h, size_t size)
 {
 	if(not buffer_) {
 		GetBuffer();
-		if(not buffer_) return shared_ptr<Block>();
+		if(not buffer_) return std::shared_ptr<Block>();
 	}
 	
-	shared_ptr<Block> existing = GetBlock(source,iteration,bid);
+	std::shared_ptr<Block> existing = GetBlock(source,iteration,bid);
 	if(existing) {
 		ERROR("Retrieving an already existing Block. "
 			<< "The new one will not be considered. "
 			<< "Possible memory leak from this point.");
-		return shared_ptr<Block>();
+		return std::shared_ptr<Block>();
 	}
 	DBG("Block retrieved for iteration " 
 		<< iteration << " block " << bid);
@@ -324,9 +324,9 @@ shared_ptr<Block> Variable::Retrieve(int source, int iteration, int bid,
 	
 	DataSpace<Buffer> ds;
 	if(addr == NULL) {
-		return shared_ptr<Block>();
+		return std::shared_ptr<Block>();
 	}
-	shared_ptr<Block> block 
+	std::shared_ptr<Block> block 
 		= Block::New(source,iteration,bid,SHARED_FROM_THIS());
 	
 	ds.Link(buffer_,addr,size);
@@ -342,7 +342,7 @@ shared_ptr<Block> Variable::Retrieve(int source, int iteration, int bid,
 	return block;
 }
 
-shared_ptr<Block> Variable::Retrieve(int source, int iteration, int bid,
+std::shared_ptr<Block> Variable::Retrieve(int source, int iteration, int bid,
 					const std::vector<int64_t>& lbounds,
 					const std::vector<int64_t>& ubounds,
 					const std::vector<int64_t>& gbounds,
@@ -351,7 +351,7 @@ shared_ptr<Block> Variable::Retrieve(int source, int iteration, int bid,
 {
 	if(lbounds.size() != GetLayout()->GetDimensions()
 	|| ubounds.size() != GetLayout()->GetDimensions()) {
-		return shared_ptr<Block>();
+		return std::shared_ptr<Block>();
 	}
 	
 	size_t size = TypeSize(GetLayout()->GetType());
@@ -359,7 +359,7 @@ shared_ptr<Block> Variable::Retrieve(int source, int iteration, int bid,
 		size *= (ubounds[i] - lbounds[i] + 1);
 	}
 	
-	shared_ptr<Block> b = Retrieve(source,iteration,bid,h,size);
+	std::shared_ptr<Block> b = Retrieve(source,iteration,bid,h,size);
 	if(not b) return b;
 	
 	if((int)lbounds.size() != b->GetDimensions()
@@ -503,7 +503,7 @@ bool Variable::ExposeVisItDomainList(visit_handle *h, int UNUSED(iteration))
 bool Variable::ExposeVisItData(visit_handle* h, 
 	int source, int iteration, int block)
 {
-	shared_ptr<Block> b = GetBlock(source,iteration,block);
+	std::shared_ptr<Block> b = GetBlock(source,iteration,block);
 	if(not b) {
 		*h = VISIT_INVALID_HANDLE;
 		return true;

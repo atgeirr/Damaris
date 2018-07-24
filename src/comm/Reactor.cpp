@@ -26,9 +26,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 namespace damaris
 {
 	
-shared_ptr<Reactor> Reactor::New(MPI_Comm comm, int radix)
+std::shared_ptr<Reactor> Reactor::New(MPI_Comm comm, int radix)
 {
-	shared_ptr<Reactor> r;
+	std::shared_ptr<Reactor> r;
 #if MPI_VERSION == 3
 	// for now...
 	r = MPI2Reactor::New(comm,radix);
@@ -83,7 +83,7 @@ void Reactor::DispatchCallback(int UNUSED(tag), int UNUSED(source),
 	std::vector<char> buffer(cnt);
 	MPI_Status status;
 	int err = MPI_Recv(&buffer[0],cnt,MPI_BYTE,root,tg,comm_,&status);
-	shared_ptr<Callback> cb = int_callbacks_[tg];
+	std::shared_ptr<Callback> cb = int_callbacks_[tg];
 	if(cb && (err == MPI_SUCCESS)) (*cb)(tg,root,&buffer[0],count);
 	
 	everybody_->AsyncRecv(DISPATCH,&dispatch_info_,sizeof(dispatch_info_),
@@ -96,7 +96,7 @@ void Reactor::DispatchCallback(int UNUSED(tag), int UNUSED(source),
 bool Reactor::Dispatch(int tag, int dest, const void* buf, int count)
 {
 	if(dest == rank_) {
-		shared_ptr<Callback> cb = int_callbacks_[tag];
+		std::shared_ptr<Callback> cb = int_callbacks_[tag];
 		if(cb) (*cb)(tag,rank_,buf,count);
 	}
 	
@@ -135,7 +135,7 @@ int Reactor::PollOne()
 	
 	if(not flag) return 0;
 	
-	shared_ptr<Callback> cb = ext_callbacks_[index];
+	std::shared_ptr<Callback> cb = ext_callbacks_[index];
 	char* buf = buffers_[index];
 	
 	RemoveRequest(index);
@@ -169,7 +169,7 @@ void Reactor::RunOne()
 	int err = MPI_Waitany(count, &(requests_[0]), &index, &status);
 	if(err != MPI_SUCCESS) return;
 	
-	shared_ptr<Callback> cb = ext_callbacks_[index];
+	std::shared_ptr<Callback> cb = ext_callbacks_[index];
 	char* buf = buffers_[index];
 	
 	RemoveRequest(index);

@@ -37,7 +37,7 @@ using namespace damaris::model;
 namespace damaris {
 
 bool				Environment::_initialized_;
-shared_ptr<model::Simulation> 	Environment::_baseModel_;
+std::shared_ptr<model::Simulation> 	Environment::_baseModel_;
 MPI_Comm 			Environment::_entityComm_;
 MPI_Comm 			Environment::_globalComm_;
 MPI_Comm 			Environment::_nodeComm_;
@@ -52,10 +52,10 @@ int				Environment::_clientsPerNode_;
 int				Environment::_coresPerNode_;
 int 				Environment::_serversPerNode_;
 std::string 			Environment::_magicNumber_;
-shared_ptr<Buffer> 		Environment::_defaultBuffer_;
-shared_ptr<Client>		Environment::_client_;
-shared_ptr<Server>		Environment::_server_;
-shared_ptr<EventLogger> Environment::_eventLogger_;
+std::shared_ptr<Buffer> 		Environment::_defaultBuffer_;
+std::shared_ptr<Client>		Environment::_client_;
+std::shared_ptr<Server>		Environment::_server_;
+std::shared_ptr<EventLogger> Environment::_eventLogger_;
 bool				Environment::_sharedStructuresOwner_;
 
 bool Environment::Init(const std::string& configFile,
@@ -95,9 +95,9 @@ bool Environment::Init(const std::string& configFile,
 
     if (_baseModel_->log().present()) {
         /* Initialize the logger single instance */
-        string file_name = _baseModel_->log().get().FileName();
+        std::string file_name = _baseModel_->log().get().FileName();
         int rotation_size = _baseModel_->log().get().RotationSize();
-        string log_format = _baseModel_->log().get().LogFormat();
+        std::string log_format = _baseModel_->log().get().LogFormat();
         LogLevelType::value log_level = _baseModel_->log().get().LogLevel();
 
         _eventLogger_ = EventLogger::New();
@@ -173,9 +173,9 @@ bool Environment::InitDedicatedCores(MPI_Comm global)
 		if(bufEnabled) _client_ = Client::New(_entityComm_);
 		else _client_ = RemoteClient::New(_entityComm_);
 
-		shared_ptr<Reactor> reactor = _client_->GetReactor();
+		std::shared_ptr<Reactor> reactor = _client_->GetReactor();
 		int servID = _clientsPerNode_ + (rankInNode/(_clientsPerNode_/dcpn));
-		shared_ptr<Channel> channel2server 
+		std::shared_ptr<Channel> channel2server 
 			= Channel::New(reactor,_nodeComm_,servID,
 				_baseModel_->architecture().queue().size());
 		_client_->SetChannelToServer(channel2server);
@@ -196,10 +196,10 @@ bool Environment::InitDedicatedCores(MPI_Comm global)
 
 		InitManagers();
 		_server_ = Server::New(_entityComm_);
-		shared_ptr<Reactor> reactor = _server_->GetReactor();
+		std::shared_ptr<Reactor> reactor = _server_->GetReactor();
 		for(int k=0; k < (_clientsPerNode_/dcpn); k++) {
 			int cID = (rankInNode-_clientsPerNode_)*(_clientsPerNode_/dcpn) + k;
-			shared_ptr<Channel> channel2client
+			std::shared_ptr<Channel> channel2client
 				= Channel::New(reactor,_nodeComm_,cID,
 				_baseModel_->architecture().queue().size());
 			_server_->AddChannelToClient(channel2client);
@@ -261,11 +261,11 @@ bool Environment::InitDedicatedNodes()
 		CreateLocalStructures();
 		InitManagers();
 		_client_ = RemoteClient::New(_entityComm_);
-		shared_ptr<Reactor> reactor = _client_->GetReactor();
+		std::shared_ptr<Reactor> reactor = _client_->GetReactor();
 		//orc:client to server mapping
 		int servID = (rank - (dn * _coresPerNode_ ))/ ratio;
 		//orc:comm will be the global one
-		shared_ptr<Channel> channel2server
+		std::shared_ptr<Channel> channel2server
 			= Channel::New(reactor,_globalComm_,servID,
 				_baseModel_->architecture().queue().size());
 		//orc:setting channel to server and connecting
@@ -276,7 +276,7 @@ bool Environment::InitDedicatedNodes()
 		CreateLocalStructures();
 		InitManagers();
 		_server_ = Server::New(_entityComm_);
-		shared_ptr<Reactor> reactor = _server_->GetReactor();
+		std::shared_ptr<Reactor> reactor = _server_->GetReactor();
 		//debugging:
                 //std::cout << "Node id is " << Hardware::GetNodeID() << "rank for the server is" << rank << std::endl  ;
 		//orc:server to client mapping
@@ -284,7 +284,7 @@ bool Environment::InitDedicatedNodes()
 			int cID = (rank * ratio) + k + (dn * _coresPerNode_ );
 
 			//orc:comm will be the global one
-			shared_ptr<Channel> channel2client
+			std::shared_ptr<Channel> channel2client
 				= Channel::New(reactor,_globalComm_,cID,
 				_baseModel_->architecture().queue().size());
 

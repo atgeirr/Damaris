@@ -56,9 +56,9 @@ public:
 	 * 
 	 * \param[in] model : base model from configuration file.
 	 */
-	static shared_ptr<LocalMemorySegment> Create(
+    static std::shared_ptr<LocalMemorySegment> Create(
 				const model::Buffer& model) {
-		return shared_ptr<LocalMemorySegment>(new LocalMemorySegment(),
+        return std::shared_ptr<LocalMemorySegment>(new LocalMemorySegment(),
 					Deleter<LocalMemorySegment>());
 	}
 

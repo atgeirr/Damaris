@@ -21,9 +21,6 @@ extern "C" void my_function(const char* name, int32_t source, int32_t /*iteratio
 
 namespace damaris {
 
-using namespace std;
-	
-USING_POINTERS;
 
 class TestAction : public CppUnit::TestFixture {
 	
@@ -57,7 +54,7 @@ protected:
 	
 	void CallAction() {
 		if(Environment::IsClient()) {
-			shared_ptr<Action> a 
+			std::shared_ptr<Action> a 
 				= ActionManager::Search("test_event");
 			CPPUNIT_ASSERT(a);
 			a->Call(1,2,NULL);

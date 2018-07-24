@@ -26,7 +26,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace damaris {
 
-USING_POINTERS;
 	
 /**
  * The StandaloneClient object represents a single core running the simulation.
@@ -52,10 +51,10 @@ class StandaloneClient : public Client {
 	
 	/**
 	 * Creates a StandaloneClient object and returns it as a 
-	 * shared_ptr<Client>.
+	 * std::shared_ptr<Client>.
 	 */
-	static shared_ptr<Client> New() {
-		return shared_ptr<Client>(new StandaloneClient(), 
+	static std::shared_ptr<Client> New() {
+		return std::shared_ptr<Client>(new StandaloneClient(), 
 				Deleter<StandaloneClient>());
 	}
 		

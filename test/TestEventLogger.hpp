@@ -15,14 +15,11 @@
 
 namespace damaris {
 
-using namespace std;
-	
-USING_POINTERS;
 
 class TestEventLogger : public CppUnit::TestFixture {
 	
 private:
-	shared_ptr<EventLogger> eventLogger_;
+	std::shared_ptr<EventLogger> eventLogger_;
 	string fileName;
 	string logFileName;
 

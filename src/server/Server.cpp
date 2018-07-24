@@ -37,14 +37,13 @@ enum {
 };
 
 namespace damaris {
-	
-USING_POINTERS;
+
 
 /**
 * Adds a Channel associated to a client, binds tags to
 * callbacks and starts listening to it asynchronously.
 */
-bool Server::AddChannelToClient(const shared_ptr<Channel>& ch) {
+bool Server::AddChannelToClient(const std::shared_ptr<Channel>& ch) {
 	int rk = ch->GetEndPoint();
 	if(clients_.count(rk) != 0 || not ch) return false;
 	clients_[rk] = ch;
@@ -57,9 +56,9 @@ void Server::Run() {
 
 	// if it's the first call to Run, install other callbacks
 	if(firstRun_) {
-		std::map<int,shared_ptr<Channel> >::iterator ch;
+		std::map<int,std::shared_ptr<Channel> >::iterator ch;
 		for(ch = clients_.begin(); ch != clients_.end(); ch++) {
-			shared_ptr<Channel> c = ch->second;
+			std::shared_ptr<Channel> c = ch->second;
 			headerMsg_[ch->first] = HeaderMessage();
 			
 			c->AsyncRecv(DAMARIS_SIG_HEADER,
@@ -117,9 +116,9 @@ void Server::EndOfIterationCallback(int tag, int source,
 {
 	// sync finished for this iteration, starts listening
 	// to clients again
-	std::map<int,shared_ptr<Channel> >::iterator ch;
+	std::map<int,std::shared_ptr<Channel> >::iterator ch;
 	for(ch = clients_.begin(); ch != clients_.end(); ch++) {
-		shared_ptr<Channel> c = ch->second;
+		std::shared_ptr<Channel> c = ch->second;
 		headerMsg_[ch->first] = HeaderMessage();
 
 		c->AsyncRecv(DAMARIS_SIG_HEADER,
@@ -145,7 +144,7 @@ void Server::EndOfIterationCallback(int tag, int source,
 void Server::OnHeader(int UNUSED(tag), int rk,
 	const void* data, int UNUSED(s)) 
 {
-	shared_ptr<Channel> ch = clients_[rk];
+	std::shared_ptr<Channel> ch = clients_[rk];
 	
 	const HeaderMessage* h = (HeaderMessage*)data;
 	SignalType type = h->type_;
@@ -227,32 +226,32 @@ void Server::OnNextIterationWithErrors(int source)
 {
 	INFO("Error in next iteration, cleaning");
 	if(Environment::StartNextIteration()) {
-		shared_ptr<Action> gc = ActionManager::Search("#error");
+		std::shared_ptr<Action> gc = ActionManager::Search("#error");
 		if(gc) (*gc)(source,Environment::GetLastIteration()-1);
 	}
 }
 
-void Server::OnCallAction(const shared_ptr<Channel>& ch, int UNUSED(source)) 
+void Server::OnCallAction(const std::shared_ptr<Channel>& ch, int UNUSED(source)) 
 {
 	EventMessage ev;
 	ch->Recv(DAMARIS_SIG_BODY,&ev,sizeof(ev));
-	shared_ptr<Action> a = ActionManager::Search(ev.id_);
+	std::shared_ptr<Action> a = ActionManager::Search(ev.id_);
 	if(a) (*a)(ev.source_,ev.iteration_);
 }
 
-void Server::OnBcastAction(const shared_ptr<Channel>& ch, int UNUSED(source))
+void Server::OnBcastAction(const std::shared_ptr<Channel>& ch, int UNUSED(source))
 {
 	EventMessage ev;
 	ch->Recv(DAMARIS_SIG_BODY,&ev,sizeof(ev));
-	shared_ptr<Action> a = ActionManager::Search(ev.id_);
+	std::shared_ptr<Action> a = ActionManager::Search(ev.id_);
 	if(a) reactor_->Broadcast(BCAST_EVENT,&ev,sizeof(ev));
 }
 
-void Server::OnWrite(const shared_ptr<Channel>& ch, int source) 
+void Server::OnWrite(const std::shared_ptr<Channel>& ch, int source) 
 {
 	WriteMessage wr;
 	ch->Recv(DAMARIS_SIG_BODY,&wr,sizeof(wr));
-	shared_ptr<Variable> v = VariableManager::Search(wr.id_);
+	std::shared_ptr<Variable> v = VariableManager::Search(wr.id_);
 	if(not v) {
 		ERROR("Client " << ch->GetEndPoint() << " tried to write "
 		<< "an unknown variable (bad id).");
@@ -262,7 +261,7 @@ void Server::OnWrite(const shared_ptr<Channel>& ch, int source)
 	int iteration = wr.iteration_;
 	int bid = wr.block_;
 	Handle h = wr.handle_;
-	shared_ptr<Block> b = v->Retrieve(source, iteration, bid, 
+	std::shared_ptr<Block> b = v->Retrieve(source, iteration, bid, 
 			std::vector<int64_t>(wr.lbounds_,wr.lbounds_+wr.dim_),
 			std::vector<int64_t>(wr.ubounds_,wr.ubounds_+wr.dim_),
 			std::vector<int64_t>(wr.gbounds_,wr.gbounds_+wr.dim_),
@@ -275,12 +274,12 @@ void Server::OnWrite(const shared_ptr<Channel>& ch, int source)
 	}
 }
 //orc:Retrieval is not possible since different node, allocate a new block for written variable and receive it via MPI.
-void Server::OnRemoteWrite(const shared_ptr<Channel>& ch, int source)
+void Server::OnRemoteWrite(const std::shared_ptr<Channel>& ch, int source)
 {
 	RemoteWriteMessage rwm;
 	ch->Recv(DAMARIS_SIG_BODY,&rwm,sizeof(rwm));
 
-	shared_ptr<Variable> v = VariableManager::Search(rwm.id_);
+	std::shared_ptr<Variable> v = VariableManager::Search(rwm.id_);
 	if(not v) {
 		ERROR("Client " << ch->GetEndPoint() << " tried to write "
 		<< "an unknown variable (bad id).");
@@ -289,7 +288,7 @@ void Server::OnRemoteWrite(const shared_ptr<Channel>& ch, int source)
 	int iteration = rwm.iteration_;
 	int block = rwm.block_;
 	bool blocking = true ;
-	shared_ptr<Block> b 
+	std::shared_ptr<Block> b 
 		= v->AllocateFixedSize(source, iteration, block,
 				std::vector<int64_t>(rwm.lbounds_,rwm.lbounds_+rwm.dim_), 
 				std::vector<int64_t>(rwm.ubounds_,rwm.ubounds_+rwm.dim_), 
@@ -317,11 +316,11 @@ void Server::OnRemoteWrite(const shared_ptr<Channel>& ch, int source)
 	ch->Recv(DAMARIS_SIG_DATA,buffer,size);
 
 }
-void Server::OnCommit(const shared_ptr<Channel>& ch, int source) 
+void Server::OnCommit(const std::shared_ptr<Channel>& ch, int source) 
 {
 	CommitMessage wr;
 	ch->Recv(DAMARIS_SIG_BODY,&wr,sizeof(wr));
-	shared_ptr<Variable> v = VariableManager::Search(wr.id_);
+	std::shared_ptr<Variable> v = VariableManager::Search(wr.id_);
 	if(not v) {
 		ERROR("Client " << ch->GetEndPoint() << " tried to commit "
 		<< "an unknown variable (bad id).");
@@ -331,7 +330,7 @@ void Server::OnCommit(const shared_ptr<Channel>& ch, int source)
 	int iteration = wr.iteration_;
 	int bid = wr.block_;
 	Handle h = wr.handle_;
-	shared_ptr<Block> b = v->Retrieve(source, iteration, bid, 
+	std::shared_ptr<Block> b = v->Retrieve(source, iteration, bid, 
 			std::vector<int64_t>(wr.lbounds_,wr.lbounds_+wr.dim_),
 			std::vector<int64_t>(wr.ubounds_,wr.ubounds_+wr.dim_),
 			std::vector<int64_t>(wr.gbounds_,wr.gbounds_+wr.dim_),
@@ -345,11 +344,11 @@ void Server::OnCommit(const shared_ptr<Channel>& ch, int source)
 	b->SetReadOnly(true);
 }
 
-void Server::OnClear(const shared_ptr<Channel>& ch, int source) 
+void Server::OnClear(const std::shared_ptr<Channel>& ch, int source) 
 {
 	ClearMessage m;
 	ch->Recv(DAMARIS_SIG_BODY,&m,sizeof(m));
-	shared_ptr<Variable> v = VariableManager::Search(m.id_);
+	std::shared_ptr<Variable> v = VariableManager::Search(m.id_);
 	if(not v) {
 		ERROR("Client " << ch->GetEndPoint() << " tried to clear "
 		<< "an unknown variable (bad id).");
@@ -358,7 +357,7 @@ void Server::OnClear(const shared_ptr<Channel>& ch, int source)
 	
 	int iteration = m.iteration_;
 	int bid = m.block_;
-	shared_ptr<Block> b = v->GetBlock(source, iteration, bid);
+	std::shared_ptr<Block> b = v->GetBlock(source, iteration, bid);
 	
 	if(not b) {
 		ERROR("Failed at retrieving block cleared by client.");
@@ -371,7 +370,7 @@ void Server::OnClear(const shared_ptr<Channel>& ch, int source)
 void Server::BcastEventCallback(int tag, int source, const void* buf, int count)
 {
 	const EventMessage* ev = (const EventMessage*)buf;
-        shared_ptr<Action> a = ActionManager::Search(ev->id_);
+        std::shared_ptr<Action> a = ActionManager::Search(ev->id_);
         if(a) (*a)(ev->source_,ev->iteration_);	
 }
 

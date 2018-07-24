@@ -21,14 +21,14 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace damaris {
 
-shared_ptr<Variable> Mesh::GetCoord(unsigned int n)
+std::shared_ptr<Variable> Mesh::GetCoord(unsigned int n)
 {
 	if(coords_.size() == 0) { // first time access coordinates
 		model::Mesh::coord_const_iterator 
 			it(GetModel().coord().begin());
 		for(; it != GetModel().coord().end(); it++) { 
 
-			shared_ptr<Variable> v;
+			std::shared_ptr<Variable> v;
 			std::string coordName = it->name();
 			bool coordIsAbsolute = 
 				(coordName.find("/") != std::string::npos);
@@ -71,7 +71,7 @@ shared_ptr<Variable> Mesh::GetCoord(unsigned int n)
 	if(n < coords_.size()) {
 		return coords_[n];
 	} else {
-		return shared_ptr<Variable>();
+		return std::shared_ptr<Variable>();
 	}
 }
 

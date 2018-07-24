@@ -34,7 +34,6 @@
 
 namespace damaris {
 
-	USING_POINTERS;
 
 	StandaloneClient::StandaloneClient() : Client()
 	{
@@ -50,7 +49,7 @@ namespace damaris {
 	int StandaloneClient::Write(const std::string & varname, 
 			int32_t block, const void* data, bool blocking)
 	{
-		shared_ptr<Variable> v = VariableManager::Search(varname);
+		std::shared_ptr<Variable> v = VariableManager::Search(varname);
 		if(not v) {
 			//ERROR("Undefined variable " << varname);
 			return DAMARIS_UNDEFINED_VARIABLE;
@@ -64,7 +63,7 @@ namespace damaris {
 		int source = Environment::GetEntityProcessID();
 		int iteration = Environment::GetLastIteration();
 
-		shared_ptr<Block> b = v->Allocate(source, iteration, block, blocking);
+		std::shared_ptr<Block> b = v->Allocate(source, iteration, block, blocking);
 
 		if(not b) {
 			errorOccured_ = 1;
@@ -88,7 +87,7 @@ namespace damaris {
 
 	int StandaloneClient::Signal(const std::string & signame)
 	{
-		shared_ptr<Action> a = ActionManager::Search(signame);
+		std::shared_ptr<Action> a = ActionManager::Search(signame);
 		if(not a) {
 			ERROR("Undefined action " << signame);
 			return DAMARIS_UNDEFINED_ACTION;
@@ -106,7 +105,7 @@ namespace damaris {
 	int StandaloneClient::Alloc(const std::string & varname,
 			int32_t block, void** buffer, bool blocking)
 	{
-		shared_ptr<Variable> v = VariableManager::Search(varname);
+		std::shared_ptr<Variable> v = VariableManager::Search(varname);
 		if(not v) {
 			ERROR("Undefined variable " << varname);
 			return DAMARIS_UNDEFINED_VARIABLE;
@@ -120,7 +119,7 @@ namespace damaris {
 		int source = Environment::GetEntityProcessID();
 		int iteration = Environment::GetLastIteration();
 
-		shared_ptr<Block> b = v->Allocate(source, iteration, block, blocking);
+		std::shared_ptr<Block> b = v->Allocate(source, iteration, block, blocking);
 
 		if(not b) {
 			ERROR("Could not allocated block for variable "<< v->GetName());
@@ -142,7 +141,7 @@ namespace damaris {
 	int StandaloneClient::Commit(const std::string & varname, 
 			int32_t block, int32_t iteration)
 	{
-		shared_ptr<Variable> v = VariableManager::Search(varname);
+		std::shared_ptr<Variable> v = VariableManager::Search(varname);
 		if(not v) {
 			ERROR("Undefined variable " << varname);
 			return DAMARIS_UNDEFINED_VARIABLE;
@@ -154,7 +153,7 @@ namespace damaris {
 		}
 
 		int source = Environment::GetEntityProcessID();
-		shared_ptr<Block> b = v->GetBlock(source,iteration,block);
+		std::shared_ptr<Block> b = v->GetBlock(source,iteration,block);
 
 		if(not b) {
 			ERROR("Unable to find corresponding block");
@@ -169,7 +168,7 @@ namespace damaris {
 	int StandaloneClient::Clear(const std::string & varname, 
 			int32_t block, int32_t iteration)
 	{
-		shared_ptr<Variable> v = VariableManager::Search(varname);
+		std::shared_ptr<Variable> v = VariableManager::Search(varname);
 		if(not v) {
 			ERROR("Undefined variable " << varname);
 			return DAMARIS_UNDEFINED_VARIABLE;
@@ -181,7 +180,7 @@ namespace damaris {
 		}
 
 		int source = Environment::GetEntityProcessID();
-		shared_ptr<Block> b = v->GetBlock(source,iteration,block);
+		std::shared_ptr<Block> b = v->GetBlock(source,iteration,block);
 
 		if(not b) {
 			ERROR("Unable to find corresponding block");

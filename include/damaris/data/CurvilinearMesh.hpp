@@ -25,7 +25,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace damaris {
 
-USING_POINTERS;
 /**
  * CurvilinearMesh is a particular type of Mesh.
  */
@@ -57,19 +56,19 @@ public:
 	 * \param[in] mdl : model from which to create the instance.
 	 */
 	template <typename SUPER>
-	static shared_ptr<SUPER> New(const model::Mesh& mdl,
+	static std::shared_ptr<SUPER> New(const model::Mesh& mdl,
 				     const std::string& name) 
 	{
 		if(mdl.type() != model::MeshType::curvilinear) {
-			return shared_ptr<SUPER>();
+			return std::shared_ptr<SUPER>();
 		}
 
 		if(mdl.name().find("/") != std::string::npos) {
 			CFGERROR("Mesh " << mdl.name() << " cannot have a '/' character.");
-			return shared_ptr<SUPER>();
+			return std::shared_ptr<SUPER>();
 		}
 
-		shared_ptr<CurvilinearMesh> m = shared_ptr<CurvilinearMesh>(
+		std::shared_ptr<CurvilinearMesh> m = std::shared_ptr<CurvilinearMesh>(
 			new CurvilinearMesh(mdl),
 			Deleter<CurvilinearMesh>());
 		m->name_ = name;

@@ -10,14 +10,11 @@
 
 namespace damaris {
 
-using namespace std;
-	
-USING_POINTERS;
 
 class TestLayoutManager : public CppUnit::TestFixture {
 	
 private:
-	static shared_ptr<model::Simulation> mdl;
+	static std::shared_ptr<model::Simulation> mdl;
 	
 public:
 	TestLayoutManager() {
@@ -70,13 +67,13 @@ protected:
 		// initialization
 		LayoutManager::Init(mdl->data());
 		// search for an existing layout
-		shared_ptr<Layout> l1
+		std::shared_ptr<Layout> l1
 			= LayoutManager::Search("rmeshY");
 		// search for a non-existing layout
-		shared_ptr<Layout> l2
+		std::shared_ptr<Layout> l2
 			= LayoutManager::Search("something");
 		// search for a type layout
-		shared_ptr<Layout> l3
+		std::shared_ptr<Layout> l3
 			= LayoutManager::Search("integer");
 		// l1 should exist, l2 should not, l3 should
 		CPPUNIT_ASSERT((bool)l1);
@@ -91,6 +88,6 @@ protected:
 	}
 };
 
-shared_ptr<model::Simulation> TestLayoutManager::mdl;
+std::shared_ptr<model::Simulation> TestLayoutManager::mdl;
 
 }

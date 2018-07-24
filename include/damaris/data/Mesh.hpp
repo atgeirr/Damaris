@@ -33,8 +33,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "damaris/model/Model.hpp"
 
 namespace damaris {
-	
-USING_POINTERS;
+
 
 /**
  * The Mesh object is used for describing a mesh within a metadata structure.
@@ -47,7 +46,7 @@ class Mesh : public Configurable<model::Mesh> {
 	protected:
 		int id_; /*! id of the mesh, provided by the MeshManager. */
 		std::string name_; /*! Name of the mesh, copy from the model. */
-		std::vector<shared_ptr<Variable> > coords_; /*! pointer to coordinate variables. */
+		std::vector<std::shared_ptr<Variable> > coords_; /*! pointer to coordinate variables. */
 
 	protected:
 		
@@ -86,7 +85,7 @@ class Mesh : public Configurable<model::Mesh> {
 		 *
 		 * \param[in] n : index of the coordinate.
 		 */
-		shared_ptr<Variable> GetCoord(unsigned int n);
+		std::shared_ptr<Variable> GetCoord(unsigned int n);
 
 		/**
 		 * Returns the number of coordinates.

@@ -44,7 +44,7 @@ class Curve : public Configurable<model::Curve> {
 		std::string name_; /*! Name of the mesh, copy from the model. */
 		int id_; /*! id of the mesh, 
 				provided when created by the MeshManager. */
-		std::vector<shared_ptr<Variable> > coords_; /*! pointer to coordinate variables. */
+		std::vector<std::shared_ptr<Variable> > coords_; /*! pointer to coordinate variables. */
 
 	protected:
 		/**
@@ -80,7 +80,7 @@ class Curve : public Configurable<model::Curve> {
 		 *
 		 * \param[in] n : index of the coordinate.
 		 */
-		shared_ptr<Variable> GetCoord(unsigned int n);
+		std::shared_ptr<Variable> GetCoord(unsigned int n);
 
 		/**
 		 * Returns the number of coordinates.
@@ -108,13 +108,13 @@ class Curve : public Configurable<model::Curve> {
 		 * \param[in] mdl : model from which to build a Curve instance.
 		 */
 		template<typename SUPER>
-		static shared_ptr<SUPER> New(const model::Curve& mdl, 
+		static std::shared_ptr<SUPER> New(const model::Curve& mdl, 
 						const std::string& name) {
 			if(mdl.name().find("/") != std::string::npos) {
 				CFGERROR("Curve " << mdl.name() << " cannot have a '/' character");
-				return shared_ptr<SUPER>();
+				return std::shared_ptr<SUPER>();
 			}
-			shared_ptr<Curve> c(new Curve(mdl,mdl.name()),
+			std::shared_ptr<Curve> c(new Curve(mdl,mdl.name()),
 					Deleter<Curve>());
 			c->name_ = name;
 			return c;

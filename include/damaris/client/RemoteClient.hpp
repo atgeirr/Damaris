@@ -28,7 +28,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace damaris {
 
-USING_POINTERS;
 
 /**
  * The RemoteClient object represents a single core running the simulation which
@@ -57,8 +56,8 @@ class RemoteClient : public Client {
 	 * Constructor. Creates a RemoteClient object given a communicator gathering
 	 * all clients.
 	 */
-	static shared_ptr<Client> New(MPI_Comm comm) {
-		shared_ptr<Client> c(new RemoteClient(),Deleter<RemoteClient>());
+	static std::shared_ptr<Client> New(MPI_Comm comm) {
+		std::shared_ptr<Client> c(new RemoteClient(),Deleter<RemoteClient>());
 		//c->reactor_ = Reactor::New(comm);
                 c->SetReactor(c,comm);
 		return c;

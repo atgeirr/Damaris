@@ -24,7 +24,7 @@ namespace damaris
 {
 
 /**
- * The Deleter class is used to provide a way of deleting shared_ptr of
+ * The Deleter class is used to provide a way of deleting std::shared_ptr of
  * objects with a private or protected destructor. Such a class A should declare
  * the class Deleter<A> as friend.
  */

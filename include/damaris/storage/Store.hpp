@@ -43,7 +43,7 @@ class Store : public Configurable<model::Store> {
 	std::string name_; /*!< Name of the Store. */
 	int id_; 	  /*!< ID given to the store when set in
 				the StorageManager. */
-	std::vector<weak_ptr<Variable> > vars_; /*!< List of variables managed by this Store. */
+    std::vector<std::weak_ptr<Variable> > vars_; /*!< List of variables managed by this Store. */
 
 	protected:
 		
@@ -74,7 +74,7 @@ class Store : public Configurable<model::Store> {
 	 * This function is called on all variables that require to be
 	 * stored using this Store object.
 	 */
-	void AddVariable(const shared_ptr<Variable>& v) {
+	void AddVariable(const std::shared_ptr<Variable>& v) {
 		vars_.push_back(v);
 	}
 
@@ -82,7 +82,7 @@ class Store : public Configurable<model::Store> {
 	 * Returns a reference to the list of variables this store is in
 	 * charge of.
 	 */
-	const std::vector< weak_ptr<Variable> >& GetVariables() const {
+	 const std::vector< std::weak_ptr<Variable> >& GetVariables() const {
 		return vars_;
 	}
 
@@ -97,12 +97,12 @@ class Store : public Configurable<model::Store> {
  	* If there is no data, the Update function in each store will return. <Maybe set it as configuratble at future>
  	*/
 	virtual bool IterationIsEmpty(int iteration){
-		vector<weak_ptr<Variable> >::const_iterator w;
+        std::vector<std::weak_ptr<Variable> >::const_iterator w;
 		w = GetVariables().begin();
 
 		// for each variable ...
 		for (; w != GetVariables().end(); w++) {
-			shared_ptr<Variable> v = w->lock();
+			std::shared_ptr<Variable> v = w->lock();
 
 			if (v->CountTotalBlocks(iteration) > 0)
 				return false;

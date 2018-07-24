@@ -28,7 +28,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace damaris {
 
-USING_POINTERS;
 	
 /**
  * The Client object represents a single core running the simulation. It
@@ -45,8 +44,8 @@ class Client {
 		
 	int errorOccured_; /*!< Indicates wether an error 
 			occured during the last iteration. */
-	shared_ptr<Reactor> reactor_;   /*!< Reactor to make channels work. */
-	shared_ptr<Channel> ch2server_; /*!< Channel to the server. */
+	std::shared_ptr<Reactor> reactor_;   /*!< Reactor to make channels work. */
+	std::shared_ptr<Channel> ch2server_; /*!< Channel to the server. */
 	
 	/** 
 	 * Constructor.
@@ -64,8 +63,8 @@ class Client {
 	 * Constructor. Creates a Client object given a communicator gathering 
 	 * all clients.
 	 */
-	static shared_ptr<Client> New(MPI_Comm comm) {
-		shared_ptr<Client> c(new Client(),Deleter<Client>());
+	static std::shared_ptr<Client> New(MPI_Comm comm) {
+		std::shared_ptr<Client> c(new Client(),Deleter<Client>());
 		c->reactor_ = Reactor::New(comm);
 		return c;
 	}
@@ -73,17 +72,17 @@ class Client {
 	/**
 	 * Returns the Reactor gathering clients.
 	 */
-	shared_ptr<Reactor> GetReactor() const {
+	std::shared_ptr<Reactor> GetReactor() const {
 		return reactor_;
 	}
 
-		virtual void SetReactor(shared_ptr<Client> c , MPI_Comm comm) {
+		virtual void SetReactor(std::shared_ptr<Client> c , MPI_Comm comm) {
 		c->reactor_ = Reactor::New(comm);
 	}
 	/**
 	 * Sets the channel that has to be used to communicate with the server.
 	 */
-	virtual bool SetChannelToServer(const shared_ptr<Channel>& ch)
+	virtual bool SetChannelToServer(const std::shared_ptr<Channel>& ch)
 	{
 		if(ch2server_) return false;
 		ch2server_ = ch;

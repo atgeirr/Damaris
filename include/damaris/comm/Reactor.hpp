@@ -33,7 +33,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 namespace damaris
 {
 
-USING_POINTERS;
 	
 class Reactor : public ENABLE_SHARED_FROM_THIS(Reactor) {
 	
@@ -62,19 +61,19 @@ class Reactor : public ENABLE_SHARED_FROM_THIS(Reactor) {
 	int rank_;	// rank in the communicator
 	int size_;	// size of the communicator
 	MPI_Comm comm_;	// communicator of the reactor
-	std::map<int,shared_ptr<Callback> > int_callbacks_;
+	std::map<int,std::shared_ptr<Callback> > int_callbacks_;
 	
 	// -------------------------------------------------------------- //
 	// attributes necessary for serving channel's requests
 	// -------------------------------------------------------------- //
 	std::vector<MPI_Request> 		requests_;
-	std::vector<shared_ptr<Callback> > 	ext_callbacks_;
+	std::vector<std::shared_ptr<Callback> > 	ext_callbacks_;
 	std::vector<char*>	 		buffers_;
 	
 	// -------------------------------------------------------------- //
 	// attributes necessary for the dispatch	
 	// -------------------------------------------------------------- //
-	shared_ptr<Channel> everybody_;
+    std::shared_ptr<Channel> everybody_;
 	MsgInfo	dispatch_info_;
 	
 	/**
@@ -108,7 +107,7 @@ class Reactor : public ENABLE_SHARED_FROM_THIS(Reactor) {
 	 * \param[in] buffer : buffer associated to the request (send or
 	 * recv buffer).
 	 */
-	int BindRequest(MPI_Request req, const shared_ptr<Callback>& cb, 
+	int BindRequest(MPI_Request req, const std::shared_ptr<Callback>& cb,
 			const void* buffer)
 	{
 		requests_.push_back(req);
@@ -229,7 +228,7 @@ public:
 	 * accross the processes of the communicator, it will duplicate the
 	 * communicator.
 	 */
-	static shared_ptr<Reactor> New(MPI_Comm comm, int radix=2);
+	static std::shared_ptr<Reactor> New(MPI_Comm comm, int radix=2);
 };
 
 }

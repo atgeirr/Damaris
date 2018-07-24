@@ -24,14 +24,14 @@ NullStore::NullStore(const model::Store& mdl)
 : Store(mdl) {
 	model::Store::option_const_iterator op = mdl.option().begin();
 	for(; op != mdl.option().end(); op++) {
-		std::cout << "Option \"" << op->key() << "\" has value \"" << (string)(*op) << "\"" << std::endl;
+        std::cout << "Option \"" << op->key() << "\" has value \"" << (std::string)(*op) << "\"" << std::endl;
 	}
 }
 
 void NullStore::Output(int32_t iteration) {
-	std::vector< weak_ptr<Variable> >::const_iterator w = GetVariables().begin();
+    std::vector< std::weak_ptr<Variable> >::const_iterator w = GetVariables().begin();
 	for(; w != GetVariables().end(); w++) {
-		shared_ptr<Variable> v = w->lock();
+		std::shared_ptr<Variable> v = w->lock();
 		if(v) {
 			std::cout << "Storging variable " << v->GetName() << " for iteration "
 			<< iteration << std::endl;

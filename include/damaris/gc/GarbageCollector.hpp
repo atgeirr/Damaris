@@ -93,8 +93,8 @@ class GarbageCollector  : public Action {
 	/**
 	 * Creates an action of type GarbageCollector.
 	 */
-	static shared_ptr<Action> New() {
-		return shared_ptr<Action>(new GarbageCollector, 
+	static std::shared_ptr<Action> New() {
+		return std::shared_ptr<Action>(new GarbageCollector, 
 			Deleter<GarbageCollector>());
 	}
 };

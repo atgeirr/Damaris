@@ -22,6 +22,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace damaris;
 
+
 extern "C" {
 
 int damaris_initialize(const char* configfile, MPI_Comm comm)
@@ -222,7 +223,7 @@ int damaris_bind(const char* signal_name, signal_t sig)
 		return DAMARIS_NOT_INITIALIZED;
 	}
 	// TODO ensure this is called by ALL the processes
-	shared_ptr<Action> a = BoundAction::New<Action>(sig,signal_name);
+    std::shared_ptr<Action> a = BoundAction::New<Action>(sig,signal_name);
 	if(not a) return DAMARIS_BIND_ERROR;
 	
 	ActionManager::Add(a);
@@ -238,7 +239,7 @@ int damaris_parameter_get(const char* name,
 	if(not Environment::Initialized()) {
 		return DAMARIS_NOT_INITIALIZED;
 	}
-	shared_ptr<Parameter> p = ParameterManager::Search(name);
+	std::shared_ptr<Parameter> p = ParameterManager::Search(name);
 	if(p) return p->ToBuffer(buffer, size);
 	else return DAMARIS_UNDEFINED_PARAMETER;
 }
@@ -251,7 +252,7 @@ int damaris_parameter_set(const char* name,
 	if(not Environment::Initialized()) {
 		return DAMARIS_NOT_INITIALIZED;
 	}
-	shared_ptr<Parameter> p = ParameterManager::Search(name);
+	std::shared_ptr<Parameter> p = ParameterManager::Search(name);
 	if(p) {
 		return p->FromBuffer(buffer, size);
 	} else {

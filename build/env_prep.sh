@@ -103,9 +103,9 @@ echo -e "--- COMPILING & INSTALLING HDF5 ---------------------------------------
 # Installing HDF5 1.10
 if [ $install_hdf5 = 1 ]; then
     cd $tempdir
-    wget --no-check-certificate https://support.hdfgroup.org/ftp/HDF5/current18/src/hdf5-1.8.19.tar
-    tar -xvf hdf5-1.8.19.tar
-    cd hdf5-1.8.19
+    wget --no-check-certificate https://support.hdfgroup.org/ftp/HDF5/current18/src/hdf5-1.8.20.tar
+    tar -xvf hdf5-1.8.20.tar
+    cd hdf5-1.8.20
     ./configure --enable-parallel --prefix=$install_path
     make
     make install

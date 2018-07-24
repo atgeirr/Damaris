@@ -90,11 +90,11 @@ class BoundAction : public Action {
 		 * Creates a BoundAction given a function pointer.
 		 */
 		template<typename SUPER>
-		static shared_ptr<SUPER> New(signal_t f, 
+		static std::shared_ptr<SUPER> New(signal_t f, 
 			const std::string& name)
 		{
-			if(f == NULL) return shared_ptr<SUPER>();
-			shared_ptr<BoundAction> a(new BoundAction(name),
+			if(f == NULL) return std::shared_ptr<SUPER>();
+			std::shared_ptr<BoundAction> a(new BoundAction(name),
 						Deleter<BoundAction>());
 			a->function_ = f;
 			return a;

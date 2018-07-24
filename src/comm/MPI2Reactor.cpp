@@ -32,7 +32,7 @@ bool MPI2Reactor::Init(MPI_Comm comm, int radix)
 	for(int i = 1; i <= radix; i++) {
 		int c = radix*rank_ + i;
 		if(c < size_) {
-			shared_ptr<Channel> ch 
+			std::shared_ptr<Channel> ch 
 				= Channel::New(
 				SHARED_FROM_BASE_OF_THIS(Reactor,MPI2Reactor),
 				comm_, c, 32);
@@ -103,7 +103,7 @@ void MPI2Reactor::BcastCallback(int UNUSED(tag), int UNUSED(source),
 	int tg 		= info->tag;
 	int cnt 	= info->count;
 	
-	std::map<int,shared_ptr<Channel> >::iterator it, end;
+	std::map<int,std::shared_ptr<Channel> >::iterator it, end;
 	it = children_.begin();
 	end = children_.end();
 	for(; it != end; it++) {
@@ -121,7 +121,7 @@ void MPI2Reactor::BcastCallback(int UNUSED(tag), int UNUSED(source),
 	void* b = &buffer[0]; 
 	int err = MPI_Bcast(b,cnt,MPI_BYTE,root,comm_);
 	
-	shared_ptr<Callback> cb = int_callbacks_[tg];
+	std::shared_ptr<Callback> cb = int_callbacks_[tg];
 	if(cb && (err == MPI_SUCCESS)) (*cb)(tg,root,b,count);
 	
 	if(rank_ != 0) {
@@ -181,7 +181,7 @@ void MPI2Reactor::SyncCallback(int tag, int source, const void* buf, int UNUSED(
 	// we can call the callback after forwarding to children
 	if(tag == SYNC_WAVE) {
 		// forward to children
-		std::map<int, shared_ptr<Channel> >::iterator it, end;
+		std::map<int, std::shared_ptr<Channel> >::iterator it, end;
 		it = children_.begin();
 		end = children_.end();
 		for(;it != end; it++) {
@@ -189,7 +189,7 @@ void MPI2Reactor::SyncCallback(int tag, int source, const void* buf, int UNUSED(
 		}
 		// call the callback
 		if(int_callbacks_.count(info->tag)) {
-			shared_ptr<Callback> cb = int_callbacks_[info->tag];
+			std::shared_ptr<Callback> cb = int_callbacks_[info->tag];
 			if(cb) (*cb)(info->tag,rank_,NULL,0);
 		} 
 	  
@@ -230,7 +230,7 @@ void MPI2Reactor::SyncCallback(int tag, int source, const void* buf, int UNUSED(
 	
 	// reload a callback for sync on this source
 	if(source != parent_->GetEndPoint()) {
-		shared_ptr<Channel> ch = children_[source];
+		std::shared_ptr<Channel> ch = children_[source];
 			ch->AsyncRecv(SYNC,&sync_info_[source],
 				sizeof(MsgInfo),
 				BIND(&MPI2Reactor::SyncCallback,

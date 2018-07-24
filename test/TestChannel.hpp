@@ -13,15 +13,12 @@
 
 namespace damaris {
 
-using namespace std;
-	
-USING_POINTERS;
 
 class TestChannel : public CppUnit::TestFixture {
 	
 private:
-	static shared_ptr<Reactor> reactor_;
-	static shared_ptr<Channel> channel_;
+	static std::shared_ptr<Reactor> reactor_;
+	static std::shared_ptr<Channel> channel_;
 	static int rank;
 
 	static void CallbackTest(int UNUSED(tag), int UNUSED(src), const void* buf, int UNUSED(size)) {
@@ -118,8 +115,8 @@ protected:
 	}
 };
 
-shared_ptr<Reactor> TestChannel::reactor_;
-shared_ptr<Channel> TestChannel::channel_;
+std::shared_ptr<Reactor> TestChannel::reactor_;
+std::shared_ptr<Channel> TestChannel::channel_;
 int TestChannel::rank;
 
 }

@@ -26,7 +26,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace damaris {
 
-USING_POINTERS;
 
 /**
  * This class is used by child classes that need to notify other objects that
@@ -34,7 +33,7 @@ USING_POINTERS;
  *
  * It uses normal pointers internal to avoid all the troubles of interfering
  * with a child class that uses ENABLE_SHARED_FROM_THIS; however it
- * imposes that AddObserver is called with a shared_ptr, to prove that the
+ * imposes that AddObserver is called with a std::shared_ptr, to prove that the
  * pointer is well managed externally. Since removing observers/observable
  * is done in the destructor, there is no chance to leave a crazy pointer there.
  */
@@ -85,7 +84,7 @@ class Observable {
 		 * \param[in] obs : observer to be added.
 		 */
 		template<typename T>
-		void AddObserver(const shared_ptr<T>& obs) {
+		void AddObserver(const std::shared_ptr<T>& obs) {
 			if(obs) {
 				obs->observed_.insert(this);
 				observers_.insert(obs.get());
@@ -99,7 +98,7 @@ class Observable {
 		 * \param[in] obs : observer to be removed.
 		 */
 		template<typename T>
-		void RemoveObserver(const shared_ptr<T>& obs) {
+		void RemoveObserver(const std::shared_ptr<T>& obs) {
 			if(obs) {
 				observers_.erase(obs.get());
 			}

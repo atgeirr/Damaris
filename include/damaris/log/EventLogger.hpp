@@ -19,6 +19,14 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __DAMARIS_EVENTLOGGER_H
 #define __DAMARIS_EVENTLOGGER_H
 
+// NOTE: these lines ignore lots of gcc wanrings caused by including common_attributes.hpp from boost library
+#pragma GCC diagnostic push      // Save the current warning state
+#pragma GCC diagnostic ignored "-Wmissing-field-initializers" // Disable the warning you're getting
+
+#include <boost/log/utility/setup/common_attributes.hpp>
+
+#pragma GCC diagnostic pop
+
 
 #include <iostream>
 
@@ -27,15 +35,11 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/log/expressions.hpp>
 #include <boost/log/sinks/text_file_backend.hpp>
 #include <boost/log/utility/setup/file.hpp>
-#include <boost/log/utility/setup/common_attributes.hpp>
 #include <boost/log/sources/severity_logger.hpp>
 #include <boost/log/sources/record_ostream.hpp>
-#include <boost/shared_ptr.hpp>
-
-
 #include "damaris/util/Deleter.hpp"
 #include "damaris/util/Pointers.hpp"
-//#include "damaris/model/Model.hpp"
+
 
 
 namespace logging = boost::log;
@@ -43,9 +47,6 @@ namespace src = boost::log::sources;
 namespace sinks = boost::log::sinks;
 namespace keywords = boost::log::keywords;
 
-using namespace std;
-using namespace boost;
-//using namespace damaris::model;
 
 
 namespace damaris {
@@ -76,19 +77,19 @@ public:
     /**
     * creates the singleton object.
     */
-    static shared_ptr<EventLogger> New()
+    static std::shared_ptr<EventLogger> New()
     {
-        shared_ptr<EventLogger> c(new EventLogger() , Deleter<EventLogger>());
+        std::shared_ptr<EventLogger> c(new EventLogger() , Deleter<EventLogger>());
 
         return c;
     }
 
-    void Init(int processId , string file_name , int rotation_size , string log_format , int log_level);
+    void Init(int processId , std::string file_name , int rotation_size , std::string log_format , int log_level);
 
     /**
     * Logs the message basaed on the logLevel severity mode
     */
-    void Log(string message , LogLevel logLevel);
+    void Log(std::string message , EventLogger::LogLevel logLevel);
 };
 
 }

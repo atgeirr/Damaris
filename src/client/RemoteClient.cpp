@@ -29,20 +29,19 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace damaris {
 
-USING_POINTERS;
 
 
 int RemoteClient::Write(const std::string & varname,
 	int32_t block, const void* data, bool UNUSED(blocking))
 {
 
-		shared_ptr<Variable> v = VariableManager::Search(varname);
+		std::shared_ptr<Variable> v = VariableManager::Search(varname);
 		if(not v) {
 			//ERROR("Undefined variable " << varname);
 			return DAMARIS_UNDEFINED_VARIABLE;
 		}
 
-		shared_ptr<Layout> l = v->GetLayout();
+		std::shared_ptr<Layout> l = v->GetLayout();
 
 		if(block < 0 || block >= (int32_t)Environment::NumDomainsPerClient()) {
 			ERROR("Invalid block id");
@@ -96,7 +95,7 @@ int RemoteClient::Write(const std::string & varname,
 int RemoteClient::Alloc(const std::string & varname,
 	int32_t block, void** buffer, bool blocking)
 {
-	shared_ptr<Variable> v = VariableManager::Search(varname);
+	std::shared_ptr<Variable> v = VariableManager::Search(varname);
 	if(not v) {
 		ERROR("Undefined variable " << varname);
 		return DAMARIS_UNDEFINED_VARIABLE;
@@ -110,7 +109,7 @@ int RemoteClient::Alloc(const std::string & varname,
 	int source = Environment::GetEntityProcessID();
 	int iteration = Environment::GetLastIteration();
 
-	shared_ptr<Block> b = v->Allocate(source, iteration, block, blocking);
+	std::shared_ptr<Block> b = v->Allocate(source, iteration, block, blocking);
 	
 	if(not b) {
 		ERROR("Could not allocated block for variable "<< v->GetName());
@@ -132,7 +131,7 @@ int RemoteClient::Alloc(const std::string & varname,
 int RemoteClient::Commit(const std::string & varname,
 	int32_t block, int32_t iteration)
 {
-	shared_ptr<Variable> v = VariableManager::Search(varname);
+	std::shared_ptr<Variable> v = VariableManager::Search(varname);
 	if(not v) {
 		ERROR("Undefined variable " << varname);
 		return DAMARIS_UNDEFINED_VARIABLE;
@@ -144,7 +143,7 @@ int RemoteClient::Commit(const std::string & varname,
 	}
 
 	int source = Environment::GetEntityProcessID();
-	shared_ptr<Block> b = v->GetBlock(source,iteration,block);
+	std::shared_ptr<Block> b = v->GetBlock(source,iteration,block);
 
 	if(not b) {
 		ERROR("Unable to find corresponding block");

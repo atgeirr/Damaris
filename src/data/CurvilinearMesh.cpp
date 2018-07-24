@@ -34,9 +34,9 @@ bool CurvilinearMesh::ExposeVisItMetaData(visit_handle md)
 		VisIt_MeshMetaData_setSpatialDimension(m1, (int)model.coord().size());
 
 		// check that the coordinate exist
-		shared_ptr<Variable> vx = GetCoord(0);
-		shared_ptr<Variable> vy = GetCoord(1);
-		shared_ptr<Variable> vz = GetCoord(2);
+		std::shared_ptr<Variable> vx = GetCoord(0);
+		std::shared_ptr<Variable> vy = GetCoord(1);
+		std::shared_ptr<Variable> vz = GetCoord(2);
 		if((not vx) || (not vy) || ((not vz) && GetNumCoord() == 3)) {
 			VisIt_MeshMetaData_free(m1);
 			return false;
@@ -84,7 +84,7 @@ bool CurvilinearMesh::ExposeVisItData(visit_handle* h,
 	// Allocates the VisIt handle
 	if(VisIt_CurvilinearMesh_alloc(h) != VISIT_ERROR) {
 		visit_handle hxc, hyc, hzc = VISIT_INVALID_HANDLE;
-		shared_ptr<Variable> vx, vy, vz;
+		std::shared_ptr<Variable> vx, vy, vz;
 
 		// Search for the X coordinate, checks that it has 1 dimenion
 		vx = GetCoord(0); 
@@ -128,7 +128,7 @@ bool CurvilinearMesh::ExposeVisItData(visit_handle* h,
 		int cmesh_dims[3];
 
 		// Accessing chunk for X coordinate
-		shared_ptr<Block> c = vx->GetBlock(source,iteration,block);
+		std::shared_ptr<Block> c = vx->GetBlock(source,iteration,block);
 		if(c) {
 			if(VisIt_VariableData_alloc(&hxc) == VISIT_OKAY) {
 				c->FillVisItDataHandle(hxc);

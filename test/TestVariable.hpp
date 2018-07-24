@@ -13,9 +13,6 @@
 
 namespace damaris {
 
-using namespace std;
-	
-USING_POINTERS;
 
 class TestVariable : public CppUnit::TestFixture {
 	
@@ -56,10 +53,10 @@ protected:
 		MPI_Comm c = Environment::GetEntityComm();
 		if(Environment::IsClient()) {
 			MPI_Comm_rank(c,&rank);
-			shared_ptr<Variable> v 
+			std::shared_ptr<Variable> v 
 				= VariableManager::Search("coordinates/x2d");
 			CPPUNIT_ASSERT(v);
-			shared_ptr<Block> b = v->Allocate(rank,0,0,false);
+			std::shared_ptr<Block> b = v->Allocate(rank,0,0,false);
 			CPPUNIT_ASSERT(b);
 			//v->DetachBlock(b);
 		}
@@ -70,10 +67,10 @@ protected:
 		MPI_Comm c = Environment::GetEntityComm();
 		if(Environment::IsClient()) {
 			MPI_Comm_rank(c,&rank);
-			shared_ptr<Variable> v 
+			std::shared_ptr<Variable> v 
 				= VariableManager::Search("coordinates/x2d");
 			CPPUNIT_ASSERT(v);
-			shared_ptr<Block> b = v->GetBlock(rank,1,0);
+			std::shared_ptr<Block> b = v->GetBlock(rank,1,0);
 			CPPUNIT_ASSERT(not b);
 			b = v->GetBlock(rank,0,0);
 			CPPUNIT_ASSERT(b);

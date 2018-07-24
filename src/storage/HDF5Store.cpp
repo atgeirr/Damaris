@@ -68,7 +68,7 @@ namespace damaris {
                     return false;
                 }
             } else if (op->key()->compare("FilesPath") == 0) {
-                path_ = (string)(*op);
+                path_ = (std::string)(*op);
             }
         }
         return true;
@@ -117,7 +117,7 @@ namespace damaris {
         }
     }
 
-    bool HDF5Store::UpdateGhostZones(shared_ptr<Variable> v , hid_t &memSpace , hsize_t* localDim){
+    bool HDF5Store::UpdateGhostZones(std::shared_ptr<Variable> v , hid_t &memSpace , hsize_t* localDim){
 
         int varDimention = v->GetLayout()->GetDimensions();
         hsize_t* offset = new hsize_t[varDimention];
@@ -140,10 +140,10 @@ namespace damaris {
         return retVal;
     }
 
-    string HDF5Store::GetOutputFileName(int32_t iteration) {
-        stringstream fileName;
+    std::string HDF5Store::GetOutputFileName(int32_t iteration) {
+        std::stringstream fileName;
         int processId;
-        string baseName;
+        std::string baseName;
 
         processId = Environment::GetEntityProcessID();
         baseName = Environment::GetSimulationName();
@@ -157,9 +157,9 @@ namespace damaris {
         return  fileName.str();
     }
 
-    string HDF5Store::GetVariableFullName(shared_ptr<Variable> v , shared_ptr<Block> *b){
-        stringstream varName;
-        string baseName;
+    std::string HDF5Store::GetVariableFullName(std::shared_ptr<Variable> v , std::shared_ptr<Block> *b){
+        std::stringstream varName;
+        std::string baseName;
         int numDomains;
 
         baseName = Environment::GetSimulationName();
@@ -183,8 +183,8 @@ namespace damaris {
         hid_t       fileSpace , memSpace;     // file and memory dataspace identifiers
         hid_t       dtypeId = -1;
         hid_t       lcplId;
-        string      fileName;
-        vector<weak_ptr<Variable> >::const_iterator w;
+        std::string      fileName;
+        std::vector<std::weak_ptr<Variable> >::const_iterator w;
 
         // Initialise variables
         fileName = GetOutputFileName(iteration);
@@ -200,7 +200,7 @@ namespace damaris {
 
         // for each variable ...
         for (; w != GetVariables().end(); w++) {
-            shared_ptr<Variable> v = w->lock();
+            std::shared_ptr<Variable> v = w->lock();
 
             // non TimeVarying variables only are written in the first iteration.
             if ((not v->IsTimeVarying()) && (iteration > 0))
@@ -213,8 +213,8 @@ namespace damaris {
             // Create a array for dimentions
             hsize_t *globalDims;
             hsize_t *localDims;
-            globalDims = new (nothrow) hsize_t[varDimention];
-            localDims = new (nothrow) hsize_t[varDimention];
+            globalDims = new (std::nothrow) hsize_t[varDimention];
+            localDims = new (std::nothrow) hsize_t[varDimention];
 
             if ((globalDims == NULL) || (localDims == NULL)) {
                 ERROR("Failed to allocate memory for dim arrays!");
@@ -237,10 +237,10 @@ namespace damaris {
             BlocksByIteration::iterator end;
             v->GetBlocksByIteration(iteration, begin, end);
             int numBlocks = 0;
-            string varName;
+            std::string varName;
 
             for (BlocksByIteration::iterator bid = begin; bid != end; bid++) {
-                shared_ptr<Block> b = *bid;
+                std::shared_ptr<Block> b = *bid;
                 numBlocks++;
 
                 // Create Dataset for each block
@@ -254,7 +254,7 @@ namespace damaris {
                 for (int i = 0; i < blockDimention; i++)
                     b->GetGlobalExtent(i);
 
-                hsize_t *blockDim = new (nothrow) hsize_t[blockDimention];
+                hsize_t *blockDim = new (std::nothrow) hsize_t[blockDimention];
                 if (blockDim == NULL)
                     ERROR("HDF5:Failed to allocate memory ");
 
@@ -293,7 +293,7 @@ namespace damaris {
         H5Fclose(fileId);
     }
 
-    bool HDF5Store::OutputBlocksCollective(int iteration , shared_ptr<Variable> v , hsize_t* localDim , hid_t dsetId ,
+    bool HDF5Store::OutputBlocksCollective(int iteration , std::shared_ptr<Variable> v , hsize_t* localDim , hid_t dsetId ,
                                            hid_t dtypeId , hid_t plistId){
 
         BlocksByIteration::iterator begin;
@@ -307,8 +307,8 @@ namespace damaris {
         v->GetBlocksByIteration(iteration, begin, end);
         varDimention = v->GetLayout()->GetDimensions();
 
-        memOffset = new (nothrow) hsize_t[varDimention];
-        memDim = new (nothrow) hsize_t[varDimention];
+        memOffset = new (std::nothrow) hsize_t[varDimention];
+        memDim = new (std::nothrow) hsize_t[varDimention];
 
         if ((memOffset == NULL) || (memDim == NULL)) {
             ERROR("HDF5: Failed to allocate memDim and memOffset memory ");
@@ -316,7 +316,7 @@ namespace damaris {
         }
 
         for(BlocksByIteration::iterator bid = begin; bid != end; bid ++) {
-            shared_ptr<Block> b = *bid;
+            std::shared_ptr<Block> b = *bid;
 
             // Obtain the starting indices of the hyperslab
             for(int i = 0; i < varDimention; i++) {
@@ -362,10 +362,10 @@ namespace damaris {
         hid_t dtypeId = -1;
         hid_t fileSpace;
         hid_t plistId = H5P_DEFAULT;
-        string fileName;
+        std::string fileName;
 
         // Initializing variables
-        vector<weak_ptr<Variable> >::const_iterator w = GetVariables().begin();
+        std::vector<std::weak_ptr<Variable> >::const_iterator w = GetVariables().begin();
         MPI_Comm comm = Environment::GetEntityComm();
         MPI_Info info  = MPI_INFO_NULL;
         fileName = GetOutputFileName(iteration);
@@ -386,7 +386,7 @@ namespace damaris {
 
         // for each variable do
         for(; w != GetVariables().end(); w++) {
-	        shared_ptr<Variable> v = w->lock();
+                std::shared_ptr<Variable> v = w->lock();
 
             // write time-varying variables only in first iteration
             if ((not v->IsTimeVarying()) && (iteration > 0))
@@ -397,8 +397,8 @@ namespace damaris {
 
             hsize_t *globalDim;
             hsize_t *localDim;
-            globalDim = new (nothrow) hsize_t[varDimention];
-            localDim = new (nothrow) hsize_t[varDimention];
+            globalDim = new (std::nothrow) hsize_t[varDimention];
+            localDim = new (std::nothrow) hsize_t[varDimention];
 
             if ((globalDim == NULL) || (localDim == NULL)) {
                 ERROR("Failed to allocate memory for dim arrays!");
@@ -417,7 +417,7 @@ namespace damaris {
             if (not GetHDF5Type(v->GetLayout()->GetType() , dtypeId))
                 ERROR("HDF5:Unknown variable type " << v->GetLayout()->GetType());
 
-            string varName = GetVariableFullName(v);
+            std::string varName = GetVariableFullName(v);
             if ((dsetId = H5Dcreate( fileId, varName.c_str(), dtypeId, fileSpace,
                      lcplId, H5P_DEFAULT, H5P_DEFAULT)) < 0)
                 ERROR("HDF5: Failed to create dataset ... ");

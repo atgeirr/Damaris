@@ -12,14 +12,11 @@
 
 namespace damaris {
 
-using namespace std;
-	
-USING_POINTERS;
 
 class TestActionManager : public CppUnit::TestFixture {
 	
 private:
-	static shared_ptr<model::Simulation> mdl;
+	static std::shared_ptr<model::Simulation> mdl;
 public:
 	TestActionManager() {
 		if(not mdl) {
@@ -63,10 +60,10 @@ protected:
 		// initialization
 		ActionManager::Init(mdl->actions());
 		// search an existing action
-		shared_ptr<Action> a1 
+		std::shared_ptr<Action> a1 
 			= ActionManager::Search("test_event");
 		// search a non-existing action
-		shared_ptr<Action> a2
+		std::shared_ptr<Action> a2
 			= ActionManager::Search("something_undefined");
 		// the first action should be valid
 		CPPUNIT_ASSERT((bool)a1);
@@ -77,7 +74,7 @@ protected:
 		// the number of objects should go down to 0
 		CPPUNIT_ASSERT(ActionManager::GetNumObjects() == 0);
 		CPPUNIT_ASSERT(ActionManager::IsEmpty());
-		// the instance a1 should still exist thanks to shared_ptr
+		// the instance a1 should still exist thanks to std::shared_ptr
 		CPPUNIT_ASSERT((bool)a1);
 		// now search again for a1
 		a1 = ActionManager::Search("test_event");
@@ -86,6 +83,6 @@ protected:
 	}
 };
 
-shared_ptr<model::Simulation> TestActionManager::mdl;
+std::shared_ptr<model::Simulation> TestActionManager::mdl;
 
 }

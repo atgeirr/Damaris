@@ -28,7 +28,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/lambda/lambda.hpp>
 
 #include "damaris/util/Pointers.hpp"
-//#include "damaris/util/TypeWrapper.hpp"
 #include "damaris/util/ForwardDcl.hpp"
 #include "damaris/util/Deleter.hpp"
 #include "damaris/util/Debug.hpp"
@@ -38,10 +37,13 @@ namespace damaris {
 
 namespace bmi = boost::multi_index;
 
-USING_POINTERS;
+
+
+
+
 
 /**
- * This class serves as a factory to build identified (named) objects. It keeps 
+ * This class serves as a factory to build identified (named) objects. It keeps
  * a record of all objects created and does not create twice the same named 
  * object. Each object must have a unique name, and the Manager also gives them 
  * a unique integer id.
@@ -58,9 +60,9 @@ class Manager {
 	 * (unless another shared_ptr exists somewhere else for these objects.
 	 */
 	typedef typename boost::multi_index_container<
-		boost::shared_ptr<T>,
-			bmi::indexed_by<
-			// index by id
+		std::shared_ptr<T>,
+		bmi::indexed_by<
+            // index by id
 			bmi::ordered_unique<
 				bmi::tag<by_id>,
 				bmi::const_mem_fun<T,int,
@@ -133,10 +135,10 @@ class Manager {
 	 * \param[in] name : name to give to the object (if it needs to be renamed).
 	 */
 	template<typename SUBCLASS, typename MODEL>
-	static shared_ptr<T> Create(const MODEL &mdl, const std::string& name)
+	static std::shared_ptr<T> Create(const MODEL &mdl, const std::string& name)
 	{
-		shared_ptr<T> t(
-			SUBCLASS::template New<T>(mdl,name));
+		std::shared_ptr<T> t(
+		SUBCLASS::template New<T>(mdl,name));
 		if(not (bool)t) return t;
 
 		t->id_ = GetNumObjects();
@@ -161,7 +163,7 @@ class Manager {
 	 * \param[in] mdl : model from which to create the object.
 	 */
 	template<typename SUBCLASS, typename MODEL>
-	static shared_ptr<T> Create(const MODEL &mdl)
+	static std::shared_ptr<T> Create(const MODEL &mdl)
 	{
 		return Create<SUBCLASS,MODEL>(mdl,mdl.name());
 	}
@@ -175,13 +177,13 @@ class Manager {
 	 * \param[in] t : object to be inserted.
 	 */
 	template<typename SUBCLASS>
-	static bool Add(const shared_ptr<SUBCLASS>& t)
+	static bool Add(const std::shared_ptr<SUBCLASS>& t)
 	{
 		if(not (bool)t) return false;
 		int32_t backup = t->id_;
 		t->id_ = GetNumObjects();
 		std::pair<typename ObjectSet::iterator,bool> ret
-				= _objects_.insert(boost::shared_ptr<T>(t));
+                = _objects_.insert(std::shared_ptr<T>(t));
 		if(!ret.second) t->id_ = backup;
 
 		return ret.second;
@@ -192,7 +194,7 @@ class Manager {
 	 *
 	 * \param[in] t : object to be deleted.
 	 */
-	static void Delete(const shared_ptr<T>& t)
+	static void Delete(const std::shared_ptr<T>& t)
 	{
 		if(t) {
 			_objects_.template get<by_name>().erase(t->GetName());
@@ -215,12 +217,12 @@ class Manager {
 	 * 
 	 * \param[in] name : name of the object to find.
 	 */
-	static shared_ptr<T> Search(const std::string &name) 
+	static std::shared_ptr<T> Search(const std::string &name)
 	{
 		typename IndexByName::iterator it =
 			_objects_.template get<by_name>().find(name);
 		if(it == _objects_.template get<by_name>().end()) {
-			return shared_ptr<T>();
+			return std::shared_ptr<T>();
 		}
 		return *it;
 	}
@@ -258,12 +260,12 @@ class Manager {
 	 * 
 	 * \param[in] id : id of the object to search for.
 	 */
-	static shared_ptr<T> Search(const int &id) 
+	static std::shared_ptr<T> Search(const int &id)
 	{
 		typename IndexById::iterator it 
 			= _objects_.template get<by_id>().find(id);
 		if(it == _objects_.template get<by_id>().end()) {
-			return shared_ptr<T>();
+			return std::shared_ptr<T>();
 		}
 		return *it;
 	}

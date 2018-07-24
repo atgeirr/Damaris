@@ -13,14 +13,11 @@
 
 namespace damaris {
 
-using namespace std;
-	
-USING_POINTERS;
 
 class TestReactor : public CppUnit::TestFixture {
 	
 private:
-	static shared_ptr<Reactor> reactor_;
+	static std::shared_ptr<Reactor> reactor_;
 	static int rank;
 	static int callcheck;
 
@@ -126,7 +123,7 @@ protected:
 	}
 };
 
-shared_ptr<Reactor> TestReactor::reactor_;
+std::shared_ptr<Reactor> TestReactor::reactor_;
 int TestReactor::rank;
 int TestReactor::callcheck = 0;
 
