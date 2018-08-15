@@ -248,7 +248,13 @@ bool CurvilinearMesh::ExposeVisItData(visit_handle* h,
 
 	return (*h != VISIT_INVALID_HANDLE);
 }
-
 #endif
 
+
+#ifdef HAVE_PARAVIEW_ENABLED
+std::shared_ptr<vtkDataSet> CurvilinearMesh::GetVtkGrid(int source , int iteration , int block)
+{
+    return nullptr;
+}
+#endif
 }

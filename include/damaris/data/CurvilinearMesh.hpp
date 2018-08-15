@@ -75,6 +75,14 @@ public:
 		return m;
 	}
 
+    /**
+     * Returns the type of the mesh (i.e. rectilinear)
+     */
+    virtual Mesh::MeshType GetType() const
+    {
+        return Mesh::MeshType::Curvilinear;
+    }
+
 #ifdef HAVE_VISIT_ENABLED
 	/**
 	 * Fills the visit handle with metadata related to this Mesh.
@@ -97,6 +105,14 @@ public:
 		int source, int iteration, int block);
 #endif
 
+
+#ifdef HAVE_PARAVIEW_ENABLED
+    /**
+    * Returns the relevant Curvilinear VTK mesh
+    *
+    */
+    virtual std::shared_ptr<vtkDataSet> GetVtkGrid(int source , int iteration , int block);
+#endif
 };
 
 }

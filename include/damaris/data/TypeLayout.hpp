@@ -102,6 +102,13 @@ class TypeLayout : public Layout,
 	virtual size_t GetRequiredMemory(bool withGhost=true) const {
 		return TypeSize(GetModel());
 	}
+
+    	/**
+     	* \see Layout::GetNumElements()
+     	*/
+    	virtual size_t GetNumElements(bool withGhost=true) const {
+        	return 1;
+    	}
 		
 	/**
 	 * Creates a new TypeLayout from a model.

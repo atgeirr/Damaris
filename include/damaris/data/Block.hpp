@@ -270,6 +270,22 @@ class Block //: public ENABLE_SHARED_FROM_THIS(Block)
 		dataspace_.GainDataOwnership();
 	}
 
+    /**
+     * \see returns the item at the ith place in the block
+     */
+    template<typename T>
+    const T GetAt(int64_t i)
+    {
+        int64_t blockSize = NbrOfItems();
+        if ((i<0) || (i>=blockSize)) {
+            ERROR("Index is out of block range");
+            return 0;
+        }
+
+        T* buffer = (T*)dataspace_.GetData();
+        return buffer[i];
+    }
+
 #ifdef HAVE_VISIT_ENABLED
 	/**
 	 * Fills a VisIt data handle (already allocated) to expose the data to 

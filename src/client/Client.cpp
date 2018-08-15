@@ -295,8 +295,10 @@ int Client::EndIteration()
 		MPI_INT, MPI_SUM, Environment::GetEntityComm());
 	Environment::StartNextIteration();
 	
-	if(nb_errors == 0) h.type_ = DAMARIS_SIG_NEXT_ITERATION;
-	else h.type_ = DAMARIS_SIG_NEXT_ITERATION_ERR;
+	if (nb_errors == 0)
+		h.type_ = DAMARIS_SIG_NEXT_ITERATION;
+	else
+		h.type_ = DAMARIS_SIG_NEXT_ITERATION_ERR;
 	
 	errorOccured_ = 0;
 	

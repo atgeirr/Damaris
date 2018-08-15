@@ -29,15 +29,17 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "damaris/util/Configurable.hpp"
 
 #include "damaris/env/Environment.hpp"
-
 #include "damaris/buffer/Buffer.hpp"
-
 #include "damaris/model/Model.hpp"
-
 #include "damaris/data/LayoutManager.hpp"
 #include "damaris/data/Layout.hpp"
 #include "damaris/data/BlockIndex.hpp"
 #include "damaris/data/Block.hpp"
+#include "damaris/data/MeshManager.hpp"
+
+#ifdef HAVE_PARAVIEW_ENABLED
+#include "damaris/paraview/ParaViewHeaders.hpp"
+#endif
 
 namespace damaris {
 
@@ -461,6 +463,15 @@ class Variable : public ENABLE_SHARED_FROM_THIS(Variable),
 	{
 		return New<SUPER>(mdl,mdl.name());
 	}
+
+    /**
+     * Static method to return the mesh associated to the variable.
+     */
+    std::shared_ptr<Mesh> GetMesh()
+    {
+        std::string meshName = GetModel().mesh();
+        return MeshManager::Search(meshName);
+    }
 	
 #ifdef HAVE_VISIT_ENABLED
 	public:
@@ -510,6 +521,15 @@ class Variable : public ENABLE_SHARED_FROM_THIS(Variable),
 	 */
 	static VisIt_VarType VarTypeToVisIt(const model::VarType& vt);
 #endif
+
+#ifdef HAVE_PARAVIEW_ENABLED
+    bool AddBlocksToVtkGrid(vtkMultiPieceDataSet* vtkMPGrid , int iteration);
+    template <typename T>
+    bool AddBufferToVtkGrid(std::shared_ptr<vtkDataSet> grid , T* buffer);
+    /*bool AddBlocksToSingleVtkGrid(std::shared_ptr<vtkDataSet> grid , int iteration);
+    bool AddBlocksToMultiVtkGrid(std::shared_ptr<vtkDataSet> grid , int iteration);*/
+#endif
+
 };
 
 }

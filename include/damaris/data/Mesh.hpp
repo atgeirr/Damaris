@@ -24,8 +24,13 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 	#include <VisItDataInterface_V2.h>
 #endif
 
+#ifdef HAVE_PARAVIEW_ENABLED
+#include "damaris/paraview/ParaViewHeaders.hpp"
+#endif
+
+
+
 #include "damaris/util/Pointers.hpp"
-//#include "damaris/util/TypeWrapper.hpp"
 #include "damaris/util/ForwardDcl.hpp"
 #include "damaris/util/Deleter.hpp"
 #include "damaris/util/Configurable.hpp"
@@ -66,6 +71,12 @@ class Mesh : public Configurable<model::Mesh> {
 
 	public:
 
+        	/**
+         	* Defines a local type for defining the type of the Mesh
+         	*/
+        	enum class MeshType {Rectilinear, Curvilinear , Point, None};
+
+
 		/**
 		 * Returns the name of the Mesh.
 		 */
@@ -101,8 +112,15 @@ class Mesh : public Configurable<model::Mesh> {
 			return GetModel().topology();
 		}
 
+        /**
+         * Returns the type of the mesh (e.g. rectilinear, point, etc. )
+         */
+        virtual MeshType GetType() const = 0;
+
+
 #ifdef HAVE_VISIT_ENABLED
-		/**
+        vtkDataObject* vtkGrid;
+        /**
 		 * Fills visit handle with metadata related to the Mesh.
 		 *
 		 * \param[in] md : visit handle to fill.
@@ -119,6 +137,18 @@ class Mesh : public Configurable<model::Mesh> {
 		 */
 		virtual bool ExposeVisItData(visit_handle* h, int source, 
 				int iteration, int block) = 0;
+#endif
+
+#ifdef HAVE_PARAVIEW_ENABLED
+        /**
+         * This variable is used to keep the instance of created VTK Grid
+         * and use it for future, iff the grid has not been changed.
+         */
+        // std::shared_ptr<vtkDataSet> vtkGrid_;
+        /**
+         * Returns the relevant VTK grid (mesh) type
+         */
+        virtual std::shared_ptr<vtkDataSet> GetVtkGrid(int source , int iteration , int block) = 0;
 #endif
 };
 

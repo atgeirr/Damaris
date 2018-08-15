@@ -75,7 +75,7 @@ class Layout
 	}
 
 	/**
-	 * Returns the type of the data. 
+     	* Returns the type (int, double, float, etc.) of the data.
 	 */
 	virtual model::Type GetType() const = 0;
 		
@@ -109,6 +109,11 @@ class Layout
 	 * Returns the size in memory of a dataset following this layout.
 	 */
 	virtual size_t GetRequiredMemory(bool includeGhost=true) const = 0;
+
+	/**
+	* Returns the number of elements of a dataset following this layout.
+	*/
+	virtual size_t GetNumElements(bool includeGhost=true) const = 0;
 		
 }; // class Layout
 

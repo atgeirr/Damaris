@@ -78,6 +78,14 @@ public:
 		}
 	}
 
+    	/**
+     	* Returns the type of the mesh (i.e. Point Mesh)
+     	*/
+    	virtual Mesh::MeshType GetType() const
+    	{
+        	return Mesh::MeshType::Point;
+    	}
+
 #ifdef HAVE_VISIT_ENABLED
 	/**
 	 * Fills the visit handle with Metadata related to this Mesh.
@@ -100,6 +108,14 @@ public:
 	 */
 	bool ExposeVisItData(visit_handle* h, 
 		int source, int iteration, int block);
+#endif
+
+#ifdef HAVE_PARAVIEW_ENABLED
+        /**
+         * Returns the relevant VTK mesh type
+         *
+         */
+        virtual std::shared_ptr<vtkDataSet> GetVtkGrid(int source , int iteration , int block);
 #endif
 
 };

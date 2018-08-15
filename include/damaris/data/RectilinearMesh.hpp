@@ -77,6 +77,14 @@ class RectilinearMesh : public Mesh {
 		return m;
 	}
 
+	/**
+	* Returns the type of the mesh (i.e. rectilinear)
+	*/
+	virtual Mesh::MeshType GetType() const
+	{
+		return Mesh::MeshType::Rectilinear;
+	}
+
 #ifdef HAVE_VISIT_ENABLED
 	/**
 	 * Fills the visit handle with Metadata related to this Mesh.
@@ -98,6 +106,56 @@ class RectilinearMesh : public Mesh {
 	bool ExposeVisItData(visit_handle* h, int source, int iteration, int block);
 #endif
 
+#ifdef HAVE_PARAVIEW_ENABLED
+
+    /**
+     * Extracts thw low and high extents of a dimention based
+     * on its coordinate variable, i.e. coord.
+     */
+    void GetGridExtents(int source , int iteration , int block ,
+                        const std::shared_ptr<Variable>& coord ,
+                        int& lowExtent , int& highExtent);
+
+    /**
+     * Creates and returns a typed vtkDataArray object based
+     * on the passed type.
+     */
+    template <typename T>
+    vtkDataArray* CreateTypedDataArray(size_t length ,
+                                       T* pointer ,
+                                       size_t dataSize);
+    /**
+     * Creates and returns a vtkDataArray object based
+     * on the passed type.
+     */
+    vtkDataArray* CreateDataArray(int source , int iteration , int block ,
+                                  std::shared_ptr<Variable> var);
+
+    /**
+     * retrived the coordinate variable memory from var and
+     * sets the value to the grid
+     */
+    bool SetGridCoord(int source , int iteration , int block ,
+                      int dim , std::shared_ptr<Variable> var ,
+                      std::shared_ptr<vtkRectilinearGrid> grid);
+
+    /**
+     * This function returns the low and high extents of the Grid
+     * based on the grid topology. It also gets the coordinate variables.
+     */
+    bool GetGridInfo(int source , int iteration , int block ,
+                     std::shared_ptr<Variable>& vx ,
+                     std::shared_ptr<Variable>& vy ,
+                     std::shared_ptr<Variable>& vz ,
+                     int& lowX , int& highX , int& lowY ,
+                     int& highY , int& lowZ , int& highZ);
+
+    /**
+    * Returns the relevant Rectilinear VTK mesh
+    *
+    */
+    virtual std::shared_ptr<vtkDataSet> GetVtkGrid(int source , int iteration , int block);
+#endif
 };
 
 }

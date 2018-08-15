@@ -65,7 +65,6 @@ void StorageManager::Init(const model::Storage& mdl)
 			}
 		}
 	}
-
 }
 
 void StorageManager::Update(int32_t iteration)

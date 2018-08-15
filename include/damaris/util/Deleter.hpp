@@ -32,8 +32,7 @@ template<typename T>
 class Deleter
 {
 //	friend class TypeWrapper<T>::type;
-	
-	public:
+public:
 		
 	/**
 	 * Private constructor, only the class for which the Deleter is defined
@@ -48,7 +47,30 @@ class Deleter
 	 *
 	 * \param[in] p : pointer to delete.
 	 */
-	void operator()(T* p) { delete p; }
+	 void operator()(T* p) { delete p; }
+};
+
+/**
+ * Unlike the Deleter<T> class, the constructor of SelfDeleter is not private. As a result, it is not
+ * necessary to declare your class as a friend of Deleter<T>. SelfDeleter<T> can be used for those classes
+ * defined in librareis with a Delete() method.
+ */
+template <typename T>
+class SelfDeleter //: public Deleter<T> -???
+{
+public:
+    /**
+     * Public constructor. Unlike the base class this deleter can be used for
+     * those classes defined in librareis.
+     */
+    SelfDeleter() {}
+
+    /**
+     * Equivalent of the delete operation on the pointer.
+     *
+     * \param[in] p : pointer to a Vtk Object
+     */
+    void operator()(T* p) { p->Delete(); }
 };
 
 }

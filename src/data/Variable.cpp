@@ -22,6 +22,10 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "data/Variable.hpp"
 #include "data/Type.hpp"
 
+#ifdef HAVE_PARAVIEW_ENABLED
+#include "damaris/paraview/ParaViewHeaders.hpp"
+#endif
+
 namespace damaris {
 
 bool Variable::AttachBlock(const std::shared_ptr<Block>& block)
@@ -553,6 +557,164 @@ VisIt_VarCentering Variable::VarCenteringToVisIt(const model::VarCentering& vc)
 		return VISIT_VARCENTERING_NODE;
 	}
 }
+
+#endif
+
+#ifdef HAVE_PARAVIEW_ENABLED
+bool Variable::AddBlocksToVtkGrid(vtkMultiPieceDataSet* vtkMPGrid , int iteration)
+{
+    int index = 0;
+
+    // Setting the number of pieces in MultiPieceGrid
+    int serversNo = Environment::CountTotalServers();
+    int serverId = Environment::GetEntityProcessID();
+    int localBlocks = CountLocalBlocks(iteration);
+    vtkMPGrid->SetNumberOfPieces(localBlocks*serversNo);  //-------------------- Fix later
+
+    ERROR("Number of total pieces: " << localBlocks*serversNo << std::endl);
+
+    //Getting the variable type (e.g. long, int, etc.) from its layout
+    auto type = GetLayout()->GetType();
+
+    // for each block in the iteration do:
+    BlocksByIteration::iterator begin , end;
+    GetBlocksByIteration(iteration, begin, end);
+    for(auto it = begin; it != end; it++) {
+
+        // Get block data
+        void* buffer = (*it)->GetDataSpace().GetData();
+        int source = (*it)->GetSource();
+        int block = (*it)->GetID();
+
+        // Get the vtkGrid from its mesh
+        std::shared_ptr<Mesh> mesh = GetMesh();
+        std::shared_ptr<vtkDataSet> vtkGrid = mesh->GetVtkGrid(source , iteration , block);
+
+        vtkMPGrid->SetPiece(serverId*localBlocks+index , vtkGrid.get());
+        ERROR("setting pieces: " << serverId*localBlocks+index);
+        index++;
+
+        switch(type)
+        {
+        case model::Type::short_:
+            if (not AddBufferToVtkGrid<short>(vtkGrid , (short*)buffer)) {
+                ERROR("Error adding buffer to vtkGrid for short type.");
+                return false;
+            }
+            break;
+        case model::Type::int_:
+        case model::Type::integer:
+            if (not AddBufferToVtkGrid<int>(vtkGrid , (int*)buffer)) {
+                ERROR("Error adding buffer to vtkGrid for int type.");
+                return false;
+            }
+            break;
+        case model::Type::long_:
+            if (not AddBufferToVtkGrid<long>(vtkGrid , (long*)buffer)) {
+                ERROR("Error adding buffer to vtkGrid for long type.");
+                return false;
+            }
+            break;
+        case model::Type::float_:
+        case model::Type::real:
+            if (not AddBufferToVtkGrid<float>(vtkGrid , (float*)buffer)) {
+                ERROR("Error adding buffer to vtkGrid for float type.");
+                return false;
+            }
+            break;
+        case model::Type::double_:
+            if (not AddBufferToVtkGrid<double>(vtkGrid , (double*)buffer)) {
+                ERROR("Error adding buffer to vtkGrid for double type.");
+                return false;
+            }
+            break;
+        default:
+            ERROR("Layout type is undefined for variable " << GetName() << " " << type.c_str() );
+            return false;
+        }
+    }
+
+    return true;
+}
+
+template <typename T>
+bool Variable::AddBufferToVtkGrid(std::shared_ptr<vtkDataSet> grid , T* buffer)
+{
+    vtkAOSDataArrayTemplate<T>* varData;
+
+    if (GetModel().centering() == damaris::model::VarCentering::nodal) {
+        if (grid->GetPointData()->GetNumberOfArrays() == 0)
+        {
+            // Create relevant vtkDataArray for point data
+            vtkNew<vtkAOSDataArrayTemplate<T>> pointData;
+
+            pointData->SetName(GetName().c_str());
+            pointData->SetNumberOfComponents(1);   // Always 1???
+            grid->GetPointData()->AddArray(pointData.GetPointer());
+        }
+
+        varData = vtkAOSDataArrayTemplate<T>::SafeDownCast(grid->GetPointData()->GetArray(GetName().c_str()));
+
+    } else if (GetModel().centering() == damaris::model::VarCentering::zonal) {
+
+        if (grid->GetCellData()->GetNumberOfArrays() == 0)
+        {
+            // Create relevant vtkDataArray for Cell data
+            vtkNew<vtkAOSDataArrayTemplate<T>> cellData;
+
+            cellData->SetName(GetName().c_str());
+            cellData->SetNumberOfComponents(1);  // Always 1???
+            grid->GetCellData()->AddArray(cellData.GetPointer());
+        }
+
+        varData = vtkAOSDataArrayTemplate<T>::SafeDownCast(grid->GetCellData()->GetArray(GetName().c_str()));
+
+    } else {
+        ERROR("Centering type is undefined for variable: " << GetName());
+        return false;
+    }
+
+    varData->SetArray(buffer , static_cast<vtkIdType>(GetLayout()->GetNumElements()) , 1);
+
+    return true;
+}
+
+/*bool Variable::AddBlocksToSingleVtkGrid(std::shared_ptr<vtkDataSet> grid , int iteration)
+{
+    BlocksByIteration::iterator begin;
+    BlocksByIteration::iterator end;
+
+    GetBlocksByIteration(iteration, begin, end);
+    std::shared_ptr<Block> b = *begin;;
+
+    void* buffer = b->GetDataSpace().GetData();
+    auto type = GetLayout()->GetType();
+
+    switch(type)
+    {
+    case model::Type::short_:
+        return AddBufferToVtkGrid<short>(grid , (short*)buffer);
+    case model::Type::int_:
+    case model::Type::integer:
+        return AddBufferToVtkGrid<int>(grid , (int*)buffer);
+    case model::Type::long_:
+        return AddBufferToVtkGrid<long>(grid , (long*)buffer);
+    case model::Type::float_:
+    case model::Type::real:
+        return AddBufferToVtkGrid<float>(grid , (float*)buffer);
+    case model::Type::double_:
+        return AddBufferToVtkGrid<double>(grid , (double*)buffer);
+    default:
+        ERROR("Layout type is undefined for variable " << GetName());
+        return false;
+    }
+}
+
+bool Variable::AddBlocksToMultiVtkGrid(std::shared_ptr<vtkDataSet> grid , int iteration)
+{
+    ERROR("Not Implemented yet!");
+    return false;
+}*/
 
 #endif
 

@@ -62,7 +62,7 @@ private:
 	static bool 	_isDedicatedCore_; /*!< Whether or not this process is a dedicated core. */
 	static bool	_isDedicatedNode_; /*!< Whether or not this process is a dedicated node. */
 	static int 	_globalProcessID_; /*!< Global process ID. */
-	static int 	_entityProcessID_; /*!< ID of the process among the
+    	static int 	_entityProcessID_; /*!< ID (rank) of the process among the
 						processes of the same kind. */
 
 	static int	_clientsPerNode_; /*!< number of clients per client nodes. */
@@ -194,7 +194,7 @@ public:
 	}
 	
 	/**
-	 * Returns the ID of the process in the communicator gathering
+	 * Returns the ID (rank) of the process in the communicator gathering
 	 * processes of the same type (i.e. clients or servers).
 	 */
 	static int GetEntityProcessID() {

@@ -62,6 +62,10 @@ if(NOT DEFINED HDF5_ROOT)
     set(HDF5_ROOT ${EXTERNAL_ROOT}) # optional
 endif(NOT DEFINED HDF5_ROOT)
 
+if(NOT DEFINED PARAVIEW_ROOT)
+    set(PARAVIEW_ROOT ${HOME}/ParaView/make/) # optional
+endif(NOT DEFINED PARAVIEW_ROOT)
+
 if(NOT DEFINED CppUnit_ROOT)
     set(CppUnit_ROOT ${EXTERNAL_ROOT}) # optional
 endif(NOT DEFINED CppUnit_ROOT)
@@ -230,6 +234,23 @@ if(HDF5_FOUND)
 else(HDF5_FOUND)
 	message(STATUS "HDF5 not found")
 endif(HDF5_FOUND)
+
+#----------------------------------------------------------------------------#
+# Set everything related to ParaView
+#----------------------------------------------------------------------------#
+find_package(ParaView 4.3 COMPONENTS  vtkPVPythonCatalyst)
+if(ParaView_FOUND)
+    message(STATUS "ParaView found")
+    include("${PARAVIEW_USE_FILE}")
+    set(HAVE_PARAVIEW_ENABLED 1)
+
+    set(PARAVIEW_LIBRARIES  "vtkPVPythonCatalyst;vtkParallelMPI")
+
+    list(APPEND DEP_LIBRARIES ${PARAVIEW_LIBRARIES})
+    add_definitions("-DUSE_CATALYST")
+else(ParaView_FOUND)
+    message(STATUS "ParaView not found")
+endif(ParaView_FOUND)
 
 #----------------------------------------------------------------------------#
 # Set everything related to CppUnit 

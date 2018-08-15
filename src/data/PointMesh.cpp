@@ -217,6 +217,13 @@ bool PointMesh::ExposeVisItData(visit_handle* h,
 
 	return (*h != VISIT_INVALID_HANDLE);
 }
+#endif
 
+#ifdef HAVE_PARAVIEW_ENABLED
+std::shared_ptr<vtkDataSet> PointMesh::GetVtkGrid(int source , int iteration , int block)
+{
+    ERROR("Point mesh is not supported by ParaView Backend of Damaris Yet!");
+    return nullptr;
+}
 #endif
 }

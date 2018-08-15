@@ -30,6 +30,10 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "visit/VisItListener.hpp"
 #endif
 
+#ifdef HAVE_PARAVIEW_ENABLED
+#include "paraview/ParaViewAdaptor.hpp"
+#endif
+
 enum {
 	BCAST_EVENT,
 	VISIT_CONNECTED,
@@ -80,6 +84,18 @@ void Server::Run() {
 				Environment::GetSimulationName());
 		}
 #endif
+
+#ifdef HAVE_PARAVIEW_ENABLED
+        if (Environment::GetModel()->paraview().present()) {
+            std::shared_ptr<ParaViewAdaptor> paraview = ParaViewAdaptor::GetInstance();
+            paraview->Initialize(Environment::GetEntityComm() ,
+                                 Environment::GetModel()->paraview() ,
+                                 Environment::GetSimulationName());
+        }
+        else
+            ERROR("ParaView is not defined in the XML configuration file. ");
+#endif
+
 		reactor_->Bind(ITERATION_SYNC, 
 			BIND(&Server::EndOfIterationCallback,this,_1,_2,_3,_4));
 		reactor_->Bind(BCAST_EVENT, &Server::BcastEventCallback);
@@ -136,6 +152,16 @@ void Server::EndOfIterationCallback(int tag, int source,
 			VisItListener::Update();
 		}
 	}
+#endif
+
+#ifdef HAVE_PARAVIEW_ENABLED
+    if (Environment::GetModel()->paraview().present()) {
+        std::shared_ptr<ParaViewAdaptor> paraview = ParaViewAdaptor::GetInstance();
+        paraview->CoProcess(iteration);
+    }
+    else
+        ERROR("ParaView is not defined in the XML configuration file. ");
+
 #endif
 
 	StorageManager::Update(iteration);
@@ -212,7 +238,15 @@ void Server::OnStop(int source)
 	{
 		Stop();
 		stopRequests.clear();
-	}
+
+#ifdef HAVE_PARAVIEW_ENABLED
+        if (Environment::GetModel()->paraview().present()) {
+            std::shared_ptr<ParaViewAdaptor> paraview = ParaViewAdaptor::GetInstance();
+            paraview->Finalize();
+        }
+
+#endif
+    }
 }
 
 void Server::OnNextIteration(int UNUSED(source)) 

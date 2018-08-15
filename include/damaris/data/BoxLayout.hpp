@@ -151,19 +151,26 @@ private:
 	 */
 	virtual size_t GetRequiredMemory(bool withGhost=true) const {
 		size_t s = TypeSize(GetModel().type());
-		for(unsigned int i=0; i<extents_.size(); i++) {
-			if(withGhost) {
-				s *= GetExtentAlong(i);
-			} else {
-				size_t e = GetExtentAlong(i);
-				std::pair<size_t,size_t> g = GetGhostAlong(i);
-				e -= g.first;
-				e -= g.second;
-				s *= e;
-			}
-		}
-		return s;
+        	s *= GetNumElements(withGhost);
+        	return s;
 	}
+
+    virtual size_t GetNumElements(bool withGhost=true) const {
+        size_t s = 1;
+        for(unsigned int i=0; i<extents_.size(); i++) {
+            if (withGhost) {
+                s *= GetExtentAlong(i);
+            } else {
+                size_t e = GetExtentAlong(i);
+                std::pair<size_t,size_t> g = GetGhostAlong(i);
+                e -= g.first;
+                e -= g.second;
+                s *= e;
+            }
+        }
+        return s;
+    }
+
 
 	/**
 	 * Overwrite the Notify function of Observer. Causes the layout to

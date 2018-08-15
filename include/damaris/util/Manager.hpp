@@ -38,10 +38,6 @@ namespace damaris {
 namespace bmi = boost::multi_index;
 
 
-
-
-
-
 /**
  * This class serves as a factory to build identified (named) objects. It keeps
  * a record of all objects created and does not create twice the same named 

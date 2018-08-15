@@ -39,17 +39,26 @@ set(DAMARIS_SRC
 	${DAMARIS_SOURCE_DIR}/src/storage/NullStore.cpp
 	)
 
+# if Damaris is compiled with VisIt
 if(VisIt_FOUND)
 set(DAMARIS_VISIT_SRC
 	${DAMARIS_SOURCE_DIR}/src/visit/VisItListener.cpp
 	)
 endif(VisIt_FOUND)
 
+# if Damairs is compiled with HDF5
 if(HDF5_FOUND)
 set(DAMARIS_HDF5_SRC
 	${DAMARIS_SOURCE_DIR}/src/storage/HDF5Store.cpp
 	)
 endif(HDF5_FOUND)
+
+# if Damaris is compiled with ParaView
+if(ParaView_FOUND)
+set(DAMARIS_PARAVIEW_SRC
+        ${DAMARIS_SOURCE_DIR}/src/paraview/ParaViewAdaptor.cpp
+        )
+endif(ParaView_FOUND)
 
 if(CMAKE_Fortran_COMPILER)
 set(DAMARIS_FORTRAN_MODULE 
@@ -60,6 +69,7 @@ endif(CMAKE_Fortran_COMPILER)
 add_library (damaris 	${DAMARIS_SRC} 
 			${DAMARIS_VISIT_SRC}
 			${DAMARIS_HDF5_SRC} 
+                        ${DAMARIS_PARAVIEW_SRC}
 			${DAMARIS_FORTRAN_MODULE})
 
 if(NOT (MODEL_PRESENT EQUAL 1))

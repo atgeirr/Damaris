@@ -52,7 +52,6 @@ class MeshManager : public Manager<Mesh> {
 	 */
 	static void ReadMeshesInSubGroup(const model::Group &g,
 		const std::string& groupName);
-
 };
 
 }

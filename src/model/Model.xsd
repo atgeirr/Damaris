@@ -292,6 +292,17 @@
 		<xs:attribute name="update-frequency" type="xs:unsignedInt" use="optional" default="1"/>
 	</xs:complexType>
 
+
+        <!-- Parameters related to ParaView -->
+        <xs:complexType name="ParaViewParam">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element name="script" type="xs:string"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute name="update-frequency" type="xs:unsignedInt" use="optional" default="1"/>
+        </xs:complexType>
+
 	<!-- Parameters related to Python -->
 	<xs:complexType name="PythonParam">
 		<xs:sequence>	
@@ -369,6 +380,7 @@
 			<xs:element name="actions" type="mdl:Actions" maxOccurs="1"/>
 			<xs:element name="python" type="mdl:PythonParam" maxOccurs="1" minOccurs="0"/>
 			<xs:element name="visit" type="mdl:VisitParam" maxOccurs="1" minOccurs="0"/>
+                        <xs:element name="paraview" type="mdl:ParaViewParam" maxOccurs="1" minOccurs="0"/>
 			<xs:element name="log" type="mdl:Log" maxOccurs="1" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string" use="required"/>
