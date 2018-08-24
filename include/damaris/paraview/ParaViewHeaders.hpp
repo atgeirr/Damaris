@@ -30,6 +30,7 @@
 #include <vtkIntArray.h>
 #include <vtkFloatArray.h>
 #include <vtkDoubleArray.h>
+#include <vtkSOADataArrayTemplate.h>
 
 //Misc.
 #include <vtkNew.h>

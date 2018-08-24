@@ -525,9 +525,7 @@ class Variable : public ENABLE_SHARED_FROM_THIS(Variable),
 #ifdef HAVE_PARAVIEW_ENABLED
     bool AddBlocksToVtkGrid(vtkMultiPieceDataSet* vtkMPGrid , int iteration);
     template <typename T>
-    bool AddBufferToVtkGrid(std::shared_ptr<vtkDataSet> grid , T* buffer);
-    /*bool AddBlocksToSingleVtkGrid(std::shared_ptr<vtkDataSet> grid , int iteration);
-    bool AddBlocksToMultiVtkGrid(std::shared_ptr<vtkDataSet> grid , int iteration);*/
+    bool AddBufferToVtkGrid(vtkDataSet* grid , T* buffer);
 #endif
 
 };

@@ -70,13 +70,6 @@ class Mesh : public Configurable<model::Mesh> {
 		virtual ~Mesh() {}
 
 	public:
-
-        	/**
-         	* Defines a local type for defining the type of the Mesh
-         	*/
-        	enum class MeshType {Rectilinear, Curvilinear , Point, None};
-
-
 		/**
 		 * Returns the name of the Mesh.
 		 */
@@ -112,11 +105,6 @@ class Mesh : public Configurable<model::Mesh> {
 			return GetModel().topology();
 		}
 
-        /**
-         * Returns the type of the mesh (e.g. rectilinear, point, etc. )
-         */
-        virtual MeshType GetType() const = 0;
-
 
 #ifdef HAVE_VISIT_ENABLED
         vtkDataObject* vtkGrid;
@@ -148,7 +136,8 @@ class Mesh : public Configurable<model::Mesh> {
         /**
          * Returns the relevant VTK grid (mesh) type
          */
-        virtual std::shared_ptr<vtkDataSet> GetVtkGrid(int source , int iteration , int block) = 0;
+		virtual vtkDataSet* GetVtkGrid(std::shared_ptr<Variable> var, int source ,
+									   int iteration , int block) = 0;
 #endif
 };
 

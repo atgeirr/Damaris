@@ -21,14 +21,14 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "Damaris.h"
 
 #include "damaris/model/Model.hpp"
-#include "damaris/data/Mesh.hpp"
+#include "damaris/data/StructuredMesh.hpp"
 
 namespace damaris {
 
 /**
  * CurvilinearMesh is a particular type of Mesh.
  */
-class CurvilinearMesh : public Mesh {
+class CurvilinearMesh : public StructuredMesh {
 
 	friend class Deleter<CurvilinearMesh>;
 	
@@ -39,7 +39,7 @@ private:
 	 * be used to create Curvilinear Meshes.
 	 */
 	CurvilinearMesh(const model::Mesh& mdl)
-	: Mesh(mdl) {}
+    : StructuredMesh(mdl) {}
 	
 	/**
 	 * Destructor.
@@ -75,14 +75,6 @@ public:
 		return m;
 	}
 
-    /**
-     * Returns the type of the mesh (i.e. rectilinear)
-     */
-    virtual Mesh::MeshType GetType() const
-    {
-        return Mesh::MeshType::Curvilinear;
-    }
-
 #ifdef HAVE_VISIT_ENABLED
 	/**
 	 * Fills the visit handle with metadata related to this Mesh.
@@ -107,12 +99,28 @@ public:
 
 
 #ifdef HAVE_PARAVIEW_ENABLED
+protected:
+	template<typename T>
+    vtkDataArray* GetPointsArray(int source , int iteration , int block ,
+                                 std::shared_ptr<Variable> vx ,
+                                 std::shared_ptr<Variable> vy ,
+                                 std::shared_ptr<Variable> vz );
     /**
-    * Returns the relevant Curvilinear VTK mesh
-    *
-    */
-    virtual std::shared_ptr<vtkDataSet> GetVtkGrid(int source , int iteration , int block);
-#endif
+     * Sets the grid coordinates based on the passed values.
+     */
+	virtual bool SetGridCoords(vtkDataSet* grid , int source , int iteration , int block ,
+                               std::shared_ptr<Variable> vx ,
+                               std::shared_ptr<Variable> vy ,
+							   std::shared_ptr<Variable> vz);
+    /**
+     * Sets the curvilinear grid extetns.
+     */
+	bool SetGridExtents(vtkDataSet* grid , std::shared_ptr<Variable> var, int source , int iteration , int block);
+    /**
+     * This method creates an instance of Structured mesh and returns it.
+     */
+	virtual vtkDataSet* CreateVtkGrid() { return vtkStructuredGrid::New();  }
+#endif  // of HAVE_PARAVIEW_ENABLED
 };
 
 }

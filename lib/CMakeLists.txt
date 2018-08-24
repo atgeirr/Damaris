@@ -19,6 +19,7 @@ set(DAMARIS_SRC
 	${DAMARIS_SOURCE_DIR}/src/data/ParameterManager.cpp
 	${DAMARIS_SOURCE_DIR}/src/data/Mesh.cpp
 	${DAMARIS_SOURCE_DIR}/src/data/MeshManager.cpp
+        ${DAMARIS_SOURCE_DIR}/src/data/StructuredMesh.cpp
 	${DAMARIS_SOURCE_DIR}/src/data/RectilinearMesh.cpp
 	${DAMARIS_SOURCE_DIR}/src/data/CurvilinearMesh.cpp
 	${DAMARIS_SOURCE_DIR}/src/data/PointMesh.cpp

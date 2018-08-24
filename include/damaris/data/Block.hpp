@@ -270,21 +270,9 @@ class Block //: public ENABLE_SHARED_FROM_THIS(Block)
 		dataspace_.GainDataOwnership();
 	}
 
-    /**
+	/**
      * \see returns the item at the ith place in the block
      */
-    template<typename T>
-    const T GetAt(int64_t i)
-    {
-        int64_t blockSize = NbrOfItems();
-        if ((i<0) || (i>=blockSize)) {
-            ERROR("Index is out of block range");
-            return 0;
-        }
-
-        T* buffer = (T*)dataspace_.GetData();
-        return buffer[i];
-    }
 
 #ifdef HAVE_VISIT_ENABLED
 	/**
@@ -294,6 +282,20 @@ class Block //: public ENABLE_SHARED_FROM_THIS(Block)
 	 * \param[in] hdl : visit handle to fill.
 	 */
 	bool FillVisItDataHandle(visit_handle hdl);
+#endif
+
+#ifdef HAVE_PARAVIEW_ENABLED
+	void GetExtents(int extents[6] , bool withGhost=true)
+	{
+		extents[0] = extents[1] = extents[2] = 0;
+		extents[3] = extents[4] = extents[5] = 0;
+		int dim = upper_bounds_.size();
+
+		for(int i=0; i<dim ; i++) {
+			extents[2*i] = GetStartIndex(i);
+			extents[2*i+1] = GetEndIndex(i) + 1; // #point = #cells + 1
+		}
+	}
 #endif
 	
 };

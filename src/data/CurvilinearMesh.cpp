@@ -252,9 +252,108 @@ bool CurvilinearMesh::ExposeVisItData(visit_handle* h,
 
 
 #ifdef HAVE_PARAVIEW_ENABLED
-std::shared_ptr<vtkDataSet> CurvilinearMesh::GetVtkGrid(int source , int iteration , int block)
+
+template<typename T>
+vtkDataArray* CurvilinearMesh::GetPointsArray(int source , int iteration , int block ,
+											  std::shared_ptr<Variable> vx ,
+											  std::shared_ptr<Variable> vy ,
+											  std::shared_ptr<Variable> vz )
 {
-    return nullptr;
+	int dimension = GetNumCoord();
+	int gridSize = 0;
+	vtkSOADataArrayTemplate<T>* soaArray = vtkSOADataArrayTemplate<T>::New();
+	soaArray->SetNumberOfComponents(dimension);
+	vtkDataArray* coordX = nullptr;;
+
+	if (vx != nullptr) {
+		vtkDataArray* coordX = CreateCoordArray(source , iteration , block , vx );
+		gridSize = coordX->GetNumberOfTuples();
+		soaArray->SetNumberOfTuples(gridSize);
+	}
+	else {
+		ERROR("Variable Vx for the mesh " << GetName() << " is null");
+		return nullptr;
+	}
+
+	if (dimension >= 1) {
+		T* bufferX = (T*)GetCoordBuffer(source , iteration , block , vx);
+		soaArray->SetArray(0 , bufferX , gridSize , false , true);
+	}
+
+	if (dimension >= 2) {
+		T* bufferY = (T*)GetCoordBuffer(source , iteration , block , vy);
+		soaArray->SetArray(1 , bufferY , gridSize , false , true);
+	}
+
+	if (dimension == 3) {
+		T* bufferZ = (T*)GetCoordBuffer(source , iteration , block , vz);
+		soaArray->SetArray(2 , bufferZ , gridSize , false , true);
+	}
+
+	return soaArray;
 }
+
+
+bool CurvilinearMesh::SetGridCoords(vtkDataSet* grid , int source , int iteration , int block ,
+                           std::shared_ptr<Variable> vx ,
+                           std::shared_ptr<Variable> vy ,
+						   std::shared_ptr<Variable> vz )
+{
+	vtkDataArray* points = nullptr;
+	auto meshType = vx->GetLayout()->GetType();
+	vtkStructuredGrid* curvGrid = vtkStructuredGrid::SafeDownCast(grid);
+
+	switch(meshType) {
+	case model::Type::short_:
+		points = GetPointsArray<short>(source , iteration , block , vx , vy , vz);
+		break;
+	case model::Type::int_:
+	case model::Type::integer:
+		points = GetPointsArray<int>(source , iteration , block , vx , vy , vz);
+		break;
+	case model::Type::long_:
+		points = GetPointsArray<long>(source , iteration , block , vx , vy , vz);
+		break;
+	case model::Type::float_:
+	case model::Type::real:
+		points = GetPointsArray<float>(source , iteration , block , vx , vy , vz);
+		break;
+	case model::Type::double_:
+		points = GetPointsArray<double>(source , iteration , block , vx , vy , vz);
+		break;
+	default:
+		ERROR("Type is undefined for mesh with its vx variable as: " << vx->GetName());
+		return false;
+	}
+
+	vtkPoints* pointArray = vtkPoints::New();
+	pointArray->SetData(points);
+	curvGrid->SetPoints(pointArray);
+
+	//points->Delete();
+	//pointArray->Delete();
+
+	return true;
+}
+
+bool CurvilinearMesh::SetGridExtents(vtkDataSet* grid , std::shared_ptr<Variable> var,
+									 int source , int iteration , int block)
+{
+	int extents[6];
+	vtkStructuredGrid* curvGrid = vtkStructuredGrid::SafeDownCast(grid);
+
+	if (curvGrid != nullptr) {
+		std::shared_ptr<Block> b = GetCoordBlock(source , iteration , block , var);
+
+		b->GetExtents(extents);
+		curvGrid->SetExtent(extents);
+
+		return true;
+	}
+
+	ERROR("Cannot downcast the parameter grid to vtkCurvilinearGrid");
+	return false;
+}
+
 #endif
 }

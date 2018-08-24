@@ -78,13 +78,6 @@ public:
 		}
 	}
 
-    	/**
-     	* Returns the type of the mesh (i.e. Point Mesh)
-     	*/
-    	virtual Mesh::MeshType GetType() const
-    	{
-        	return Mesh::MeshType::Point;
-    	}
 
 #ifdef HAVE_VISIT_ENABLED
 	/**
@@ -115,7 +108,7 @@ public:
          * Returns the relevant VTK mesh type
          *
          */
-        virtual std::shared_ptr<vtkDataSet> GetVtkGrid(int source , int iteration , int block);
+		virtual vtkDataSet* GetVtkGrid(std::shared_ptr<damaris::Variable> var, int source , int iteration , int block);
 #endif
 
 };

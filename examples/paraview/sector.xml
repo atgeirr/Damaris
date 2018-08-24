@@ -13,21 +13,21 @@
                 <parameter name="size"	 type="int" value="2"  />
 
                 <layout name="cells"  type="double" dimensions="WIDTH,HEIGHT,DEPTH/size"
-                        global="WIDTH,HEIGHT,DEPTH" ghosts="0:0,0:0,0:0" />
-                <layout name="rmeshX" type="float" dimensions="WIDTH+1" global="WIDTH+1" ghosts="0:0" />
-                <layout name="rmeshY" type="float" dimensions="HEIGHT+1" global="HEIGHT+1" ghost="0:0" />
-                <layout name="rmeshZ" type="float" dimensions="DEPTH/size+1" global="DEPTH+1" ghost="0:0" />
+				        global="WIDTH,HEIGHT,DEPTH" ghosts="0:0,0:0,0:0" />
 
-                <mesh name="mesh" type="rectilinear" topology="3">
+                <layout name="cmesh"  type="float"  dimensions="WIDTH+1,HEIGHT+1,DEPTH/size+1"
+				                global="WIDTH+1,HEIGHT+1,DEPTH+1" ghosts="0:0,0:0,0:0" />
+
+                <mesh name="mesh" type="curvilinear" topology="3">
                         <coord name="coord/x" label="x"/>
                         <coord name="coord/y" label="y"/>
                         <coord name="coord/z" label="z"/>
                 </mesh>
 
                 <group name="coord">
-                        <variable name="x" layout="rmeshX" visualizable="false" time-varying="false"  />
-                        <variable name="y" layout="rmeshY" visualizable="false" time-varying="false"  />
-                        <variable name="z" layout="rmeshZ" visualizable="false" time-varying="false"  />
+                        <variable name="x" layout="cmesh" visualizable="false" time-varying="false"  />
+                        <variable name="y" layout="cmesh" visualizable="false" time-varying="false"  />
+                        <variable name="z" layout="cmesh" visualizable="false" time-varying="false"  />
                 </group>
 
                 <variable name="pressure" type="scalar" layout="cells" mesh="mesh" centering="zonal" />
@@ -35,7 +35,7 @@
         <actions>
         </actions>
         <paraview>
-            <script>/home/hadi/Damaris/DamarisDevHadi/examples/paraview/image.py</script>
+            <script>/home/hadi/Damaris/DamarisDevHadi/examples/paraview/sector.py</script>
         </paraview>
         <log FileName="log/damaris" RotationSize="5" LogFormat="[%TimeStamp%]: %Message%" LogLevel="info" />
 </simulation>

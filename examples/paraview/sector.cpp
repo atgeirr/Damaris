@@ -1,11 +1,13 @@
 #include <iostream>
 #include <unistd.h>
+#include <math.h>
 
 #include "mpi.h"
 #include "Damaris.h"
 
 
 int Steps = 10000;
+int PI = 3.1415;
 
 using namespace std;
 
@@ -68,18 +70,25 @@ void FreeSimData(simdata& sim)
 
 void WriteCoordinates(simdata sim)
 {
-	float* XCoord = new float[sim.x+1];
-	float* YCoord = new float[sim.y+1];
-	float* ZCoord = new float[sim.z+1];
+	long size = (sim.x+1) * (sim.y+1) * (sim.z+1);
+
+    float* XCoord = new float[size];
+    float* YCoord = new float[size];
+    float* ZCoord = new float[size];
 
 	for(int i=0; i<=sim.x ; i++)
-		XCoord[i] = i*2;
+		for(int j=0; j<=sim.y ; j++)
+			for(int k=0; k<=sim.z ; k++) {
 
-	for(int j=0; j<=sim.y ; j++)
-		YCoord[j] = j*3;
+                double tetta = 10 + 70*j/sim.y;
+                double radi = tetta * PI/180;
 
-	for(int k=0; k<=sim.z ; k++)
-        ZCoord[k] = k+sim.rank*sim.z;
+				int index = i + j*(sim.x+1) + k*(sim.y+1) * (sim.x+1);
+				XCoord[index] = (i+10)*cos(radi);
+				YCoord[index] = (i+10)*sin(radi);
+				ZCoord[index] = k+sim.rank*sim.z;
+            }
+
 
     damaris_write("coord/x" , XCoord);
     damaris_write("coord/y" , YCoord);
@@ -88,9 +97,9 @@ void WriteCoordinates(simdata sim)
 
 void SimMainLoop(simdata& sim)
 {
-    for(int i=0; i<sim.x; i++)
-        for(int j=0; j<sim.y; j++)
-            for(int k=0; k<sim.z; k++)
+	for(int i=0; i<sim.x; i++)
+		for(int j=0; j<sim.y; j++)
+			for(int k=0; k<sim.z; k++)
                 setValue(sim , GetFillValue(sim , i,j,k) ,  i , j , k  );
 
     // write results to Damaris
@@ -98,25 +107,32 @@ void SimMainLoop(simdata& sim)
     {
         if (sim.rank == 0)
         {
-            cout << "Image example: Iteration " << sim.step << " out of " << Steps << endl;
+			cout << "Sector example: Iteration " << sim.step << " out of " << Steps << endl;
         }
-		int64_t pos[3];
 
+		int64_t pos[3];
 		pos[0] = 0;
 		pos[1] = 0;
 		pos[2] = sim.rank*sim.z;
 
-		damaris_set_position("pressure" ,  pos);
+		damaris_set_position("pressure" , pos);
         damaris_write("pressure" , sim.cube);
         damaris_end_iteration();
 
-        sleep(5);
+		sleep(3);
     }
 }
 
 int main(int argc, char *argv[])
 {
     MPI_Init(&argc , &argv);
+
+	if (argc != 2)
+	{
+		std::cout << "The example should be run like: mpirun -np <X> ./sector ./<xml_file> " << std::endl;
+		return 1;
+	}
+
 	damaris_initialize(argv[1] , MPI_COMM_WORLD);
 
 

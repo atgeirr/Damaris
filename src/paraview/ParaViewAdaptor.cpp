@@ -33,7 +33,6 @@ void ParaViewAdaptor::Initialize(MPI_Comm comm,
                                 const model::Simulation::paraview_optional& mdl,
                                 const std::string& simname)
 {
-    std::cout << "ParaView adaptor initialized ... " << std::endl;
     if (processor_ == nullptr) {
         vtkMPICommunicatorOpaqueComm vtkMpiComm(&comm);
 
@@ -43,7 +42,7 @@ void ParaViewAdaptor::Initialize(MPI_Comm comm,
         processor_->RemoveAllPipelines();
     }
 
-    // Add in the Python script
+	// Add the Python script
     model::ParaViewParam::script_sequence scripts = mdl.get().script();
     model::ParaViewParam::script_const_iterator it ;
 
@@ -56,38 +55,25 @@ void ParaViewAdaptor::Initialize(MPI_Comm comm,
 
         pipeline->Delete();
     }
-
-    //create the root multi-block grid
-    if (rootGrid_ == nullptr)
-        rootGrid_ = vtkMultiBlockDataSet::New();
 }
 
 void ParaViewAdaptor::Finalize()
 {
-    std::cout << "ParaView adaptor finalized ... " << std::endl;
-
     if (processor_ != nullptr) {
         processor_->Delete();
         processor_ = nullptr;
-    }
-
-    if (rootGrid_ != nullptr) {
-        rootGrid_->Delete();
-        rootGrid_ = nullptr;
     }
 }
 
 void ParaViewAdaptor::CoProcess(int iteration , bool lastTimeStep)
 {
-    std::cout << "------------ ParaView Adaptor CoProcess Called: Iteration: " << iteration << endl;
-
     vtkCPDataDescription* dataDescription = vtkCPDataDescription::New();
 
     // specify the simulation time and time step for Catalyst
     dataDescription->AddInput("input");
-    dataDescription->SetTimeData(iteration*0.1 , iteration);  // What is the difference???????
+	dataDescription->SetTimeData(iteration*0.1 , iteration);  // What is the difference?
 
-    if (lastTimeStep == true) { // Execute all pipelines
+	if (lastTimeStep == true) { // Who to know about it?
         dataDescription->ForceOutputOn();
     }
 
@@ -100,39 +86,40 @@ void ParaViewAdaptor::CoProcess(int iteration , bool lastTimeStep)
             return;
         }
 
-        if (not FillMultiBlockGrid(iteration)) {
+		vtkMultiBlockDataSet* rootGrid = vtkMultiBlockDataSet::New();
+
+		if (not FillMultiBlockGrid(iteration , rootGrid)) {
             ERROR("Error in Filling the root multi-block grid in iteration " << iteration);
             return;
         }
 
         // Catalyst gets the proper input dataset for the pipeline.
-        dataDescription->GetInputDescriptionByName("input")->SetGrid(rootGrid_);
+		dataDescription->GetInputDescriptionByName("input")->SetGrid(rootGrid);
 
         // Call Catalyst to execute the desired pipelines.
         processor_->CoProcess(dataDescription);
+
+		rootGrid->Delete();
     }
 
     dataDescription->Delete();
 }
 
-bool ParaViewAdaptor::FillMultiBlockGrid(int iteration)
+bool ParaViewAdaptor::FillMultiBlockGrid(int iteration , vtkMultiBlockDataSet* rootGrid)
 {
     int index = 0;
     int serverCount = Environment::CountTotalServers();
     int meshCount = MeshManager::GetNumObjects();
     int serverRank = Environment::GetEntityProcessID();
 
-    ERROR("Muti-block element count: " << meshCount);
-
-    rootGrid_->SetNumberOfBlocks(meshCount);
+	rootGrid->SetNumberOfBlocks(meshCount);
 
     auto meshItr = MeshManager::Begin();
     for(; meshItr != MeshManager::End(); meshItr++) {
         std::shared_ptr<Mesh> mesh = *meshItr;
 
         vtkMultiPieceDataSet* vtkMPGrid = vtkMultiPieceDataSet::New();
-        rootGrid_->SetBlock(index , vtkMPGrid);
-        ERROR("rootGrid_->SetBlock(index , vtkMPGrid) in index: " << index);
+		rootGrid->SetBlock(index , vtkMPGrid);
         index++;
 
         auto varItr = VariableManager::Begin();
@@ -143,9 +130,7 @@ bool ParaViewAdaptor::FillMultiBlockGrid(int iteration)
 
             if (mdl.mesh() == "#") continue;    // a variable with empty mesh
             if (mdl.mesh() != mesh->GetName()) continue;  // a variable with a differetn mesh
-            if (mdl.visualizable() == false) continue;  // non visualizable variable
-
-            ERROR("Varieble to write is: " << var->GetName());
+            if (mdl.visualizable() == false) continue;  // non-visualizable variable
 
             if (not (*varItr)->AddBlocksToVtkGrid(vtkMPGrid , iteration)) {
                 ERROR("Error in adding blocks to variable " << var->GetName());
@@ -156,30 +141,5 @@ bool ParaViewAdaptor::FillMultiBlockGrid(int iteration)
     return true;
 }
 
-/*std::shared_ptr<vtkDataSet> ParaViewAdaptor::CoProcessSingleGrid(int iteration)
-{
-    std::shared_ptr<Mesh> grid = MeshManager::Search(0); // Search by Id, fix later ?????????????
-
-    if (grid == nullptr) {
-        ERROR("The only available mesh in the system is not valid!");
-        return nullptr;
-    }
-
-    std::shared_ptr<vtkDataSet> vtkGrid = grid->GetVtkGrid(iteration);
-
-    auto it = VariableManager::Begin();
-    for(; it != VariableManager::End(); it++) {
-        const model::Variable& mdl = (*it)->GetModel();
-
-        if (mdl.mesh() == "#") continue;    // a variable with empty mesh
-        if (mdl.visualizable() == false) continue;  // non visualizable variable
-
-        ERROR("Varieble to write is: " << (*it)->GetName());
-
-        (*it)->AddBlocksToSingleVtkGrid(vtkGrid , iteration);
-    }
-
-    return vtkGrid;
-}*/
 
 } // end of namespace damaris

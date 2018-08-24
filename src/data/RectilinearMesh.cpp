@@ -20,9 +20,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "data/VariableManager.hpp"
 #include "data/RectilinearMesh.hpp"
 
-#ifdef HAVE_PARAVIEW_ENABLED
-#include "damaris/paraview/ParaViewHeaders.hpp"
-#endif
+
 
 namespace damaris {
 
@@ -231,220 +229,53 @@ bool RectilinearMesh::ExposeVisItData(visit_handle* h,
 
 #ifdef HAVE_PARAVIEW_ENABLED
 
-
-void RectilinearMesh::GetGridExtents(int source , int iteration , int block ,
-                                     const std::shared_ptr<Variable>& coord ,
-                                     int& lowExtent , int& highExtent)
+bool RectilinearMesh::SetGridCoords(vtkDataSet* grid , int source , int iteration , int block ,
+                           std::shared_ptr<Variable> vx ,
+                           std::shared_ptr<Variable> vy ,
+						   std::shared_ptr<Variable> vz)
 {
-    std::shared_ptr<Block> coordBlock = coord->GetBlock(source , iteration , block);
+    vtkRectilinearGrid* rectGrid = vtkRectilinearGrid::SafeDownCast(grid);
 
-    if (coordBlock == nullptr) { // the coordinate has been written only in the first iteration
-        std::shared_ptr<Block> coordBlock = coord->GetBlock(source , 0 , block);
+    if (vx != nullptr) {
+        vtkDataArray* coordX = CreateCoordArray(source , iteration , block , vx );
+        rectGrid->SetXCoordinates(coordX);
+        // coordX->Delete();    -------------- ?????
     }
 
-    auto type = coord->GetLayout()->GetType();
-    size_t length = coord->GetLayout()->GetExtentAlong(0);
-
-    switch(type) {
-    case model::Type::short_:
-        lowExtent = coordBlock->GetAt<short>(0);
-        highExtent = coordBlock->GetAt<short>(length-1);
-        break;
-    case model::Type::int_:
-    case model::Type::integer:
-        lowExtent = coordBlock->GetAt<int>(0);
-        highExtent = coordBlock->GetAt<int>(length-1);
-        break;
-    case model::Type::long_:
-        lowExtent = coordBlock->GetAt<long>(0);
-        highExtent = coordBlock->GetAt<long>(length-1);
-        break;
-    case model::Type::float_:
-    case model::Type::real:
-        lowExtent = coordBlock->GetAt<float>(0);
-        highExtent = coordBlock->GetAt<float>(length-1);
-        break;
-    case model::Type::double_:
-        lowExtent = coordBlock->GetAt<double>(0);
-        highExtent = coordBlock->GetAt<double>(length-1);
-        break;
-    default:
-        ERROR("Type is undefined for variable: " << coord->GetName());
-    }
-}
-
-bool RectilinearMesh::GetGridInfo(int source , int iteration , int block ,
-                                  std::shared_ptr<Variable>& vx ,
-                                  std::shared_ptr<Variable>& vy ,
-                                  std::shared_ptr<Variable>& vz ,
-                                  int& lowX , int& highX , int& lowY ,
-                                  int& highY , int& lowZ , int& highZ)
-{
-    unsigned int numCoord = GetNumCoord();
-    if ((numCoord < 1) || (numCoord > 3)) {
-        CFGERROR("The number of coordinate variabels is not correct!");
-        return false;
+    if (vy != nullptr) {
+        vtkDataArray* coordY = CreateCoordArray(source , iteration , block , vy );
+        rectGrid->SetYCoordinates(coordY);
+        // Ycoords->Delete(); ------------------ ???????
     }
 
-    vx = GetCoord(0);
-    if (not vx) {
-        CFGERROR("incorrect coordinate variable for dimention X!");
-        return false;
-    }
-    else if (vx->GetLayout()->GetDimensions() != 1) {
-        CFGERROR("incorrect variable for coordinate X of variable " << vx->GetName());
-        return false;
-    } else
-        GetGridExtents(source , iteration , block , vx , lowX , highX);
-
-
-    if (numCoord >= 2)
-    {
-        vy = GetCoord(1);
-        if (not vy) {
-            CFGERROR("incorrect coordinate variable for dimention Y!");
-            return false;
-        }
-        else if (vy->GetLayout()->GetDimensions() != 1) {
-            CFGERROR("incorrect variable for coordinate Y of variable " << vx->GetName());
-            return false;
-        } else
-            GetGridExtents(source, iteration, block, vy, lowY, highY);
-    }
-
-    if (numCoord == 3)
-    {
-        vz = GetCoord(2);
-        if (not vz) {
-            CFGERROR("incorrect coordinate variable for dimention Z!");
-            return false;
-        }
-        else if (vz->GetLayout()->GetDimensions() != 1) {
-            CFGERROR("Incorrect variable for coordinate Z of variable " << vx->GetName());
-            return false;
-        } else
-            GetGridExtents(source , iteration , block ,vz , lowZ , highZ);
+    if (vz != nullptr) {
+		vtkDataArray* coordZ = CreateCoordArray(source , iteration , block , vz );
+        rectGrid->SetZCoordinates(coordZ);
+        // coordZ->Delete(); ------------------ ???????
     }
 
     return true;
 }
 
-template <typename T>
-vtkDataArray* RectilinearMesh::CreateTypedDataArray(size_t length , T* pointer , size_t dataSize)
-{
-    vtkAOSDataArrayTemplate<T>* array = vtkAOSDataArrayTemplate<T>::New();
-    array->SetNumberOfTuples(length);
-    array->SetArray((T*)pointer , dataSize , 1);
 
-    return array;
+bool RectilinearMesh::SetGridExtents(vtkDataSet* grid , std::shared_ptr<Variable> var, int source , int iteration , int block)
+{
+	int extents[6];
+    vtkRectilinearGrid* rectGrid = vtkRectilinearGrid::SafeDownCast(grid);
+
+    if (rectGrid != nullptr) {
+		std::shared_ptr<Block> b = GetCoordBlock(source , iteration , block , var);
+		b->GetExtents(extents);
+
+		rectGrid->SetExtent(extents);
+
+		return true;
+    }
+
+    ERROR("Cannot downcast the parameter grid to vtkRectilinearGrid");
+    return false;
 }
 
-vtkDataArray* RectilinearMesh::CreateDataArray(int source , int iteration , int block ,
-                                               std::shared_ptr<Variable> var )
-{
-     model::Type type = var->GetLayout()->GetType();
-     size_t length = var->GetLayout()->GetExtentAlong(0);
-     size_t layoutSize = var->GetLayout()->GetRequiredMemory();
-
-     std::shared_ptr<Block> b = var->GetBlock(source , iteration , block);
-     if (b == nullptr)
-         b = var->GetBlock(source , 0 , block);
-
-     ERROR("variable " << var->GetName() << " has " << var->CountLocalBlocks(iteration));
-
-     void* pointer = b->GetDataSpace().GetData();
-
-     switch(type) {
-     case model::Type::short_:
-         return CreateTypedDataArray<short>(length , (short*)pointer , layoutSize);
-     case model::Type::int_:
-     case model::Type::integer:
-         return CreateTypedDataArray<int>(length , (int*)pointer , layoutSize);
-     case model::Type::long_:
-         return CreateTypedDataArray<long>(length , (long*)pointer , layoutSize);
-     case model::Type::float_:
-     case model::Type::real:
-         return CreateTypedDataArray<float>(length , (float*)pointer , layoutSize);
-     case model::Type::double_:
-         return CreateTypedDataArray<double>(length , (double*)pointer , layoutSize);
-     default:
-         ERROR("Type is undefined for variable " << var->GetName());
-     }
-
-     return nullptr;
-}
-
-bool RectilinearMesh::SetGridCoord(int source , int iteration , int block ,
-                                   int dim , std::shared_ptr<Variable> var ,
-                                   std::shared_ptr<vtkRectilinearGrid> grid)
-{
-    if (var == nullptr) {
-        ERROR("Cannot set grid coordinates for null variables. \n");
-        return false;
-    }
-
-    // creating proper vtkDataArray based on its type
-    vtkDataArray* coords = CreateDataArray(source , iteration , block , var );
-
-    switch(dim) {
-    case 0:
-        grid->SetXCoordinates(coords);
-        break;
-    case 1:
-        grid->SetYCoordinates(coords);
-        break;
-    case 2:
-        grid->SetZCoordinates(coords);
-        break;
-    default:
-        ERROR("Invalid value for the demention of the grid!");
-        return false;
-    }
-
-    coords->Delete();
-
-    return true;
-}
-
-std::shared_ptr<vtkDataSet> RectilinearMesh::GetVtkGrid(int source , int iteration , int block)
-{
-    /*if (vtkGrid_ != nullptr) // In future we should checck the change in the grid at run-time
-        return vtkGrid_;*/
-
-    std::shared_ptr<vtkRectilinearGrid> grid =
-            std::shared_ptr<vtkRectilinearGrid>(vtkRectilinearGrid::New() , SelfDeleter<vtkRectilinearGrid>());
-
-
-    int x1=0, x2=0, y1=0, y2=0, z1=0, z2=0; // mesh extents
-    std::shared_ptr<Variable> vx = nullptr;
-    std::shared_ptr<Variable> vy = nullptr;
-    std::shared_ptr<Variable> vz = nullptr;
-
-    if (not GetGridInfo(source , iteration , block , vx , vy , vz , x1 , x2 , y1 , y2 , z1 , z2)) {
-        ERROR("Failed to get information related to the vtkGrid of: " << GetName());
-        return nullptr;
-    }
-
-    grid->SetExtent(x1 , x2 , y1 , y2 , z1 , z2);
-    ERROR("Setting Grid extents: Source: " << source << "   Extents: " << x1 << "," << x2 << "  " << y1 << "," << y2 << " " << z1 << "," << z2);
-
-    //Setting the coordinates
-    if (not SetGridCoord(source , iteration , block , 0 , vx , grid)) {
-        ERROR("Setting the VTK Grid Coordinate for dimention 0 failed. ");
-        return nullptr;
-    }
-
-    if (not SetGridCoord(source , iteration , block , 1 , vy , grid)) {
-        ERROR("Setting the VTK Grid Coordinate for dimention 1 failed. ");
-        return nullptr;
-    }
-
-    if (not SetGridCoord(source , iteration , block , 2 , vz , grid)) {
-        ERROR("Setting the VTK Grid Coordinate for dimention 2 failed. ");
-        return nullptr;
-    }
-
-    return grid;
-}
 #endif
+
 }

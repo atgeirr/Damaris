@@ -4,4 +4,5 @@ export PATH=$HOME/local/bin:$PATH
 
 #Run the example:
 mpirun -np 6 ./image "image.xml"
+#mpirun -np 6 ./sector "sector.xml"
 

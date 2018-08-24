@@ -43,7 +43,7 @@ class ParaViewAdaptor
 
     vtkCPProcessor* processor_;
 
-    vtkMultiBlockDataSet* rootGrid_;
+	//vtkMultiBlockDataSet* rootGrid_;
 
 
 protected:
@@ -51,7 +51,7 @@ protected:
     * Constructor.
     */
     ParaViewAdaptor() {
-        rootGrid_ = nullptr;
+		//rootGrid_ = nullptr;
         processor_ = nullptr;
     }
 
@@ -59,11 +59,9 @@ protected:
     * Destructor.
     */
     virtual ~ParaViewAdaptor() {
-
-
     }
 
-    bool FillMultiBlockGrid(int iteration);
+	bool FillMultiBlockGrid(int iteration , vtkMultiBlockDataSet* rootGrid);
 
 public:
 
@@ -84,6 +82,7 @@ public:
     void Initialize(MPI_Comm comm,
                     const model::Simulation::paraview_optional& mdl,
                     const std::string& simname);
+
     /**
     * Finalizes the CoProcessors of the singleton object.
     */

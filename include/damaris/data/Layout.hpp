@@ -113,7 +113,7 @@ class Layout
 	/**
 	* Returns the number of elements of a dataset following this layout.
 	*/
-	virtual size_t GetNumElements(bool includeGhost=true) const = 0;
+	virtual size_t GetNumberOfItems(bool includeGhost=true) const = 0;
 		
 }; // class Layout
 
