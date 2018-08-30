@@ -107,7 +107,7 @@ class RectilinearMesh : public StructuredMesh {
      * Sets the rectiniliear grid extents.
      */
 	virtual bool SetGridExtents(vtkDataSet* grid , std::shared_ptr<Variable> var, int source , int iteration , int block);
-	virtual vtkDataSet* CreateVtkGrid() { ERROR("REcti grid created. "  << std::endl); return vtkRectilinearGrid::New(); }
+	virtual vtkDataSet* CreateVtkGrid() { return vtkRectilinearGrid::New(); }
 #endif
 };
 

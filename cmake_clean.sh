@@ -26,7 +26,7 @@ rm -rf examples/visit/log
 rm -rf examples/visit/CMakeFiles
 rm -rf examples/plugin/CMakeFiles
 rm -rf examples/fortran/CMakeFiles
-
+rm -rf examples/paraview/CMakeFiles
 
 #examples - Makefile
 rm examples/Makefile
@@ -34,6 +34,7 @@ rm examples/visit/Makefile
 rm examples/storage/Makefile 
 rm examples/plugin/Makefile
 rm examples/fortran/Makefile
+rm examplea/paraview/Makefile
 
 #examples - binaries
 rm examples/fortran/cube
@@ -52,6 +53,10 @@ rm examples/visit/mesh
 rm examples/visit/point
 rm examples/visit/var
 rm examples/Example
+rm examples/paraview/image
+rm examples/paraview/sector
+rm examples/paraview/plate
+rm examples/paraview/lollipop
 
 #examples - xml files
 rm examples/visit/blocks.xml
@@ -61,13 +66,13 @@ rm examples/visit/life.xml
 rm examples/visit/mesh.xml
 rm examples/visit/point.xml
 rm examples/visit/var.xml
-rm examples/fortran/cube.xml
 
 rm examples/cmake_install.cmake 
 rm examples/storage/cmake_install.cmake 
 rm examples/visit/cmake_install.cmake 
 rm examples/fortran/cmake_install.cmake 
 rm examples/plugin/cmake_install.cmake 
+rm examples/paraview/cmake_install.cmake
 
 #source and include files 
 rm include/damaris/model/Model.hpp 

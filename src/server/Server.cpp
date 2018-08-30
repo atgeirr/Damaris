@@ -93,7 +93,7 @@ void Server::Run() {
                                  Environment::GetSimulationName());
         }
         else
-            ERROR("ParaView is not defined in the XML configuration file. ");
+			ERROR("Damaris is compiled with ParaView, but ParaView is not enabled in the XML configuration file. ");
 #endif
 
 		reactor_->Bind(ITERATION_SYNC, 
@@ -159,9 +159,6 @@ void Server::EndOfIterationCallback(int tag, int source,
         std::shared_ptr<ParaViewAdaptor> paraview = ParaViewAdaptor::GetInstance();
         paraview->CoProcess(iteration);
     }
-    else
-        ERROR("ParaView is not defined in the XML configuration file. ");
-
 #endif
 
 	StorageManager::Update(iteration);
