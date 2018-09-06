@@ -128,16 +128,17 @@ class Mesh : public Configurable<model::Mesh> {
 #endif
 
 #ifdef HAVE_PARAVIEW_ENABLED
-        /**
-         * This variable is used to keep the instance of created VTK Grid
-         * and use it for future, iff the grid has not been changed.
-         */
-        // std::shared_ptr<vtkDataSet> vtkGrid_;
-        /**
-         * Returns the relevant VTK grid (mesh) type
-         */
-		virtual vtkDataSet* GetVtkGrid(std::shared_ptr<Variable> var, int source ,
-									   int iteration , int block) = 0;
+
+		/**
+		* creates and returns the expected VTK grid object for a block
+		*
+		* \param[in] source : source of the block
+		* \param[in] iteration : iteration of the block
+		* \param[in] block : id of the block
+		* \param[in] var : the variable owning the block
+		*/
+		virtual vtkDataSet* GetVtkGrid(int source , int iteration , int block ,
+									   const std::shared_ptr<Variable>& var) = 0;
 #endif
 };
 

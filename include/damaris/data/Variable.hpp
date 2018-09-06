@@ -523,8 +523,21 @@ class Variable : public ENABLE_SHARED_FROM_THIS(Variable),
 #endif
 
 #ifdef HAVE_PARAVIEW_ENABLED
+	/**
+	* Adds different blocks of a variable into the passed multi piece grid
+	*
+	* \param[in,out] vtkMPGrid : the root multi piece grid for an specific mesh
+	* \param[in] iteration : the Damaris iteration
+	*/
     bool AddBlocksToVtkGrid(vtkMultiPieceDataSet* vtkMPGrid , int iteration);
-    template <typename T>
+
+	/**
+	* Adds the variable's main data as a grid field data
+	*
+	* \param[in,out] grid : the Damaris iteration
+	* \param[in] buffer : the buffer of type T* to be added to the grid as the field data
+	*/
+	template <typename T>
     bool AddBufferToVtkGrid(vtkDataSet* grid , T* buffer);
 #endif
 

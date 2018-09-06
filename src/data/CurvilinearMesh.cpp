@@ -255,9 +255,9 @@ bool CurvilinearMesh::ExposeVisItData(visit_handle* h,
 
 template<typename T>
 vtkDataArray* CurvilinearMesh::GetPointsArray(int source , int iteration , int block ,
-											  std::shared_ptr<Variable> vx ,
-											  std::shared_ptr<Variable> vy ,
-											  std::shared_ptr<Variable> vz )
+											  const std::shared_ptr<Variable>& vx ,
+											  const std::shared_ptr<Variable>& vy ,
+											  const std::shared_ptr<Variable>& vz )
 {
 	int dimension = GetNumCoord();
 	int gridSize = 0;
@@ -295,9 +295,9 @@ vtkDataArray* CurvilinearMesh::GetPointsArray(int source , int iteration , int b
 
 
 bool CurvilinearMesh::SetGridCoords(vtkDataSet* grid , int source , int iteration , int block ,
-                           std::shared_ptr<Variable> vx ,
-                           std::shared_ptr<Variable> vy ,
-						   std::shared_ptr<Variable> vz )
+						   const std::shared_ptr<Variable>& vx ,
+						   const std::shared_ptr<Variable>& vy ,
+						   const std::shared_ptr<Variable>& vz )
 {
 	vtkDataArray* points = nullptr;
 	auto meshType = vx->GetLayout()->GetType();
@@ -330,29 +330,28 @@ bool CurvilinearMesh::SetGridCoords(vtkDataSet* grid , int source , int iteratio
 	pointArray->SetData(points);
 	curvGrid->SetPoints(pointArray);
 
-	//points->Delete();
-	//pointArray->Delete();
+	points->Delete();
+	pointArray->Delete();
 
 	return true;
 }
 
-bool CurvilinearMesh::SetGridExtents(vtkDataSet* grid , std::shared_ptr<Variable> var,
-									 int source , int iteration , int block)
+bool CurvilinearMesh::SetGridExtents(vtkDataSet* grid , int source , int iteration , int block ,
+									 const std::shared_ptr<Variable>& var)
 {
 	int extents[6];
 	vtkStructuredGrid* curvGrid = vtkStructuredGrid::SafeDownCast(grid);
 
-	if (curvGrid != nullptr) {
-		std::shared_ptr<Block> b = GetCoordBlock(source , iteration , block , var);
-
-		b->GetExtents(extents);
-		curvGrid->SetExtent(extents);
-
-		return true;
+	if (curvGrid == nullptr) {
+		ERROR("Cannot downcast the parameter grid to vtkCurvilinearGrid");
+		return false;
 	}
 
-	ERROR("Cannot downcast the parameter grid to vtkCurvilinearGrid");
-	return false;
+	std::shared_ptr<Block> b = GetCoordBlock(source , iteration , block , var);
+	b->GetExtents(extents);
+	curvGrid->SetExtent(extents);
+
+	return true;
 }
 
 #endif

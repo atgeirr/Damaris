@@ -99,15 +99,40 @@ class RectilinearMesh : public StructuredMesh {
 #endif
 
 #ifdef HAVE_PARAVIEW_ENABLED
+	/**
+	 * Sets the grid coordinate variables based on the passed values.
+	 *
+	 * \param[in,out] grid : the expected grid
+	 * \param[in] source : the source of the expected block
+	 * \param[in] iteration : the Damaris iteration
+	 * \param[in] block : the block id of the expected block
+	 * \param[in] vx : the coordinate variable for X direction
+	 * \param[in] vy : the coordinate variable for Y direction
+	 * \param[in] vz : the coordinate variable for Z direction
+	 */
 	bool SetGridCoords(vtkDataSet* grid , int source , int iteration , int block ,
-                        std::shared_ptr<Variable> vx ,
-                        std::shared_ptr<Variable> vy ,
-						std::shared_ptr<Variable> vz);
-    /**
-     * Sets the rectiniliear grid extents.
-     */
-	virtual bool SetGridExtents(vtkDataSet* grid , std::shared_ptr<Variable> var, int source , int iteration , int block);
-	virtual vtkDataSet* CreateVtkGrid() { return vtkRectilinearGrid::New(); }
+						const std::shared_ptr<Variable>& vx ,
+						const std::shared_ptr<Variable>& vy ,
+						const std::shared_ptr<Variable>& vz) override;
+
+	/**
+	 * Sets the grid extents.
+	 *
+	 * \param[in,out] grid : the expected grid for setting the extents
+	 * \param[in] source : the source of the expected block
+	 * \param[in] iteration : the Damaris iteration
+	 * \param[in] block : the block id of the expected block
+	 * \param[in] var : the variable
+	 */
+	virtual bool SetGridExtents(vtkDataSet* grid , int source , int iteration , int block , const std::shared_ptr<Variable>& var) override;
+
+	/**
+	 * Simply creates a vtkRectilinearGrid and return it.
+	 */
+	virtual vtkDataSet* CreateVtkGrid() override
+	{
+		return vtkRectilinearGrid::New();
+	}
 #endif
 };
 

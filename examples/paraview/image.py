@@ -11,28 +11,6 @@ def CreateCoProcessor():
     class Pipeline:
       filename_2_pvti = coprocessor.CreateProducer( datadescription, "input" )
 
-      # create a new 'Parallel ImageData Writer'
-      imageDataWriter1 = servermanager.writers.XMLPImageDataWriter(Input=filename_2_pvti)
-
-      # register the writer with coprocessor
-      # and provide it with information such as the filename to use,
-      # how frequently to write the data, etc.
-      coprocessor.RegisterWriter(imageDataWriter1, filename='fullgrid_%t.pvti', freq=100)
-
-      #SetActiveSource(filename_2_pvti)
-      #Slice1 = Slice( guiName="Slice1", Crinkleslice=0, SliceOffsetValues=[0.0], Triangulatetheslice=1, SliceType="Plane" )
-      #Slice1.SliceType.Offset = 0.0
-      #Slice1.SliceType.Origin = [9.0, 33.0, 28.6]
-      #Slice1.SliceType.Normal = [1.0, 0.0, 0.0]
-
-      # create a new 'Parallel PolyData Writer'
-      #parallelPolyDataWriter1 = servermanager.writers.XMLPPolyDataWriter(Input=Slice1)
-
-      # register the writer with coprocessor
-      # and provide it with information such as the filename to use,
-      # how frequently to write the data, etc.
-      #coprocessor.RegisterWriter(parallelPolyDataWriter1, filename='slice_%t.pvtp', freq=10)
-
     return Pipeline()
 
   class CoProcessor(coprocessing.CoProcessor):

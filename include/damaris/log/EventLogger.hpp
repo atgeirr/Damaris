@@ -84,12 +84,12 @@ public:
         return c;
     }
 
-    void Init(int processId , std::string file_name , int rotation_size , std::string log_format , int log_level);
+	void Init(int processId , const std::string& file_name , int rotation_size , const std::string& log_format , int log_level);
 
     /**
     * Logs the message basaed on the logLevel severity mode
     */
-    void Log(std::string message , EventLogger::LogLevel logLevel);
+	void Log(const std::string& message , EventLogger::LogLevel logLevel);
 };
 
 }

@@ -230,50 +230,50 @@ bool RectilinearMesh::ExposeVisItData(visit_handle* h,
 #ifdef HAVE_PARAVIEW_ENABLED
 
 bool RectilinearMesh::SetGridCoords(vtkDataSet* grid , int source , int iteration , int block ,
-                           std::shared_ptr<Variable> vx ,
-                           std::shared_ptr<Variable> vy ,
-						   std::shared_ptr<Variable> vz)
+						   const std::shared_ptr<Variable>& vx ,
+						   const std::shared_ptr<Variable>& vy ,
+						   const std::shared_ptr<Variable>& vz)
 {
     vtkRectilinearGrid* rectGrid = vtkRectilinearGrid::SafeDownCast(grid);
 
     if (vx != nullptr) {
         vtkDataArray* coordX = CreateCoordArray(source , iteration , block , vx );
         rectGrid->SetXCoordinates(coordX);
-        // coordX->Delete();    -------------- ?????
+		coordX->Delete();    //-------------- ?????
     }
 
     if (vy != nullptr) {
         vtkDataArray* coordY = CreateCoordArray(source , iteration , block , vy );
         rectGrid->SetYCoordinates(coordY);
-        // Ycoords->Delete(); ------------------ ???????
+		coordY->Delete(); //------------------ ???????
     }
 
     if (vz != nullptr) {
 		vtkDataArray* coordZ = CreateCoordArray(source , iteration , block , vz );
         rectGrid->SetZCoordinates(coordZ);
-        // coordZ->Delete(); ------------------ ???????
+		coordZ->Delete(); //------------------ ???????
     }
 
     return true;
 }
 
 
-bool RectilinearMesh::SetGridExtents(vtkDataSet* grid , std::shared_ptr<Variable> var, int source , int iteration , int block)
+bool RectilinearMesh::SetGridExtents(vtkDataSet* grid , int source , int iteration , int block ,
+									 const std::shared_ptr<Variable>& var)
 {
 	int extents[6];
     vtkRectilinearGrid* rectGrid = vtkRectilinearGrid::SafeDownCast(grid);
 
-    if (rectGrid != nullptr) {
-		std::shared_ptr<Block> b = GetCoordBlock(source , iteration , block , var);
-		b->GetExtents(extents);
+	if (rectGrid == nullptr) {
+		ERROR("Cannot downcast the parameter grid to vtkRectilinearGrid");
+		return false;
+	}
 
-		rectGrid->SetExtent(extents);
+	std::shared_ptr<Block> b = GetCoordBlock(source , iteration , block , var);
+	b->GetExtents(extents);
+	rectGrid->SetExtent(extents);
 
-		return true;
-    }
-
-    ERROR("Cannot downcast the parameter grid to vtkRectilinearGrid");
-    return false;
+	return true;
 }
 
 #endif

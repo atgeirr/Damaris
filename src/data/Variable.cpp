@@ -570,7 +570,7 @@ bool Variable::AddBlocksToVtkGrid(vtkMultiPieceDataSet* vtkMPGrid , int iteratio
     int serversNo = Environment::CountTotalServers();
     int serverId = Environment::GetEntityProcessID();
     int localBlocks = CountLocalBlocks(iteration);
-    vtkMPGrid->SetNumberOfPieces(localBlocks*serversNo);  //-------- Fix later - Will not work for multi mesh configs
+	vtkMPGrid->SetNumberOfPieces(localBlocks*serversNo);  // Ok for multiMesh apps???
 
     //Getting the variable type (e.g. long, int, etc.) from its layout
     auto type = GetLayout()->GetType();
@@ -587,7 +587,7 @@ bool Variable::AddBlocksToVtkGrid(vtkMultiPieceDataSet* vtkMPGrid , int iteratio
 
         // Get the vtkGrid from its mesh
 		std::shared_ptr<Mesh> mesh = GetMesh();
-		vtkDataSet* vtkGrid = mesh->GetVtkGrid(shared_from_this() ,  source , iteration , block);
+		vtkDataSet* vtkGrid = mesh->GetVtkGrid(source , iteration , block , shared_from_this());
 
         vtkMPGrid->SetPiece(serverId*localBlocks+index , vtkGrid);
         index++;

@@ -285,6 +285,12 @@ class Block //: public ENABLE_SHARED_FROM_THIS(Block)
 #endif
 
 #ifdef HAVE_PARAVIEW_ENABLED
+
+	/**
+	 * Returns the extents of the block
+	 * \param[in,out] extents : The extents array to be filled by this method
+	 * \param[in] withGhost : should the extents be return wither with ghosts or not?
+	 */
 	void GetExtents(int extents[6] , bool withGhost=true)
 	{
 		extents[0] = extents[1] = extents[2] = 0;

@@ -101,25 +101,54 @@ public:
 #ifdef HAVE_PARAVIEW_ENABLED
 protected:
 	template<typename T>
+
+	/**
+	 * Creates and returns a point array based on the passed coordinate varaibels
+	 *
+	 * \param[in] source : the source of the block
+	 * \param[in] iteration : the iteration of the block
+	 * \param[in] block : the block id
+	 * \param[in] vx : coordinate variable of the X direction
+	 * \param[in] vy : coordinate variable of the Y direction
+	 * \param[in] vz : coordinate variable of the Z direction
+	 */
     vtkDataArray* GetPointsArray(int source , int iteration , int block ,
-                                 std::shared_ptr<Variable> vx ,
-                                 std::shared_ptr<Variable> vy ,
-                                 std::shared_ptr<Variable> vz );
-    /**
-     * Sets the grid coordinates based on the passed values.
-     */
+								 const std::shared_ptr<Variable>& vx ,
+								 const std::shared_ptr<Variable>& vy ,
+								 const std::shared_ptr<Variable>& vz );
+	/**
+	 * Sets the grid coordinate variables based on the passed values.
+	 *
+	 * \param[in,out] grid : the expected grid
+	 * \param[in] source : the source of the expected block
+	 * \param[in] iteration : the Damaris iteration
+	 * \param[in] block : the block id of the expected block
+	 * \param[in] vx : the coordinate variable for X direction
+	 * \param[in] vy : the coordinate variable for Y direction
+	 * \param[in] vz : the coordinate variable for Z direction
+	 */
 	virtual bool SetGridCoords(vtkDataSet* grid , int source , int iteration , int block ,
-                               std::shared_ptr<Variable> vx ,
-                               std::shared_ptr<Variable> vy ,
-							   std::shared_ptr<Variable> vz);
-    /**
-     * Sets the curvilinear grid extetns.
-     */
-	bool SetGridExtents(vtkDataSet* grid , std::shared_ptr<Variable> var, int source , int iteration , int block);
-    /**
-     * This method creates an instance of Structured mesh and returns it.
-     */
-	virtual vtkDataSet* CreateVtkGrid() { return vtkStructuredGrid::New();  }
+							   const std::shared_ptr<Variable>& vx ,
+							   const std::shared_ptr<Variable>& vy ,
+							   const std::shared_ptr<Variable>& vz) override;
+	/**
+	 * Sets the grid extents.
+	 *
+	 * \param[in,out] grid : the expected grid for setting the extents
+	 * \param[in] source : the source of the expected block
+	 * \param[in] iteration : the Damaris iteration
+	 * \param[in] block : the block id of the expected block
+	 * \param[in] var : the variable
+	 */
+	bool SetGridExtents(vtkDataSet* grid , int source , int iteration , int block ,
+						const std::shared_ptr<Variable>& var) override;
+	/**
+	 * Simply creates a vtkStructuredGrid and returns it.
+	 */
+	virtual vtkDataSet* CreateVtkGrid() override
+	{
+		return vtkStructuredGrid::New();
+	}
 #endif  // of HAVE_PARAVIEW_ENABLED
 };
 

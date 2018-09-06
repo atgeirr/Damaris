@@ -84,6 +84,10 @@ void WriteCoordinates(simdata sim)
     damaris_write("coord/x" , XCoord);
     damaris_write("coord/y" , YCoord);
     damaris_write("coord/z" , ZCoord);
+
+	delete [] XCoord;
+	delete [] YCoord;
+	delete [] ZCoord;
 }
 
 void SimMainLoop(simdata& sim)

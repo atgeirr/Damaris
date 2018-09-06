@@ -61,6 +61,12 @@ protected:
     virtual ~ParaViewAdaptor() {
     }
 
+	/**
+	 * Fills the rootGrid with relevant sub-grids and fields data.
+	 *
+	 * \param[in] iteration : the Damaris iteration
+	 * \param[out] rootGrid : the root multi-block iteration that should be filled
+	 */
 	bool FillMultiBlockGrid(int iteration , vtkMultiBlockDataSet* rootGrid);
 
 public:
@@ -77,11 +83,15 @@ public:
     }
 
     /**
-    * Initiates the singleton object.
+	* Initiates the paraview adaptor object.
+	*
+	* \param[in] comm : mpi communicator of all clients (not includeing dedicated cores)
+	* \param[in] mdl : root model of the paraview section
+	* \param[in] simName : The simulation name specified in the xml file
     */
     void Initialize(MPI_Comm comm,
                     const model::Simulation::paraview_optional& mdl,
-                    const std::string& simname);
+					const std::string& simName);
 
     /**
     * Finalizes the CoProcessors of the singleton object.
@@ -90,13 +100,26 @@ public:
 
     /**
     * Updates ParaView Catalyst filters at the end of each iteration.
+	*
+	* \param[in] iteration : the Damaris iteration
+	* \param[in] lastTimeStep : determines if it is the last time step or not.
     */
     void CoProcess(int iteration , bool lastTimeStep=false);
 
     /**
-    * return a ParaView adaptor object based on the grid type defined in XML file
+	* returns a ParaView adaptor singleton object
+	*
+	* \param[in] mdl : root model of the paraview section
     */
     std::shared_ptr<ParaViewAdaptor> GetAdaptor(const model::Simulation::paraview_optional& mdl);
+
+	/**
+	* Calls the Delete() method on each object of the Grid hierarchy
+	*
+	* \param[in] vtkMBGrid : the root grid to be deleted with all of its child grids.
+	*/
+	void DeleteGridHierarchy(vtkMultiBlockDataSet* vtkMBGrid);
+
 };
 
 

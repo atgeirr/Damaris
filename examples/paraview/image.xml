@@ -10,7 +10,7 @@
                 <parameter name="WIDTH"  type="int" value="100" />
                 <parameter name="HEIGHT" type="int" value="100" />
                 <parameter name="DEPTH"  type="int" value="100" />
-                <parameter name="size"	 type="int" value="2"  />
+                <parameter name="size"	 type="int" value="4"  />
 
                 <layout name="cells"  type="double" dimensions="WIDTH,HEIGHT,DEPTH/size"
                         global="WIDTH,HEIGHT,DEPTH" ghosts="0:0,0:0,0:0" />

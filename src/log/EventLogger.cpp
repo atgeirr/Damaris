@@ -26,7 +26,7 @@ namespace damaris
 
 // We should always make sure that the serverity_level enum has the same items as LogLevel enum, othewise
 // the below casts are not valid anymore.
-void EventLogger::Init(int processId , std::string file_name , int rotation_size , std::string log_format , int log_level)
+void EventLogger::Init(int processId , const std::string& file_name , int rotation_size , const std::string& log_format , int log_level)
 {
     std::stringstream logFileName;
     logFileName << file_name << "_P" << processId << "_%N.log";
@@ -44,7 +44,7 @@ void EventLogger::Init(int processId , std::string file_name , int rotation_size
     logging::add_common_attributes();
 }
 
-void EventLogger::Log(std::string message , EventLogger::LogLevel logLevel) {
+void EventLogger::Log(const std::string& message , EventLogger::LogLevel logLevel) {
 
     src::severity_logger <severity_level> lg;
     logging::trivial::severity_level severity = (logging::trivial::severity_level)logLevel;

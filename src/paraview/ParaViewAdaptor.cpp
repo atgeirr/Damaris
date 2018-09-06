@@ -31,7 +31,7 @@ std::shared_ptr<ParaViewAdaptor> ParaViewAdaptor::instance_;
 
 void ParaViewAdaptor::Initialize(MPI_Comm comm,
                                 const model::Simulation::paraview_optional& mdl,
-                                const std::string& simname)
+								const std::string& simName)
 {
     if (processor_ == nullptr) {
         vtkMPICommunicatorOpaqueComm vtkMpiComm(&comm);
@@ -91,7 +91,8 @@ void ParaViewAdaptor::CoProcess(int iteration , bool lastTimeStep)
 		if (not FillMultiBlockGrid(iteration , rootGrid)) {
             ERROR("Error in Filling the root multi-block grid in iteration " << iteration);
             return;
-        }
+		}
+
 
         // Catalyst gets the proper input dataset for the pipeline.
 		dataDescription->GetInputDescriptionByName("input")->SetGrid(rootGrid);
@@ -99,7 +100,8 @@ void ParaViewAdaptor::CoProcess(int iteration , bool lastTimeStep)
         // Call Catalyst to execute the desired pipelines.
         processor_->CoProcess(dataDescription);
 
-		rootGrid->Delete();
+		// Call Delete() function on each grid in the hierarchy
+		DeleteGridHierarchy(rootGrid);
     }
 
     dataDescription->Delete();
@@ -120,6 +122,7 @@ bool ParaViewAdaptor::FillMultiBlockGrid(int iteration , vtkMultiBlockDataSet* r
 
         vtkMultiPieceDataSet* vtkMPGrid = vtkMultiPieceDataSet::New();
 		rootGrid->SetBlock(index , vtkMPGrid);
+
         index++;
 
         auto varItr = VariableManager::Begin();
@@ -138,8 +141,43 @@ bool ParaViewAdaptor::FillMultiBlockGrid(int iteration , vtkMultiBlockDataSet* r
             }
         }
     }
+
     return true;
 }
 
+void ParaViewAdaptor::DeleteGridHierarchy(vtkMultiBlockDataSet* vtkMBGrid)
+{
+	int nBlocks = vtkMBGrid->GetNumberOfBlocks();
+
+	for(int i=0; i< nBlocks ; i++) {
+		vtkMultiPieceDataSet* vtkMPGrid = vtkMultiPieceDataSet::SafeDownCast(vtkMBGrid->GetBlock(i));
+		int nPieces = vtkMPGrid->GetNumberOfPieces();
+
+		for(int j=0; j<nPieces ; j++) {
+			vtkDataSet* vtkDS = vtkMPGrid->GetPiece(j);
+
+			if (vtkDS != nullptr) {
+
+				// Uncommenting the lines below makes the program crash !
+				/*int nCellArray = vtkDS->GetCellData()->GetNumberOfArrays();
+				for(int k1=0; k1<nCellArray ; k1++) {
+					vtkDataArray* array = vtkDS->GetCellData()->GetArray(k1);
+					if (array != nullptr)
+						array->Delete();
+				}
+
+				int nPointArray = vtkDS->GetPointData()->GetNumberOfArrays();
+				for(int k2=0; k2<nPointArray ; k2++) {
+					vtkDataArray* array = vtkDS->GetPointData()->GetArray(k2);
+					array->Delete();
+				}*/
+
+				vtkDS->Delete();
+			}
+		}
+		vtkMPGrid->Delete();
+	}
+	vtkMBGrid->Delete();
+}
 
 } // end of namespace damaris

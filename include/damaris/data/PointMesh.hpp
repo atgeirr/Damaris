@@ -104,11 +104,16 @@ public:
 #endif
 
 #ifdef HAVE_PARAVIEW_ENABLED
-        /**
-         * Returns the relevant VTK mesh type
-         *
-         */
-		virtual vtkDataSet* GetVtkGrid(std::shared_ptr<damaris::Variable> var, int source , int iteration , int block);
+	/**
+	* creates and returns the expected VTK grid object for a block
+	*
+	* \param[in] source : source of the block
+	* \param[in] iteration : iteration of the block
+	* \param[in] block : id of the block
+	* \param[in] var : the variable owning the block
+	*/
+	virtual vtkDataSet* GetVtkGrid(int source , int iteration , int block ,
+									   const std::shared_ptr<damaris::Variable>& var) override;
 #endif
 
 };

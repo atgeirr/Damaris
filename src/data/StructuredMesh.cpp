@@ -61,14 +61,14 @@ bool StructuredMesh::GetGridVariables(std::shared_ptr<Variable>& vx ,
 }
 
 void* StructuredMesh::GetCoordBuffer(int source , int iteration , int block ,
-									 std::shared_ptr<Variable> var)
+									 const std::shared_ptr<Variable>& var)
 {
 	std::shared_ptr<Block> b = GetCoordBlock(source , iteration , block , var);
 	return b->GetDataSpace().GetData();
 }
 
 std::shared_ptr<Block> StructuredMesh::GetCoordBlock(int source , int iteration , int block ,
-													 std::shared_ptr<Variable> var)
+													 const std::shared_ptr<Variable>& var)
 {
 	std::shared_ptr<Block> b = var->GetBlock(source , iteration , block);
 
@@ -94,7 +94,7 @@ vtkDataArray* StructuredMesh::CreateTypedCoordArray(size_t length , T* pointer)
 }
 
 vtkDataArray* StructuredMesh::CreateCoordArray(int source , int iteration , int block ,
-                                               std::shared_ptr<Variable> var )
+											   const std::shared_ptr<Variable>& var )
 {
      model::Type type = var->GetLayout()->GetType();
 	 size_t layoutSize = var->GetLayout()->GetNumberOfItems();
@@ -122,7 +122,8 @@ vtkDataArray* StructuredMesh::CreateCoordArray(int source , int iteration , int 
      return nullptr;
 }
 
-vtkDataSet* StructuredMesh::GetVtkGrid(std::shared_ptr<Variable> var , int source , int iteration , int block)
+vtkDataSet* StructuredMesh::GetVtkGrid(int source , int iteration , int block ,
+									   const std::shared_ptr<Variable>& var)
 {
 	std::shared_ptr<Variable> vx = nullptr;
 	std::shared_ptr<Variable> vy = nullptr;
@@ -138,7 +139,7 @@ vtkDataSet* StructuredMesh::GetVtkGrid(std::shared_ptr<Variable> var , int sourc
 	}
 
 	// Setting the grid extents
-	if (not SetGridExtents(grid , var , source ,  iteration ,  block)) {
+	if (not SetGridExtents(grid , source ,  iteration ,  block , var)) {
 		ERROR("Setting the grid extents failed.");
 		return nullptr;
 	}
