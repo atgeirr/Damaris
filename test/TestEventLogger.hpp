@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 #include <cppunit/TestFixture.h>
 #include <cppunit/TestAssert.h>
 #include <cppunit/TestCaller.h>
@@ -20,25 +21,25 @@ class TestEventLogger : public CppUnit::TestFixture {
 	
 private:
 	std::shared_ptr<EventLogger> eventLogger_;
-	string fileName;
-	string logFileName;
+    std::string fileName;
+    std::string logFileName;
 
-	string traceMessage;
-	string debugMessage;
-	string infoMessage;
-	string warningMessage;
-	string errorMessage;
-	string fatalMessage;
+    std::string traceMessage;
+    std::string debugMessage;
+    std::string infoMessage;
+    std::string warningMessage;
+    std::string errorMessage;
+    std::string fatalMessage;
 
-	inline bool FileExists(const string& file_name) {
-		ifstream f(file_name.c_str());
+	inline bool FileExists(const std::string& file_name) {
+        std::ifstream f(file_name.c_str());
 		return f.good();
 	}
 
-	inline bool WordExistsInFile(const string& file_name , const string& word) {
+	inline bool WordExistsInFile(const std::string& file_name , const std::string& word) {
 
-		string line;
-		ifstream read_file;
+        std::string line;
+        std::ifstream read_file;
 
 		if (FileExists(file_name.c_str()) == false) return false;
 
@@ -46,7 +47,7 @@ private:
 
 		while( getline(read_file, line) )
 		{
-			if (line.find(word) != string::npos)
+			if (line.find(word) != std::string::npos)
 				return true;
 		}
 		return false;
@@ -99,12 +100,12 @@ protected:
 	}
 
 	void Log() {
-		eventLogger_->LogTrace(traceMessage);
-		eventLogger_->LogDebug(debugMessage);
-		eventLogger_->LogInfo(infoMessage);
-		eventLogger_->LogWarning(warningMessage);
-		eventLogger_->LogError(errorMessage);
-		eventLogger_->LogFatal(fatalMessage);
+		eventLogger_->Log(traceMessage, damaris::EventLogger::Trace);
+		eventLogger_->Log(debugMessage, damaris::EventLogger::Debug);
+		eventLogger_->Log(infoMessage,  damaris::EventLogger::Info);
+		eventLogger_->Log(warningMessage, damaris::EventLogger::Warning);
+		eventLogger_->Log(errorMessage, damaris::EventLogger::Error);
+		eventLogger_->Log(fatalMessage, damaris::EventLogger::Fatal);
 	}
 
 	void CheckLog() {
