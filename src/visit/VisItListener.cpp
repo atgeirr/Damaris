@@ -15,6 +15,7 @@ You should have received a copy of the GNU General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 
+#include <memory>
 #include <string>
 #include <string.h>
 #include <mpi.h>
@@ -235,7 +236,7 @@ void VisItListener::ControlCommandCallback(const char *cmd, const char *args,
 {
 	DBG("In VisItListener::ControlCommandCallback");
 	SimData* sim = (SimData*)(cbdata);
-	shared_ptr<Action> a = ActionManager::Search(std::string(cmd));
+    std::shared_ptr<Action> a = ActionManager::Search(std::string(cmd));
 	if(a == NULL) {
 		ERROR("Damaris received the event \"" << cmd 
 			<< "\" which does not correspond to "
@@ -312,7 +313,7 @@ visit_handle VisItListener::GetMesh(int domain, const char *name, void *cbdata)
 {
 	DBG("Entering VisItListener::GetMesh for mesh " << name << ", domain is " << domain);
 	SimData *s = (SimData*)cbdata;
-	shared_ptr<Mesh> m = MeshManager::Search(name);
+    std::shared_ptr<Mesh> m = MeshManager::Search(name);
 	visit_handle h = VISIT_INVALID_HANDLE;
 	if(m != NULL) {
 		DBG("Mesh found, exposing data, iteration is " << s->iteration_);
@@ -331,7 +332,7 @@ visit_handle VisItListener::GetMesh(int domain, const char *name, void *cbdata)
 visit_handle VisItListener::GetCurve(const char *name, void *cbdata)
 {
 	SimData *s = (SimData*)cbdata;
-	shared_ptr<Curve> c = CurveManager::Search(name);
+    std::shared_ptr<Curve> c = CurveManager::Search(name);
 	visit_handle h = VISIT_INVALID_HANDLE;
 	if(c != NULL) {
 		c->ExposeVisItData(&h,s->iteration_);
@@ -344,7 +345,7 @@ visit_handle VisItListener::GetVariable(int domain, const char *name, void *cbda
 	DBG("Entering VisItListener::GetVariable for variable " << name);
 	SimData *s = (SimData*)cbdata;
 	DBG("In GetVariable, iteration is " << s->iteration_ << ", domain is " << domain);
-	shared_ptr<Variable> v = VariableManager::Search(name);
+    std::shared_ptr<Variable> v = VariableManager::Search(name);
 	visit_handle h = VISIT_INVALID_HANDLE;
 	if(v != NULL) {
 		std::list<int> clients = Environment::GetKnownLocalClients();
