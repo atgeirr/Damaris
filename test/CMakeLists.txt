@@ -1,3 +1,5 @@
+configure_file(test.xml test.xml COPYONLY)
+	
 add_executable(TestDataSpace TestDataSpace.cpp)
 target_link_libraries(TestDataSpace ${DEP_LIBRARIES} ${CPPUNIT_LIBRARIES})
 
