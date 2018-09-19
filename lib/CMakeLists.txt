@@ -107,8 +107,13 @@ write_basic_package_version_file(
 		VERSION ${DAMARIS_VERSION}
 		COMPATIBILITY AnyNewerVersion)
 
+# TODO
 # generate our config file for find_package()
-configure_file(damaris-config.cmake.in damaris-config.cmake @ONLY)
+# configure_file(damaris-config.cmake.in damaris-config.cmake @ONLY)
+
+# TODO
+# generate pkg-config file
+# configure_file(damaris.pc.in damaris.pc @ONLY)
 
 #----------------------------------------------------------------------------#
 # Installation process
@@ -122,6 +127,8 @@ install(EXPORT damaris-targets
 install(FILES  "${CMAKE_CURRENT_BINARY_DIR}/damaris-config.cmake"
 		"${CMAKE_CURRENT_BINARY_DIR}/damaris-config-version.cmake"
 		DESTINATION ${DAMARIS_PKG} )
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/damaris.pc"
+	DESTINATION lib/pkgconfig)
 install(FILES "${DAMARIS_SOURCE_DIR}/include/Damaris.h" DESTINATION include)
 install(DIRECTORY "${DAMARIS_SOURCE_DIR}/include/damaris" DESTINATION include)
 if(CMAKE_Fortran_COMPILER)
