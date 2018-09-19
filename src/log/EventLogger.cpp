@@ -24,6 +24,9 @@ using namespace logging::trivial;
 namespace damaris
 {
 
+// this should be the only time we use a boost::shared_ptr
+static boost::shared_ptr<boost::log::sinks::synchronous_sink<boost::log::sinks::text_file_backend>> pLogSink;
+
 // We should always make sure that the serverity_level enum has the same items as LogLevel enum, othewise
 // the below casts are not valid anymore.
 void EventLogger::Init(int processId , const std::string& file_name , int rotation_size , const std::string& log_format , int log_level)
@@ -31,7 +34,7 @@ void EventLogger::Init(int processId , const std::string& file_name , int rotati
     std::stringstream logFileName;
     logFileName << file_name << "_P" << processId << "_%N.log";
 
-    logging::add_file_log(
+    pLogSink = logging::add_file_log(
                     keywords::file_name = logFileName.str(),                                           /*< file name pattern >*/
                     keywords::rotation_size = rotation_size * 1024 * 1024,                             /*< rotate files every 10 MiB... >*/
                    // keywords::time_based_rotation = sinks::file::rotation_at_time_point(0, 0, 0),    /*< ...or at midnight >*/
@@ -50,6 +53,12 @@ void EventLogger::Log(const std::string& message , EventLogger::LogLevel logLeve
     logging::trivial::severity_level severity = (logging::trivial::severity_level)logLevel;
 
     BOOST_LOG_SEV(lg, severity) << message;
+}
+
+void EventLogger::Flush() {
+    if(pLogSink) {
+        pLogSink->flush();
+    }
 }
 
 } //namespace damaris

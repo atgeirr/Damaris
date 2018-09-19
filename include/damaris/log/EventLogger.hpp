@@ -90,6 +90,11 @@ public:
     * Logs the message basaed on the logLevel severity mode
     */
 	void Log(const std::string& message , EventLogger::LogLevel logLevel);
+
+    /**
+     * Forces the log file to be flushed.
+     */
+    void Flush();
 };
 
 }
