@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstdio>
 #include <string>
 #include <cppunit/TestFixture.h>
 #include <cppunit/TestAssert.h>
@@ -6,11 +7,6 @@
 #include <cppunit/TestSuite.h>
 #include <cppunit/TestCase.h>
 
-//#include <mpi.h>
-
-//#include "util/Unused.hpp"
-//#include "comm/Channel.hpp"
-//#include "comm/Reactor.hpp"
 #include "log/EventLogger.hpp"
 
 
@@ -41,7 +37,7 @@ private:
         std::string line;
         std::ifstream read_file;
 
-		if (FileExists(file_name.c_str()) == false) return false;
+		if (!FileExists(file_name)) return false;
 
 		read_file.open(file_name.c_str());
 
@@ -63,6 +59,9 @@ public:
 		warningMessage = "Warning Log Message";
 		errorMessage = "Error Log Message";
 		fatalMessage = "Fatal Log Message";
+
+		fileName = "/tmp/TestEventLogger";
+		logFileName = "/tmp/TestEventLogger_P2_0.log";
 	}
 
 	virtual ~TestEventLogger() {}
@@ -89,14 +88,12 @@ public:
 protected:
 	void InitiateEventLogger() {
 
-		fileName = "./TestEventLogger";
-		logFileName = "./TestEventLogger_P2_0.log";
 
 		eventLogger_->Init(2 /*rank*/,
 						   fileName /*log file*/,
 						   1 /*rotation_size - MB*/ ,
 						   "[%TimeStamp%]: %Message%" /*Msg Format*/,
-						   1 /*Log Level - Info*/);
+						   2 /*Log Level - Info*/);
 	}
 
 	void Log() {
@@ -106,10 +103,11 @@ protected:
 		eventLogger_->Log(warningMessage, damaris::EventLogger::Warning);
 		eventLogger_->Log(errorMessage, damaris::EventLogger::Error);
 		eventLogger_->Log(fatalMessage, damaris::EventLogger::Fatal);
-	}
+        eventLogger_->Flush();
+    }
 
 	void CheckLog() {
-		FileExists(logFileName);
+		CPPUNIT_ASSERT(FileExists(logFileName));
 
 		CPPUNIT_ASSERT(WordExistsInFile(logFileName , traceMessage) == false);
 		CPPUNIT_ASSERT(WordExistsInFile(logFileName , debugMessage) == false);
@@ -117,7 +115,8 @@ protected:
 		CPPUNIT_ASSERT(WordExistsInFile(logFileName , warningMessage) == true);
 		CPPUNIT_ASSERT(WordExistsInFile(logFileName , errorMessage) == true);
 		CPPUNIT_ASSERT(WordExistsInFile(logFileName , fatalMessage) == true);
-	}
+        remove(logFileName.c_str());
+    }
 };
 
 
