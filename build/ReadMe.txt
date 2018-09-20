@@ -221,9 +221,59 @@ the lib folder and the headers in the include folder.
 6) Building with VisIt support
 ------------------------------
 
-Building VisIt is challening enough that we won't go into detail here.
+Building VisIt's LibSim is challening enough that we won't go into detail
+here. In most cases, it is sufficient to download the build_visitX_Y_Z
+script (recommanded version is 2.13.2) from
+https://wci.llnl.gov/simulation/computer-codes/visit/source
+and call the following command:
+
+./build_visit2_10_3 --server-components-only --mesa --system-cmake \
+	--system-python --parallel --prefix $HOME/local
+
+Remove --system-cmake if you don't have cmake installed on your platform.
+Remove --system-python if you don't have python (including development
+libraries) installed on your platform.
+Change $HOME/local if you want it installed in another directory.
+
+Once the procedure completes, VisIt is installed and you can enable
+it using Damaris' cmake flags:
+
+    -DENABLE_VISIT=ON \
+    -DVisIt_ROOT=$HOME/local/visit
+
+Note that if you install Damaris and VisIt on a Docker image or directly
+using the env_prep.sh script, you can enable VisIt simply by toggling
+install_visit=1 in env_prep.sh.
+
 
 7) Building with Catalyst support
 ---------------------------------
 
-TODO
+At the time of writing this, spack fails to install its catalyst package. 
+Hence we will need to build it manually.
+
+First, download one of the Catalyst archives here:
+https://www.paraview.org/download/
+(this tutorial has been tested with 
+Catalyst-v5.6.0-RC1-Base-Enable-Python-Essentials-Extras-Rendering-Base)
+
+Run the following command (adapting to the version of Catalyst you wish
+to install):
+
+    tar xvf Catalyst-<selected-version>.tar.gz
+    cd Catalyst-<selected-version>
+    mkdir build
+    cd build
+    ../cmake.sh .. -DCMAKE_INSTALL_PREFIX=$HOME/local
+    make
+    make install
+
+You can of course change the prefix where Catalyst will be installed.
+
+Now you can add the following cmake flags when building Damaris to enable
+Catalyst:
+
+    -DENABLE_CATALYST=ON \
+    -DParaView_DIR=$HOME/local/lib/cmake/paraview-5.6
+
+Again, adapt the second line if you installed Catalyst somewhere else.
