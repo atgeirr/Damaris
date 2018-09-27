@@ -20,6 +20,11 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdlib.h>
 #include <mpi.h>
 
+#define DAMARIS_VERSION_MAJOR @DAMARIS_VERSION_MAJOR@
+#define DAMARIS_VERSION_MINOR @DAMARIS_VERSION_MINOR@
+#define DAMARIS_VERSION_PATCH @DAMARIS_VERSION_PATCH@
+#define DAMARIS_VERSION "@DAMARIS_VERSION@"
+
 #cmakedefine HAVE_VISIT_ENABLED
 #cmakedefine HAVE_HDF5_ENABLED
 #cmakedefine HAVE_PARAVIEW_ENABLED

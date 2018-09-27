@@ -69,6 +69,7 @@ add_definitions (-D__INFO)
 #----------------------------------------------------------------------------#
 include_directories(${DAMARIS_SOURCE_DIR}/include)
 include_directories(${DAMARIS_SOURCE_DIR}/include/damaris)
+include_directories(${CMAKE_BINARY_DIR}/include)
 
 #----------------------------------------------------------------------------#
 # Set everything related to the Boost libraries
@@ -160,7 +161,7 @@ endfunction()
 # Configure Damaris
 #----------------------------------------------------------------------------#
 CONFIGURE_FILE(${DAMARIS_SOURCE_DIR}/include/Damaris.h.in 
-	       ${DAMARIS_SOURCE_DIR}/include/Damaris.h)
+	       ${CMAKE_BINARY_DIR}/include/Damaris.h)
 
 #----------------------------------------------------------------------------#
 # Add the proper subdirectories

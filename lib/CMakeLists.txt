@@ -1,7 +1,7 @@
 # load package helper for generating cmake CONFIG packages
 include (CMakePackageConfigHelpers)
 
-include_directories(${CMAKE_BINARY_DIR})
+#include_directories(${CMAKE_BINARY_DIR}/include)
 
 # where to install files for "find_package"
 set(DAMARIS_PKG "share/cmake/damaris")
@@ -39,11 +39,11 @@ set(DAMARIS_SRC
 	${DAMARIS_SOURCE_DIR}/src/comm/Reactor.cpp
 	${DAMARIS_SOURCE_DIR}/src/comm/MPI2Reactor.cpp
 	${DAMARIS_SOURCE_DIR}/src/buffer/SharedMemorySegment.cpp
-	${DAMARIS_SOURCE_DIR}/src/model/Model.cpp
 	${DAMARIS_SOURCE_DIR}/src/model/BcastXML.cpp
 	${DAMARIS_SOURCE_DIR}/src/log/EventLogger.cpp
 	${DAMARIS_SOURCE_DIR}/src/storage/StorageManager.cpp
 	${DAMARIS_SOURCE_DIR}/src/storage/NullStore.cpp
+	${CMAKE_BINARY_DIR}/src/model/Model.cpp
 	)
 
 # if Damaris is compiled with VisIt
@@ -87,15 +87,16 @@ set_source_files_properties(
 		PROPERTIES GENERATED 1)
 add_dependencies(damaris XSDModel)
 add_custom_target(XSDModel DEPENDS ${DAMARIS_SOURCE_DIR}/src/model/Model.cpp)
-set(XSD_ARGS 	--output-dir ${DAMARIS_SOURCE_DIR}/src/model
+set(XSD_ARGS 	--output-dir ${CMAKE_BINARY_DIR}/src/model
 		--type-naming knr 
 		--hxx-suffix .hpp 
 		--cxx-suffix .cpp 
                 --std       c++11
 		${DAMARIS_SOURCE_DIR}/src/model/Model.xsd) 
 add_custom_command(OUTPUT ${DAMARIS_SOURCE_DIR}/src/model/Model.cpp
+		COMMAND mkdir -p ${CMAKE_BINARY_DIR}/src/model
 		COMMAND ${XSD_EXECUTABLE} ARGS "cxx-tree" ${XSD_ARGS}
-		COMMAND cp ARGS ${DAMARIS_SOURCE_DIR}/src/model/Model.hpp ${DAMARIS_SOURCE_DIR}/include/damaris/model/Model.hpp
+#		COMMAND cp ARGS ${DAMARIS_SOURCE_DIR}/src/model/Model.hpp ${DAMARIS_SOURCE_DIR}/include/damaris/model/Model.hpp
 		DEPENDS ${DAMARIS_SOURCE_DIR}/src/model/Model.xsd
 		COMMENT "Generating C++/XML mapping")
 
@@ -129,7 +130,7 @@ install(FILES  "${CMAKE_CURRENT_BINARY_DIR}/damaris-config.cmake"
 		DESTINATION ${DAMARIS_PKG} )
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/damaris.pc"
 	DESTINATION lib/pkgconfig)
-install(FILES "${DAMARIS_SOURCE_DIR}/include/Damaris.h" DESTINATION include)
+install(FILES "${CMAKE_BINARY_DIR}/include/Damaris.h" DESTINATION include)
 install(DIRECTORY "${DAMARIS_SOURCE_DIR}/include/damaris" DESTINATION include)
 if(CMAKE_Fortran_COMPILER)
   install(FILES "${CMAKE_BINARY_DIR}/lib/damaris.mod" DESTINATION include)
