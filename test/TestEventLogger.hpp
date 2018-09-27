@@ -1,15 +1,12 @@
 #include <iostream>
+#include <cstdio>
+#include <string>
 #include <cppunit/TestFixture.h>
 #include <cppunit/TestAssert.h>
 #include <cppunit/TestCaller.h>
 #include <cppunit/TestSuite.h>
 #include <cppunit/TestCase.h>
 
-//#include <mpi.h>
-
-//#include "util/Unused.hpp"
-//#include "comm/Channel.hpp"
-//#include "comm/Reactor.hpp"
 #include "log/EventLogger.hpp"
 
 
@@ -20,33 +17,33 @@ class TestEventLogger : public CppUnit::TestFixture {
 	
 private:
 	std::shared_ptr<EventLogger> eventLogger_;
-	string fileName;
-	string logFileName;
+    std::string fileName;
+    std::string logFileName;
 
-	string traceMessage;
-	string debugMessage;
-	string infoMessage;
-	string warningMessage;
-	string errorMessage;
-	string fatalMessage;
+    std::string traceMessage;
+    std::string debugMessage;
+    std::string infoMessage;
+    std::string warningMessage;
+    std::string errorMessage;
+    std::string fatalMessage;
 
-	inline bool FileExists(const string& file_name) {
-		ifstream f(file_name.c_str());
+	inline bool FileExists(const std::string& file_name) {
+        std::ifstream f(file_name.c_str());
 		return f.good();
 	}
 
-	inline bool WordExistsInFile(const string& file_name , const string& word) {
+	inline bool WordExistsInFile(const std::string& file_name , const std::string& word) {
 
-		string line;
-		ifstream read_file;
+        std::string line;
+        std::ifstream read_file;
 
-		if (FileExists(file_name.c_str()) == false) return false;
+		if (!FileExists(file_name)) return false;
 
 		read_file.open(file_name.c_str());
 
 		while( getline(read_file, line) )
 		{
-			if (line.find(word) != string::npos)
+			if (line.find(word) != std::string::npos)
 				return true;
 		}
 		return false;
@@ -62,6 +59,9 @@ public:
 		warningMessage = "Warning Log Message";
 		errorMessage = "Error Log Message";
 		fatalMessage = "Fatal Log Message";
+
+		fileName = "/tmp/TestEventLogger";
+		logFileName = "/tmp/TestEventLogger_P2_0.log";
 	}
 
 	virtual ~TestEventLogger() {}
@@ -88,27 +88,26 @@ public:
 protected:
 	void InitiateEventLogger() {
 
-		fileName = "./TestEventLogger";
-		logFileName = "./TestEventLogger_P2_0.log";
 
 		eventLogger_->Init(2 /*rank*/,
 						   fileName /*log file*/,
 						   1 /*rotation_size - MB*/ ,
 						   "[%TimeStamp%]: %Message%" /*Msg Format*/,
-						   1 /*Log Level - Info*/);
+						   2 /*Log Level - Info*/);
 	}
 
 	void Log() {
-		eventLogger_->LogTrace(traceMessage);
-		eventLogger_->LogDebug(debugMessage);
-		eventLogger_->LogInfo(infoMessage);
-		eventLogger_->LogWarning(warningMessage);
-		eventLogger_->LogError(errorMessage);
-		eventLogger_->LogFatal(fatalMessage);
-	}
+		eventLogger_->Log(traceMessage, damaris::EventLogger::Trace);
+		eventLogger_->Log(debugMessage, damaris::EventLogger::Debug);
+		eventLogger_->Log(infoMessage,  damaris::EventLogger::Info);
+		eventLogger_->Log(warningMessage, damaris::EventLogger::Warning);
+		eventLogger_->Log(errorMessage, damaris::EventLogger::Error);
+		eventLogger_->Log(fatalMessage, damaris::EventLogger::Fatal);
+        eventLogger_->Flush();
+    }
 
 	void CheckLog() {
-		FileExists(logFileName);
+		CPPUNIT_ASSERT(FileExists(logFileName));
 
 		CPPUNIT_ASSERT(WordExistsInFile(logFileName , traceMessage) == false);
 		CPPUNIT_ASSERT(WordExistsInFile(logFileName , debugMessage) == false);
@@ -116,7 +115,8 @@ protected:
 		CPPUNIT_ASSERT(WordExistsInFile(logFileName , warningMessage) == true);
 		CPPUNIT_ASSERT(WordExistsInFile(logFileName , errorMessage) == true);
 		CPPUNIT_ASSERT(WordExistsInFile(logFileName , fatalMessage) == true);
-	}
+        remove(logFileName.c_str());
+    }
 };
 
 

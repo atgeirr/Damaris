@@ -1,4 +1,10 @@
+# load package helper for generating cmake CONFIG packages
+include (CMakePackageConfigHelpers)
+
 include_directories(${CMAKE_BINARY_DIR})
+
+# where to install files for "find_package"
+set(DAMARIS_PKG "share/cmake/damaris")
 
 set(DAMARIS_SRC
 	${DAMARIS_SOURCE_DIR}/src/main/Damaris.cpp
@@ -41,59 +47,90 @@ set(DAMARIS_SRC
 	)
 
 # if Damaris is compiled with VisIt
-if(VisIt_FOUND)
-set(DAMARIS_VISIT_SRC
-	${DAMARIS_SOURCE_DIR}/src/visit/VisItListener.cpp
-	)
-endif(VisIt_FOUND)
+if(ENABLE_VISIT)
+  set(DAMARIS_VISIT_SRC ${DAMARIS_SOURCE_DIR}/src/visit/VisItListener.cpp)
+endif(ENABLE_VISIT)
 
 # if Damairs is compiled with HDF5
-if(HDF5_FOUND)
-set(DAMARIS_HDF5_SRC
-	${DAMARIS_SOURCE_DIR}/src/storage/HDF5Store.cpp
-	)
-endif(HDF5_FOUND)
+if(ENABLE_HDF5)
+ set(DAMARIS_HDF5_SRC ${DAMARIS_SOURCE_DIR}/src/storage/HDF5Store.cpp)
+endif(ENABLE_HDF5)
 
 # if Damaris is compiled with ParaView
-if(ParaView_FOUND)
-set(DAMARIS_PARAVIEW_SRC
-        ${DAMARIS_SOURCE_DIR}/src/paraview/ParaViewAdaptor.cpp
-        )
-endif(ParaView_FOUND)
+if(ENABLE_CATALYST)
+  set(DAMARIS_PARAVIEW_SRC ${DAMARIS_SOURCE_DIR}/src/paraview/ParaViewAdaptor.cpp)
+endif(ENABLE_CATALYST)
 
-if(CMAKE_Fortran_COMPILER)
-set(DAMARIS_FORTRAN_MODULE 
-	${DAMARIS_SOURCE_DIR}/src/main/Damaris.F90
-	)
-endif(CMAKE_Fortran_COMPILER)
+# if Damaris is compiled with Fortran support
+if(ENABLE_FORTRAN)
+  set(DAMARIS_FORTRAN_MODULE ${DAMARIS_SOURCE_DIR}/src/main/Damaris.F90)
+endif(ENABLE_FORTRAN)
 
-add_library (damaris 	${DAMARIS_SRC} 
+add_library(damaris 	${DAMARIS_SRC}
 			${DAMARIS_VISIT_SRC}
 			${DAMARIS_HDF5_SRC} 
                         ${DAMARIS_PARAVIEW_SRC}
 			${DAMARIS_FORTRAN_MODULE})
+target_include_directories(damaris PUBLIC $<INSTALL_INTERFACE:include>)
+# local include's BEFORE, in case old incompatable .h files in prefix/include
+target_include_directories(damaris BEFORE PUBLIC
+		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>)
 
-if(NOT (MODEL_PRESENT EQUAL 1))
+# for shared libs, establish the lib version
+set_target_properties(damaris
+		PROPERTIES VERSION ${DAMARIS_VERSION}
+		SOVERSION ${DAMARIS_VERSION_MAJOR})
 
+# add the Dependency on XSD-generated files
 set_source_files_properties(
 		${CMAKE_BINARY_DIR}/src/model/Model.cpp
 		PROPERTIES GENERATED 1)
-
 add_dependencies(damaris XSDModel)
-
 add_custom_target(XSDModel DEPENDS ${DAMARIS_SOURCE_DIR}/src/model/Model.cpp)
-
 set(XSD_ARGS 	--output-dir ${DAMARIS_SOURCE_DIR}/src/model
 		--type-naming knr 
 		--hxx-suffix .hpp 
 		--cxx-suffix .cpp 
                 --std       c++11
 		${DAMARIS_SOURCE_DIR}/src/model/Model.xsd) 
-
 add_custom_command(OUTPUT ${DAMARIS_SOURCE_DIR}/src/model/Model.cpp
 		COMMAND ${XSD_EXECUTABLE} ARGS "cxx-tree" ${XSD_ARGS}
 		COMMAND cp ARGS ${DAMARIS_SOURCE_DIR}/src/model/Model.hpp ${DAMARIS_SOURCE_DIR}/include/damaris/model/Model.hpp
 		DEPENDS ${DAMARIS_SOURCE_DIR}/src/model/Model.xsd
 		COMMENT "Generating C++/XML mapping")
 
-endif()
+#
+# installation stuff (packaging and install commands)
+#
+write_basic_package_version_file(
+		"damaris-config-version.cmake"
+		VERSION ${DAMARIS_VERSION}
+		COMPATIBILITY AnyNewerVersion)
+
+# TODO
+# generate our config file for find_package()
+# configure_file(damaris-config.cmake.in damaris-config.cmake @ONLY)
+
+# TODO
+# generate pkg-config file
+# configure_file(damaris.pc.in damaris.pc @ONLY)
+
+#----------------------------------------------------------------------------#
+# Installation process
+#----------------------------------------------------------------------------#
+install(TARGETS damaris EXPORT damaris-targets
+		ARCHIVE DESTINATION lib 
+		LIBRARY DESTINATION lib)
+install(EXPORT damaris-targets
+		DESTINATION ${DAMARIS_PKG}
+		FILE "damaris-targets.cmake")
+install(FILES  "${CMAKE_CURRENT_BINARY_DIR}/damaris-config.cmake"
+		"${CMAKE_CURRENT_BINARY_DIR}/damaris-config-version.cmake"
+		DESTINATION ${DAMARIS_PKG} )
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/damaris.pc"
+	DESTINATION lib/pkgconfig)
+install(FILES "${DAMARIS_SOURCE_DIR}/include/Damaris.h" DESTINATION include)
+install(DIRECTORY "${DAMARIS_SOURCE_DIR}/include/damaris" DESTINATION include)
+if(CMAKE_Fortran_COMPILER)
+  install(FILES "${CMAKE_BINARY_DIR}/lib/damaris.mod" DESTINATION include)
+endif(CMAKE_Fortran_COMPILER)

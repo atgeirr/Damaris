@@ -6,14 +6,12 @@
 # are installed on $install_path, so please change this variable before 
 # running, if you need to change it. 
 
-
-
 install_visit=0
-install_hdf5=0
-
+install_hdf5=1
+make_jobs=1
 mpi_impl=mpich  # either mpich or openmpi
 
-export install_path=$HOME/local
+export install_path=$HOME/damaris-work/sw
 
 export PATH=$install_path/bin:$PATH
 export LD_LIBRARY_PATH=$install_path/lib:$LD_LIBRARY_PATH
@@ -27,13 +25,12 @@ tempdir=$(pwd)
 
 echo -e "--- COMPILING & INSTALLING CMAKE ---------------------------------------------------------------\n"
 # Installing cmake
-wget --no-check-certificate http://www.cmake.org/files/v3.0/cmake-3.0.1.tar.gz
-tar -xzf cmake-3.0.1.tar.gz
-cd cmake-3.0.1
+wget --no-check-certificate http://www.cmake.org/files/v3.11/cmake-3.11.4.tar.gz
+tar -xzf cmake-3.11.4.tar.gz
+cd cmake-3.11.4
 ./bootstrap --prefix=$install_path
-make 
+make -j$make_jobs
 make install
-
 
 echo -e "--- COMPILING & INSTALLING MPI LIBRARY -----------------------------------------------------------\n"
 cd $tempdir
@@ -43,14 +40,14 @@ if [ $mpi_impl == mpich ]; then
   tar -xzf mpich2-1.5rc3.tar.gz
   cd mpich2-1.5rc3
   ./configure --prefix=$install_path --enable-shared --enable-romio --enable-fc 2>&1 | tee c.txt
-  make 2>&1 | tee m.txt
+  make -j$make_jobs 2>&1 | tee m.txt
   make install 2>&1 | tee mi.txt
 else
   wget --no-check-certificate https://www.open-mpi.org/software/ompi/v2.1/downloads/openmpi-2.1.0.tar.gz
   tar -xzf openmpi-2.1.0.tar.gz
   cd openmpi-2.1.0
   ./configure --prefix=$install_path --enable-shared
-  make
+  make -j$make_jobs
   make install
 fi
 
@@ -62,17 +59,17 @@ wget --no-check-certificate https://archive.apache.org/dist/xerces/c/3/sources/x
 tar -xzf xerces-c-3.1.4.tar.gz
 cd xerces-c-3.1.4
 ./configure --prefix=$install_path --disable-threads --disable-network
-make
+make -j$make_jobs
 make install
 
 
 echo -e "--- COMPILING & INSTALLING XSD ---------------------------------------------------------------\n"
 # Installing xsd
 cd $tempdir
-wget   http://www.codesynthesis.com/download/xsd/4.0/xsd-4.0.0+dep.tar.bz2
+wget http://www.codesynthesis.com/download/xsd/4.0/xsd-4.0.0+dep.tar.bz2
 tar -xjf xsd-4.0.0+dep.tar.bz2
-cd  xsd-4.0.0+dep
-make LDFLAGS="-L${install_path}/lib/" CFLAGS="-I ${install_path}/include" CXXFLAGS="-I ${install_path}/include/"
+cd xsd-4.0.0+dep
+make -j$make_jobs LDFLAGS="-L${install_path}/lib/" CFLAGS="-I ${install_path}/include" CXXFLAGS="-I ${install_path}/include/"
 make install_prefix=$install_path install LDFLAGS="-L${install_path}/lib/" CFLAGS="-I ${install_path}/include" 
 CXXFLAGS="-I ${install_path}/include/"
 
@@ -80,9 +77,9 @@ CXXFLAGS="-I ${install_path}/include/"
 echo -e "--- COMPILING & INSTALLING BOOST ---------------------------------------------------------------\n"
 # Installing boost
 cd $tempdir
-wget --no-check-certificate http://sourceforge.net/projects/boost/files/boost/1.62.0/boost_1_62_0.tar.gz
-tar -xzf boost_1_62_0.tar.gz
-cd boost_1_62_0
+wget --no-check-certificate http://sourceforge.net/projects/boost/files/boost/1.67.0/boost_1_67_0.tar.gz
+tar -xzf boost_1_67_0.tar.gz
+cd boost_1_67_0
 ./bootstrap.sh --prefix=$install_path --with-libraries=thread,log,date_time,program_options,filesystem,system
 ./b2 threading=multi,single
 ./b2 install
@@ -95,7 +92,7 @@ wget --no-check-certificate  http://sourceforge.net/projects/cppunit/files/cppun
 tar -xzf cppunit-1.12.1.tar.gz
 cd cppunit-1.12.1
 ./configure --prefix=$install_path
-make
+make -j$make_jobs
 make install
 
 
@@ -107,8 +104,9 @@ if [ $install_hdf5 = 1 ]; then
     tar -xvf hdf5-1.8.20.tar
     cd hdf5-1.8.20
     ./configure --enable-parallel --prefix=$install_path
-    make
+    make -j$make_jobs
     make install
+    hdf5_arg="-DENABLE_HDF5=ON -DHDF5_ROOT=$install_path"
 fi
 
 echo -e "--- COMPILING & INSTALLING VISIT -----------------------------------------------------------------\n"
@@ -117,18 +115,29 @@ if [ $install_visit = 1 ]; then
   cd $tempdir
   mkdir visit
   cd visit
-  wget http://portal.nersc.gov/project/visit/releases/2.10.3/build_visit2_10_3
-  chmod +x build_visit2_10_3
-  ./build_visit2_10_3 --server-components-only --mesa --system-cmake --parallel --prefix $install_path/visit
+  wget http://portal.nersc.gov/project/visit/releases/2.13.2/build_visit2_13_2
+  chmod +x build_visit2_13_2
+  ./build_visit2_13_2 --server-components-only --mesa --system-cmake --parallel --prefix $install_path/visit
+  visit_arg="-DENABLE_VISIT=ON -DVisIt_ROOT=$install_path"
 fi
 
 
 # echo -e "--- COMPILING & INSTALLING DAMARIS ---------------------------------------------------------------\n"
 # compiling and installing Damaris
 cd $tempdir
-cd ..
-cd ..
-cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX:PATH=$install_path
-make
+mkdir damaris-build
+cd damaris-build
+cmake ../../.. -DCMAKE_INSTALL_PREFIX:PATH=$install_path \
+	-DBOOST_ROOT=$install_path \
+	-DXSD_ROOT=$install_path \
+	-DXERCESC_ROOT=$install_path \
+	-DCMAKE_CXX_COMPILER=mpicxx \
+	-DCMAKE_C_COMPILER=mpicc \
+	-DENABLE_TESTS=ON \
+	-DCppUnit_ROOT=$install_path \
+	-DBUILD_SHARED_LIBS=ON \
+	$visit_arg \
+	$hdf5_arg
+make -j$make_jobs
 make install
 

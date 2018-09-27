@@ -2,9 +2,8 @@
 <simulation name="life" language="c" 
 	xmlns="http://damaris.gforge.inria.fr/damaris/model">
 	<architecture>
-		<cores  count="3">
-			<clients count="2"/>
-		</cores>
+		<domains count="1"/>
+		<dedicated cores="1" nodes="0" />
 		<buffer name="buffer" size="67108864" />
 		<queue  name="queue" size="100" />
 	</architecture>
@@ -39,6 +38,5 @@
 	</storage>
 	<actions>
 		<event name="test_event" action="my_function" scope="core" />
-		<script name="test_script" language="python" file="test.py" />
 	</actions>
 </simulation>

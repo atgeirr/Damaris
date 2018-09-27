@@ -107,7 +107,6 @@ class Mesh : public Configurable<model::Mesh> {
 
 
 #ifdef HAVE_VISIT_ENABLED
-        vtkDataObject* vtkGrid;
         /**
 		 * Fills visit handle with metadata related to the Mesh.
 		 *
@@ -128,6 +127,7 @@ class Mesh : public Configurable<model::Mesh> {
 #endif
 
 #ifdef HAVE_PARAVIEW_ENABLED
+        vtkDataObject* vtkGrid;
 
 		/**
 		* creates and returns the expected VTK grid object for a block

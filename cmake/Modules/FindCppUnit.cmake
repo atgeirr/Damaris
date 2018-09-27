@@ -13,6 +13,7 @@
 FIND_PATH(CPPUNIT_INCLUDE_DIR cppunit/TestCase.h HINTS
   /usr/local/include
   /usr/include
+  ${CppUnit_ROOT}/include
   ENV CppUnit_ROOT
 )
 

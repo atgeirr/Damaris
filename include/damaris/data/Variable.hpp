@@ -523,7 +523,10 @@ class Variable : public ENABLE_SHARED_FROM_THIS(Variable),
 #endif
 
 #ifdef HAVE_PARAVIEW_ENABLED
-	/**
+
+    public:
+
+    /**
 	* Adds different blocks of a variable into the passed multi piece grid
 	*
 	* \param[in,out] vtkMPGrid : the root multi piece grid for an specific mesh
