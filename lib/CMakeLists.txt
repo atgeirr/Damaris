@@ -66,6 +66,24 @@ if(ENABLE_FORTRAN)
   set(DAMARIS_FORTRAN_MODULE ${DAMARIS_SOURCE_DIR}/src/main/Damaris.F90)
 endif(ENABLE_FORTRAN)
 
+# add the Dependency on XSD-generated files
+set_source_files_properties(
+		${CMAKE_BINARY_DIR}/src/model/Model.cpp
+		PROPERTIES GENERATED 1)
+#add_dependencies(damaris ${CMAKE_BINARY_DIR}/src/model/Model.cpp)
+#add_custom_target(XSDModel DEPENDS ${CMAKE_BINARY_DIR}/src/model/Model.cpp)
+set(XSD_ARGS 	--output-dir ${CMAKE_BINARY_DIR}/src/model
+		--type-naming knr 
+		--hxx-suffix .hpp 
+		--cxx-suffix .cpp 
+                --std       c++11
+		${DAMARIS_SOURCE_DIR}/src/model/Model.xsd)
+add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/src/model/Model.cpp
+		COMMAND mkdir -p ${CMAKE_BINARY_DIR}/src/model
+		COMMAND ${XSD_EXECUTABLE} ARGS "cxx-tree" ${XSD_ARGS}
+		DEPENDS ${DAMARIS_SOURCE_DIR}/src/model/Model.xsd
+		COMMENT "Generating C++/XML mapping")
+
 add_library(damaris 	${DAMARIS_SRC}
 			${DAMARIS_VISIT_SRC}
 			${DAMARIS_HDF5_SRC} 
@@ -81,36 +99,17 @@ set_target_properties(damaris
 		PROPERTIES VERSION ${DAMARIS_VERSION}
 		SOVERSION ${DAMARIS_VERSION_MAJOR})
 
-# add the Dependency on XSD-generated files
-set_source_files_properties(
-		${CMAKE_BINARY_DIR}/src/model/Model.cpp
-		PROPERTIES GENERATED 1)
-add_dependencies(damaris XSDModel)
-add_custom_target(XSDModel DEPENDS ${DAMARIS_SOURCE_DIR}/src/model/Model.cpp)
-set(XSD_ARGS 	--output-dir ${CMAKE_BINARY_DIR}/src/model
-		--type-naming knr 
-		--hxx-suffix .hpp 
-		--cxx-suffix .cpp 
-                --std       c++11
-		${DAMARIS_SOURCE_DIR}/src/model/Model.xsd) 
-add_custom_command(OUTPUT ${DAMARIS_SOURCE_DIR}/src/model/Model.cpp
-		COMMAND mkdir -p ${CMAKE_BINARY_DIR}/src/model
-		COMMAND ${XSD_EXECUTABLE} ARGS "cxx-tree" ${XSD_ARGS}
-#		COMMAND cp ARGS ${DAMARIS_SOURCE_DIR}/src/model/Model.hpp ${DAMARIS_SOURCE_DIR}/include/damaris/model/Model.hpp
-		DEPENDS ${DAMARIS_SOURCE_DIR}/src/model/Model.xsd
-		COMMENT "Generating C++/XML mapping")
+target_link_libraries(damaris ${DEP_LIBRARIES})
 
 #
 # installation stuff (packaging and install commands)
 #
 write_basic_package_version_file(
-		"damaris-config-version.cmake"
+		"DamarisConfigVersion.cmake"
 		VERSION ${DAMARIS_VERSION}
 		COMPATIBILITY AnyNewerVersion)
-
-# TODO
-# generate our config file for find_package()
-# configure_file(damaris-config.cmake.in damaris-config.cmake @ONLY)
+configure_package_config_file(DamarisConfig.cmake.in DamarisConfig.cmake
+		INSTALL_DESTINATION ${DAMARIS_PKG})
 
 # TODO
 # generate pkg-config file
@@ -119,17 +118,19 @@ write_basic_package_version_file(
 #----------------------------------------------------------------------------#
 # Installation process
 #----------------------------------------------------------------------------#
-install(TARGETS damaris EXPORT damaris-targets
+install(TARGETS damaris EXPORT DamarisTargets
 		ARCHIVE DESTINATION lib 
 		LIBRARY DESTINATION lib)
-install(EXPORT damaris-targets
+install(EXPORT DamarisTargets
 		DESTINATION ${DAMARIS_PKG}
-		FILE "damaris-targets.cmake")
-install(FILES  "${CMAKE_CURRENT_BINARY_DIR}/damaris-config.cmake"
-		"${CMAKE_CURRENT_BINARY_DIR}/damaris-config-version.cmake"
+		FILE "DamarisTargets.cmake")
+install(FILES   "${CMAKE_CURRENT_BINARY_DIR}/DamarisConfigVersion.cmake"
+		"${CMAKE_CURRENT_BINARY_DIR}/DamarisConfig.cmake"
+	        "${DAMARIS_SOURCE_DIR}/cmake/Modules/FindVisIt.cmake"
+		"${DAMARIS_SOURCE_DIR}/cmake/Modules/FindXSD.cmake"
 		DESTINATION ${DAMARIS_PKG} )
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/damaris.pc"
-	DESTINATION lib/pkgconfig)
+#install(FILES "${CMAKE_CURRENT_BINARY_DIR}/damaris.pc"
+#	DESTINATION lib/pkgconfig)
 install(FILES "${CMAKE_BINARY_DIR}/include/Damaris.h" DESTINATION include)
 install(DIRECTORY "${DAMARIS_SOURCE_DIR}/include/damaris" DESTINATION include)
 if(CMAKE_Fortran_COMPILER)
