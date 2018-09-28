@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.11)
+cmake_minimum_required (VERSION 3.12) # Required because of policy CMP0074
 
 #----------------------------------------------------------------------------#
 # Starting project definition
@@ -75,14 +75,15 @@ include_directories(${CMAKE_BINARY_DIR}/include)
 #----------------------------------------------------------------------------#
 # Set everything related to the Boost libraries
 #----------------------------------------------------------------------------#
-#ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
-set(Boost_USE_STATIC_LIBS ON)
+ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
+set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 find_package(Threads REQUIRED)
 find_package(Boost 1.67.0 REQUIRED COMPONENTS thread log log_setup filesystem system date_time)
 include_directories(${Boost_INCLUDE_DIRS})
 link_directories(${Boost_LIBRARY_DIRS})
-list(APPEND DEP_LIBRARIES Boost::thread Boost::log Boost::log_setup Boost::filesystem Boost::date_time)
+#list(APPEND DEP_LIBRARIES Boost::thread Boost::log Boost::log_setup Boost::filesystem Boost::date_time)
+list(APPEND DEP_LIBRARIES ${Boost_LIBRARIES})
 
 #----------------------------------------------------------------------------#
 # Set everything related to the XSD libraries
@@ -95,14 +96,10 @@ include_directories(${XSD_INCLUDE_DIR})
 # Note: even though cmake provides a FindXercesC.cmake, we provide our own
 # because the new one doesn't seem to have the possibility to set XercesC_ROOT.
 #----------------------------------------------------------------------------#
-if(DEFINED XercesC_ROOT)
-  set(XercesC_INCLUDE_DIR ${XercesC_ROOT}/include)
-  set(XercesC_LIBRARY ${XercesC_ROOT}/lib)
-endif(DEFINED XercesC_ROOT)
 find_package(XercesC REQUIRED)
 include_directories(${XercesC_INCLUDE_DIRS})
-list(APPEND DEP_LIBRARIES xerces-c)
-
+#list(APPEND DEP_LIBRARIES XercesC::XercesC)
+list(APPEND DEP_LIBRARIES ${XercesC_LIBRARIES})
 #----------------------------------------------------------------------------#
 # Set everything related to VisIt 
 #----------------------------------------------------------------------------#

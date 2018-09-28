@@ -1,8 +1,6 @@
 # load package helper for generating cmake CONFIG packages
 include (CMakePackageConfigHelpers)
 
-#include_directories(${CMAKE_BINARY_DIR}/include)
-
 # where to install files for "find_package"
 set(DAMARIS_PKG "share/cmake/damaris")
 
@@ -70,8 +68,6 @@ endif(ENABLE_FORTRAN)
 set_source_files_properties(
 		${CMAKE_BINARY_DIR}/src/model/Model.cpp
 		PROPERTIES GENERATED 1)
-#add_dependencies(damaris ${CMAKE_BINARY_DIR}/src/model/Model.cpp)
-#add_custom_target(XSDModel DEPENDS ${CMAKE_BINARY_DIR}/src/model/Model.cpp)
 set(XSD_ARGS 	--output-dir ${CMAKE_BINARY_DIR}/src/model
 		--type-naming knr 
 		--hxx-suffix .hpp 
@@ -93,17 +89,28 @@ target_include_directories(damaris PUBLIC $<INSTALL_INTERFACE:include>)
 # local include's BEFORE, in case old incompatable .h files in prefix/include
 target_include_directories(damaris BEFORE PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>)
+target_include_directories(damaris PUBLIC ${Boost_INCLUDE_DIRS}
+		${XSD_INCLUDE_DIR} ${XercesC_INCLUDE_DIRS})
+if(ENABLE_VISIT)
+	target_include_directories(damaris PUBLIC ${VisIt_INCLUDE_DIRS})
+endif(ENABLE_VISIT)
+if(ENABLE_HDF5)
+	target_include_directories(damaris PUBLIC ${HDF5_INCLUDE_DIRS})
+endif(ENABLE_HDF5)
+if(ENABLE_CATALYST)
+	target_include_directories(damaris PUBLIC ${PARAVIEW_INCLUDE_DIRS})
+endif(ENABLE_CATALYST)
 
 # for shared libs, establish the lib version
 set_target_properties(damaris
 		PROPERTIES VERSION ${DAMARIS_VERSION}
 		SOVERSION ${DAMARIS_VERSION_MAJOR})
 
-target_link_libraries(damaris ${DEP_LIBRARIES})
+target_link_libraries(damaris PUBLIC ${DEP_LIBRARIES})
 
-#
-# installation stuff (packaging and install commands)
-#
+#----------------------------------------------------------------------------#
+# installation stuff 
+#----------------------------------------------------------------------------#
 write_basic_package_version_file(
 		"DamarisConfigVersion.cmake"
 		VERSION ${DAMARIS_VERSION}
@@ -111,15 +118,60 @@ write_basic_package_version_file(
 configure_package_config_file(DamarisConfig.cmake.in DamarisConfig.cmake
 		INSTALL_DESTINATION ${DAMARIS_PKG})
 
-# TODO
+#----------------------------------------------------------------------------#
 # generate pkg-config file
-# configure_file(damaris.pc.in damaris.pc @ONLY)
+#----------------------------------------------------------------------------#
+set(LIBS_LIST_FOR_PKGCONFIG "")
+set(LIBS_DIR_LIST_FOR_PKG_CONFIG "")
+set(INCS_LIST_FOR_PKGCONFIG "")
+# processing include dirs
+foreach(p ${XSD_INCLUDE_DIRS} ${XercesC_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+  list(APPEND INCS_LIST_FOR_PKGCONFIG ${p})
+endforeach(p)
+if(ENABLE_HDF5)
+  foreach(p ${HDF5_INCLUDE_DIRS})
+    list(APPEND INCS_LIST_FOR_PKGCONFIG ${p})
+  endforeach(p)
+endif(ENABLE_HDF5)
+if(ENABLE_VISIT)
+  foreach(p ${VisIt_INCLUDE_DIRS})
+    list(APPEND INCS_LIST_FOR_PKGCONFIG ${p})
+  endforeach(p)
+endif(ENABLE_VISIT)
+if(ENABLE_CATALYST)
+  foreach(p ${ParaView_INCLUDE_DIRS})
+    list(APPEND INCS_LIST_FOR_PKGCONFIG ${p})
+  endforeach(p)
+endif(ENABLE_CATALYST)
+list(REMOVE_DUPLICATES INCS_LIST_FOR_PKGCONFIG)
+set(PKG_CONFIG_INC_FLAGS "")
+foreach(p ${INCS_LIST_FOR_PKGCONFIG})
+  string(CONCAT PKG_CONFIG_INC_FLAGS ${PKG_CONFIG_INC_FLAGS} "-I${p} ")
+endforeach(p)
+# processing library dirs and names
+foreach(p ${DEP_LIBRARIES})
+  get_filename_component(libname ${p} NAME_WE)
+  get_filename_component(libpath ${p} DIRECTORY)
+  list(APPEND LIBS_LIST_FOR_PKGCONFIG ${libname})
+  list(APPEND LIBS_DIR_LIST_FOR_PKGCONFIG ${libpath})
+endforeach(p)
+list(REMOVE_DUPLICATES LIBS_LIST_FOR_PKGCONFIG)
+list(REMOVE_DUPLICATES LIBS_DIR_LIST_FOR_PKGCONFIG)
+set(PKG_CONFIG_LIBS_FLAGS "")
+foreach(p ${LIBS_DIR_LIST_FOR_PKGCONFIG})
+  string(CONCAT PKG_CONFIG_LIBS_FLAGS ${PKG_CONFIG_LIBS_FLAGS} "-L${p} ")
+endforeach(p)
+foreach(p ${LIBS_LIST_FOR_PKGCONFIG})
+  string(REGEX REPLACE "^lib" "" p_without_lib ${p})
+  string(CONCAT PKG_CONFIG_LIBS_FLAGS ${PKG_CONFIG_LIBS_FLAGS} "-l${p_without_lib} ")
+endforeach(p)
+configure_file(damaris.pc.in damaris.pc @ONLY)
 
 #----------------------------------------------------------------------------#
 # Installation process
 #----------------------------------------------------------------------------#
 install(TARGETS damaris EXPORT DamarisTargets
-		ARCHIVE DESTINATION lib 
+		ARCHIVE DESTINATION lib
 		LIBRARY DESTINATION lib)
 install(EXPORT DamarisTargets
 		DESTINATION ${DAMARIS_PKG}
@@ -129,8 +181,8 @@ install(FILES   "${CMAKE_CURRENT_BINARY_DIR}/DamarisConfigVersion.cmake"
 	        "${DAMARIS_SOURCE_DIR}/cmake/Modules/FindVisIt.cmake"
 		"${DAMARIS_SOURCE_DIR}/cmake/Modules/FindXSD.cmake"
 		DESTINATION ${DAMARIS_PKG} )
-#install(FILES "${CMAKE_CURRENT_BINARY_DIR}/damaris.pc"
-#	DESTINATION lib/pkgconfig)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/damaris.pc"
+	DESTINATION lib/pkgconfig)
 install(FILES "${CMAKE_BINARY_DIR}/include/Damaris.h" DESTINATION include)
 install(DIRECTORY "${DAMARIS_SOURCE_DIR}/include/damaris" DESTINATION include)
 if(CMAKE_Fortran_COMPILER)
