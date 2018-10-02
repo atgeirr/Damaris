@@ -185,7 +185,7 @@ endif(ENABLE_VISIT)
 # optional: Catalyst
 if(ENABLE_CATALYST)
   set(PV_CFG_ARGS --libs vtkPVPythonCatalyst vtkParallelMPI)
-  add_custom_command(OUTPUT pv-config.out COMMAND $<TARGET_FILE:paraview-config-launcher> ${PV_CFG_ARGS})
+  add_custom_command(OUTPUT pv-config.out COMMAND $<TARGET_FILE:paraview-config-launcher> ${PV_CFG_ARGS} > pv-config.out)
   add_custom_target(damaris.pc COMMAND ${DAMARIS_SOURCE_DIR}/lib/make-pc-file.sh DEPENDS pv-config.out)
 else(ENABLE_CATALYST)
   add_custom_target(damaris.pc COMMAND sed -e s/PV_LIBS//g damaris.pc.in > damaris.pc)
