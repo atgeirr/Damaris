@@ -27,7 +27,6 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "damaris/paraview/ParaViewHeaders.hpp"
 
 
-
 namespace damaris {
 
 /**
@@ -38,12 +37,8 @@ namespace damaris {
 class ParaViewAdaptor
 {
     friend class Deleter<ParaViewAdaptor>;
-
     static std::shared_ptr<ParaViewAdaptor> instance_;
-
     vtkCPProcessor* processor_;
-
-	//vtkMultiBlockDataSet* rootGrid_;
 
 
 protected:
@@ -51,7 +46,6 @@ protected:
     * Constructor.
     */
     ParaViewAdaptor() {
-		//rootGrid_ = nullptr;
         processor_ = nullptr;
     }
 
@@ -112,14 +106,6 @@ public:
 	* \param[in] mdl : root model of the paraview section
     */
     std::shared_ptr<ParaViewAdaptor> GetAdaptor(const model::Simulation::paraview_optional& mdl);
-
-	/**
-	* Calls the Delete() method on each object of the Grid hierarchy
-	*
-	* \param[in] vtkMBGrid : the root grid to be deleted with all of its child grids.
-	*/
-	void DeleteGridHierarchy(vtkMultiBlockDataSet* vtkMBGrid);
-
 };
 
 

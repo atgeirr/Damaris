@@ -127,7 +127,6 @@ class Mesh : public Configurable<model::Mesh> {
 #endif
 
 #ifdef HAVE_PARAVIEW_ENABLED
-        vtkDataObject* vtkGrid;
 
 		/**
 		* creates and returns the expected VTK grid object for a block

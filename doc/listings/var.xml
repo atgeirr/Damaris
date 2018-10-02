@@ -1,8 +1,0 @@
-<data>
-	<variable name="x_coordinates" layout="a layout" 
-	          visualizable="false" time-varying="false" />
-	<group name="my group">
-		<variable name="temperature" layout="some other layout" />
-	</group>
-    <variable name="simple var" layout="int" />
-</data>

@@ -1,4 +1,0 @@
-<curve name="my curve">
-	<coord name="x_curve" unit="cm" label="t"/>
-	<coord name="y_curve" unit="cm" label="f(t)"/>
-</curve>

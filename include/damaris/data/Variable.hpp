@@ -472,6 +472,28 @@ class Variable : public ENABLE_SHARED_FROM_THIS(Variable),
         std::string meshName = GetModel().mesh();
         return MeshManager::Search(meshName);
     }
+
+	/**
+	 * Determines if the variable elements is stored on the points of the mesh or not.
+	 */
+	bool IsNodal()
+	{
+		if (GetModel().centering() == damaris::model::VarCentering::nodal)
+			return true;
+
+		return false;
+	}
+
+	/**
+	 * Determines if the variable elements is stored on the cells of the mesh or not.
+	 */
+	bool IsZonal()
+	{
+		if (GetModel().centering() == damaris::model::VarCentering::zonal)
+			return true;
+
+		return false;
+	}
 	
 #ifdef HAVE_VISIT_ENABLED
 	public:
@@ -541,7 +563,7 @@ class Variable : public ENABLE_SHARED_FROM_THIS(Variable),
 	* \param[in] buffer : the buffer of type T* to be added to the grid as the field data
 	*/
 	template <typename T>
-    bool AddBufferToVtkGrid(vtkDataSet* grid , T* buffer);
+	bool AddBufferToVtkGrid(vtkDataSet* grid , T* buffer , int64_t size);
 #endif
 
 };

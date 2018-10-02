@@ -201,7 +201,7 @@ class Block //: public ENABLE_SHARED_FROM_THIS(Block)
 	/**
 	 * Gives the number of items contained in the Block. 
 	 */
-	virtual int NbrOfItems(bool withGhost=true) const {
+	virtual int64_t GetNumberOfItems(bool withGhost=true) const {
 		if(upper_bounds_.size() == 0) return 0;
 		int result = 1;
 		for(unsigned int i = 0; i < upper_bounds_.size(); i++) {
@@ -291,15 +291,17 @@ class Block //: public ENABLE_SHARED_FROM_THIS(Block)
 	 * \param[in,out] extents : The extents array to be filled by this method
 	 * \param[in] withGhost : should the extents be return wither with ghosts or not?
 	 */
-	void GetExtents(int extents[6] , bool withGhost=true)
+	void GetGridExtents(int extents[6] , bool zonal , bool withGhost=true)
 	{
+		int offset = zonal ? 1 : 0;
+
 		extents[0] = extents[1] = extents[2] = 0;
 		extents[3] = extents[4] = extents[5] = 0;
 		int dim = upper_bounds_.size();
 
 		for(int i=0; i<dim ; i++) {
 			extents[2*i] = GetStartIndex(i);
-			extents[2*i+1] = GetEndIndex(i) + 1; // #point = #cells + 1
+			extents[2*i+1] = GetEndIndex(i) + offset; // #point = #cells + 1
 		}
 	}
 #endif

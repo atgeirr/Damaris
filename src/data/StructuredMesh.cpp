@@ -97,24 +97,25 @@ vtkDataArray* StructuredMesh::CreateCoordArray(int source , int iteration , int 
 											   const std::shared_ptr<Variable>& var )
 {
      model::Type type = var->GetLayout()->GetType();
-	 size_t layoutSize = var->GetLayout()->GetNumberOfItems();
+	 //size_t layoutSize = var->GetLayout()->GetNumberOfItems();
 
 	 std::shared_ptr<Block>  b = GetCoordBlock(source ,  iteration , block , var);
 	 void* pointer = b->GetDataSpace().GetData();
+	 size_t blockSize = b->GetNumberOfItems();
 
      switch(type) {
      case model::Type::short_:
-		 return CreateTypedCoordArray<short>(layoutSize , (short*)pointer);
+		 return CreateTypedCoordArray<short>(blockSize , (short*)pointer);
      case model::Type::int_:
      case model::Type::integer:
-		 return CreateTypedCoordArray<int>(layoutSize , (int*)pointer);
+		 return CreateTypedCoordArray<int>(blockSize , (int*)pointer);
      case model::Type::long_:
-		 return CreateTypedCoordArray<long>(layoutSize , (long*)pointer);
+		 return CreateTypedCoordArray<long>(blockSize , (long*)pointer);
      case model::Type::float_:
      case model::Type::real:
-		 return CreateTypedCoordArray<float>(layoutSize , (float*)pointer);
+		 return CreateTypedCoordArray<float>(blockSize , (float*)pointer);
      case model::Type::double_:
-		 return CreateTypedCoordArray<double>(layoutSize , (double*)pointer);
+		 return CreateTypedCoordArray<double>(blockSize , (double*)pointer);
      default:
          ERROR("Type is undefined for variable " << var->GetName());
      }

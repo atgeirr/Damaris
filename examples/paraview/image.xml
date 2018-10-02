@@ -2,7 +2,7 @@
 <simulation name="image" language="c" xmlns="http://damaris.gforge.inria.fr/damaris/model">
         <architecture>
                 <domains count="1" />
-                <dedicated cores="2" nodes="0" />
+				<dedicated cores="2" nodes="0" />
                 <buffer name="damaris-buffer" size="150000000" />
                 <queue  name="damaris-queue" size="100" />
         </architecture>
@@ -10,10 +10,14 @@
                 <parameter name="WIDTH"  type="int" value="100" />
                 <parameter name="HEIGHT" type="int" value="100" />
                 <parameter name="DEPTH"  type="int" value="100" />
-                <parameter name="size"	 type="int" value="4"  />
+				<parameter name="size"	 type="int" value="2"  />
 
-                <layout name="cells"  type="double" dimensions="WIDTH,HEIGHT,DEPTH/size"
-                        global="WIDTH,HEIGHT,DEPTH" ghosts="0:0,0:0,0:0" />
+                <layout name="zonal_layout"  type="double" dimensions="WIDTH,HEIGHT,DEPTH/size"
+				        global="WIDTH,HEIGHT,DEPTH" />
+
+                <layout name="nodal_layout"  type="double" dimensions="WIDTH+1,HEIGHT+1,DEPTH/size+1"
+				        global="WIDTH+1,HEIGHT+1,DEPTH+1" />
+
                 <layout name="rmeshX" type="float" dimensions="WIDTH+1" global="WIDTH+1" ghosts="0:0" />
                 <layout name="rmeshY" type="float" dimensions="HEIGHT+1" global="HEIGHT+1" ghost="0:0" />
                 <layout name="rmeshZ" type="float" dimensions="DEPTH/size+1" global="DEPTH+1" ghost="0:0" />
@@ -30,7 +34,8 @@
                         <variable name="z" layout="rmeshZ" visualizable="false" time-varying="false"  />
                 </group>
 
-                <variable name="pressure" type="scalar" layout="cells" mesh="mesh" centering="zonal" />
+                <variable name="zonal_pressure" type="scalar" layout="zonal_layout" mesh="mesh" centering="zonal" />
+				<variable name="nodal_pressure" type="scalar" layout="nodal_layout" mesh="mesh" centering="nodal" />
         </data>
         <actions>
         </actions>

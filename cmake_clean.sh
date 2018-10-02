@@ -9,14 +9,19 @@ rm DAMARIS.cbp
 rm Makefile 
 rm cmake_install.cmake 
 rm install_manifest.txt 
+rm CMakeLists.txt.user
+rm -rf Testing
 
 #CTestTestfile.cmake
 rm ./CTestTestfile.cmake
+rm lib/CTestTestfile.cmake
 rm examples/CTestTestfile.cmake
 rm examples/storage/CTestTestfile.cmake
 rm examples/visit/CTestTestfile.cmake
 rm examples/fortran/CTestTestfile.cmake
 rm examples/plugin/CTestTestfile.cmake
+rm examples/paraview/CTestTestfile.cmake
+rm test/CTestTestfile.cmake
 
 #examples - CMakeFiles
 rm -rf examples/CMakeFiles/
@@ -27,14 +32,16 @@ rm -rf examples/visit/CMakeFiles
 rm -rf examples/plugin/CMakeFiles
 rm -rf examples/fortran/CMakeFiles
 rm -rf examples/paraview/CMakeFiles
+rm -rf test/CMakeFiles
 
-#examples - Makefile
+#Makefiles
 rm examples/Makefile
 rm examples/visit/Makefile 
 rm examples/storage/Makefile 
 rm examples/plugin/Makefile
 rm examples/fortran/Makefile
 rm examplea/paraview/Makefile
+rm test/Makefile
 
 #examples - binaries
 rm examples/fortran/cube
@@ -57,6 +64,19 @@ rm examples/paraview/image
 rm examples/paraview/sector
 rm examples/paraview/plate
 rm examples/paraview/lollipop
+rm lib/libdamaris.*
+
+#tests - binaries
+rm test/TestAction
+rm test/TestActionManager
+rm test/TestBuffer
+rm test/TestChannel
+rm test/TestDataSpace
+rm test/TestEventLogger
+rm test/TestLayoutManager
+rm test/TestReactor
+rm test/TestVariable
+rm test/TestVariableManager
 
 #examples - xml files
 rm examples/visit/blocks.xml
@@ -73,6 +93,7 @@ rm examples/visit/cmake_install.cmake
 rm examples/fortran/cmake_install.cmake 
 rm examples/plugin/cmake_install.cmake 
 rm examples/paraview/cmake_install.cmake
+rm test/cmake_install.cmake
 
 #source and include files 
 rm include/damaris/model/Model.hpp 
@@ -88,3 +109,10 @@ rm  lib/cmake_install.cmake
 rm  lib/damaris.mod 
 rm  lib/libdamaris.a
 
+#logs
+rm -rf examples/paraview/log
+rm -rf examples/log
+rm -rf examples/fortran/log
+rm -rf examples/plugin/log
+rm -rf examples/visit/log
+rm -rf examples/storage/log

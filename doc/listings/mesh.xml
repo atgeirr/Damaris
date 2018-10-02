@@ -1,4 +1,0 @@
-<mesh name="mesh2d" type="rectilinear" topology="2">
-	<coord name="x2d" unit="cm" label="Width"/>
-	<coord name="y2d" unit="cm" label="Height"/>
-</mesh>

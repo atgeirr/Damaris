@@ -270,7 +270,7 @@ bool RectilinearMesh::SetGridExtents(vtkDataSet* grid , int source , int iterati
 	}
 
 	std::shared_ptr<Block> b = GetCoordBlock(source , iteration , block , var);
-	b->GetExtents(extents);
+	b->GetGridExtents(extents , var->IsZonal());
 	rectGrid->SetExtent(extents);
 
 	return true;

@@ -7,26 +7,35 @@
 
 int Steps = 10000;
 
-using namespace std;
 
 struct simdata {
-    double* cube;
+	double* zonal_cube;
+	double* nodal_cube;
     int step;
     int rank;
     int size;
-    int x;
-    int y;
-    int z;
+
+	int zonal_x;
+	int zonal_y;
+	int zonal_z;
+
+	int nodal_x;
+	int nodal_y;
+	int nodal_z;
 };
 
+
 template <typename T>
-T getValue(simdata& sim, int i , int j , int k=0) {
-    return sim.cube[i + j * sim.x + k * sim.y * sim.x];  // row major
+void setZonalValue(simdata& sim , T value, int i , int j , int k=0) {
+	if ((i == sim.zonal_x) || (j == sim.zonal_y) || (k == sim.zonal_z))
+		return;
+
+	sim.zonal_cube[i + j * sim.zonal_x + k * sim.zonal_y * sim.zonal_x] = value; // row major
 }
 
 template <typename T>
-void setValue(simdata& sim , T value, int i , int j , int k=0) {
-    sim.cube[i + j * sim.x + k * sim.y * sim.x] =  value; // row major
+void setNodalValue(simdata& sim , T value, int i , int j , int k=0) {
+	sim.nodal_cube[i + j * sim.nodal_x + k * sim.nodal_y * sim.nodal_x] = value; // row major
 }
 
 double GetFillValue(simdata& sim, int i , int j , int k)
@@ -53,33 +62,40 @@ void InitSimData(simdata &sim ,  MPI_Comm comm)
     // Split the cube over the Z direction
     int local_z = Z/sim.size;
 
-    sim.cube = new double[X*Y*local_z];
+	sim.zonal_x = X;
+	sim.zonal_y = Y;
+	sim.zonal_z = local_z;
+	sim.zonal_cube = new double[sim.zonal_x*sim.zonal_y*sim.zonal_z];
 
-    sim.x = X;
-    sim.y = Y;
-    sim.z = local_z;
+	sim.nodal_x = sim.zonal_x + 1;
+	sim.nodal_y = sim.zonal_y + 1;
+	sim.nodal_z = sim.zonal_z + 1;
+	sim.nodal_cube = new double[sim.nodal_x*sim.nodal_y*sim.nodal_z];
 }
 
 void FreeSimData(simdata& sim)
 {
-    delete [] sim.cube;
-    sim.cube = NULL;
+	delete [] sim.zonal_cube;
+	delete [] sim.nodal_cube;
+
+	sim.zonal_cube = nullptr;
+	sim.nodal_cube = nullptr;
 }
 
 void WriteCoordinates(simdata sim)
 {
-	float* XCoord = new float[sim.x+1];
-	float* YCoord = new float[sim.y+1];
-	float* ZCoord = new float[sim.z+1];
+	float* XCoord = new float[sim.nodal_x];
+	float* YCoord = new float[sim.nodal_y];
+	float* ZCoord = new float[sim.nodal_z];
 
-	for(int i=0; i<=sim.x ; i++)
+	for(int i=0; i<sim.nodal_x ; i++)
 		XCoord[i] = i*2;
 
-	for(int j=0; j<=sim.y ; j++)
+	for(int j=0; j<sim.nodal_y ; j++)
 		YCoord[j] = j*3;
 
-	for(int k=0; k<=sim.z ; k++)
-        ZCoord[k] = k+sim.rank*sim.z;
+	for(int k=0; k<sim.nodal_z ; k++)
+		ZCoord[k] = k+sim.rank*sim.zonal_z;
 
     damaris_write("coord/x" , XCoord);
     damaris_write("coord/y" , YCoord);
@@ -92,26 +108,33 @@ void WriteCoordinates(simdata sim)
 
 void SimMainLoop(simdata& sim)
 {
-    for(int i=0; i<sim.x; i++)
-        for(int j=0; j<sim.y; j++)
-            for(int k=0; k<sim.z; k++)
-                setValue(sim , GetFillValue(sim , i,j,k) ,  i , j , k  );
+	for(int i=0; i<=sim.zonal_x; i++)
+		for(int j=0; j<=sim.zonal_y; j++)
+			for(int k=0; k<=sim.zonal_z; k++)
+			{
+				setZonalValue(sim , GetFillValue(sim , i , j , k) ,  i , j , k  );
+				setNodalValue(sim , i*j*GetFillValue(sim , i,j,k) ,  i , j , k  );
+			}
 
     // write results to Damaris
     if (sim.step % 10 == 0)
     {
         if (sim.rank == 0)
         {
-            cout << "Image example: Iteration " << sim.step << " out of " << Steps << endl;
+			std::cout << "Image example: Iteration " << sim.step << " out of " << Steps << std::endl;
         }
 		int64_t pos[3];
 
 		pos[0] = 0;
 		pos[1] = 0;
-		pos[2] = sim.rank*sim.z;
+		pos[2] = sim.rank*sim.zonal_z;
 
-		damaris_set_position("pressure" ,  pos);
-        damaris_write("pressure" , sim.cube);
+		damaris_set_position("zonal_pressure" ,  pos);
+		damaris_write("zonal_pressure" , sim.zonal_cube);
+
+		damaris_set_position("nodal_pressure" ,  pos);
+		damaris_write("nodal_pressure" , sim.nodal_cube);
+
         damaris_end_iteration();
 
         sleep(5);

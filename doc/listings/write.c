@@ -1,3 +1,0 @@
-float* data;
-...
-int err = damaris_write("my group/temperature",data);

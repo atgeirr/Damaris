@@ -1,1 +1,0 @@
-damaris_signal("my_event");

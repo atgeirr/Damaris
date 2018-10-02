@@ -1,4 +1,0 @@
-<actions>
-	<script name="my_script" file="script.py" language="python" scope="core"/>
-    <error script="my_script" />
-</actions>
