@@ -66,6 +66,7 @@ endif(ENABLE_FORTRAN)
 
 # add the Dependency on XSD-generated files
 set_source_files_properties(
+		${CMAKE_BINARY_DIR}/include/damaris/model/Model.hpp
 		${CMAKE_BINARY_DIR}/src/model/Model.cpp
 		PROPERTIES GENERATED 1)
 set(XSD_ARGS 	--output-dir ${CMAKE_BINARY_DIR}/src/model
@@ -75,8 +76,11 @@ set(XSD_ARGS 	--output-dir ${CMAKE_BINARY_DIR}/src/model
                 --std       c++11
 		${DAMARIS_SOURCE_DIR}/src/model/Model.xsd)
 add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/src/model/Model.cpp
+		${CMAKE_BINARY_DIR}/include/damaris/model/Model.hpp
 		COMMAND mkdir -p ${CMAKE_BINARY_DIR}/src/model
+		COMMAND mkdir -p ${CMAKE_BINARY_DIR}/include/damaris/model
 		COMMAND ${XSD_EXECUTABLE} ARGS "cxx-tree" ${XSD_ARGS}
+		COMMAND cp ${CMAKE_BINARY_DIR}/src/model/Model.hpp ${CMAKE_BINARY_DIR}/include/damaris/model
 		DEPENDS ${DAMARIS_SOURCE_DIR}/src/model/Model.xsd
 		COMMENT "Generating C++/XML mapping")
 
@@ -85,6 +89,10 @@ add_library(damaris 	${DAMARIS_SRC}
 			${DAMARIS_HDF5_SRC} 
                         ${DAMARIS_PARAVIEW_SRC}
 			${DAMARIS_FORTRAN_MODULE})
+
+include_directories(${CMAKE_BINARY_DIR}/include/damaris
+		${CMAKE_BINARY_DIR}/include)
+
 target_include_directories(damaris PUBLIC $<INSTALL_INTERFACE:include>)
 # local include's BEFORE, in case old incompatable .h files in prefix/include
 target_include_directories(damaris BEFORE PUBLIC
@@ -226,6 +234,7 @@ install(FILES   "${CMAKE_CURRENT_BINARY_DIR}/DamarisConfigVersion.cmake"
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/damaris.pc"
 	DESTINATION lib/pkgconfig)
 install(FILES "${CMAKE_BINARY_DIR}/include/Damaris.h" DESTINATION include)
+install(FILES "${CMAKE_BINARY_DIR}/include/damaris/model/Model.hpp" DESTINATION include/damaris/model)
 install(DIRECTORY "${DAMARIS_SOURCE_DIR}/include/damaris" DESTINATION include)
 if(CMAKE_Fortran_COMPILER)
   install(FILES "${CMAKE_BINARY_DIR}/lib/damaris.mod" DESTINATION include)
