@@ -186,9 +186,9 @@ endif(ENABLE_VISIT)
 if(ENABLE_CATALYST)
   set(PV_CFG_ARGS --libs vtkPVPythonCatalyst vtkParallelMPI)
   add_custom_command(OUTPUT pv-config.out COMMAND $<TARGET_FILE:paraview-config-launcher> ${PV_CFG_ARGS})
-  add_custom_command(TARGET damaris COMMAND ${DAMARIS_SOURCE_DIR}/lib/make-pc-file.sh DEPENDS pv-config.out)
+  add_custom_target(damaris.pc COMMAND ${DAMARIS_SOURCE_DIR}/lib/make-pc-file.sh DEPENDS pv-config.out)
 else(ENABLE_CATALYST)
-  add_custom_command(TARGET damaris COMMAND sed -e s/PV_LIBS//g -i damaris.pc)
+  add_custom_target(damaris.pc COMMAND sed -e s/PV_LIBS//g damaris.pc.in > damaris.pc)
 endif(ENABLE_CATALYST)  
 # remove dublicates
 list(REMOVE_DUPLICATES LIBS_LIST_FOR_PKGCONFIG)
@@ -205,8 +205,9 @@ foreach(p ${LIBS_LIST_FOR_PKGCONFIG})
 endforeach(p)
 string(CONCAT PKG_CONFIG_LIBS_FLAGS ${PKG_CONFIG_LIBS_FLAGS} " -lstdc++ -lrt -ldl -lpthread")
 # ---
-# configure the .pc file from the .pc.in file
-configure_file(damaris.pc.in damaris.pc @ONLY)
+# configure the .pc.in file
+configure_file(damaris.pc.in damaris.pc.in @ONLY)
+add_dependencies(damaris damaris.pc)
 
 #----------------------------------------------------------------------------#
 # Installation process
