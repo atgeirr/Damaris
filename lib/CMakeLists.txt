@@ -121,50 +121,91 @@ configure_package_config_file(DamarisConfig.cmake.in DamarisConfig.cmake
 #----------------------------------------------------------------------------#
 # generate pkg-config file
 #----------------------------------------------------------------------------#
-set(LIBS_LIST_FOR_PKGCONFIG "")
-set(LIBS_DIR_LIST_FOR_PKG_CONFIG "")
 set(INCS_LIST_FOR_PKGCONFIG "")
 # processing include dirs
-foreach(p ${XSD_INCLUDE_DIRS} ${XercesC_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+# mandatory dependencies (XSD, XercesC, Boost)
+# XercesC is not needed because it has its own .pc file
+foreach(p ${XSD_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
   list(APPEND INCS_LIST_FOR_PKGCONFIG ${p})
 endforeach(p)
+# optional: HDF5
 if(ENABLE_HDF5)
   foreach(p ${HDF5_INCLUDE_DIRS})
     list(APPEND INCS_LIST_FOR_PKGCONFIG ${p})
   endforeach(p)
 endif(ENABLE_HDF5)
+# optional: VisIt
 if(ENABLE_VISIT)
   foreach(p ${VisIt_INCLUDE_DIRS})
     list(APPEND INCS_LIST_FOR_PKGCONFIG ${p})
   endforeach(p)
 endif(ENABLE_VISIT)
+# optional: Catalyst
 if(ENABLE_CATALYST)
-  foreach(p ${ParaView_INCLUDE_DIRS})
+  foreach(p ${PARAVIEW_INCLUDE_DIRS})
     list(APPEND INCS_LIST_FOR_PKGCONFIG ${p})
   endforeach(p)
 endif(ENABLE_CATALYST)
+# remove duplicates from the list
 list(REMOVE_DUPLICATES INCS_LIST_FOR_PKGCONFIG)
+# convert the list into a string with "-I" added in front of every path
 set(PKG_CONFIG_INC_FLAGS "")
 foreach(p ${INCS_LIST_FOR_PKGCONFIG})
   string(CONCAT PKG_CONFIG_INC_FLAGS ${PKG_CONFIG_INC_FLAGS} "-I${p} ")
 endforeach(p)
+# ---
 # processing library dirs and names
-foreach(p ${DEP_LIBRARIES})
+set(LIBS_LIST_FOR_PKGCONFIG "")
+set(LIBS_DIR_LIST_FOR_PKG_CONFIG "")
+# get Boost libraries
+foreach(p ${Boost_LIBRARIES})
   get_filename_component(libname ${p} NAME_WE)
   get_filename_component(libpath ${p} DIRECTORY)
   list(APPEND LIBS_LIST_FOR_PKGCONFIG ${libname})
   list(APPEND LIBS_DIR_LIST_FOR_PKGCONFIG ${libpath})
 endforeach(p)
+# optional: HDF5
+if(ENABLE_HDF5)
+  foreach(p ${HDF5_LIBRARIES})
+    get_filename_component(libname ${p} NAME_WE)
+    get_filename_component(libpath ${p} DIRECTORY)
+    list(APPEND LIBS_LIST_FOR_PKGCONFIG ${libname})
+    list(APPEND LIBS_DIR_LIST_FOR_PKGCONFIG ${libpath})
+  endforeach(p)
+endif(ENABLE_HDF5)
+# optional: VisIt
+if(ENABLE_VISIT)
+  foreach(p ${VisIt_LIBRARIES})
+    get_filename_component(libname ${p} NAME_WE)
+    get_filename_component(libpath ${p} DIRECTORY)
+    list(APPEND LIBS_LIST_FOR_PKGCONFIG ${libname})
+    list(APPEND LIBS_DIR_LIST_FOR_PKGCONFIG ${libpath})
+  endforeach(p)
+endif(ENABLE_VISIT)
+# optional: Catalyst
+if(ENABLE_CATALYST)
+  set(PV_CFG_ARGS --libs vtkPVPythonCatalyst vtkParallelMPI)
+  add_custom_command(OUTPUT pv-config.out COMMAND $<TARGET_FILE:paraview-config-launcher> ${PV_CFG_ARGS})
+  add_custom_command(TARGET damaris COMMAND ${DAMARIS_SOURCE_DIR}/lib/make-pc-file.sh DEPENDS pv-config.out)
+else(ENABLE_CATALYST)
+  add_custom_command(TARGET damaris COMMAND sed -e s/PV_LIBS//g -i damaris.pc)
+endif(ENABLE_CATALYST)  
+# remove dublicates
 list(REMOVE_DUPLICATES LIBS_LIST_FOR_PKGCONFIG)
 list(REMOVE_DUPLICATES LIBS_DIR_LIST_FOR_PKGCONFIG)
+# build a string for the list of directories (-L)
 set(PKG_CONFIG_LIBS_FLAGS "")
 foreach(p ${LIBS_DIR_LIST_FOR_PKGCONFIG})
   string(CONCAT PKG_CONFIG_LIBS_FLAGS ${PKG_CONFIG_LIBS_FLAGS} "-L${p} ")
 endforeach(p)
+# build a string for the list of libraries (-l)
 foreach(p ${LIBS_LIST_FOR_PKGCONFIG})
   string(REGEX REPLACE "^lib" "" p_without_lib ${p})
   string(CONCAT PKG_CONFIG_LIBS_FLAGS ${PKG_CONFIG_LIBS_FLAGS} "-l${p_without_lib} ")
 endforeach(p)
+string(CONCAT PKG_CONFIG_LIBS_FLAGS ${PKG_CONFIG_LIBS_FLAGS} " -lstdc++ -lrt -ldl -lpthread")
+# ---
+# configure the .pc file from the .pc.in file
 configure_file(damaris.pc.in damaris.pc @ONLY)
 
 #----------------------------------------------------------------------------#
