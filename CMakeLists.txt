@@ -28,6 +28,7 @@ option(ENABLE_FORTRAN  "Build Fortran support. Requires CMAKE_Fortran_COMPILER t
 option(ENABLE_VISIT    "Build VisIt support. May requires VisIt_ROOT to be set." OFF)
 option(ENABLE_CATALYST "Build Catalyst support. May requires ParaView_DIR to be set." OFF)
 option(ENABLE_HDF5     "Build with HDF5 support. May requires HDF5_ROOT to be set." OFF)
+option(GENERATE_MODEL  "Regenerates the XSD model instead of using existing ones." OFF)
 
 #----------------------------------------------------------------------------#
 # Setting the C++ compiler options

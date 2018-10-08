@@ -69,13 +69,26 @@ set_source_files_properties(
 		${CMAKE_BINARY_DIR}/include/damaris/model/Model.hpp
 		${CMAKE_BINARY_DIR}/src/model/Model.cpp
 		PROPERTIES GENERATED 1)
-set(XSD_ARGS 	--output-dir ${CMAKE_BINARY_DIR}/src/model
+# check if Model.cpp and Model.hpp are present in the xsd folder
+if(EXISTS ${DAMARIS_SOURCE_DIR}/xsd/Model.hpp AND NOT ${GENERATE_MODEL})
+
+  add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/src/model/Model.cpp
+		  ${CMAKE_BINARY_DIR}/include/damaris/model/Model.hpp
+		  COMMAND mkdir -p ${CMAKE_BINARY_DIR}/src/model
+		  COMMAND mkdir -p ${CMAKE_BINARY_DIR}/include/damaris/model
+		  COMMAND cp ${DAMARIS_SOURCE_DIR}/xsd/Model.hpp ${CMAKE_BINARY_DIR}/include/damaris/model
+		  COMMAND cp ${DAMARIS_SOURCE_DIR}/xsd/Model.cpp ${CMAKE_BINARY_DIR}/src/model
+		  COMMAND cp ${DAMARIS_SOURCE_DIR}/xsd/Model.hpp ${CMAKE_BINARY_DIR}/src/model
+		  COMMENT "Copying existing C++/XML mapping")
+else()
+
+  set(XSD_ARGS 	--output-dir ${CMAKE_BINARY_DIR}/src/model
 		--type-naming knr 
 		--hxx-suffix .hpp 
 		--cxx-suffix .cpp 
                 --std       c++11
 		${DAMARIS_SOURCE_DIR}/src/model/Model.xsd)
-add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/src/model/Model.cpp
+  add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/src/model/Model.cpp
 		${CMAKE_BINARY_DIR}/include/damaris/model/Model.hpp
 		COMMAND mkdir -p ${CMAKE_BINARY_DIR}/src/model
 		COMMAND mkdir -p ${CMAKE_BINARY_DIR}/include/damaris/model
@@ -83,6 +96,7 @@ add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/src/model/Model.cpp
 		COMMAND cp ${CMAKE_BINARY_DIR}/src/model/Model.hpp ${CMAKE_BINARY_DIR}/include/damaris/model
 		DEPENDS ${DAMARIS_SOURCE_DIR}/src/model/Model.xsd
 		COMMENT "Generating C++/XML mapping")
+endif()
 
 add_library(damaris 	${DAMARIS_SRC}
 			${DAMARIS_VISIT_SRC}
