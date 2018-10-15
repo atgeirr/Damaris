@@ -19,6 +19,13 @@ set(DAMARIS_VERSION "${DAMARIS_VERSION_MAJOR}.${DAMARIS_VERSION_MINOR}.${DAMARIS
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} 
 		"${DAMARIS_SOURCE_DIR}/cmake/Modules/")
 
+
+#----------------------------------------------------------------------------#
+# Setup RPATH
+#----------------------------------------------------------------------------#
+set (CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+set (CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
 #----------------------------------------------------------------------------#
 # Options thet user may set 
 #----------------------------------------------------------------------------#
@@ -132,10 +139,10 @@ endif(ENABLE_HDF5)
 # Set everything related to ParaView
 #----------------------------------------------------------------------------#
 if(ENABLE_CATALYST)
-  find_package(ParaView 4.3 REQUIRED COMPONENTS vtkPVPythonCatalyst)
+  find_package(ParaView 4.3 REQUIRED COMPONENTS vtkPVPythonCatalyst vtkParallelMPI vtkUtilitiesPythonInitializer)
   include("${PARAVIEW_USE_FILE}")
   set(HAVE_PARAVIEW_ENABLED 1)
-  set(PARAVIEW_LIBRARIES "vtkPVPythonCatalyst;vtkParallelMPI")
+  set(PARAVIEW_LIBRARIES "vtkUtilitiesPythonInitializer;vtkPVPythonCatalyst;vtkParallelMPI")
   list(APPEND DEP_LIBRARIES ${PARAVIEW_LIBRARIES})
   add_definitions("-DUSE_CATALYST")
 endif(ENABLE_CATALYST)
