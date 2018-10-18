@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.11)
+cmake_minimum_required (VERSION 3.12) # Required because of policy CMP0074
 
 #----------------------------------------------------------------------------#
 # Starting project definition
@@ -19,14 +19,23 @@ set(DAMARIS_VERSION "${DAMARIS_VERSION_MAJOR}.${DAMARIS_VERSION_MINOR}.${DAMARIS
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} 
 		"${DAMARIS_SOURCE_DIR}/cmake/Modules/")
 
+
+#----------------------------------------------------------------------------#
+# Setup RPATH
+#----------------------------------------------------------------------------#
+set (CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+set (CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
 #----------------------------------------------------------------------------#
 # Options thet user may set 
 #----------------------------------------------------------------------------#
-option(ENABLE_TESTS    "Build tests. Requires CppUnit" OFF)
+option(ENABLE_TESTS    "Build tests. May require CppUnit_ROOT" OFF)
 option(ENABLE_EXAMPLES "Build examples." OFF)
 option(ENABLE_FORTRAN  "Build Fortran support. Requires CMAKE_Fortran_COMPILER to be set to an MPI-enabled compiler." OFF)
-option(ENABLE_VISIT    "Build VisIt support. Requires VisIt_ROOT to be set." OFF)
-option(ENABLE_CATALYST "Build Catalyst support. Requires ParaView_DIR to be set." OFF)
+option(ENABLE_VISIT    "Build VisIt support. May requires VisIt_ROOT to be set." OFF)
+option(ENABLE_CATALYST "Build Catalyst support. May requires ParaView_DIR to be set." OFF)
+option(ENABLE_HDF5     "Build with HDF5 support. May requires HDF5_ROOT to be set." OFF)
+option(GENERATE_MODEL  "Regenerates the XSD model instead of using existing ones." OFF)
 
 #----------------------------------------------------------------------------#
 # Setting the C++ compiler options
@@ -69,15 +78,16 @@ add_definitions (-D__INFO)
 #----------------------------------------------------------------------------#
 include_directories(${DAMARIS_SOURCE_DIR}/include)
 include_directories(${DAMARIS_SOURCE_DIR}/include/damaris)
+include_directories(${CMAKE_BINARY_DIR}/include)
 
 #----------------------------------------------------------------------------#
 # Set everything related to the Boost libraries
 #----------------------------------------------------------------------------#
-#ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
-set(Boost_USE_STATIC_LIBS ON)
+ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
+set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 find_package(Threads REQUIRED)
-find_package(Boost 1.67.0 REQUIRED COMPONENTS thread log log_setup filesystem system date_time)
+find_package(Boost 1.65.0 REQUIRED COMPONENTS thread log log_setup filesystem system date_time)
 include_directories(${Boost_INCLUDE_DIRS})
 link_directories(${Boost_LIBRARY_DIRS})
 list(APPEND DEP_LIBRARIES Boost::thread Boost::log Boost::log_setup Boost::filesystem Boost::date_time)
@@ -94,8 +104,8 @@ include_directories(${XSD_INCLUDE_DIR})
 # because the new one doesn't seem to have the possibility to set XercesC_ROOT.
 #----------------------------------------------------------------------------#
 find_package(XercesC REQUIRED)
-include_directories(${XERCESC_INCLUDE})
-list(APPEND DEP_LIBRARIES ${XERCESC_LIBRARY})
+include_directories(${XercesC_INCLUDE_DIRS})
+list(APPEND DEP_LIBRARIES XercesC::XercesC)
 
 #----------------------------------------------------------------------------#
 # Set everything related to VisIt 
@@ -129,10 +139,10 @@ endif(ENABLE_HDF5)
 # Set everything related to ParaView
 #----------------------------------------------------------------------------#
 if(ENABLE_CATALYST)
-  find_package(ParaView 4.3 REQUIRED COMPONENTS vtkPVPythonCatalyst)
+  find_package(ParaView 4.3 REQUIRED COMPONENTS vtkPVPythonCatalyst vtkParallelMPI vtkUtilitiesPythonInitializer)
   include("${PARAVIEW_USE_FILE}")
   set(HAVE_PARAVIEW_ENABLED 1)
-  set(PARAVIEW_LIBRARIES "vtkPVPythonCatalyst;vtkParallelMPI")
+  set(PARAVIEW_LIBRARIES "vtkUtilitiesPythonInitializer;vtkPVPythonCatalyst;vtkParallelMPI")
   list(APPEND DEP_LIBRARIES ${PARAVIEW_LIBRARIES})
   add_definitions("-DUSE_CATALYST")
 endif(ENABLE_CATALYST)
@@ -160,7 +170,7 @@ endfunction()
 # Configure Damaris
 #----------------------------------------------------------------------------#
 CONFIGURE_FILE(${DAMARIS_SOURCE_DIR}/include/Damaris.h.in 
-	       ${DAMARIS_SOURCE_DIR}/include/Damaris.h)
+	       ${CMAKE_BINARY_DIR}/include/Damaris.h)
 
 #----------------------------------------------------------------------------#
 # Add the proper subdirectories

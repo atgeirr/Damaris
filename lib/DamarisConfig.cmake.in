@@ -1,0 +1,45 @@
+@PACKAGE_INIT@
+
+# adjust module path to make it easy to pick up files from the config directory
+set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}")
+
+set(Damaris_HAS_HDF5 @ENABLE_HDF5@)
+set(Damaris_HAS_VISIT @ENABLE_VISIT@)
+set(Damaris_HAS_CATALYST @ENABLE_CATALYST@)
+set(Damaris_INCLUDE_DIRS @CMAKE_INSTALL_PREFIX@/include)
+set(Damaris_LIBRARIES "damaris" @DEP_LIBRARIES@)
+
+include (CMakeFindDependencyMacro)
+find_dependency (Threads)
+set(BOOST_ROOT @BOOST_ROOT@)
+find_package(Boost 1.67.0 REQUIRED COMPONENTS thread log log_setup filesystem system date_time)
+set(XercesC_ROOT @XercesC_ROOT@)
+find_dependency (XercesC)
+set(XSD_ROOT @XSD_ROOT@)
+find_dependency (XSD)
+
+list(APPEND Damaris_INCLUDE_DIRS ${Boost_INCLUDE_DIRS})
+list(APPEND Damaris_INCLUDE_DIRS ${XSD_INCLUDE_DIR})
+list(APPEND Damaris_INCLUDE_DIRS ${XercesC_INCLUDE_DIRS})
+
+if(Damaris_HAS_HDF5)
+  set(HDF5_ROOT @HDF5_ROOT@)
+  find_dependency (HDF5)
+  list(APPEND Damaris_INCLUDE_DIRS ${HDF5_INCLUDE_DIRS})
+endif(Damaris_HAS_HDF5)
+
+if(Damaris_HAS_VISIT)
+  set(VisIt_ROOT @VisIt_ROOT@)
+  find_dependency (VisIt)
+  list(APPEND Damaris_INCLUDE_DIRS ${VisIt_INCLUDE_DIRS})
+endif(Damaris_HAS_VISIT)
+
+if(Damaris_HAS_CATALYST)
+  set(ParaView_DIR @ParaView_DIR@)
+  find_dependency (ParaView)
+  include("${PARAVIEW_USE_FILE}")
+endif(Damaris_HAS_CATALYST)
+
+include ("${CMAKE_CURRENT_LIST_DIR}/DamarisTargets.cmake")
+
+check_required_components (Damaris)
