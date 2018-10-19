@@ -6,9 +6,9 @@
 #include <cppunit/TestSuite.h>
 #include <cppunit/TestCase.h>
 
-#include "model/Model.hpp"
-#include "model/BcastXML.hpp"
-#include "buffer/SharedMemorySegment.hpp"
+#include "damaris/model/Model.hpp"
+#include "damaris/model/BcastXML.hpp"
+#include "damaris/buffer/SharedMemorySegment.hpp"
 
 namespace damaris {
 

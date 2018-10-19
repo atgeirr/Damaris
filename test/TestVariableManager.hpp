@@ -7,10 +7,10 @@
 
 #include <mpi.h>
 
-#include "model/BcastXML.hpp"
-#include "data/VariableManager.hpp"
-#include "data/LayoutManager.hpp"
-#include "data/ParameterManager.hpp"
+#include "damaris/model/BcastXML.hpp"
+#include "damaris/data/VariableManager.hpp"
+#include "damaris/data/LayoutManager.hpp"
+#include "damaris/data/ParameterManager.hpp"
 
 namespace damaris {
 

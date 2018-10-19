@@ -7,7 +7,7 @@
 #include <cppunit/TestSuite.h>
 #include <cppunit/TestCase.h>
 
-#include "log/EventLogger.hpp"
+#include "damaris/log/EventLogger.hpp"
 
 
 namespace damaris {

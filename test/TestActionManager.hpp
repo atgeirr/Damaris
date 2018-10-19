@@ -7,8 +7,8 @@
 
 #include <mpi.h>
 
-#include "model/BcastXML.hpp"
-#include "action/ActionManager.hpp"
+#include "damaris/model/BcastXML.hpp"
+#include "damaris/action/ActionManager.hpp"
 
 namespace damaris {
 

@@ -5,7 +5,7 @@
 #include <cppunit/TestSuite.h>
 #include <cppunit/TestCase.h>
 
-#include "buffer/DataSpace.hpp"
+#include "damaris/buffer/DataSpace.hpp"
 
 namespace damaris {
 

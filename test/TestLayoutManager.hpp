@@ -5,8 +5,8 @@
 #include <cppunit/TestSuite.h>
 #include <cppunit/TestCase.h>
 
-#include "model/BcastXML.hpp"
-#include "data/LayoutManager.hpp"
+#include "damaris/model/BcastXML.hpp"
+#include "damaris/data/LayoutManager.hpp"
 
 namespace damaris {
 

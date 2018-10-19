@@ -6,10 +6,10 @@
 #include <cppunit/TestSuite.h>
 #include <cppunit/TestCase.h>
 
-#include "model/Model.hpp"
-#include "model/BcastXML.hpp"
-#include "data/VariableManager.hpp"
-#include "env/Environment.hpp"
+#include "damaris/model/Model.hpp"
+#include "damaris/model/BcastXML.hpp"
+#include "damaris/data/VariableManager.hpp"
+#include "damaris/env/Environment.hpp"
 
 namespace damaris {
 

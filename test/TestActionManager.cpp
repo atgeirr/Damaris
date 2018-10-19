@@ -1,6 +1,6 @@
 #include <cppunit/ui/text/TestRunner.h>
 
-#include "util/Unused.hpp"
+#include "damaris/util/Unused.hpp"
 #include "TestActionManager.hpp"
 
 using namespace std;

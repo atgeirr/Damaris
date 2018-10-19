@@ -7,9 +7,9 @@
 
 #include <mpi.h>
 
-#include "util/Unused.hpp"
-#include "comm/Channel.hpp"
-#include "comm/Reactor.hpp"
+#include "damaris/util/Unused.hpp"
+#include "damaris/comm/Channel.hpp"
+#include "damaris/comm/Reactor.hpp"
 
 namespace damaris {
 

@@ -6,10 +6,10 @@
 #include <cppunit/TestSuite.h>
 #include <cppunit/TestCase.h>
 
-#include "model/Model.hpp"
-#include "model/BcastXML.hpp"
-#include "action/ActionManager.hpp"
-#include "env/Environment.hpp"
+#include "damaris/model/Model.hpp"
+#include "damaris/model/BcastXML.hpp"
+#include "damaris/action/ActionManager.hpp"
+#include "damaris/env/Environment.hpp"
 
 extern "C" void my_function(const char* name, int32_t source, int32_t /*iteration*/,
 		const char* args)
