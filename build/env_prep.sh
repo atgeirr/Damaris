@@ -11,7 +11,7 @@ install_hdf5=1
 make_jobs=1
 mpi_impl=mpich  # either mpich or openmpi
 
-export install_path=$HOME/damaris-work/sw
+export install_path=/opt/local/
 
 export PATH=$install_path/bin:$PATH
 export LD_LIBRARY_PATH=$install_path/lib:$LD_LIBRARY_PATH
@@ -25,9 +25,9 @@ tempdir=$(pwd)
 
 echo -e "--- COMPILING & INSTALLING CMAKE ---------------------------------------------------------------\n"
 # Installing cmake
-wget --no-check-certificate http://www.cmake.org/files/v3.11/cmake-3.11.4.tar.gz
-tar -xzf cmake-3.11.4.tar.gz
-cd cmake-3.11.4
+wget --no-check-certificate http://www.cmake.org/files/v3.12/cmake-3.12.3.tar.gz
+tar -xzf cmake-3.12.3.tar.gz
+cd cmake-3.12.3
 ./bootstrap --prefix=$install_path
 make -j$make_jobs
 make install
@@ -36,9 +36,9 @@ echo -e "--- COMPILING & INSTALLING MPI LIBRARY --------------------------------
 cd $tempdir
 
 if [ $mpi_impl == mpich ]; then
-  wget http://www.mpich.org/static/downloads/1.5rc3/mpich2-1.5rc3.tar.gz
-  tar -xzf mpich2-1.5rc3.tar.gz
-  cd mpich2-1.5rc3
+  wget http://www.mpich.org/static/downloads/3.2.1/mpich-3.2.1.tar.gz
+  tar -xzf mpich-3.2.1.tar.gz
+  cd mpich-3.2.1
   ./configure --prefix=$install_path --enable-shared --enable-romio --enable-fc 2>&1 | tee c.txt
   make -j$make_jobs 2>&1 | tee m.txt
   make install 2>&1 | tee mi.txt
