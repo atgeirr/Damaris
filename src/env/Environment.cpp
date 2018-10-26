@@ -51,6 +51,7 @@ int				Environment::_entityProcessID_;
 int				Environment::_clientsPerNode_;
 int				Environment::_coresPerNode_;
 int 				Environment::_serversPerNode_;
+int  				Environment::_numberOfNodes_;
 std::string 			Environment::_magicNumber_;
 std::shared_ptr<Buffer> 		Environment::_defaultBuffer_;
 std::shared_ptr<Client>		Environment::_client_;
@@ -92,6 +93,9 @@ bool Environment::Init(const std::string& configFile,
 
 	/* Get the size of the node */
 	MPI_Comm_size(_nodeComm_,&_coresPerNode_);
+
+	// Get the number of the nodes
+	_numberOfNodes_ = size/_coresPerNode_;
 
     if (_baseModel_->log().present()) {
         /* Initialize the logger single instance */
@@ -228,20 +232,20 @@ bool Environment::InitDedicatedNodes()
 	MPI_Comm_rank(_nodeComm_,&rankInNode);
 
 	// number of cores per node is _coresPerNode_, so the number of nodes is
-	int nb_nodes = size/_coresPerNode_;
+	//int nb_nodes = size/_coresPerNode_;
 	//orc:mapping ratio between servers and clients:
-	int ratio = (nb_nodes - dn ) / dn ;
+	int ratio = (_numberOfNodes_ - dn ) / dn ;
 	//orc:to make it compatible with other funcs , actually gives total compute node number
-	_clientsPerNode_ = nb_nodes - dn;
+	_clientsPerNode_ = _numberOfNodes_ - dn;
 	_serversPerNode_ = dn;
 	// make sure we don't have only dedicated nodes
-	if(nb_nodes - dn <= 0) {
+	if(_numberOfNodes_ - dn <= 0) {
 		ERROR("Too many dedicated nodes, aborting.");
 		MPI_Abort(MPI_COMM_WORLD,-1);
 	}
 
 	// make sure the number of dedicated nodes divides the number of client nodes
-	if(not ((nb_nodes - dn) % dn == 0)) {
+	if(not ((_numberOfNodes_ - dn) % dn == 0)) {
 		ERROR("Number of dedicated nodes does not divide the"
 		" number of client nodes, aborting.");
 		MPI_Abort(MPI_COMM_WORLD,-1);

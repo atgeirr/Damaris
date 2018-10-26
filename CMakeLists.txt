@@ -159,7 +159,7 @@ endif(ENABLE_TESTS)
 #----------------------------------------------------------------------------#
 # Other dependencies required
 #----------------------------------------------------------------------------#
-list(APPEND DEP_LIBRARIES "stdc++" "rt" "dl" "pthread")
+list(APPEND DEP_LIBRARIES "stdc++" "rt" "dl" "pthread" "m")
 
 function(add_executable TARGET) 
   _ADD_EXECUTABLE(${TARGET} ${ARGN})

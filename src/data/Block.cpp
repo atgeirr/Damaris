@@ -95,7 +95,7 @@ bool Block::FillVisItDataHandle(visit_handle hdl)
 	DataSpace<Buffer> ds = GetDataSpace();
 	
 	DBG("source is " << GetSource() << ", iteration is " << GetIteration());
-	int nb_items = NbrOfItems();
+	int nb_items = GetNumberOfItems();
 	DBG("Number of items is " << nb_items);
 	const model::Type& t = v->GetLayout()->GetType();
 	DBG("Type is " << t);
