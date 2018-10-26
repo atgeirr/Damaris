@@ -65,9 +65,10 @@ private:
     	static int 	_entityProcessID_; /*!< ID (rank) of the process among the
 						processes of the same kind. */
 
-	static int	_clientsPerNode_; /*!< number of clients per client nodes. */
+	static int	_clientsPerNode_; /*!< number of clients per node. */
 	static int	_coresPerNode_;	/*!< number of cores per node. */
 	static int _serversPerNode_; //orc:number of servers per node
+	static int _numberOfNodes_; /*!< number of nodes in the simulation. */
 
 	static std::shared_ptr<Client> _client_; /*!< Pointer to the Client object
 		that serves for the API. not-null only if _isClient_ is true. */
@@ -233,6 +234,15 @@ public:
 	}
 
 	/**
+	 * Returns the number of simulation nodes.
+	 */
+	static int NumberOfNodes() {
+		if(not _initialized_)
+			return -1;
+		return _numberOfNodes_;
+	}
+
+	/**
 	 * Returns the list of id of clients connected to the
 	 * dedicated core. In standalone mode, will return a list
 	 * with only the id of the calling client.
@@ -245,22 +255,19 @@ public:
 	 * Returns the total number of clients used by the simulation.
 	 */
 	static int CountTotalClients() {
-		if(not _initialized_) return -1;
-		int dcore = 0;
-		MPI_Comm_size(_entityComm_,&dcore);
-		/*if(HasServer()) {
-			return dcore*ClientsPerNode();
-		}
-		return dcore;*/
-		if(_isDedicatedCore_){
-			return dcore*ClientsPerNode();
-		}
-		//since in dedicated node mode all cores are client
-		//and clientspernode yields the total number of client nodes.
-		else if(_isDedicatedNode_){
+		if(not _initialized_)
+			return -1;
+
+		if(_isDedicatedCore_)
+			// return the number of clients of each node multiplied by
+			// the number of the nodes
+			return _numberOfNodes_*ClientsPerNode();
+		else if(_isDedicatedNode_)
+			// return the number of dedicated nodes (ClientsPerNode())
+			// multiplied by the number of cores per node.
 			return CoresPerNode()*ClientsPerNode();
-		}
-		return dcore;
+
+		return 0;
 	}
 
 	/**

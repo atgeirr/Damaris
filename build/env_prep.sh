@@ -6,12 +6,13 @@
 # are installed on $install_path, so please change this variable before 
 # running, if you need to change it. 
 
+install_catalyst=1
 install_visit=0
-install_hdf5=1
-make_jobs=1
+install_hdf5=0
+make_jobs=8
 mpi_impl=mpich  # either mpich or openmpi
 
-export install_path=/opt/local/
+export install_path=/home/hadi/local/
 
 export PATH=$install_path/bin:$PATH
 export LD_LIBRARY_PATH=$install_path/lib:$LD_LIBRARY_PATH
@@ -31,6 +32,7 @@ cd cmake-3.12.3
 ./bootstrap --prefix=$install_path
 make -j$make_jobs
 make install
+
 
 echo -e "--- COMPILING & INSTALLING MPI LIBRARY -----------------------------------------------------------\n"
 cd $tempdir
@@ -74,6 +76,7 @@ make install_prefix=$install_path install LDFLAGS="-L${install_path}/lib/" CFLAG
 CXXFLAGS="-I ${install_path}/include/"
 
 
+
 echo -e "--- COMPILING & INSTALLING BOOST ---------------------------------------------------------------\n"
 # Installing boost
 cd $tempdir
@@ -83,6 +86,7 @@ cd boost_1_67_0
 ./bootstrap.sh --prefix=$install_path --with-libraries=thread,log,date_time,program_options,filesystem,system
 ./b2 threading=multi,single
 ./b2 install
+
 
 
 echo -e "--- COMPILING & INSTALLING CPPUNIT ---------------------------------------------------------------\n"
@@ -122,6 +126,21 @@ if [ $install_visit = 1 ]; then
 fi
 
 
+echo -e "--- COMPILING & INSTALLING CATALYST -----------------------------------------------------------------\n"
+# Installling Catalyst
+if [ $install_catalyst = 1 ]; then
+  cd $tempdir
+  wget -O Catalyst-5.6.tar.gz "https://www.paraview.org/paraview-downloads/download.php?submit=Download&version=v5.6&type=catalyst&os=Sources&downloadFile=Catalyst-v5.6.0-RC2-Base-Enable-Python-Essentials-Extras-Rendering-Base.tar.gz"
+  tar -xvf Catalyst-5.6.tar.gz
+  cd Catalyst-v5.6.0-RC2-Base-Enable-Python-Essentials-Extras-Rendering-Base
+  mkdir catalyst-build
+  cd catalyst-build
+  ../cmake.sh .. -DCMAKE_INSTALL_PREFIX=$install_path
+  make -j $make_jobs
+  make install
+fi
+
+
 # echo -e "--- COMPILING & INSTALLING DAMARIS ---------------------------------------------------------------\n"
 # compiling and installing Damaris
 cd $tempdir
@@ -130,14 +149,17 @@ cd damaris-build
 cmake ../../.. -DCMAKE_INSTALL_PREFIX:PATH=$install_path \
 	-DBOOST_ROOT=$install_path \
 	-DXSD_ROOT=$install_path \
-	-DXERCESC_ROOT=$install_path \
+	-DXercesC_ROOT=$install_path \
+	-DCppUnit_ROOT=$install_path \
 	-DCMAKE_CXX_COMPILER=mpicxx \
 	-DCMAKE_C_COMPILER=mpicc \
 	-DENABLE_TESTS=ON \
-	-DCppUnit_ROOT=$install_path \
-	-DBUILD_SHARED_LIBS=ON \
+	-DENABLE_EXAMPLES=ON \
+	-DBUILD_SHARED_LIBS=OFF \
 	$visit_arg \
 	$hdf5_arg
-make -j$make_jobs
+make -j $make_jobs
 make install
+
+
 
