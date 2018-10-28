@@ -131,7 +131,7 @@ echo -e "--- COMPILING & INSTALLING CATALYST -----------------------------------
 if [ $install_catalyst = 1 ]; then
   cd $tempdir
   wget -O Catalyst-5.6.tar.gz "https://www.paraview.org/paraview-downloads/download.php?submit=Download&version=v5.6&type=catalyst&os=Sources&downloadFile=Catalyst-v5.6.0-RC2-Base-Enable-Python-Essentials-Extras-Rendering-Base.tar.gz"
-  tar -xvf Catalyst-5.6.tar.gz
+  tar -xf Catalyst-5.6.tar.gz
   cd Catalyst-v5.6.0-RC2-Base-Enable-Python-Essentials-Extras-Rendering-Base
   mkdir catalyst-build
   cd catalyst-build
