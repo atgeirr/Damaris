@@ -20,10 +20,18 @@ v8VISIT=1
 v9CATALYST=1
 v10COMPILE=1
 
+make_jobs=4
+
+export install_path=/opt/damaris/local
+export PATH=$install_path/bin:$PATH
+export LD_LIBRARY_PATH=$install_path/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=$install_path/lib64:$LD_LIBRARY_PATH
+
 USAGE=$'Usage: env_prep.sh (all|compile|custom) \n [args:(cmake, mpi[mpich,openmpi,none], xercess, xsd, boost, cppunit, hdf5, visit, catalyst, compile)]'
 EXAMPLE1="env_prep.sh all //(equiv env_prep.sh custom 1 mpich 1 1 1 1 1 1 1 1)"
 EXAMPLE2="env_prep.sh compile //(equiv env_prep.sh custom 0 none 0 0 0 0 0 0 0 1)"
 EXAMPLE3="env_prep.sh custom 1 mpich 1 1 1 1 1 1 1 0 //(all - compile)"
+EXAMPLE4="env_prep.sh compile 1 1 1 //(compile with hdfs5 and visit and catalyst enabled)"
 SERVICE=$1
 ARGS=("${@:2}") # get remaining arguments as array
 
@@ -31,6 +39,10 @@ echo "options"
 echo $ARGS
 
 length=${#ARGS[@]}
+
+hdf5_arg="-DENABLE_HDF5=OFF -DHDF5_ROOT=$install_path"
+visit_arg="-DENABLE_VISIT=OFF -DVisIt_ROOT=$install_path"
+catalyst_arg="-DENABLE_CATALYST=OFF -DParaView_DIR=$install_path"
 
 case $SERVICE in
     (all)
@@ -49,6 +61,17 @@ case $SERVICE in
         v8VISIT=0
         v9CATALYST=0
         v10COMPILE=1
+        if (( $length == 3 )); then
+         if  [ ${ARGS[0]} == 1 ]; then
+          hdf5_arg="-DENABLE_HDF5=ON -DHDF5_ROOT=$install_path"
+         fi
+         if  [ ${ARGS[1]} == 1 ]; then
+          visit_arg="-DENABLE_VISIT=ON -DVisIt_ROOT=$install_path"
+         fi
+         if  [ ${ARGS[2]} == 1 ]; then
+          catalyst_arg="-DENABLE_CATALYST=OFF -DParaView_DIR=$install_path"
+         fi
+        fi
     ;;
 
     (custom)
@@ -76,16 +99,10 @@ case $SERVICE in
         echo $EXAMPLE1
         echo $EXAMPLE2
         echo $EXAMPLE3
+        echo $EXAMPLE4
         exit 1
     ;;
 esac
-
-make_jobs=4
-
-export install_path=/opt/damaris/local
-export PATH=$install_path/bin:$PATH
-export LD_LIBRARY_PATH=$install_path/lib:$LD_LIBRARY_PATH
-export LD_LIBRARY_PATH=$install_path/lib64:$LD_LIBRARY_PATH
 
 # create folders 
 mkdir -p temp
@@ -201,7 +218,6 @@ if (( $v8VISIT == 1 )); then
   visit_arg="-DENABLE_VISIT=ON -DVisIt_ROOT=$install_path"
 fi
 
-
 # Installling Catalyst
 if (( $v9CATALYST == 1 )); then
   echo -e "--- COMPILING & INSTALLING CATALYST -----------------------------------------------------------------\n"
@@ -236,6 +252,7 @@ if (( $v10COMPILE == 1 )); then
 	-DBUILD_SHARED_LIBS=OFF \
 	$visit_arg \
 	$hdf5_arg
+  $catalyst_arg
  make -j $make_jobs
  make install
 fi
