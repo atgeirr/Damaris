@@ -206,6 +206,12 @@ if (( $v7HDF5 == 1 )); then
     hdf5_arg="-DENABLE_HDF5=ON -DHDF5_ROOT=$install_path"
 fi
 
+#prerequisites
+# sudo apt-get install subversion xutils-dev libxt-dev python-libxml2
+#sudo su; apt-get install aptitude
+#aptitude install freeglut3-dev libgl1-mesa-dev libdrm-dev
+
+#Just run: ./env_prep.sh custom 0 none 0 0 0 0 0 1 0 0
 # Installling Visit
 if (( $v8VISIT == 1 )); then
   echo -e "--- COMPILING & INSTALLING VISIT -----------------------------------------------------------------\n"
@@ -218,6 +224,11 @@ if (( $v8VISIT == 1 )); then
   visit_arg="-DENABLE_VISIT=ON -DVisIt_ROOT=$install_path"
 fi
 
+#prerequisites
+#sudo su; apt-get install aptitude
+#aptitude install freeglut3-dev libgl1-mesa-dev libdrm-dev
+
+#Just run: ./env_prep.sh custom 0 none 0 0 0 0 0 0 1 0
 # Installling Catalyst
 if (( $v9CATALYST == 1 )); then
   echo -e "--- COMPILING & INSTALLING CATALYST -----------------------------------------------------------------\n"
