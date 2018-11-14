@@ -6,8 +6,8 @@
 # are installed on $install_path, so please change this variable before 
 # running, if you need to change it. 
 
-# prerequisites
-# sudo apt-get install gfortran gcc g++ git-core
+# prerequisites for debian
+# sudo apt-get install gfortran gcc g++ git-core python-dev
 
 v1CMAKE=1
 v2MPI_IMPL=mpich #mpich or openmpi
@@ -210,6 +210,7 @@ fi
 # sudo apt-get install subversion xutils-dev libxt-dev python-libxml2
 #sudo su; apt-get install aptitude
 #aptitude install freeglut3-dev libgl1-mesa-dev libdrm-dev
+# ! still some issue compiling IceT 1.0 !
 
 #Just run: ./env_prep.sh custom 0 none 0 0 0 0 0 1 0 0
 # Installling Visit
