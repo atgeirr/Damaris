@@ -69,7 +69,7 @@ case $SERVICE in
           visit_arg="-DENABLE_VISIT=ON -DVisIt_ROOT=$install_path"
          fi
          if  [ ${ARGS[2]} == 1 ]; then
-          catalyst_arg="-DENABLE_CATALYST=OFF -DParaView_DIR=$install_path"
+          catalyst_arg="-DENABLE_CATALYST=ON -DParaView_DIR=$install_path"
          fi
         fi
     ;;
