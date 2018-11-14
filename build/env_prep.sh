@@ -207,10 +207,10 @@ if (( $v7HDF5 == 1 )); then
 fi
 
 #prerequisites
-# sudo apt-get install subversion xutils-dev libxt-dev python-libxml2
-#sudo su; apt-get install aptitude
-#aptitude install freeglut3-dev libgl1-mesa-dev libdrm-dev
-# ! still some issue compiling IceT 1.0 !
+# sudo apt-get install subversion xutils-dev libxt-dev python-libxml2 zlib1g-dev aptitude
+# sudo aptitude install freeglut3-dev libgl1-mesa-dev libdrm-dev -> n then y 
+# ! still some issue compiling IceT 1.0 ! -> with cmake 2.6.4 it worked compiling IceT
+# But Visit needs cmake 3.8 and higher, so we move to latest cmake
 
 #Just run: ./env_prep.sh custom 0 none 0 0 0 0 0 1 0 0
 # Installling Visit
