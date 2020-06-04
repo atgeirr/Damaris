@@ -9,7 +9,7 @@ build_command: pandoc  --pdf-engine=xelatex -s --highlight-style haddock --listi
 # Installation of Damaris with Catalyst Support using Spack 
 This documentation is currently augmenting what is available on [https://project.inria.fr/damaris/](https://project.inria.fr/damaris/paraview-connector/). It is targeted to software versions Damaris 1.3.1, Catalyst 5.6.0 and Spack 0.14.2.
 
-## Install and configure Spack{#configure_spack}
+## [Install and configure Spack]{#configure_spack}
 
 We will be using Spack ([https://spack.io/](https://spack.io/)) to install the full graph of dependencies of Damaris with Catalyst support. This will require a couple of hours or so to complete and is best done on a compute node with multiple cores. See [Appendix](#appendix_grid5000) for instructions on how to request extra resources on Grid5000.  
 
@@ -19,27 +19,27 @@ We will be using Spack ([https://spack.io/](https://spack.io/)) to install the f
 
 ```bash
         # Create a directory for Spack
-        mkdir ~/myspack
-        cd ~/myspack
+        $ mkdir ~/myspack
+        $ cd ~/myspack
         # download the Spack repository
-        git cone https://github.com/spack/spack.github
-        export SPACK_ROOT=$PWD/spack
-        . spack/share/spack-env.sh
-        spack bootstrap
+        $ git cone https://github.com/spack/spack.github
+        $ export SPACK_ROOT=$PWD/spack
+        $ . spack/share/spack-env.sh
+        $ spack bootstrap
 ```
 
   - If it is available you will need to make a copy so that we can change some Spack files to suit our requirements
 
 ```bash
         # Create a directory for Spack
-        mkdir ~/myspack
-        spack clone ~/myspack
+        $ mkdir ~/myspack
+        $ spack clone ~/myspack
 ```
 
 2. Ensure the Spack environment is set up in future shells by adding the following to your `~/.bashrc` file 
 
 ```bash
-        cat ~/.bashrc
+        $ cat ~/.bashrc
 # Set up your editor of choice here
 export EDITOR=nano
 export SPACK_ROOT=~/myspack/spack
@@ -49,7 +49,7 @@ export SPACK_ROOT=~/myspack/spack
 3. If running MPI jobs across multiple nodes then create a `~/.profile` file that will source the `~/.bashrc` file. This will make sure that the same environment is used on all the nodes in login and non-login shells that are created by OpenMPI/MPI. 
 
 ```bash
-        cat ~/.profile
+        $ cat ~/.profile
 ...
 source ~/.bashrc
 ...
@@ -59,7 +59,7 @@ source ~/.bashrc
 
 ```bash
         # Check the config.yaml file
-        cat ~/.spack/config.yaml
+        $ cat ~/.spack/config.yaml
 config:
   build_stage:
    - ~/.spack/stage
@@ -69,24 +69,40 @@ config:
 
 ## Building Damaris and Paraview Catalyst dependencies.
 
-For Catalyst installation there is a Spack configuration requirement that needs to be made to ensure Python3 is preferred over Python2 for the whole set of dependencies. The Damaris Spack spec file also needs to be modified to accommodate the Python3 dependency and also to add a CMake flag so that example code is compiled.   
+For Catalyst installation there is a Spack configuration requirement that needs to be made to ensure Python3 is preferred over Python2 for the whole set of dependencies. The Damaris Spack package file may need to be modified to accommodate the Python3 dependency and also to add a CMake flag so that example code is compiled.   
 
-### Set up the Spack packages.yaml to have the following section: 
+### Set the Spack packages.yaml file to specify python3
 This should prevent installed libaries from using Python2 and Spack *py-packages* seem to get mixed up due to their Python2/3 dependencies.
 
 ```bash
-    cat ~/.spack/packages.yaml
+    $ cat ~/.spack/packages.yaml
 ---
 packages:
   python: 
     version: [3,2]
 ```
 
-### Update the Damaris spec file
-Make sure the Damaris Spack 'spec' file is updated to specify `catalyst+python3` *not* `catalyst+python`. Also needed in the file are commands to add a CMake `examples` variant and the CMake flag to build the Damaris examples.
+### Update the Damaris package file
+Make sure the Damaris Spack 'package.py' file needs to be updated to specify `catalyst+python3` *not* `catalyst+python`. Also needed in the file are commands to add a CMake `examples` variant and the CMake flag to build the Damaris examples.  
+  
+An updated Damaris Spack 'package.py' file is available from the [gitlab repository](https://gitlab.inria.fr/Damaris/damaris/-/tree/master/build/spack/repo/packages/damaris) and can be used by setting up a custom Spack repository by adding the path to the `build/spack/repo` directory to the file `~/.spack/repos.yaml`. 
 
+```bash
+    $ cat ~/.spack/repos.yaml
+repos:
+- <git repo dir>/damaris/build/spack/repo
+
+    $ cat <git repo dir>/damaris/build/spack/repo/repos.yaml
+repo:
+  namespace: 'damaris.gitlab.dev'
+
+```
+
+All future `spack install damaris` commands will preferentially use the custom repo, unless explicitly overridden using a specific namespace e.g. `spack install builtin.damaris`. For further documentation on Spack repositories please see [Spack.io Repositories](https://spack.readthedocs.io/en/latest/repositories.html)
+
+The differences between the package.py code that is obtained from Spack and that which is present from the Damaris gitlab code repository are something like as follows:
 ```python
->spack edit damaris
+>spack edit damaris.gitlab.dev.damaris
     ...
     variant('examples', default=False, description='Enables compilation and installation of the examples code')
     ...
@@ -98,19 +114,20 @@ Make sure the Damaris Spack 'spec' file is updated to specify `catalyst+python3`
             args.extend(['-DENABLE_EXAMPLES:BOOL=ON'])
 
 ```
+
 ### Create a Spack environment
 We will create a Spack *environment* to work from. This is a filesystem area that will contain all the libraries needed to run and build Damaris and its dependent executable simulation code. Environments are easily created from Spack installed libraries and can be removed easily without removing the underlying Spack installed library. The activation of the environment will set the `PATH`, `LIBRARY_PATH`, `CPATH`, `LD_LIBRARY_PATH`, `PKG_CONFIG_PATH`, `MANPATH` environment variables to the view of the system specific to the installed libarires and dependencies. One should note that common tools may not be available without installing them specifically in the environment (e.g. the `nano` editor) or possibly loading them using modules. 
   
 ```bash
     # create and the activate a spack environment
-    spack env create damaris-catalyst
-    spack env activate damaris-catalyst
+    $ spack env create damaris-catalyst
+    $ spack env activate damaris-catalyst
 ```
 
 To support OpenMPI/MPI ensure the Spack environment is loaded by your shell by adding the following to your `~/.bashrc` file 
 
 ```bash
-        cat ~/.bashrc
+        $ cat ~/.bashrc
 ...
 spack env activate damaris-catalyst
 ```
@@ -120,38 +137,37 @@ The following `spack install` command should build and install Damaris and all o
   
 ```bash
     # Install your favourite editor
-    spack install nano
+    $ spack install nano
     # Install dependencies without keeping the staging directory (saves disk space)
-    spack install catalyst@5.6.0+osmesa+rendering ^mesa+osmesa swr=avx ^llvm@8.0.0 target=sandybridge
+    $ spack install catalyst@5.6.0+osmesa+rendering ^mesa+osmesa swr=avx ^llvm@8.0.0 target=sandybridge
     
     # Install Damaris and dependencies
-    spack install --keep-stage damaris+catalyst+hdf5+examples+fortran
+    $ spack install --keep-stage damaris+catalyst+hdf5+examples+fortran
 ```  
   
-The Mesa 'swr' option can be specified for x86_64 CPUs dependent on the architecture of the CPU on the compute nodes. I have specifed `swr=avx` and `target=Sandybridge` so that libs are compatible with my VM CPU.
+The Mesa 'swr' option can be specified for x86_64 CPUs dependent on the architecture of the CPU on the compute nodes. I have specifed `swr=avx` and `target=sandybridge` so that libs are compatible with my VM CPU.
 
 
-## Run a Damaris example and have it connect to Paraview{#run_damaris_example}
+## [Run a Damaris example and have it connect to Paraview]{#run_damaris_example}
 Download and install a Paraview version that matches the version of Catalyst that was installed via Spack available here: [https://www.paraview.org/download/](https://www.paraview.org/download/). There are pre-compiled executables available for Windows, Mac and Linux. When using Linux on compute nodes or on a VM no GPU support then check out notes on running with Mesa in [appendix below](#notes_on_mesa).  
 
 ### Find and set up the example simulation code
 To access the examples from the Damaris Spack build directory use the `spack cd` command and navigate to the build directory.
   
 ```bash
-    # Check what the Spack install spec configuration was
+    # Check what the Spack install package configuration was
     # (from withing the environment)
-    spack config edit
+    $ spack config edit
     
     # 'spack cd' gets us to the install directory
-    spack cd damaris+catalyst+hdf5+examples ^catalyst@5.6.0+osmesa+rendering ^mesa+osmesa swr=avx ^llvm@7.0.0 target=sandybridge
+    $ spack cd damaris+catalyst+hdf5+examples+fortran ^catalyst@5.6.0+osmesa+rendering ^mesa+osmesa swr=avx ^llvm@8.0.0 target=sandybridge
 
     # Now find the build directory and examples that we kept 
     # using '--keep-stage'
-    cd ../spack-build/examples/paraview
+    $ cd ../spack-build/examples/paraview
     # Copy the input damaris xml files and catalyst python scripts 
     # to the executables
-    cp ../../../spack-src/examples/paraview/*.xml .
-    cp ../../../spack-src/examples/paraview/*.py  .
+    $ cp ../../../spack-src/examples/paraview/* .
 
 ```
   
@@ -195,7 +211,7 @@ The next step is to execute the simulation code using `mpirun` and the appropria
     # examples directory (use `spack cd ...`)
     # This is a typical Damaris example where the Damaris 
     # configuration xml file is specified on the command line
-    mpirun --oversubscribe -np 4 ./image "image.xml" 
+    $ mpirun --oversubscribe -np 4 ./image "image.xml" 
 ```
   
 ### Render the simulation data using Paraview
@@ -210,89 +226,89 @@ The data in this case is named *input* and can be selected for display within th
 ![Paraview GUI: Selecting the eye icon to render the data](./paraview_catalyst_images/paraview_catalyst_pipeline_browser_5.png){  width=240px }  
 
 Now that the data is available in the Pipeline Browser the full set of visualization possibilities are available through ParaView. To start with the data is rendered in a very conservative manner - as a bounded box with single set color. The dataset can be rendered and colored by modifying the *Representation* and *Color* of the dataset using either the *Active variable control* toolbar or the *Properties* tab on the *Pipeline Browser* View panel as seen in fig.6 and fig.7 below.  
-
+  
 ![Paraview GUI: Active variable control bar](./paraview_catalyst_images/paraview_catalyst_active_variable_control_6.png){ width=550px }  
   
-![Paraview GUI: Properties panel. Choose a representation and select a Coloring method that describes highlights a variable of interest](./paraview_catalyst_images/paraview_catalyst_property_control_tab_6b.png){ width=280px }  
 
+![Paraview GUI: Properties panel. Choose a representation and select a Coloring method that  highlights a variable of interest](./paraview_catalyst_images/paraview_catalyst_property_control_tab_6b.png){ width=280px }  
+  
 
-
-
-
-
+  
 
 ## Appendix
 
 ### A1. Request resources from Grid5000 {#appendix_grid5000}
-[Back](#configure_spack)
-
+[Back](#configure_spack)  
+  
 ```bash
-    ssh <username>@rennes
+    $ ssh <username>@rennes
     
     # Check if there are nodes available
-    funk -m date -r rennes -w 04:00:00
+    $ funk -m date -r rennes -w 04:00:00
     
     # request 4 cores (or more) 
-    oarsub -I -p "cluster='paravance'" -l /nodes=1/core=16,walltime=02:00:00
+    $ oarsub -I -p "cluster='paravance'" -l /nodes=1/core=16,walltime=04:00:00
     
     # Check that your spack build will use all cores:
-    cat ~/.spack/config.yaml
+    $ cat ~/.spack/config.yaml
 config:
 build_stage:
 - ~/.spack/stage
 
 build_jobs: 16
 ```
-
+  
 We will also need OpenMPI set up correctly to use the `oarsh` helper to talk to nodes  
+  
 ```bash
-    cat ~/.openmpi/mca-params.conf 
+    $ cat ~/.openmpi/mca-params.conf 
 # orte_rsh_agent=oarsh  # for pre-ompi@3.1
 plm_rsh_agent=oarsh
 filem_rsh_agent=oarcp
 
 ```
-
+  
 The `oarsh` command is the same one used to access nodes requested via `oarsub`.
 This is how you use `oarsh` to log into the job running your node
+  
 ```bash
     # check what job I am running (if forgotten)
-    oarstat -cu <username>
+    $ oarstat -cu <username>
 Job id     Name           User           Submission Date     S Queue
 ---------- -------------- -------------- ------------------- - ----------
 1270759                   <username>        2020-05-27 15:43:50 R default   
 
     # export the job number of interst
-    OAR_JOB_ID=1270759
+    $ OAR_JOB_ID=1270759
     # print the given nodes provided by the job
-    oarstat -fj $OAR_JOB_ID | grep assigned_hostnames | sed -n 's/^.*= //p'
+    $ oarstat -fj $OAR_JOB_ID | grep assigned_hostnames | sed -n 's/^.*= //p'
     paravance-28.rennes.grid5000.fr
 
     # the OAR_JOB_ID variable is used by oarsh
-    oarsh paravance-28  
+    $ oarsh paravance-28  
     # you should now be on the node
 ```
 
 
 ### A2. Set up sshfs
 Set up sshfs between a VM and Grid5000 user Rennes NFS filesystem
-
+  
 ```bash
-    ssh <vm-name>.grid5000.fr
-    sudo apt-get update 
-    sudo apt-get install sshfs
-    sudo gpasswd -a <username> fuse # (add myself to fuse group)
+    $ ssh <vm-name>.grid5000.fr
+    $ sudo apt-get update 
+    $ sudo apt-get install sshfs
+    $ sudo gpasswd -a <username> fuse # (add myself to fuse group)
 
     # make the local shared directory
-    mkdir ~/sshfslocal
+    $ mkdir ~/sshfslocal
     # Make the remote shared directory
-    ssh  <username>@frennes.rennes.grid5000.fr mkdir /home/<username>/sshfsshare
+    $ ssh  <username>@frennes.rennes.grid5000.fr mkdir /home/<username>/sshfsshare
     # Set up the filesystem between the two directories
-    sshfs <username>@frennes.rennes.grid5000.fr:/home/<username>/sshfsshare /home/<username>/sshfslocal
+    $ sshfs <username>@frennes.rennes.grid5000.fr:/home/<username>/sshfsshare /home/<username>/sshfslocal
 
 ```
 
-### A3. Some notes on Graphics drivers on Linux: {#notes_on_mesa}
+### A3. Some notes on Graphics drivers on Linux: {#notes_on_mesa}  
 [Return to Run Damaris Example](#run_damaris_example)  
 
 Running Catalyst on systems without dedicated graphics hardware (i.e. Virtual Machines and compute nodes of clusters) requires Mesa 3D graphics libraries which are used for OpenGL rendering support. Mesa uses the llvm infrastructure so llvm will be installed as a dependency (see [LLVM Installation Issues](#llvm_install_issues)).
@@ -305,17 +321,17 @@ Once LLVM and Mesa are installed there are some environment variables to tweak.
 (see: [www.mesa3d.org/envvars.html](https://www.mesa3d.org/envvars.html) )
 
 ```bash
-    export GALLIUM_DRIVER=softpipe|llvmpipe|swr
+    $ export GALLIUM_DRIVER=softpipe|llvmpipe|swr
 
     # If llvmpipe is chosen, the number of threads to use is 
     # selected as follows
     # llvmpipe is only threaded in the pixel operations 
     # so the thread level has no improvement in vertex rendering. 
     # N.B. Catalyst/MPI adds capability for vertex rendering.
-    export LP_NUM_THREADS=2
+    $ export LP_NUM_THREADS=2
 
     # if swr is available (X86_64 only), it is threaded in vertex and pixel operations
-    export KNOB_MAX_WORKER_THREADS=1..256
+    $ export KNOB_MAX_WORKER_THREADS=1..256
 ```
 Other performance tips for using the Mesa are available [www.mesa3d.org/perf.html](https://www.mesa3d.org/perf.html)  
 
@@ -326,7 +342,7 @@ Use the following guide to manually compile a development version of Damaris wit
 #### Download development version from gitlab
 ```bash
     # N.B. git may not be available from the spack environemnt (i.e. first use despactivate)
-    git clone https://gitlab.inria.fr/Damaris/damaris-development.git 
+    $ git clone https://gitlab.inria.fr/Damaris/damaris-development.git 
 ```
 
 #### Build Damaris examples with Catalyst support (no VisIt)
@@ -334,17 +350,17 @@ Use the following guide to manually compile a development version of Damaris wit
 N.B. install_path can be determined using spack env st
 
 ```bash
-    spack env activate damaris-catalyst
+    $ spack env activate damaris-catalyst
 
-    cd damaris-development/build
-    mkdir mybuild
-    cd mybuild
+    $ cd damaris-development/build
+    $ mkdir mybuild
+    $ cd mybuild
 
-    export install_path=~/spack/var/spack/environments/damaris-catalyst/.spack-env/view
-    hdf5_arg="-DENABLE_HDF5=ON -DHDF5_ROOT=$install_path"
-    visit_arg="-DENABLE_VISIT=OFF -DVisIt_ROOT=$install_path"
-    catalyst_arg="-DENABLE_CATALYST=ON -DParaView_DIR=$install_path"
-    cmake ../../.. -DCMAKE_INSTALL_PREFIX:PATH=$install_path \
+    $ export install_path=~/spack/var/spack/environments/damaris-catalyst/.spack-env/view
+    $ hdf5_arg="-DENABLE_HDF5=ON -DHDF5_ROOT=$install_path"
+    $ visit_arg="-DENABLE_VISIT=OFF -DVisIt_ROOT=$install_path"
+    $ catalyst_arg="-DENABLE_CATALYST=ON -DParaView_DIR=$install_path"
+    $ cmake ../../.. -DCMAKE_INSTALL_PREFIX:PATH=$install_path \
 	-DBOOST_ROOT=$install_path \
 	-DXSD_ROOT=$install_path \
 	-DXercesC_ROOT=$install_path \
@@ -358,9 +374,9 @@ N.B. install_path can be determined using spack env st
 	$hdf5_arg \
 	$catalyst_arg
 
-    cd examples/paraview
-    make -j 4
-    make install
+    $ cd examples/paraview
+    $ make -j 4
+    $ make install
 
 ```
   
@@ -377,11 +393,11 @@ A way around the RAM requirement is to get Spack to use a system installed llvm.
 
 ```bash
     # use sudo-g5k for Grid5000 builds
-    sudo apt-get install clang  
-    clang --version
+    $ sudo apt-get install clang  
+    $ clang --version
 
     # Add dependency to packages.yaml
-    cat ~/.spack/packages.yaml
+    $ cat ~/.spack/packages.yaml
 ---
 packages:
   python: 
