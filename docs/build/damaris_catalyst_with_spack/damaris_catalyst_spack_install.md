@@ -3,14 +3,15 @@ pdftitle: "Installing Damaris with Catalyst Support via Spack"
 pdfauthor: Joshua Bowden
 geometry: margin=2.5cm
 output: pdf_document
-# pandoc  --pdf-engine=xelatex -s --highlight-style haddock --listings -H listings-setup.tex --variable urlcolor=cyan -M date="$(date "+%B %e, %Y")" damaris_catalyst_spack_install.md --toc -o damaris_catalyst_spack_install.pdf
+build_command: pandoc  --pdf-engine=xelatex -s --highlight-style haddock --listings -H listings-setup.tex --variable urlcolor=cyan -M date="$(date "+%B %e, %Y")" damaris_catalyst_spack_install.md --toc -o damaris_catalyst_spack_install.pdf
 ---
 
-# Installation of Damaris with Catalyst Support with Spack 
+# Installation of Damaris with Catalyst Support using Spack 
+This documentation is currently augmenting what is available on [https://project.inria.fr/damaris/](https://project.inria.fr/damaris/paraview-connector/). It is targeted to software versions Damaris 1.3.1, Catalyst 5.6.0 and Spack 0.14.2.
 
-## Install and configure Spack {#configure_spack}
+## Install and configure Spack{#configure_spack}
 
-We will be using Spack ([https://spack.io/](https://spack.io/)) to install the full graph of dependencies of Damaris with Catalyst support. This will require a couple of hours on 4 or so cores to complete and is best done on a compute node with multiple cores (see [Appendix](#appendix_grid5000) for instructions on how to request extra resources on Grid5000).  
+We will be using Spack ([https://spack.io/](https://spack.io/)) to install the full graph of dependencies of Damaris with Catalyst support. This will require a couple of hours or so to complete and is best done on a compute node with multiple cores. See [Appendix](#appendix_grid5000) for instructions on how to request extra resources on Grid5000.  
 
 1. Obtain Spack
 
@@ -38,22 +39,32 @@ We will be using Spack ([https://spack.io/](https://spack.io/)) to install the f
 2. Ensure the Spack environment is set up in future shells by adding the following to your `~/.bashrc` file 
 
 ```bash
-        # Set up your editor of choice here
-        export EDITOR=nano
-        export SPACK_ROOT=~/myspack/spack
-        . $SPACK_ROOT/share/spack/setup-env.sh
+        cat ~/.bashrc
+# Set up your editor of choice here
+export EDITOR=nano
+export SPACK_ROOT=~/myspack/spack
+. $SPACK_ROOT/share/spack/setup-env.sh
 ```
 
-3. Check that your Spack build will use the desired number of cores
+3. If running MPI jobs across multiple nodes then create a `~/.profile` file that will source the `~/.bashrc` file. This will make sure that the same environment is used on all the nodes in login and non-login shells that are created by OpenMPI/MPI. 
+
+```bash
+        cat ~/.profile
+...
+source ~/.bashrc
+...
+```
+
+4. Check that your Spack build will use the desired number of cores
 
 ```bash
         # Check the config.yaml file
         cat ~/.spack/config.yaml
-        config:
-        build_stage:
-        - ~/.spack/stage
+config:
+  build_stage:
+   - ~/.spack/stage
 
-        build_jobs: 4
+  build_jobs: 4
 ```
 
 ## Building Damaris and Paraview Catalyst dependencies.
@@ -95,19 +106,32 @@ We will create a Spack *environment* to work from. This is a filesystem area tha
     spack env create damaris-catalyst
     spack env activate damaris-catalyst
 ```
+
+To support OpenMPI/MPI ensure the Spack environment is loaded by your shell by adding the following to your `~/.bashrc` file 
+
+```bash
+        cat ~/.bashrc
+...
+spack env activate damaris-catalyst
+```
   
 ### Install Damaris  
 The following `spack install` command should build and install Damaris and all of its dependencies including the Paraview Catalyst libraries. This process can take a long time (multiple hours). If a particular part fails ([LLVM for example ](#llvm_install_issues)) then the Spack environment should be removed using `spack env rm <env-name>` and then re-created. The `--keep-stage` option is needed so that the Damaris examples are not removed when the build directory is cleaned, as the Damaris Spack install does not install the examples for us.  
   
 ```bash
+    # Install your favourite editor
+    spack install nano
+    # Install dependencies without keeping the staging directory (saves disk space)
+    spack install catalyst@5.6.0+osmesa+rendering ^mesa+osmesa swr=avx ^llvm@8.0.0 target=sandybridge
+    
     # Install Damaris and dependencies
-    spack install --keep-stage damaris+catalyst+hdf5+examples ^catalyst@5.6.0+osmesa+rendering ^mesa+osmesa swr=avx ^llvm@7.0.0 target=sandybridge
+    spack install --keep-stage damaris+catalyst+hdf5+examples+fortran
 ```  
   
 The Mesa 'swr' option can be specified for x86_64 CPUs dependent on the architecture of the CPU on the compute nodes. I have specifed `swr=avx` and `target=Sandybridge` so that libs are compatible with my VM CPU.
 
 
-## Run a Damaris example and have it connect to Paraview {#run_damaris_example}
+## Run a Damaris example and have it connect to Paraview{#run_damaris_example}
 Download and install a Paraview version that matches the version of Catalyst that was installed via Spack available here: [https://www.paraview.org/download/](https://www.paraview.org/download/). There are pre-compiled executables available for Windows, Mac and Linux. When using Linux on compute nodes or on a VM no GPU support then check out notes on running with Mesa in [appendix below](#notes_on_mesa).  
 
 ### Find and set up the example simulation code
@@ -193,7 +217,7 @@ Now that the data is available in the Pipeline Browser the full set of visualiza
 
 
 
-{ \pagebreak }
+
 
 
 
@@ -271,7 +295,7 @@ Set up sshfs between a VM and Grid5000 user Rennes NFS filesystem
 ### A3. Some notes on Graphics drivers on Linux: {#notes_on_mesa}
 [Return to Run Damaris Example](#run_damaris_example)  
 
-Running Catalyst on systems without dedicated graphics hardware (i.e. VM, compute nodes of clusters) requires Mesa 3D graphics libraries which are used for OpenGL rendering support. Mesa uses the llvm infrastructure so llvm will be installed as a dependency (see [LLVM Installation Issues](#llvm_install_issues)).
+Running Catalyst on systems without dedicated graphics hardware (i.e. Virtual Machines and compute nodes of clusters) requires Mesa 3D graphics libraries which are used for OpenGL rendering support. Mesa uses the llvm infrastructure so llvm will be installed as a dependency (see [LLVM Installation Issues](#llvm_install_issues)).
 For a better understanding of the Mesa driver infrastructure and its multiple options, please see: [www.paraview.org/ParaView_And_Mesa_3D](https://www.paraview.org/Wiki/ParaView/ParaView_And_Mesa_3D)) 
 
 OSMesa ("Off Screen Mesa") is the front end to various drivers that provide different levels of acceleration support.
@@ -341,12 +365,12 @@ N.B. install_path can be determined using spack env st
 ```
   
 
-### A5. Installation of dependencies on VM with restricted memory
-I had trouble installing Catalyst on a Debian 10 VM, which was narrowed down to the limited amount of RAM available (2GB running XFCE over Xrdp/VNC). This affected LLVM and Catalyst builds (vtkDataArray.cxx compile was a common fail point). On machines where LLVM did compile then the Mesa build would fail for LLVM versions >=9.0. The Spack Mesa installation is restricted to versions <=18.3.6 when installing with Spack as the build system was changed from autotools to meson after that version.
+### A5. Installation of Damaris dependencies on VM with restricted memory
+There can be multiple issues found when installing Catalyst on systems with limited amount of available RAM (e.g. 2GB running XFCE over Xrdp/VNC). This will affect LLVM and Catalyst builds (vtkDataArray.cxx compile was a common fail point). On machines where LLVM did compile then the Mesa build would fail for LLVM versions >=9.0. The Spack Mesa installation is restricted to versions <=mesa@18.3.6 when installing with Spack as the Mesa build system was changed to used meson which is not yet supported by Spack.
 
 #### To overcome LLVM installation issues {#llvm_install_issues}
 LLVM was a source of multiple issues during installation of Damaris with visualization support when using Spack. 
-1. Need for a machine with a good amount of RAM otherwise the LLVM build will fail.  
+1. Require a machine with >2GB RAM otherwise the LLVM build may fail (see below).  
 2. LLVM versions <=8.0.0 are compatible with the Mesa installed by Spack (mesa@18.3.6)  
 
 A way around the RAM requirement is to get Spack to use a system installed llvm. You may need to install clang/llvm using your system package manager first.  
@@ -369,129 +393,7 @@ packages:
     version: [7.0]
 
 ```
-#### Try to fix the Catalyst build fail
-I downloaded and configured a Catalyst repository that had been pre- catalize.py'ed from the ParaView files download site. *It compiled and installed*.
-I then created a spack package that used the same source so that Spack could install it in the environment ready for Damaris installation. *The build failed*.   
-I then decided to exit my VM and compile from a terminal without TigerVNC and XFCE overheads. *The full `spack install damaris` command worked* - albeit with system installed llvm.
+
+#### Fix for Catalyst build fail
+The Catalyst libraries were also found to require as much as available of 2GB RAM for building. Logging out of the VNC session and killing the server of my build machine and compilation from a terminal without TigerVNC and XFCE overheads succeeded, albeit with the system installed llvm.
   
-
-### A6. Create a cmake based Spack package from a url download of a repository:
-```bash
-    # Created a new package spack for some know catalyst code that would build and install
-    spack create -n catalyst-mybuild -f -t cmake http://www.paraview.org/files/v5.6/Catalyst-v5.6.0-Base-Enable-Python-Essentials-Extras-Rendering-Base.tar.xz
-
-
-    # All options are hard-coded and set in the cmake build step by spack.
-    # N.B. If LLVM install failed then the llvm version should match what is in the .spack/packages.yaml file
-    spack install catalyst-mybuild@5.6.0 ^mesa+osmesa swr=avx ^llvm@7.0.0
-```
-  
-#### The Spack spec file
-Available via `spack edit catalyst-mybuild`
-  
-```python
-from spack import *
-
-class CatalystMybuild(CMakePackage):
-    """ A package to install catalyst with python3+mpi+rendering with osmesa support.
-        The tar archive has cmake already set up for catalyst and uses the pre-made cmake.sh
-        to configure the build, adding spack environment details (rpath, install prefix).
-        I'm reasonably sure the code is derived from the catalize.py script in the main paraview
-        codebase.
-        uses Catalyst-v5.6.0-Base-Enable-Python-Essentials-Extras-Rendering-Base.tar.xz
-    """
-
-    # FIXME: Add a proper url for your package's homepage here.
-    homepage = "https://www.paraview.org"
-    url      = "http://www.paraview.org/files/v5.6/Catalyst-v5.6.0-Base-Enable-Python-Essentials-Extras-Rendering-Base.tar.xz"
-
-    # Add a list of GitHub accounts to
-    # notify when the package is updated.
-    maintainers = ['jcbowden']
-
-    version('5.6.2-Base-Enable-Python-Essentials-Extras-Rendering-Base', sha256='61ed20028f23d5e8926e8783d8ff6ce6503e8989a12cd83e1a8422d571')
-    version('5.6.1-Base-Enable-Python-Essentials-Extras-Rendering-Base', sha256='dd60dead6469cce91014f31137b386860078dc284231ea2da2fc884b21')
-    version('5.6.0-Base-Enable-Python-Essentials-Extras-Rendering-Base', sha256='198440b2a95b585db6063cce04809f49ca19f8bbf5b219356cb615da26')
-
-
-    depends_on('git', type='build')
-    depends_on('mpi')
-    depends_on('python@3:', type=('build', 'link', 'run'))
-
-    depends_on('py-numpy', type=('build', 'run'))
-    depends_on('py-mpi4py', type=('build', 'run'))
-
-    depends_on('gl@3.2:')
-    depends_on('mesa+osmesa')
-    # depends_on('glx', when='+rendering~osmesa')
-    depends_on('cmake@3.3:', type='build')
-
-    def setup_run_environment(self, env):
-        # paraview 5.5 and later
-        # - cmake under lib/cmake/paraview-5.5
-        # - libs  under lib
-        # - python bits under lib/python2.8/site-packages
-        if os.path.isdir(self.prefix.lib64):
-            lib_dir = self.prefix.lib64
-        else:
-            lib_dir = self.prefix.lib
-
-        if self.spec.version <= Version('5.4.1'):
-            lib_dir = join_path(lib_dir, paraview_subdir)
-        env.set('ParaView_DIR', self.prefix)
-        env.prepend_path('LIBRARY_PATH', lib_dir)
-        env.prepend_path('LD_LIBRARY_PATH', lib_dir)
-
-        python_version = self.spec['python'].version.up_to(2)
-        env.prepend_path('PYTHONPATH', join_path(lib_dir,
-                         'python{0}'.format(python_version),
-                         'site-packages'))
-
-    def setup_dependent_build_environment(self, env, dependent_spec):
-        env.set('ParaView_DIR', self.prefix)
-
-
-    @property
-    def build_directory(self):
-        """Returns the directory to use when building the package
-
-        :return: directory where to build the package
-        """
-        return join_path(os.path.abspath(self.stage.source_path),
-                         'spack-build')
-
-    def cmake_args(self):
-        """Populate cmake arguments for Catalyst."""
-        spec = self.spec
-
-        cmake_args = [
-            '-DPARAVIEW_GIT_DESCRIBE=v%s' % str(self.version),
-            '-DVTK_USE_SYSTEM_EXPAT:BOOL=ON',
-            '-DVTK_USE_X:BOOL=OFF',
-            '-DVTK_USE_OFFSCREEN:BOOL=ON',
-            '-DVTK_OPENGL_HAS_OSMESA:BOOL=ON',
-        ]
-        cmake_args.extend([
-            '-DPARAVIEW_ENABLE_PYTHON:BOOL=ON',
-            '-DPYTHON_EXECUTABLE:FILEPATH=%s' %
-            spec['python'].command.path,
-            '-DVTK_USE_SYSTEM_MPI4PY:BOOL=ON'
-        ])
-
-        if spec.platform == 'linux' and spec.target == 'aarch64':
-            cmake_args.append('-DCMAKE_CXX_FLAGS=-DPNG_ARM_NEON_OPT=0')
-            cmake_args.append('-DCMAKE_C_FLAGS=-DPNG_ARM_NEON_OPT=0')
-
-        return cmake_args
-
-    def cmake(self, spec, prefix):
-        """Runs ``cmake`` in the build directory through the cmake.sh script"""
-        cmake_script_path = os.path.join(
-           os.path.abspath(self.root_cmakelists_dir),
-           'cmake.sh')
-        with working_dir(self.build_directory, create=True):
-           subprocess.check_call([cmake_script_path,
-                                  os.path.abspath(self.root_cmakelists_dir)] +
-                                  self.cmake_args() + self.std_cmake_args)
-
-```
