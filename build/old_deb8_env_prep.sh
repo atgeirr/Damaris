@@ -10,8 +10,7 @@
 # sudo apt-get install gfortran gcc g++ git-core python-dev
 
 v1CMAKE=1
-# mpich or openmpi
-v2MPI_IMPL=openmpi
+v2MPI_IMPL=mpich #mpich or openmpi
 v3XERCESS=1
 v4XSD=1
 v5BOOST=1
@@ -21,7 +20,7 @@ v8VISIT=1
 v9CATALYST=1
 v10COMPILE=1
 
-make_jobs=2
+make_jobs=4
 
 export install_path=/opt/damaris/local
 export PATH=$install_path/bin:$PATH
@@ -119,7 +118,7 @@ if (( $v1CMAKE == 1 )); then
   tar -xzf cmake-3.12.3.tar.gz
   cd cmake-3.12.3
   ./bootstrap --prefix=$install_path
-  make -j1
+  make -j$make_jobs
   make install
 fi
 
@@ -164,7 +163,8 @@ if (( $v4XSD == 1 )); then
  tar -xjf xsd-4.0.0+dep.tar.bz2
  cd xsd-4.0.0+dep
  make -j$make_jobs LDFLAGS="-L${install_path}/lib/" CFLAGS="-I ${install_path}/include" CXXFLAGS="-I ${install_path}/include/"
- make install_prefix=$install_path install LDFLAGS="-L${install_path}/lib/" CFLAGS="-I ${install_path}/include" CXXFLAGS="-I ${install_path}/include/"
+ make install_prefix=$install_path install LDFLAGS="-L${install_path}/lib/" CFLAGS="-I ${install_path}/include" 
+ CXXFLAGS="-I ${install_path}/include/"
 fi
 
 
@@ -176,8 +176,7 @@ if (( $v5BOOST == 1 )); then
  tar -xzf boost_1_67_0.tar.gz
  cd boost_1_67_0
  ./bootstrap.sh --prefix=$install_path --with-libraries=thread,log,date_time,program_options,filesystem,system
- # ./b2 threading=multi,single # seem like both of these together is not supported
- ./b2 threading=multi
+ ./b2 threading=multi,single
  ./b2 install
 fi
 
@@ -198,9 +197,8 @@ fi
 if (( $v7HDF5 == 1 )); then
     echo -e "--- COMPILING & INSTALLING HDF5 ---------------------------------------------------------------\n"
     cd $tempdir
-    # wget --no-check-certificate https://support.hdfgroup.org/ftp/HDF5/current18/src/hdf5-1.8.20.tar
-    wget --no-check-certificate https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8/hdf5-1.8.20/src/hdf5-1.8.20.tar.gz
-    tar -xvf hdf5-1.8.20.tar.gz
+    wget --no-check-certificate https://support.hdfgroup.org/ftp/HDF5/current18/src/hdf5-1.8.20.tar
+    tar -xvf hdf5-1.8.20.tar
     cd hdf5-1.8.20
     ./configure --enable-parallel --prefix=$install_path
     make -j$make_jobs
@@ -214,10 +212,6 @@ fi
 # ! still some issue compiling IceT 1.0 ! -> with cmake 2.6.4 it worked compiling IceT
 # But Visit needs cmake 3.8 and higher, so we move to latest cmake
 
-
-# meson builddir -Dosmesa=gallium -Dgallium-drivers=swrast -Ddri-drivers=[] -Dvulkan-drivers=[] -Dprefix=$PWD/builddir/install
-# ninja -C builddir install
-
 #Just run: ./env_prep.sh custom 0 none 0 0 0 0 0 1 0 0
 # Installling Visit
 if (( $v8VISIT == 1 )); then
@@ -225,15 +219,9 @@ if (( $v8VISIT == 1 )); then
   cd $tempdir
   mkdir -p visit
   cd visit
-  # wget http://portal.nersc.gov/project/visit/releases/2.13.2/build_visit2_13_2
-  wget https://github.com/visit-dav/visit/releases/download/v3.1.1/build_visit3_1_1
+  wget http://portal.nersc.gov/project/visit/releases/2.13.2/build_visit2_13_2
   chmod +x build_visit2_13_2
-  #./build_visit2_13_2 --server-components-only --mesa --system-cmake --parallel --prefix $install_path/visit
-PAR_COMPILER=$install_path/bin/mpicc \
-PAR_COMPILER_CXX=$install_path/bin/mpicxx \
-PAR_INCLUDE=-I$install_path/include \
-PAR_LIBS=-lmpi \
-./build_visit3_1_1 --server-components-only --mesagl --system-cmake --parallel --prefix $install_path/visit
+  ./build_visit2_13_2 --server-components-only --mesa --system-cmake --parallel --prefix $install_path/visit
   visit_arg="-DENABLE_VISIT=ON -DVisIt_ROOT=$install_path"
 fi
 
@@ -247,7 +235,7 @@ if (( $v9CATALYST == 1 )); then
   echo -e "--- COMPILING & INSTALLING CATALYST -----------------------------------------------------------------\n"
   cd $tempdir
   wget -O Catalyst-5.6.tar.gz "https://www.paraview.org/paraview-downloads/download.php?submit=Download&version=v5.6&type=catalyst&os=Sources&downloadFile=Catalyst-v5.6.0-RC2-Base-Enable-Python-Essentials-Extras-Rendering-Base.tar.gz"
-  tar -xvf Catalyst-5.6.tar.gz
+  tar -xf Catalyst-5.6.tar.gz
   cd Catalyst-v5.6.0-RC2-Base-Enable-Python-Essentials-Extras-Rendering-Base
   mkdir -p catalyst-build
   cd catalyst-build

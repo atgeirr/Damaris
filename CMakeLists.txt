@@ -10,7 +10,7 @@ project(DAMARIS)
 #
 set(DAMARIS_VERSION_MAJOR 1)
 set(DAMARIS_VERSION_MINOR 3)
-set(DAMARIS_VERSION_PATCH 1)
+set(DAMARIS_VERSION_PATCH 2)
 set(DAMARIS_VERSION "${DAMARIS_VERSION_MAJOR}.${DAMARIS_VERSION_MINOR}.${DAMARIS_VERSION_PATCH}")
 
 #----------------------------------------------------------------------------#
