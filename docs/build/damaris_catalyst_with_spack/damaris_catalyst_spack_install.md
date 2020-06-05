@@ -9,6 +9,7 @@ build_command: pandoc  --pdf-engine=xelatex -s --highlight-style haddock --listi
 # Installation of Damaris with Catalyst Support using Spack 
 This documentation is currently augmenting what is available on [https://project.inria.fr/damaris/](https://project.inria.fr/damaris/paraview-connector/). It is targeted to software versions Damaris 1.3.1, Catalyst 5.6.0 and Spack 0.14.2.
 
+
 ## [Install and configure Spack]{#configure_spack}
 
 We will be using Spack ([https://spack.io/](https://spack.io/)) to install the full graph of dependencies of Damaris with Catalyst support. This will require a couple of hours or so to complete and is best done on a compute node with multiple cores. See [Appendix](#appendix_grid5000) for instructions on how to request extra resources on Grid5000.  
@@ -55,7 +56,7 @@ source ~/.bashrc
 ...
 ```
 
-4. Check that your Spack build will use the desired number of cores
+4. Check that your Spack build will use the desired number of cores. Also set the staging directory to something with plenty of room. The whole install takes around 7GB and another 1.5G for the Spack download cache. More space will be required if builds fail resulting in multiple versions of libraries installed.
 
 ```bash
         # Check the config.yaml file
@@ -83,7 +84,7 @@ packages:
 ```
 
 ### Update the Damaris package file
-Make sure the Damaris Spack 'package.py' file needs to be updated to specify `catalyst+python3` *not* `catalyst+python`. Also needed in the file are commands to add a CMake `examples` variant and the CMake flag to build the Damaris examples.  
+Make sure the Damaris Spack 'package.py' file is updated to specify `catalyst+python3` *not* `catalyst+python`. Also needed in the file are commands to add a CMake `examples` variant and the CMake flag to build the Damaris examples.  
   
 An updated Damaris Spack 'package.py' file is available from the [gitlab repository](https://gitlab.inria.fr/Damaris/damaris/-/tree/master/build/spack/repo/packages/damaris) and can be used by setting up a custom Spack repository by adding the path to the `build/spack/repo` directory to the file `~/.spack/repos.yaml`. 
 
@@ -411,5 +412,5 @@ packages:
 ```
 
 #### Fix for Catalyst build fail
-The Catalyst libraries were also found to require as much as available of 2GB RAM for building. Logging out of the VNC session and killing the server of my build machine and compilation from a terminal without TigerVNC and XFCE overheads succeeded, albeit with the system installed llvm.
+The Catalyst libraries were also found to require as much of the 2GB RAM available on my machine for building. Logging out of the VNC session and killing the VNC server and then compilation from a terminal without TigerVNC and XFCE overheads succeeded, albeit with the system installed llvm.
   
