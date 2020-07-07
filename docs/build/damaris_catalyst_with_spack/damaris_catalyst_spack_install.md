@@ -93,7 +93,7 @@ An updated Damaris Spack 'package.py' file is available from the [gitlab reposit
 repos:
 - <git repo dir>/damaris/build/spack/repo
 
-    $ cat <git repo dir>/damaris/build/spack/repo/repos.yaml
+    $ cat <git repo dir>/damaris/build/spack/repo/repo.yaml
 repo:
   namespace: 'damaris.gitlab.dev'
 
