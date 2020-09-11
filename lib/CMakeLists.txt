@@ -101,7 +101,7 @@ endif()
 add_library(damaris 	${DAMARIS_SRC}
 			${DAMARIS_VISIT_SRC}
 			${DAMARIS_HDF5_SRC} 
-                        ${DAMARIS_PARAVIEW_SRC}
+			${DAMARIS_PARAVIEW_SRC}
 			${DAMARIS_FORTRAN_MODULE})
 
 include_directories(${CMAKE_BINARY_DIR}/include/damaris
@@ -205,13 +205,25 @@ if(ENABLE_VISIT)
   endforeach(p)
 endif(ENABLE_VISIT)
 # optional: Catalyst
+
 if(ENABLE_CATALYST)
-  set(PV_CFG_ARGS --libs vtkPVPythonCatalyst vtkParallelMPI vtkUtilitiesPythonInitializer)
-  add_custom_command(OUTPUT pv-config.out COMMAND $<TARGET_FILE:paraview-config-launcher> ${PV_CFG_ARGS} > pv-config.out)
-  add_custom_target(damaris.pc COMMAND ${DAMARIS_SOURCE_DIR}/lib/make-pc-file.sh DEPENDS pv-config.out)
+  # target_link_libraries(damaris ParaView::PythonCatalyst VTK::mpi)  
+  if(ParaView_VERSION VERSION_LESS "5.7")
+    set(PV_CFG_ARGS --libs vtkPVPythonCatalyst vtkParallelMPI vtkUtilitiesPythonInitializer)
+    add_custom_command(OUTPUT pv-config.out COMMAND $<TARGET_FILE:paraview-config> ${PV_CFG_ARGS} > pv-config.out)
+    add_custom_target(damaris.pc COMMAND ${DAMARIS_SOURCE_DIR}/lib/make-pc-file.sh DEPENDS pv-config.out)
+    message(STATUS "ParaView < 5.7 setting pkg-config libraries") 
+  else()
+    set(PV_CFG_ARGS --libs ParaView::PythonCatalyst VTK::mpi)
+    add_custom_command(OUTPUT pv-config.out COMMAND $<TARGET_FILE:paraview-config> ${PV_CFG_ARGS} > pv-config.out)
+    add_custom_target(damaris.pc COMMAND ${DAMARIS_SOURCE_DIR}/lib/make-pc-file.sh DEPENDS pv-config.out)
+    message(STATUS "ParaView >= 5.7 setting pkg-config libraries") 
+  endif()
+
 else(ENABLE_CATALYST)
   add_custom_target(damaris.pc COMMAND sed -e s/PV_LIBS//g damaris.pc.in > damaris.pc)
 endif(ENABLE_CATALYST)  
+
 # remove dublicates
 list(REMOVE_DUPLICATES LIBS_LIST_FOR_PKGCONFIG)
 list(REMOVE_DUPLICATES LIBS_DIR_LIST_FOR_PKGCONFIG)

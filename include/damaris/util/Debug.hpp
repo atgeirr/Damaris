@@ -39,9 +39,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #define __RFILE__ boost::filesystem::path(__FILE__).leaf()
 
 #ifdef __BENCHMARK
-#define TIMER_START(timer) \
+#define TIMER_START(timer) { \
 	boost::posix_time::ptime timer( \
-		boost::posix_time::microsec_clock::local_time());
+		boost::posix_time::microsec_clock::local_time()); }
 		
 #define TIMER_STOP(timer, message) {\
 	boost::posix_time::ptime now(\
@@ -56,17 +56,17 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #define TIMER_STOP(timer, message)
 #endif
 
-#define MESSAGE(out, level, message)\
+#define MESSAGE(out, level, message) { \
     out << "[" << level << " " << \
 	boost::posix_time::microsec_clock::local_time() << "] [" \
 	<< __RFILE__ << ":" << __LINE__ << ":" << __FUNCTION__ << "] " \
 	<< message << std::endl; \
-    out.flush()
+    out.flush() ; }
 
-#define SIMPLE(out,level, message)\
+#define SIMPLE(out,level, message) { \
 	out << "[" << level << " " << \
 		boost::posix_time::microsec_clock::local_time() << "] "\
-		<< message << std::endl
+		<< message << std::endl ; }
 
 namespace damaris {
 

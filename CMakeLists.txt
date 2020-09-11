@@ -1,17 +1,22 @@
 cmake_minimum_required (VERSION 3.12) # Required because of policy CMP0074
 
+if(${CMAKE_VERSION} VERSION_EQUAL "3.18") 
+    message("WARNING: CMake v3.18 is known to have issues finding OpenMPI libraries")
+    message("WARNING: CMake v3.14.1 was found to work fine.")
+endif()
 #----------------------------------------------------------------------------#
 # Starting project definition
 #----------------------------------------------------------------------------#
-project(DAMARIS)
+project(DAMARIS VERSION 1.4.0)
 
 #
 # library version set here (e.g. for shared libs).
 #
-set(DAMARIS_VERSION_MAJOR 1)
-set(DAMARIS_VERSION_MINOR 3)
-set(DAMARIS_VERSION_PATCH 2)
-set(DAMARIS_VERSION "${DAMARIS_VERSION_MAJOR}.${DAMARIS_VERSION_MINOR}.${DAMARIS_VERSION_PATCH}")
+# set(DAMARIS_VERSION_MAJOR 1)
+# set(DAMARIS_VERSION_MINOR 3)
+# set(DAMARIS_VERSION_PATCH 2)
+# set(DAMARIS_VERSION "${DAMARIS_VERSION_MAJOR}.${DAMARIS_VERSION_MINOR}.${DAMARIS_VERSION_PATCH}")
+
 
 #----------------------------------------------------------------------------#
 # Set the location of CMake Modules
@@ -63,7 +68,7 @@ if(ENABLE_FORTRAN)
 endif(ENABLE_FORTRAN)
 
 #----------------------------------------------------------------------------#
-set(CMAKE_CXX_FLAGS "-g -O2 -Wno-unused-variable -Wno-unused-parameter -Wall -rdynamic")
+set(CMAKE_CXX_FLAGS "-O2 -Wno-unused-variable -Wno-unused-parameter -Wall -rdynamic")
 #set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra") # for development only
 
 #----------------------------------------------------------------------------#
@@ -88,6 +93,8 @@ set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 find_package(Threads REQUIRED)
 find_package(Boost 1.65.0 REQUIRED COMPONENTS thread log log_setup filesystem system date_time)
+message(STATUS "Boost BOOST_BIND_GLOBAL_PLACEHOLDERS defined to remove warnings - perhaps check for issue?")
+add_definitions("-DBOOST_BIND_GLOBAL_PLACEHOLDERS")
 include_directories(${Boost_INCLUDE_DIRS})
 link_directories(${Boost_LIBRARY_DIRS})
 list(APPEND DEP_LIBRARIES Boost::thread Boost::log Boost::log_setup Boost::filesystem Boost::date_time)
@@ -139,12 +146,22 @@ endif(ENABLE_HDF5)
 # Set everything related to ParaView
 #----------------------------------------------------------------------------#
 if(ENABLE_CATALYST)
-  find_package(ParaView 4.3 REQUIRED COMPONENTS vtkPVPythonCatalyst vtkParallelMPI vtkUtilitiesPythonInitializer)
-  include("${PARAVIEW_USE_FILE}")
-  set(HAVE_PARAVIEW_ENABLED 1)
-  set(PARAVIEW_LIBRARIES "vtkUtilitiesPythonInitializer;vtkPVPythonCatalyst;vtkParallelMPI")
+  # find_package(ParaView 4.2 REQUIRED COMPONENTS vtkPVPythonCatalyst vtkParallelMPI vtkUtilitiesPythonInitializer)  
+  find_package(ParaView 4.2 REQUIRED COMPONENTS PythonCatalyst)
+  if(ParaView_VERSION VERSION_LESS "5.7")
+    include("${PARAVIEW_USE_FILE}")
+    set(HAVE_PARAVIEW_ENABLED 1)
+    set(PARAVIEW_LIBRARIES "vtkUtilitiesPythonInitializer" "vtkPVPythonCatalyst" "vtkParallelMPI")
+    message(STATUS "ParaView < 5.7 found")
+  else()
+    set(HAVE_PARAVIEW_ENABLED 1)
+    set(PARAVIEW_LIBRARIES "ParaView::PythonCatalyst" "VTK::mpi")
+    message(STATUS "ParaView >= 5.7 found")
+  endif()
+  
   list(APPEND DEP_LIBRARIES ${PARAVIEW_LIBRARIES})
   add_definitions("-DUSE_CATALYST")
+  # target_link_libraries(DAMARIS ParaView::PythonCatalyst VTK::mpi)
 endif(ENABLE_CATALYST)
 
 #----------------------------------------------------------------------------#
@@ -171,6 +188,7 @@ endfunction()
 #----------------------------------------------------------------------------#
 CONFIGURE_FILE(${DAMARIS_SOURCE_DIR}/include/Damaris.h.in 
 	       ${CMAKE_BINARY_DIR}/include/Damaris.h)
+	       
 
 #----------------------------------------------------------------------------#
 # Add the proper subdirectories
