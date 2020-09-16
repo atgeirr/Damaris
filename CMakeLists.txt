@@ -68,7 +68,7 @@ if(ENABLE_FORTRAN)
 endif(ENABLE_FORTRAN)
 
 #----------------------------------------------------------------------------#
-set(CMAKE_CXX_FLAGS "-O2 -Wno-unused-variable -Wno-unused-parameter -Wall -rdynamic")
+set(CMAKE_CXX_FLAGS "-Wno-unused-variable -Wno-unused-parameter -Wall -rdynamic")
 #set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra") # for development only
 
 #----------------------------------------------------------------------------#
@@ -93,7 +93,7 @@ set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 find_package(Threads REQUIRED)
 find_package(Boost 1.65.0 REQUIRED COMPONENTS thread log log_setup filesystem system date_time)
-message(STATUS "Boost BOOST_BIND_GLOBAL_PLACEHOLDERS defined to remove warnings - perhaps check for issue?")
+message(WARNING "WARNING Boost BOOST_BIND_GLOBAL_PLACEHOLDERS defined to remove warnings - perhaps check for issue?")
 add_definitions("-DBOOST_BIND_GLOBAL_PLACEHOLDERS")
 include_directories(${Boost_INCLUDE_DIRS})
 link_directories(${Boost_LIBRARY_DIRS})
@@ -157,11 +157,11 @@ if(ENABLE_CATALYST)
     set(HAVE_PARAVIEW_ENABLED 1)
     set(PARAVIEW_LIBRARIES "ParaView::PythonCatalyst" "VTK::mpi")
     message(STATUS "ParaView >= 5.7 found")
+    # message(STATUS "ParaView_LIBRARIES: ${ParaView_LIBRARIES}")
+    # message(STATUS "VTK_LIBRARIES: ${VTK_LIBRARIES}")
   endif()
-  
   list(APPEND DEP_LIBRARIES ${PARAVIEW_LIBRARIES})
   add_definitions("-DUSE_CATALYST")
-  # target_link_libraries(DAMARIS ParaView::PythonCatalyst VTK::mpi)
 endif(ENABLE_CATALYST)
 
 #----------------------------------------------------------------------------#
@@ -170,6 +170,7 @@ endif(ENABLE_CATALYST)
 if(ENABLE_TESTS)
   find_package(CppUnit)
   include_directories(${CPPUNIT_INCLUDE_DIR})
+  include_directories(${ParaView_INCLUDE_DIRS})
   enable_testing()
 endif(ENABLE_TESTS)
 
