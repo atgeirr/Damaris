@@ -30,9 +30,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 namespace damaris {
 
 /**
- * The ParaViewAdaptor class allows only one instance of it to be created. It acts as a mediator between Damaris classes and ParaView Catalyst
- * functionality. At the end of each iteration, this class will be responsible for updating the live visualizatio of the data collected at the
- * servers.
+ * The ParaViewAdaptor class allows only one instance of it to be created. It acts as a mediator between 
+ * Damaris classes and ParaView Catalyst functionality. At the end of each iteration, this class will be 
+ * responsible for updating the live visualization of the data collected at the servers.
  */
 class ParaViewAdaptor
 {

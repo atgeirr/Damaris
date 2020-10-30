@@ -642,11 +642,13 @@ bool Variable::AddBlocksToVtkGrid(vtkMultiPieceDataSet* vtkMPGrid , int iteratio
     return true;
 }
 
+
 template <typename T>
 bool Variable::AddBufferToVtkGrid(vtkDataSet* grid , T* buffer , int64_t size)
 {
 	vtkAOSDataArrayTemplate<T>* varData = nullptr;
 	std::string varName = GetName();
+   int numVectComponents = 1;
 
 	if (IsNodal()) { // Data is stored on the points
 		if (grid->GetPointData()->GetArray(varName.c_str()) == nullptr) { // No array is assigned to grid for this variable
@@ -655,7 +657,7 @@ bool Variable::AddBufferToVtkGrid(vtkDataSet* grid , T* buffer , int64_t size)
             vtkNew<vtkAOSDataArrayTemplate<T>> pointData;
 
 			pointData->SetName(varName.c_str());
-			pointData->SetNumberOfComponents(1);   // Always 1 for scalar data
+			pointData->SetNumberOfComponents(numVectComponents);   // Always 1 for scalar data
             grid->GetPointData()->AddArray(pointData.GetPointer());
         }
         varData = vtkAOSDataArrayTemplate<T>::SafeDownCast(grid->GetPointData()->GetArray(GetName().c_str()));
@@ -663,13 +665,19 @@ bool Variable::AddBufferToVtkGrid(vtkDataSet* grid , T* buffer , int64_t size)
 	else if (IsZonal()) { // Data is stored on the cells
 
 		if (grid->GetCellData()->GetArray(varName.c_str()) == nullptr) {
-            // Create relevant vtkDataArray for Cell data
-            vtkNew<vtkAOSDataArrayTemplate<T>> cellData;
+         // Create relevant vtkDataArray for Cell data
+         vtkNew<vtkAOSDataArrayTemplate<T>> cellData;
 
 			cellData->SetName(varName.c_str());
-            cellData->SetNumberOfComponents(1);  // Always 1???
-            grid->GetCellData()->AddArray(cellData.GetPointer());
-        }
+         
+         // if (GetModel().type() == damaris::model::VarType::vector )
+         //    numVectComponents = etModel().vectortype().components();
+      
+         numVectComponents = GetModel().vectorlength() ; 
+         
+         cellData->SetNumberOfComponents(numVectComponents);  // Always 1???
+         grid->GetCellData()->AddArray(cellData.GetPointer());
+      }
         varData = vtkAOSDataArrayTemplate<T>::SafeDownCast(grid->GetCellData()->GetArray(GetName().c_str()));
 	}
 	else {

@@ -109,8 +109,8 @@
 			<xs:attribute name="name"         type="xs:string" use="required"/>
 			<xs:attribute name="type"         type="mdl:Type"  use="required"/>
 			<xs:attribute name="dimensions"   type="xs:string" use="required" />
-			<xs:attribute name="global"	  type="xs:string"    use="optional" default="#"/>
-			<xs:attribute name="ghosts"	  type="xs:string"    use="optional" default="#"/>
+			<xs:attribute name="global"	    type="xs:string"    use="optional" default="#"/>
+			<xs:attribute name="ghosts"	    type="xs:string"    use="optional" default="#"/>
 			<xs:attribute name="language"     type="mdl:Language" use="optional" default="unknown"/>
 			<xs:attribute name="visualizable" type="xs:boolean"   use="optional" default="true"/>
 		</xs:extension>
@@ -132,6 +132,27 @@
 			<xs:enumeration value="curve" />
 		</xs:restriction>
 	</xs:simpleType>
+   
+   <!-- Vector layout type 
+   <xs:simpleType name="StructType"> 
+      <xs:restriction base="xs:string">
+         <xs:enumeration value="ArrayOfStructs" />
+         <xs:enumeration value="StructOfArrays" />
+      </xs:restriction>
+   </xs:simpleType> 
+   -->
+   <!-- Vector layout description 
+   <xs:complexType  name="Vector">
+      <xs:simpleContent>
+         <xs:extension base="xs:string">
+            <xs:attribute name="name"       type="xs:string" use="required" />
+	   	   <xs:attribute name="type"       type="mdl:StructType" use="optional" default="ArrayOfStructs" />
+	   	   <xs:attribute name="components" type="xs:unsignedInt" use="optional" default="1" />
+         </xs:extension>
+      </xs:simpleContent>
+	</xs:complexType>	
+   -->
+
 
 	<!-- Variable centering -->
 	<xs:simpleType name="VarCentering">
@@ -145,16 +166,17 @@
 	<xs:complexType name="Variable">
 		<xs:simpleContent>
 		<xs:extension base="xs:string">
-			<xs:attribute name="name"    type="xs:string"  use="required"/>
-			<xs:attribute name="unit"    type="xs:string"  use="optional" default=""/>
-			<xs:attribute name="layout"  type="xs:string"  use="required"/>
-			<xs:attribute name="enabled" type="xs:boolean" use="optional" default="true"/>
-			<xs:attribute name="mesh"	 type="xs:string"  use="optional" default="#"/>
-			<xs:attribute name="type"    type="mdl:VarType" use="optional" default="scalar"/>
-			<xs:attribute name="centering" type="mdl:VarCentering" use="optional" default="zonal"/>
+			<xs:attribute name="name"       type="xs:string"   use="required"/>
+			<xs:attribute name="unit"       type="xs:string"   use="optional" default=""/>
+			<xs:attribute name="layout"     type="xs:string"   use="required"/>
+			<xs:attribute name="enabled"    type="xs:boolean"  use="optional" default="true"/>
+			<xs:attribute name="mesh"	     type="xs:string"   use="optional" default="#"/>
+			<xs:attribute name="type"       type="mdl:VarType" use="optional" default="scalar"/>
+         <xs:attribute name="vectorlength" type="xs:unsignedInt"  use="optional" default="1" />
+			<xs:attribute name="centering"    type="mdl:VarCentering" use="optional" default="zonal"/>
 			<xs:attribute name="visualizable" type="xs:boolean" use="optional" default="true"/>
 			<xs:attribute name="time-varying" type="xs:boolean" use="optional" default="true"/>
-			<xs:attribute name="store"	type="xs:string" use="optional" default="#"/>
+			<xs:attribute name="store"	       type="xs:string"  use="optional" default="#"/>
 		</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
@@ -209,11 +231,11 @@
 	<!-- Mesh node -->
 	<xs:complexType name="Mesh">
 		<xs:sequence>
-			<xs:element name="coord" type="mdl:Coord" minOccurs="2" maxOccurs="3"/>
+			<xs:element name="coord"   type="mdl:Coord" minOccurs="2" maxOccurs="3"/>
 		</xs:sequence>
-		<xs:attribute name="name" type="xs:string"    use="required"/>
-		<xs:attribute name="type" type="mdl:MeshType" use="required"/>
-		<xs:attribute name="topology"   type="xs:unsignedInt" use="optional" default="2"/>
+		<xs:attribute name="name"     type="xs:string"    use="required"/>
+		<xs:attribute name="type"     type="mdl:MeshType" use="required"/>
+		<xs:attribute name="topology" type="xs:unsignedInt" use="optional" default="2"/>
 	</xs:complexType>
 
 	<!-- Curve node -->
