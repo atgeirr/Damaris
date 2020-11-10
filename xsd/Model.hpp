@@ -31,8 +31,8 @@
 // in the accompanying FLOSSE file.
 //
 
-#ifndef CXX_HOME_MDORIER_DAMARIS_WORK_DAMARIS_DEVELOPMENT_SRC_MODEL_MODEL_HPP
-#define CXX_HOME_MDORIER_DAMARIS_WORK_DAMARIS_DEVELOPMENT_SRC_MODEL_MODEL_HPP
+#ifndef CXX_HOME_JBOWDEN_C_S_DAMARIS_DEVELOPMENT_SRC_MODEL_MODEL_HPP
+#define CXX_HOME_JBOWDEN_C_S_DAMARIS_DEVELOPMENT_SRC_MODEL_MODEL_HPP
 
 #ifndef XSD_CXX11
 #define XSD_CXX11
@@ -249,6 +249,10 @@ namespace damaris
     class Parameter;
     class MeshType;
     class Coord;
+    class VertexGID;
+    class SectionVTKTypes;
+    class SectionSizes;
+    class SecontionConnectivity;
     class Mesh;
     class Curve;
     class Data;
@@ -1554,6 +1558,23 @@ namespace damaris
       static const type_type&
       type_default_value ();
 
+      // vectorlength
+      //
+      typedef ::xml_schema::unsigned_int vectorlength_type;
+      typedef ::xsd::cxx::tree::traits< vectorlength_type, char > vectorlength_traits;
+
+      const vectorlength_type&
+      vectorlength () const;
+
+      vectorlength_type&
+      vectorlength ();
+
+      void
+      vectorlength (const vectorlength_type& x);
+
+      static vectorlength_type
+      vectorlength_default_value ();
+
       // centering
       //
       typedef ::damaris::model::VarCentering centering_type;
@@ -1680,6 +1701,7 @@ namespace damaris
       static const mesh_type mesh_default_value_;
       ::xsd::cxx::tree::one< type_type > type_;
       static const type_type type_default_value_;
+      ::xsd::cxx::tree::one< vectorlength_type > vectorlength_;
       ::xsd::cxx::tree::one< centering_type > centering_;
       static const centering_type centering_default_value_;
       ::xsd::cxx::tree::one< visualizable_type > visualizable_;
@@ -2135,6 +2157,236 @@ namespace damaris
       static const label_type label_default_value_;
     };
 
+    class VertexGID: public ::xml_schema::type
+    {
+      public:
+      // name
+      //
+      typedef ::xml_schema::string name_type;
+      typedef ::xsd::cxx::tree::traits< name_type, char > name_traits;
+
+      const name_type&
+      name () const;
+
+      name_type&
+      name ();
+
+      void
+      name (const name_type& x);
+
+      void
+      name (::std::unique_ptr< name_type > p);
+
+      // offset
+      //
+      typedef ::xml_schema::int_ offset_type;
+      typedef ::xsd::cxx::tree::traits< offset_type, char > offset_traits;
+
+      const offset_type&
+      offset () const;
+
+      offset_type&
+      offset ();
+
+      void
+      offset (const offset_type& x);
+
+      static offset_type
+      offset_default_value ();
+
+      // Constructors.
+      //
+      VertexGID (const name_type&);
+
+      VertexGID (const ::xercesc::DOMElement& e,
+                 ::xml_schema::flags f = 0,
+                 ::xml_schema::container* c = 0);
+
+      VertexGID (const VertexGID& x,
+                 ::xml_schema::flags f = 0,
+                 ::xml_schema::container* c = 0);
+
+      virtual VertexGID*
+      _clone (::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0) const;
+
+      VertexGID&
+      operator= (const VertexGID& x);
+
+      virtual 
+      ~VertexGID ();
+
+      // Implementation.
+      //
+      protected:
+      void
+      parse (::xsd::cxx::xml::dom::parser< char >&,
+             ::xml_schema::flags);
+
+      protected:
+      ::xsd::cxx::tree::one< name_type > name_;
+      ::xsd::cxx::tree::one< offset_type > offset_;
+    };
+
+    class SectionVTKTypes: public ::xml_schema::type
+    {
+      public:
+      // name
+      //
+      typedef ::xml_schema::string name_type;
+      typedef ::xsd::cxx::tree::traits< name_type, char > name_traits;
+
+      const name_type&
+      name () const;
+
+      name_type&
+      name ();
+
+      void
+      name (const name_type& x);
+
+      void
+      name (::std::unique_ptr< name_type > p);
+
+      // Constructors.
+      //
+      SectionVTKTypes (const name_type&);
+
+      SectionVTKTypes (const ::xercesc::DOMElement& e,
+                       ::xml_schema::flags f = 0,
+                       ::xml_schema::container* c = 0);
+
+      SectionVTKTypes (const SectionVTKTypes& x,
+                       ::xml_schema::flags f = 0,
+                       ::xml_schema::container* c = 0);
+
+      virtual SectionVTKTypes*
+      _clone (::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0) const;
+
+      SectionVTKTypes&
+      operator= (const SectionVTKTypes& x);
+
+      virtual 
+      ~SectionVTKTypes ();
+
+      // Implementation.
+      //
+      protected:
+      void
+      parse (::xsd::cxx::xml::dom::parser< char >&,
+             ::xml_schema::flags);
+
+      protected:
+      ::xsd::cxx::tree::one< name_type > name_;
+    };
+
+    class SectionSizes: public ::xml_schema::type
+    {
+      public:
+      // name
+      //
+      typedef ::xml_schema::string name_type;
+      typedef ::xsd::cxx::tree::traits< name_type, char > name_traits;
+
+      const name_type&
+      name () const;
+
+      name_type&
+      name ();
+
+      void
+      name (const name_type& x);
+
+      void
+      name (::std::unique_ptr< name_type > p);
+
+      // Constructors.
+      //
+      SectionSizes (const name_type&);
+
+      SectionSizes (const ::xercesc::DOMElement& e,
+                    ::xml_schema::flags f = 0,
+                    ::xml_schema::container* c = 0);
+
+      SectionSizes (const SectionSizes& x,
+                    ::xml_schema::flags f = 0,
+                    ::xml_schema::container* c = 0);
+
+      virtual SectionSizes*
+      _clone (::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0) const;
+
+      SectionSizes&
+      operator= (const SectionSizes& x);
+
+      virtual 
+      ~SectionSizes ();
+
+      // Implementation.
+      //
+      protected:
+      void
+      parse (::xsd::cxx::xml::dom::parser< char >&,
+             ::xml_schema::flags);
+
+      protected:
+      ::xsd::cxx::tree::one< name_type > name_;
+    };
+
+    class SecontionConnectivity: public ::xml_schema::type
+    {
+      public:
+      // name
+      //
+      typedef ::xml_schema::string name_type;
+      typedef ::xsd::cxx::tree::traits< name_type, char > name_traits;
+
+      const name_type&
+      name () const;
+
+      name_type&
+      name ();
+
+      void
+      name (const name_type& x);
+
+      void
+      name (::std::unique_ptr< name_type > p);
+
+      // Constructors.
+      //
+      SecontionConnectivity (const name_type&);
+
+      SecontionConnectivity (const ::xercesc::DOMElement& e,
+                             ::xml_schema::flags f = 0,
+                             ::xml_schema::container* c = 0);
+
+      SecontionConnectivity (const SecontionConnectivity& x,
+                             ::xml_schema::flags f = 0,
+                             ::xml_schema::container* c = 0);
+
+      virtual SecontionConnectivity*
+      _clone (::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0) const;
+
+      SecontionConnectivity&
+      operator= (const SecontionConnectivity& x);
+
+      virtual 
+      ~SecontionConnectivity ();
+
+      // Implementation.
+      //
+      protected:
+      void
+      parse (::xsd::cxx::xml::dom::parser< char >&,
+             ::xml_schema::flags);
+
+      protected:
+      ::xsd::cxx::tree::one< name_type > name_;
+    };
+
     class Mesh: public ::xml_schema::type
     {
       public:
@@ -2154,6 +2406,90 @@ namespace damaris
 
       void
       coord (const coord_sequence& s);
+
+      // vertex_global_id
+      //
+      typedef ::damaris::model::VertexGID vertex_global_id_type;
+      typedef ::xsd::cxx::tree::optional< vertex_global_id_type > vertex_global_id_optional;
+      typedef ::xsd::cxx::tree::traits< vertex_global_id_type, char > vertex_global_id_traits;
+
+      const vertex_global_id_optional&
+      vertex_global_id () const;
+
+      vertex_global_id_optional&
+      vertex_global_id ();
+
+      void
+      vertex_global_id (const vertex_global_id_type& x);
+
+      void
+      vertex_global_id (const vertex_global_id_optional& x);
+
+      void
+      vertex_global_id (::std::unique_ptr< vertex_global_id_type > p);
+
+      // section_types
+      //
+      typedef ::damaris::model::SectionVTKTypes section_types_type;
+      typedef ::xsd::cxx::tree::optional< section_types_type > section_types_optional;
+      typedef ::xsd::cxx::tree::traits< section_types_type, char > section_types_traits;
+
+      const section_types_optional&
+      section_types () const;
+
+      section_types_optional&
+      section_types ();
+
+      void
+      section_types (const section_types_type& x);
+
+      void
+      section_types (const section_types_optional& x);
+
+      void
+      section_types (::std::unique_ptr< section_types_type > p);
+
+      // section_sizes
+      //
+      typedef ::damaris::model::SectionSizes section_sizes_type;
+      typedef ::xsd::cxx::tree::optional< section_sizes_type > section_sizes_optional;
+      typedef ::xsd::cxx::tree::traits< section_sizes_type, char > section_sizes_traits;
+
+      const section_sizes_optional&
+      section_sizes () const;
+
+      section_sizes_optional&
+      section_sizes ();
+
+      void
+      section_sizes (const section_sizes_type& x);
+
+      void
+      section_sizes (const section_sizes_optional& x);
+
+      void
+      section_sizes (::std::unique_ptr< section_sizes_type > p);
+
+      // section_conectivity
+      //
+      typedef ::damaris::model::SecontionConnectivity section_conectivity_type;
+      typedef ::xsd::cxx::tree::optional< section_conectivity_type > section_conectivity_optional;
+      typedef ::xsd::cxx::tree::traits< section_conectivity_type, char > section_conectivity_traits;
+
+      const section_conectivity_optional&
+      section_conectivity () const;
+
+      section_conectivity_optional&
+      section_conectivity ();
+
+      void
+      section_conectivity (const section_conectivity_type& x);
+
+      void
+      section_conectivity (const section_conectivity_optional& x);
+
+      void
+      section_conectivity (::std::unique_ptr< section_conectivity_type > p);
 
       // name
       //
@@ -2238,6 +2574,10 @@ namespace damaris
 
       protected:
       coord_sequence coord_;
+      vertex_global_id_optional vertex_global_id_;
+      section_types_optional section_types_;
+      section_sizes_optional section_sizes_;
+      section_conectivity_optional section_conectivity_;
       ::xsd::cxx::tree::one< name_type > name_;
       ::xsd::cxx::tree::one< type_type > type_;
       ::xsd::cxx::tree::one< topology_type > topology_;
@@ -4033,4 +4373,4 @@ namespace damaris
 //
 // End epilogue.
 
-#endif // CXX_HOME_MDORIER_DAMARIS_WORK_DAMARIS_DEVELOPMENT_SRC_MODEL_MODEL_HPP
+#endif // CXX_HOME_JBOWDEN_C_S_DAMARIS_DEVELOPMENT_SRC_MODEL_MODEL_HPP

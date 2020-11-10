@@ -20,7 +20,7 @@
 	</xs:complexType>
 <!-- End deprecated -->
 
-        <xs:complexType name="KeyVal">
+	<xs:complexType name="KeyVal">
 		<xs:simpleContent>
 		<xs:extension base="xs:string">
 			<xs:attribute name="key" type="xs:string" />
@@ -181,6 +181,12 @@
 		</xs:simpleContent>
 	</xs:complexType>
 
+   <!-- xs:complexType name="VectorVar">
+      <xs:sequence>
+         <xs:element name="name" type="mdl:Variable" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:sequence>
+   </xs:complexType -->
+
 	<!-- Group node -->
 	<xs:complexType name="Group">
 		<xs:sequence>
@@ -227,16 +233,53 @@
 		<xs:attribute name="unit"  type="xs:string" use="optional" default="#"/>
 		<xs:attribute name="label" type="xs:string" use="optional" default="#"/>
 	</xs:complexType>
+   
+   <!-- Unstructured Mesh Vertex global id list -->
+	<xs:complexType name="VertexGID">
+		    <xs:attribute name="name"    type="xs:string" use="required"/>
+          <xs:attribute name="offset"  type="xs:int" use="optional" default="0"/>
+	</xs:complexType> 
 
+   <!-- Unstructured Mesh Vertex global id list -->
+	<xs:complexType name="SectionVTKTypes">
+		    <xs:attribute name="name"    type="xs:string" use="required"/>
+	</xs:complexType> 
+   
+      <!-- Unstructured Mesh Vertex global id list -->
+	<xs:complexType name="SectionSizes">
+		    <xs:attribute name="name"    type="xs:string" use="required"/>
+	</xs:complexType> 
+   
+      <!-- Unstructured Mesh Vertex global id list -->
+	<xs:complexType name="SecontionConnectivity">
+		    <xs:attribute name="name"    type="xs:string" use="required"/>
+	</xs:complexType> 
+   <!-- Unstructured Mesh Vertex connectivity vector -->
+	<!-- xs:complexType name="VertexConnectivity">
+		<xs:attribute name="name"  type="xs:string" use="required"/>
+      <xs:sequence>
+         <xs:element name="section_types"   type="xs:string" minOccurs="0" maxOccurs="1"/>
+         <xs:element name="section_sizes"   type="xs:string" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+   </xs:complexType>
+   -->
+   
 	<!-- Mesh node -->
 	<xs:complexType name="Mesh">
-		<xs:sequence>
-			<xs:element name="coord"   type="mdl:Coord" minOccurs="2" maxOccurs="3"/>
+
+      <xs:sequence>
+         <xs:element name="coord"   type="mdl:Coord" minOccurs="1" maxOccurs="3"/>   
+         <xs:element name="vertex_global_id"    type="mdl:VertexGID" minOccurs="0" maxOccurs="1"/>
+         <xs:element name="section_types"       type="mdl:SectionVTKTypes" minOccurs="0" maxOccurs="1"/>
+         <xs:element name="section_sizes"       type="mdl:SectionSizes" minOccurs="0" maxOccurs="1"/>
+         <xs:element name="section_conectivity" type="mdl:SecontionConnectivity" minOccurs="0" maxOccurs="1"/>
 		</xs:sequence>
 		<xs:attribute name="name"     type="xs:string"    use="required"/>
 		<xs:attribute name="type"     type="mdl:MeshType" use="required"/>
 		<xs:attribute name="topology" type="xs:unsignedInt" use="optional" default="2"/>
 	</xs:complexType>
+   
+
 
 	<!-- Curve node -->
 	<xs:complexType name="Curve">
@@ -315,15 +358,15 @@
 	</xs:complexType>
 
 
-        <!-- Parameters related to ParaView -->
-        <xs:complexType name="ParaViewParam">
-            <xs:sequence>
-                <xs:choice minOccurs="0" maxOccurs="unbounded">
-                    <xs:element name="script" type="xs:string"/>
-                </xs:choice>
-            </xs:sequence>
-            <xs:attribute name="update-frequency" type="xs:unsignedInt" use="optional" default="1"/>
-        </xs:complexType>
+   <!-- Parameters related to ParaView -->
+   <xs:complexType name="ParaViewParam">
+      <xs:sequence>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+               <xs:element name="script" type="xs:string"/>
+            </xs:choice>
+      </xs:sequence>
+      <xs:attribute name="update-frequency" type="xs:unsignedInt" use="optional" default="1"/>
+   </xs:complexType>
 
 	<!-- Parameters related to Python -->
 	<xs:complexType name="PythonParam">
@@ -402,7 +445,7 @@
 			<xs:element name="actions" type="mdl:Actions" maxOccurs="1"/>
 			<xs:element name="python" type="mdl:PythonParam" maxOccurs="1" minOccurs="0"/>
 			<xs:element name="visit" type="mdl:VisitParam" maxOccurs="1" minOccurs="0"/>
-                        <xs:element name="paraview" type="mdl:ParaViewParam" maxOccurs="1" minOccurs="0"/>
+			<xs:element name="paraview" type="mdl:ParaViewParam" maxOccurs="1" minOccurs="0"/>
 			<xs:element name="log" type="mdl:Log" maxOccurs="1" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string" use="required"/>

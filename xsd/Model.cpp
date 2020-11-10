@@ -1130,6 +1130,30 @@ namespace damaris
       return type_default_value_;
     }
 
+    const Variable::vectorlength_type& Variable::
+    vectorlength () const
+    {
+      return this->vectorlength_.get ();
+    }
+
+    Variable::vectorlength_type& Variable::
+    vectorlength ()
+    {
+      return this->vectorlength_.get ();
+    }
+
+    void Variable::
+    vectorlength (const vectorlength_type& x)
+    {
+      this->vectorlength_.set (x);
+    }
+
+    Variable::vectorlength_type Variable::
+    vectorlength_default_value ()
+    {
+      return vectorlength_type (1U);
+    }
+
     const Variable::centering_type& Variable::
     centering () const
     {
@@ -1620,6 +1644,142 @@ namespace damaris
     }
 
 
+    // VertexGID
+    // 
+
+    const VertexGID::name_type& VertexGID::
+    name () const
+    {
+      return this->name_.get ();
+    }
+
+    VertexGID::name_type& VertexGID::
+    name ()
+    {
+      return this->name_.get ();
+    }
+
+    void VertexGID::
+    name (const name_type& x)
+    {
+      this->name_.set (x);
+    }
+
+    void VertexGID::
+    name (::std::unique_ptr< name_type > x)
+    {
+      this->name_.set (std::move (x));
+    }
+
+    const VertexGID::offset_type& VertexGID::
+    offset () const
+    {
+      return this->offset_.get ();
+    }
+
+    VertexGID::offset_type& VertexGID::
+    offset ()
+    {
+      return this->offset_.get ();
+    }
+
+    void VertexGID::
+    offset (const offset_type& x)
+    {
+      this->offset_.set (x);
+    }
+
+    VertexGID::offset_type VertexGID::
+    offset_default_value ()
+    {
+      return offset_type (0);
+    }
+
+
+    // SectionVTKTypes
+    // 
+
+    const SectionVTKTypes::name_type& SectionVTKTypes::
+    name () const
+    {
+      return this->name_.get ();
+    }
+
+    SectionVTKTypes::name_type& SectionVTKTypes::
+    name ()
+    {
+      return this->name_.get ();
+    }
+
+    void SectionVTKTypes::
+    name (const name_type& x)
+    {
+      this->name_.set (x);
+    }
+
+    void SectionVTKTypes::
+    name (::std::unique_ptr< name_type > x)
+    {
+      this->name_.set (std::move (x));
+    }
+
+
+    // SectionSizes
+    // 
+
+    const SectionSizes::name_type& SectionSizes::
+    name () const
+    {
+      return this->name_.get ();
+    }
+
+    SectionSizes::name_type& SectionSizes::
+    name ()
+    {
+      return this->name_.get ();
+    }
+
+    void SectionSizes::
+    name (const name_type& x)
+    {
+      this->name_.set (x);
+    }
+
+    void SectionSizes::
+    name (::std::unique_ptr< name_type > x)
+    {
+      this->name_.set (std::move (x));
+    }
+
+
+    // SecontionConnectivity
+    // 
+
+    const SecontionConnectivity::name_type& SecontionConnectivity::
+    name () const
+    {
+      return this->name_.get ();
+    }
+
+    SecontionConnectivity::name_type& SecontionConnectivity::
+    name ()
+    {
+      return this->name_.get ();
+    }
+
+    void SecontionConnectivity::
+    name (const name_type& x)
+    {
+      this->name_.set (x);
+    }
+
+    void SecontionConnectivity::
+    name (::std::unique_ptr< name_type > x)
+    {
+      this->name_.set (std::move (x));
+    }
+
+
     // Mesh
     // 
 
@@ -1639,6 +1799,126 @@ namespace damaris
     coord (const coord_sequence& s)
     {
       this->coord_ = s;
+    }
+
+    const Mesh::vertex_global_id_optional& Mesh::
+    vertex_global_id () const
+    {
+      return this->vertex_global_id_;
+    }
+
+    Mesh::vertex_global_id_optional& Mesh::
+    vertex_global_id ()
+    {
+      return this->vertex_global_id_;
+    }
+
+    void Mesh::
+    vertex_global_id (const vertex_global_id_type& x)
+    {
+      this->vertex_global_id_.set (x);
+    }
+
+    void Mesh::
+    vertex_global_id (const vertex_global_id_optional& x)
+    {
+      this->vertex_global_id_ = x;
+    }
+
+    void Mesh::
+    vertex_global_id (::std::unique_ptr< vertex_global_id_type > x)
+    {
+      this->vertex_global_id_.set (std::move (x));
+    }
+
+    const Mesh::section_types_optional& Mesh::
+    section_types () const
+    {
+      return this->section_types_;
+    }
+
+    Mesh::section_types_optional& Mesh::
+    section_types ()
+    {
+      return this->section_types_;
+    }
+
+    void Mesh::
+    section_types (const section_types_type& x)
+    {
+      this->section_types_.set (x);
+    }
+
+    void Mesh::
+    section_types (const section_types_optional& x)
+    {
+      this->section_types_ = x;
+    }
+
+    void Mesh::
+    section_types (::std::unique_ptr< section_types_type > x)
+    {
+      this->section_types_.set (std::move (x));
+    }
+
+    const Mesh::section_sizes_optional& Mesh::
+    section_sizes () const
+    {
+      return this->section_sizes_;
+    }
+
+    Mesh::section_sizes_optional& Mesh::
+    section_sizes ()
+    {
+      return this->section_sizes_;
+    }
+
+    void Mesh::
+    section_sizes (const section_sizes_type& x)
+    {
+      this->section_sizes_.set (x);
+    }
+
+    void Mesh::
+    section_sizes (const section_sizes_optional& x)
+    {
+      this->section_sizes_ = x;
+    }
+
+    void Mesh::
+    section_sizes (::std::unique_ptr< section_sizes_type > x)
+    {
+      this->section_sizes_.set (std::move (x));
+    }
+
+    const Mesh::section_conectivity_optional& Mesh::
+    section_conectivity () const
+    {
+      return this->section_conectivity_;
+    }
+
+    Mesh::section_conectivity_optional& Mesh::
+    section_conectivity ()
+    {
+      return this->section_conectivity_;
+    }
+
+    void Mesh::
+    section_conectivity (const section_conectivity_type& x)
+    {
+      this->section_conectivity_.set (x);
+    }
+
+    void Mesh::
+    section_conectivity (const section_conectivity_optional& x)
+    {
+      this->section_conectivity_ = x;
+    }
+
+    void Mesh::
+    section_conectivity (::std::unique_ptr< section_conectivity_type > x)
+    {
+      this->section_conectivity_.set (std::move (x));
     }
 
     const Mesh::name_type& Mesh::
@@ -4781,6 +5061,7 @@ namespace damaris
       enabled_ (enabled_default_value (), this),
       mesh_ (mesh_default_value (), this),
       type_ (type_default_value (), this),
+      vectorlength_ (vectorlength_default_value (), this),
       centering_ (centering_default_value (), this),
       visualizable_ (visualizable_default_value (), this),
       time_varying_ (time_varying_default_value (), this),
@@ -4799,6 +5080,7 @@ namespace damaris
       enabled_ (enabled_default_value (), this),
       mesh_ (mesh_default_value (), this),
       type_ (type_default_value (), this),
+      vectorlength_ (vectorlength_default_value (), this),
       centering_ (centering_default_value (), this),
       visualizable_ (visualizable_default_value (), this),
       time_varying_ (time_varying_default_value (), this),
@@ -4817,6 +5099,7 @@ namespace damaris
       enabled_ (enabled_default_value (), this),
       mesh_ (mesh_default_value (), this),
       type_ (type_default_value (), this),
+      vectorlength_ (vectorlength_default_value (), this),
       centering_ (centering_default_value (), this),
       visualizable_ (visualizable_default_value (), this),
       time_varying_ (time_varying_default_value (), this),
@@ -4835,6 +5118,7 @@ namespace damaris
       enabled_ (enabled_default_value (), this),
       mesh_ (mesh_default_value (), this),
       type_ (type_default_value (), this),
+      vectorlength_ (vectorlength_default_value (), this),
       centering_ (centering_default_value (), this),
       visualizable_ (visualizable_default_value (), this),
       time_varying_ (time_varying_default_value (), this),
@@ -4853,6 +5137,7 @@ namespace damaris
       enabled_ (x.enabled_, f, this),
       mesh_ (x.mesh_, f, this),
       type_ (x.type_, f, this),
+      vectorlength_ (x.vectorlength_, f, this),
       centering_ (x.centering_, f, this),
       visualizable_ (x.visualizable_, f, this),
       time_varying_ (x.time_varying_, f, this),
@@ -4871,6 +5156,7 @@ namespace damaris
       enabled_ (this),
       mesh_ (this),
       type_ (this),
+      vectorlength_ (this),
       centering_ (this),
       visualizable_ (this),
       time_varying_ (this),
@@ -4926,6 +5212,12 @@ namespace damaris
         if (n.name () == "type" && n.namespace_ ().empty ())
         {
           this->type_.set (type_traits::create (i, f, this));
+          continue;
+        }
+
+        if (n.name () == "vectorlength" && n.namespace_ ().empty ())
+        {
+          this->vectorlength_.set (vectorlength_traits::create (i, f, this));
           continue;
         }
 
@@ -4988,6 +5280,11 @@ namespace damaris
         this->type_.set (type_default_value ());
       }
 
+      if (!vectorlength_.present ())
+      {
+        this->vectorlength_.set (vectorlength_default_value ());
+      }
+
       if (!centering_.present ())
       {
         this->centering_.set (centering_default_value ());
@@ -5028,6 +5325,7 @@ namespace damaris
         this->enabled_ = x.enabled_;
         this->mesh_ = x.mesh_;
         this->type_ = x.type_;
+        this->vectorlength_ = x.vectorlength_;
         this->centering_ = x.centering_;
         this->visualizable_ = x.visualizable_;
         this->time_varying_ = x.time_varying_;
@@ -5593,6 +5891,349 @@ namespace damaris
     {
     }
 
+    // VertexGID
+    //
+
+    VertexGID::
+    VertexGID (const name_type& name)
+    : ::xml_schema::type (),
+      name_ (name, this),
+      offset_ (offset_default_value (), this)
+    {
+    }
+
+    VertexGID::
+    VertexGID (const VertexGID& x,
+               ::xml_schema::flags f,
+               ::xml_schema::container* c)
+    : ::xml_schema::type (x, f, c),
+      name_ (x.name_, f, this),
+      offset_ (x.offset_, f, this)
+    {
+    }
+
+    VertexGID::
+    VertexGID (const ::xercesc::DOMElement& e,
+               ::xml_schema::flags f,
+               ::xml_schema::container* c)
+    : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+      name_ (this),
+      offset_ (this)
+    {
+      if ((f & ::xml_schema::flags::base) == 0)
+      {
+        ::xsd::cxx::xml::dom::parser< char > p (e, false, false, true);
+        this->parse (p, f);
+      }
+    }
+
+    void VertexGID::
+    parse (::xsd::cxx::xml::dom::parser< char >& p,
+           ::xml_schema::flags f)
+    {
+      while (p.more_attributes ())
+      {
+        const ::xercesc::DOMAttr& i (p.next_attribute ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        if (n.name () == "name" && n.namespace_ ().empty ())
+        {
+          this->name_.set (name_traits::create (i, f, this));
+          continue;
+        }
+
+        if (n.name () == "offset" && n.namespace_ ().empty ())
+        {
+          this->offset_.set (offset_traits::create (i, f, this));
+          continue;
+        }
+      }
+
+      if (!name_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_attribute< char > (
+          "name",
+          "");
+      }
+
+      if (!offset_.present ())
+      {
+        this->offset_.set (offset_default_value ());
+      }
+    }
+
+    VertexGID* VertexGID::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class VertexGID (*this, f, c);
+    }
+
+    VertexGID& VertexGID::
+    operator= (const VertexGID& x)
+    {
+      if (this != &x)
+      {
+        static_cast< ::xml_schema::type& > (*this) = x;
+        this->name_ = x.name_;
+        this->offset_ = x.offset_;
+      }
+
+      return *this;
+    }
+
+    VertexGID::
+    ~VertexGID ()
+    {
+    }
+
+    // SectionVTKTypes
+    //
+
+    SectionVTKTypes::
+    SectionVTKTypes (const name_type& name)
+    : ::xml_schema::type (),
+      name_ (name, this)
+    {
+    }
+
+    SectionVTKTypes::
+    SectionVTKTypes (const SectionVTKTypes& x,
+                     ::xml_schema::flags f,
+                     ::xml_schema::container* c)
+    : ::xml_schema::type (x, f, c),
+      name_ (x.name_, f, this)
+    {
+    }
+
+    SectionVTKTypes::
+    SectionVTKTypes (const ::xercesc::DOMElement& e,
+                     ::xml_schema::flags f,
+                     ::xml_schema::container* c)
+    : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+      name_ (this)
+    {
+      if ((f & ::xml_schema::flags::base) == 0)
+      {
+        ::xsd::cxx::xml::dom::parser< char > p (e, false, false, true);
+        this->parse (p, f);
+      }
+    }
+
+    void SectionVTKTypes::
+    parse (::xsd::cxx::xml::dom::parser< char >& p,
+           ::xml_schema::flags f)
+    {
+      while (p.more_attributes ())
+      {
+        const ::xercesc::DOMAttr& i (p.next_attribute ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        if (n.name () == "name" && n.namespace_ ().empty ())
+        {
+          this->name_.set (name_traits::create (i, f, this));
+          continue;
+        }
+      }
+
+      if (!name_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_attribute< char > (
+          "name",
+          "");
+      }
+    }
+
+    SectionVTKTypes* SectionVTKTypes::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class SectionVTKTypes (*this, f, c);
+    }
+
+    SectionVTKTypes& SectionVTKTypes::
+    operator= (const SectionVTKTypes& x)
+    {
+      if (this != &x)
+      {
+        static_cast< ::xml_schema::type& > (*this) = x;
+        this->name_ = x.name_;
+      }
+
+      return *this;
+    }
+
+    SectionVTKTypes::
+    ~SectionVTKTypes ()
+    {
+    }
+
+    // SectionSizes
+    //
+
+    SectionSizes::
+    SectionSizes (const name_type& name)
+    : ::xml_schema::type (),
+      name_ (name, this)
+    {
+    }
+
+    SectionSizes::
+    SectionSizes (const SectionSizes& x,
+                  ::xml_schema::flags f,
+                  ::xml_schema::container* c)
+    : ::xml_schema::type (x, f, c),
+      name_ (x.name_, f, this)
+    {
+    }
+
+    SectionSizes::
+    SectionSizes (const ::xercesc::DOMElement& e,
+                  ::xml_schema::flags f,
+                  ::xml_schema::container* c)
+    : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+      name_ (this)
+    {
+      if ((f & ::xml_schema::flags::base) == 0)
+      {
+        ::xsd::cxx::xml::dom::parser< char > p (e, false, false, true);
+        this->parse (p, f);
+      }
+    }
+
+    void SectionSizes::
+    parse (::xsd::cxx::xml::dom::parser< char >& p,
+           ::xml_schema::flags f)
+    {
+      while (p.more_attributes ())
+      {
+        const ::xercesc::DOMAttr& i (p.next_attribute ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        if (n.name () == "name" && n.namespace_ ().empty ())
+        {
+          this->name_.set (name_traits::create (i, f, this));
+          continue;
+        }
+      }
+
+      if (!name_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_attribute< char > (
+          "name",
+          "");
+      }
+    }
+
+    SectionSizes* SectionSizes::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class SectionSizes (*this, f, c);
+    }
+
+    SectionSizes& SectionSizes::
+    operator= (const SectionSizes& x)
+    {
+      if (this != &x)
+      {
+        static_cast< ::xml_schema::type& > (*this) = x;
+        this->name_ = x.name_;
+      }
+
+      return *this;
+    }
+
+    SectionSizes::
+    ~SectionSizes ()
+    {
+    }
+
+    // SecontionConnectivity
+    //
+
+    SecontionConnectivity::
+    SecontionConnectivity (const name_type& name)
+    : ::xml_schema::type (),
+      name_ (name, this)
+    {
+    }
+
+    SecontionConnectivity::
+    SecontionConnectivity (const SecontionConnectivity& x,
+                           ::xml_schema::flags f,
+                           ::xml_schema::container* c)
+    : ::xml_schema::type (x, f, c),
+      name_ (x.name_, f, this)
+    {
+    }
+
+    SecontionConnectivity::
+    SecontionConnectivity (const ::xercesc::DOMElement& e,
+                           ::xml_schema::flags f,
+                           ::xml_schema::container* c)
+    : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+      name_ (this)
+    {
+      if ((f & ::xml_schema::flags::base) == 0)
+      {
+        ::xsd::cxx::xml::dom::parser< char > p (e, false, false, true);
+        this->parse (p, f);
+      }
+    }
+
+    void SecontionConnectivity::
+    parse (::xsd::cxx::xml::dom::parser< char >& p,
+           ::xml_schema::flags f)
+    {
+      while (p.more_attributes ())
+      {
+        const ::xercesc::DOMAttr& i (p.next_attribute ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        if (n.name () == "name" && n.namespace_ ().empty ())
+        {
+          this->name_.set (name_traits::create (i, f, this));
+          continue;
+        }
+      }
+
+      if (!name_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_attribute< char > (
+          "name",
+          "");
+      }
+    }
+
+    SecontionConnectivity* SecontionConnectivity::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class SecontionConnectivity (*this, f, c);
+    }
+
+    SecontionConnectivity& SecontionConnectivity::
+    operator= (const SecontionConnectivity& x)
+    {
+      if (this != &x)
+      {
+        static_cast< ::xml_schema::type& > (*this) = x;
+        this->name_ = x.name_;
+      }
+
+      return *this;
+    }
+
+    SecontionConnectivity::
+    ~SecontionConnectivity ()
+    {
+    }
+
     // Mesh
     //
 
@@ -5601,6 +6242,10 @@ namespace damaris
           const type_type& type)
     : ::xml_schema::type (),
       coord_ (this),
+      vertex_global_id_ (this),
+      section_types_ (this),
+      section_sizes_ (this),
+      section_conectivity_ (this),
       name_ (name, this),
       type_ (type, this),
       topology_ (topology_default_value (), this)
@@ -5613,6 +6258,10 @@ namespace damaris
           ::xml_schema::container* c)
     : ::xml_schema::type (x, f, c),
       coord_ (x.coord_, f, this),
+      vertex_global_id_ (x.vertex_global_id_, f, this),
+      section_types_ (x.section_types_, f, this),
+      section_sizes_ (x.section_sizes_, f, this),
+      section_conectivity_ (x.section_conectivity_, f, this),
       name_ (x.name_, f, this),
       type_ (x.type_, f, this),
       topology_ (x.topology_, f, this)
@@ -5625,6 +6274,10 @@ namespace damaris
           ::xml_schema::container* c)
     : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
       coord_ (this),
+      vertex_global_id_ (this),
+      section_types_ (this),
+      section_sizes_ (this),
+      section_conectivity_ (this),
       name_ (this),
       type_ (this),
       topology_ (this)
@@ -5655,6 +6308,62 @@ namespace damaris
 
           this->coord_.push_back (::std::move (r));
           continue;
+        }
+
+        // vertex_global_id
+        //
+        if (n.name () == "vertex_global_id" && n.namespace_ () == "http://damaris.gforge.inria.fr/damaris/model")
+        {
+          ::std::unique_ptr< vertex_global_id_type > r (
+            vertex_global_id_traits::create (i, f, this));
+
+          if (!this->vertex_global_id_)
+          {
+            this->vertex_global_id_.set (::std::move (r));
+            continue;
+          }
+        }
+
+        // section_types
+        //
+        if (n.name () == "section_types" && n.namespace_ () == "http://damaris.gforge.inria.fr/damaris/model")
+        {
+          ::std::unique_ptr< section_types_type > r (
+            section_types_traits::create (i, f, this));
+
+          if (!this->section_types_)
+          {
+            this->section_types_.set (::std::move (r));
+            continue;
+          }
+        }
+
+        // section_sizes
+        //
+        if (n.name () == "section_sizes" && n.namespace_ () == "http://damaris.gforge.inria.fr/damaris/model")
+        {
+          ::std::unique_ptr< section_sizes_type > r (
+            section_sizes_traits::create (i, f, this));
+
+          if (!this->section_sizes_)
+          {
+            this->section_sizes_.set (::std::move (r));
+            continue;
+          }
+        }
+
+        // section_conectivity
+        //
+        if (n.name () == "section_conectivity" && n.namespace_ () == "http://damaris.gforge.inria.fr/damaris/model")
+        {
+          ::std::unique_ptr< section_conectivity_type > r (
+            section_conectivity_traits::create (i, f, this));
+
+          if (!this->section_conectivity_)
+          {
+            this->section_conectivity_.set (::std::move (r));
+            continue;
+          }
         }
 
         break;
@@ -5719,6 +6428,10 @@ namespace damaris
       {
         static_cast< ::xml_schema::type& > (*this) = x;
         this->coord_ = x.coord_;
+        this->vertex_global_id_ = x.vertex_global_id_;
+        this->section_types_ = x.section_types_;
+        this->section_sizes_ = x.section_sizes_;
+        this->section_conectivity_ = x.section_conectivity_;
         this->name_ = x.name_;
         this->type_ = x.type_;
         this->topology_ = x.topology_;

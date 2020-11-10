@@ -23,6 +23,7 @@
 #include <vtkPointData.h>
 #include <vtkMultiBlockDataSet.h>
 #include <vtkMultiPieceDataSet.h>
+#include <vtkUnstructuredGrid.h>
 
 //Data Arrays
 #include <vtkShortArray.h>
