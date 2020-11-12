@@ -121,7 +121,7 @@ std::shared_ptr<Variable> Mesh::GetSectionSizes()
  	return vtktype ;
 }
 
-std::shared_ptr<Variable> Mesh::GetVertexConnectivity()
+std::shared_ptr<Variable> Mesh::GetSectionVertexConnectivity()
 {
 	std::shared_ptr<Variable> vtktype = nullptr ;
 	std::string vert_gid_name = GetModel().section_conectivity().get().name();

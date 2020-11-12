@@ -66,7 +66,7 @@ class Mesh : public Configurable<model::Mesh> {
 	protected:
 		
 		/**
-		 * Constructor, is protected (cannot be instanciated by outside,
+		 * Constructor, is protected (cannot be instantiated by outside,
 		 * allows child classes).
 		 * 
 		 * \param[in] mdl : model from which to initialize the Mesh.
@@ -103,11 +103,13 @@ class Mesh : public Configurable<model::Mesh> {
 
 		/**
 		 * Returns the nth coordinate variable.
+		 * Specified by the (sequence) XML tag: <coord  name="" unit="" label="" />
 		 * Will search for the coordinates only once and store the
-		 * the result for later calls. If there is only a single coordinate variable, it
-		 * is assumed to be for an Unstructured mesh and contains (x,y,z) vertex position
-		 * tuples. Otherwise there should be 2 or 3 coordinate arrays, one for x, one for
-		 * y and an optional one for z vertex values. These are used for Rectilinear grid
+		 * the result for later calls.
+		 * If there is only a single coordinate variable, it is assumed to be for an
+		 * Unstructured mesh and contains (x,y,z) vertex position tuples. Otherwise
+		 * there should be 2 or 3 coordinate arrays, one for x, one for  y and an
+		 * optional one for z vertex values. These are used for Rectilinear grid
 		 * definitions.
 		 *
 		 * \param[in] n : index of the coordinate.
@@ -115,21 +117,26 @@ class Mesh : public Configurable<model::Mesh> {
 		std::shared_ptr<Variable> GetCoord(unsigned int n);
 
 		/**
-		 * Returns the VertexGID variable (if it exists) which is vector of global ID's
-		 * of each vertex that is found in the coordinate variable. These ID's are used
-		 * in the VertexConnectivity vector to specify what vertex is connected to which other.
+		 * Returns the vertex global ID variable (if it exists) which is specified by the
+		 * XML tag <vertex_global_id   name="" offset=""  />
+		 * This is the vector of global ID's of each vertex that is found in the coordinate
+		 * variable. These ID's are used in the VertexConnectivity vector to specify what
+		 * vertex is connected to which other.
 		 */
 		 std::shared_ptr<Variable> GetVertexGID();
 
 		 /**
 		 * Returns the vector of VTK types (if it exists) of each section
 		 * of an Unstructured grid.
+		 * Specified by the XML tag: <section_types  name=""  />
 		 */
 		 std::shared_ptr<Variable> GetSectionVTKType();
 
 		 /**
 		 * Returns the vector of sizes (if it exists) of each section
-		 * of an Unstructured grid. The size is defined as the number of elements of the VTK
+		 * of an Unstructured grid.
+		 * Specified by the XML tag:   <section_sizes  name=""  />
+		 * The size is defined as the number of elements of the VTK
 		 * type mulitplied by the 'stride' of the element. The stride is the number of values
 		 * required to specify a single complete VTK structural type (e.g. VTK_LINE = 2,
 		 * VTK_QUAD = 4, VTK_HEXAHEDRON = 8, etc.)
@@ -138,12 +145,13 @@ class Mesh : public Configurable<model::Mesh> {
 
 		 /**
 		 * Returns the variable that contains the vertex connectivities of an Unstructured mesh.
+		 * Specified by the XML tag: <connectivity   name=""  />
 		 * The variable may consist of multiple sections (the number of sections being the length
 		 * of the section_types variable (return value of GetSectionVTKType()) and the size of
 		 * each section being described by entries in the section_sizes variable (the return
 		 * value of GetSectionSizes()).
 		 */
-		 std::shared_ptr<Variable> GetVertexConnectivity();
+		 std::shared_ptr<Variable> GetSectionVertexConnectivity();
 
 
 		/**
@@ -183,6 +191,8 @@ class Mesh : public Configurable<model::Mesh> {
 
 #ifdef HAVE_PARAVIEW_ENABLED
 
+
+
 		/**
 		* creates and returns the expected VTK grid object for a block
 		*
@@ -193,6 +203,14 @@ class Mesh : public Configurable<model::Mesh> {
 		*/
 		virtual vtkDataSet* GetVtkGrid(int source , int iteration , int block ,
 									   const std::shared_ptr<Variable>& var) = 0;
+
+	protected:
+	    /**
+	     * Every derived class, should implement this method and
+	     * create the appropriate vtkDataSet and return it.
+	     */
+	    virtual vtkDataSet* CreateVtkGrid() = 0;
+
 #endif
 };
 
