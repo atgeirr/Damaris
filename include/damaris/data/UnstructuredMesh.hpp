@@ -112,6 +112,45 @@ protected:
 			return vtkUnstructuredGrid::New();
 		}
 
+
+		std::shared_ptr<Block> UnstructuredMesh::ReturnBlock(int source , int iteration , int block ,
+																 const std::shared_ptr<Variable>& var )
+		{
+			std::shared_ptr<Block> b = var->GetBlock(source , iteration , block);
+
+			if (b == nullptr)  // no coord for this iteration
+				b = var->GetBlock(source , 0 , block);
+
+			if (b == nullptr) {
+				ERROR("No block for variable " << var->GetName() << " in iteration " << iteration << std::endl );
+				return nullptr;
+			}
+
+			return b ;
+		}
+
+		template<typename T>
+		T * UnstructuredMesh::ReturnBlockDataPtr<T>(int source , int iteration , int block ,
+				 	 	 	 	 	 	 	 	 	 	 	 	 const std::shared_ptr<Variable>& var )
+		{
+			std::shared_ptr<Block> b = ReturnBlock( source, iteration,  block , var );
+			if ( b == nullptr ) {
+			    ERROR("The vertex data for variable " << varVerticies->GetName() << " in iteration " << iteration
+				  " does not an allocated Block " << std::endl );
+				return nullptr ;
+		   }
+		   return (T *) b->GetDataSpace().GetData();
+		}
+
+		template<typename T>
+		T * UnstructuredMesh::ReturnBlockDataPtr<T>(std::shared_ptr<Block>& b )
+		{
+			if ( b == nullptr ) {
+				ERROR("The Block provided is not allocated" << std::endl );
+				return nullptr ;
+		   }
+		   return (T *) b->GetDataSpace().GetData();
+		}
 		/**
 		 * This returns the three variable coordinates of the grid. Due to the
 		 * dimension of the grid, some variables may be nullptr.
@@ -155,6 +194,39 @@ protected:
 		 */
 		vtkIdTypeArray * SetGlobalIDs(int source , int iteration , int block ,
 											 const std::shared_ptr<Variable>& varGID);
+
+		/**
+		 * Sets the connectivities for the vtkDataSet unstructured mesh, and (possibly) consists of
+		 * multiple sections of (possibly) different mesh element types.
+		 *
+		 * \param[in,out] grid    : the VTK Unstructured mesh data set.
+		 * \param[in] source      : the source of the expected block
+		 * \param[in] iteration   : the Damaris iteration
+		 * \param[in] block       : the block id of the expected block
+		 * \param[in] section_vtk_type    : the array of VTK mesh element types (VTK_LINE, VTK_QUAD etc.),
+		 *                                  one for each mesh section.
+		 *                                  XML <mesh> element: <section_types name=""/>
+		 * \param[in] section_vtk_sizes   : the variable array of sizes for the mesh sections. It is the number
+		 *                                  of elements of the VTK type in this section. The mesh connectivity will then have
+		 *                                  vtk_sizes_ptr[x] * strideof(vtk_type_ptr[x]) indices into the vertex data.
+		 *                                  XML <mesh> element: <section_sizes name=""/>
+		 * \param[in] vertex_connectivity : The array of indices of connectivity for each section of the mesh.
+		 *                                  XML <mesh> element: <connectivity name=""/>
+		 */
+		bool SetVtkConnections(vtkDataSet* grid,  int source , int iteration , int block ,
+				 const std::shared_ptr<Variable>& section_vtk_type,
+				 const std::shared_ptr<Variable>& section_vtk_sizes,
+				 const std::shared_ptr<Variable>& vertex_connectivity
+				 );
+
+		/**
+		 * Returns the number of elements in a VTK_TYPE (i.e. VTK_QUAD returns 4)
+		 * Returns -1 for VTK_POLYGON and VTK_POLYHEDRON
+		 * and returns -2 if VTK_TYPE was not recognized.
+		 *
+		 * \param[in] VTK_TYPE : the VTK type (as defined in VTK vtkCellType.h)
+		 */
+		int strideofVtkType(int VTK_TYPE);
 
 
 #endif // HAVE_PARAVIEW_ENABLED
