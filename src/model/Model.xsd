@@ -227,7 +227,7 @@
 		</xs:restriction>
 	</xs:simpleType>
 
-	<!-- Coordinates (for curves and meshes) -->
+		<!-- Coordinates (for curves and meshes) -->
 	<xs:complexType name="Coord">
 		<xs:attribute name="name"  type="xs:string" use="required"/>
 		<xs:attribute name="unit"  type="xs:string" use="optional" default="#"/>
@@ -240,33 +240,23 @@
           <xs:attribute name="offset"  type="xs:int" use="optional" default="0"/>
 	</xs:complexType> 
 
-   <!-- Unstructured Mesh Vertex global id list -->
+   <!-- Unstructured Mesh mesh sections types (VTK defined preprocessor constants i.e VTK_QUAD, VTK_HEXAHEDRON -->
 	<xs:complexType name="SectionVTKTypes">
 		    <xs:attribute name="name"    type="xs:string" use="required"/>
 	</xs:complexType> 
    
-      <!-- Unstructured Mesh Vertex global id list -->
+      <!-- Unstructured Mesh section types - number of elements of the section type -->
 	<xs:complexType name="SectionSizes">
 		    <xs:attribute name="name"    type="xs:string" use="required"/>
 	</xs:complexType> 
    
-      <!-- Unstructured Mesh Vertex global id list -->
+      <!-- Unstructured Mesh list of vertex connectivities one for each element -->
 	<xs:complexType name="SecontionConnectivity">
 		    <xs:attribute name="name"    type="xs:string" use="required"/>
 	</xs:complexType> 
-   <!-- Unstructured Mesh Vertex connectivity vector -->
-	<!-- xs:complexType name="VertexConnectivity">
-		<xs:attribute name="name"  type="xs:string" use="required"/>
-      <xs:sequence>
-         <xs:element name="section_types"   type="xs:string" minOccurs="0" maxOccurs="1"/>
-         <xs:element name="section_sizes"   type="xs:string" minOccurs="0" maxOccurs="1"/>
-      </xs:sequence>
-   </xs:complexType>
-   -->
-   
-	<!-- Mesh node -->
-	<xs:complexType name="Mesh">
 
+      <!-- Mesh node, expands on original rectilinear definitions -->
+      <xs:complexType name="Mesh">
       <xs:sequence>
          <xs:element name="coord"   type="mdl:Coord" minOccurs="1" maxOccurs="3"/>   
          <xs:element name="vertex_global_id"    type="mdl:VertexGID" minOccurs="0" maxOccurs="1"/>
@@ -278,8 +268,7 @@
 		<xs:attribute name="type"     type="mdl:MeshType" use="required"/>
 		<xs:attribute name="topology" type="xs:unsignedInt" use="optional" default="2"/>
 	</xs:complexType>
-   
-
+ 
 
 	<!-- Curve node -->
 	<xs:complexType name="Curve">

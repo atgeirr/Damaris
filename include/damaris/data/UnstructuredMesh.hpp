@@ -113,7 +113,7 @@ protected:
 		}
 
 
-		std::shared_ptr<Block> UnstructuredMesh::ReturnBlock(int source , int iteration , int block ,
+		std::shared_ptr<Block> ReturnBlock(int source , int iteration , int block ,
 																 const std::shared_ptr<Variable>& var )
 		{
 			std::shared_ptr<Block> b = var->GetBlock(source , iteration , block);
@@ -130,20 +130,20 @@ protected:
 		}
 
 		template<typename T>
-		T * UnstructuredMesh::ReturnBlockDataPtr<T>(int source , int iteration , int block ,
+		T * ReturnBlockDataPtr(int source , int iteration , int block ,
 				 	 	 	 	 	 	 	 	 	 	 	 	 const std::shared_ptr<Variable>& var )
 		{
 			std::shared_ptr<Block> b = ReturnBlock( source, iteration,  block , var );
 			if ( b == nullptr ) {
-			    ERROR("The vertex data for variable " << varVerticies->GetName() << " in iteration " << iteration
-				  " does not an allocated Block " << std::endl );
+			    ERROR("The vertex data for variable " << var->GetName() << " in iteration " << iteration
+				  << " does not an allocated Block " << std::endl );
 				return nullptr ;
 		   }
 		   return (T *) b->GetDataSpace().GetData();
 		}
 
 		template<typename T>
-		T * UnstructuredMesh::ReturnBlockDataPtr<T>(std::shared_ptr<Block>& b )
+		T * ReturnBlockDataPtr(std::shared_ptr<Block>& b )
 		{
 			if ( b == nullptr ) {
 				ERROR("The Block provided is not allocated" << std::endl );

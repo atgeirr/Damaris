@@ -65,9 +65,10 @@ vtkDataSet* UnstructuredMesh::GetVtkGrid(int source , int iteration , int block 
 	std::shared_ptr<Variable> section_vtk_sizes = nullptr;
 	std::shared_ptr<Variable> vertex_connectivity = nullptr;
 
-	// Creat the proper vtkGrid Object, dependent on grid type (in this case, unstructured)
+	// Create the proper vtkGrid Object, dependent on grid type (in this case, unstructured)
 	// Uses virtual method dispatch of Mesh::GetVtkGrid() class
-	vtkDataSet* grid = CreateVtkGrid();
+	vtkUnstructuredGrid* grid = vtkUnstructuredGrid::SafeDownCast
+	        (vtkDataSet::SafeDownCast(CreateVtkGrid()));
 
 	// Getting the grid info
 	if (not GetGridVariables(coords_xyz ,
@@ -80,14 +81,14 @@ vtkDataSet* UnstructuredMesh::GetVtkGrid(int source , int iteration , int block 
 	}
 
 	// Setting the vertex point coordinates
-	vtkPoints * vtkPoints = SetVertexCoords( source ,  iteration ,  block , coords_xyz)
+	vtkPoints * vtkPoints = SetVertexCoords( source ,  iteration ,  block , coords_xyz) ;
 	if (vtkPoints == nullptr ) {
 		ERROR("Setting the unstructured mesh vertex coordinates failed: Mesh name: " << GetName()) ;
 		return nullptr;
 	}
 
 	//Setting the global ID's
-	vtkIdTypeArray * vtkGid =  SetGlobalIDs(  source , iteration , block ,vertex_gid)
+	vtkIdTypeArray * vtkGid =  SetGlobalIDs(  source , iteration , block ,vertex_gid) ;
 	if (vtkGid == nullptr ) {
 		ERROR("Setting the unstructured mesh global ids failed! Mesh name: " << GetName()) ;
 		return nullptr;
@@ -134,11 +135,11 @@ bool UnstructuredMesh::SetVtkConnections(vtkDataSet* grid,  int source , int ite
     // Get the array of VTK mesh element types (VTK_LINE, VTK_QUAD etc.), one for each mesh section
     if (section_vtk_type->GetLayout()->GetType() == model::Type::int_) {
 		std::shared_ptr<Block> b = ReturnBlock(source ,  iteration ,  block , section_vtk_type) ;
-		vtk_type_ptr             = std::static_cast<const int *>(ReturnBlockDataPtr<int>( b )) ;
+		vtk_type_ptr             = static_cast<const int *>(ReturnBlockDataPtr<int>( b )) ;
 		vtk_num_sections         = b->GetNumberOfItems();
     } else {
-		ERROR("The section type for mesh " << GetName()  < " variable named: " << section_vtk_type->GetName()
-				<< " in iteration " << iteration " does not have the correct data type (requires int) " << std::endl );
+		ERROR("The section type for mesh " << GetName()  << " variable named: " << section_vtk_type->GetName()
+				<< " in iteration " << iteration << " does not have the correct data type (requires int) " << std::endl );
 		return false ;
 	}
 
@@ -146,16 +147,16 @@ bool UnstructuredMesh::SetVtkConnections(vtkDataSet* grid,  int source , int ite
     // The mesh connectivity will then have vtk_sizes_ptr[x] * strideof(vtk_type_ptr[x]) indices into the vertex data.
     if (section_vtk_sizes->GetLayout()->GetType() == model::Type::int_) {
 		std::shared_ptr<Block> b = ReturnBlock(source ,  iteration ,  block , section_vtk_sizes) ;
-		vtk_sizes_ptr            = std::static_cast<const int *>(ReturnBlockDataPtr<int>( b )) ;
+		vtk_sizes_ptr            = static_cast<const int *>(ReturnBlockDataPtr<int>( b )) ;
 		if (vtk_num_sections != b->GetNumberOfItems()) { // check they are the same size (they should use the same layout)
-			ERROR("The section size for mesh " << GetName()  < " variable named: " << section_vtk_sizes->GetName()
-					<< " in iteration " << iteration " does not match the section size or the vtk_type variable: "
+			ERROR("The section size for mesh " << GetName()  << " variable named: " << section_vtk_sizes->GetName()
+					<< " in iteration " << iteration << " does not match the section size or the vtk_type variable: "
 					<< section_vtk_type->GetName() << std::endl );
 					return false ;
 		}
     } else {
-		ERROR("The section type for mesh " << GetName()  < " variable named: " << section_vtk_sizes->GetName()
-				<< " in iteration " << iteration " does not have the correct data type (requires int) " << std::endl );
+		ERROR("The section type for mesh " << GetName() << " variable named:  " << section_vtk_sizes->GetName()
+				<< " in iteration " << iteration << " does not have the correct data type (requires int) " << std::endl );
 		return false ;
 	}
 
@@ -171,10 +172,10 @@ bool UnstructuredMesh::SetVtkConnections(vtkDataSet* grid,  int source , int ite
     // Get the array of mesh connectivities.
 	if (vertex_connectivity->GetLayout()->GetType() == model::Type::long_) {
 		std::shared_ptr<Block> b = ReturnBlock(source ,  iteration ,  block , section_vtk_sizes) ;
-		vrtx_connect_ptr         = std::static_cast<const unsigned long *>(ReturnBlockDataPtr<long int>( b )) ;
+		vrtx_connect_ptr         = static_cast<const unsigned long *>(ReturnBlockDataPtr<const unsigned long>( b )) ;
 	} else {
-		ERROR("The section type for mesh " << GetName()  < " variable named: " << section_vtk_sizes->GetName()
-				<< " in iteration " << iteration " does not have the correct data type (requires long) " << std::endl );
+		ERROR("The section type for mesh " << GetName()  << " variable named: " << section_vtk_sizes->GetName()
+				<< " in iteration " << iteration << " does not have the correct data type (requires long) " << std::endl );
 		return false ;
 	}
 
@@ -196,12 +197,12 @@ bool UnstructuredMesh::SetVtkConnections(vtkDataSet* grid,  int source , int ite
 	    }
 	    else if (vtk_type == VTK_POLYGON) {
 	    	// _export_nodal_polygons(section, ugrid);
-	    	ERROR("The section type for mesh " << GetName()  < " is VTK_POLYGON which is not implemented in current (development) version " << std::endl );
+	    	ERROR("The section type for mesh " << GetName()  << " is VTK_POLYGON which is not implemented in current (development) version " << std::endl );
 	    	return false ;
 	    }
 	    else if (vtk_type == VTK_POLYHEDRON) {
 	    	// _export_nodal_polyhedra(mesh->n_vertices, section, ugrid);
-	    	ERROR("The section type for mesh " << GetName()  < " is VTK_POLYHEDRON which is not implemented in current (development) version " << std::endl );
+	    	ERROR("The section type for mesh " << GetName()  << " is VTK_POLYHEDRON which is not implemented in current (development) version " << std::endl );
 	    	return false ;
 	    }
 
@@ -226,11 +227,11 @@ vtkPoints * UnstructuredMesh::SetVertexCoords( int source , int iteration , int 
 	//double * vertexdata = (double *) b->GetDataSpace().GetData();
 	if (varVerticies->GetLayout()->GetType() == model::Type::double_) {
 		std::shared_ptr<Block> b = ReturnBlock(source ,  iteration ,  block , varVerticies) ;
-		vertexdata               = std::static_cast<const double *>(ReturnBlockDataPtr<double>( b ) );
+		vertexdata               = static_cast<const double *>(ReturnBlockDataPtr<double>( b ) );
 		vertexSize                = b->GetNumberOfItems();
 	} else {
 		ERROR("The vertex data for variable " << varVerticies->GetName() << " in iteration " << iteration
-						" does not have the correct data type (requires double) " << std::endl );
+						<< " does not have the correct data type (requires double) " << std::endl );
 		return nullptr ;
 	}
 
@@ -243,7 +244,7 @@ vtkPoints * UnstructuredMesh::SetVertexCoords( int source , int iteration , int 
 	if (topology == 3) {
 		if ((vertexSize % 3) != 0) { // in case the layout is not correct
 			ERROR("The unstructured coordinate blocks for variable " << varVerticies->GetName() << " in iteration " << iteration
-				" does not have the correct number of coordinates (not a factor of 3 for x,y,z coordinates) "
+				<< " does not have the correct number of coordinates (not a factor of 3 for x,y,z coordinates) "
 				  << std::endl );
 			return nullptr ;
 		}
@@ -253,7 +254,7 @@ vtkPoints * UnstructuredMesh::SetVertexCoords( int source , int iteration , int 
 	} else if (topology == 2) {
 		if ((vertexSize % 2) != 0) { // in case the layout is not correct
 			ERROR("The unstructured coordinate blocks for variable " << varVerticies->GetName() << " in iteration " << iteration
-				" does not have the correct number of coordinates (not a factor of 2 for x,y coordinates) "
+				<< " does not have the correct number of coordinates (not a factor of 2 for x,y coordinates) "
 				  << std::endl );
 			return nullptr ;
 		}
@@ -273,7 +274,7 @@ vtkPoints * UnstructuredMesh::SetVertexCoords( int source , int iteration , int 
 
 	for (size_t t1 = 0 ; t1 < n_verticies_ ; t1++){
 
-		for (t2 = 0 ; t2 < topology ; t2++)
+		for (int t2 = 0 ; t2 < topology ; t2++)
 			point[t2] = vertexdata[t1*topology + t2] ;
 
 		points->InsertNextPoint(point[0],point[1],point[2]) ;
@@ -293,10 +294,10 @@ vtkIdTypeArray * UnstructuredMesh::SetGlobalIDs(int source , int iteration , int
 	global_vtx_ids->SetNumberOfComponents(1);
 	global_vtx_ids->SetName("GlobalNodeIds");
 	if (n_verticies_ == 0) {
-		ERROR(" The n_verticies_ has not been set! Mesh is named: " << GetName() ". (Has SetVertexCoords() been called first?) " << std::endl) ;
+		ERROR(" The n_verticies_ has not been set! Mesh is named: " << GetName() << ". (Has SetVertexCoords() been called first?) " << std::endl) ;
 		return nullptr ;
 	}
-	global_vtx_ids->SetNumberOFTuples(n_verticies_);
+	global_vtx_ids->SetNumberOfTuples(n_verticies_);
 
 
 	std::shared_ptr<Block> b = varGID->GetBlock(source , iteration , block);
@@ -306,7 +307,7 @@ vtkIdTypeArray * UnstructuredMesh::SetGlobalIDs(int source , int iteration , int
 
 	if (b == nullptr) {
 		ERROR("No coordinate blocks for variable " << varGID->GetName() << " in iteration " << iteration << std::endl );
-		return false;
+		return nullptr;
 	}
 
 	// Assuming model::Type::long_:
@@ -317,17 +318,17 @@ vtkIdTypeArray * UnstructuredMesh::SetGlobalIDs(int source , int iteration , int
 		long int * giddata = (long int *) b->GetDataSpace().GetData();
 
 		for (size_t t1 = 0 ; t1 < n_verticies_ ; t1++){
-			vtkIdType idt = std::static_cast<unsigned long int>(giddata[i]) + vert_gid_offset ;
+			vtkIdType idt = static_cast<unsigned long int>(giddata[t1]) + vert_gid_offset ;
 
-			global_vtx_ids->setTypedTuple(t1, &idt) ;
+			global_vtx_ids->SetTypedTuple(t1, &idt) ;
 		}
 	} else if (varGID->GetLayout()->GetType()  == model::Type::int_) {
 		 int * giddata = ( int *) b->GetDataSpace().GetData();
 
 		for (size_t t1 = 0 ; t1 < n_verticies_ ; t1++){
-			vtkIdType idt = std::static_cast<unsigned int>(giddata[i]) + vert_gid_offset ;
+			vtkIdType idt = static_cast<unsigned int>(giddata[t1]) + vert_gid_offset ;
 
-			global_vtx_ids->setTypedTuple(t1, &idt) ;
+			global_vtx_ids->SetTypedTuple(t1, &idt) ;
 		}
 	}
 
