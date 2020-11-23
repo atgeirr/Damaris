@@ -108,25 +108,25 @@ std::shared_ptr<Variable> Mesh::GetVertexGID()
 std::shared_ptr<Variable> Mesh::GetSectionVTKType()
 {
 	std::shared_ptr<Variable> vtktype = nullptr ;
-	std::string vert_gid_name = GetModel().section_types().get().name() ;
-	vtktype = FindVar(vert_gid_name)  ;
+	std::string sectn_type_name = GetModel().section_types().get().name() ;
+	vtktype = FindVar(sectn_type_name)  ;
  	return vtktype ;
 }
 
 std::shared_ptr<Variable> Mesh::GetSectionSizes()
 {
-	std::shared_ptr<Variable> vtktype = nullptr ;
-	std::string vert_gid_name = GetModel().section_sizes().get().name() ;
-	vtktype = FindVar(vert_gid_name)  ;
- 	return vtktype ;
+	std::shared_ptr<Variable> sctnsz = nullptr ;
+	std::string sectn_size_name = GetModel().section_sizes().get().name() ;
+	sctnsz = FindVar(sectn_size_name)  ;
+ 	return sctnsz ;
 }
 
 std::shared_ptr<Variable> Mesh::GetSectionVertexConnectivity()
 {
-	std::shared_ptr<Variable> vtktype = nullptr ;
-	std::string vert_gid_name = GetModel().section_conectivity().get().name();
-	vtktype = FindVar(vert_gid_name)  ;
- 	return vtktype ;
+	std::shared_ptr<Variable> sctn_connect = nullptr ;
+	std::string sect_connect_name = GetModel().section_connectivity().get().name();
+	sctn_connect = FindVar(sect_connect_name)  ;
+ 	return sctn_connect ;
 }
 
 }

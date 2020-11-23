@@ -105,7 +105,7 @@ public:
 
 protected:
 		/**
-		 * Simply creates a vtkUnstructuredGrid and return it.
+		 * Simply creates a vtkUnstructuredGrid and returns it.
 		 */
 		virtual vtkDataSet* CreateVtkGrid() override
 		{

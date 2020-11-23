@@ -120,7 +120,7 @@ bool UnstructuredMesh::SetVtkConnections(vtkDataSet* grid,  int source , int ite
 									 const std::shared_ptr<Variable>& vertex_connectivity
 									 )
 {
-	size_t vtk_num_sections ; // This is the size of the section_vtk_type block
+	size_t vtk_num_sections ; // This is the size of the section_vtk_type and section_vtk_sizes Variables
 	const int * vtk_type_ptr ;
 	const int * vtk_sizes_ptr ;
 	const unsigned long * vrtx_connect_ptr ;
@@ -132,7 +132,7 @@ bool UnstructuredMesh::SetVtkConnections(vtkDataSet* grid,  int source , int ite
     		return false;
     }
 
-    // Get the array of VTK mesh element types (VTK_LINE, VTK_QUAD etc.), one for each mesh section
+    // Get the array of VTK mesh element types (VTK_LINE, VTK_QUAD etc.), one element type for each mesh section
     if (section_vtk_type->GetLayout()->GetType() == model::Type::int_) {
 		std::shared_ptr<Block> b = ReturnBlock(source ,  iteration ,  block , section_vtk_type) ;
 		vtk_type_ptr             = static_cast<const int *>(ReturnBlockDataPtr<int>( b )) ;
@@ -161,7 +161,7 @@ bool UnstructuredMesh::SetVtkConnections(vtkDataSet* grid,  int source , int ite
 	}
 
     long int n_elts = 0 ;
-    for (int t1 = 0 ; t1 < vtk_num_sections; t1++)
+    for (size_t t1 = 0 ; t1 < vtk_num_sections; t1++)
     {
     	n_elts += vtk_sizes_ptr[t1] ;
     }
@@ -184,16 +184,17 @@ bool UnstructuredMesh::SetVtkConnections(vtkDataSet* grid,  int source , int ite
 	int vert_gid_offset = GetModel().vertex_global_id().get().offset() ; // can also request offset()
 	vtkIdType *vtx_ids = new vtkIdType[8]; // 8 is the maximum size required
 
-
-	for (int sectn_id = 0; sectn_id < vtk_num_sections; sectn_id++) {
+	size_t sectn_offset = 0 ;
+	for (size_t sectn_id = 0; sectn_id < vtk_num_sections; sectn_id++) {
 		vtk_type         = vtk_type_ptr[sectn_id] ;
 		vtk_type_stride  = strideofVtkType(vtk_type);
 	    if (vtk_type_stride > 0) {
 	    	  for (int t1 = 0; t1 < vtk_sizes_ptr[sectn_id]; t1++) {
 	    		  for (int t2 = 0; t2 < vtk_type_stride; t2++)
-	    			  vtx_ids[t2] = vrtx_connect_ptr[t1*vtk_type_stride] + vert_gid_offset;
+	    			  vtx_ids[t2] = vrtx_connect_ptr[sectn_offset + (t1*vtk_type_stride) + t2] + vert_gid_offset;
 	    		  uGrid->InsertNextCell(vtk_type, vtk_type_stride, vtx_ids);
 	    	  }
+	    	  sectn_offset += vtk_sizes_ptr[sectn_id] * vtk_type_stride;
 	    }
 	    else if (vtk_type == VTK_POLYGON) {
 	    	// _export_nodal_polygons(section, ugrid);

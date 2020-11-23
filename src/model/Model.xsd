@@ -113,6 +113,7 @@
 			<xs:attribute name="ghosts"	    type="xs:string"    use="optional" default="#"/>
 			<xs:attribute name="language"     type="mdl:Language" use="optional" default="unknown"/>
 			<xs:attribute name="visualizable" type="xs:boolean"   use="optional" default="true"/>
+         <xs:attribute name="comment"      type="xs:string"    use="optional"/>
 		</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
@@ -132,27 +133,6 @@
 			<xs:enumeration value="curve" />
 		</xs:restriction>
 	</xs:simpleType>
-   
-   <!-- Vector layout type 
-   <xs:simpleType name="StructType"> 
-      <xs:restriction base="xs:string">
-         <xs:enumeration value="ArrayOfStructs" />
-         <xs:enumeration value="StructOfArrays" />
-      </xs:restriction>
-   </xs:simpleType> 
-   -->
-   <!-- Vector layout description 
-   <xs:complexType  name="Vector">
-      <xs:simpleContent>
-         <xs:extension base="xs:string">
-            <xs:attribute name="name"       type="xs:string" use="required" />
-	   	   <xs:attribute name="type"       type="mdl:StructType" use="optional" default="ArrayOfStructs" />
-	   	   <xs:attribute name="components" type="xs:unsignedInt" use="optional" default="1" />
-         </xs:extension>
-      </xs:simpleContent>
-	</xs:complexType>	
-   -->
-
 
 	<!-- Variable centering -->
 	<xs:simpleType name="VarCentering">
@@ -177,6 +157,7 @@
 			<xs:attribute name="visualizable" type="xs:boolean" use="optional" default="true"/>
 			<xs:attribute name="time-varying" type="xs:boolean" use="optional" default="true"/>
 			<xs:attribute name="store"	       type="xs:string"  use="optional" default="#"/>
+         <xs:attribute name="comment"      type="xs:string"  use="optional"/>
 		</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
@@ -210,6 +191,7 @@
 			<xs:attribute name="name"  type="xs:NCName" use="required"/>
 			<xs:attribute  name="type"  type="mdl:Type" use="required"/>
 			<xs:attribute name="value" type="xs:string" use="required"/>
+         <xs:attribute name="comment" type="xs:string" use="optional"/>
 		</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
@@ -232,41 +214,47 @@
 		<xs:attribute name="name"  type="xs:string" use="required"/>
 		<xs:attribute name="unit"  type="xs:string" use="optional" default="#"/>
 		<xs:attribute name="label" type="xs:string" use="optional" default="#"/>
+      <xs:attribute name="comment" type="xs:string" use="optional"/>
 	</xs:complexType>
    
    <!-- Unstructured Mesh Vertex global id list -->
 	<xs:complexType name="VertexGID">
 		    <xs:attribute name="name"    type="xs:string" use="required"/>
           <xs:attribute name="offset"  type="xs:int" use="optional" default="0"/>
+          <xs:attribute name="comment" type="xs:string" use="optional"/>
 	</xs:complexType> 
 
    <!-- Unstructured Mesh mesh sections types (VTK defined preprocessor constants i.e VTK_QUAD, VTK_HEXAHEDRON -->
 	<xs:complexType name="SectionVTKTypes">
 		    <xs:attribute name="name"    type="xs:string" use="required"/>
+          <xs:attribute name="comment" type="xs:string" use="optional"/>
 	</xs:complexType> 
    
       <!-- Unstructured Mesh section types - number of elements of the section type -->
 	<xs:complexType name="SectionSizes">
 		    <xs:attribute name="name"    type="xs:string" use="required"/>
+          <xs:attribute name="comment" type="xs:string" use="optional"/>
 	</xs:complexType> 
    
       <!-- Unstructured Mesh list of vertex connectivities one for each element -->
 	<xs:complexType name="SecontionConnectivity">
 		    <xs:attribute name="name"    type="xs:string" use="required"/>
+          <xs:attribute name="comment" type="xs:string" use="optional"/>
 	</xs:complexType> 
 
       <!-- Mesh node, expands on original rectilinear definitions -->
       <xs:complexType name="Mesh">
       <xs:sequence>
-         <xs:element name="coord"   type="mdl:Coord" minOccurs="1" maxOccurs="3"/>   
-         <xs:element name="vertex_global_id"    type="mdl:VertexGID" minOccurs="0" maxOccurs="1"/>
-         <xs:element name="section_types"       type="mdl:SectionVTKTypes" minOccurs="0" maxOccurs="1"/>
-         <xs:element name="section_sizes"       type="mdl:SectionSizes" minOccurs="0" maxOccurs="1"/>
-         <xs:element name="section_conectivity" type="mdl:SecontionConnectivity" minOccurs="0" maxOccurs="1"/>
+         <xs:element name="coord"                type="mdl:Coord"           minOccurs="1" maxOccurs="3"/>   
+         <xs:element name="vertex_global_id"     type="mdl:VertexGID"       minOccurs="0" maxOccurs="1"/>
+         <xs:element name="section_types"        type="mdl:SectionVTKTypes" minOccurs="0" maxOccurs="1"/>
+         <xs:element name="section_sizes"        type="mdl:SectionSizes"    minOccurs="0" maxOccurs="1"/>
+         <xs:element name="section_connectivity" type="mdl:SecontionConnectivity" minOccurs="0" maxOccurs="1"/>
 		</xs:sequence>
 		<xs:attribute name="name"     type="xs:string"    use="required"/>
 		<xs:attribute name="type"     type="mdl:MeshType" use="required"/>
 		<xs:attribute name="topology" type="xs:unsignedInt" use="optional" default="2"/>
+      <xs:attribute name="comment" type="xs:string" use="optional"/>
 	</xs:complexType>
  
 

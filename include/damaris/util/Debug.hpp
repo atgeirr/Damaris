@@ -111,37 +111,37 @@ class Trace {
 #define __LEAK
 #define __CFGERROR
 #define __CFGWARN
-#define INFO(message) MESSAGE(std::cout, "INFO", message)
+#define INFO(message) MESSAGE(std::cout, "DAMARIS INFO", message)
 #else
 #define INFO(message)
 #endif
 
 #ifdef __TRACE
-#define TRACE(out,message) SIMPLE(out, "TRACE", message)
+#define TRACE(out,message) SIMPLE(out, "DAMARIS TRACE", message)
 #else
 #define TRACE(out,message)
 #endif
 
 #ifdef __ERROR
-#define ERROR(message) MESSAGE(std::cerr, "ERROR", message)
+#define ERROR(message) MESSAGE(std::cerr, "DAMARIS ERROR", message)
 #else
 #define ERROR(message)
 #endif
 
 #ifdef __LEAK
-#define LEAK(message) MESSAGE(std::cerr, "LEAK", message)
+#define LEAK(message) MESSAGE(std::cerr, "DAMARIS LEAK", message)
 #else
 #define LEAK(message)
 #endif
 
 #ifdef __CFGERROR
-#define CFGERROR(message) MESSAGE(std::cerr, "CONFIG-ERROR",message)
+#define CFGERROR(message) MESSAGE(std::cerr, "DAMARIS CONFIG-ERROR",message)
 #else
 #define CFGERROR(message)
 #endif
 
 #ifdef __WARN
-#define WARN(message) MESSAGE(std::cerr, "WARNING", message)
+#define WARN(message) MESSAGE(std::cerr, "DAMARIS WARNING", message)
 #define WARN_IF(condition,message) if(condition) {\
 		WARN(message); \
 	}
@@ -151,7 +151,7 @@ class Trace {
 #endif
 
 #ifdef __CFGWARN
-#define CFGWARN(message) MESSAGE(std::cerr, "CONFIG-WARNING", message)
+#define CFGWARN(message) MESSAGE(std::cerr, "DAMARIS CONFIG-WARNING", message)
 #else
 #define CFGWARN(message)
 #endif
@@ -171,17 +171,17 @@ class Trace {
 #define FATAL(expression,msg) {\
 	if(expression) {\
 		std::ostringstream out; \
-		MESSAGE(out, "FATAL", msg);\
+		MESSAGE(out, "DAMARIS FATAL", msg);\
 		throw std::runtime_error(out.str()); \
 	}\
 	}
 
 #ifdef __DEBUG_ALL
-#define DBG(message) MESSAGE(std::cerr, "DEBUG", message)
+#define DBG(message) MESSAGE(std::cerr, "DAMARIS DEBUG", message)
 #else
 #undef DBG
 #ifdef __DEBUG
-#define DBG(message) MESSAGE(std::cerr, "DEBUG", message)
+#define DBG(message) MESSAGE(std::cerr, "DAMARIS DEBUG", message)
 #undef __DEBUG
 #else
 #define DBG(message)
