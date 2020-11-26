@@ -71,7 +71,7 @@ void ParaViewAdaptor::CoProcess(int iteration , bool lastTimeStep)
 
     // specify the simulation time and time step for Catalyst
     dataDescription->AddInput("input");
-	dataDescription->SetTimeData(iteration*0.1 , iteration);  // What is the difference?
+	dataDescription->SetTimeData(iteration*0.1 , iteration);  // What is the difference? Simulation time and simulation iteration
 
 	if (lastTimeStep == true) { // How to know about it?
         dataDescription->ForceOutputOn();
@@ -126,7 +126,7 @@ bool ParaViewAdaptor::FillMultiBlockGrid(int iteration , vtkMultiBlockDataSet* r
             const model::Variable& mdl = var->GetModel();
 
             if (mdl.mesh() == "#") continue;    // a variable with empty mesh
-            if (mdl.mesh() != mesh->GetName()) continue;  // a variable with a differetn mesh
+            if (mdl.mesh() != mesh->GetName()) continue;  // a variable with a different mesh
             if (mdl.visualizable() == false) continue;  // non-visualizable variable
 
             if (not (*varItr)->AddBlocksToVtkGrid(vtkMPGrid , iteration)) {

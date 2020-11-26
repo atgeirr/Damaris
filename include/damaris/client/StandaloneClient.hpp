@@ -29,9 +29,9 @@ namespace damaris {
 	
 /**
  * The StandaloneClient object represents a single core running the simulation.
- * It is instanciated when no dedicated core is required by the user, and
+ * It is instantiated when no dedicated core is required by the user, and
  * calls itself plugins instead of relying on a dedicated core. This class
- * inherites from Client.
+ * Inherits from Client.
  */
 class StandaloneClient : public Client {
 
@@ -74,7 +74,7 @@ class StandaloneClient : public Client {
 	 * \param[in] varname : name of the variable to write.
 	 * \param[in] block : id of the block to write.
 	 * \param[in] data : pointer to the data to write.
-	 * \param[in] blocking : wether to block or not if the required memory
+	 * \param[in] blocking : whether to block or not if the required memory
 	 * is not available. Forced to false in StandaloneClient.
 	 */
 	virtual int Write(const std::string &varname,

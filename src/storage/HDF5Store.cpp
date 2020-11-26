@@ -220,16 +220,21 @@ namespace damaris {
                 ERROR("Failed to allocate memory for dim arrays!");
             }
 
+           /*
+            * This is being moved to the inner block loop as
+            * https://gitlab.inria.fr/Damaris/damaris-development/-/issues/20
+            *
             for (int i = 0; i < varDimention; i++) {
                 globalDims[i] = v->GetLayout()->GetGlobalExtentAlong(i);
                 localDims[i] = v->GetLayout()->GetExtentAlong(i, false);
             }
 
             // create the file space
-            if ((fileSpace = H5Screate_simple(varDimention, localDims , NULL)) < 0)
+            * if ((fileSpace = H5Screate_simple(varDimention, localDims , NULL)) < 0)
                 ERROR("HDF5: file space creation failed !");
+            */
 
-            // Getting the equivalend hDF5 Variable Type
+            // Getting the equivalent hDF5 Variable Type
             if (not GetHDF5Type(v->GetLayout()->GetType(), dtypeId))
                 ERROR("HDF5:Unknown variable type " << v->GetLayout()->GetType());
 
@@ -243,25 +248,55 @@ namespace damaris {
                 std::shared_ptr<Block> b = *bid;
                 numBlocks++;
 
+                // Create block dimentions
+				int blockDimention = b->GetDimensions();
+				for (int i = 0; i < blockDimention; i++)
+					b->GetGlobalExtent(i);
+
+				hsize_t *blockDim = new (std::nothrow) hsize_t[blockDimention];
+				if (blockDim == NULL)
+					ERROR("HDF5:Failed to allocate memory ");
+
+                // Obtain the block size
+				for (int i = 0; i < blockDimention; i++)
+					blockDim[i] = b->GetEndIndex(i) - b->GetStartIndex(i) + 1;
+
+				// Obtain the FilesSpace size (has to match the memory space dimensions)
+				for (int i = 0; i < varDimention; i++) {
+					localDims[i] = b->GetEndIndex(i) - b->GetStartIndex(i) + 1;
+				}
+				// create the file space
+				if ((fileSpace = H5Screate_simple(varDimention, localDims , NULL)) < 0)
+					ERROR("HDF5: file space creation failed !");
+
                 // Create Dataset for each block
                 varName = GetVariableFullName(v , &b);
                 if ((dsetId = H5Dcreate(fileId, varName.c_str() , dtypeId , fileSpace,
                                          lcplId, H5P_DEFAULT, H5P_DEFAULT)) < 0)
                     ERROR("HDF5: Failed to create dataset ... ");
 
+                /*
                 // Create block dimentions
-                int blockDimention = b->GetDimensions();
-                for (int i = 0; i < blockDimention; i++)
-                    b->GetGlobalExtent(i);
+                                int blockDimention = b->GetDimensions();
+                                for (int i = 0; i < blockDimention; i++)
+                                    b->GetGlobalExtent(i);
 
-                hsize_t *blockDim = new (std::nothrow) hsize_t[blockDimention];
-                if (blockDim == NULL)
-                    ERROR("HDF5:Failed to allocate memory ");
+                                hsize_t *blockDim = new (std::nothrow) hsize_t[blockDimention];
+                                if (blockDim == NULL)
+                                    ERROR("HDF5:Failed to allocate memory ");
 
                 // Obtain the block size
                 for (int i = 0; i < blockDimention; i++)
                     blockDim[i] = b->GetEndIndex(i) - b->GetStartIndex(i) + 1;
 
+                // Obtain the FilesSpace size (has to match the memory space dimensions)
+                for (int i = 0; i < varDimention; i++) {
+					localDims[i] = b->GetEndIndex(i) - b->GetStartIndex(i) + 1;
+				}
+				// create the file space
+				if ((fileSpace = H5Screate_simple(varDimention, localDims , NULL)) < 0)
+					ERROR("HDF5: file space creation failed !");
+*/
                 // Create memory data space
                 memSpace = H5Screate_simple(blockDimention, blockDim , NULL);
 
@@ -283,9 +318,10 @@ namespace damaris {
                 // 8 Free evertything
                 delete [] blockDim;
                 H5Sclose(memSpace);
+                H5Sclose(fileSpace);
                 H5Dclose(dsetId);
             } // for of block iteration
-            H5Sclose(fileSpace);
+            // H5Sclose(fileSpace);
             delete [] globalDims;
             delete [] localDims;
         } // for of variable iteration
