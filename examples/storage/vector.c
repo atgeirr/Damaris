@@ -24,6 +24,8 @@ int main(int argc, char** argv)
 
     int size, rank;
     int is_client;
+    int LENGTH = 1024 ;
+
 
     int err = damaris_start(&is_client);
 
@@ -32,7 +34,6 @@ int main(int argc, char** argv)
         MPI_Comm comm;
         damaris_client_comm_get(&comm);
 
-        int LENGTH = 1024 ;
         int size_in_xml ;
         err = damaris_parameter_set("LENGTH",&LENGTH, sizeof(int));
         if (err != DAMARIS_OK ) {
@@ -59,50 +60,52 @@ int main(int argc, char** argv)
         for(i=0; i < MAX_CYCLES; i++) {
             double t1 = MPI_Wtime();
             if (LENGTH/size/domains > 1){
-				int local_length      = LENGTH/size;
-				int process_offset    = rank*local_length;
-				int block_offset;
+                int local_length      = LENGTH/size;  // progressively make the data smaller
+                int process_offset    = rank*local_length;
+                int block_offset;
 
 
-				float* bar = (float*)malloc(local_length* sizeof(float));
+                float* bar = (float*)malloc(local_length* sizeof(float));
 
-				for(z = 0; z < local_length; z++)
-					bar[z] = -1.0 ;
-
-
-				err = damaris_parameter_set("LENGTH",&LENGTH, sizeof(int));
-				if (err != DAMARIS_OK ) {
-				  fprintf(stderr, "ERROR: Damaris damaris_parameter_set():\nparamater: LENGTH");
-				}
+                for(z = 0; z < local_length; z++)
+                    bar[z] = -1.0 ;
 
 
-				if (domains == 1){
-					for(z = 0; z < local_length; z++)
-						bar[z] = rank;
+                err = damaris_parameter_set("LENGTH",&LENGTH, sizeof(int));
+                if (err != DAMARIS_OK ) {
+                  fprintf(stderr, "ERROR: Damaris damaris_parameter_set():\nparamater: LENGTH");
+                }
 
-					position[0] = process_offset;
-					// damaris_set_position() does nothing for the output of the data to HDF5 in filePerProcess mode
-					//damaris_set_position("bar",position);
-					damaris_write("bar",bar);
-				} else {
-					for(y=0; y<domains ; y++){
-						for(z = 0; z < local_length/domains; z++)
-							bar[z] = rank*10 + y;
 
-						block_offset = y*(local_length/domains);
-						position[0] = process_offset + block_offset;
-						// damaris_set_block_position() does nothing for the output of the data to HDF5 in filePerProcess mode
-						//damaris_set_block_position("bar" , y , position);
-						damaris_write_block("bar" , y , bar );
-					}
-				}
-				LENGTH /= 2 ;
-				damaris_end_iteration();
+                if (domains == 1){
+                    for(z = 0; z < local_length; z++)
+                        bar[z] = rank;
 
-				MPI_Barrier(comm);
-				free(bar);
+                    position[0] = process_offset;
+                    // damaris_set_position() does nothing for the output of the data to HDF5 in filePerProcess mode
+                    // however, it is important in the Collective mode as it sets the metadata of where the data is positioned
+                    damaris_set_position("bar",position);
+                    damaris_write("bar",bar);
+                } else {
+                    for(y=0; y<domains ; y++){
+                        for(z = 0; z < local_length/domains; z++)
+                            bar[z] = rank*10 + y;
+
+                        block_offset = y*(local_length/domains);
+                        position[0] = process_offset + block_offset;
+                        // damaris_set_block_position() does nothing for the output of the data to HDF5 in filePerProcess mode
+                        // however, it is important in the Collective mode as it sets the metadata of where the data is positioned
+                        damaris_set_block_position("bar" , y , position);
+                        damaris_write_block("bar" , y , bar );
+                    }
+                }
+                LENGTH /= 2 ;
+                damaris_end_iteration();
+
+                MPI_Barrier(comm);
+                free(bar);
             } else {
-            	fprintf(stderr, "ERROR: Vector: Possibly running example with too many processes or domains");
+                fprintf(stderr, "ERROR: Vector: Possibly running example with too many processes or domains");
             }
             double t2 = MPI_Wtime();
 

@@ -43,7 +43,7 @@ class HDF5Store : public Store {
 	virtual ~HDF5Store() {}
 
 private:
-    enum FileMode {FilePerCore , FilePerNode , Collective};
+    enum FileMode {FilePerCore , FilePerNode , Collective, CollectiveTest};
     enum XdmfMode {NoIteration, FirstIteration, EveryIteration};
 
 	FileMode fileMode_;
@@ -83,13 +83,30 @@ private:
 
     /**
 	* This function writes the data of an iteration into a single HDF5 file using collective I/O.
-	* Parallel HDF5 has been used as an I/O midlleware here.
+	* Parallel HDF5 has been used as an I/O middleware here.
+	* N.B. This version is known to fail when damaris_set_paramater() is called that affects a damaris::Layout
+	* i.e. when a variables Layout has a local or global dimension modified through a parameter.
+	* Is enabled by specifying "CollectiveTest" in the Damaris
+	* XML config file <store> section:
+	*  <option key="FileMode">Collective</option>
 	*/
 	void OutputCollective(int32_t iteration);
+
+    /**
+	* This function writes the data of an iteration into a single HDF5 file using collective I/O.
+	* Parallel HDF5 has been used as an I/O middleware here.
+	* It is a to-be-tested version that can be used by specifying "CollectiveTest" in the Damaris
+	* XML config file <store> section:
+	*  <option key="FileMode">CollectiveTest</option>
+	*/
+	void OutputCollectiveTest(int32_t iteration);
 
 	/**
 	* This function writes the data of an iteration into multiple files in a file-per-dedicated-core manner.
 	* No collective I/O is used in this case.
+	* Is enabled by specifying "CollectiveTest" in the Damaris
+	* XML config file <store> section:
+	*  <option key="FileMode">FilePerCore</option>
 	*/
 	void OutputPerCore(int32_t iteration);
 

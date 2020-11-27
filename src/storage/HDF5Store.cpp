@@ -50,7 +50,9 @@ namespace damaris {
                     return false;
                 } else if (op->compare("Collective") == 0) {
                     fileMode_ = Collective;
-                } else {
+                } else if (op->compare("CollectiveTest") == 0) {
+                    fileMode_ = CollectiveTest;
+                }  else {
                     ERROR("FileMode is undefined. ");
                     return false;
                 }
@@ -112,6 +114,9 @@ namespace damaris {
             case Collective:
                 OutputCollective(iteration);
                 break;
+            case CollectiveTest:
+                OutputCollectiveTest(iteration);
+                break;
             default: // e.g. file per dedicated node
                 ERROR("FileMode is not supported!!!");
         }
@@ -152,7 +157,9 @@ namespace damaris {
             fileName << path_ << baseName << "_It" << iteration << "_Pr" << processId << ".h5";
         } else if (fileMode_ == Collective) {
             fileName << path_ << baseName << "_It" << iteration << ".h5";
-        }
+        } else if (fileMode_ == CollectiveTest) {
+                    fileName << path_ << baseName << "_It" << iteration << ".h5";
+                }
 
         return  fileName.str();
     }
@@ -166,7 +173,7 @@ namespace damaris {
         numDomains = Environment::NumDomainsPerClient();
 
         // (b == NULL) means that there is no access to block data, i.e. in file-per-core mode or future modes.
-        if ((fileMode_ == Collective) || (b == NULL))
+        if ((fileMode_ == Collective) || (fileMode_ == CollectiveTest) ||  (b == NULL))
             return v->GetName();
 
         if (numDomains == 1){
@@ -220,18 +227,12 @@ namespace damaris {
                 ERROR("Failed to allocate memory for dim arrays!");
             }
 
-           /*
-            * This is being moved to the inner block loop as
-            * https://gitlab.inria.fr/Damaris/damaris-development/-/issues/20
-            *
-            for (int i = 0; i < varDimention; i++) {
-                globalDims[i] = v->GetLayout()->GetGlobalExtentAlong(i);
-                localDims[i] = v->GetLayout()->GetExtentAlong(i, false);
-            }
 
-            // create the file space
-            * if ((fileSpace = H5Screate_simple(varDimention, localDims , NULL)) < 0)
-                ERROR("HDF5: file space creation failed !");
+           /*
+            * fileSpace creation is being moved to the inner block loop due
+            * to issue with updating layout sizes when paramaters change on the
+            * server side. See:
+            * https://gitlab.inria.fr/Damaris/damaris-development/-/issues/20
             */
 
             // Getting the equivalent hDF5 Variable Type
@@ -249,41 +250,13 @@ namespace damaris {
                 numBlocks++;
 
                 // Create block dimentions
-				int blockDimention = b->GetDimensions();
-				for (int i = 0; i < blockDimention; i++)
-					b->GetGlobalExtent(i);
+                int blockDimention = b->GetDimensions();
+                for (int i = 0; i < blockDimention; i++)
+                    b->GetGlobalExtent(i);
 
-				hsize_t *blockDim = new (std::nothrow) hsize_t[blockDimention];
-				if (blockDim == NULL)
-					ERROR("HDF5:Failed to allocate memory ");
-
-                // Obtain the block size
-				for (int i = 0; i < blockDimention; i++)
-					blockDim[i] = b->GetEndIndex(i) - b->GetStartIndex(i) + 1;
-
-				// Obtain the FilesSpace size (has to match the memory space dimensions)
-				for (int i = 0; i < varDimention; i++) {
-					localDims[i] = b->GetEndIndex(i) - b->GetStartIndex(i) + 1;
-				}
-				// create the file space
-				if ((fileSpace = H5Screate_simple(varDimention, localDims , NULL)) < 0)
-					ERROR("HDF5: file space creation failed !");
-
-                // Create Dataset for each block
-                varName = GetVariableFullName(v , &b);
-                if ((dsetId = H5Dcreate(fileId, varName.c_str() , dtypeId , fileSpace,
-                                         lcplId, H5P_DEFAULT, H5P_DEFAULT)) < 0)
-                    ERROR("HDF5: Failed to create dataset ... ");
-
-                /*
-                // Create block dimentions
-                                int blockDimention = b->GetDimensions();
-                                for (int i = 0; i < blockDimention; i++)
-                                    b->GetGlobalExtent(i);
-
-                                hsize_t *blockDim = new (std::nothrow) hsize_t[blockDimention];
-                                if (blockDim == NULL)
-                                    ERROR("HDF5:Failed to allocate memory ");
+                hsize_t *blockDim = new (std::nothrow) hsize_t[blockDimention];
+                if (blockDim == NULL)
+                    ERROR("HDF5:Failed to allocate memory ");
 
                 // Obtain the block size
                 for (int i = 0; i < blockDimention; i++)
@@ -291,12 +264,25 @@ namespace damaris {
 
                 // Obtain the FilesSpace size (has to match the memory space dimensions)
                 for (int i = 0; i < varDimention; i++) {
-					localDims[i] = b->GetEndIndex(i) - b->GetStartIndex(i) + 1;
-				}
-				// create the file space
-				if ((fileSpace = H5Screate_simple(varDimention, localDims , NULL)) < 0)
-					ERROR("HDF5: file space creation failed !");
-*/
+                    localDims[i] = b->GetEndIndex(i) - b->GetStartIndex(i) + 1;
+                }
+
+                // This is just for debug of Collective version...
+                // checks that global extents from block are valid/make sense
+                for (int i = 0; i < varDimention; i++) {
+                    globalDims[i] = b->GetGlobalExtent(i) ;
+                }
+
+                // create the file space
+                if ((fileSpace = H5Screate_simple(varDimention, localDims , NULL)) < 0)
+                    ERROR("HDF5: file space creation failed !");
+
+                // Create Dataset for each block
+                varName = GetVariableFullName(v , &b);
+                if ((dsetId = H5Dcreate(fileId, varName.c_str() , dtypeId , fileSpace,
+                                         lcplId, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+                    ERROR("HDF5: Failed to create dataset ... ");
+               
                 // Create memory data space
                 memSpace = H5Screate_simple(blockDimention, blockDim , NULL);
 
@@ -328,6 +314,129 @@ namespace damaris {
 
         H5Fclose(fileId);
     }
+
+    void HDF5Store::OutputCollectiveTest(int32_t iteration) {
+        hid_t fileId;
+        hid_t lcplId;
+        hid_t dsetId;
+        hid_t dtypeId = -1;
+        hid_t fileSpace;
+        hid_t fileSpace2;
+        hid_t memSpace;
+        hsize_t *memOffset;
+        hsize_t *memDim;
+
+        hid_t plistId = H5P_DEFAULT;
+        std::string fileName;
+
+        BlocksByIteration::iterator begin;
+        BlocksByIteration::iterator end;
+
+
+        // Initializing variables
+        std::vector<std::weak_ptr<Variable> >::const_iterator w = GetVariables().begin();
+        MPI_Comm comm = Environment::GetEntityComm();
+        MPI_Info info  = MPI_INFO_NULL;
+        fileName = GetOutputFileName(iteration);
+
+        // Create file access property list
+        plistId = H5Pcreate(H5P_FILE_ACCESS);
+        H5Pset_fapl_mpio(plistId, comm, info);
+
+        // Creating the HDF5 file
+        if((fileId = H5Fcreate(fileName.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, plistId)) < 0)
+            ERROR("HDF5: H5Fcreate Failed. Filename: " << fileName.c_str() );
+
+        H5Pclose(plistId);
+
+        // enabling group creation with full qualified names
+        lcplId = H5Pcreate (H5P_LINK_CREATE);
+        H5Pset_create_intermediate_group(lcplId, 1);
+
+        // for each variable do
+        for(; w != GetVariables().end(); w++) {
+                std::shared_ptr<Variable> v = w->lock();
+
+            // write time-varying variables only in first iteration
+            if ((not v->IsTimeVarying()) && (iteration > 0))
+                    continue;
+
+            int varDimention;
+            varDimention = v->GetLayout()->GetDimensions();
+
+            hsize_t *globalDim;
+            globalDim = new (std::nothrow) hsize_t[varDimention];
+
+            // Get equivalent HDF5 type
+            if (not GetHDF5Type(v->GetLayout()->GetType() , dtypeId))
+                ERROR("HDF5:Unknown variable type " << v->GetLayout()->GetType());
+
+            v->GetBlocksByIteration(iteration, begin, end);
+
+            memOffset = new (std::nothrow) hsize_t[varDimention];
+            memDim = new (std::nothrow) hsize_t[varDimention];
+
+            if ((memOffset == NULL) || (memDim == NULL)) {
+             ERROR("HDF5: Failed to allocate memDim and memOffset memory ");
+              ERROR("Writing blocks to the file failed. ");
+            }
+            int numBlocks = 0;
+            for(BlocksByIteration::iterator bid = begin; bid != end; bid ++) {
+                 std::shared_ptr<Block> b = *bid;
+                 if (numBlocks == 0) {
+                     // Obtain the FilesSpace size (has to match the memory space dimensions)
+                    for (int i = 0; i < varDimention; i++) {
+                        globalDim[i] = b->GetGlobalExtent(i);
+                    }
+                    // Create dataspace.
+                    if ((fileSpace = H5Screate_simple(varDimention, globalDim , NULL)) < 0)
+                        ERROR("HDF5: file space creation failed !");
+
+                    std::string varName = GetVariableFullName(v);
+                    if ((dsetId = H5Dcreate( fileId, varName.c_str(), dtypeId, fileSpace,
+                             lcplId, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+                        ERROR("HDF5: Failed to create dataset ... " << varName.c_str());
+
+                    H5Sclose(fileSpace);
+                }
+
+                 // Obtain the starting indices and the size of the hyperslab
+                 for(int i = 0; i < varDimention; i++) {
+                     memOffset[i] = b->GetStartIndex(i);
+                     memDim[i]   = b->GetEndIndex(i) - b->GetStartIndex(i) + 1;
+                 }
+
+                 // create memory data space
+                 memSpace = H5Screate_simple(varDimention, memDim , NULL);
+
+                 // Update ghost zones (N.B. untested)
+                 UpdateGhostZones(v , memSpace , memDim);
+
+                 // Select hyperslab in the file.
+                 fileSpace2 = H5Dget_space(dsetId);
+                 H5Sselect_hyperslab(fileSpace2, H5S_SELECT_SET, memOffset, NULL, memDim , NULL);
+
+                 // Create property list for collective dataset write.
+                 plistId = H5Pcreate(H5P_DATASET_XFER);
+                 H5Pset_dxpl_mpio(plistId, H5FD_MPIO_COLLECTIVE);
+
+                 void* ptr = b->GetDataSpace().GetData();
+
+                 if (H5Dwrite(dsetId, dtypeId, memSpace, fileSpace2, plistId, ptr) < 0) {
+                     ERROR("Writing blocks to the file failed. ");
+                 }
+                 numBlocks++ ;
+                 H5Sclose(fileSpace2);
+                 H5Sclose(memSpace);
+                 H5Pclose(plistId);
+            } // for the blocks loop
+            delete [] memOffset;
+            delete [] memDim;
+            delete [] globalDim;
+            H5Dclose(dsetId);
+        } // for loop
+    }
+
 
     bool HDF5Store::OutputBlocksCollective(int iteration , std::shared_ptr<Variable> v , hsize_t* localDim , hid_t dsetId ,
                                            hid_t dtypeId , hid_t plistId){
@@ -407,8 +516,8 @@ namespace damaris {
         fileName = GetOutputFileName(iteration);
 
         // Create file access property list
-	    plistId = H5Pcreate(H5P_FILE_ACCESS);
-	    H5Pset_fapl_mpio(plistId, comm, info);
+        plistId = H5Pcreate(H5P_FILE_ACCESS);
+        H5Pset_fapl_mpio(plistId, comm, info);
 
         // Creating the HDF5 file
         if((fileId = H5Fcreate(fileName.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, plistId)) < 0)
@@ -428,8 +537,8 @@ namespace damaris {
             if ((not v->IsTimeVarying()) && (iteration > 0))
                     continue;
 
-	        int varDimention;
-	        varDimention = v->GetLayout()->GetDimensions();
+            int varDimention;
+            varDimention = v->GetLayout()->GetDimensions();
 
             hsize_t *globalDim;
             hsize_t *localDim;
@@ -440,13 +549,13 @@ namespace damaris {
                 ERROR("Failed to allocate memory for dim arrays!");
             }
 
-	        for(int i = 0; i < varDimention; i++) {
-	            globalDim[i] = v->GetLayout()->GetGlobalExtentAlong(i);
-	            localDim[i] = v->GetLayout()->GetExtentAlong(i);
-	        }
+            for(int i = 0; i < varDimention; i++) {
+                globalDim[i] = v->GetLayout()->GetGlobalExtentAlong(i);
+                localDim[i] = v->GetLayout()->GetExtentAlong(i);
+            }
 
             // Create dataspace.
-	        if ((fileSpace = H5Screate_simple(varDimention, globalDim , NULL)) < 0)
+            if ((fileSpace = H5Screate_simple(varDimention, globalDim , NULL)) < 0)
                 ERROR("HDF5: file space creation failed !");
 
             // Get equivalent HDF5 type
