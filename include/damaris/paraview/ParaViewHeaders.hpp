@@ -32,6 +32,7 @@
 #include <vtkFloatArray.h>
 #include <vtkDoubleArray.h>
 #include <vtkSOADataArrayTemplate.h>
+#include <vtkIdTypeArray.h>
 
 //Misc.
 #include <vtkNew.h>
