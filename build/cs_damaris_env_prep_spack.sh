@@ -2,7 +2,7 @@
 # Author: Josh Bowden, INRIA
 # Description:
 # This script configures Damaris via camke, using pre-installed libraries that were installed via Spack.
-# It is specific to installing Damaris with in-sityuu vizulisation support with Catalyst using a Spack 
+# It is specific to installing Damaris with in-situ vizulisation support with Catalyst using a Spack 
 # installed Paraview library.
 #
 # Before running this script, please make sure that C/C++/Fortran compilers are installed on the target machine.
@@ -22,6 +22,7 @@
 #     python:
 #       version: [3, 2]
 #    
+## May need: sudo apt-get install libclang-7-dev
 ## version: clang --version
 #    llvm: 
 #      externals:
@@ -30,15 +31,19 @@
 #      version: [7.0]
 #      buildable: False
 #    
-## may need: sudo apt-get install libssl-dev
-## Forr _ssl module error: add full path to /usr/bin/python3 to the spack script
+## May need: sudo apt-get install libssl-dev
+## For _ssl module error: add full path to /usr/bin/python3 to the spack script
 ## to specify the system python 3 to be used due to _ssl import error 
 ## due to spack installed python
+# From qt install: When linking against OpenSSL, you can override the default
+## library names through OPENSSL_LIBS.
+## For example:
+##     OPENSSL_LIBS='-L/opt/ssl/lib -lssl -lcrypto' ./configure -openssl-linked
 ## version: openssl version
 #    openssl:
 #      externals:
-#      - spec: openssl@1.1.1
-#        prefix: /usr/lib/x86_64-linux-gnu
+#      - spec: openssl@1.1.1d
+#        prefix: /us
 #      buildable: False
 #
 ## version: find / -type f -name ncurses 2> /dev/null 
@@ -52,7 +57,7 @@
 # 
 # Also set the install path
 # >cat ~/.spack/config.yaml set:
-# install_pat_scheme:  ${ARCHITECTURE}/${COMPILERNAME}-${COMPILERVER}/${PACKAGE}-${VERSION}-${HASH:5} 
+# install_path_scheme:  ${ARCHITECTURE}/${COMPILERNAME}-${COMPILERVER}/${PACKAGE}-${VERSION}-${HASH:5} 
 #
 
 # Dependencies can be installed using Spack:
@@ -62,9 +67,16 @@
 # N.B. Prior to Paraview 5.7, there was a seperate Catalyst spack option for minimalist installation
 # spack install paraview@5.8.0~cuda~examples+hdf5+kits+mpi+opengl2+osmesa+plugins~python+python3~qt+shared build_type=Release cuda_arch=none
 #
-# N.B. Do not install hdf5 or openmpi as Paraview installs them as dependencies and this script will find and use the dependents
-
-
+# N.B. Paraview will install hdf5 and openmpi as dependencies and this script will find and use the dependents.
+#      To force the use of a pre-installed MPI and HDF5 with Paraview then specify them in the ~/.spack/packages.yaml file
+#
+# N.B. If installing Code_Saturne then the downstream MED format spec seems to want hdf5@1.10.2
+#      where as Damaris will use the HDF version fom Paraview installation (e.g. hdf5@10.1.6 )
+#      So perhaps get paraview to use to use ^hdf5@1.10.2 
+#      *or* edit spack definition for med -> depends_on('hdf5@1.10.2:+mpi', when='@4.0.0')
+#      see: c_s_config_with_spack_and_damaris.sh
+#      Try to get med to use the Paraview installed HDF and OpenMPI using the dependent hash
+#      spack install med ^openmpi/$OMPI_HASH  ^hdf5/$HDF_HASH
 
 ############################################################
 ## User supplied variables
@@ -75,23 +87,22 @@
 SCRIPTDIR=/home/jbowden/C_S/damaris_build
 # Where the source code for Damaris is
 REPODIR=/home/jbowden/C_S/damaris-development
-# The build directory that will be created in the SCRIPTDIR direcory
-BUILDDIR=damaris-build-sharedlib-examples-dbg
-# The installation direcory
+# The build directory that will be created by the SCRIPTDIR directory
+BUILDDIR=damaris-build-sharedlib-examples-dbg4
+# The installation directory
 INSTALL_PREFIX=/opt/damaris/shared_dbg
 
 
 # CMake options (other options can be changed at the cmake... command below)
 # Options: ON | OFF
+# Build damaris as shared library (N.B. static library build has problems)
 SHLIBS_ON_OFF=ON
 # Build examples
-# Currently, both the build and the install of the examples are broken
-# due to examples/plugin/ not finding vtkDataObject.h in build and xsd/cxx/config.hxx in install
 EXAMPLES_ON_OFF=ON
 # Options: Debug | Release | MinSizeRel | RelWithDebInfo
 CMAKE_BUILD_TYPE=Debug
 # Regenerate the xml model in C using XSD
-REGEN_ON_OFF=OFF
+REGEN_ON_OFF=ON
 
 
 ################
@@ -111,13 +122,8 @@ BOOST_HASH=4qfvorx
 CPPUNIT_HASH=jywsrhy
 # Paraview has dependent libs OpenMPI HDF5 and Python
 # They should *not be overridden* by other versions using: spack load <other version>
-##  N.B. downstream med spec seems to want hdf5@1.10.2
-##  Damaris installed hdf5@10.1.6 with the Paraview installation
-##  So perhaps get paraview to use to use ^hdf5@1.10.2 
-##  *or* edit spack definition for med -> depends_on('hdf5@1.10.2:+mpi', when='@4.0.0')
-# spack install med ^openmpi/$OPENMPI_HASH  ^hdf5/$HDF_HASH_PV
-# Med could be replaced as a file format though.
-PARAVIEW_HASH=e6s2at7
+PARAVIEW_HASH=y64gtko
+# e6s2at7
 
 ############################################################
 ## End of user supplied variables
@@ -264,7 +270,7 @@ exit_no_dir "$CATALYSTDIR" CATALYSTDIR paraview
 
 
 # compiling and installing Damaris
- echo -e "--- COMPILING DAMARIS -------------------------------------------------------------\n"
+ echo -e "--- Running CMake for DAMARIS -------------------------------------------------------------\n"
 
  
 
@@ -292,7 +298,7 @@ echo -e ""
 
 echo -e "--- FINISHED CONFIGURATION -----------------------------------------------------------\n"
 echo -e "Now: "
-echo -e "cd $BUILDDIR"
+echo -e "cd $SCRIPTDIR/$BUILDDIR"
 echo -e "make -j2"
 echo -e "sudo make install"
  

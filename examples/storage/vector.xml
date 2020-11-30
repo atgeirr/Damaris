@@ -1,15 +1,15 @@
 <?xml version="1.0"?>
-<simulation name="vector" language="c" xmlns="http://damaris.gforge.inria.fr/damaris/model">
+<simulation name="vector_2domains_fpc1" language="c" xmlns="http://damaris.gforge.inria.fr/damaris/model">
 	<architecture>
-		<domains count="8" />
-		<dedicated cores="2" nodes="0" />
+		<domains count="2" />
+		 <dedicated cores="1" nodes="0" />
 		<buffer name="damaris-buffer" size="536870912" />
 		<queue  name="damaris-queue" size="100" />
 	</architecture>
 	<data>
-		<parameter name="LENGTH"  type="int" value="256" />
-		<parameter name="size"	 type="int" value="4" />
-		<parameter name="domains"	type="int" value="8"  />
+		<parameter name="LENGTH"  type="int" value="128" comment="N.B. this value is overwritten using damaris_set_parameter() in the vector.cpp code"/>
+		<parameter name="size"	 type="int" value="2" />
+		<parameter name="domains"	type="int" value="2"  />
 
 		<layout name="pipe"  type="float" dimensions="LENGTH/size/domains" global="LENGTH" ghosts="0:0" />
 

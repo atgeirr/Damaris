@@ -23,6 +23,10 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace damaris {
 
+
+#ifdef HAVE_PARAVIEW_ENABLED
+
+
 void UnstructuredMesh::SetNVerticies(size_t n_verticies)
 {
 	// The total number of (x,y,z) tuples to describe the vertex positions
@@ -30,7 +34,6 @@ void UnstructuredMesh::SetNVerticies(size_t n_verticies)
 	n_verticies_ = n_verticies ;
 }
 
-#ifdef HAVE_PARAVIEW_ENABLED
 
 bool UnstructuredMesh::GetGridVariables(std::shared_ptr<Variable>& coords_xyz,
 										std::shared_ptr<Variable>& vert_gid,

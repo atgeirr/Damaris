@@ -7,7 +7,7 @@ endif()
 #----------------------------------------------------------------------------#
 # Starting project definition
 #----------------------------------------------------------------------------#
-project(DAMARIS VERSION 1.4.0)
+project(DAMARIS VERSION 1.3.2)
 
 #
 # library version set here (e.g. for shared libs).

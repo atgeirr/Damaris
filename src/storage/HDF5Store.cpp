@@ -115,7 +115,7 @@ namespace damaris {
                 OutputCollective(iteration);
                 break;
             case CollectiveTest:
-                OutputCollectiveTest(iteration);
+                OutputCollective(iteration);
                 break;
             default: // e.g. file per dedicated node
                 ERROR("FileMode is not supported!!!");
@@ -267,8 +267,7 @@ namespace damaris {
                     localDims[i] = b->GetEndIndex(i) - b->GetStartIndex(i) + 1;
                 }
 
-                // This is just for debug of Collective version...
-                // checks that global extents from block are valid/make sense
+                // globalDims are not currently used (may be needed for VDS support?)
                 for (int i = 0; i < varDimention; i++) {
                     globalDims[i] = b->GetGlobalExtent(i) ;
                 }
@@ -313,9 +312,12 @@ namespace damaris {
         } // for of variable iteration
 
         H5Fclose(fileId);
+        H5Pclose(lcplId);
     }
+    
+    
 
-    void HDF5Store::OutputCollectiveTest(int32_t iteration) {
+    void HDF5Store::OutputCollective(int32_t iteration) {
         hid_t fileId;
         hid_t lcplId;
         hid_t dsetId;
@@ -434,10 +436,14 @@ namespace damaris {
             delete [] memDim;
             delete [] globalDim;
             H5Dclose(dsetId);
-        } // for loop
+        } // for loop over variables
+        
+        H5Fclose(fileId);
+        H5Pclose(lcplId);
     }
 
 
+    /*
     bool HDF5Store::OutputBlocksCollective(int iteration , std::shared_ptr<Variable> v , hsize_t* localDim , hid_t dsetId ,
                                            hid_t dtypeId , hid_t plistId){
 
@@ -577,5 +583,6 @@ namespace damaris {
             H5Dclose(dsetId);
         } // for loop
     }
+    */
 }
 
