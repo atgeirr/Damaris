@@ -147,7 +147,7 @@ endif(ENABLE_HDF5)
 #----------------------------------------------------------------------------#
 if(ENABLE_CATALYST)
   # find_package(ParaView 4.2 REQUIRED COMPONENTS vtkPVPythonCatalyst vtkParallelMPI vtkUtilitiesPythonInitializer)  
-  # find_package(ParaView 4.2 REQUIRED)
+  find_package(ParaView 4.2 REQUIRED)
   if(ParaView_VERSION VERSION_LESS "5.7")
     find_package(ParaView 4.2 REQUIRED COMPONENTS vtkPVPythonCatalyst vtkParallelMPI vtkUtilitiesPythonInitializer) 
     include("${PARAVIEW_USE_FILE}")

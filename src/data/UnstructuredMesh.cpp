@@ -97,7 +97,7 @@ vtkDataSet* UnstructuredMesh::GetVtkGrid(int source , int iteration , int block 
 		return nullptr;
 	}
 
-	grid->GetPointData()->SetGlobalIds(vtkDataArray::SafeDownCast(vtkGid)) ;
+	grid->GetPointData()->SetGlobalIds(vtkGid) ;
 	vtkGid->Delete() ;
 
 	grid->SetPoints(vtkPoints) ;
