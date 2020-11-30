@@ -249,28 +249,31 @@ foreach(p ${LIBS_LIST_FOR_PKGCONFIG})
 endforeach(p)
 string(CONCAT PKG_CONFIG_LIBS_FLAGS ${PKG_CONFIG_LIBS_FLAGS} " -lstdc++ -lrt -ldl -lpthread")
 
-####################################################
-# This does not really help as the format of ${VTK_LIBRARIES}  ${BOOST_LIBRARIES} and  ${ParaView_LIBRARIES}
-# is VTK::LIBNAME or BOOST::LIBNAME etc. 
-# build a string for the list of VTK libraries (-l)
-string(REGEX REPLACE ";" " " VTK_LIBS ${VTK_LIBS})
-set(PV_CONFIG_LIBS_FLAGS "")
-foreach(p ${VTK_LIBS})
-  string(REGEX REPLACE "VTK::" " -lVTK::" p_with_l ${p})
- #  string(REGEX REPLACE ";" " " p_with_space ${p_with_l})
-  string(CONCAT PV_CONFIG_LIBS_FLAGS ${PV_CONFIG_LIBS_FLAGS} "${p_with_l} ")
-endforeach(p)
-set(VTK_LIBS ${PV_CONFIG_LIBS_FLAGS})
 
-# build a string for the list of PARAVIEW libraries (-l)
-string(REGEX REPLACE ";" " " PV_LIBS ${PV_LIBS})
-set(PV_CONFIG_LIBS_FLAGS "")
-foreach(p ${PV_LIBS})
-  string(REGEX REPLACE "ParaView::" " -lParaView::" p_with_l ${p})
- #  string(REGEX REPLACE ";" " " p_with_space ${p_with_l})
-  string(CONCAT PV_CONFIG_LIBS_FLAGS ${PV_CONFIG_LIBS_FLAGS} "${p_with_l} ")
-endforeach(p)
-set(PV_LIBS ${PV_CONFIG_LIBS_FLAGS})
+if(ENABLE_CATALYST)
+	####################################################
+	# This does not really help as the format of ${VTK_LIBRARIES}  ${BOOST_LIBRARIES} and  ${ParaView_LIBRARIES}
+	# is VTK::LIBNAME or BOOST::LIBNAME etc. 
+	# build a string for the list of VTK libraries (-l)
+	string(REGEX REPLACE ";" " " VTK_LIBS ${VTK_LIBS})
+	set(PV_CONFIG_LIBS_FLAGS "")
+	foreach(p ${VTK_LIBS})
+	string(REGEX REPLACE "VTK::" " -lVTK::" p_with_l ${p})
+	#  string(REGEX REPLACE ";" " " p_with_space ${p_with_l})
+	string(CONCAT PV_CONFIG_LIBS_FLAGS ${PV_CONFIG_LIBS_FLAGS} "${p_with_l} ")
+	endforeach(p)
+	set(VTK_LIBS ${PV_CONFIG_LIBS_FLAGS})
+
+	# build a string for the list of PARAVIEW libraries (-l)
+	string(REGEX REPLACE ";" " " PV_LIBS ${PV_LIBS})
+	set(PV_CONFIG_LIBS_FLAGS "")
+	foreach(p ${PV_LIBS})
+	string(REGEX REPLACE "ParaView::" " -lParaView::" p_with_l ${p})
+	#  string(REGEX REPLACE ";" " " p_with_space ${p_with_l})
+	string(CONCAT PV_CONFIG_LIBS_FLAGS ${PV_CONFIG_LIBS_FLAGS} "${p_with_l} ")
+	endforeach(p)
+	set(PV_LIBS ${PV_CONFIG_LIBS_FLAGS})
+endif()
 ####################################################
 # ---
 # configure the .pc.in file
