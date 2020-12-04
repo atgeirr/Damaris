@@ -3,7 +3,7 @@ exec_prefix=${prefix}
 libdir=${prefix}/lib
 includedir=${prefix}/include
 
-catalyst_libs=@PV_LIBS@ @VTK_LIBS@ 
+catalyst_libs=PV_LIBS
 
 Name: Damaris
 Description: Middleware for I/O and In Situ Analysis in HPC simulations
