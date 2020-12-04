@@ -23,10 +23,11 @@ set(DAMARIS_SRC
 	${DAMARIS_SOURCE_DIR}/src/data/ParameterManager.cpp
 	${DAMARIS_SOURCE_DIR}/src/data/Mesh.cpp
 	${DAMARIS_SOURCE_DIR}/src/data/MeshManager.cpp
-   ${DAMARIS_SOURCE_DIR}/src/data/StructuredMesh.cpp
+    ${DAMARIS_SOURCE_DIR}/src/data/StructuredMesh.cpp
 	${DAMARIS_SOURCE_DIR}/src/data/RectilinearMesh.cpp
 	${DAMARIS_SOURCE_DIR}/src/data/CurvilinearMesh.cpp
 	${DAMARIS_SOURCE_DIR}/src/data/PointMesh.cpp
+	${DAMARIS_SOURCE_DIR}/src/data/UnstructuredMesh.cpp
 	${DAMARIS_SOURCE_DIR}/src/data/CurveManager.cpp
 	${DAMARIS_SOURCE_DIR}/src/data/Curve.cpp
 	${DAMARIS_SOURCE_DIR}/src/data/Block.cpp
@@ -79,6 +80,7 @@ if(EXISTS ${DAMARIS_SOURCE_DIR}/xsd/Model.hpp AND NOT ${GENERATE_MODEL})
 		  COMMAND cp ${DAMARIS_SOURCE_DIR}/xsd/Model.hpp ${CMAKE_BINARY_DIR}/include/damaris/model
 		  COMMAND cp ${DAMARIS_SOURCE_DIR}/xsd/Model.cpp ${CMAKE_BINARY_DIR}/src/model
 		  COMMAND cp ${DAMARIS_SOURCE_DIR}/xsd/Model.hpp ${CMAKE_BINARY_DIR}/src/model
+		  # COMMAND cp ${DAMARIS_SOURCE_DIR}/xsd/Model.hpp ${DAMARIS_SOURCE_DIR}/include/damaris/model
 		  COMMENT "Copying existing C++/XML mapping")
 else()
 
@@ -94,6 +96,11 @@ else()
 		COMMAND mkdir -p ${CMAKE_BINARY_DIR}/include/damaris/model
 		COMMAND ${XSD_EXECUTABLE} ARGS "cxx-tree" ${XSD_ARGS}
 		COMMAND cp ${CMAKE_BINARY_DIR}/src/model/Model.hpp ${CMAKE_BINARY_DIR}/include/damaris/model
+		COMMAND cp ${CMAKE_BINARY_DIR}/src/model/Model.hpp ${DAMARIS_SOURCE_DIR}/include/damaris/model
+		# Copy the new version of the model to xsd directory 
+		# i'm not sure why it needs to be in two places though
+		COMMAND cp ${CMAKE_BINARY_DIR}/src/model/Model.cpp ${DAMARIS_SOURCE_DIR}/xsd/Model.cpp
+		COMMAND cp ${CMAKE_BINARY_DIR}/src/model/Model.hpp ${DAMARIS_SOURCE_DIR}/xsd/Model.hpp 
 		DEPENDS ${DAMARIS_SOURCE_DIR}/src/model/Model.xsd
 		COMMENT "Generating C++/XML mapping")
 endif()
