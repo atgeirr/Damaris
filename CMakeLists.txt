@@ -78,6 +78,7 @@ add_definitions (-D__INFO)
 
 #----------------------------------------------------------------------------#
 include_directories(${DAMARIS_SOURCE_DIR}/include)
+include_directories(${DAMARIS_SOURCE_DIR}/xsd)
 include_directories(${DAMARIS_SOURCE_DIR}/include/damaris)
 include_directories(${CMAKE_BINARY_DIR}/include)
 
