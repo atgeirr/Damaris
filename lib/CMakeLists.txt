@@ -27,6 +27,7 @@ set(DAMARIS_SRC
 	${DAMARIS_SOURCE_DIR}/src/data/RectilinearMesh.cpp
 	${DAMARIS_SOURCE_DIR}/src/data/CurvilinearMesh.cpp
 	${DAMARIS_SOURCE_DIR}/src/data/PointMesh.cpp
+	${DAMARIS_SOURCE_DIR}/src/data/UnstructuredMesh.cpp
 	${DAMARIS_SOURCE_DIR}/src/data/CurveManager.cpp
 	${DAMARIS_SOURCE_DIR}/src/data/Curve.cpp
 	${DAMARIS_SOURCE_DIR}/src/data/Block.cpp
@@ -325,7 +326,7 @@ if(ENABLE_HDF5)
 endif(ENABLE_HDF5)
 if(ENABLE_VISIT)
   install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/blocks" DESTINATION examples/visit)
-  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/cmd" DESTINATION examples/visit)
+  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/cmd.py" DESTINATION examples/visit)
   install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/curve" DESTINATION examples/visit)
   install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/mandelbulb" DESTINATION examples/visit)
   install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/mesh" DESTINATION examples/visit)
