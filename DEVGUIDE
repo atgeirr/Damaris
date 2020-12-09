@@ -14,7 +14,7 @@ which case it should be named with lower-case letters only (ex: damaris::viz).
 - Class names use the Java naming convention, i.e. all words of the name 
 starting with a capital letter, no underscore (ex: damaris::VariableManager).
 
-- Member functions use the same naming conventions than classes
+- Member functions use the same naming conventions as classes
 (ex: damaris::VariableManager::Search()).
 
 - Instance attributes are lower-case only, using underscore and terminating with
@@ -36,13 +36,8 @@ Pointerless implementation
 - Damaris tries to use a pointerless convention, i.e. avoiding the use of a raw
 pointer (int*, Variable*, etc.). Instead, it uses shared_ptr and weak_ptr.
 
-- To use shared_ptr and weak_ptr, one must not directly include the 
-corresponding boost headers, but include "util/Pointers.hpp", then use add
-USING_POINTER; before the class definition.
-
-- One must not use the boost:: prefix in front of shared_ptr and weak_ptr, the
-goal being to clearly decouple the implementation from boost (Pointers.hpp may
-be filled with other implementations of shared_ptr or weak_ptr in the future).
+- Previous versions of Damaris (pre-1.3.0) used boost for shared_ptr and weak_ptr support. Instances of these classes have been replaced by the standard library 
+versions std::shared_ptr  and std::weak_ptr and the C++11 stdandard is specified in the build.
 
 - If the use of boost::enable_shared_from_this is necessary, include
 "util/Pointers.hpp" and declare your class the following way:
@@ -57,7 +52,7 @@ weak_ptr are only used to break cyclic dependencies).
 
 - All use of a raw pointer should be carefully considered and well justified in
 the comments of the corresponding section of the code (usually a raw pointer
-will be used to actuall point to a raw memory area that will be given to the
+will be used to actually point to a raw memory area that will be given to the
 user of Damaris, on the application side).
 
 - All instanciable classes must have private (or at least protected)

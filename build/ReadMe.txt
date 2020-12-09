@@ -32,6 +32,24 @@ Spack (https://spack.io/) is a powerful package manager that is often
 used on clusters and supercomputers. Spack can be installed by following
 the instructions at https://spack.readthedocs.io.
 
+Damaris now has a Spack packages file that is part of the Spack git repository.
+So, now it is easy enough to install Damaris. To see the options enabled through Spack
+
+    spack info damaris
+    
+To install the base damaris (no visulization support)
+  
+    spack install damaris+hdf5+fortran+examples
+    
+
+Some detalied instructions on using Spack to install Damaris with visulisation support are being developed and available here:
+
+https://gitlab.inria.fr/Damaris/damaris-development/-/blob/master/docs/build/damaris_catalyst_with_spack/damaris_catalyst_spack_install.md
+    
+-------------------------------
+
+Prior to having a full Spack package file, Damaris could be installed using the following procedure:
+
 Once spack is installed, you need to install cmake, boost, Xerces-C, and
 XSD (and possibly MPI if you don't have it):
 
@@ -64,7 +82,7 @@ commands:
 
 If you want to enable CppUnit tests, add -DENABLE_TESTS=ON to the cmake
 command. If you want to enable HDF5, add -DENABLE_HDF5=ON to the cmake
-command.
+command. To build the examples add -DENABLE_EXAMPLES=ON to the cmake command.
 
 
 3) Building a Docker image with Damaris

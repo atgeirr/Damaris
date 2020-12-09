@@ -23,7 +23,7 @@ set(DAMARIS_SRC
 	${DAMARIS_SOURCE_DIR}/src/data/ParameterManager.cpp
 	${DAMARIS_SOURCE_DIR}/src/data/Mesh.cpp
 	${DAMARIS_SOURCE_DIR}/src/data/MeshManager.cpp
-        ${DAMARIS_SOURCE_DIR}/src/data/StructuredMesh.cpp
+    ${DAMARIS_SOURCE_DIR}/src/data/StructuredMesh.cpp
 	${DAMARIS_SOURCE_DIR}/src/data/RectilinearMesh.cpp
 	${DAMARIS_SOURCE_DIR}/src/data/CurvilinearMesh.cpp
 	${DAMARIS_SOURCE_DIR}/src/data/PointMesh.cpp
@@ -79,6 +79,7 @@ if(EXISTS ${DAMARIS_SOURCE_DIR}/xsd/Model.hpp AND NOT ${GENERATE_MODEL})
 		  COMMAND cp ${DAMARIS_SOURCE_DIR}/xsd/Model.hpp ${CMAKE_BINARY_DIR}/include/damaris/model
 		  COMMAND cp ${DAMARIS_SOURCE_DIR}/xsd/Model.cpp ${CMAKE_BINARY_DIR}/src/model
 		  COMMAND cp ${DAMARIS_SOURCE_DIR}/xsd/Model.hpp ${CMAKE_BINARY_DIR}/src/model
+		  # COMMAND cp ${DAMARIS_SOURCE_DIR}/xsd/Model.hpp ${DAMARIS_SOURCE_DIR}/include/damaris/model
 		  COMMENT "Copying existing C++/XML mapping")
 else()
 
@@ -94,6 +95,11 @@ else()
 		COMMAND mkdir -p ${CMAKE_BINARY_DIR}/include/damaris/model
 		COMMAND ${XSD_EXECUTABLE} ARGS "cxx-tree" ${XSD_ARGS}
 		COMMAND cp ${CMAKE_BINARY_DIR}/src/model/Model.hpp ${CMAKE_BINARY_DIR}/include/damaris/model
+		COMMAND cp ${CMAKE_BINARY_DIR}/src/model/Model.hpp ${DAMARIS_SOURCE_DIR}/include/damaris/model
+		# Copy the new version of the model to xsd directory 
+		# i'm not sure why it needs to be in two places though
+		COMMAND cp ${CMAKE_BINARY_DIR}/src/model/Model.cpp ${DAMARIS_SOURCE_DIR}/xsd/Model.cpp
+		COMMAND cp ${CMAKE_BINARY_DIR}/src/model/Model.hpp ${DAMARIS_SOURCE_DIR}/xsd/Model.hpp 
 		DEPENDS ${DAMARIS_SOURCE_DIR}/src/model/Model.xsd
 		COMMENT "Generating C++/XML mapping")
 endif()
@@ -101,7 +107,7 @@ endif()
 add_library(damaris 	${DAMARIS_SRC}
 			${DAMARIS_VISIT_SRC}
 			${DAMARIS_HDF5_SRC} 
-                        ${DAMARIS_PARAVIEW_SRC}
+			${DAMARIS_PARAVIEW_SRC}
 			${DAMARIS_FORTRAN_MODULE})
 
 include_directories(${CMAKE_BINARY_DIR}/include/damaris
@@ -121,6 +127,7 @@ if(ENABLE_HDF5)
 endif(ENABLE_HDF5)
 if(ENABLE_CATALYST)
 	target_include_directories(damaris PUBLIC ${PARAVIEW_INCLUDE_DIRS})
+	target_include_directories(damaris PUBLIC ${ParaView_INCLUDE_DIRS})
 endif(ENABLE_CATALYST)
 
 # for shared libs, establish the lib version
@@ -128,6 +135,7 @@ set_target_properties(damaris
 		PROPERTIES VERSION ${DAMARIS_VERSION}
 		SOVERSION ${DAMARIS_VERSION_MAJOR})
 
+target_compile_options(damaris PRIVATE -fPIC)
 target_link_libraries(damaris PUBLIC ${DEP_LIBRARIES})
 
 #----------------------------------------------------------------------------#
@@ -141,7 +149,8 @@ configure_package_config_file(DamarisConfig.cmake.in DamarisConfig.cmake
 		INSTALL_DESTINATION ${DAMARIS_PKG})
 
 #----------------------------------------------------------------------------#
-# generate pkg-config file
+# generate pkg-config file - 
+# TODO: Fix This so that Paraview/Catalyst and Boost libbs are included correctly
 #----------------------------------------------------------------------------#
 set(INCS_LIST_FOR_PKGCONFIG "")
 # processing include dirs
@@ -164,7 +173,10 @@ if(ENABLE_VISIT)
 endif(ENABLE_VISIT)
 # optional: Catalyst
 if(ENABLE_CATALYST)
-  foreach(p ${PARAVIEW_INCLUDE_DIRS})
+  foreach(p ${ParaView_INCLUDE_DIRS})
+    list(APPEND INCS_LIST_FOR_PKGCONFIG ${p})
+  endforeach(p)
+ foreach(p ${VTK_INCLUDE_DIRS})
     list(APPEND INCS_LIST_FOR_PKGCONFIG ${p})
   endforeach(p)
 endif(ENABLE_CATALYST)
@@ -204,14 +216,29 @@ if(ENABLE_VISIT)
     list(APPEND LIBS_DIR_LIST_FOR_PKGCONFIG ${libpath})
   endforeach(p)
 endif(ENABLE_VISIT)
+
 # optional: Catalyst
 if(ENABLE_CATALYST)
-  set(PV_CFG_ARGS --libs vtkPVPythonCatalyst vtkParallelMPI vtkUtilitiesPythonInitializer)
-  add_custom_command(OUTPUT pv-config.out COMMAND $<TARGET_FILE:paraview-config-launcher> ${PV_CFG_ARGS} > pv-config.out)
-  add_custom_target(damaris.pc COMMAND ${DAMARIS_SOURCE_DIR}/lib/make-pc-file.sh DEPENDS pv-config.out)
+  # target_link_libraries(damaris ParaView::PythonCatalyst VTK::mpi)  
+  if(ParaView_VERSION VERSION_LESS "5.7")
+    set(PV_CFG_ARGS --libs vtkPVPythonCatalyst vtkParallelMPI vtkUtilitiesPythonInitializer)
+    add_custom_command(OUTPUT pv-config.out COMMAND $<TARGET_FILE:paraview-config> ${PV_CFG_ARGS} > pv-config.out)
+    add_custom_target(damaris.pc COMMAND ${DAMARIS_SOURCE_DIR}/lib/make-pc-file.sh DEPENDS pv-config.out)
+    message(STATUS "ParaView < 5.7 setting pkg-config libraries") 
+  else()
+   # set(PV_CFG_ARGS --libs ParaView::PythonCatalyst VTK::mpi)
+    # add_custom_command(OUTPUT pv-config.out COMMAND $<TARGET_FILE:paraview-config> ${PV_CFG_ARGS} > pv-config.out)
+    # add_custom_target(damaris.pc COMMAND ${DAMARIS_SOURCE_DIR}/lib/make-pc-file.sh DEPENDS pv-config.out)
+    set(PV_LIBS ${ParaView_LIBRARIES})
+    set(VTK_LIBS ${VTK_LIBRARIES})
+    message(STATUS "ParaView >= 5.7 setting pkg-config libraries") 
+  endif()
+
 else(ENABLE_CATALYST)
-  add_custom_target(damaris.pc COMMAND sed -e s/PV_LIBS//g damaris.pc.in > damaris.pc)
+  # add_custom_target(damaris.pc COMMAND sed -e s/PV_LIBS//g damaris.pc.in > damaris.pc)
+  set(PV_LIBS ${ParaView_LIBS})
 endif(ENABLE_CATALYST)  
+
 # remove dublicates
 list(REMOVE_DUPLICATES LIBS_LIST_FOR_PKGCONFIG)
 list(REMOVE_DUPLICATES LIBS_DIR_LIST_FOR_PKGCONFIG)
@@ -226,10 +253,37 @@ foreach(p ${LIBS_LIST_FOR_PKGCONFIG})
   string(CONCAT PKG_CONFIG_LIBS_FLAGS ${PKG_CONFIG_LIBS_FLAGS} "-l${p_without_lib} ")
 endforeach(p)
 string(CONCAT PKG_CONFIG_LIBS_FLAGS ${PKG_CONFIG_LIBS_FLAGS} " -lstdc++ -lrt -ldl -lpthread")
+
+
+if(ENABLE_CATALYST)
+	####################################################
+	# This does not really help as the format of ${VTK_LIBRARIES}  ${BOOST_LIBRARIES} and  ${ParaView_LIBRARIES}
+	# is VTK::LIBNAME or BOOST::LIBNAME etc. 
+	# build a string for the list of VTK libraries (-l)
+#	string(REGEX REPLACE ";" " " VTK_LIBS ${VTK_LIBS})
+#	set(PV_CONFIG_LIBS_FLAGS "")
+#	foreach(p ${VTK_LIBS})
+#	string(REGEX REPLACE "VTK::" " -lVTK::" p_with_l ${p})
+	#  string(REGEX REPLACE ";" " " p_with_space ${p_with_l})
+#	string(CONCAT PV_CONFIG_LIBS_FLAGS ${PV_CONFIG_LIBS_FLAGS} "${p_with_l} ")
+#	endforeach(p)
+#	set(VTK_LIBS ${PV_CONFIG_LIBS_FLAGS})
+
+	# build a string for the list of PARAVIEW libraries (-l)
+#	string(REGEX REPLACE ";" " " PV_LIBS ${PV_LIBS})
+#	set(PV_CONFIG_LIBS_FLAGS "")
+#	foreach(p ${PV_LIBS})
+#	string(REGEX REPLACE "ParaView::" " -lParaView::" p_with_l ${p})
+	#  string(REGEX REPLACE ";" " " p_with_space ${p_with_l})
+#	string(CONCAT PV_CONFIG_LIBS_FLAGS ${PV_CONFIG_LIBS_FLAGS} "${p_with_l} ")
+#	endforeach(p)
+#	set(PV_LIBS ${PV_CONFIG_LIBS_FLAGS})
+endif()
+####################################################
 # ---
 # configure the .pc.in file
-configure_file(damaris.pc.in damaris.pc.in @ONLY)
-add_dependencies(damaris damaris.pc)
+configure_file(damaris.pc.in damaris.pc @ONLY)
+# add_dependencies(damaris damaris.pc)
 
 #----------------------------------------------------------------------------#
 # Installation process
@@ -253,3 +307,36 @@ install(DIRECTORY "${DAMARIS_SOURCE_DIR}/include/damaris" DESTINATION include)
 if(CMAKE_Fortran_COMPILER)
   install(FILES "${CMAKE_BINARY_DIR}/lib/damaris.mod" DESTINATION include)
 endif(CMAKE_Fortran_COMPILER)
+
+install(DIRECTORY "${DAMARIS_SOURCE_DIR}/examples" DESTINATION  ${CMAKE_INSTALL_PREFIX} )
+# install(FILES "${CMAKE_BINARY_DIR}/examples/Makefile" DESTINATION examples)
+
+if(ENABLE_EXAMPLES)
+	if(ENABLE_CATALYST)
+	  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/paraview/image" DESTINATION examples/paraview)
+	  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/paraview/lollipop" DESTINATION examples/paraview)
+	  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/paraview/plate" DESTINATION examples/paraview)
+	  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/paraview/sector" DESTINATION examples/paraview)
+	endif(ENABLE_CATALYST) 
+	if(ENABLE_HDF5)
+	  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/storage/2dmesh" DESTINATION examples/storage)
+	  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/storage/3dmesh" DESTINATION examples/storage)
+	  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/storage/blocks-hdf5" DESTINATION examples/storage)
+	  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/storage/mandelbulb-hdf5" DESTINATION examples/storage)
+	  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/storage/vector" DESTINATION examples/storage)
+	endif(ENABLE_HDF5)
+	if(ENABLE_VISIT)
+	  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/blocks" DESTINATION examples/visit)
+	  install(PROGRAMS "${DAMARIS_SOURCE_DIR}/examples/visit/cmd.py" DESTINATION examples/visit)
+	  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/curve" DESTINATION examples/visit)
+	  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/mandelbulb" DESTINATION examples/visit)
+	  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/mesh" DESTINATION examples/visit)
+	  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/point" DESTINATION examples/visit)
+	  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/var" DESTINATION examples/visit)
+	endif(ENABLE_VISIT)
+	if(ENABLE_FORTRAN)
+	  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/fortran/cube" DESTINATION examples/fortran)
+	endif(ENABLE_FORTRAN)
+	install(FILES "${CMAKE_BINARY_DIR}/examples/plugin/libgc.so" DESTINATION examples/plugin)
+endif(ENABLE_EXAMPLES)
+
