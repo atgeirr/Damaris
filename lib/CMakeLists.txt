@@ -80,6 +80,7 @@ if(EXISTS ${DAMARIS_SOURCE_DIR}/xsd/Model.hpp AND NOT ${GENERATE_MODEL})
 		  COMMAND cp ${DAMARIS_SOURCE_DIR}/xsd/Model.hpp ${CMAKE_BINARY_DIR}/include/damaris/model
 		  COMMAND cp ${DAMARIS_SOURCE_DIR}/xsd/Model.cpp ${CMAKE_BINARY_DIR}/src/model
 		  COMMAND cp ${DAMARIS_SOURCE_DIR}/xsd/Model.hpp ${CMAKE_BINARY_DIR}/src/model
+		  # COMMAND cp ${DAMARIS_SOURCE_DIR}/xsd/Model.hpp ${DAMARIS_SOURCE_DIR}/include/damaris/model
 		  COMMENT "Copying existing C++/XML mapping")
 else()
 
@@ -95,6 +96,11 @@ else()
 		COMMAND mkdir -p ${CMAKE_BINARY_DIR}/include/damaris/model
 		COMMAND ${XSD_EXECUTABLE} ARGS "cxx-tree" ${XSD_ARGS}
 		COMMAND cp ${CMAKE_BINARY_DIR}/src/model/Model.hpp ${CMAKE_BINARY_DIR}/include/damaris/model
+		COMMAND cp ${CMAKE_BINARY_DIR}/src/model/Model.hpp ${DAMARIS_SOURCE_DIR}/include/damaris/model
+		# Copy the new version of the model to xsd directory 
+		# i'm not sure why it needs to be in two places though
+		COMMAND cp ${CMAKE_BINARY_DIR}/src/model/Model.cpp ${DAMARIS_SOURCE_DIR}/xsd/Model.cpp
+		COMMAND cp ${CMAKE_BINARY_DIR}/src/model/Model.hpp ${DAMARIS_SOURCE_DIR}/xsd/Model.hpp 
 		DEPENDS ${DAMARIS_SOURCE_DIR}/src/model/Model.xsd
 		COMMENT "Generating C++/XML mapping")
 endif()
@@ -299,36 +305,40 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/damaris.pc"
 install(FILES "${CMAKE_BINARY_DIR}/include/Damaris.h" DESTINATION include)
 install(FILES "${CMAKE_BINARY_DIR}/include/damaris/model/Model.hpp" DESTINATION include/damaris/model)
 install(DIRECTORY "${DAMARIS_SOURCE_DIR}/include/damaris" DESTINATION include)
+
 if(CMAKE_Fortran_COMPILER)
   install(FILES "${CMAKE_BINARY_DIR}/lib/damaris.mod" DESTINATION include)
 endif(CMAKE_Fortran_COMPILER)
 
 install(DIRECTORY "${DAMARIS_SOURCE_DIR}/examples" DESTINATION  ${CMAKE_INSTALL_PREFIX} )
 # install(FILES "${CMAKE_BINARY_DIR}/examples/Makefile" DESTINATION examples)
-if(ENABLE_CATALYST)
-  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/paraview/image" DESTINATION examples/paraview)
-  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/paraview/lollipop" DESTINATION examples/paraview)
-  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/paraview/plate" DESTINATION examples/paraview)
-  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/paraview/sector" DESTINATION examples/paraview)
-endif(ENABLE_CATALYST) 
-if(ENABLE_HDF5)
-  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/storage/2dmesh" DESTINATION examples/storage)
-  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/storage/3dmesh" DESTINATION examples/storage)
-  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/storage/blocks-hdf5" DESTINATION examples/storage)
-  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/storage/mandelbulb-hdf5" DESTINATION examples/storage)
-  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/storage/vector" DESTINATION examples/storage)
-endif(ENABLE_HDF5)
-if(ENABLE_VISIT)
-  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/blocks" DESTINATION examples/visit)
-  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/cmd" DESTINATION examples/visit)
-  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/curve" DESTINATION examples/visit)
-  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/mandelbulb" DESTINATION examples/visit)
-  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/mesh" DESTINATION examples/visit)
-  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/point" DESTINATION examples/visit)
-  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/var" DESTINATION examples/visit)
-endif(ENABLE_VISIT)
-if(ENABLE_FORTRAN)
-  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/fortran/cube" DESTINATION examples/fortran)
-endif(ENABLE_FORTRAN)
-install(FILES "${CMAKE_BINARY_DIR}/examples/plugin/libgc.so" DESTINATION examples/plugin)
+
+if(ENABLE_EXAMPLES)
+	if(ENABLE_CATALYST)
+	  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/paraview/image" DESTINATION examples/paraview)
+	  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/paraview/lollipop" DESTINATION examples/paraview)
+	  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/paraview/plate" DESTINATION examples/paraview)
+	  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/paraview/sector" DESTINATION examples/paraview)
+	endif(ENABLE_CATALYST) 
+	if(ENABLE_HDF5)
+	  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/storage/2dmesh" DESTINATION examples/storage)
+	  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/storage/3dmesh" DESTINATION examples/storage)
+	  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/storage/blocks-hdf5" DESTINATION examples/storage)
+	  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/storage/mandelbulb-hdf5" DESTINATION examples/storage)
+	  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/storage/vector" DESTINATION examples/storage)
+	endif(ENABLE_HDF5)
+	if(ENABLE_VISIT)
+	  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/blocks" DESTINATION examples/visit)
+	  install(PROGRAMS "${DAMARIS_SOURCE_DIR}/examples/visit/cmd.py" DESTINATION examples/visit)
+	  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/curve" DESTINATION examples/visit)
+	  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/mandelbulb" DESTINATION examples/visit)
+	  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/mesh" DESTINATION examples/visit)
+	  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/point" DESTINATION examples/visit)
+	  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/var" DESTINATION examples/visit)
+	endif(ENABLE_VISIT)
+	if(ENABLE_FORTRAN)
+	  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/fortran/cube" DESTINATION examples/fortran)
+	endif(ENABLE_FORTRAN)
+	install(FILES "${CMAKE_BINARY_DIR}/examples/plugin/libgc.so" DESTINATION examples/plugin)
+endif(ENABLE_EXAMPLES)
 

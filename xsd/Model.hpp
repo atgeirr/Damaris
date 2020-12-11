@@ -252,7 +252,7 @@ namespace damaris
     class VertexGID;
     class SectionVTKTypes;
     class SectionSizes;
-    class SecontionConnectivity;
+    class SectionConnectivity;
     class Mesh;
     class Curve;
     class Data;
@@ -1265,6 +1265,27 @@ namespace damaris
       static visualizable_type
       visualizable_default_value ();
 
+      // comment
+      //
+      typedef ::xml_schema::string comment_type;
+      typedef ::xsd::cxx::tree::optional< comment_type > comment_optional;
+      typedef ::xsd::cxx::tree::traits< comment_type, char > comment_traits;
+
+      const comment_optional&
+      comment () const;
+
+      comment_optional&
+      comment ();
+
+      void
+      comment (const comment_type& x);
+
+      void
+      comment (const comment_optional& x);
+
+      void
+      comment (::std::unique_ptr< comment_type > p);
+
       // Constructors.
       //
       Layout (const name_type&,
@@ -1322,6 +1343,7 @@ namespace damaris
       ::xsd::cxx::tree::one< language_type > language_;
       static const language_type language_default_value_;
       ::xsd::cxx::tree::one< visualizable_type > visualizable_;
+      comment_optional comment_;
     };
 
     class VarType: public ::xml_schema::string
@@ -1649,6 +1671,27 @@ namespace damaris
       static const store_type&
       store_default_value ();
 
+      // comment
+      //
+      typedef ::xml_schema::string comment_type;
+      typedef ::xsd::cxx::tree::optional< comment_type > comment_optional;
+      typedef ::xsd::cxx::tree::traits< comment_type, char > comment_traits;
+
+      const comment_optional&
+      comment () const;
+
+      comment_optional&
+      comment ();
+
+      void
+      comment (const comment_type& x);
+
+      void
+      comment (const comment_optional& x);
+
+      void
+      comment (::std::unique_ptr< comment_type > p);
+
       // Constructors.
       //
       Variable (const name_type&,
@@ -1708,6 +1751,7 @@ namespace damaris
       ::xsd::cxx::tree::one< time_varying_type > time_varying_;
       ::xsd::cxx::tree::one< store_type > store_;
       static const store_type store_default_value_;
+      comment_optional comment_;
     };
 
     class Group: public ::xml_schema::type
@@ -1947,6 +1991,27 @@ namespace damaris
       void
       value (::std::unique_ptr< value_type > p);
 
+      // comment
+      //
+      typedef ::xml_schema::string comment_type;
+      typedef ::xsd::cxx::tree::optional< comment_type > comment_optional;
+      typedef ::xsd::cxx::tree::traits< comment_type, char > comment_traits;
+
+      const comment_optional&
+      comment () const;
+
+      comment_optional&
+      comment ();
+
+      void
+      comment (const comment_type& x);
+
+      void
+      comment (const comment_optional& x);
+
+      void
+      comment (::std::unique_ptr< comment_type > p);
+
       // Constructors.
       //
       Parameter (const name_type&,
@@ -1997,6 +2062,7 @@ namespace damaris
       ::xsd::cxx::tree::one< name_type > name_;
       ::xsd::cxx::tree::one< type_type > type_;
       ::xsd::cxx::tree::one< value_type > value_;
+      comment_optional comment_;
     };
 
     class MeshType: public ::xml_schema::string
@@ -2120,6 +2186,27 @@ namespace damaris
       static const label_type&
       label_default_value ();
 
+      // comment
+      //
+      typedef ::xml_schema::string comment_type;
+      typedef ::xsd::cxx::tree::optional< comment_type > comment_optional;
+      typedef ::xsd::cxx::tree::traits< comment_type, char > comment_traits;
+
+      const comment_optional&
+      comment () const;
+
+      comment_optional&
+      comment ();
+
+      void
+      comment (const comment_type& x);
+
+      void
+      comment (const comment_optional& x);
+
+      void
+      comment (::std::unique_ptr< comment_type > p);
+
       // Constructors.
       //
       Coord (const name_type&);
@@ -2155,6 +2242,7 @@ namespace damaris
       static const unit_type unit_default_value_;
       ::xsd::cxx::tree::one< label_type > label_;
       static const label_type label_default_value_;
+      comment_optional comment_;
     };
 
     class VertexGID: public ::xml_schema::type
@@ -2194,6 +2282,27 @@ namespace damaris
       static offset_type
       offset_default_value ();
 
+      // comment
+      //
+      typedef ::xml_schema::string comment_type;
+      typedef ::xsd::cxx::tree::optional< comment_type > comment_optional;
+      typedef ::xsd::cxx::tree::traits< comment_type, char > comment_traits;
+
+      const comment_optional&
+      comment () const;
+
+      comment_optional&
+      comment ();
+
+      void
+      comment (const comment_type& x);
+
+      void
+      comment (const comment_optional& x);
+
+      void
+      comment (::std::unique_ptr< comment_type > p);
+
       // Constructors.
       //
       VertexGID (const name_type&);
@@ -2226,6 +2335,7 @@ namespace damaris
       protected:
       ::xsd::cxx::tree::one< name_type > name_;
       ::xsd::cxx::tree::one< offset_type > offset_;
+      comment_optional comment_;
     };
 
     class SectionVTKTypes: public ::xml_schema::type
@@ -2247,6 +2357,27 @@ namespace damaris
 
       void
       name (::std::unique_ptr< name_type > p);
+
+      // comment
+      //
+      typedef ::xml_schema::string comment_type;
+      typedef ::xsd::cxx::tree::optional< comment_type > comment_optional;
+      typedef ::xsd::cxx::tree::traits< comment_type, char > comment_traits;
+
+      const comment_optional&
+      comment () const;
+
+      comment_optional&
+      comment ();
+
+      void
+      comment (const comment_type& x);
+
+      void
+      comment (const comment_optional& x);
+
+      void
+      comment (::std::unique_ptr< comment_type > p);
 
       // Constructors.
       //
@@ -2279,6 +2410,7 @@ namespace damaris
 
       protected:
       ::xsd::cxx::tree::one< name_type > name_;
+      comment_optional comment_;
     };
 
     class SectionSizes: public ::xml_schema::type
@@ -2300,6 +2432,27 @@ namespace damaris
 
       void
       name (::std::unique_ptr< name_type > p);
+
+      // comment
+      //
+      typedef ::xml_schema::string comment_type;
+      typedef ::xsd::cxx::tree::optional< comment_type > comment_optional;
+      typedef ::xsd::cxx::tree::traits< comment_type, char > comment_traits;
+
+      const comment_optional&
+      comment () const;
+
+      comment_optional&
+      comment ();
+
+      void
+      comment (const comment_type& x);
+
+      void
+      comment (const comment_optional& x);
+
+      void
+      comment (::std::unique_ptr< comment_type > p);
 
       // Constructors.
       //
@@ -2332,9 +2485,10 @@ namespace damaris
 
       protected:
       ::xsd::cxx::tree::one< name_type > name_;
+      comment_optional comment_;
     };
 
-    class SecontionConnectivity: public ::xml_schema::type
+    class SectionConnectivity: public ::xml_schema::type
     {
       public:
       // name
@@ -2354,27 +2508,48 @@ namespace damaris
       void
       name (::std::unique_ptr< name_type > p);
 
+      // comment
+      //
+      typedef ::xml_schema::string comment_type;
+      typedef ::xsd::cxx::tree::optional< comment_type > comment_optional;
+      typedef ::xsd::cxx::tree::traits< comment_type, char > comment_traits;
+
+      const comment_optional&
+      comment () const;
+
+      comment_optional&
+      comment ();
+
+      void
+      comment (const comment_type& x);
+
+      void
+      comment (const comment_optional& x);
+
+      void
+      comment (::std::unique_ptr< comment_type > p);
+
       // Constructors.
       //
-      SecontionConnectivity (const name_type&);
+      SectionConnectivity (const name_type&);
 
-      SecontionConnectivity (const ::xercesc::DOMElement& e,
-                             ::xml_schema::flags f = 0,
-                             ::xml_schema::container* c = 0);
+      SectionConnectivity (const ::xercesc::DOMElement& e,
+                           ::xml_schema::flags f = 0,
+                           ::xml_schema::container* c = 0);
 
-      SecontionConnectivity (const SecontionConnectivity& x,
-                             ::xml_schema::flags f = 0,
-                             ::xml_schema::container* c = 0);
+      SectionConnectivity (const SectionConnectivity& x,
+                           ::xml_schema::flags f = 0,
+                           ::xml_schema::container* c = 0);
 
-      virtual SecontionConnectivity*
+      virtual SectionConnectivity*
       _clone (::xml_schema::flags f = 0,
               ::xml_schema::container* c = 0) const;
 
-      SecontionConnectivity&
-      operator= (const SecontionConnectivity& x);
+      SectionConnectivity&
+      operator= (const SectionConnectivity& x);
 
       virtual 
-      ~SecontionConnectivity ();
+      ~SectionConnectivity ();
 
       // Implementation.
       //
@@ -2385,6 +2560,7 @@ namespace damaris
 
       protected:
       ::xsd::cxx::tree::one< name_type > name_;
+      comment_optional comment_;
     };
 
     class Mesh: public ::xml_schema::type
@@ -2470,26 +2646,26 @@ namespace damaris
       void
       section_sizes (::std::unique_ptr< section_sizes_type > p);
 
-      // section_conectivity
+      // section_connectivity
       //
-      typedef ::damaris::model::SecontionConnectivity section_conectivity_type;
-      typedef ::xsd::cxx::tree::optional< section_conectivity_type > section_conectivity_optional;
-      typedef ::xsd::cxx::tree::traits< section_conectivity_type, char > section_conectivity_traits;
+      typedef ::damaris::model::SectionConnectivity section_connectivity_type;
+      typedef ::xsd::cxx::tree::optional< section_connectivity_type > section_connectivity_optional;
+      typedef ::xsd::cxx::tree::traits< section_connectivity_type, char > section_connectivity_traits;
 
-      const section_conectivity_optional&
-      section_conectivity () const;
+      const section_connectivity_optional&
+      section_connectivity () const;
 
-      section_conectivity_optional&
-      section_conectivity ();
-
-      void
-      section_conectivity (const section_conectivity_type& x);
+      section_connectivity_optional&
+      section_connectivity ();
 
       void
-      section_conectivity (const section_conectivity_optional& x);
+      section_connectivity (const section_connectivity_type& x);
 
       void
-      section_conectivity (::std::unique_ptr< section_conectivity_type > p);
+      section_connectivity (const section_connectivity_optional& x);
+
+      void
+      section_connectivity (::std::unique_ptr< section_connectivity_type > p);
 
       // name
       //
@@ -2542,6 +2718,27 @@ namespace damaris
       static topology_type
       topology_default_value ();
 
+      // comment
+      //
+      typedef ::xml_schema::string comment_type;
+      typedef ::xsd::cxx::tree::optional< comment_type > comment_optional;
+      typedef ::xsd::cxx::tree::traits< comment_type, char > comment_traits;
+
+      const comment_optional&
+      comment () const;
+
+      comment_optional&
+      comment ();
+
+      void
+      comment (const comment_type& x);
+
+      void
+      comment (const comment_optional& x);
+
+      void
+      comment (::std::unique_ptr< comment_type > p);
+
       // Constructors.
       //
       Mesh (const name_type&,
@@ -2577,10 +2774,11 @@ namespace damaris
       vertex_global_id_optional vertex_global_id_;
       section_types_optional section_types_;
       section_sizes_optional section_sizes_;
-      section_conectivity_optional section_conectivity_;
+      section_connectivity_optional section_connectivity_;
       ::xsd::cxx::tree::one< name_type > name_;
       ::xsd::cxx::tree::one< type_type > type_;
       ::xsd::cxx::tree::one< topology_type > topology_;
+      comment_optional comment_;
     };
 
     class Curve: public ::xml_schema::type

@@ -560,6 +560,20 @@ VisIt_VarCentering Variable::VarCenteringToVisIt(const model::VarCentering& vc)
 
 #endif
 
+int Variable::GetVectorSizeFromBlock(std::shared_ptr<Block> b)
+{
+	int retVectComponents = 1 ;
+	// numVectComponents = GetModel().vectorlength() ;
+
+	if (GetModel().type() == "vector")
+	{
+		retVectComponents  = b->GetEndIndex(0) - b->GetStartIndex(0) + 1;
+	}
+
+	return retVectComponents;
+}
+
+
 #ifdef HAVE_PARAVIEW_ENABLED
 
 bool Variable::AddBlocksToVtkGrid(vtkMultiPieceDataSet* vtkMPGrid , int iteration)
@@ -577,6 +591,7 @@ bool Variable::AddBlocksToVtkGrid(vtkMultiPieceDataSet* vtkMPGrid , int iteratio
     //Getting the variable type (e.g. long, int, etc.) from its layout
     auto type = GetLayout()->GetType();
 
+    int numVectComponents;
     // for each block in the iteration do:
     BlocksByIteration::iterator begin , end;
     GetBlocksByIteration(iteration, begin, end);
@@ -598,37 +613,38 @@ bool Variable::AddBlocksToVtkGrid(vtkMultiPieceDataSet* vtkMPGrid , int iteratio
 			vtkMPGrid->SetPiece(serverId*localBlocks+index , vtkGrid);
 		}
         index++;
-
+        std::shared_ptr<Block> b = *it;
+        numVectComponents = GetVectorSizeFromBlock(b);
         switch(type)
         {
         case model::Type::short_:
-			if (not AddBufferToVtkGrid<short>(vtkGrid , (short*)buffer , size)) {
+			if (not AddBufferToVtkGrid<short>(vtkGrid , (short*)buffer , size, numVectComponents)) {
                 ERROR("Error adding buffer to vtkGrid for short type.");
                 return false;
             }
             break;
         case model::Type::int_:
         case model::Type::integer:
-			if (not AddBufferToVtkGrid<int>(vtkGrid , (int*)buffer , size)) {
+			if (not AddBufferToVtkGrid<int>(vtkGrid , (int*)buffer , size, numVectComponents)) {
                 ERROR("Error adding buffer to vtkGrid for int type.");
                 return false;
             }
             break;
         case model::Type::long_:
-			if (not AddBufferToVtkGrid<long>(vtkGrid , (long*)buffer , size)) {
+			if (not AddBufferToVtkGrid<long>(vtkGrid , (long*)buffer , size, numVectComponents)) {
                 ERROR("Error adding buffer to vtkGrid for long type.");
                 return false;
             }
             break;
         case model::Type::float_:
         case model::Type::real:
-			if (not AddBufferToVtkGrid<float>(vtkGrid , (float*)buffer , size)) {
+			if (not AddBufferToVtkGrid<float>(vtkGrid , (float*)buffer , size, numVectComponents)) {
                 ERROR("Error adding buffer to vtkGrid for float type.");
                 return false;
             }
             break;
         case model::Type::double_:
-			if (not AddBufferToVtkGrid<double>(vtkGrid , (double*)buffer , size)) {
+			if (not AddBufferToVtkGrid<double>(vtkGrid , (double*)buffer , size, numVectComponents)) {
                 ERROR("Error adding buffer to vtkGrid for double type.");
                 return false;
             }
@@ -648,7 +664,20 @@ bool Variable::AddBufferToVtkGrid(vtkDataSet* grid , T* buffer , int64_t size)
 {
 	vtkAOSDataArrayTemplate<T>* varData = nullptr;
 	std::string varName = GetName();
-   int numVectComponents = 1;
+    int numVectComponents = 1;
+
+    bool retval = AddBufferToVtkGrid<double>(grid , buffer , size, numVectComponents);
+    return true;
+}
+
+
+
+
+template <typename T>
+bool Variable::AddBufferToVtkGrid(vtkDataSet* grid , T* buffer , int64_t size, int numVectComponents)
+{
+	vtkAOSDataArrayTemplate<T>* varData = nullptr;
+	std::string varName = GetName();
 
 	if (IsNodal()) { // Data is stored on the points
 		if (grid->GetPointData()->GetArray(varName.c_str()) == nullptr) { // No array is assigned to grid for this variable
@@ -665,18 +694,14 @@ bool Variable::AddBufferToVtkGrid(vtkDataSet* grid , T* buffer , int64_t size)
 	else if (IsZonal()) { // Data is stored on the cells
 
 		if (grid->GetCellData()->GetArray(varName.c_str()) == nullptr) {
-         // Create relevant vtkDataArray for Cell data
-         vtkNew<vtkAOSDataArrayTemplate<T>> cellData;
+          // Create relevant vtkDataArray for Cell data
+          vtkNew<vtkAOSDataArrayTemplate<T>> cellData;
 
 			cellData->SetName(varName.c_str());
+
          
-         // if (GetModel().type() == damaris::model::VarType::vector )
-         //    numVectComponents = etModel().vectortype().components();
-      
-         numVectComponents = GetModel().vectorlength() ; 
-         
-         cellData->SetNumberOfComponents(numVectComponents);  // Always 1???
-         grid->GetCellData()->AddArray(cellData.GetPointer());
+          cellData->SetNumberOfComponents(numVectComponents);  // Always 1??? No, variables such as velocity have 3 vector components
+          grid->GetCellData()->AddArray(cellData.GetPointer());
       }
         varData = vtkAOSDataArrayTemplate<T>::SafeDownCast(grid->GetCellData()->GetArray(GetName().c_str()));
 	}

@@ -1,9 +1,5 @@
 cmake_minimum_required (VERSION 3.12) # Required because of policy CMP0074
 
-if(${CMAKE_VERSION} VERSION_EQUAL "3.18") 
-    message("WARNING: CMake v3.18 is known to have issues finding OpenMPI libraries")
-    message("WARNING: CMake v3.14.1 was found to work fine.")
-endif()
 #----------------------------------------------------------------------------#
 # Starting project definition
 #----------------------------------------------------------------------------#
@@ -82,6 +78,7 @@ add_definitions (-D__INFO)
 
 #----------------------------------------------------------------------------#
 include_directories(${DAMARIS_SOURCE_DIR}/include)
+include_directories(${CMAKE_BINARY_DIR}/include/damaris)
 include_directories(${DAMARIS_SOURCE_DIR}/include/damaris)
 include_directories(${CMAKE_BINARY_DIR}/include)
 
@@ -154,13 +151,15 @@ if(ENABLE_CATALYST)
     include("${PARAVIEW_USE_FILE}")
     set(HAVE_PARAVIEW_ENABLED 1)
     set(PARAVIEW_LIBRARIES "vtkUtilitiesPythonInitializer" "vtkPVPythonCatalyst" "vtkParallelMPI")
+    message(STATUS "ParaView_LIBRARIES: ${ParaView_LIBRARIES}")
+    message(STATUS "VTK_LIBRARIES: ${VTK_LIBRARIES}")
   else()
     message(STATUS "ParaView >= 5.7 found")
     set(HAVE_PARAVIEW_ENABLED 1)
-    find_package(ParaView 4.2 REQUIRED COMPONENTS PythonCatalyst) 
+    find_package(ParaView 4.2 REQUIRED COMPONENTS PythonCatalyst ) 
     set(PARAVIEW_LIBRARIES ParaView::PythonCatalyst VTK::mpi)
-    # message(STATUS "ParaView_LIBRARIES: ${ParaView_LIBRARIES}")
-    # message(STATUS "VTK_LIBRARIES: ${VTK_LIBRARIES}")
+    message(STATUS "ParaView_LIBRARIES: ${ParaView_LIBRARIES}")
+    message(STATUS "VTK_LIBRARIES: ${VTK_LIBRARIES}")
   endif()
   list(APPEND DEP_LIBRARIES ${PARAVIEW_LIBRARIES})
   add_definitions("-DUSE_CATALYST")

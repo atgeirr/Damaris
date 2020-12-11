@@ -495,6 +495,25 @@ class Variable : public ENABLE_SHARED_FROM_THIS(Variable),
 		return false;
 	}
 	
+	/**
+	* Obtain the size of the first  (0) dimension of a Variable that is specified as
+	* a "vector" type. Otherwise return the dimension as 1.
+	* N.B. this is an assumed data layout for a type="vector" type variable.
+	* The Variable should be specified with a mulit-dimensional Layout dimension
+	* i.e. as something like:
+	*   <layout name="zonal_vect" type="double"  dimensions="x,y,z,3"/>
+	* And the variable that uses the Layout, has tyep="vector"
+	* e.g.
+	*   <variable name="my_vector" layout="zonal_vect" type="vector" .. />
+	*
+	* This function would return 3 as the vector size.
+	*
+	* This value is used by Paraview vtkDataSet::SetNumberOfComponents() for
+	* passing multi-dimensional data to paraview, such as for Velocity field data
+	* that has 3 components (vx,vy,vz)
+	*/
+	int GetVectorSizeFromBlock(std::shared_ptr<Block> b);
+
 #ifdef HAVE_VISIT_ENABLED
 	public:
 	
@@ -545,7 +564,6 @@ class Variable : public ENABLE_SHARED_FROM_THIS(Variable),
 #endif
 
 #ifdef HAVE_PARAVIEW_ENABLED
-
     public:
 
     /**
@@ -557,13 +575,23 @@ class Variable : public ENABLE_SHARED_FROM_THIS(Variable),
     bool AddBlocksToVtkGrid(vtkMultiPieceDataSet* vtkMPGrid , int iteration);
 
 	/**
-	* Adds the variable's main data as a grid field data
+	* Adds the variable's main data as a grid field data. This is the default function
+	* for Variables that are type="scalar"
 	*
 	* \param[in,out] grid : the Damaris iteration
 	* \param[in] buffer : the buffer of type T* to be added to the grid as the field data
 	*/
 	template <typename T>
 	bool AddBufferToVtkGrid(vtkDataSet* grid , T* buffer , int64_t size);
+
+	/**
+	* Adds the variable's main data as a grid field data
+	*
+	* \param[in,out] grid : the Damaris iteration
+	* \param[in] buffer : the buffer of type T* to be added to the grid as the field data
+	*/
+	template <typename T>
+	bool AddBufferToVtkGrid(vtkDataSet* grid , T* buffer , int64_t size, int numVectComponents);
 #endif
 
 };

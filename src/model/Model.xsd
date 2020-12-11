@@ -237,24 +237,24 @@
 	</xs:complexType> 
    
       <!-- Unstructured Mesh list of vertex connectivities one for each element -->
-	<xs:complexType name="SecontionConnectivity">
+	<xs:complexType name="SectionConnectivity">
 		    <xs:attribute name="name"    type="xs:string" use="required"/>
           <xs:attribute name="comment" type="xs:string" use="optional"/>
 	</xs:complexType> 
 
-      <!-- Mesh node, expands on original rectilinear definitions -->
+      <!-- Mesh node, expands on original rectilinear definitions section_connectivity -->
       <xs:complexType name="Mesh">
       <xs:sequence>
          <xs:element name="coord"                type="mdl:Coord"           minOccurs="1" maxOccurs="3"/>   
          <xs:element name="vertex_global_id"     type="mdl:VertexGID"       minOccurs="0" maxOccurs="1"/>
          <xs:element name="section_types"        type="mdl:SectionVTKTypes" minOccurs="0" maxOccurs="1"/>
          <xs:element name="section_sizes"        type="mdl:SectionSizes"    minOccurs="0" maxOccurs="1"/>
-         <xs:element name="section_connectivity" type="mdl:SecontionConnectivity" minOccurs="0" maxOccurs="1"/>
+         <xs:element name="section_connectivity" type="mdl:SectionConnectivity" minOccurs="0" maxOccurs="1"/>
 		</xs:sequence>
 		<xs:attribute name="name"     type="xs:string"    use="required"/>
 		<xs:attribute name="type"     type="mdl:MeshType" use="required"/>
 		<xs:attribute name="topology" type="xs:unsignedInt" use="optional" default="2"/>
-      <xs:attribute name="comment" type="xs:string" use="optional"/>
+      <xs:attribute name="comment"  type="xs:string" use="optional"/>
 	</xs:complexType>
  
 
