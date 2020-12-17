@@ -2,7 +2,7 @@
 <simulation name="image" language="c" xmlns="http://damaris.gforge.inria.fr/damaris/model">
         <architecture>
                 <domains count="1" />
-				<dedicated cores="2" nodes="0" />
+				<dedicated cores="1" nodes="0" />
                 <buffer name="damaris-buffer" size="150000000" />
                 <queue  name="damaris-queue" size="100" />
         </architecture>
@@ -10,7 +10,7 @@
                 <parameter name="WIDTH"  type="int" value="100" />
                 <parameter name="HEIGHT" type="int" value="100" />
                 <parameter name="DEPTH"  type="int" value="100" />
-				<parameter name="size"	 type="int" value="2"  />
+                <parameter name="size"	 type="int" value="2"  />
 
                 <layout name="zonal_layout"  type="double" dimensions="WIDTH,HEIGHT,DEPTH/size"
 				        global="WIDTH,HEIGHT,DEPTH" />
@@ -22,25 +22,25 @@
                 <layout name="rmeshY" type="float" dimensions="HEIGHT+1" global="HEIGHT+1" ghost="0:0" />
                 <layout name="rmeshZ" type="float" dimensions="DEPTH/size+1" global="DEPTH+1" ghost="0:0" />
 
+                <group name="coord">
+                        <variable name="x" layout="rmeshX" visualizable="false" time-varying="false"  />
+                        <variable name="y" layout="rmeshY" visualizable="false" time-varying="false"  />
+                        <variable name="z" layout="rmeshZ" visualizable="false" time-varying="false"  />
+                </group>
+                
                 <mesh name="mesh" type="rectilinear" topology="3">
                         <coord name="coord/x" label="x"/>
                         <coord name="coord/y" label="y"/>
                         <coord name="coord/z" label="z"/>
                 </mesh>
 
-                <group name="coord">
-                        <variable name="x" layout="rmeshX" visualizable="false" time-varying="false"  />
-                        <variable name="y" layout="rmeshY" visualizable="false" time-varying="false"  />
-                        <variable name="z" layout="rmeshZ" visualizable="false" time-varying="false"  />
-                </group>
-
                 <variable name="zonal_pressure" type="scalar" layout="zonal_layout" mesh="mesh" centering="zonal" />
-				<variable name="nodal_pressure" type="scalar" layout="nodal_layout" mesh="mesh" centering="nodal" />
+				    <variable name="nodal_pressure" type="scalar" layout="nodal_layout"  mesh="mesh" centering="nodal" />
         </data>
         <actions>
         </actions>
         <paraview>
-            <script>/home/hadi/Damaris/DamarisDevHadi/examples/paraview/image.py</script>
+            <script>/home/jbowden/C_S/damaris_example/paraview/image.py</script>
         </paraview>
         <log FileName="log/damaris" RotationSize="5" LogFormat="[%TimeStamp%]: %Message%" LogLevel="info" />
 </simulation>

@@ -496,13 +496,13 @@ class Variable : public ENABLE_SHARED_FROM_THIS(Variable),
 	}
 	
 	/**
-	* Obtain the size of the first  (0) dimension of a Variable that is specified as
+	* Obtain the size of the (final) dimension of a Variable that is specified as
 	* a "vector" type. Otherwise return the dimension as 1.
-	* N.B. this is an assumed data layout for a type="vector" type variable.
-	* The Variable should be specified with a mulit-dimensional Layout dimension
+	* N.B. This is an assumed data layout for a type="vector" type variable.
+	* The Variable should be specified with a multi-dimensional Layout dimension
 	* i.e. as something like:
 	*   <layout name="zonal_vect" type="double"  dimensions="x,y,z,3"/>
-	* And the variable that uses the Layout, has tyep="vector"
+	* And the variable that uses the Layout, has type="vector"
 	* e.g.
 	*   <variable name="my_vector" layout="zonal_vect" type="vector" .. />
 	*
@@ -510,9 +510,9 @@ class Variable : public ENABLE_SHARED_FROM_THIS(Variable),
 	*
 	* This value is used by Paraview vtkDataSet::SetNumberOfComponents() for
 	* passing multi-dimensional data to paraview, such as for Velocity field data
-	* that has 3 components (vx,vy,vz)
+	* that has 3 components (vx,vy,vz) per zonal spatial location.
 	*/
-	int GetVectorSizeFromBlock(std::shared_ptr<Block> b);
+	int GetVectorSizeFromBlock(std::shared_ptr<Block> b, int dim);
 
 #ifdef HAVE_VISIT_ENABLED
 	public:

@@ -192,7 +192,9 @@ class Block //: public ENABLE_SHARED_FROM_THIS(Block)
 
 	/**
 	 * Returns the global extent along the desired dimension
-	 * at the moment of creation.
+	 * at the moment of creation. N.B. This value  may change if a
+	 * variable that owns the block relies on a paramater that is
+	 * modified in user code.
 	 */
 	virtual size_t GetGlobalExtent(unsigned int i) const {
 		return global_dims_[i];
@@ -270,6 +272,9 @@ class Block //: public ENABLE_SHARED_FROM_THIS(Block)
 		dataspace_.GainDataOwnership();
 	}
 
+
+
+
 	/**
      * \see returns the item at the ith place in the block
      */
@@ -298,6 +303,14 @@ class Block //: public ENABLE_SHARED_FROM_THIS(Block)
 		extents[0] = extents[1] = extents[2] = 0;
 		extents[3] = extents[4] = extents[5] = 0;
 		int dim = upper_bounds_.size();
+
+		// As variables can have more than 3 dimensions we should check here. Now it is implicit that
+		// the first 3 dimensions are the spatial ones and implicit Array of Structures format, with
+		// a struct at each spatial point.
+		// TODO: Check if AOS is only format to be supported by Damaris. This would be unwise as SOA
+		// is efficient for CPU and GPU based processing. Further meta-data about the spatial dims
+		// could be provided
+		if (dim > 3) dim = 3;
 
 		for(int i=0; i<dim ; i++) {
 			extents[2*i] = GetStartIndex(i);

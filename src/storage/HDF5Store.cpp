@@ -230,7 +230,7 @@ namespace damaris {
 
            /*
             * fileSpace creation is being moved to the inner block loop due
-            * to issue with updating layout sizes when paramaters change on the
+            * to issue with updating layout sizes when parameters change on the
             * server side. See:
             * https://gitlab.inria.fr/Damaris/damaris-development/-/issues/20
             */
@@ -251,20 +251,33 @@ namespace damaris {
 
                 // Create block dimentions
                 int blockDimention = b->GetDimensions();
-                for (int i = 0; i < blockDimention; i++)
-                    b->GetGlobalExtent(i);
+                //for (int i = 0; i < blockDimention; i++)
+                //    b->GetGlobalExtent(i);              // TODO: What does this do? Nothing!
 
                 hsize_t *blockDim = new (std::nothrow) hsize_t[blockDimention];
                 if (blockDim == NULL)
                     ERROR("HDF5:Failed to allocate memory ");
 
                 // Obtain the block size
-                for (int i = 0; i < blockDimention; i++)
-                    blockDim[i] = b->GetEndIndex(i) - b->GetStartIndex(i) + 1;
+                // HDF5 uses C storage conventions, assuming that the last listed
+				// dimension is the fastest-changing dimension and the first-listed
+                // dimension is the slowest changing.
+                // So here we are assuming that Damaris has stored the fastest moving dimension
+                // in the 1st ([0]) position of the lower_bounds_ and upper_bounds_ arrays
+                int i_backwards = blockDimention - 1 ;
+                for (int i = 0 ; i < blockDimention ; i++)
+                {
+                     blockDim[i_backwards] = b->GetEndIndex(i) - b->GetStartIndex(i) + 1;
+                     if (blockDim[i_backwards] == 32) blockDim[i_backwards] = blockDim[i_backwards] / 2 ;  // TODO: REMOVE. This is a testing hack
+                     i_backwards-- ;
+                }
 
                 // Obtain the FilesSpace size (has to match the memory space dimensions)
-                for (int i = 0; i < varDimention; i++) {
-                    localDims[i] = b->GetEndIndex(i) - b->GetStartIndex(i) + 1;
+                i_backwards =  blockDimention - 1;
+                for (int i = 0 ; i < blockDimention ; i++) {
+                    localDims[i_backwards] = b->GetEndIndex(i) - b->GetStartIndex(i) + 1;
+                    if (localDims[i_backwards] == 32) localDims[i_backwards] = localDims[i_backwards] / 2 ;  // TODO: REMOVE. This is a testing hack
+                    i_backwards-- ;
                 }
 
                 // globalDims are not currently used (may be needed for VDS support?)
@@ -383,13 +396,19 @@ namespace damaris {
               ERROR("Writing blocks to the file failed. ");
             }
             int numBlocks = 0;
+            int i_backwards = varDimention - 1;
             for(BlocksByIteration::iterator bid = begin; bid != end; bid ++) {
                  std::shared_ptr<Block> b = *bid;
                  if (numBlocks == 0) {
                      // Obtain the FilesSpace size (has to match the memory space dimensions)
-                    for (int i = 0; i < varDimention; i++) {
+                    /*for (int i = 0; i < varDimention; i++) {
                         globalDim[i] = b->GetGlobalExtent(i);
-                    }
+                    }*/
+                    i_backwards = varDimention - 1 ;
+                	for (int i = 0 ; i < varDimention ; i++) {
+                		 globalDim[i_backwards] = b->GetGlobalExtent(i);
+                		 i_backwards-- ;
+                	}
                     // Create dataspace.
                     if ((fileSpace = H5Screate_simple(varDimention, globalDim , NULL)) < 0)
                         ERROR("HDF5: file space creation failed !");
@@ -403,9 +422,12 @@ namespace damaris {
                 }
 
                  // Obtain the starting indices and the size of the hyperslab
+                 i_backwards = varDimention - 1 ;
                  for(int i = 0; i < varDimention; i++) {
-                     memOffset[i] = b->GetStartIndex(i);
-                     memDim[i]   = b->GetEndIndex(i) - b->GetStartIndex(i) + 1;
+                     memOffset[i_backwards] = b->GetStartIndex(i);
+                     memDim[i_backwards]   = b->GetEndIndex(i) - b->GetStartIndex(i) + 1;
+                     if (memDim[i_backwards] == 32) memDim[i_backwards] = memDim[i_backwards] / 2 ; // TODO: REMOVE. This is a testing hack
+                     i_backwards--;
                  }
 
                  // create memory data space

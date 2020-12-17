@@ -560,14 +560,15 @@ VisIt_VarCentering Variable::VarCenteringToVisIt(const model::VarCentering& vc)
 
 #endif
 
-int Variable::GetVectorSizeFromBlock(std::shared_ptr<Block> b)
+
+int Variable::GetVectorSizeFromBlock(std::shared_ptr<Block> b, int dim)
 {
 	int retVectComponents = 1 ;
 	// numVectComponents = GetModel().vectorlength() ;
 
 	if (GetModel().type() == "vector")
 	{
-		retVectComponents  = b->GetEndIndex(0) - b->GetStartIndex(0) + 1;
+		retVectComponents  = b->GetEndIndex(dim) - b->GetStartIndex(dim) + 1;
 	}
 
 	return retVectComponents;
@@ -614,7 +615,11 @@ bool Variable::AddBlocksToVtkGrid(vtkMultiPieceDataSet* vtkMPGrid , int iteratio
 		}
         index++;
         std::shared_ptr<Block> b = *it;
-        numVectComponents = GetVectorSizeFromBlock(b);
+        // We are assuming the last dimension is the vector
+        int lastDimIndex = b->GetDimensions() - 1 ;
+        // numVectComponents = b->GetGlobalExtent(lastDimIndex) ; // this is value "on creation" which may have changed due to setting a paramater
+        numVectComponents =  GetVectorSizeFromBlock(b, lastDimIndex);
+
         switch(type)
         {
         case model::Type::short_:
