@@ -64,11 +64,16 @@ class Variable : public ENABLE_SHARED_FROM_THIS(Variable),
 	std::string name_; /*!< name of the Variable. 
 			(full name, including the groups) */
 	BlockIndex blocks_; /*!< Blocks container. */
-	std::shared_ptr<Layout> layout_; /*!< Layout of the variable. */
+	std::shared_ptr<Layout> layout_; /*!< Layout of the variable. 
+            Note: Only valid on client side variables as damaris_set_paramater 
+            may alter dimensions which server size variables are not updated with.
+            Use the Block extents properties on a server side operation. */
 	std::shared_ptr<Buffer> buffer_; /*!< Buffer in which to allocate 
 					blocks of the variable. */
 	std::map<int32_t, std::vector<int64_t> > positions_; /*!< Positions of
 		each domain within a global description of the Variable.*/
+	std::map<int32_t, std::vector<int64_t> > end_positions_; /*!< End positions of
+			each domain within a global description of the Variable.*/
 	//std::shared_ptr<Storage> storage_;
 	
 	/**
@@ -166,6 +171,35 @@ class Variable : public ENABLE_SHARED_FROM_THIS(Variable),
 		return DAMARIS_OK;
 	}
 	
+
+	/**
+	 * Sets the end positions of a domain.
+	 *
+	 * \param[in] block : domain id.
+	 * \param[in] p : vector of upper bounds. Should have the same dimension
+	 * as the dimension of the layout.
+	 */
+	virtual int SetEndPosition(int32_t block, const std::vector<int64_t>& p)
+	{
+		if(p.size() != GetLayout()->GetDimensions())
+			return DAMARIS_INVALID_DIMENSIONS;
+
+		// Check that the start position has been set
+		if ( positions_.find(block) == positions_.end() ) {
+			return DAMARIS_START_POSITION_NOT_SET;
+		}
+		// Check that the end positon always is greater than or equal
+		// to the start position
+		for (int dim = 0 ; dim < GetLayout()->GetDimensions() ; dim++)
+		{
+			if (positions_[block][dim] <= p[dim])
+				return DAMARIS_INVALID_END_POSITION;
+		}
+
+		end_positions_[block] = p;
+		return DAMARIS_OK;
+	}
+
 	/**
 	 * Attach a Block already created. Since only a Variable can
 	 * create a Block, either this function will be used internally,

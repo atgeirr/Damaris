@@ -176,7 +176,7 @@ std::shared_ptr<Block> Variable::Allocate(int source, int iteration, int bid,
 	block->SetDataSpace(ds);
 	
 	if(positions_.count(bid)) {
-		block->Move(positions_[bid]);
+		block->Move(positions_[bid], end_positions_[bid]);
 	}
 
 	AttachBlock(block);
@@ -298,7 +298,7 @@ std::shared_ptr<Block> Variable::AllocateAligned(int source, int iteration, int 
 	block->SetDataSpace(ds);
 	
 	if(positions_.count(bid)) {
-		block->Move(positions_[bid]);
+		block->Move(positions_[bid], end_positions_[bid]);
 	}
 
 	AttachBlock(block);
@@ -340,7 +340,7 @@ std::shared_ptr<Block> Variable::Retrieve(int source, int iteration, int bid,
 	block->LoseDataOwnership();
 	
 	if(positions_.count(bid)) {
-		block->Move(positions_[bid]);
+		block->Move(positions_[bid], end_positions_[bid]);
 	}
 	
 	return block;

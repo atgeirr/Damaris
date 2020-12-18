@@ -278,6 +278,25 @@ int damaris_set_block_position(const char* var_name, int32_t block,
 	return Environment::GetClient()->SetPosition(var_name,block,position);
 }
 
+int damaris_set_endposition(const char* var_name, const int64_t* endposition)
+{
+	Environment::Log("damaris_set_endposition method started.", EventLogger::Info);
+
+	return damaris_set_block_endpostion(var_name,0,endposition);
+}
+
+
+int damaris_set_block_endpostion(const char* var_name, int32_t block,
+	const int64_t* endposition)
+{
+	Environment::Log("damaris_set_block_endpostion method started.", EventLogger::Info);
+
+	if(not Environment::Initialized()) {
+		return DAMARIS_NOT_INITIALIZED;
+	}
+	return Environment::GetClient()->SetEndPosition(var_name,block,endposition);
+}
+
 
 int damaris_client_comm_get(MPI_Comm* comm)
 {
@@ -291,7 +310,7 @@ int damaris_client_comm_get(MPI_Comm* comm)
 	}
 }
 
-int damaris_end_iteration()
+int damaris_end_iteration(  )
 {
 	Environment::Log("damaris_end_iteration method started.", EventLogger::Info);
 

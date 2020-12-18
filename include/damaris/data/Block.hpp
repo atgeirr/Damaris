@@ -218,13 +218,14 @@ class Block //: public ENABLE_SHARED_FROM_THIS(Block)
 		return result;
 	}
 	
-	virtual int Move(const std::vector<int64_t>& p) {
+	virtual int Move(const std::vector<int64_t>& p, const std::vector<int64_t>& endp) {
 		if((int)p.size() != GetDimensions()) {
 			return DAMARIS_INVALID_DIMENSIONS;
 		}
 		
 		for(int i=0; i < GetDimensions(); i++) {
-			upper_bounds_[i] += (p[i] - lower_bounds_[i]);
+			// upper_bounds_[i] += (p[i] - lower_bounds_[i]);
+			upper_bounds_[i] = endp[i];
 			lower_bounds_[i] = p[i];
 		}
 		
