@@ -224,8 +224,8 @@ class Block //: public ENABLE_SHARED_FROM_THIS(Block)
 		}
 		
 		for(int i=0; i < GetDimensions(); i++) {
-			// upper_bounds_[i] += (p[i] - lower_bounds_[i]);
-			upper_bounds_[i] = endp[i];
+		    upper_bounds_[i] += (p[i] - lower_bounds_[i]);
+			// upper_bounds_[i] = endp[i];
 			lower_bounds_[i] = p[i];
 		}
 		

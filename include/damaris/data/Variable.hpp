@@ -65,7 +65,7 @@ class Variable : public ENABLE_SHARED_FROM_THIS(Variable),
 			(full name, including the groups) */
 	BlockIndex blocks_; /*!< Blocks container. */
 	std::shared_ptr<Layout> layout_; /*!< Layout of the variable. 
-            Note: Only valid on client side variables as damaris_set_paramater 
+            Note: Only valid on client side variables as damaris_parameter_set
             may alter dimensions which server size variables are not updated with.
             Use the Block extents properties on a server side operation. */
 	std::shared_ptr<Buffer> buffer_; /*!< Buffer in which to allocate 
@@ -190,7 +190,7 @@ class Variable : public ENABLE_SHARED_FROM_THIS(Variable),
 		}
 		// Check that the end positon always is greater than or equal
 		// to the start position
-		for (int dim = 0 ; dim < GetLayout()->GetDimensions() ; dim++)
+		for (unsigned int dim = 0 ; dim < GetLayout()->GetDimensions() ; dim++)
 		{
 			if (positions_[block][dim] <= p[dim])
 				return DAMARIS_INVALID_END_POSITION;

@@ -268,7 +268,6 @@ namespace damaris {
                 for (int i = 0 ; i < blockDimention ; i++)
                 {
                      blockDim[i_backwards] = b->GetEndIndex(i) - b->GetStartIndex(i) + 1;
-                     if (blockDim[i_backwards] == 32) blockDim[i_backwards] = blockDim[i_backwards] / 2 ;  // TODO: REMOVE. This is a testing hack
                      i_backwards-- ;
                 }
 
@@ -276,7 +275,6 @@ namespace damaris {
                 i_backwards =  blockDimention - 1;
                 for (int i = 0 ; i < blockDimention ; i++) {
                     localDims[i_backwards] = b->GetEndIndex(i) - b->GetStartIndex(i) + 1;
-                    if (localDims[i_backwards] == 32) localDims[i_backwards] = localDims[i_backwards] / 2 ;  // TODO: REMOVE. This is a testing hack
                     i_backwards-- ;
                 }
 
@@ -426,7 +424,6 @@ namespace damaris {
                  for(int i = 0; i < varDimention; i++) {
                      memOffset[i_backwards] = b->GetStartIndex(i);
                      memDim[i_backwards]   = b->GetEndIndex(i) - b->GetStartIndex(i) + 1;
-                     if (memDim[i_backwards] == 32) memDim[i_backwards] = memDim[i_backwards] / 2 ; // TODO: REMOVE. This is a testing hack
                      i_backwards--;
                  }
 
