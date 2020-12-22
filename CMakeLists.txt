@@ -3,7 +3,7 @@ cmake_minimum_required (VERSION 3.12) # Required because of policy CMP0074
 #----------------------------------------------------------------------------#
 # Starting project definition
 #----------------------------------------------------------------------------#
-project(DAMARIS VERSION 1.3.3)
+project(DAMARIS VERSION 1.4.0)
 
 #
 # library version set here (e.g. for shared libs).
