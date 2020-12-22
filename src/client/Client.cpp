@@ -269,24 +269,6 @@ int Client::SetPosition(const std::string& varname, int32_t block,
 	return v->SetPosition(block,p);
 }
 
-
-int Client::SetEndPosition(const std::string& varname, int32_t block,
-	const int64_t* position)
-{
-	std::shared_ptr<Variable> v = VariableManager::Search(varname);
-	if(not v) return DAMARIS_UNDEFINED_VARIABLE;
-
-	if(block < 0 || block >= (int32_t)Environment::NumDomainsPerClient()) {
-		return DAMARIS_INVALID_BLOCK;
-	}
-
-	int d = v->GetLayout()->GetDimensions();
-	std::vector<int64_t> p(position, position+d);
-
-	return v->SetEndPosition(block,p);
-}
-
-
 int Client::StopServer()
 {
 	HeaderMessage h;

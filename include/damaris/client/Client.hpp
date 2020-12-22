@@ -163,18 +163,6 @@ class Client {
 			const int64_t* position);
 
 	/**
-	 * Set the end index positions of a variable within a global space.
-	 *
-	 * \param[in] varname : name of the variable.
-	 * \param[in] block : id of the block.
-	 * \param[in] endposition : an array of offsets to the end of the variable block
-	 * (should contain as many items as the variable has dimensions).
-	 */
-	virtual int SetEndPosition(const std::string& varname, int32_t block,
-			const int64_t* endposition);
-
-
-	/**
 	 * Sends a signal to the server to shut it down (all clients in node 
 	 * need to call this function before the server is actually stopped.
 	 */

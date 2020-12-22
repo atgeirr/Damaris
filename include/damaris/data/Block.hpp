@@ -218,7 +218,7 @@ class Block //: public ENABLE_SHARED_FROM_THIS(Block)
 		return result;
 	}
 	
-	virtual int Move(const std::vector<int64_t>& p, const std::vector<int64_t>& endp) {
+	virtual int Move(const std::vector<int64_t>& p) {
 		if((int)p.size() != GetDimensions()) {
 			return DAMARIS_INVALID_DIMENSIONS;
 		}
@@ -306,16 +306,21 @@ class Block //: public ENABLE_SHARED_FROM_THIS(Block)
 		int dim = upper_bounds_.size();
 
 		// As variables can have more than 3 dimensions we should check here. Now it is implicit that
-		// the first 3 dimensions are the spatial ones and implicit Array of Structures format, with
+		// the last 3 dimensions are the spatial ones and implicit Array of Structures format, with
 		// a struct at each spatial point.
 		// TODO: Check if AOS is only format to be supported by Damaris. This would be unwise as SOA
 		// is efficient for CPU and GPU based processing. Further meta-data about the spatial dims
 		// could be provided
-		if (dim > 3) dim = 3;
-
-		for(int i=0; i<dim ; i++) {
-			extents[2*i] = GetStartIndex(i);
-			extents[2*i+1] = GetEndIndex(i) + offset; // #point = #cells + 1
+		int startdim = 0 ;
+		if (dim > 3)
+		{
+			startdim = dim - 3;
+		}
+		int j = 0 ;
+		for(int i=startdim; i<dim ; i++) {
+			extents[2*j] = GetStartIndex(i);
+			extents[2*j+1] = GetEndIndex(i) + offset; // #point = #cells + 1
+			j++ ;
 		}
 	}
 #endif

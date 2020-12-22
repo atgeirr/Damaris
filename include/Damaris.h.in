@@ -58,8 +58,6 @@ extern "C" {
  *  - DAMARIS_BLOCK_NOT_FOUND block not found.
  *  - DAMARIS_REACTOR_NOT_FOUND reactor not initialized.
  *  - DAMARIS_BIND_ERROR error when trying a function as a signal.
- *  - DAMARIS_INVALID_END_POSITION the end position of a variable block is before the start position
- *  - DAMARIS_START_POSITION_NOT_SET the damaris_set_positons() function has not set an entry for the start positons
  *  - DAMARIS_ERROR_UNKNOWN unknown error.
  */
 enum {
@@ -81,8 +79,6 @@ enum {
 	DAMARIS_UNDEFINED_PARAMETER,
 	DAMARIS_UNDEFINED_VARIABLE,
 	DAMARIS_INVALID_BLOCK,
-	DAMARIS_INVALID_END_POSITION,
-	DAMARIS_START_POSITION_NOT_SET,
 	DAMARIS_INVALID_DIMENSIONS,
 	DAMARIS_BLOCK_NOT_FOUND,
 	DAMARIS_REACTOR_NOT_FOUND,
@@ -302,29 +298,6 @@ int damaris_set_position(const char* var_name, const int64_t* position);
  */
 int damaris_set_block_position(const char* var_name, 
 	int32_t block, const int64_t* position);
-
-/**
- * Changes the end position of the variable meta-data that is represented
- * by the block. Is equivalent to a call to
- * damaris_set_block_endpostion(var_name,0,endposition).
- * 
- * \param[in] var_name : name of the variable to move.
- * \param[in] endposition : array of end position coordinates.
- */
-int damaris_set_endposition(const char* var_name, const int64_t* endposition);
-
-/**
- * Changes the end position of a block of the variable. Combined with the 
- * starting positon set with damaris_set_block_position() this is used 
- * to compute the size of required block and to recompose a full data set
- * from its component blocks.
- * 
- * \param[in] var_name : name of the variable to move.
- * \param[in] endposition : block id.
- * \param[in] position : array of new coordinates.
- */
-int damaris_set_block_endpostion(const char* var_name, 
-	int32_t block, const int64_t* endposition);
 
 /**
  * Gets the communicator that the clients must use.

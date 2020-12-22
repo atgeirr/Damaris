@@ -176,7 +176,7 @@ std::shared_ptr<Block> Variable::Allocate(int source, int iteration, int bid,
 	block->SetDataSpace(ds);
 	
 	if(positions_.count(bid)) {
-		block->Move(positions_[bid], end_positions_[bid]);
+		block->Move(positions_[bid]);
 	}
 
 	AttachBlock(block);
@@ -298,7 +298,7 @@ std::shared_ptr<Block> Variable::AllocateAligned(int source, int iteration, int 
 	block->SetDataSpace(ds);
 	
 	if(positions_.count(bid)) {
-		block->Move(positions_[bid], end_positions_[bid]);
+		block->Move(positions_[bid]);
 	}
 
 	AttachBlock(block);
@@ -340,7 +340,7 @@ std::shared_ptr<Block> Variable::Retrieve(int source, int iteration, int bid,
 	block->LoseDataOwnership();
 	
 	if(positions_.count(bid)) {
-		block->Move(positions_[bid], end_positions_[bid]);
+		block->Move(positions_[bid]);
 	}
 	
 	return block;
@@ -615,10 +615,10 @@ bool Variable::AddBlocksToVtkGrid(vtkMultiPieceDataSet* vtkMPGrid , int iteratio
 		}
         index++;
         std::shared_ptr<Block> b = *it;
-        // We are assuming the last dimension is the vector
-        int lastDimIndex = b->GetDimensions() - 1 ;
+        // We are assuming the first dimension is the vector
+        int vectorDimIndex = 0 ;
         // numVectComponents = b->GetGlobalExtent(lastDimIndex) ; // this is value "on creation" which may have changed due to setting a paramater
-        numVectComponents =  GetVectorSizeFromBlock(b, lastDimIndex);
+        numVectComponents =  GetVectorSizeFromBlock(b, vectorDimIndex);
 
         switch(type)
         {
