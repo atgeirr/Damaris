@@ -1,25 +1,33 @@
 <?xml version="1.0"?>
-<simulation name="3dmesh" language="c" xmlns="http://damaris.gforge.inria.fr/damaris/model">
+<simulation name="3dmesh_wf" language="c" xmlns="http://damaris.gforge.inria.fr/damaris/model">
 	<architecture>
 		<domains count="1" />
-		<dedicated cores="4" nodes="0" />
+		<dedicated cores="1" nodes="0" />
 		<buffer name="damaris-buffer" size="536870912" />
 		<queue  name="damaris-queue" size="100" />
 	</architecture>
 	<data>
 		<parameter name="WIDTH"  type="int" value="16" />
-		<parameter name="HEIGHT" type="int" value="16" />
-		<parameter name="DEPTH" type="int" value="16" />
-		<parameter name="size"	 type="int" value="16"  />
+		<parameter name="HEIGHT" type="int" value="8" />
+		<parameter name="DEPTH"  type="int" value="4" />
+		<parameter name="size"	 type="int" value="4"      comment="this will be dynamically updated with the number of mpi client ranks"/>
+      <parameter name="whd_layout" type="int" value="2"  comment="Set this to 0 for layout=cells_whd_dl, 1 for layout=cells_whd_hm and 2 for layout=cells_whd_wf "/>
 
-		<layout name="cells"  type="int" dimensions="WIDTH/size,HEIGHT,DEPTH"
+      
+      <layout name="cells_whd_dl"  type="int" dimensions="WIDTH,HEIGHT,DEPTH/size"
+			global="WIDTH,HEIGHT,DEPTH" ghosts="0:0,0:0,0:0" />
+      
+      <layout name="cells_whd_hm"  type="int" dimensions="WIDTH,HEIGHT/size,DEPTH"
+			global="WIDTH,HEIGHT,DEPTH" ghosts="0:0,0:0,0:0" />
+      
+      <layout name="cells_whd_wf"  type="int" dimensions="WIDTH/size,HEIGHT,DEPTH"
 			global="WIDTH,HEIGHT,DEPTH" ghosts="0:0,0:0,0:0" />
 
-		<variable name="cube" type="scalar" layout="cells" mesh="mesh" centering="nodal" store="MyStore" />
+		<variable name="cube" type="scalar" layout="cells_whd_wf" mesh="mesh" centering="nodal" store="MyStore" />
 	</data>
 	<storage>
 		<store name="MyStore" type="HDF5">
-			<option key="FileMode">FilePerCore</option>
+			<option key="FileMode">Collective</option>
 			<option key="XDMFMode">NoIteration</option>
 			<option key="FilesPath"></option>
 		</store>
