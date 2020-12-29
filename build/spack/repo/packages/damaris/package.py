@@ -15,6 +15,7 @@ class Damaris(CMakePackage):
     git      = "https://gitlab.inria.fr/Damaris/damaris.git"
 
     version('master', branch='master')
+    version('1.3.2',  tag='v1.3.2')
     version('1.3.1',  tag='v1.3.1')
 
     variant('fortran',  default=True,  description='Enables Fortran support')
@@ -25,12 +26,12 @@ class Damaris(CMakePackage):
     variant('examples', default=False, description='Enables compilation and installation of the examples code')
 
     depends_on('mpi')
-    depends_on('cmake@3.12.0:', type=('build'))
+    depends_on('cmake@3.18.0:', type=('build'))
     depends_on('boost +thread+log+filesystem+date_time @1.67:')
     depends_on('xsd')
     depends_on('xerces-c')
     depends_on('hdf5@1.8.20:', when='+hdf5')
-    depends_on('catalyst+python3', when='+catalyst')
+    depends_on('paraview+python3', when='+catalyst')
     depends_on('visit+mpi', when='+visit')
 
     def cmake_args(self):
