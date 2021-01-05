@@ -39,6 +39,7 @@ class ParaViewAdaptor
     friend class Deleter<ParaViewAdaptor>;
     static std::shared_ptr<ParaViewAdaptor> instance_;
     vtkCPProcessor* processor_;
+    model::Simulation::paraview_optional mdl_;
 
 
 protected:
@@ -62,6 +63,8 @@ protected:
 	 * \param[out] rootGrid : the root multi-block iteration that should be filled
 	 */
 	bool FillMultiBlockGrid(int iteration , vtkMultiBlockDataSet* rootGrid);
+
+	void AddPythonPipeline(void);
 
 public:
 

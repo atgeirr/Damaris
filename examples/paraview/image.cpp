@@ -100,10 +100,10 @@ void WriteCoordinates(simdata sim)
   for(int k=0; k<sim.nodal_z ; k++)
     ZCoord[k] = k+sim.rank*sim.zonal_z;
 
-    damaris_write("coord/x" , XCoord);
-    damaris_write("coord/y" , YCoord);
-    damaris_write("coord/z" , ZCoord);
-
+  damaris_write("coord/x" , XCoord);
+  damaris_write("coord/y" , YCoord);
+  damaris_write("coord/z" , ZCoord);
+    
   delete [] XCoord;
   delete [] YCoord;
   delete [] ZCoord;
@@ -119,29 +119,30 @@ void SimMainLoop(simdata& sim)
         setNodalValue(sim , i*j*GetFillValue(sim , i,j,k) ,  i , j , k  );
       }
 
-    // write results to Damaris
-    if (sim.step % 10 == 0)
-    {
-        if (sim.rank == 0)
-        {
-          std::cout << "Image example: Iteration " << sim.step << " out of " << Steps << std::endl;
-        }
-        int64_t pos[3];
 
-        pos[0] = 0;
-        pos[1] = 0;
-        pos[2] = sim.rank*sim.zonal_z;
-    
-        damaris_set_position("zonal_pressure" ,  pos);
-        damaris_write("zonal_pressure" , sim.zonal_cube);
+   // write results to Damaris
+   if (sim.step % 10 == 0)
+   {
+      if (sim.rank == 0)
+      {
+         std::cout << "Image example: Iteration " << sim.step << " out of " << Steps << std::endl;
+      }
+      int64_t pos[3];
 
-        damaris_set_position("nodal_pressure" ,  pos);
-        damaris_write("nodal_pressure" , sim.nodal_cube);
+      pos[0] = 0;
+      pos[1] = 0;
+      pos[2] = sim.rank*sim.zonal_z;
 
-        damaris_end_iteration();
+      damaris_set_position("zonal_pressure" ,  pos);
+      damaris_write("zonal_pressure" , sim.zonal_cube);
 
-        sleep(5);
-    }
+      damaris_set_position("nodal_pressure" ,  pos);
+      damaris_write("nodal_pressure" , sim.nodal_cube);
+
+      damaris_end_iteration();
+
+      sleep(5);
+   }
 }
 
 int main(int argc, char *argv[])

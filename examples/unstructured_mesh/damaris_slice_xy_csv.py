@@ -65,12 +65,12 @@ def CreateCoProcessor():
       
       # coprocessor_name_template = ''
       timestep = datadescription.GetTimeStep()
-      print('timestep:1 '+str(timestep)   )
+      print('DAMARIS timestep:1 '+str(timestep)   )
       
-      if (timestep == 0):
-          print(mynon_existant_variable)
+      #if (timestep == 0):
+      #    print(mynon_existant_variable)
       
-      if (timestep != 0):
+      if (timestep > 0):
          rESULTS_FLUID_DOMAINcase = coprocessor.CreateProducer(datadescription, 'input')
       
          # https://stackoverflow.com/questions/48068641/paraview-get-points-data-from-integrate-variables
@@ -78,122 +78,79 @@ def CreateCoProcessor():
          # https://kitware.github.io/vtk-examples/site/Python/CompositeData/MultiBlockDataSet/
          # or
          # https://kitware.github.io/vtk-examples/site/Cxx/CompositeData/MultiBlockDataSet/
-         # as1 = paraview.simple.GetSources()
-         # as1.keys()
-         # as1.get('PassArrays1')
-         # iv1 = IntegrateVariables(Input=as1.get('PassArrays1'))
-         
-         # integrateVariables1 = integrateVariables(Input=slice1)
-         # DataSliceFile = paraview.servermanager.Fetch(integrateVariables1)
-         # numCells = DataSliceFile.GetNumberOfCells()
 
-         # list(GetSources().keys()) [list(GetSources().values()).index(GetActiveSource())][0]
-
+         """         
+         # This was one way to get the mid-point of the data-set
          vel_arrays = PassArrays(Input=rESULTS_FLUID_DOMAINcase, PointDataArrays=[], CellDataArrays=['fields/velocity'])  
-         # di         = vel_arrays.GetDataInformation()
-         # pointInfo  = di.GetPointDataInformation()
-         # bnds       = di.DataInformation.GetBounds()
-         # um_data_slice1 = MergeBlocks(Input=vel_arrays)
-         # bnds = um_data_slice1.GetDataInformation().DataInformation.GetBounds()
-         
-         #iv1 = IntegrateVariables(Input=vel_arrays)
-         # GetSources().get('IntegrateVariables1').GetDataInformation().DataInformation.GetBounds()
-         
-         # bnds = GetSources()[('IntegrateVariables1', '5662')].GetDataInformation().DataInformation.GetBounds()
-         # bnds = GetSources()['IntegrateVariables1'].GetDataInformation().DataInformation.GetBounds()
-         # bnds = list(paraview.simple.GetSources().values())[1].GetDataInformation().DataInformation.GetBounds()
          iv1 = IntegrateVariables(Input=vel_arrays)
          dsf = paraview.servermanager.Fetch(iv1)
          pt1 = dsf.GetPoint(0)
-         # bnds = dsf.GetBounds()
-         # ctr = dsf.GetCenter()
-         # bnds = dsf.GetDataInformation().DataInformation.GetBounds()
-
          
-         
-         #list(GetSources().keys())[1]
-         ## ('IntegrateVariables1', '5662')
+         # this is one way to get the bounds of a data-set - which if symetrical, we can compute the centre point
          mkey = list(GetSources().keys())[1]
          print(mkey)
-         # GetSources().get(mkey)
-         ## <paraview.servermanager.IntegrateVariables object at 0x7fbe0e44d090>
          bnds = GetSources().get(mkey).GetDataInformation().DataInformation.GetBounds()
-
-         # dsf = paraview.servermanager.Fetch(iv1)
-         # glyph   = Glyph(iv1)
-         #di         = iv1.GetDataInformation()
-         #pointInfo  = di.GetPointDataInformation()
-         #bnds       = di.DataInformation.GetBounds()
-         # bnds    = di.DataInformation.GetBounds()
-         #  iv1 = IntegrateVariables(Input=as1.get('IntegrateVariables1'))
-         # as1.get('PassArrays1')
          
-         # glyph   = Glyph(vel_arrays)
-         # glyph.UpdatePipeline()
-         # di      = glyph.GetDataInformation()
-         # bnds    = di.DataInformation.GetBounds()
+         # Or this way:
+         bnds = list(paraview.simple.GetSources().values())[1].GetDataInformation().DataInformation.GetBounds()
+         
+         # or this way:
+         glyph   = Glyph(vel_arrays)
+         glyph.UpdatePipeline()
+         di      = glyph.GetDataInformation()
+         bnds    = di.DataInformation.GetBounds()
+         """
+         
+         
+         #  vel_arrays = PassArrays(Input=rESULTS_FLUID_DOMAINcase, PointDataArrays=[], CellDataArrays=['fields/velocity'])  
+                 
+         bnds = list(paraview.simple.GetSources().values())[1].GetDataInformation().DataInformation.GetBounds()
+         pt1=[(bnds[1]-bnds[0])/2,(bnds[3]-bnds[2])/2,(bnds[5]-bnds[4])/2]
+         
+         
          # x_range =  bnds[0]
-         print('bnds   :'+str(bnds[0])+', '+str(bnds[1])+', '+str(bnds[2]) +', '+str(bnds[3]) +', '+str(bnds[4]) +', '+str(bnds[5])  )
-         print('ctr    :'+str(pt1[0])+', '+str(pt1[1])+', '+str(pt1[2])   )
+         print('DAMARIS bnds   :'+str(bnds[0])+', '+str(bnds[1])+', '+str(bnds[2]) +', '+str(bnds[3]) +', '+str(bnds[4]) +', '+str(bnds[5])  )
+         print('DAMARIS ctr    :'+str(pt1[0])+', '+str(pt1[1])+', '+str(pt1[2])   )
+         # print('DAMARIS ctr    :'+str(pt2[0])+', '+str(pt2[1])+', '+str(pt2[2])   )
          
-         
-         # intf = paraview.servermanager.Fetch(iv1)
-         # print intf.GetPoint(0)
-         # x_range2 = intf.GetPoint(0)[1] - intf.GetPoint(0)[0]
-         # print('x_range2:'+str(intf.GetPoint(0)))
-
-         # bounds    = pointInfo.GetBounds() 
-
-     
       
-      
-          # create a new 'Slice'
+         # create a new 'Slice'
          slice1 = Slice(Input=rESULTS_FLUID_DOMAINcase)
          slice1.SliceType = 'Plane'
          slice1.HyperTreeGridSlicer = 'Plane'
          slice1.Triangulatetheslice = 0
          slice1.Mergeduplicatedpointsintheslice = 0
          slice1.SliceOffsetValues = [0.0]
-         
-         
-         # slice_z_origin = _TEMPLATE_SLICE_Z_ORIGIN_
-         # /home/jbowden/C_S/saturne_examples/case_mesh_3d_64/PARAVIEW_EXPORTS
-         #slice_z_origin = os.environ.get('SLICE_Z_ORIGIN')
-         #if slice_z_origin == 'None':
-         #print('WARNING: Catalyst Coprocessing Script: '+os.path.basename(__file__))
-         #print(' The SLICE_Z_ORIGIN environment variable was not set!')
-         #slice_z_origin=0.5
-         # sys.exit('exiting due to no SLICE_Z_ORIGIN env variable')
-         slice_z_origin=0.5
-         
-         
-         slice1.SliceType.Normal = [0.0, 0.0, 1.0]
-         # init the 'Plane' selected for 'SliceType'
-         # slice1.SliceType.Origin = [0.0, 0.0, 0.0]
-         #slice1.SliceType.Origin = [pt1[0]/2.0,pt1[1]/2.0, pt1[2]/2.0]
-         # slice1.SliceType.Origin = [iv1[0], iv1[1], iv1[2]]
-
-         # init the 'Plane' selected for 'HyperTreeGridSlicer'
-         # slice1.HyperTreeGridSlicer.Origin = [0.0, 0.0, 0.0]
-         # slice1.HyperTreeGridSlicer.Origin = [pt1[0]/2.0,pt1[1]/2.0, pt1[2]/2.0]
-         print('timestep:2 '+str(timestep)   )
-         slice1.SliceType.Origin = [pt1[0], pt1[1], pt1[2]]
+         slice1.SliceType.Normal  = [0.0, 0.0, 1.0]
+         slice1.SliceType.Origin  = [pt1[0], pt1[1], pt1[2]]
          slice1.HyperTreeGridSlicer.Origin = [pt1[0], pt1[1], pt1[2]]
           
          # ----------------------------------------------------------------
          # finally, restore active source
          SetActiveSource(slice1)
          # ----------------------------------------------------------------
+         
+          # create a new 'Slice'
+         slice2 = Slice(Input=rESULTS_FLUID_DOMAINcase)
+         slice2.SliceType = 'Plane'
+         slice2.HyperTreeGridSlicer = 'Plane'
+         slice2.Triangulatetheslice = 0
+         slice2.Mergeduplicatedpointsintheslice = 0
+         slice2.SliceOffsetValues = [0.0]
+         slice2.SliceType.Normal  = [0.0, 1.0, 0.0]
+         slice2.SliceType.Origin  = [pt1[0], pt1[1], pt1[2]]
+         slice2.HyperTreeGridSlicer.Origin = [pt1[0], pt1[1], pt1[2]]
 
          # Now any catalyst writers
-      
-      
          slice1_arrays = PassArrays(Input=slice1, PointDataArrays=[], CellDataArrays=['fields/velocity'])  # not FieldDataArrays=['fields/velocity']
+         slice2_arrays = PassArrays(Input=slice2, PointDataArrays=[], CellDataArrays=['fields/velocity']) 
          # cSVWriter1 = servermanager.writers.CSVWriter(Input=slice1_arrays)
          # um_data_slice1 = MergeBlocks(Input=slice1_arrays)
          # cSVWriter1 = servermanager.writers.CSVWriter(Input=um_data_slice1, CellDataArrays=['fields/velocity'])
          cSVWriter1 = servermanager.writers.CSVWriter(Input=slice1_arrays, FieldAssociation='Cell Data')
-         coprocessor.RegisterWriter(cSVWriter1, filename='input_velocity'+'_%t.csv', freq=2, paddingamount=2, DataMode='None', HeaderType='None', EncodeAppendedData=None, CompressorType='None', CompressionLevel='None')
+         cSVWriter2 = servermanager.writers.CSVWriter(Input=slice2_arrays, FieldAssociation='Cell Data')
+         coprocessor.RegisterWriter(cSVWriter1, filename='input_velocity_xy'+'_%t.csv', freq=2, paddingamount=3, DataMode='None', HeaderType='None', EncodeAppendedData=None, CompressorType='None', CompressionLevel='None')
+         coprocessor.RegisterWriter(cSVWriter2, filename='input_velocity_xz'+'_%t.csv', freq=2, paddingamount=3, DataMode='None', HeaderType='None', EncodeAppendedData=None, CompressorType='None', CompressionLevel='None')
 
     return Pipeline()
 

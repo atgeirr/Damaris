@@ -295,6 +295,7 @@ class Block //: public ENABLE_SHARED_FROM_THIS(Block)
 	/**
 	 * Returns the extents of the block
 	 * \param[in,out] extents : The extents array to be filled by this method
+	 * \param[in] zonal : The data exists with zonal placement (as opposed to nodal placement if false)
 	 * \param[in] withGhost : should the extents be return wither with ghosts or not?
 	 */
 	void GetGridExtents(int extents[6] , bool zonal , bool withGhost=true)

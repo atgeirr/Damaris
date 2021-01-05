@@ -42,8 +42,14 @@ void ParaViewAdaptor::Initialize(MPI_Comm comm,
         processor_->RemoveAllPipelines();
     }
 
-	// Add the Python script
-    model::ParaViewParam::script_sequence scripts = mdl.get().script();
+    mdl_ = mdl ;  // I'm not sure how inefficient this copy is
+    AddPythonPipeline();
+}
+
+void ParaViewAdaptor::AddPythonPipeline()
+{
+// Add the Python script
+    model::ParaViewParam::script_sequence scripts = mdl_.get().script();
     model::ParaViewParam::script_const_iterator it ;
 
     for(it = scripts.begin(); it != scripts.end(); ++it) {
@@ -55,7 +61,9 @@ void ParaViewAdaptor::Initialize(MPI_Comm comm,
 
         pipeline->Delete();
     }
+
 }
+
 
 void ParaViewAdaptor::Finalize()
 {
@@ -96,8 +104,12 @@ void ParaViewAdaptor::CoProcess(int iteration , bool lastTimeStep)
         // Catalyst gets the proper input dataset for the pipeline.
 		dataDescription->GetInputDescriptionByName("input")->SetGrid(rootGrid);
 
-        // Call Catalyst to execute the desired pipelines.
-        processor_->CoProcess(dataDescription);
+	    //if ( processor_->GetNumberOfPipelines() == 0)
+	    //	AddPythonPipeline();
+
+	    // Call Catalyst to execute the desired pipelines.
+	    if (iteration > 0)
+	    	processor_->CoProcess(dataDescription);
     }
 }
 

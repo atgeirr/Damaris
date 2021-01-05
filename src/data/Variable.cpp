@@ -606,12 +606,13 @@ bool Variable::AddBlocksToVtkGrid(vtkMultiPieceDataSet* vtkMPGrid , int iteratio
 
         // Get the vtkGrid from its mesh
 		std::shared_ptr<Mesh> mesh = GetMesh();
-		int pieceId = serverId*localBlocks+index;
+		unsigned int pieceId = serverId*localBlocks+index;
 		vtkDataSet* vtkGrid = vtkMPGrid->GetPiece(pieceId);
 
 		if (vtkGrid == nullptr) { // This is the first (or maybe the only) variable of the mesh
 			vtkGrid = mesh->GetVtkGrid(source , iteration , block , shared_from_this());
-			vtkMPGrid->SetPiece(serverId*localBlocks+index , vtkGrid);
+			INFO("AddBlocksToVtkGrid(): Mesh:" << mesh->GetName() << "Variable: " << this->GetName() <<" Iteration: " << iteration << " Server: " << serverId << " Block: " << localBlocks << " Index: " << index << " PieceId: " << pieceId)
+			vtkMPGrid->SetPiece(pieceId , vtkGrid);
 		}
         index++;
         std::shared_ptr<Block> b = *it;
