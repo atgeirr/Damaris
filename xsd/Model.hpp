@@ -2718,6 +2718,23 @@ namespace damaris
       static topology_type
       topology_default_value ();
 
+      // time-varying
+      //
+      typedef ::xml_schema::boolean time_varying_type;
+      typedef ::xsd::cxx::tree::traits< time_varying_type, char > time_varying_traits;
+
+      const time_varying_type&
+      time_varying () const;
+
+      time_varying_type&
+      time_varying ();
+
+      void
+      time_varying (const time_varying_type& x);
+
+      static time_varying_type
+      time_varying_default_value ();
+
       // comment
       //
       typedef ::xml_schema::string comment_type;
@@ -2778,6 +2795,7 @@ namespace damaris
       ::xsd::cxx::tree::one< name_type > name_;
       ::xsd::cxx::tree::one< type_type > type_;
       ::xsd::cxx::tree::one< topology_type > topology_;
+      ::xsd::cxx::tree::one< time_varying_type > time_varying_;
       comment_optional comment_;
     };
 
@@ -3631,6 +3649,40 @@ namespace damaris
       static update_frequency_type
       update_frequency_default_value ();
 
+      // realtime-timestep
+      //
+      typedef ::xml_schema::double_ realtime_timestep_type;
+      typedef ::xsd::cxx::tree::traits< realtime_timestep_type, char, ::xsd::cxx::tree::schema_type::double_ > realtime_timestep_traits;
+
+      const realtime_timestep_type&
+      realtime_timestep () const;
+
+      realtime_timestep_type&
+      realtime_timestep ();
+
+      void
+      realtime_timestep (const realtime_timestep_type& x);
+
+      static realtime_timestep_type
+      realtime_timestep_default_value ();
+
+      // end-iteration
+      //
+      typedef ::xml_schema::unsigned_int end_iteration_type;
+      typedef ::xsd::cxx::tree::traits< end_iteration_type, char > end_iteration_traits;
+
+      const end_iteration_type&
+      end_iteration () const;
+
+      end_iteration_type&
+      end_iteration ();
+
+      void
+      end_iteration (const end_iteration_type& x);
+
+      static end_iteration_type
+      end_iteration_default_value ();
+
       // Constructors.
       //
       ParaViewParam ();
@@ -3663,6 +3715,8 @@ namespace damaris
       protected:
       script_sequence script_;
       ::xsd::cxx::tree::one< update_frequency_type > update_frequency_;
+      ::xsd::cxx::tree::one< realtime_timestep_type > realtime_timestep_;
+      ::xsd::cxx::tree::one< end_iteration_type > end_iteration_;
     };
 
     class PythonParam: public ::xml_schema::type

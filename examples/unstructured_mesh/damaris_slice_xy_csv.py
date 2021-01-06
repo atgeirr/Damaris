@@ -104,55 +104,64 @@ def CreateCoProcessor():
          
          #  vel_arrays = PassArrays(Input=rESULTS_FLUID_DOMAINcase, PointDataArrays=[], CellDataArrays=['fields/velocity'])  
                  
-         bnds = list(paraview.simple.GetSources().values())[1].GetDataInformation().DataInformation.GetBounds()
-         pt1=[(bnds[1]-bnds[0])/2,(bnds[3]-bnds[2])/2,(bnds[5]-bnds[4])/2]
-         
-         
-         # x_range =  bnds[0]
-         print('DAMARIS bnds   :'+str(bnds[0])+', '+str(bnds[1])+', '+str(bnds[2]) +', '+str(bnds[3]) +', '+str(bnds[4]) +', '+str(bnds[5])  )
-         print('DAMARIS ctr    :'+str(pt1[0])+', '+str(pt1[1])+', '+str(pt1[2])   )
-         # print('DAMARIS ctr    :'+str(pt2[0])+', '+str(pt2[1])+', '+str(pt2[2])   )
-         
-      
-         # create a new 'Slice'
-         slice1 = Slice(Input=rESULTS_FLUID_DOMAINcase)
-         slice1.SliceType = 'Plane'
-         slice1.HyperTreeGridSlicer = 'Plane'
-         slice1.Triangulatetheslice = 0
-         slice1.Mergeduplicatedpointsintheslice = 0
-         slice1.SliceOffsetValues = [0.0]
-         slice1.SliceType.Normal  = [0.0, 0.0, 1.0]
-         slice1.SliceType.Origin  = [pt1[0], pt1[1], pt1[2]]
-         slice1.HyperTreeGridSlicer.Origin = [pt1[0], pt1[1], pt1[2]]
-          
-         # ----------------------------------------------------------------
-         # finally, restore active source
-         SetActiveSource(slice1)
-         # ----------------------------------------------------------------
-         
-          # create a new 'Slice'
-         slice2 = Slice(Input=rESULTS_FLUID_DOMAINcase)
-         slice2.SliceType = 'Plane'
-         slice2.HyperTreeGridSlicer = 'Plane'
-         slice2.Triangulatetheslice = 0
-         slice2.Mergeduplicatedpointsintheslice = 0
-         slice2.SliceOffsetValues = [0.0]
-         slice2.SliceType.Normal  = [0.0, 1.0, 0.0]
-         slice2.SliceType.Origin  = [pt1[0], pt1[1], pt1[2]]
-         slice2.HyperTreeGridSlicer.Origin = [pt1[0], pt1[1], pt1[2]]
+         # bnds = list(paraview.simple.GetSources().values())[1].GetDataInformation().DataInformation.GetBounds()
+         if (len(list(GetSources().keys())) > 1):
+            mkey = list(GetSources().keys())[1]
+            print(mkey)
+            bnds = GetSources().get(mkey).GetDataInformation().DataInformation.GetBounds()
 
-         # Now any catalyst writers
-         slice1_arrays = PassArrays(Input=slice1, PointDataArrays=[], CellDataArrays=['fields/velocity'])  # not FieldDataArrays=['fields/velocity']
-         slice2_arrays = PassArrays(Input=slice2, PointDataArrays=[], CellDataArrays=['fields/velocity']) 
-         # cSVWriter1 = servermanager.writers.CSVWriter(Input=slice1_arrays)
-         # um_data_slice1 = MergeBlocks(Input=slice1_arrays)
-         # cSVWriter1 = servermanager.writers.CSVWriter(Input=um_data_slice1, CellDataArrays=['fields/velocity'])
-         cSVWriter1 = servermanager.writers.CSVWriter(Input=slice1_arrays, FieldAssociation='Cell Data')
-         cSVWriter2 = servermanager.writers.CSVWriter(Input=slice2_arrays, FieldAssociation='Cell Data')
-         coprocessor.RegisterWriter(cSVWriter1, filename='input_velocity_xy'+'_%t.csv', freq=2, paddingamount=3, DataMode='None', HeaderType='None', EncodeAppendedData=None, CompressorType='None', CompressionLevel='None')
-         coprocessor.RegisterWriter(cSVWriter2, filename='input_velocity_xz'+'_%t.csv', freq=2, paddingamount=3, DataMode='None', HeaderType='None', EncodeAppendedData=None, CompressorType='None', CompressionLevel='None')
+            pt1=[(bnds[1]-bnds[0])/2,(bnds[3]-bnds[2])/2,(bnds[5]-bnds[4])/2]
+         
+         
+            # x_range =  bnds[0]
+            print('DAMARIS bnds   :'+str(bnds[0])+', '+str(bnds[1])+', '+str(bnds[2]) +', '+str(bnds[3]) +', '+str(bnds[4]) +', '+str(bnds[5])  )
+            print('DAMARIS ctr    :'+str(pt1[0])+', '+str(pt1[1])+', '+str(pt1[2])   )
+            # print('DAMARIS ctr    :'+str(pt2[0])+', '+str(pt2[1])+', '+str(pt2[2])   )
 
-    return Pipeline()
+
+            # create a new 'Slice'
+            slice1 = Slice(Input=rESULTS_FLUID_DOMAINcase)
+            slice1.SliceType = 'Plane'
+            slice1.HyperTreeGridSlicer = 'Plane'
+            slice1.Triangulatetheslice = 0
+            slice1.Mergeduplicatedpointsintheslice = 0
+            slice1.SliceOffsetValues = [0.0]
+            slice1.SliceType.Normal  = [0.0, 0.0, 1.0]
+            slice1.SliceType.Origin  = [pt1[0], pt1[1], pt1[2]]
+            slice1.HyperTreeGridSlicer.Origin = [pt1[0], pt1[1], pt1[2]]
+            # ----------------------------------------------------------------
+            # finally, restore active source
+            SetActiveSource(slice1)
+            # ----------------------------------------------------------------
+            # Now any catalyst writers
+            slice1_arrays = PassArrays(Input=slice1, PointDataArrays=[], CellDataArrays=['fields/velocity'])  # not FieldDataArrays=['fields/velocity']
+            # cSVWriter1 = servermanager.writers.CSVWriter(Input=slice1_arrays)
+            cSVWriter1 = servermanager.writers.CSVWriter(Input=slice1_arrays, FieldAssociation='Cell Data')
+            coprocessor.RegisterWriter(cSVWriter1, filename='input_velocity_xz'+'_%t.csv', freq=2, paddingamount=3, DataMode='None', HeaderType='None', EncodeAppendedData=None, CompressorType='None', CompressionLevel='None')
+
+            # create a new 'Slice' for the xz plane
+            """
+            slice2 = Slice(Input=rESULTS_FLUID_DOMAINcase)
+            slice2.SliceType = 'Plane'
+            slice2.HyperTreeGridSlicer = 'Plane'
+            slice2.Triangulatetheslice = 0
+            slice2.Mergeduplicatedpointsintheslice = 0
+            slice2.SliceOffsetValues = [0.0]
+            slice2.SliceType.Normal  = [0.0, 1.0, 0.0]
+            slice2.SliceType.Origin  = [pt1[0], pt1[1], pt1[2]]
+            slice2.HyperTreeGridSlicer.Origin = [pt1[0], pt1[1], pt1[2]]
+            # finally, restore active source
+            SetActiveSource(slice2)
+            cSVWriter2 = servermanager.writers.CSVWriter(Input=slice2_arrays, FieldAssociation='Cell Data')
+            slice2_arrays = PassArrays(Input=slice2, PointDataArrays=[], CellDataArrays=['fields/velocity'])
+            coprocessor.RegisterWriter(cSVWriter2, filename='input_velocity_xz'+'_%t.csv', freq=2, paddingamount=3, DataMode='None', HeaderType='None', EncodeAppendedData=None, CompressorType='None', CompressionLevel='None')
+            """
+            
+         else:
+            print(mynon_existant_variable)
+            
+    return Pipeline()            
+
 
   class CoProcessor(coprocessing.CoProcessor):
     def CreatePipeline(self, datadescription):

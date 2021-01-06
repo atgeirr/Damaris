@@ -42,6 +42,10 @@ void ParaViewAdaptor::Initialize(MPI_Comm comm,
         processor_->RemoveAllPipelines();
     }
 
+    timestep_      = mdl.get().realtime_timestep();    // default is 0.1
+    updatefreq_    = mdl.get().update_frequency();     // default is 1, but is this neededas the Catalyst script can set this also?
+    end_iteration_ = mdl.get().end_iteration();        // default is 0 - should be tested for
+
     mdl_ = mdl ;  // I'm not sure how inefficient this copy is
     AddPythonPipeline();
 }
@@ -73,14 +77,22 @@ void ParaViewAdaptor::Finalize()
     }
 }
 
-void ParaViewAdaptor::CoProcess(int iteration , bool lastTimeStep)
+void ParaViewAdaptor::CoProcess(int iteration)
 {
 	vtkNew<vtkCPDataDescription> dataDescription;
 
+	bool lastTimeStep = false ;
     // specify the simulation time and time step for Catalyst
     dataDescription->AddInput("input");
-	dataDescription->SetTimeData(iteration*0.1 , iteration);  // What is the difference? Simulation time and simulation iteration
 
+	dataDescription->SetTimeData(iteration*timestep_ , iteration);  // What is the difference? Simulation time and simulation iteration
+
+	if (end_iteration_ != 0)
+	{
+		if (iteration == end_iteration_)
+			lastTimeStep = true ;
+	}
+	// check: end_iteration_ from the xsd model. if not == 0 then use the value
 	if (lastTimeStep == true) { // How to know about it?
         dataDescription->ForceOutputOn();
     }
@@ -108,7 +120,8 @@ void ParaViewAdaptor::CoProcess(int iteration , bool lastTimeStep)
 	    //	AddPythonPipeline();
 
 	    // Call Catalyst to execute the desired pipelines.
-	    if (iteration > 0)
+	    //  if (iteration > 0)
+	    if ( processor_->GetNumberOfPipelines() > 0)
 	    	processor_->CoProcess(dataDescription);
     }
 }

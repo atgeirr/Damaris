@@ -254,6 +254,7 @@
 		<xs:attribute name="name"     type="xs:string"    use="required"/>
 		<xs:attribute name="type"     type="mdl:MeshType" use="required"/>
 		<xs:attribute name="topology" type="xs:unsignedInt" use="optional" default="2"/>
+      <xs:attribute name="time-varying" type="xs:boolean" use="optional" default="false"/>
       <xs:attribute name="comment"  type="xs:string" use="optional"/>
 	</xs:complexType>
  
@@ -343,6 +344,8 @@
             </xs:choice>
       </xs:sequence>
       <xs:attribute name="update-frequency" type="xs:unsignedInt" use="optional" default="1"/>
+      <xs:attribute name="realtime-timestep" type="xs:double" use="optional" default="0.1"/>
+      <xs:attribute name="end-iteration" type="xs:unsignedInt" use="optional" default="0"/>
    </xs:complexType>
 
 	<!-- Parameters related to Python -->

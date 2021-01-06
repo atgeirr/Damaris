@@ -40,6 +40,9 @@ class ParaViewAdaptor
     static std::shared_ptr<ParaViewAdaptor> instance_;
     vtkCPProcessor* processor_;
     model::Simulation::paraview_optional mdl_;
+    unsigned int updatefreq_ ;
+    double timestep_ ;
+    unsigned int end_iteration_ ;
 
 
 protected:
@@ -101,7 +104,7 @@ public:
 	* \param[in] iteration : the Damaris iteration
 	* \param[in] lastTimeStep : determines if it is the last time step or not.
     */
-    void CoProcess(int iteration , bool lastTimeStep=false);
+    void CoProcess(int iteration);
 
     /**
 	* returns a ParaView adaptor singleton object

@@ -2233,6 +2233,30 @@ namespace damaris
       return topology_type (2U);
     }
 
+    const Mesh::time_varying_type& Mesh::
+    time_varying () const
+    {
+      return this->time_varying_.get ();
+    }
+
+    Mesh::time_varying_type& Mesh::
+    time_varying ()
+    {
+      return this->time_varying_.get ();
+    }
+
+    void Mesh::
+    time_varying (const time_varying_type& x)
+    {
+      this->time_varying_.set (x);
+    }
+
+    Mesh::time_varying_type Mesh::
+    time_varying_default_value ()
+    {
+      return time_varying_type (false);
+    }
+
     const Mesh::comment_optional& Mesh::
     comment () const
     {
@@ -3033,6 +3057,54 @@ namespace damaris
     update_frequency_default_value ()
     {
       return update_frequency_type (1U);
+    }
+
+    const ParaViewParam::realtime_timestep_type& ParaViewParam::
+    realtime_timestep () const
+    {
+      return this->realtime_timestep_.get ();
+    }
+
+    ParaViewParam::realtime_timestep_type& ParaViewParam::
+    realtime_timestep ()
+    {
+      return this->realtime_timestep_.get ();
+    }
+
+    void ParaViewParam::
+    realtime_timestep (const realtime_timestep_type& x)
+    {
+      this->realtime_timestep_.set (x);
+    }
+
+    ParaViewParam::realtime_timestep_type ParaViewParam::
+    realtime_timestep_default_value ()
+    {
+      return realtime_timestep_type (.1);
+    }
+
+    const ParaViewParam::end_iteration_type& ParaViewParam::
+    end_iteration () const
+    {
+      return this->end_iteration_.get ();
+    }
+
+    ParaViewParam::end_iteration_type& ParaViewParam::
+    end_iteration ()
+    {
+      return this->end_iteration_.get ();
+    }
+
+    void ParaViewParam::
+    end_iteration (const end_iteration_type& x)
+    {
+      this->end_iteration_.set (x);
+    }
+
+    ParaViewParam::end_iteration_type ParaViewParam::
+    end_iteration_default_value ()
+    {
+      return end_iteration_type (0U);
     }
 
 
@@ -6608,6 +6680,7 @@ namespace damaris
       name_ (name, this),
       type_ (type, this),
       topology_ (topology_default_value (), this),
+      time_varying_ (time_varying_default_value (), this),
       comment_ (this)
     {
     }
@@ -6625,6 +6698,7 @@ namespace damaris
       name_ (x.name_, f, this),
       type_ (x.type_, f, this),
       topology_ (x.topology_, f, this),
+      time_varying_ (x.time_varying_, f, this),
       comment_ (x.comment_, f, this)
     {
     }
@@ -6642,6 +6716,7 @@ namespace damaris
       name_ (this),
       type_ (this),
       topology_ (this),
+      time_varying_ (this),
       comment_ (this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
@@ -6755,6 +6830,12 @@ namespace damaris
           continue;
         }
 
+        if (n.name () == "time-varying" && n.namespace_ ().empty ())
+        {
+          this->time_varying_.set (time_varying_traits::create (i, f, this));
+          continue;
+        }
+
         if (n.name () == "comment" && n.namespace_ ().empty ())
         {
           this->comment_.set (comment_traits::create (i, f, this));
@@ -6780,6 +6861,11 @@ namespace damaris
       {
         this->topology_.set (topology_default_value ());
       }
+
+      if (!time_varying_.present ())
+      {
+        this->time_varying_.set (time_varying_default_value ());
+      }
     }
 
     Mesh* Mesh::
@@ -6803,6 +6889,7 @@ namespace damaris
         this->name_ = x.name_;
         this->type_ = x.type_;
         this->topology_ = x.topology_;
+        this->time_varying_ = x.time_varying_;
         this->comment_ = x.comment_;
       }
 
@@ -7776,7 +7863,9 @@ namespace damaris
     ParaViewParam ()
     : ::xml_schema::type (),
       script_ (this),
-      update_frequency_ (update_frequency_default_value (), this)
+      update_frequency_ (update_frequency_default_value (), this),
+      realtime_timestep_ (realtime_timestep_default_value (), this),
+      end_iteration_ (end_iteration_default_value (), this)
     {
     }
 
@@ -7786,7 +7875,9 @@ namespace damaris
                    ::xml_schema::container* c)
     : ::xml_schema::type (x, f, c),
       script_ (x.script_, f, this),
-      update_frequency_ (x.update_frequency_, f, this)
+      update_frequency_ (x.update_frequency_, f, this),
+      realtime_timestep_ (x.realtime_timestep_, f, this),
+      end_iteration_ (x.end_iteration_, f, this)
     {
     }
 
@@ -7796,7 +7887,9 @@ namespace damaris
                    ::xml_schema::container* c)
     : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
       script_ (this),
-      update_frequency_ (this)
+      update_frequency_ (this),
+      realtime_timestep_ (this),
+      end_iteration_ (this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
       {
@@ -7840,11 +7933,33 @@ namespace damaris
           this->update_frequency_.set (update_frequency_traits::create (i, f, this));
           continue;
         }
+
+        if (n.name () == "realtime-timestep" && n.namespace_ ().empty ())
+        {
+          this->realtime_timestep_.set (realtime_timestep_traits::create (i, f, this));
+          continue;
+        }
+
+        if (n.name () == "end-iteration" && n.namespace_ ().empty ())
+        {
+          this->end_iteration_.set (end_iteration_traits::create (i, f, this));
+          continue;
+        }
       }
 
       if (!update_frequency_.present ())
       {
         this->update_frequency_.set (update_frequency_default_value ());
+      }
+
+      if (!realtime_timestep_.present ())
+      {
+        this->realtime_timestep_.set (realtime_timestep_default_value ());
+      }
+
+      if (!end_iteration_.present ())
+      {
+        this->end_iteration_.set (end_iteration_default_value ());
       }
     }
 
@@ -7863,6 +7978,8 @@ namespace damaris
         static_cast< ::xml_schema::type& > (*this) = x;
         this->script_ = x.script_;
         this->update_frequency_ = x.update_frequency_;
+        this->realtime_timestep_ = x.realtime_timestep_;
+        this->end_iteration_ = x.end_iteration_;
       }
 
       return *this;
