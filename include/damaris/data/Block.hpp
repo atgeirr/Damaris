@@ -92,7 +92,7 @@ class Block //: public ENABLE_SHARED_FROM_THIS(Block)
 	}
 	
 	/**
-	 * Sets an lower bound of the block.
+	 * Sets a lower bound of the block.
 	 * 
 	 * \param[in] i : index of the lower-bound.
 	 * \param[in] val : new value.

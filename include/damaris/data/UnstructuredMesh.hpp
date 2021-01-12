@@ -43,19 +43,23 @@ private:
 
 	/**
 	 * Destructor.
-	 */
-	virtual ~UnstructuredMesh() {}
+
+	virtual ~UnstructuredMesh() override {
+		if (this->vtk_usm_grid_ != nullptr )
+			delete(this->vtk_usm_grid_) ;
+	} */
+	virtual ~UnstructuredMesh() {} ;
 
 	/**
 	 * The total number of (x,y,z) tuples to describe the vertex positions
 	 * in 3d space
 	 */
 	size_t n_verticies_ ;
-
-
+	// vtkNew<vtkUnstructuredGrid> vtkUSGrid_ ;
+	vtkUnstructuredGrid* vtk_usm_grid_ ;
 public:
 	     /**
-		 * Creates an instance of RectilinearMesh given a model and a name.
+		 * Creates an instance of UnstructuredMesh given a model and a name.
 		 * Do some additional checking before creating it.
 		 * If these verifications fail, return NULL.
 		 *
@@ -79,6 +83,8 @@ public:
 					Deleter<UnstructuredMesh>());
 			m->name_ = name;
 			m->n_verticies_ = 0 ;
+			m->vtk_usm_grid_ = nullptr ;
+
 			return m;
 		}
 
@@ -109,7 +115,30 @@ protected:
 		 */
 		virtual vtkDataSet* CreateVtkGrid() override
 		{
-			return vtkUnstructuredGrid::New();
+			vtk_usm_grid_ = vtkUnstructuredGrid::New();
+			return vtk_usm_grid_;
+			//vtkNew<vtkUnstructuredGrid> vtkUSGrid ;
+			//return vtkUSGrid.GetPointer() ;
+		}
+
+		bool IsNull()
+		{
+			if ( vtk_usm_grid_ == nullptr )
+				return true;
+			else
+				return false ;
+			//vtkNew<vtkUnstructuredGrid> vtkUSGrid ;
+			//return vtkUSGrid.GetPointer() ;
+		}
+
+		vtkUnstructuredGrid* ReturnVTKMeshPtr()
+		{
+			if ( vtk_usm_grid_ != nullptr )
+				return vtk_usm_grid_ ;
+			else
+				return nullptr ;
+					//vtkNew<vtkUnstructuredGrid> vtkUSGrid ;
+					//return vtkUSGrid.GetPointer() ;
 		}
 
 

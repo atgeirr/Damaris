@@ -139,7 +139,8 @@ bool ParaViewAdaptor::FillMultiBlockGrid(int iteration , vtkMultiBlockDataSet* r
     for(; meshItr != MeshManager::End(); meshItr++) {
         std::shared_ptr<Mesh> mesh = *meshItr;
 
-        vtkMultiPieceDataSet* vtkMPGrid = vtkMultiPieceDataSet::New();
+        // vtkMultiPieceDataSet* vtkMPGrid = vtkMultiPieceDataSet::New();
+        vtkNew<vtkMultiPieceDataSet> vtkMPGrid ;
 		rootGrid->SetBlock(index , vtkMPGrid);
 
         index++;

@@ -611,11 +611,28 @@ bool Variable::AddBlocksToVtkGrid(vtkMultiPieceDataSet* vtkMPGrid , int iteratio
 		vtkDataSet* vtkGrid = vtkMPGrid->GetPiece(pieceId);
 
 		if (vtkGrid == nullptr) { // This is the first (or maybe the only) variable of the mesh
-			vtkGrid = mesh->GetVtkGrid(source , iteration , block , shared_from_this());
-			INFO("AddBlocksToVtkGrid(): Mesh:" << mesh->GetName() << "Variable: " << this->GetName() <<" Iteration: " << iteration << " Server: " << serverId << " Block: " << localBlocks << " Index: " << index << " PieceId: " << pieceId)
+			vtkGrid = mesh->GetVtkGrid(source , 0 , block , shared_from_this());
+			INFO("AddBlocksToVtkGrid():  Mesh:" << mesh->GetName() << "  Variable: " << this->GetName() <<" Source: " << source  <<" Iteration: " << iteration << " Server: " << serverId << " Block: " << localBlocks << " Index: " << index << " PieceId: " << pieceId)
 			vtkMPGrid->SetPiece(pieceId , vtkGrid);
 		}
-        index++;
+
+		std::shared_ptr<Variable> sect_sizes_var;
+		std::shared_ptr<Block> sectn_block;
+		size_t sect_size = 0;
+		size_t sect_offset = 0;
+		int * sectn_size_ptr = nullptr ;
+		int    num_sections ;
+		int    section_size =0  ;
+		if ( mesh->GetModel().type() == model::MeshType::unstructured ){
+			sect_sizes_var = mesh->GetSectionSizes() ;
+			sectn_block =  sect_sizes_var->GetBlock(source , 0 , block) ;
+			num_sections = sectn_block->GetNumberOfItems();
+			sectn_size_ptr = (int *) sectn_block->GetDataSpace().GetData();
+			section_size = sectn_size_ptr[0] ;
+		}
+		  INFO("section_sizes mesh     Mesh:" << mesh->GetName() << "  Variable: " << this->GetName() << "  Source: " << source <<  " Iteration: " << iteration <<  " num_sections: " << num_sections <<  " section_size: " << section_size  )
+
+        // index++;
         std::shared_ptr<Block> b = *it;
         // We are assuming the first dimension is the vector
         int vectorDimIndex = 0 ;

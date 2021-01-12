@@ -70,8 +70,19 @@ vtkDataSet* UnstructuredMesh::GetVtkGrid(int source , int iteration , int block 
 
     // Create the proper vtkGrid Object, dependent on grid type (in this case, unstructured)
     // Uses virtual method dispatch of Mesh::GetVtkGrid() class
-    vtkUnstructuredGrid* grid = vtkUnstructuredGrid::SafeDownCast
-            (vtkDataSet::SafeDownCast(CreateVtkGrid()));
+    //  vtkUnstructuredGrid* grid = vtkUnstructuredGrid::SafeDownCast
+   // (vtkDataSet::SafeDownCast(CreateVtkGrid()));
+
+    vtkUnstructuredGrid* grid ;
+    if ( IsNull() ) {
+    	grid = vtkUnstructuredGrid::SafeDownCast
+    			    (vtkDataSet::SafeDownCast(CreateVtkGrid()));
+
+
+   // vtkSmartPointer<vtkUnstructuredGrid> grid = CreateVtkGrid();
+
+   // vtkSmartPointer<vtkUnstructuredGrid> grid  = vtkUnstructuredGrid::SafeDownCast
+   //             (vtkDataSet::SafeDownCast(CreateVtkGrid()));
 
     // Getting the grid info
     if (not GetGridVariables(coords_xyz ,
@@ -112,6 +123,10 @@ vtkDataSet* UnstructuredMesh::GetVtkGrid(int source , int iteration , int block 
             ERROR("Failed toset the vertex connections in the vtkGrid of: " << GetName());
             return nullptr;
         }
+
+    } else {
+    	grid = ReturnVTKMeshPtr() ;
+    }
 
     return grid;
 }

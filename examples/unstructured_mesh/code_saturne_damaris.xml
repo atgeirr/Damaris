@@ -13,8 +13,7 @@
                 <parameter name="y"    type="int" value="64" />
                 <parameter name="z"    type="int" value="64" />
                 <parameter name="cs_glob_n_ranks" type="int" value="4"  /> 
-                <parameter name="x_length" type="double" value="1.0"  />
-                
+                <parameter name="x_length" type="double" value="100.0"  />
                 
                 
                 <parameter name="mesh_dim" type="int" value="3"  /> 
@@ -24,42 +23,30 @@
                 <parameter name="n_sections_local" type="int" value="1"  /> 
                 <parameter name="n_vertices_local" type="int" value="1"  />
                 <parameter name="n_connectivity_local" type="int" value="1"  /> 
-                <parameter name="n_field_array_total" type="int" value="262144" comment="total size of the field array over all processes"  /> 
-                <parameter name="n_field_array_local" type="int" value="131072" comment="total size on local process (all sections included)"  />
                
                 
                 <layout name="zonal_layout_xyz"    type="double" dimensions="x,y,z/cs_glob_n_ranks"    global="x,y,z"   comment="N.B. if global= is empty then global is equal to dimensions" />
                 <layout name="zonal_layout_vect3"  type="double" dimensions="3,x,y,z/cs_glob_n_ranks"  global="3,x,y,z" />
 
-                <layout name="layout_x" type="double" dimensions="x+1"      global="x+1" ghosts="0:0" />
-                <layout name="layout_y" type="double" dimensions="y+1"      global="y+1" ghost="0:0" />
-                <layout name="layout_z" type="double" dimensions="z/cs_glob_n_ranks+1" global="z+1" ghost="0:0" />
                 
-            
-                
-               <layout name="mpi_global_n_ranks"             type="long"    dimensions="cs_glob_n_ranks" comment="1 value per rank, simple layout for arrays that store the offsets for writing and reading of the ragged arrays" />
+             
                <layout name="unstructured_vertex_layout_xyz" type="double"  dimensions="mesh_dim, n_vertices_local"   global="mesh_dim, n_vertices_total"   />
                <layout name="unstructured_gid_layout"        type="long"    dimensions="n_vertices_local"     global="n_vertices_total"     />
                <layout name="mesh_n_sections"                type="int"     dimensions="n_sections_local"     global="n_sections_total"     />
-               <layout name="conectivity_size"               type="long"    dimensions="n_connectivity_local" global="n_connectivity_total" />
+               <layout name="connectivity_size"               type="long"    dimensions="n_connectivity_local" global="n_connectivity_total" />
 
             <group name="umesh_vars">    
                <variable name="unstructured_mesh_xyz" layout="unstructured_vertex_layout_xyz" type="vector" visualizable="false" time-varying="false" comment="The x,y,(z) coordinates of each vertex"  />
                <variable name="unstructured_gid"      layout="unstructured_gid_layout"        type="scalar" visualizable="false"   time-varying="false" comment="The global id's of each vertex" />
                
-               <variable name="sections_offsets"          layout="mpi_global_n_ranks" type="scalar" visualizable="false"  time-varying="false" comment="Probably not needed. One per MPI rank, if sections per rank == 3,2,4,2, then sections_offsets=0,3,5,9" />
-               <variable name="vertices_rank_offsets"     layout="mpi_global_n_ranks" type="scalar" visualizable="false"  time-varying="false" comment="Probably not needed. One per MPI rank, result of Allgather of " />
-               <variable name="connectivity_rank_offsets" layout="mpi_global_n_ranks" type="scalar" visualizable="false"  time-varying="false" comment="Probably not needed. One per MPI rank, " />
-               
-               <variable name="section_vertices"      layout="mesh_n_sections"    type="scalar" visualizable="false"  time-varying="false"   comment="Not needed - computed from sect_type x sectn_size "/>
-               
+
                <variable name="section_types"         layout="mesh_n_sections"    type="scalar" visualizable="false"  time-varying="false"   comment="This is the sectioon geometry type - VTK_QUAD VTK_HEXAHEDRON etc." />
-               <variable name="section_sizes"         layout="mesh_n_sections"    type="scalar" visualizable="false"  time-varying="false"   comment="This is the number of elements in each section" />
-               <variable name="section_connectivity"  layout="conectivity_size"   type="scalar" visualizable="false"  time-varying="false"   comment="n_connectivity += section->n_elements * vtk_type_stride ;"/>
+               <variable name="section_sizes"         layout="mesh_n_sections"    type="scalar" visualizable="false"  time-varying="false"   comment="This is the number of elements in each section- soe equiv to the number of field values per section" />
+               <variable name="section_connectivity"  layout="connectivity_size"   type="scalar" visualizable="false"  time-varying="false"   comment="n_connectivity += section->n_elements * vtk_type_stride ;"/>
                
                <mesh name="fluid_domain_umesh" type="unstructured" topology="3" comment="These arrays can be ragged, i.e. each rank could have a different number of sections and each section can have a diiferent number of verticies etc" >
-                  <coord               name="umesh_vars/unstructured_mesh_xyz" unit="m"   />
-                  <vertex_global_id    name="umesh_vars/unstructured_gid"      offset="-1" />
+                  <coord               name="umesh_vars/unstructured_mesh_xyz"  unit="m"   />
+                  <vertex_global_id    name="umesh_vars/unstructured_gid"       offset="-1" />
                   <section_types       name="umesh_vars/section_types"                     />
                   <section_sizes       name="umesh_vars/section_sizes"                     />
                   <section_connectivity name="umesh_vars/section_connectivity"              />
@@ -79,7 +66,7 @@
       </actions>
       
       <paraview update-frequency="1" >
-         <script>damaris_slice_xy_csv.py</script>
+         <script>image.py</script>
       </paraview>
         
                 
