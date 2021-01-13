@@ -74,9 +74,9 @@ vtkDataSet* UnstructuredMesh::GetVtkGrid(int source , int iteration , int block 
    // (vtkDataSet::SafeDownCast(CreateVtkGrid()));
 
     vtkUnstructuredGrid* grid ;
-    if ( IsNull() ) {
+    if ( IsNull(source) ) {
     	grid = vtkUnstructuredGrid::SafeDownCast
-    			    (vtkDataSet::SafeDownCast(CreateVtkGrid()));
+    			    (vtkDataSet::SafeDownCast(CreateVtkGrid(source)));
 
 
    // vtkSmartPointer<vtkUnstructuredGrid> grid = CreateVtkGrid();
@@ -125,7 +125,7 @@ vtkDataSet* UnstructuredMesh::GetVtkGrid(int source , int iteration , int block 
         }
 
     } else {
-    	grid = ReturnVTKMeshPtr() ;
+    	grid = ReturnVTKMeshPtr(source) ;
     }
 
     return grid;
@@ -166,7 +166,7 @@ bool UnstructuredMesh::SetVtkConnections(vtkDataSet* grid,  int source , int ite
     if (section_vtk_sizes->GetLayout()->GetType() == model::Type::int_) {
         std::shared_ptr<Block> b = ReturnBlock(source ,  iteration ,  block , section_vtk_sizes) ;
         vtk_sizes_ptr            = static_cast<const int *>(ReturnBlockDataPtr<int>( b )) ;
-        if (vtk_num_sections != b->GetNumberOfItems()) { // check they are the same size (they should use the same layout)
+        if (vtk_num_sections != (size_t) b->GetNumberOfItems()) { // check they are the same size (they should use the same layout)
             ERROR("The section size for mesh " << GetName()  << " variable named: " << section_vtk_sizes->GetName()
                     << " in iteration " << iteration << " does not match the section size or the vtk_type variable: "
                     << section_vtk_type->GetName() << std::endl );

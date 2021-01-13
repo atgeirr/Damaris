@@ -21,6 +21,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "env/Environment.hpp"
 #include "data/Variable.hpp"
 #include "data/Type.hpp"
+#include "data/UnstructuredMesh.hpp"
 
 #ifdef HAVE_PARAVIEW_ENABLED
 #include "damaris/paraview/ParaViewHeaders.hpp"
@@ -596,9 +597,13 @@ bool Variable::AddBlocksToVtkGrid(vtkMultiPieceDataSet* vtkMPGrid , int iteratio
     int clientsPerNode = Environment::ClientsPerNode();
 	std::shared_ptr<Variable> sect_sizes_var;
 	std::shared_ptr<Block> sectn_block;
+	int source_range_low, source_range_high ;
+	GetSourceRange(source_range_low, source_range_high);
+	INFO("SourceRange    Variable:" << this->GetName()  << "  source_range_low: " << source_range_low << "  source_range_high: " << source_range_high)
     GetBlocksByIteration(iteration, begin, end);
     int    n_sections_total  = 1;
     if ( mesh->GetModel().type() == model::MeshType::unstructured ){
+    	//std::shared_ptr<UnstructuredMesh> um_mesh = dynamic_cast<std::shared_ptr<damaris::UnstructuredMesh> > (GetMesh());
 		// For a single block of the 'section_sizes' Variable, check the total size
 		// of the Variable - need to use the block based info. as it has
 		// the global size updated when damaris_paramater_set(n_sections_total) is called
@@ -614,10 +619,15 @@ bool Variable::AddBlocksToVtkGrid(vtkMultiPieceDataSet* vtkMPGrid , int iteratio
 		n_sections_total = sectn_block->GetGlobalExtent(0);
 
 		vtkMPGrid->SetNumberOfPieces(n_sections_total);
+
+		mesh->SetSourceRange(source_range_low, source_range_high); // only does something on first call.
     } else {
     	// Should be changed in future. Check issue #2 in Damaris GitLab
     	vtkMPGrid->SetNumberOfPieces(localBlocks*serversNo);
     }
+
+
+
 
     //Getting the variable type (e.g. long, int, etc.) from its layout
     auto type = GetLayout()->GetType();
@@ -658,7 +668,8 @@ bool Variable::AddBlocksToVtkGrid(vtkMultiPieceDataSet* vtkMPGrid , int iteratio
 
 
 		// unsigned int pieceId = serverId*localBlocks+index;
-		unsigned int pieceId = serverId*localBlocks+source;
+		// unsigned int pieceId = serverId*localBlocks+source;
+		unsigned int pieceId = source;
 		vtkDataSet* vtkGrid = vtkMPGrid->GetPiece(pieceId);
 
 

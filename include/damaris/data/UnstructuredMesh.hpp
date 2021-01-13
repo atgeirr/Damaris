@@ -24,6 +24,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "damaris/paraview/ParaViewHeaders.hpp"
 #endif
 
+#include <vector>
+
 namespace damaris {
 
 class UnstructuredMesh :  public Mesh {
@@ -56,8 +58,21 @@ private:
 	 */
 	size_t n_verticies_ ;
 	// vtkNew<vtkUnstructuredGrid> vtkUSGrid_ ;
-	vtkUnstructuredGrid* vtk_usm_grid_ ;
+	// vtkUnstructuredGrid* vtk_usm_grid_ ;
 	std::vector<vtkUnstructuredGrid* > vect_vtk_usm_grid_ ;
+
+	/**
+	 * used as an offset to select vtkUnstructuredGrid from vect_vtk_usm_grid_ container
+	 */
+	int source_range_low_;
+	/**
+	 * used to compute source_total_
+	 */
+	int source_range_high_;
+	/**
+	 * used to set the size of std::vector<vtkUnstructuredGrid* > vect_vtk_usm_grid_
+	 */
+	int source_total_ ;
 public:
 	     /**
 		 * Creates an instance of UnstructuredMesh given a model and a name.
@@ -84,9 +99,29 @@ public:
 					Deleter<UnstructuredMesh>());
 			m->name_ = name;
 			m->n_verticies_ = 0 ;
-			m->vtk_usm_grid_ = nullptr ;
-
+			// m->vtk_usm_grid_ = nullptr ;
+			m->vect_vtk_usm_grid_.resize(0);
 			return m;
+		}
+
+		/**
+		* Sets the range of client processes that are populating
+		* the vector of vtkUnstructuredGrid* and resizes the vector to that size.
+		* Only resizes vect_vtk_usm_grid_ on the first call.
+		*
+		* \param[in] source_range_low : lowest in the range of source (i.e. client rank) that the local server looks after
+		* \param[in] source_range_high :  highest in the range of source (i.e. client rank) that the local server looks after
+        *  N.B. The values for input are returned by Variable::GetSourceRange().
+		*/
+		virtual void SetSourceRange(int source_range_low, int source_range_high) override {
+
+			if (vect_vtk_usm_grid_.size() == 0) {
+				source_range_low_ = source_range_low ;
+				source_range_high_ = source_range_high;
+				source_total_ = source_range_high_ - source_range_low_ + 1 ;
+				vect_vtk_usm_grid_.resize(source_total_, nullptr);  // explictly set to nullptr
+				//for (vtkUnstructuredGrid* elem : vect_vtk_usm_grid_) elem = nullptr ;
+			}
 		}
 
 #ifdef HAVE_PARAVIEW_ENABLED
@@ -116,15 +151,25 @@ protected:
 		 */
 		virtual vtkDataSet* CreateVtkGrid() override
 		{
-			vtk_usm_grid_ = vtkUnstructuredGrid::New();
+
+			vtkUnstructuredGrid*  vtk_usm_grid_ = vtkUnstructuredGrid::New();
 			return vtk_usm_grid_;
 			//vtkNew<vtkUnstructuredGrid> vtkUSGrid ;
 			//return vtkUSGrid.GetPointer() ;
 		}
 
-		bool IsNull()
+		 vtkDataSet* CreateVtkGrid(int source)
 		{
-			if ( vtk_usm_grid_ == nullptr )
+
+			vect_vtk_usm_grid_[source-source_range_low_] = vtkUnstructuredGrid::New();
+			return vect_vtk_usm_grid_[source-source_range_low_] ;
+			//vtkNew<vtkUnstructuredGrid> vtkUSGrid ;
+			//return vtkUSGrid.GetPointer() ;
+		}
+
+		bool IsNull(int source)
+		{
+			if ( vect_vtk_usm_grid_[source-source_range_low_] == nullptr )
 				return true;
 			else
 				return false ;
@@ -132,14 +177,12 @@ protected:
 			//return vtkUSGrid.GetPointer() ;
 		}
 
-		vtkUnstructuredGrid* ReturnVTKMeshPtr()
+		vtkUnstructuredGrid* ReturnVTKMeshPtr(int source)
 		{
-			if ( vtk_usm_grid_ != nullptr )
-				return vtk_usm_grid_ ;
+			if (source-source_range_low_ <= (int) vect_vtk_usm_grid_.size())
+				return vect_vtk_usm_grid_[source-source_range_low_] ;
 			else
 				return nullptr ;
-					//vtkNew<vtkUnstructuredGrid> vtkUSGrid ;
-					//return vtkUSGrid.GetPointer() ;
 		}
 
 

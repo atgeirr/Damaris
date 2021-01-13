@@ -96,6 +96,7 @@ class Mesh : public Configurable<model::Mesh> {
 			return name_;
 		}
 
+		virtual void SetSourceRange(int source_range_low, int source_range_high) = 0;
 		/**
 		 * Returns the id of the Mesh.
 		 */
