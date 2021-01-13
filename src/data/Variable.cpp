@@ -580,22 +580,51 @@ int Variable::GetVectorSizeFromBlock(std::shared_ptr<Block> b, int dim)
 bool Variable::AddBlocksToVtkGrid(vtkMultiPieceDataSet* vtkMPGrid , int iteration)
 {
     int index = 0;
+    // for each block in the iteration do:
+    BlocksByIteration::iterator begin , end;
+    // Get the vtkGrid from its mesh
+    std::shared_ptr<Mesh> mesh = GetMesh();
 
     // Setting the number of pieces in MultiPieceGrid
     int serversNo = Environment::CountTotalServers();
     int serverId = Environment::GetEntityProcessID();
     int localBlocks = CountLocalBlocks(iteration);
 
-	// Should be changed in future. Check issue #2 in Damaris GitLab
-	vtkMPGrid->SetNumberOfPieces(localBlocks*serversNo);
+    // used to work out how many mesh sections the local
+    // UnstructuredMesh should look after. Combined with num_sections
+    // of the mesh
+    int clientsPerNode = Environment::ClientsPerNode();
+	std::shared_ptr<Variable> sect_sizes_var;
+	std::shared_ptr<Block> sectn_block;
+    GetBlocksByIteration(iteration, begin, end);
+    int    n_sections_total  = 1;
+    if ( mesh->GetModel().type() == model::MeshType::unstructured ){
+		// For a single block of the 'section_sizes' Variable, check the total size
+		// of the Variable - need to use the block based info. as it has
+		// the global size updated when damaris_paramater_set(n_sections_total) is called
+		// to modify the layout.
+    	int block = (*begin)->GetID();
+		int source = (*begin)->GetSource();  // we need a reference to a source that exists on this server
+		// get the variable of the mesh that holds the section sizes
+		sect_sizes_var = mesh->GetSectionSizes() ;
+		// Get the block (that corresponds to the block of the enclosing field Variable)
+		sectn_block =  sect_sizes_var->GetBlock(source , 0 , block) ;
+		// Get the number of sections of the mesh held by this block
+		// - there is 1 array element per mesh section.
+		n_sections_total = sectn_block->GetGlobalExtent(0);
+
+		vtkMPGrid->SetNumberOfPieces(n_sections_total);
+    } else {
+    	// Should be changed in future. Check issue #2 in Damaris GitLab
+    	vtkMPGrid->SetNumberOfPieces(localBlocks*serversNo);
+    }
 
     //Getting the variable type (e.g. long, int, etc.) from its layout
     auto type = GetLayout()->GetType();
 
-    int numVectComponents;
-    // for each block in the iteration do:
-    BlocksByIteration::iterator begin , end;
-    GetBlocksByIteration(iteration, begin, end);
+   // GetBlocksByIteration(iteration, begin, end);
+    int    num_sections ;
+    int    section_size ;
     for(auto it = begin; it != end; it++) {
 
         // Get block data
@@ -604,40 +633,48 @@ bool Variable::AddBlocksToVtkGrid(vtkMultiPieceDataSet* vtkMPGrid , int iteratio
         int block = (*it)->GetID();
 		int size = (*it)->GetNumberOfItems();
 
-        // Get the vtkGrid from its mesh
-		std::shared_ptr<Mesh> mesh = GetMesh();
+
+		//std::shared_ptr<Variable> sect_sizes_var;
+		//std::shared_ptr<Block> sectn_block;
+		size_t sect_offset = 0;
+		int * sectn_size_ptr = nullptr ;
+		num_sections  = 1;
+		section_size  = size; // deafult is the full block size
+		if ( mesh->GetModel().type() == model::MeshType::unstructured ){
+			// get the variable of the mesh that holds the section sizes
+			sect_sizes_var = mesh->GetSectionSizes() ;
+			// Get the block (that corresponds to the block of the enclosing field Variable)
+			sectn_block =  sect_sizes_var->GetBlock(source , 0 , block) ;
+			// Get the number of sections of the mesh held by this block
+			// - there is 1 array element per mesh section.
+			num_sections = sectn_block->GetNumberOfItems();
+			// Get a pointer to the
+			sectn_size_ptr = (int *) sectn_block->GetDataSpace().GetData();
+			// Get the number of elements in the section (i.e. number of hexahedrals or quads etc.)
+			// This will be how many field elements are in the Variable block if we have a 'zonal' variable
+			section_size = sectn_size_ptr[0] ;
+		}
+		INFO("section_sizes mesh     Mesh:" << mesh->GetName() << "  Variable: " << this->GetName() << " Source: " << source <<  " Iteration: " << iteration <<  " num_sections: " << num_sections <<  " section_size: " << section_size  )
+
+
 		// unsigned int pieceId = serverId*localBlocks+index;
 		unsigned int pieceId = serverId*localBlocks+source;
 		vtkDataSet* vtkGrid = vtkMPGrid->GetPiece(pieceId);
 
+
 		if (vtkGrid == nullptr) { // This is the first (or maybe the only) variable of the mesh
 			vtkGrid = mesh->GetVtkGrid(source , 0 , block , shared_from_this());
-			INFO("AddBlocksToVtkGrid():  Mesh:" << mesh->GetName() << "  Variable: " << this->GetName() <<" Source: " << source  <<" Iteration: " << iteration << " Server: " << serverId << " Block: " << localBlocks << " Index: " << index << " PieceId: " << pieceId)
+			INFO("AddBlocksToVtkGrid():  Mesh:" << mesh->GetName() << "  Variable: " << this->GetName() <<" Source: " << source  <<" Iteration: " << iteration << " Server: " << serverId << " localBlocks: " << localBlocks << " Index: " << index << " PieceId: " << pieceId)
 			vtkMPGrid->SetPiece(pieceId , vtkGrid);
 		}
 
-		std::shared_ptr<Variable> sect_sizes_var;
-		std::shared_ptr<Block> sectn_block;
-		size_t sect_size = 0;
-		size_t sect_offset = 0;
-		int * sectn_size_ptr = nullptr ;
-		int    num_sections ;
-		int    section_size =0  ;
-		if ( mesh->GetModel().type() == model::MeshType::unstructured ){
-			sect_sizes_var = mesh->GetSectionSizes() ;
-			sectn_block =  sect_sizes_var->GetBlock(source , 0 , block) ;
-			num_sections = sectn_block->GetNumberOfItems();
-			sectn_size_ptr = (int *) sectn_block->GetDataSpace().GetData();
-			section_size = sectn_size_ptr[0] ;
-		}
-		  INFO("section_sizes mesh     Mesh:" << mesh->GetName() << "  Variable: " << this->GetName() << "  Source: " << source <<  " Iteration: " << iteration <<  " num_sections: " << num_sections <<  " section_size: " << section_size  )
 
         // index++;
         std::shared_ptr<Block> b = *it;
         // We are assuming the first dimension is the vector
         int vectorDimIndex = 0 ;
         // numVectComponents = b->GetGlobalExtent(lastDimIndex) ; // this is value "on creation" which may have changed due to setting a paramater
-        numVectComponents =  GetVectorSizeFromBlock(b, vectorDimIndex);
+        int numVectComponents =  GetVectorSizeFromBlock(b, vectorDimIndex);
 
         switch(type)
         {

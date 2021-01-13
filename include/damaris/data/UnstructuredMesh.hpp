@@ -57,6 +57,7 @@ private:
 	size_t n_verticies_ ;
 	// vtkNew<vtkUnstructuredGrid> vtkUSGrid_ ;
 	vtkUnstructuredGrid* vtk_usm_grid_ ;
+	std::vector<vtkUnstructuredGrid* > vect_vtk_usm_grid_ ;
 public:
 	     /**
 		 * Creates an instance of UnstructuredMesh given a model and a name.
