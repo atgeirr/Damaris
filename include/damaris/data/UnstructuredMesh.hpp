@@ -62,6 +62,27 @@ private:
 	std::vector<vtkUnstructuredGrid* > vect_vtk_usm_grid_ ;
 
 	/**
+	 * The number of section in each block that is looked after
+	 * by the current server core
+	 */
+	std::vector<int > vect_server_sctns_numberof_ ;
+
+	/**
+	 * The number of section in each block that is looked after
+	 * by the current server core
+	 */
+	std::vector<int > vect_server_sctn_offsets_ ;
+
+	/**
+	 *  The source that was called in the last call to the function IsNull()
+	 */
+	int last_source_;
+	/**
+	 *  If the source is the same as last_source_ then Increments, otherwise reset to 0
+	 */
+	int times_called_for_current_source_;
+
+	/**
 	 * used as an offset to select vtkUnstructuredGrid from vect_vtk_usm_grid_ container
 	 */
 	int source_range_low_;
@@ -101,6 +122,8 @@ public:
 			m->n_verticies_ = 0 ;
 			// m->vtk_usm_grid_ = nullptr ;
 			m->vect_vtk_usm_grid_.resize(0);
+			m->last_source_ = -1 ;
+			m->times_called_for_current_source_ = 0 ;
 			return m;
 		}
 
@@ -116,11 +139,34 @@ public:
 		virtual void SetSourceRange(int source_range_low, int source_range_high) override {
 
 			if (vect_vtk_usm_grid_.size() == 0) {
-				source_range_low_ = source_range_low ;
+				source_range_low_  = source_range_low ;
 				source_range_high_ = source_range_high;
-				source_total_ = source_range_high_ - source_range_low_ + 1 ;
-				vect_vtk_usm_grid_.resize(source_total_, nullptr);  // explictly set to nullptr
-				//for (vtkUnstructuredGrid* elem : vect_vtk_usm_grid_) elem = nullptr ;
+				source_total_      = source_range_high_ - source_range_low_ + 1 ;
+
+				// get the variable of the mesh that holds the section sizes
+				std::shared_ptr<Variable> sect_vtk_sizes    = GetSectionSizes();
+				int         num_sections ;
+				int         section_size ;
+				int         num_sections_total = 0;  // the number of vtkMultiPieceDataSet sections required for this server
+				const int   iteration = 0 ;  // currently the mesh is unchanging so we only need data from iteration 0. This is a big assumption!
+				const int   block = 0 ;
+				// Loop over (the first) block from each source that is being looked after by this server.
+				// We assume there is only one block ber source for the UnstructuredMesh data Variable sect_vtk_sizes.
+				for(int source = source_range_low_; source <= source_range_high_; source++) {
+					std::shared_ptr<Block> sectn_block;
+					vect_server_sctn_offsets_.push_back(num_sections_total);
+					// Get the block (that corresponds to the block of the enclosing field Variable)
+					sectn_block =  sect_vtk_sizes->GetBlock(source , iteration , block) ;
+					// Get the number of sections of the mesh held by this block
+					// - there is 1 array element per mesh section.
+					num_sections = sectn_block->GetNumberOfItems();
+					num_sections_total += num_sections ;
+					vect_server_sctns_numberof_.push_back(num_sections);
+					INFO("SetSourceRange mesh     Mesh:" << GetName() <<  " source: " << source  << "  num_sections: " << num_sections <<  "  num_sections_total: " << num_sections_total );
+				}
+
+				vect_vtk_usm_grid_.resize(num_sections_total, nullptr);  // explictly set to nullptr
+
 			}
 		}
 
@@ -160,16 +206,44 @@ protected:
 
 		 vtkDataSet* CreateVtkGrid(int source)
 		{
+			int offset_to_source = source-source_range_low_ ;
+			int offset = vect_server_sctn_offsets_[offset_to_source] + times_called_for_current_source_++  ;
 
-			vect_vtk_usm_grid_[source-source_range_low_] = vtkUnstructuredGrid::New();
-			return vect_vtk_usm_grid_[source-source_range_low_] ;
+			vect_vtk_usm_grid_[offset] = vtkUnstructuredGrid::New();
+			return vect_vtk_usm_grid_[offset] ;
 			//vtkNew<vtkUnstructuredGrid> vtkUSGrid ;
 			//return vtkUSGrid.GetPointer() ;
 		}
 
+		 /**
+		 *  has to be called each time a vtkUnstructuredGrid is required. It sets the
+		 *  correct offset for the section. Not threadsafe and should not be called
+		 *  in more than one function
+		 */
 		bool IsNull(int source)
 		{
-			if ( vect_vtk_usm_grid_[source-source_range_low_] == nullptr )
+
+			int offset_to_source = source-source_range_low_ ;
+			int sects_in_source  = vect_server_sctns_numberof_[offset_to_source];
+
+			/*
+			// The second test is if the same section was called in a previous iteration
+			if ((source == last_source_) && (times_called_for_current_source_ < sects_in_source))
+				times_called_for_current_source_++ ;
+			else {
+			   times_called_for_current_source_ = 0 ;
+			   last_source_ = source ;
+			}
+			*/
+			if ((times_called_for_current_source_ >= sects_in_source) || (source != last_source_))
+			   times_called_for_current_source_ = 0 ;
+			   last_source_ = source ;
+			}
+
+			int offset = vect_server_sctn_offsets_[offset_to_source]  + times_called_for_current_source_ ;
+
+
+			if ( vect_vtk_usm_grid_[offset] == nullptr )
 				return true;
 			else
 				return false ;
@@ -179,8 +253,11 @@ protected:
 
 		vtkUnstructuredGrid* ReturnVTKMeshPtr(int source)
 		{
-			if (source-source_range_low_ <= (int) vect_vtk_usm_grid_.size())
-				return vect_vtk_usm_grid_[source-source_range_low_] ;
+			int offset_to_source = source-source_range_low_ ;
+			int offset = vect_server_sctn_offsets_[offset_to_source]  + times_called_for_current_source_++ ;
+
+			if (offset <= (int) vect_vtk_usm_grid_.size())
+				return vect_vtk_usm_grid_[offset] ;
 			else
 				return nullptr ;
 		}

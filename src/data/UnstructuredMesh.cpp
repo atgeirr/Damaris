@@ -75,57 +75,57 @@ vtkDataSet* UnstructuredMesh::GetVtkGrid(int source , int iteration , int block 
 
     vtkUnstructuredGrid* grid ;
     if ( IsNull(source) ) {
-    	grid = vtkUnstructuredGrid::SafeDownCast
-    			    (vtkDataSet::SafeDownCast(CreateVtkGrid(source)));
+        grid = vtkUnstructuredGrid::SafeDownCast
+                    (vtkDataSet::SafeDownCast(CreateVtkGrid(source)));
 
 
-   // vtkSmartPointer<vtkUnstructuredGrid> grid = CreateVtkGrid();
+       // vtkSmartPointer<vtkUnstructuredGrid> grid = CreateVtkGrid();
 
-   // vtkSmartPointer<vtkUnstructuredGrid> grid  = vtkUnstructuredGrid::SafeDownCast
-   //             (vtkDataSet::SafeDownCast(CreateVtkGrid()));
+       // vtkSmartPointer<vtkUnstructuredGrid> grid  = vtkUnstructuredGrid::SafeDownCast
+       //             (vtkDataSet::SafeDownCast(CreateVtkGrid()));
 
-    // Getting the grid info
-    if (not GetGridVariables(coords_xyz ,
-                             vertex_gid ,
-                             section_vtk_type,
-                             section_vtk_sizes,
-                             vertex_connectivity)) {
-        ERROR("Failed to get variables related to the vtkGrid of: " << GetName());
-        return nullptr;
-    }
+        // Getting the grid info
+        if (not GetGridVariables(coords_xyz ,
+                                 vertex_gid ,
+                                 section_vtk_type,
+                                 section_vtk_sizes,
+                                 vertex_connectivity)) {
+            ERROR("Failed to get variables related to the vtkGrid of: " << GetName());
+            return nullptr;
+        }
 
-    // Setting the vertex point coordinates
-    vtkPoints * vtkPoints = SetVertexCoords( source ,  iteration ,  block , coords_xyz) ;
-    if (vtkPoints == nullptr ) {
-        ERROR("Setting the unstructured mesh vertex coordinates failed: Mesh name: " << GetName()) ;
-        return nullptr;
-    }
+        // Setting the vertex point coordinates
+        vtkPoints * vtkPoints = SetVertexCoords( source ,  iteration ,  block , coords_xyz) ;
+        if (vtkPoints == nullptr ) {
+            ERROR("Setting the unstructured mesh vertex coordinates failed: Mesh name: " << GetName()) ;
+            return nullptr;
+        }
 
-    //Setting the global ID's
-    vtkIdTypeArray * vtkGid =  SetGlobalIDs(  source , iteration , block ,vertex_gid) ;
-    if (vtkGid == nullptr ) {
-        ERROR("Setting the unstructured mesh global ids failed! Mesh name: " << GetName()) ;
-        return nullptr;
-    }
+        //Setting the global ID's
+        vtkIdTypeArray * vtkGid =  SetGlobalIDs(  source , iteration , block ,vertex_gid) ;
+        if (vtkGid == nullptr ) {
+            ERROR("Setting the unstructured mesh global ids failed! Mesh name: " << GetName()) ;
+            return nullptr;
+        }
 
-    grid->GetPointData()->SetGlobalIds(vtkGid) ;
-    vtkGid->Delete() ;
+        grid->GetPointData()->SetGlobalIds(vtkGid) ;
+        vtkGid->Delete() ;
 
-    grid->SetPoints(vtkPoints) ;
-    vtkPoints->Delete() ;
+        grid->SetPoints(vtkPoints) ;
+        vtkPoints->Delete() ;
 
-    // This does a loop over all sections, adding the connectivities which are specific for
-    // each vtk mesh element type
-    if (not SetVtkConnections(grid, source, iteration, block,
-                              section_vtk_type,
-                              section_vtk_sizes,
-                              vertex_connectivity)) {
+        // This does a loop over all sections, adding the connectivities which are specific for
+        // each vtk mesh element type
+        if (not SetVtkConnections(grid, source, iteration, block,
+                                  section_vtk_type,
+                                  section_vtk_sizes,
+                                  vertex_connectivity)) {
             ERROR("Failed toset the vertex connections in the vtkGrid of: " << GetName());
             return nullptr;
         }
 
     } else {
-    	grid = ReturnVTKMeshPtr(source) ;
+        grid = ReturnVTKMeshPtr(source) ;
     }
 
     return grid;
