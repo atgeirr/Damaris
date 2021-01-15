@@ -132,8 +132,8 @@ public:
 		* the vector of vtkUnstructuredGrid* and resizes the vector to that size.
 		* Only resizes vect_vtk_usm_grid_ on the first call.
 		*
-		* \param[in] source_range_low : lowest in the range of source (i.e. client rank) that the local server looks after
-		* \param[in] source_range_high :  highest in the range of source (i.e. client rank) that the local server looks after
+		* \param[in] source_range_low : lowest in the range of source (i.e. client communicator rank) that the local server looks after
+		* \param[in] source_range_high :  highest in the range of source (i.e. client communicator rank) that the local server looks after
         *  N.B. The values for input are returned by Variable::GetSourceRange().
 		*/
 		virtual void SetSourceRange(int source_range_low, int source_range_high) override {
@@ -170,12 +170,17 @@ public:
 			}
 		}
 
+		void ResetSectionOffset( void )
+		{
+			times_called_for_current_source_ = 0 ;
+		}
+
 #ifdef HAVE_PARAVIEW_ENABLED
 
 	    /**
 		* creates and returns the expected VTK grid object (vtkUnstructured) for a block
 	    *
-		* \param[in] source : source of the block
+		* \param[in] source : source of the block  (mpi rank within the client communicator)
 		* \param[in] iteration : iteration of the block
 		* \param[in] block : id of the block
 		* \param[in] var : the variable owning the block
@@ -190,6 +195,17 @@ public:
 		 */
 		void SetNVerticies(size_t n_verticies);
 
+
+		/**
+		 * Returns an offset into  std::vector<int > vect_server_sctn_offsets_ that corresponds to
+		 * the source ( source is an mpi rank within the client communicator )
+		 *
+		 * \param[in] source : The source of the block  (i.e. mpi rank within the client communicator)
+		 */
+		int LocalServerSourceIndex(int source) {
+			//assert(source-source_range_low_ >= 0)
+			return source-source_range_low_;
+		}
 
 protected:
 		/**
@@ -206,7 +222,7 @@ protected:
 
 		 vtkDataSet* CreateVtkGrid(int source)
 		{
-			int offset_to_source = source-source_range_low_ ;
+			int offset_to_source = LocalServerSourceIndex(source)  ;
 			int offset = vect_server_sctn_offsets_[offset_to_source] + times_called_for_current_source_++  ;
 
 			vect_vtk_usm_grid_[offset] = vtkUnstructuredGrid::New();
@@ -223,24 +239,18 @@ protected:
 		bool IsNull(int source)
 		{
 
-			int offset_to_source = source-source_range_low_ ;
+			int offset_to_source  ;  // get local server source index
+			int offset ;
+			offset_to_source = LocalServerSourceIndex(source) ;
 			int sects_in_source  = vect_server_sctns_numberof_[offset_to_source];
 
-			/*
-			// The second test is if the same section was called in a previous iteration
-			if ((source == last_source_) && (times_called_for_current_source_ < sects_in_source))
-				times_called_for_current_source_++ ;
-			else {
-			   times_called_for_current_source_ = 0 ;
-			   last_source_ = source ;
-			}
-			*/
-			if ((times_called_for_current_source_ >= sects_in_source) || (source != last_source_))
-			   times_called_for_current_source_ = 0 ;
+
+			if ((times_called_for_current_source_ >= sects_in_source) || (source != last_source_)) {
+			   ResetSectionOffset() ; // resets times_called_for_current_source_ = 0 ;
 			   last_source_ = source ;
 			}
 
-			int offset = vect_server_sctn_offsets_[offset_to_source]  + times_called_for_current_source_ ;
+		    offset = vect_server_sctn_offsets_[offset_to_source]  + times_called_for_current_source_ ;
 
 
 			if ( vect_vtk_usm_grid_[offset] == nullptr )
@@ -251,9 +261,12 @@ protected:
 			//return vtkUSGrid.GetPointer() ;
 		}
 
+
+
+
 		vtkUnstructuredGrid* ReturnVTKMeshPtr(int source)
 		{
-			int offset_to_source = source-source_range_low_ ;
+			int offset_to_source = LocalServerSourceIndex(source)  ;
 			int offset = vect_server_sctn_offsets_[offset_to_source]  + times_called_for_current_source_++ ;
 
 			if (offset <= (int) vect_vtk_usm_grid_.size())
