@@ -97,6 +97,8 @@ class Mesh : public Configurable<model::Mesh> {
 		}
 
 		virtual void SetSourceRange(int source_range_low, int source_range_high) = 0;
+
+		virtual int GetTotalMeshSections(int iteration) = 0;
 		/**
 		 * Returns the id of the Mesh.
 		 */

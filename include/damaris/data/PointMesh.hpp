@@ -48,6 +48,7 @@ private:
 	 */
 	virtual ~PointMesh() {}
 	virtual void SetSourceRange(int source_range_low, int source_range_high) {}
+	virtual int GetTotalMeshSections(int iteration) {}
 public:
 	
 	/**

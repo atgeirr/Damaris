@@ -571,11 +571,34 @@ class Variable : public ENABLE_SHARED_FROM_THIS(Variable),
 
     /**
 	* Adds different blocks of a variable into the passed multi piece grid
+	* Requires 1 block per client (i.e. not multiple domains)
 	*
 	* \param[in,out] vtkMPGrid : the root multi piece grid for an specific mesh
 	* \param[in] iteration : the Damaris iteration
 	*/
     bool AddBlocksToVtkGrid(vtkMultiPieceDataSet* vtkMPGrid , int iteration);
+
+    /**
+   	* A more involved version of AddBlocksToVtkGrid for variables with UnstructuredMesh
+   	* mesh types that may have multiple sections per block.
+   	* Requires 1 block per client (i.e. not multiple domains)
+   	*
+   	* \param[in,out] vtkMPGrid : the root multi piece grid for an specific mesh
+   	* \param[in] iteration : the Damaris iteration
+   	*/
+    bool AddBlocksToUnstructuredMesh(vtkMultiPieceDataSet* vtkMPGrid , int iteration);
+
+
+    /**
+	* Determines buffer type and calls AddBufferToVtkGrid<T>
+	*
+	* \param[in,out] grid : the Damaris iteration
+	* \param[in] buffer : the buffer of type T* to be added to the grid as the field data
+	* \param[in] buffer_offset : offset within the buffer to find the start of the section
+	* \param[in] size   : The number of elements in the buffer of type T
+	* \param[in] numVectComponents : The number of vector components of the field type (size of 1st dimension of array)
+	*/
+    bool InstantiateBufferAndAddToVtkGrid(vtkDataSet*  vtkGrid , void *buffer , size_t buffer_offset, int64_t size, int numVectComponents);
 
 	/**
 	* Adds the variable's main data as a grid field data. This is the default function
@@ -586,6 +609,7 @@ class Variable : public ENABLE_SHARED_FROM_THIS(Variable),
 	*/
 	template <typename T>
 	bool AddBufferToVtkGrid(vtkDataSet* grid , T* buffer , int64_t size);
+
 
 	/**
 	* Adds the variable's main data as a grid field data

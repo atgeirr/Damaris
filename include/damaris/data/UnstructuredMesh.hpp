@@ -94,6 +94,8 @@ private:
 	 * used to set the size of std::vector<vtkUnstructuredGrid* > vect_vtk_usm_grid_
 	 */
 	int source_total_ ;
+
+	std::shared_ptr<Variable> sect_vtk_sizes_ ;
 public:
 	     /**
 		 * Creates an instance of UnstructuredMesh given a model and a name.
@@ -144,7 +146,7 @@ public:
 				source_total_      = source_range_high_ - source_range_low_ + 1 ;
 
 				// get the variable of the mesh that holds the section sizes
-				std::shared_ptr<Variable> sect_vtk_sizes    = GetSectionSizes();
+				sect_vtk_sizes_    = GetSectionSizes();
 				int         num_sections ;
 				int         section_size ;
 				int         num_sections_total = 0;  // the number of vtkMultiPieceDataSet sections required for this server
@@ -156,7 +158,7 @@ public:
 					std::shared_ptr<Block> sectn_block;
 					vect_server_sctn_offsets_.push_back(num_sections_total);
 					// Get the block (that corresponds to the block of the enclosing field Variable)
-					sectn_block =  sect_vtk_sizes->GetBlock(source , iteration , block) ;
+					sectn_block =  sect_vtk_sizes_->GetBlock(source , iteration , block) ;
 					// Get the number of sections of the mesh held by this block
 					// - there is 1 array element per mesh section.
 					num_sections = sectn_block->GetNumberOfItems();
@@ -168,6 +170,36 @@ public:
 				vect_vtk_usm_grid_.resize(num_sections_total, nullptr);  // explictly set to nullptr
 
 			}
+		}
+
+		int GetNumberOfSections(int source)  {
+			int offset_to_source =  LocalServerSourceIndex(source) ;
+			return vect_server_sctns_numberof_[offset_to_source] ;
+		}
+
+		int GetSectionOffset(int source) {
+			int offset_to_source =  LocalServerSourceIndex(source) ;
+			return vect_server_sctn_offsets_[offset_to_source] ;
+		}
+
+		int GetSectionSize(int source, int sectn_num) {
+			// int offset_to_source =  LocalServerSourceIndex(source) ;
+			// Could check that sectn_num is a valaid index?
+			int iteration = 0 ;
+			int block = 0 ;
+			int * sectn_size_ptr ;
+
+			//std::shared_ptr<Variable> sect_vtk_sizes ;  // we use this variable a lot, so maybe retrieve and cache?
+			std::shared_ptr<Block> sectn_block;
+			//sect_vtk_sizes  = GetSectionSizes();  // returns a Variable
+			// Get the block (that corresponds to the block of the enclosing field Variable)
+			sectn_block =  sect_vtk_sizes_->GetBlock(source , iteration , block) ;
+			// Get a pointer to the section block
+			sectn_size_ptr = (int *) sectn_block->GetDataSpace().GetData();
+
+			return sectn_size_ptr[sectn_num] ;
+
+
 		}
 
 		void ResetSectionOffset( void )
@@ -220,6 +252,10 @@ protected:
 			//return vtkUSGrid.GetPointer() ;
 		}
 
+		/**
+		 * Creates a vtkUnstructuredGrid places it in the correct place of the std::vector<> taking in to account
+		 * the source and the number of section within the block of the source and then returns it.
+		 */
 		 vtkDataSet* CreateVtkGrid(int source)
 		{
 			int offset_to_source = LocalServerSourceIndex(source)  ;
@@ -238,10 +274,7 @@ protected:
 		 */
 		bool IsNull(int source)
 		{
-
-			int offset_to_source  ;  // get local server source index
-			int offset ;
-			offset_to_source = LocalServerSourceIndex(source) ;
+			int offset_to_source = LocalServerSourceIndex(source) ; // get local server source index
 			int sects_in_source  = vect_server_sctns_numberof_[offset_to_source];
 
 
@@ -250,7 +283,7 @@ protected:
 			   last_source_ = source ;
 			}
 
-		    offset = vect_server_sctn_offsets_[offset_to_source]  + times_called_for_current_source_ ;
+			int offset = vect_server_sctn_offsets_[offset_to_source]  + times_called_for_current_source_ ;
 
 
 			if ( vect_vtk_usm_grid_[offset] == nullptr )
@@ -261,9 +294,6 @@ protected:
 			//return vtkUSGrid.GetPointer() ;
 		}
 
-
-
-
 		vtkUnstructuredGrid* ReturnVTKMeshPtr(int source)
 		{
 			int offset_to_source = LocalServerSourceIndex(source)  ;
@@ -273,6 +303,34 @@ protected:
 				return vect_vtk_usm_grid_[offset] ;
 			else
 				return nullptr ;
+		}
+
+		/**
+		 *  Return the total number of sections in the mesh - this is done by looking at the
+		 *  number of elements in the 'groupname/section_sizes' Variable, so requires a Block
+		 *  of the Variable. Each server will have to call this and use there own version of the
+		 *  Variable.
+		 *  Need to use the block based info. as it has the global size updated when
+		 *  damaris_paramater_set(n_sections_total) is called to modify the layout.
+		 *
+		 */
+		int GetTotalMeshSections(int iteration) {
+			std::shared_ptr<Variable> sect_sizes_var;
+			std::shared_ptr<Block> sectn_block;
+			int source_range_low, source_range_high ;
+			int    n_sections_total  = 1;
+
+			// get the variable of the mesh that holds the section sizes
+			sect_sizes_var = GetSectionSizes() ;
+			sect_sizes_var->GetSourceRange(source_range_low, source_range_high);
+			int block = 0 ;     // always a single block for mesh variables.
+			int dimension = 0 ; // always a single dimension variable
+
+			// Get the block (that corresponds to the block of the enclosing field Variable)
+			sectn_block =  sect_sizes_var->GetBlock(source_range_low , 0 , block) ;
+			// Get the number of sections of the mesh held by this block
+			// - there is 1 array element per mesh section.
+			n_sections_total = sectn_block->GetGlobalExtent(0);
 		}
 
 
