@@ -7,32 +7,32 @@
                 <queue  name="damaris-queue" size="100" />
         </architecture>
         <data>
-           
-                          
-                <parameter name="x"    type="int" value="64" />
-                <parameter name="y"    type="int" value="64" />
-                <parameter name="z"    type="int" value="64" />
-                <parameter name="cs_glob_n_ranks" type="int" value="4"  /> 
-                <parameter name="x_length" type="double" value="100.0"  />
+               <parameter name="x"    type="int" value="64" />
+               <parameter name="y"    type="int" value="64" />
+               <parameter name="z"    type="int" value="64" />
+               <parameter name="cs_glob_n_ranks" type="int" value="4"  /> 
+               <parameter name="x_length" type="double" value="100.0"  />
                 
                 
-                <parameter name="mesh_dim" type="int" value="3"  /> 
-                <parameter name="n_sections_total" type="int" value="1"  /> 
-                <parameter name="n_vertices_total" type="int" value="1"  />
-                <parameter name="n_connectivity_total" type="int" value="1"  /> 
-                <parameter name="n_sections_local" type="int" value="1"  /> 
-                <parameter name="n_vertices_local" type="int" value="1"  />
-                <parameter name="n_connectivity_local" type="int" value="1"  /> 
-               
+               <parameter name="mesh_dim"             type="int" value="3"  /> 
+               <parameter name="n_sections_total"     type="int" value="1"  /> 
+               <parameter name="n_vertices_total"     type="int" value="1"  />
+               <parameter name="n_connectivity_total" type="int" value="1"  /> 
+               <parameter name="n_sections_local"     type="int" value="1"  /> 
+               <parameter name="n_vertices_local"     type="int" value="1"  />
+               <parameter name="n_connectivity_local" type="int" value="1"  /> 
+               <parameter name="n_local_elements"     type="int" value="1"  /> 
+               <parameter name="n_global_elements"    type="int" value="1"  /> 
                 
-                <layout name="zonal_layout_xyz"    type="double" dimensions="x,y,z/cs_glob_n_ranks"    global="x,y,z"   comment="N.B. if global= is empty then global is equal to dimensions" />
-                <layout name="zonal_layout_vect3"  type="double" dimensions="3,x,y,z/cs_glob_n_ranks"  global="3,x,y,z" />
+               <layout name="zonal_layout_xyz"    type="double" dimensions="x,y,z/cs_glob_n_ranks"    global="x,y,z"   comment="N.B. if global= is empty then global is equal to dimensions" />
+               <layout name="zonal_layout_vect3"  type="double" dimensions="3,x,y,z/cs_glob_n_ranks"  global="3,x,y,z" />
 
-                
+               <layout name="zonal_layout_usmesh"        type="double" dimensions="n_local_elements"    global="n_global_elements"   comment="N.B. if global= is empty then global is equal to dimensions" />
+               <layout name="zonal_layout_usmesh_vect3"  type="double" dimensions="3,n_local_elements"  global="3,n_global_elements" />
              
-               <layout name="unstructured_vertex_layout_xyz" type="double"  dimensions="mesh_dim, n_vertices_local"   global="mesh_dim, n_vertices_total"   />
-               <layout name="unstructured_gid_layout"        type="long"    dimensions="n_vertices_local"     global="n_vertices_total"     />
-               <layout name="mesh_n_sections"                type="int"     dimensions="n_sections_local"     global="n_sections_total"     />
+               <layout name="unstructured_vertex_layout_xyz"  type="double"  dimensions="mesh_dim, n_vertices_local"   global="mesh_dim, n_vertices_total"   />
+               <layout name="unstructured_gid_layout"         type="long"    dimensions="n_vertices_local"     global="n_vertices_total"     />
+               <layout name="mesh_n_sections"                 type="int"     dimensions="n_sections_local"     global="n_sections_total"     />
                <layout name="connectivity_size"               type="long"    dimensions="n_connectivity_local" global="n_connectivity_total" />
 
             <group name="umesh_vars">    
@@ -45,28 +45,25 @@
                <variable name="section_connectivity"  layout="connectivity_size"   type="scalar" visualizable="false"  time-varying="false"   comment="n_connectivity += section->n_elements * vtk_type_stride ;"/>
                
                <mesh name="fluid_domain_umesh" type="unstructured" topology="3" comment="These arrays can be ragged, i.e. each rank could have a different number of sections and each section can have a diiferent number of verticies etc" >
-                  <coord               name="umesh_vars/unstructured_mesh_xyz"  unit="m"   />
-                  <vertex_global_id    name="umesh_vars/unstructured_gid"       offset="-1" />
-                  <section_types       name="umesh_vars/section_types"                     />
-                  <section_sizes       name="umesh_vars/section_sizes"                     />
+                  <coord                name="umesh_vars/unstructured_mesh_xyz"  unit="m"   />
+                  <vertex_global_id     name="umesh_vars/unstructured_gid"       offset="-1" />
+                  <section_types        name="umesh_vars/section_types"                     />
+                  <section_sizes        name="umesh_vars/section_sizes"                     />
                   <section_connectivity name="umesh_vars/section_connectivity"              />
                </mesh>
             </group>
 
             <group name="fields">     
-            <variable name="pressure" type="scalar" layout="zonal_layout_xyz"   mesh="fluid_domain_umesh"  visualizable="true" unit="Pa"  centering="zonal" />
-            <variable name="velocity" layout="zonal_layout_vect3" mesh="fluid_domain_umesh"  visualizable="true"  type="vector"  vectorlength="3" unit="m/s" centering="zonal" />
+              <variable name="pressure" type="scalar" layout="zonal_layout_usmesh"   mesh="fluid_domain_umesh"  visualizable="true" unit="Pa"  centering="zonal" />
+              <variable name="velocity" layout="zonal_layout_usmesh_vect3" mesh="fluid_domain_umesh"  visualizable="true"  type="vector"  vectorlength="3" unit="m/s" centering="zonal" />
             </group>
-                
-                
-                
       </data>
       
       <actions>
       </actions>
       
       <paraview update-frequency="1" >
-         <script>image.py</script>
+         <script>damaris_slice_xy_csv.py</script>
       </paraview>
         
                 

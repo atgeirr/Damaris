@@ -706,10 +706,10 @@ bool Variable::AddBlocksToUnstructuredMesh(vtkMultiPieceDataSet* vtkMPGrid , int
     }
 
     us_mesh = std::dynamic_pointer_cast<UnstructuredMesh>(mesh);
-    // for each block in the iteration do:
+   
     BlocksByIteration::iterator begin , end;
     // Get the vtkGrid from its mesh
-    std::shared_ptr<Mesh> mesh = GetMesh();
+    // std::shared_ptr<Mesh> mesh = GetMesh();
 
     // Setting the number of pieces in MultiPieceGrid
     // int serversNo = Environment::CountTotalServers();
@@ -721,7 +721,7 @@ bool Variable::AddBlocksToUnstructuredMesh(vtkMultiPieceDataSet* vtkMPGrid , int
     // of the mesh
     // int clientsPerNode = Environment::ClientsPerNode();
 
-    int    n_sections_total  = mesh->GetTotalMeshSections(0) ;
+    int    n_sections_total  = us_mesh->GetTotalMeshSections(0) ;
 	vtkMPGrid->SetNumberOfPieces(n_sections_total);
 
 
@@ -730,14 +730,13 @@ bool Variable::AddBlocksToUnstructuredMesh(vtkMultiPieceDataSet* vtkMPGrid , int
 	INFO("SourceRange    Variable:" << this->GetName()  << "  source_range_low: " << source_range_low << "  source_range_high: " << source_range_high)
 	us_mesh->SetSourceRange(source_range_low, source_range_high); // only does something on first call.
 
-
-
     //Getting the variable type (e.g. long, int, etc.) from its layout
     //auto type = GetLayout()->GetType();
-
-   // GetBlocksByIteration(iteration, begin, end);
+    // for each block in the iteration do:
+    GetBlocksByIteration(iteration, begin, end);
     int    num_sections ;
-    int    section_size ;
+    int    section_size ;  // how many VTK elements in the section
+    int    global_section_offset_of_source ;  // the number of sections allocated in ranks less than the variable/blocks source
     // int    sect_offset ;  // for random access to the current source's
     for(auto it = begin; it != end; it++) {
         // Get block data
@@ -770,12 +769,14 @@ bool Variable::AddBlocksToUnstructuredMesh(vtkMultiPieceDataSet* vtkMPGrid , int
 			// sectn_size_ptr = (int *) sectn_block->GetDataSpace().GetData();
 
 			num_sections = us_mesh->GetNumberOfSections(source);
+
+			global_section_offset_of_source = us_mesh->GetGlobalOffsetOfSections(source);
 			// sect_offset  = us_mesh->GetSectionOffset(source);
 			for (int sectn_num = 0 ; sectn_num < num_sections; sectn_num++)
 			{
 				// unsigned int pieceId = serverId*localBlocks+source;
-				unsigned int pieceId = source;
-				vtkDataSet* vtkGrid = vtkMPGrid->GetPiece(pieceId);
+				// unsigned int pieceId = source;
+				vtkDataSet* vtkGrid = vtkMPGrid->GetPiece(global_section_offset_of_source + sectn_num);
 
 				// Get the number of elements in the section (i.e. number of hexahedrals or quads etc.)
 				// This will be how many field elements are in the Variable block if we have a 'zonal' variable
@@ -784,8 +785,8 @@ bool Variable::AddBlocksToUnstructuredMesh(vtkMultiPieceDataSet* vtkMPGrid , int
 
 				if (vtkGrid == nullptr) { // This is the first (or maybe the only) variable of the mesh
 					vtkGrid = mesh->GetVtkGrid(source , 0 , block , shared_from_this());
-					INFO("AddBlocksToVtkGrid():  Mesh:" << mesh->GetName() << "  Variable: " << this->GetName() <<" Source: " << source  <<" Iteration: " << iteration << " Server: " << serverId << " localBlocks: " << localBlocks << " Index: " << index << " PieceId: " << pieceId)
-					vtkMPGrid->SetPiece(pieceId , vtkGrid);
+					INFO("AddBlocksToVtkGrid():  Mesh:" << mesh->GetName() << "  Variable: " << this->GetName() <<" Source: " << source  <<" Iteration: " << iteration  << " PieceId: " << global_section_offset_of_source + sectn_num)
+					vtkMPGrid->SetPiece(global_section_offset_of_source + sectn_num , vtkGrid);
 				}
 
 

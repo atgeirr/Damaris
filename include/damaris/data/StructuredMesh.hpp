@@ -35,8 +35,6 @@ public:
     StructuredMesh(const model::Mesh& mdl)
     : Mesh(mdl) {}
 
-    virtual void SetSourceRange(int source_range_low, int source_range_high) {}
-    virtual int GetTotalMeshSections(int iteration) {}
 
 #ifdef HAVE_PARAVIEW_ENABLED
 protected:
