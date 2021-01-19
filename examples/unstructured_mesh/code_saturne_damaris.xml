@@ -18,17 +18,19 @@
                <parameter name="n_sections_total"     type="int" value="1"  /> 
                <parameter name="n_vertices_total"     type="int" value="1"  />
                <parameter name="n_connectivity_total" type="int" value="1"  /> 
+               <parameter name="n_elements_total"     type="int" value="1"  /> 
                <parameter name="n_sections_local"     type="int" value="1"  /> 
                <parameter name="n_vertices_local"     type="int" value="1"  />
                <parameter name="n_connectivity_local" type="int" value="1"  /> 
-               <parameter name="n_local_elements"     type="int" value="1"  /> 
-               <parameter name="n_global_elements"    type="int" value="1"  /> 
+               <parameter name="n_elements_local"     type="int" value="1"  /> 
+               <parameter name="n_elements_offset"    type="int" value="1"  />
+              
                 
-               <layout name="zonal_layout_xyz"    type="double" dimensions="x,y,z/cs_glob_n_ranks"    global="x,y,z"   comment="N.B. if global= is empty then global is equal to dimensions" />
+               <layout name="zonal_layout_xyz"    type="double" dimensions="x,y,z/cs_glob_n_ranks"    global="x,y,z"  />
                <layout name="zonal_layout_vect3"  type="double" dimensions="3,x,y,z/cs_glob_n_ranks"  global="3,x,y,z" />
 
-               <layout name="zonal_layout_usmesh"        type="double" dimensions="n_local_elements"    global="n_global_elements"   comment="N.B. if global= is empty then global is equal to dimensions" />
-               <layout name="zonal_layout_usmesh_vect3"  type="double" dimensions="3,n_local_elements"  global="3,n_global_elements" />
+               <layout name="zonal_layout_usmesh"        type="double" dimensions="n_elements_local"    global="n_elements_total"   />
+               <layout name="zonal_layout_usmesh_vect3"  type="double" dimensions="3,n_elements_local"  global="3,n_elements_total" />
              
                <layout name="unstructured_vertex_layout_xyz"  type="double"  dimensions="mesh_dim, n_vertices_local"   global="mesh_dim, n_vertices_total"   />
                <layout name="unstructured_gid_layout"         type="long"    dimensions="n_vertices_local"     global="n_vertices_total"     />
