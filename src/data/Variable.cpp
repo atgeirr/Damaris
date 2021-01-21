@@ -583,6 +583,12 @@ bool Variable::AddBlocksToVtkGrid(vtkMultiPieceDataSet* vtkMPGrid , int iteratio
 	bool retval = false ;
 	std::shared_ptr<Mesh> mesh = GetMesh();
 
+	// write time-invarying variables only in first iteration
+	if ( IsTimeVarying() == false){
+	   iteration = 0;
+	}
+
+
 	if ( mesh->GetModel().type() == model::MeshType::unstructured )
 	{
 		retval = AddBlocksToUnstructuredMesh(vtkMPGrid , iteration);
