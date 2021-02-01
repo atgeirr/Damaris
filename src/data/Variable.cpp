@@ -673,7 +673,7 @@ bool Variable::AddBlocksToUnstructuredMesh(vtkMultiPieceDataSet* vtkMPGrid , int
 	// continue if there are blocks for this iteration - i.e. GetSourceRange() returns true
 	if ( GetSourceRange(source_range_low, source_range_high) == true ) {
 
-		INFO("SourceRange    Variable:" << this->GetName()  << "  clientsPerNode: " << clientsPerNode << "  source_range_low: " << source_range_low << "  source_range_high: " << source_range_high)
+		//INFO("SourceRange    Variable:" << this->GetName()  << "  clientsPerNode: " << clientsPerNode << "  source_range_low: " << source_range_low << "  source_range_high: " << source_range_high)
 		us_mesh->SetSourceRange(source_range_low, source_range_high); // only does something on first call.
 
 		// for each block in the iteration available to this server
@@ -714,7 +714,7 @@ bool Variable::AddBlocksToUnstructuredMesh(vtkMultiPieceDataSet* vtkMPGrid , int
 
 				if (vtkGrid == nullptr) { // This is the first (or maybe the only) variable of the mesh
 					vtkGrid = us_mesh->GetVtkGrid(source , 0 , block , shared_from_this());
-					INFO("AddBlocksToVtkGrid():  Mesh:" << us_mesh->GetName() << "  Variable: " << this->GetName() <<" Source: " << source  <<" Iteration: " << iteration  << " PieceId: " << global_section_offset_of_source + sectn_num)
+					//INFO("AddBlocksToVtkGrid():  Mesh:" << us_mesh->GetName() << "  Variable: " << this->GetName() <<" Source: " << source  <<" Iteration: " << iteration  << " PieceId: " << global_section_offset_of_source + sectn_num)
 					vtkMPGrid->SetPiece(global_section_offset_of_source + sectn_num , vtkGrid);
 				}
 

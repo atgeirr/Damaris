@@ -164,7 +164,7 @@ public:
                     num_sections = sectn_block->GetNumberOfItems();
                     num_sections_total += num_sections ;
                     vect_server_sctns_numberof_.push_back(num_sections);
-                    INFO("SetSourceRange mesh     Mesh:" << GetName() <<  " source: " << source  << "  num_sections: " << num_sections <<  "  num_sections_total: " << num_sections_total );
+                    //INFO("SetSourceRange mesh     Mesh:" << GetName() <<  " source: " << source  << "  num_sections: " << num_sections <<  "  num_sections_total: " << num_sections_total );
                 }
 
                 vect_vtk_usm_grid_.resize(num_sections_total, nullptr);  // explictly set to nullptr
