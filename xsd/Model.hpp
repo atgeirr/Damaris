@@ -698,7 +698,7 @@ namespace damaris
 
       // size
       //
-      typedef ::xml_schema::unsigned_int size_type;
+      typedef ::xml_schema::unsigned_long size_type;
       typedef ::xsd::cxx::tree::traits< size_type, char > size_traits;
 
       const size_type&
