@@ -718,7 +718,7 @@ bool Variable::AddBlocksToUnstructuredMesh(vtkMultiPieceDataSet* vtkMPGrid , int
 					vtkMPGrid->SetPiece(global_section_offset_of_source + sectn_num , vtkGrid);
 				}
 
-				retval = InstantiateBufferAndAddToVtkGrid(vtkGrid , buffer, buffer_offset, section_size, numVectComponents);
+				retval = InstantiateBufferAndAddToVtkGrid(vtkGrid , buffer, buffer_offset, (section_size*numVectComponents), numVectComponents);
 				if (retval == false)
 					return false ;
 

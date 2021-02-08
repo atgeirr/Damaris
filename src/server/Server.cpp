@@ -130,6 +130,7 @@ void Server::Run() {
 void Server::EndOfIterationCallback(int tag, int source,
 	const void* buf, int count) 
 {
+	Environment::Log("Server::EndOfIterationCallback method started.", EventLogger::Info);
 	// sync finished for this iteration, starts listening
 	// to clients again
 	std::map<int,std::shared_ptr<Channel> >::iterator ch;
@@ -162,6 +163,9 @@ void Server::EndOfIterationCallback(int tag, int source,
 #endif
 
 	StorageManager::Update(iteration);
+
+	Environment::Log("Server::EndOfIterationCallback method finished.", EventLogger::Info);
+	Environment::FlushLog();
 }
 
 void Server::OnHeader(int UNUSED(tag), int rk,

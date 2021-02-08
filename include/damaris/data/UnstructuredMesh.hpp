@@ -179,7 +179,7 @@ public:
          *  of the Variable. Each server will have to call this and use their own version of the
          *  Variable.
          *  Need to use the block based info. as it has the global size updated when
-         *  damaris_paramater_set(n_sections_total) is called to modify the layout.
+         *  damaris_parameter_set(n_sections_total) is called to modify the layout.
          *
          * \param[in] iteration : The iteration in which the variable of interest should be queried
          * - most likely to be 0 for a mesh that does not change during the simulation
@@ -211,7 +211,7 @@ public:
 		 *   'groupname/section_sizes' using block->GetStartIndex(),
 		 *
 		 *  The lower_bound_ value was set when the block was created taking into account the size
-		 *  set by damaris_paramater_set(pos) was called to modify the layout.
+		 *  set by damaris_parameter_set(pos) was called to modify the layout.
 		 *  where: pos = sectn_offsets[cs_glob_rank_id] ; which was computed using MPI_Allgather()
 		 *  of the section sizes per rank and a subsequent scan summation.
 		 *
