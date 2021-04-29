@@ -69,5 +69,5 @@
       </storage>
    
          
-         <log FileName="log/damaris" RotationSize="5" LogFormat="[%TimeStamp%]: %Message%" LogLevel="info" />
+         <log FileName="log/damaris" RotationSize="5" LogFormat="[%TimeStamp%]: %Message%" LogLevel="info" Flush="false" />
 </simulation>

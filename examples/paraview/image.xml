@@ -40,7 +40,7 @@
         <actions>
         </actions>
         <paraview>
-            <script>/home/jbowden/C_S/damaris_example/paraview/image.py</script>
+            <script>/usr/local/examples/paraview/image.py</script>
         </paraview>
-        <log FileName="log/damaris" RotationSize="5" LogFormat="[%TimeStamp%]: %Message%" LogLevel="info" />
+        <log FileName="log/damaris" RotationSize="5" LogFormat="[%TimeStamp%]: %Message%" LogLevel="info" Flush="false"  />
 </simulation>

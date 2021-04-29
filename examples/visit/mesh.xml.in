@@ -55,5 +55,5 @@
 	<visit>
 		<path>@VisIt_ROOT@</path>
 	</visit>
-	<log FileName="log/mesh" RotationSize="5" LogFormat="[%TimeStamp%]: %Message%" LogLevel="info" />
+	<log FileName="log/mesh" RotationSize="5" LogFormat="[%TimeStamp%]: %Message%" LogLevel="info" Flush="false" />
 </simulation>

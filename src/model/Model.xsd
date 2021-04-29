@@ -414,7 +414,7 @@
 		<xs:attribute name="RotationSize" type="xs:unsignedInt" use="required"/>
 		<xs:attribute name="LogFormat" type="xs:string" use="required"/>
 		<xs:attribute name="LogLevel" type="mdl:LogLevelType" use="required"/>
-    <xs:attribute name="Flush"    type="xs:boolean" use="optional" default="false"/>
+		<xs:attribute name="Flush"    type="xs:boolean" use="optional" default="false"/>
 	</xs:complexType>
 
 	<!-- Simulation node -->

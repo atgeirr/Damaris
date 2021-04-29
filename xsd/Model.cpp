@@ -3517,6 +3517,30 @@ namespace damaris
       this->LogLevel_.set (std::move (x));
     }
 
+    const Log::Flush_type& Log::
+    Flush () const
+    {
+      return this->Flush_.get ();
+    }
+
+    Log::Flush_type& Log::
+    Flush ()
+    {
+      return this->Flush_.get ();
+    }
+
+    void Log::
+    Flush (const Flush_type& x)
+    {
+      this->Flush_.set (x);
+    }
+
+    Log::Flush_type Log::
+    Flush_default_value ()
+    {
+      return Flush_type (false);
+    }
+
 
     // Simulation
     // 
@@ -8601,7 +8625,8 @@ namespace damaris
       FileName_ (FileName, this),
       RotationSize_ (RotationSize, this),
       LogFormat_ (LogFormat, this),
-      LogLevel_ (LogLevel, this)
+      LogLevel_ (LogLevel, this),
+      Flush_ (Flush_default_value (), this)
     {
     }
 
@@ -8613,7 +8638,8 @@ namespace damaris
       FileName_ (x.FileName_, f, this),
       RotationSize_ (x.RotationSize_, f, this),
       LogFormat_ (x.LogFormat_, f, this),
-      LogLevel_ (x.LogLevel_, f, this)
+      LogLevel_ (x.LogLevel_, f, this),
+      Flush_ (x.Flush_, f, this)
     {
     }
 
@@ -8625,7 +8651,8 @@ namespace damaris
       FileName_ (this),
       RotationSize_ (this),
       LogFormat_ (this),
-      LogLevel_ (this)
+      LogLevel_ (this),
+      Flush_ (this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
       {
@@ -8667,6 +8694,12 @@ namespace damaris
           this->LogLevel_.set (LogLevel_traits::create (i, f, this));
           continue;
         }
+
+        if (n.name () == "Flush" && n.namespace_ ().empty ())
+        {
+          this->Flush_.set (Flush_traits::create (i, f, this));
+          continue;
+        }
       }
 
       if (!FileName_.present ())
@@ -8696,6 +8729,11 @@ namespace damaris
           "LogLevel",
           "");
       }
+
+      if (!Flush_.present ())
+      {
+        this->Flush_.set (Flush_default_value ());
+      }
     }
 
     Log* Log::
@@ -8715,6 +8753,7 @@ namespace damaris
         this->RotationSize_ = x.RotationSize_;
         this->LogFormat_ = x.LogFormat_;
         this->LogLevel_ = x.LogLevel_;
+        this->Flush_ = x.Flush_;
       }
 
       return *this;
