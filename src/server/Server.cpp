@@ -157,15 +157,20 @@ void Server::EndOfIterationCallback(int tag, int source,
 
 #ifdef HAVE_PARAVIEW_ENABLED
     if (Environment::GetModel()->paraview().present()) {
-        std::shared_ptr<ParaViewAdaptor> paraview = ParaViewAdaptor::GetInstance();
-        paraview->CoProcess(iteration);
+    	if (iteration > 0) {
+    		std::shared_ptr<ParaViewAdaptor> paraview = ParaViewAdaptor::GetInstance();
+    		paraview->CoProcess(iteration);
+    	}
     }
 #endif
 
 	StorageManager::Update(iteration);
 
 	Environment::Log("Server::EndOfIterationCallback method finished.", EventLogger::Info);
-	Environment::FlushLog();
+	if (Environment::GetModel()->log().get().Flush()) {
+		Environment::FlushLog();
+	}
+
 }
 
 void Server::OnHeader(int UNUSED(tag), int rk,
