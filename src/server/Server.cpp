@@ -157,10 +157,10 @@ void Server::EndOfIterationCallback(int tag, int source,
 
 #ifdef HAVE_PARAVIEW_ENABLED
     if (Environment::GetModel()->paraview().present()) {
-    	if (iteration > 0) {
+    	//if (iteration > 0) {
     		std::shared_ptr<ParaViewAdaptor> paraview = ParaViewAdaptor::GetInstance();
     		paraview->CoProcess(iteration);
-    	}
+    	//}
     }
 #endif
 

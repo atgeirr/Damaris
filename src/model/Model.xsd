@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
 	elementFormDefault="qualified"
-           targetNamespace="https://gitlab.inria.fr/Damaris/damaris"
-           xmlns:mdl="https://gitlab.inria.fr/Damaris/damaris">
+           targetNamespace="http://damaris.gforge.inria.fr/damaris/model"
+           xmlns:mdl="http://damaris.gforge.inria.fr/damaris/model">
 
 <!-- Deprecated -->
 	<!-- Client node -->
