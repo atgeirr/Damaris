@@ -22,7 +22,7 @@ Damaris requires the following dependencies.
   * (optional) CppUnit (version 1.12.1 or greater)
   * (optional) HDF5 (version 1.8.20 or greater)
   * (optional) VisIt (version 2.10.3 or greater)
-  * (optional) ParaView (version 5.6 or greater)
+  * (optional) ParaView (version 5.8 is recomended)
 
 
 2) Building Damaris using Spack
@@ -37,18 +37,24 @@ So, now it is easy enough to install Damaris. To see the options enabled through
 
     spack info damaris
     
-To install the base damaris (no visulization support)
+To install the base damaris with HDF5 support (no visulization support)
   
     spack install damaris+hdf5+fortran+examples
-    
 
-Some detalied instructions on using Spack to install Damaris with visulisation support are being developed and available here:
+The Spack version of the Damaris 'package.py' file may be out of date. An updated Damaris Spack 'package.py' file is available from the [gitlab repository](https://gitlab.inria.fr/Damaris/damaris/-/tree/master/build/spack/repo/packages/damaris) and can be used by setting up a custom Spack repository by adding the path to the `build/spack/repo` directory to the file `~/.spack/repos.yaml`. 
 
-https://gitlab.inria.fr/Damaris/damaris-development/-/blob/master/docs/build/damaris_catalyst_with_spack/damaris_catalyst_spack_install.md
+```bash
+$ cat ~/.spack/repos.yaml
+repos:
+  - https://gitlab.inria.fr/Damaris/damaris/-/tree/master/build/spack/repo
+
+```
+
+Some detalied instructions on using Spack to install Damaris with visulisation support are being developed and are [available here](https://gitlab.inria.fr/Damaris/damaris-development/-/blob/master/docs/build/damaris_catalyst_with_spack/damaris_catalyst_spack_install.md)
     
 -------------------------------
 
-Prior to having a full Spack package file, Damaris could be installed using the following procedure:
+Prior to having a full Spack package file, Damaris could be installed using Spack built dependencies using the following procedure:
 
 Once spack is installed, you need to install cmake, boost, Xerces-C, and
 XSD (and possibly MPI if you don't have it):
