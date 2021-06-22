@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<simulation name="cube" language="c" xmlns="https://gitlab.inria.fr/Damaris/damaris">
+<simulation name="cube" language="c" xmlns="http://damaris.gforge.inria.fr/damaris/model">
 	<architecture>
 		<domains count="1" />
 		<dedicated cores="1" nodes="0" />
