@@ -31,8 +31,8 @@
 // in the accompanying FLOSSE file.
 //
 
-#ifndef CXX_OPMBUILDSTACKDIR_DAMARIS_DEVELOPMENT_SRC_MODEL_MODEL_HPP
-#define CXX_OPMBUILDSTACKDIR_DAMARIS_DEVELOPMENT_SRC_MODEL_MODEL_HPP
+#ifndef CXX_HOME_JBOWDEN_PV_BUILD_DAMARIS_DEVELOPMENT_SRC_MODEL_MODEL_HPP
+#define CXX_HOME_JBOWDEN_PV_BUILD_DAMARIS_DEVELOPMENT_SRC_MODEL_MODEL_HPP
 
 #ifndef XSD_CXX11
 #define XSD_CXX11
@@ -4225,6 +4225,9 @@ namespace damaris
       void
       LogLevel (::std::unique_ptr< LogLevel_type > p);
 
+      static const LogLevel_type&
+      LogLevel_default_value ();
+
       // Flush
       //
       typedef ::xml_schema::boolean Flush_type;
@@ -4246,8 +4249,7 @@ namespace damaris
       //
       Log (const FileName_type&,
            const RotationSize_type&,
-           const LogFormat_type&,
-           const LogLevel_type&);
+           const LogFormat_type&);
 
       Log (const ::xercesc::DOMElement& e,
            ::xml_schema::flags f = 0,
@@ -4279,6 +4281,7 @@ namespace damaris
       ::xsd::cxx::tree::one< RotationSize_type > RotationSize_;
       ::xsd::cxx::tree::one< LogFormat_type > LogFormat_;
       ::xsd::cxx::tree::one< LogLevel_type > LogLevel_;
+      static const LogLevel_type LogLevel_default_value_;
       ::xsd::cxx::tree::one< Flush_type > Flush_;
     };
 
@@ -4643,4 +4646,4 @@ namespace damaris
 //
 // End epilogue.
 
-#endif // CXX_OPMBUILDSTACKDIR_DAMARIS_DEVELOPMENT_SRC_MODEL_MODEL_HPP
+#endif // CXX_HOME_JBOWDEN_PV_BUILD_DAMARIS_DEVELOPMENT_SRC_MODEL_MODEL_HPP

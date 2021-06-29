@@ -36,9 +36,11 @@ int damaris_initialize(const char* configfile, MPI_Comm comm)
 	if(Environment::Init(std::string(configfile),comm)) {
 
 		Environment::Log(Environment::GetEnvString() , EventLogger::Info);
-		if (Environment::GetModel()->log().get().Flush()) {
-			Environment::FlushLog();
-		}
+        if (Environment::GetModel()->log().present()) {
+                if (Environment::GetModel()->log().get().Flush()) {
+                Environment::FlushLog();
+            }
+        }
 
 		return DAMARIS_OK;
 	} else {
@@ -304,9 +306,11 @@ int damaris_end_iteration(  )
 		return DAMARIS_NOT_INITIALIZED;
 	}
 	Environment::GetClient()->EndIteration();
-	if (Environment::GetModel()->log().get().Flush()) {
-			Environment::FlushLog();
-	}
+    if (Environment::GetModel()->log().present()) {
+        if (Environment::GetModel()->log().get().Flush()) {
+                Environment::FlushLog();
+        }
+    }
 	return DAMARIS_OK;
 }
 

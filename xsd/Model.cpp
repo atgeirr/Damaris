@@ -3517,6 +3517,12 @@ namespace damaris
       this->LogLevel_.set (std::move (x));
     }
 
+    const Log::LogLevel_type& Log::
+    LogLevel_default_value ()
+    {
+      return LogLevel_default_value_;
+    }
+
     const Log::Flush_type& Log::
     Flush () const
     {
@@ -8616,16 +8622,18 @@ namespace damaris
     // Log
     //
 
+    const Log::LogLevel_type Log::LogLevel_default_value_ (
+      "warning");
+
     Log::
     Log (const FileName_type& FileName,
          const RotationSize_type& RotationSize,
-         const LogFormat_type& LogFormat,
-         const LogLevel_type& LogLevel)
+         const LogFormat_type& LogFormat)
     : ::xml_schema::type (),
       FileName_ (FileName, this),
       RotationSize_ (RotationSize, this),
       LogFormat_ (LogFormat, this),
-      LogLevel_ (LogLevel, this),
+      LogLevel_ (LogLevel_default_value (), this),
       Flush_ (Flush_default_value (), this)
     {
     }
@@ -8725,9 +8733,7 @@ namespace damaris
 
       if (!LogLevel_.present ())
       {
-        throw ::xsd::cxx::tree::expected_attribute< char > (
-          "LogLevel",
-          "");
+        this->LogLevel_.set (LogLevel_default_value ());
       }
 
       if (!Flush_.present ())

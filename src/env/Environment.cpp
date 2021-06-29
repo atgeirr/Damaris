@@ -122,7 +122,9 @@ bool Environment::Init(const std::string& configFile,
 	}
 
 	// Set LogLevel to Debug to get the string output to the log file
-	if (GetModel()->log().get().LogLevel() < 2) SetEnvString() ;
+	if (GetModel()->log().present()) {
+        if (GetModel()->log().get().LogLevel() < 2) SetEnvString() ;
+    }
 
 	return (retbool) ;
 }

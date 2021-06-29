@@ -167,9 +167,11 @@ void Server::EndOfIterationCallback(int tag, int source,
 	StorageManager::Update(iteration);
 
 	Environment::Log("Server::EndOfIterationCallback method finished.", EventLogger::Info);
-	if (Environment::GetModel()->log().get().Flush()) {
-		Environment::FlushLog();
-	}
+    if (Environment::GetModel()->log().present()) {
+        if (Environment::GetModel()->log().get().Flush()) {
+            Environment::FlushLog();
+        }
+    }
 
 }
 
