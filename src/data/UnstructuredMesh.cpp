@@ -23,7 +23,23 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace damaris {
 
+#ifdef HAVE_VISIT_ENABLED
+bool UnstructuredMesh::ExposeVisItMetaData(visit_handle md)
+{
+    DBG("In UnstructuredMesh::ExposeVisItMetaData");
+	return false;
+}
 
+bool UnstructuredMesh::ExposeVisItData(visit_handle* h, 
+	int source, int iteration, int block) 
+{
+	//const model::Mesh& model = GetModel();
+	DBG("In UnstructuredMesh::ExposeVisItData");
+	
+	return (false);
+}
+
+#endif
 #ifdef HAVE_PARAVIEW_ENABLED
 
 

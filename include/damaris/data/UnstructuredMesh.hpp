@@ -101,6 +101,31 @@ private:
     int source_total_ ;
 
     std::shared_ptr<Variable> sect_vtk_sizes_ ;
+    
+#ifdef HAVE_VISIT_ENABLED
+	/**
+	 * Currently no implementation
+     * Fills the visit handle with Metadata related to this Mesh.
+	 * Returns true in case of success.
+	 *
+	 * \param[in] md : visit handle to fill.
+	 */
+	bool ExposeVisItMetaData(visit_handle md);
+		
+	/**	
+	 * Currently no implementation
+     * Fills the visit handle with the data related to this Mesh.
+	 * Returns true is successful.
+	 *
+	 * \param[out] h : visit handle to create.
+	 * \param[in] source : source to expose to visit.
+	 * \param[in] iteration : iteration to expose to visit.
+	 * \param[in] block : domain to expose to visit.
+	 */
+	bool ExposeVisItData(visit_handle* h, int source, int iteration, int block);
+#endif
+
+    
 public:
          /**
          * Creates an instance of UnstructuredMesh given a model and a name.
