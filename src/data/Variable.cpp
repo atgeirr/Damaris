@@ -21,9 +21,10 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "env/Environment.hpp"
 #include "data/Variable.hpp"
 #include "data/Type.hpp"
-#include "data/UnstructuredMesh.hpp"
+
 
 #ifdef HAVE_PARAVIEW_ENABLED
+#include "data/UnstructuredMesh.hpp"
 #include "damaris/paraview/ParaViewHeaders.hpp"
 #endif
 

@@ -59,7 +59,11 @@ private:
     size_t n_verticies_ ;
     // vtkNew<vtkUnstructuredGrid> vtkUSGrid_ ;
     // vtkUnstructuredGrid* vtk_usm_grid_ ;
+#ifdef HAVE_PARAVIEW_ENABLED
     std::vector<vtkUnstructuredGrid* > vect_vtk_usm_grid_ ;
+#else
+    std::vector<void* > vect_vtk_usm_grid_ ;
+#endif
 
     /**
      * The number of section in each block that is looked after
@@ -237,7 +241,7 @@ public:
 			return global_section_offset ;
         }
 
-
+#ifdef HAVE_PARAVIEW_ENABLED
         int GetNumberOfSections(int source)  {
             int offset_to_source =  LocalServerSourceIndex(source) ;
             return vect_server_sctns_numberof_[offset_to_source] ;
@@ -272,7 +276,7 @@ public:
             times_called_for_current_source_ = 0 ;
         }
 
-#ifdef HAVE_PARAVIEW_ENABLED
+// #ifdef HAVE_PARAVIEW_ENABLED
 
         /**
         * creates and returns the expected VTK grid object (vtkUnstructured) for a block
