@@ -70,16 +70,13 @@ int RemoteClient::Write(const std::string & varname,
 		rwm.source_ = source;
 		rwm.iteration_ = iteration;
 		rwm.size_   = size;
-        
-        
-        std::vector<int64_t> p ;
-        p = v->GetPositions(block) ;
+
+                std::vector<int64_t> p ;
+                p = v->GetPositions(block) ;
 
 		rwm.dim_ = l->GetDimensions();
 		for(int i = 0; i < rwm.dim_; i++) {
-			// rwm.lbounds_[i] = 0;
-			// rwm.ubounds_[i] = l->GetExtentAlong(i)-1;
-            rwm.ubounds_[i] = l->GetExtentAlong(i)-1 + p[i]  ; // Move() has a "- lower_bounds[]" in there too
+                        rwm.ubounds_[i] = l->GetExtentAlong(i)-1 + p[i]  ; // block->Move() has a "- lower_bounds[]" in here too
 			rwm.lbounds_[i] = p[i];
 			rwm.gbounds_[i] = l->GetGlobalExtentAlong(i);
 			rwm.ghosts_[2*i]   = l->GetGhostAlong(i).first;
