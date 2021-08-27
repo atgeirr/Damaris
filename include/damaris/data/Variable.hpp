@@ -168,6 +168,22 @@ class Variable : public ENABLE_SHARED_FROM_THIS(Variable),
 		positions_[block] = p;
 		return DAMARIS_OK;
 	}
+    
+    /**
+	 * Gets the current positions of a domain as a std::vector<int64_t>.
+	 * Each value indicates the offset in the particular dimension into 
+     * the global size of the dataset.
+     *
+	 * \param[in] block : domain id.
+     *
+	 * \return The vector of lower bounds of the position of the data.
+     *  relative to the global dimensions (if set in the layout).
+     *  It should have the same dimension as the dimension of the layout.
+	 */
+	virtual std::vector<int64_t> GetPositions(int32_t block)
+	{
+		return positions_[block];
+	}
 
 	/**
 	 * Attach a Block already created. Since only a Variable can

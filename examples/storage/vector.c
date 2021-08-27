@@ -12,6 +12,12 @@ int domains; // change the domain in .xml file (both in the domain tag and the d
 
 int main(int argc, char** argv)
 {
+    
+    int size, rank;
+    int is_client;
+    int LENGTH = 1024 ;
+    
+    
     if(argc != 2)
     {
         fprintf(stderr,"Usage: %s <vector.xml>\n",argv[0]);
@@ -19,14 +25,13 @@ int main(int argc, char** argv)
     }
 
     MPI_Init(&argc,&argv);
-
+    MPI_Comm_rank(MPI_COMM_WORLD , &rank);
+    if ( rank == 0 ) {
+        fprintf(stdout, "INFO: argv[1] : %s", argv[1]);
+        fflush(stdout) ;
+    }
+    
     damaris_initialize(argv[1],MPI_COMM_WORLD);
-
-    int size, rank;
-    int is_client;
-    int LENGTH = 1024 ;
-
-
     int err = damaris_start(&is_client);
 
     if((err == DAMARIS_OK || err == DAMARIS_NO_SERVER) && is_client) {
@@ -35,23 +40,18 @@ int main(int argc, char** argv)
         damaris_client_comm_get(&comm);
 
         int size_in_xml ;
-        err = damaris_parameter_set("LENGTH",&LENGTH, sizeof(int));
+        err = damaris_parameter_get("LENGTH",&LENGTH, sizeof(int));
         if (err != DAMARIS_OK ) {
           fprintf(stderr, "ERROR: Damaris damaris_parameter_set():\nparamater: LENGTH");
         }
         // damaris_parameter_get("LENGTH",&LENGTH,sizeof(int));
         damaris_parameter_get("domains",&domains,sizeof(int));
-        damaris_parameter_get("size",&size_in_xml,sizeof(int));
+        
 
         MPI_Comm_rank(comm , &rank);
         MPI_Comm_size(comm , &size);
 
-        if (size_in_xml != size) {
-             fprintf(stderr, "ERROR: File %s 'size' parameter does not match the Damaris MPI communicator size", argv[0]);
-             return -1 ;
-        }
-
-
+        damaris_parameter_set("size",&size,sizeof(int));
 
         int i,x,y,z;
         int64_t position[1];

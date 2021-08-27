@@ -7,8 +7,8 @@
 		<queue  name="damaris-queue" size="100" />
 	</architecture>
 	<data>
-		<parameter name="LENGTH"  type="int" value="128" comment="N.B. this value is overwritten using damaris_set_parameter() in the vector.cpp code"/>
-		<parameter name="size"	 type="int" value="2" />
+		<parameter name="LENGTH"  type="int" value="448" />
+		<parameter name="size"	 type="int" value="2" comment="N.B. this value is with the number of client mpi ranks overwritten using damaris_set_parameter() in the vector.cpp code" />
 		<parameter name="domains"	type="int" value="2"  />
 
 		<layout name="pipe"  type="float" dimensions="LENGTH/size/domains" global="LENGTH" ghosts="0:0" />
