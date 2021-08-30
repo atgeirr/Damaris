@@ -46,6 +46,7 @@ private:
 	 */
 	~CurvilinearMesh() {}
 	
+
 public:
 
 	/**
@@ -74,6 +75,8 @@ public:
 		m->name_ = name;
 		return m;
 	}
+
+
 
 #ifdef HAVE_VISIT_ENABLED
 	/**

@@ -148,9 +148,9 @@ if (( $v3XERCESS == 1 )); then
  echo -e "--- COMPILING & INSTALLING XERCESS ---------------------------------------------------------------\n"
  # Installing xerces-c
  cd $tempdir
- wget --no-check-certificate https://archive.apache.org/dist/xerces/c/3/sources/xerces-c-3.1.4.tar.gz
-tar -xzf xerces-c-3.1.4.tar.gz
-cd xerces-c-3.1.4
+ wget --no-check-certificate https://archive.apache.org/dist/xerces/c/3/sources/xerces-c-3.2.2.tar.gz
+tar -xzf xerces-c-3.2.2.tar.gz
+cd xerces-c-3.2.2
 ./configure --prefix=$install_path --disable-threads --disable-network
 make -j$make_jobs
 make install
@@ -208,6 +208,51 @@ if (( $v7HDF5 == 1 )); then
     hdf5_arg="-DENABLE_HDF5=ON -DHDF5_ROOT=$install_path"
 fi
 
+
+if (( $MED == 1 )); then
+    echo -e "--- COMPILING & INSTALLING MED (requires HDF) -------------------------------------------------\n"
+    cd $tempdir
+    wget https://files.salome-platform.org/Salome/other/med-4.1.0.tar.gz
+    tar -xzf med-4.1.0.tar.gz
+    # Options: Debug | Release | MinSizeRel | RelWithDebInfo
+    mkdir ../medbuild
+    
+    export CXXFLAGS=-O2
+    export CFLAGS=-O2
+    cd ../medbuild
+    ../med-4.1.0/configure --prefix=$install_path \
+    --disable-fortran \
+    --with-hdf5=$HDF5_ROOT \
+    --disable-python \
+    --with-med_int=int \
+    --with-int64=long \
+    --with-mpi=$MPI_ROOT
+    
+    
+#     --with-f90=$MPI_ROOT/bin/mpif90 \
+#     FFLAGS="-fdefault-integer-8"  \
+#     FCFLAGS="-fdefault-integer-8" \
+#     
+#     CMAKE_BUILD_TYPE=Release
+#     mkdir ../medbuild
+#     cd ../medbuild
+#     cmake ../med-4.1.0 -Wno-dev -DCMAKE_INSTALL_PREFIX:PATH=$install_path \
+#     -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
+#     -DMED_MEDINT_TYPE=int \
+#     -DCMAKE_CXX_FLAGS:STRING=-DMED_API_23=1 \
+#     -DCMAKE_C_FLAGS:STRING=-DMED_API_23=1 \
+#     -DMED_API_23=1 \
+#     -DMEDFILE_USE_MPI=YES \
+#     -DMEDFILE_BUILD_TESTS=OFF \
+#     -DMEDFILE_BUILD_PYTHON=OFF \
+#     -DMEDFILE_INSTALL_DOC=OFF \
+#     -DMEDFILE_BUILD_SHARED_LIBS=off \
+#     -DMEDFILE_BUILD_STATIC_LIBS=ON \
+#     -DCMAKE_Fortran_COMPILER=$MPI_ROOT/bin/mpif90 \
+#     -DHDF5_ROOT_DIR=$HDF5_ROOT \
+#     -DMPI_ROOT_DIR=$MPI_ROOT 
+
+fi
 #prerequisites
 # sudo apt-get install subversion xutils-dev libxt-dev python-libxml2 zlib1g-dev aptitude
 # sudo aptitude install freeglut3-dev libgl1-mesa-dev libdrm-dev -> n then y 

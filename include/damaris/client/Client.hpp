@@ -152,7 +152,7 @@ class Client {
 			int32_t block, int32_t iteration = -1);
 
 	/**
-	 * Set the position of a variable within a global space.
+	 * Set the start position indices of a variable within a global space.
 	 *
 	 * \param[in] varname : name of the variable.
 	 * \param[in] block : id of the block.

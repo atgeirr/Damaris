@@ -370,7 +370,7 @@ namespace damaris {
         for(; w != GetVariables().end(); w++) {
                 std::shared_ptr<Variable> v = w->lock();
 
-            // write time-varying variables only in first iteration
+            // write non-time-varying variables only in first iteration
             if ((not v->IsTimeVarying()) && (iteration > 0))
                     continue;
 

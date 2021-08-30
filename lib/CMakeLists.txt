@@ -27,6 +27,7 @@ set(DAMARIS_SRC
 	${DAMARIS_SOURCE_DIR}/src/data/RectilinearMesh.cpp
 	${DAMARIS_SOURCE_DIR}/src/data/CurvilinearMesh.cpp
 	${DAMARIS_SOURCE_DIR}/src/data/PointMesh.cpp
+	${DAMARIS_SOURCE_DIR}/src/data/UnstructuredMesh.cpp
 	${DAMARIS_SOURCE_DIR}/src/data/CurveManager.cpp
 	${DAMARIS_SOURCE_DIR}/src/data/Curve.cpp
 	${DAMARIS_SOURCE_DIR}/src/data/Block.cpp
@@ -296,7 +297,7 @@ install(EXPORT DamarisTargets
 		FILE "DamarisTargets.cmake")
 install(FILES   "${CMAKE_CURRENT_BINARY_DIR}/DamarisConfigVersion.cmake"
 		"${CMAKE_CURRENT_BINARY_DIR}/DamarisConfig.cmake"
-	        "${DAMARIS_SOURCE_DIR}/cmake/Modules/FindVisIt.cmake"
+        "${DAMARIS_SOURCE_DIR}/cmake/Modules/FindVisIt.cmake"
 		"${DAMARIS_SOURCE_DIR}/cmake/Modules/FindXSD.cmake"
 		DESTINATION ${DAMARIS_PKG} )
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/damaris.pc"
@@ -304,9 +305,16 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/damaris.pc"
 install(FILES "${CMAKE_BINARY_DIR}/include/Damaris.h" DESTINATION include)
 install(FILES "${CMAKE_BINARY_DIR}/include/damaris/model/Model.hpp" DESTINATION include/damaris/model)
 install(DIRECTORY "${DAMARIS_SOURCE_DIR}/include/damaris" DESTINATION include)
+
 if(CMAKE_Fortran_COMPILER)
   install(FILES "${CMAKE_BINARY_DIR}/lib/damaris.mod" DESTINATION include)
 endif(CMAKE_Fortran_COMPILER)
+
+
+if(ENABLE_TESTS)
+  install(FILES "${DAMARIS_SOURCE_DIR}/test/my-hostfile" DESTINATION  ${PROJECT_BINARY_DIR}/test)
+endif(ENABLE_TESTS)
+
 
 install(DIRECTORY "${DAMARIS_SOURCE_DIR}/examples" DESTINATION  ${CMAKE_INSTALL_PREFIX} )
 # install(FILES "${CMAKE_BINARY_DIR}/examples/Makefile" DESTINATION examples)

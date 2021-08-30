@@ -48,7 +48,7 @@ class Observer {
 	
 		/**
 		 * This function is called when an observable is deleted.
-		 * It is intentionnaly not virtual so that the child classes
+		 * It is intentionally not virtual so that the child classes
 		 * cannot override it (could lead to bad behaviors).
 		 * It uses a raw pointer instead of a smart pointer because
 		 * it will be called from the destructor of the object, thus

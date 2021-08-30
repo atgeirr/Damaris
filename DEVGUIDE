@@ -36,8 +36,11 @@ Pointerless implementation
 - Damaris tries to use a pointerless convention, i.e. avoiding the use of a raw
 pointer (int*, Variable*, etc.). Instead, it uses shared_ptr and weak_ptr.
 
-- Previous versions of Damaris (pre-1.3.0) used boost for shared_ptr and weak_ptr support. Instances of these classes have been replaced by the standard library 
-versions std::shared_ptr  and std::weak_ptr and the C++11 stdandard is specified in the build.
+- Previous versions of Damaris (pre-1.3.0) used boost for shared_ptr and 
+weak_ptr support. 
+Instances of these classes have been replaced by the standard library versions 
+std::shared_ptr  and std::weak_ptr and the C++11 stdandard is specified in the 
+build.
 
 - If the use of boost::enable_shared_from_this is necessary, include
 "util/Pointers.hpp" and declare your class the following way:

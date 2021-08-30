@@ -42,8 +42,18 @@ void ParaViewAdaptor::Initialize(MPI_Comm comm,
         processor_->RemoveAllPipelines();
     }
 
-	// Add the Python script
-    model::ParaViewParam::script_sequence scripts = mdl.get().script();
+    timestep_      = mdl.get().realtime_timestep();    // default is 0.1
+    updatefreq_    = mdl.get().update_frequency();     // default is 1, but is this neededas the Catalyst script can set this also?
+    end_iteration_ = mdl.get().end_iteration();        // default is 0 - should be tested for
+
+    mdl_ = mdl ;  // I'm not sure how inefficient this copy is
+    AddPythonPipeline();
+}
+
+void ParaViewAdaptor::AddPythonPipeline()
+{
+// Add the Python script
+    model::ParaViewParam::script_sequence scripts = mdl_.get().script();
     model::ParaViewParam::script_const_iterator it ;
 
     for(it = scripts.begin(); it != scripts.end(); ++it) {
@@ -55,7 +65,9 @@ void ParaViewAdaptor::Initialize(MPI_Comm comm,
 
         pipeline->Delete();
     }
+
 }
+
 
 void ParaViewAdaptor::Finalize()
 {
@@ -65,14 +77,22 @@ void ParaViewAdaptor::Finalize()
     }
 }
 
-void ParaViewAdaptor::CoProcess(int iteration , bool lastTimeStep)
+void ParaViewAdaptor::CoProcess(int iteration)
 {
 	vtkNew<vtkCPDataDescription> dataDescription;
 
+	bool lastTimeStep = false ;
     // specify the simulation time and time step for Catalyst
     dataDescription->AddInput("input");
-	dataDescription->SetTimeData(iteration*0.1 , iteration);  // What is the difference?
 
+	dataDescription->SetTimeData(iteration*timestep_ , iteration);  // What is the difference? Simulation time and simulation iteration
+
+	if (end_iteration_ != 0)
+	{
+		if (iteration == end_iteration_)
+			lastTimeStep = true ;
+	}
+	// check: end_iteration_ from the xsd model. if not == 0 then use the value
 	if (lastTimeStep == true) { // How to know about it?
         dataDescription->ForceOutputOn();
     }
@@ -96,8 +116,13 @@ void ParaViewAdaptor::CoProcess(int iteration , bool lastTimeStep)
         // Catalyst gets the proper input dataset for the pipeline.
 		dataDescription->GetInputDescriptionByName("input")->SetGrid(rootGrid);
 
-        // Call Catalyst to execute the desired pipelines.
-        processor_->CoProcess(dataDescription);
+	    //if ( processor_->GetNumberOfPipelines() == 0)
+	    //	AddPythonPipeline();
+
+	    // Call Catalyst to execute the desired pipelines.
+	    //  if (iteration > 0)
+	    if ( processor_->GetNumberOfPipelines() > 0)
+	    	processor_->CoProcess(dataDescription);
     }
 }
 
@@ -114,7 +139,8 @@ bool ParaViewAdaptor::FillMultiBlockGrid(int iteration , vtkMultiBlockDataSet* r
     for(; meshItr != MeshManager::End(); meshItr++) {
         std::shared_ptr<Mesh> mesh = *meshItr;
 
-        vtkMultiPieceDataSet* vtkMPGrid = vtkMultiPieceDataSet::New();
+        // vtkMultiPieceDataSet* vtkMPGrid = vtkMultiPieceDataSet::New();
+        vtkNew<vtkMultiPieceDataSet> vtkMPGrid ;
 		rootGrid->SetBlock(index , vtkMPGrid);
 
         index++;
@@ -126,7 +152,7 @@ bool ParaViewAdaptor::FillMultiBlockGrid(int iteration , vtkMultiBlockDataSet* r
             const model::Variable& mdl = var->GetModel();
 
             if (mdl.mesh() == "#") continue;    // a variable with empty mesh
-            if (mdl.mesh() != mesh->GetName()) continue;  // a variable with a differetn mesh
+            if (mdl.mesh() != mesh->GetName()) continue;  // a variable with a different mesh
             if (mdl.visualizable() == false) continue;  // non-visualizable variable
 
             if (not (*varItr)->AddBlocksToVtkGrid(vtkMPGrid , iteration)) {

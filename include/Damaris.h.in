@@ -103,7 +103,7 @@ int damaris_initialize(const char* configfile, MPI_Comm comm);
  * Finalize Damaris. Should be called before MPI_Finalize. If Damaris was 
  * started (damaris_start), it should be stopped before this call.
  */
-int damaris_finalize();
+int damaris_finalize( void );
 
 /**
  * Starts the server. Sets is_client to 1 if this core is a client.
@@ -278,7 +278,10 @@ int damaris_parameter_set(const char* param_name,
 	const void* buffer, unsigned int size);
 
 /**
- * Changes the position of the variable. Equivalent to a call to
+ * Changes the position of the variable. Sets the meta-data that represents
+ * the start of position within the variable of which the block stores the data
+ * of.
+ * Equivalent to a call to
  * damaris_set_block_position(var_name,0,position).
  * 
  * \param[in] var_name : name of the variable to move.
@@ -306,7 +309,7 @@ int damaris_client_comm_get(MPI_Comm* comm);
 /**
  * Ends the current iteration.
  */
-int damaris_end_iteration();
+int damaris_end_iteration( void );
 
 /**
  * Gets the current iteration number.

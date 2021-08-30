@@ -29,5 +29,5 @@
 	<visit>
 		<path>@VisIt_ROOT@</path>
 	</visit>
-	<log FileName="log/curve" RotationSize="5" LogFormat="[%TimeStamp%]: %Message%" LogLevel="info" />
+	<log FileName="log/curve" RotationSize="5" LogFormat="[%TimeStamp%]: %Message%" LogLevel="info" Flush="false" />
 </simulation>

@@ -3,14 +3,16 @@ cmake_minimum_required (VERSION 3.12) # Required because of policy CMP0074
 #----------------------------------------------------------------------------#
 # Starting project definition
 #----------------------------------------------------------------------------#
-project(DAMARIS VERSION 1.3.3)
+
+project(DAMARIS VERSION 1.5.0)
 
 #
 # library version set here (e.g. for shared libs).
 #
 # set(DAMARIS_VERSION_MAJOR 1)
-# set(DAMARIS_VERSION_MINOR 3)
-# set(DAMARIS_VERSION_PATCH 2)
+# set(DAMARIS_VERSION_MINOR 5)
+# set(DAMARIS_VERSION_PATCH 0)
+
 # set(DAMARIS_VERSION "${DAMARIS_VERSION_MAJOR}.${DAMARIS_VERSION_MINOR}.${DAMARIS_VERSION_PATCH}")
 
 

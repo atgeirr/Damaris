@@ -130,6 +130,7 @@ void Server::Run() {
 void Server::EndOfIterationCallback(int tag, int source,
 	const void* buf, int count) 
 {
+	Environment::Log("Server::EndOfIterationCallback method started.", EventLogger::Info);
 	// sync finished for this iteration, starts listening
 	// to clients again
 	std::map<int,std::shared_ptr<Channel> >::iterator ch;
@@ -156,12 +157,22 @@ void Server::EndOfIterationCallback(int tag, int source,
 
 #ifdef HAVE_PARAVIEW_ENABLED
     if (Environment::GetModel()->paraview().present()) {
-        std::shared_ptr<ParaViewAdaptor> paraview = ParaViewAdaptor::GetInstance();
-        paraview->CoProcess(iteration);
+    	//if (iteration > 0) {
+    		std::shared_ptr<ParaViewAdaptor> paraview = ParaViewAdaptor::GetInstance();
+    		paraview->CoProcess(iteration);
+    	//}
     }
 #endif
 
 	StorageManager::Update(iteration);
+
+	Environment::Log("Server::EndOfIterationCallback method finished.", EventLogger::Info);
+    if (Environment::GetModel()->log().present()) {
+        if (Environment::GetModel()->log().get().Flush()) {
+            Environment::FlushLog();
+        }
+    }
+
 }
 
 void Server::OnHeader(int UNUSED(tag), int rk,

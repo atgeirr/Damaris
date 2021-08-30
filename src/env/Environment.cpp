@@ -53,6 +53,7 @@ int				Environment::_coresPerNode_;
 int 				Environment::_serversPerNode_;
 int  				Environment::_numberOfNodes_;
 std::string 			Environment::_magicNumber_;
+std::string 			Environment::_environment_print_string_;
 std::shared_ptr<Buffer> 		Environment::_defaultBuffer_;
 std::shared_ptr<Client>		Environment::_client_;
 std::shared_ptr<Server>		Environment::_server_;
@@ -109,15 +110,23 @@ bool Environment::Init(const std::string& configFile,
         _eventLogger_->Log("EventLogger initiated successfully\n" , EventLogger::Info);
     }
 
+    bool retbool ;
 	/* If there are dedicated nodes */
 	if(_baseModel_->architecture().dedicated().nodes() > 0) {
 		/* There are dedicated nodes */
-		return InitDedicatedNodes();
+		retbool = InitDedicatedNodes();
 	} else if(_baseModel_->architecture().dedicated().cores() > 0) {
-		return InitDedicatedCores(_globalComm_);
+		retbool =  InitDedicatedCores(_globalComm_);
 	} else {
-		return InitStandalone(_globalComm_);
+		retbool =  InitStandalone(_globalComm_);
 	}
+
+	// Set LogLevel to Debug to get the string output to the log file
+	if (GetModel()->log().present()) {
+        if (GetModel()->log().get().LogLevel() < 2) SetEnvString() ;
+    }
+
+	return (retbool) ;
 }
 
 bool Environment::InitDedicatedCores(MPI_Comm global)

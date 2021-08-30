@@ -22,6 +22,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "data/RectilinearMesh.hpp"
 #include "data/CurvilinearMesh.hpp"
 #include "data/PointMesh.hpp"
+#include "data/UnstructuredMesh.hpp"
 
 namespace damaris {
 
@@ -42,6 +43,7 @@ void MeshManager::Init(const model::Data& mdl)
 		case model::MeshType::point :
 			Create<PointMesh>(*m); break;
 		case model::MeshType::unstructured :
+			Create<UnstructuredMesh>(*m); break;
 		case model::MeshType::csg :
 		case model::MeshType::amr :
 		case model::MeshType::unknown :
@@ -75,6 +77,7 @@ void MeshManager::ReadMeshesInSubGroup(const model::Group &g,
 		case model::MeshType::point :
 			Create<PointMesh>(*m,meshName); break;
 		case model::MeshType::unstructured :
+			Create<UnstructuredMesh>(*m); break;
 		case model::MeshType::csg :
 		case model::MeshType::amr :
 		case model::MeshType::unknown :

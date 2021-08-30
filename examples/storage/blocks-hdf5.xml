@@ -35,5 +35,5 @@
 	<visit>
 		<path>/home/hadi/local/visit</path>
 	</visit>
-	<log FileName="log/blocks" RotationSize="5" LogFormat="[%TimeStamp%]: %Message%" LogLevel="info" />
+	<log FileName="log/blocks" RotationSize="5" LogFormat="[%TimeStamp%]: %Message%" LogLevel="info" Flush="false" />
 </simulation>

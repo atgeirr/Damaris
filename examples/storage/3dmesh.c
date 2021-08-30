@@ -127,14 +127,18 @@ int main(int argc, char** argv)
       // set the appropriate position for the current rank
       damaris_set_position("cube",position_cube);
 
-      for(int i=0; i < MAX_CYCLES; i++) {
+
+      int i, d, h, w ;
+      for( i=0; i < MAX_CYCLES; i++) {
          double t1 = MPI_Wtime();         
          int sequence ;
          if (verbose == 0) { // default - do not print values to screen
             sequence = 0;
-             for (int d = 0; d < local_depth; d++){
-               for (int h = 0; h < local_height; h++){
-                 for (int w = 0; w < local_width; w++) {
+
+             for ( d = 0; d < local_depth; d++){
+               for ( h = 0; h < local_height; h++){
+                 for ( w = 0; w < local_width; w++) {
+
                     cube[d][h][w] = (int) sequence + rank;
                     if (rank_only==0) sequence++;
                  }  
@@ -149,9 +153,10 @@ int main(int argc, char** argv)
                printf("\n"); 
                if (rank == current_rank) { // start of serialized section
                   sequence = 0;
-                  for (int d = 0; d < local_depth; d++){
-                    for (int h = 0; h < local_height; h++){
-                     for (int w = 0; w < local_width; w++) {
+
+                  for ( d = 0; d < local_depth; d++){
+                    for ( h = 0; h < local_height; h++){
+                     for ( w = 0; w < local_width; w++) {
                         cube[d][h][w] = (int) sequence + rank;
                         printf("%2d\t", cube[d][h][w] );
                         if (rank_only==0) sequence++;

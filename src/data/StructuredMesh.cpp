@@ -148,7 +148,7 @@ vtkDataSet* StructuredMesh::GetVtkGrid(int source , int iteration , int block ,
 	//Setting the coordinates
 	if (not SetGridCoords(grid , source , iteration , block ,
 						  vx , vy , vz)) {
-		ERROR("Setting the curvilinear grid coordinates failed!");
+		ERROR("Setting the structured mesh grid coordinates failed!");
 		return nullptr;
 	}
 

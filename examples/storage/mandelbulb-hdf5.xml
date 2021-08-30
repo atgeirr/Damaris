@@ -38,5 +38,5 @@
 	</storage>
 	<actions>
 	</actions>
-	<log FileName="log/mandelbulb-hdf5" RotationSize="5" LogFormat="[%TimeStamp%]: %Message%" LogLevel="info" />
+	<log FileName="log/mandelbulb-hdf5" RotationSize="5" LogFormat="[%TimeStamp%]: %Message%" LogLevel="info" Flush="false" />
 </simulation>
