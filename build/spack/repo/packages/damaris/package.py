@@ -14,7 +14,9 @@ class Damaris(CMakePackage):
     homepage = "https://project.inria.fr/damaris/"
     git      = "https://gitlab.inria.fr/Damaris/damaris.git"
 
-    version('master', branch='master')
+    # version('master', branch='master')
+    version('1.5.0',  tag='v1.5.0')
+    version('1.3.3',  tag='v1.3.3')
     version('1.3.2',  tag='v1.3.2')
     version('1.3.1',  tag='v1.3.1')
 
