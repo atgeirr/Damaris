@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
 	elementFormDefault="qualified"
-	targetNamespace="http://damaris.gforge.inria.fr/damaris/model"
-	xmlns:mdl="http://damaris.gforge.inria.fr/damaris/model">
+           targetNamespace="http://damaris.gforge.inria.fr/damaris/model"
+           xmlns:mdl="http://damaris.gforge.inria.fr/damaris/model">
 
 <!-- Deprecated -->
 	<!-- Client node -->
@@ -20,7 +20,7 @@
 	</xs:complexType>
 <!-- End deprecated -->
 
-        <xs:complexType name="KeyVal">
+	<xs:complexType name="KeyVal">
 		<xs:simpleContent>
 		<xs:extension base="xs:string">
 			<xs:attribute name="key" type="xs:string" />
@@ -49,7 +49,7 @@
 	<!-- Buffer node -->
 	<xs:complexType name="Buffer">
 		<xs:attribute name="name" type="xs:string" use="required"/>
-		<xs:attribute name="size" type="xs:unsignedInt" use="required"/>
+		<xs:attribute name="size" type="xs:unsignedLong" use="required"/>
 		<xs:attribute name="type"   type="mdl:ShmType"    use="optional" default="posix"/>
 		<xs:attribute name="blocks" type="xs:unsignedInt" use="optional" default="0"/>
 		<xs:attribute name="enabled" type="xs:boolean" use="optional" default="true"/>
@@ -109,10 +109,11 @@
 			<xs:attribute name="name"         type="xs:string" use="required"/>
 			<xs:attribute name="type"         type="mdl:Type"  use="required"/>
 			<xs:attribute name="dimensions"   type="xs:string" use="required" />
-			<xs:attribute name="global"	  type="xs:string"    use="optional" default="#"/>
-			<xs:attribute name="ghosts"	  type="xs:string"    use="optional" default="#"/>
+			<xs:attribute name="global"	    type="xs:string"    use="optional" default="#"/>
+			<xs:attribute name="ghosts"	    type="xs:string"    use="optional" default="#"/>
 			<xs:attribute name="language"     type="mdl:Language" use="optional" default="unknown"/>
 			<xs:attribute name="visualizable" type="xs:boolean"   use="optional" default="true"/>
+         <xs:attribute name="comment"      type="xs:string"    use="optional"/>
 		</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
@@ -145,19 +146,28 @@
 	<xs:complexType name="Variable">
 		<xs:simpleContent>
 		<xs:extension base="xs:string">
-			<xs:attribute name="name"    type="xs:string"  use="required"/>
-			<xs:attribute name="unit"    type="xs:string"  use="optional" default=""/>
-			<xs:attribute name="layout"  type="xs:string"  use="required"/>
-			<xs:attribute name="enabled" type="xs:boolean" use="optional" default="true"/>
-			<xs:attribute name="mesh"	 type="xs:string"  use="optional" default="#"/>
-			<xs:attribute name="type"    type="mdl:VarType" use="optional" default="scalar"/>
-			<xs:attribute name="centering" type="mdl:VarCentering" use="optional" default="zonal"/>
+			<xs:attribute name="name"       type="xs:string"   use="required"/>
+			<xs:attribute name="unit"       type="xs:string"   use="optional" default=""/>
+			<xs:attribute name="layout"     type="xs:string"   use="required"/>
+			<xs:attribute name="enabled"    type="xs:boolean"  use="optional" default="true"/>
+			<xs:attribute name="mesh"	     type="xs:string"   use="optional" default="#"/>
+			<xs:attribute name="type"       type="mdl:VarType" use="optional" default="scalar"/>
+         <xs:attribute name="vectorlength" type="xs:unsignedInt"  use="optional" default="1" />
+			<xs:attribute name="centering"    type="mdl:VarCentering" use="optional" default="zonal"/>
 			<xs:attribute name="visualizable" type="xs:boolean" use="optional" default="true"/>
 			<xs:attribute name="time-varying" type="xs:boolean" use="optional" default="true"/>
-			<xs:attribute name="store"	type="xs:string" use="optional" default="#"/>
+			<xs:attribute name="store"	   type="xs:string"  use="optional" default="#"/>
+         <xs:attribute name="comment"      type="xs:string"  use="optional"/>
+
 		</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
+
+   <!-- xs:complexType name="VectorVar">
+      <xs:sequence>
+         <xs:element name="name" type="mdl:Variable" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:sequence>
+   </xs:complexType -->
 
 	<!-- Group node -->
 	<xs:complexType name="Group">
@@ -182,6 +192,7 @@
 			<xs:attribute name="name"  type="xs:NCName" use="required"/>
 			<xs:attribute  name="type"  type="mdl:Type" use="required"/>
 			<xs:attribute name="value" type="xs:string" use="required"/>
+         <xs:attribute name="comment" type="xs:string" use="optional"/>
 		</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
@@ -199,22 +210,56 @@
 		</xs:restriction>
 	</xs:simpleType>
 
-	<!-- Coordinates (for curves and meshes) -->
+		<!-- Coordinates (for curves and meshes) -->
 	<xs:complexType name="Coord">
 		<xs:attribute name="name"  type="xs:string" use="required"/>
 		<xs:attribute name="unit"  type="xs:string" use="optional" default="#"/>
 		<xs:attribute name="label" type="xs:string" use="optional" default="#"/>
+      <xs:attribute name="comment" type="xs:string" use="optional"/>
 	</xs:complexType>
+   
+   <!-- Unstructured Mesh Vertex global id list -->
+	<xs:complexType name="VertexGID">
+		    <xs:attribute name="name"    type="xs:string" use="required"/>
+          <xs:attribute name="offset"  type="xs:int" use="optional" default="0"/>
+          <xs:attribute name="comment" type="xs:string" use="optional"/>
+	</xs:complexType> 
 
-	<!-- Mesh node -->
-	<xs:complexType name="Mesh">
-		<xs:sequence>
-			<xs:element name="coord" type="mdl:Coord" minOccurs="2" maxOccurs="3"/>
+   <!-- Unstructured Mesh mesh sections types (VTK defined preprocessor constants i.e VTK_QUAD, VTK_HEXAHEDRON -->
+	<xs:complexType name="SectionVTKTypes">
+		    <xs:attribute name="name"    type="xs:string" use="required"/>
+          <xs:attribute name="comment" type="xs:string" use="optional"/>
+	</xs:complexType> 
+   
+      <!-- Unstructured Mesh section types - number of elements of the section type -->
+	<xs:complexType name="SectionSizes">
+		    <xs:attribute name="name"    type="xs:string" use="required"/>
+          <xs:attribute name="comment" type="xs:string" use="optional"/>
+	</xs:complexType> 
+   
+      <!-- Unstructured Mesh list of vertex connectivities one for each element -->
+	<xs:complexType name="SectionConnectivity">
+		    <xs:attribute name="name"    type="xs:string" use="required"/>
+          <xs:attribute name="comment" type="xs:string" use="optional"/>
+	</xs:complexType> 
+
+      <!-- Mesh node, expands on original rectilinear definitions section_connectivity -->
+      <xs:complexType name="Mesh">
+      <xs:sequence>
+         <xs:element name="coord"                type="mdl:Coord"           minOccurs="1" maxOccurs="3"/>   
+         <xs:element name="vertex_global_id"     type="mdl:VertexGID"       minOccurs="0" maxOccurs="1"/>
+         <xs:element name="section_types"        type="mdl:SectionVTKTypes" minOccurs="0" maxOccurs="1"/>
+         <xs:element name="section_sizes"        type="mdl:SectionSizes"    minOccurs="0" maxOccurs="1"/>
+         <xs:element name="section_connectivity" type="mdl:SectionConnectivity" minOccurs="0" maxOccurs="1"/>
 		</xs:sequence>
-		<xs:attribute name="name" type="xs:string"    use="required"/>
-		<xs:attribute name="type" type="mdl:MeshType" use="required"/>
-		<xs:attribute name="topology"   type="xs:unsignedInt" use="optional" default="2"/>
+		<xs:attribute name="name"     type="xs:string"    use="required"/>
+		<xs:attribute name="type"     type="mdl:MeshType" use="required"/>
+		<xs:attribute name="topology" type="xs:unsignedInt" use="optional" default="2"/>
+      <xs:attribute name="time-varying" type="xs:boolean" use="optional" default="false"/>
+      <xs:attribute name="comment"  type="xs:string" use="optional"/>
+
 	</xs:complexType>
+ 
 
 	<!-- Curve node -->
 	<xs:complexType name="Curve">
@@ -293,15 +338,17 @@
 	</xs:complexType>
 
 
-        <!-- Parameters related to ParaView -->
-        <xs:complexType name="ParaViewParam">
-            <xs:sequence>
-                <xs:choice minOccurs="0" maxOccurs="unbounded">
-                    <xs:element name="script" type="xs:string"/>
-                </xs:choice>
-            </xs:sequence>
-            <xs:attribute name="update-frequency" type="xs:unsignedInt" use="optional" default="1"/>
-        </xs:complexType>
+   <!-- Parameters related to ParaView -->
+   <xs:complexType name="ParaViewParam">
+      <xs:sequence>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+               <xs:element name="script" type="xs:string"/>
+            </xs:choice>
+      </xs:sequence>
+      <xs:attribute name="update-frequency" type="xs:unsignedInt" use="optional" default="1"/>
+      <xs:attribute name="realtime-timestep" type="xs:double" use="optional" default="0.1"/>
+      <xs:attribute name="end-iteration" type="xs:unsignedInt" use="optional" default="0"/>
+   </xs:complexType>
 
 	<!-- Parameters related to Python -->
 	<xs:complexType name="PythonParam">
@@ -368,7 +415,8 @@
 		<xs:attribute name="FileName" type="xs:string"      use="required"/>
 		<xs:attribute name="RotationSize" type="xs:unsignedInt" use="required"/>
 		<xs:attribute name="LogFormat" type="xs:string" use="required"/>
-		<xs:attribute name="LogLevel" type="mdl:LogLevelType" use="required"/>
+		<xs:attribute name="LogLevel" type="mdl:LogLevelType" use="optional" default="warning" />
+		<xs:attribute name="Flush"    type="xs:boolean" use="optional" default="false"/>
 	</xs:complexType>
 
 	<!-- Simulation node -->
@@ -380,7 +428,7 @@
 			<xs:element name="actions" type="mdl:Actions" maxOccurs="1"/>
 			<xs:element name="python" type="mdl:PythonParam" maxOccurs="1" minOccurs="0"/>
 			<xs:element name="visit" type="mdl:VisitParam" maxOccurs="1" minOccurs="0"/>
-                        <xs:element name="paraview" type="mdl:ParaViewParam" maxOccurs="1" minOccurs="0"/>
+			<xs:element name="paraview" type="mdl:ParaViewParam" maxOccurs="1" minOccurs="0"/>
 			<xs:element name="log" type="mdl:Log" maxOccurs="1" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string" use="required"/>

@@ -30,5 +30,5 @@
 	</storage>
 	<actions>
 	</actions>
-	<log FileName="log/2dmesh" RotationSize="5" LogFormat="[%TimeStamp%]: %Message%" LogLevel="info" />
+	<log FileName="log/2dmesh" RotationSize="5" LogFormat="[%TimeStamp%]: %Message%" LogLevel="info" Flush="false" />
 </simulation>

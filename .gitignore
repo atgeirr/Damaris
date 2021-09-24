@@ -1,4 +1,8 @@
+.cproject
+.project
+.settings/
 CMakeFiles/
+doc/
 cmake-build-debug/
 CMakeCache.txt 
 DAMARIS.cbp 

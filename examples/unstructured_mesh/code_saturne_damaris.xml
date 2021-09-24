@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<simulation name="cs_mesh_xyz" language="c" xmlns="http://damaris.gforge.inria.fr/damaris/model">
+        <architecture>
+                <domains count="1" />
+                <dedicated cores="1" nodes="0" />
+                <buffer name="damaris-buffer" size="150000000" />
+                <queue  name="damaris-queue"  size="100" />
+        </architecture>
+        <data>
+               <parameter name="cs_glob_n_ranks"      type="int" value="4" /> 
+               <parameter name="mesh_dim"             type="int" value="3" /> 
+               <parameter name="n_sections_total"     type="int" value="1" /> 
+               <parameter name="n_vertices_total"     type="int" value="1" />
+               <parameter name="n_connectivity_total" type="int" value="1" /> 
+               <parameter name="n_elements_total"     type="int" value="1" /> 
+               <parameter name="n_sections_local"     type="int" value="1" /> 
+               <parameter name="n_vertices_local"     type="int" value="1" />
+               <parameter name="n_connectivity_local" type="int" value="1" /> 
+               <parameter name="n_elements_local"     type="int" value="1" /> 
+               <parameter name="n_elements_offset"    type="int" value="1" />
+              
+
+               <layout name="zonal_layout_usmesh"             type="double" dimensions="n_elements_local"   global="n_elements_total"   comment="For the field data e.g. Pressure"  />
+               <layout name="zonal_layout_usmesh_int"         type="int"    dimensions="n_elements_local"   global="n_elements_total"   comment="For the integer based MPI rank data"  />
+               <layout name="zonal_layout_usmesh_vect3"       type="double" dimensions="3,n_elements_local" global="3,n_elements_total" comment="For vectorised (3 component) field data e.g. Velocity "  />
+             
+               <layout name="unstructured_vertex_layout_xyz"  type="double"  dimensions="mesh_dim, n_vertices_local"   global="mesh_dim, n_vertices_total"   />
+               <layout name="unstructured_gid_layout"         type="long"    dimensions="n_vertices_local"     global="n_vertices_total"     />
+               <layout name="mesh_n_sections"                 type="int"     dimensions="n_sections_local"     global="n_sections_total"     />
+               <layout name="connectivity_size"               type="long"    dimensions="n_connectivity_local" global="n_connectivity_total" />
+
+            <group name="umesh_vars">    
+               <variable name="unstructured_mesh_xyz" layout="unstructured_vertex_layout_xyz" type="vector" visualizable="false" time-varying="false" comment="The x,y,(z) coordinates of each vertex"  />
+               <variable name="unstructured_gid"      layout="unstructured_gid_layout"        type="scalar" visualizable="false" time-varying="false" comment="The global id's of each vertex" />
+               
+               <variable name="section_types"         layout="mesh_n_sections"    type="scalar" visualizable="false"  time-varying="false"  comment="The section geometry type - VTK_QUAD VTK_HEXAHEDRON etc." />
+               <variable name="section_sizes"         layout="mesh_n_sections"    type="scalar" visualizable="false"  time-varying="false"  comment="The number of elements in each section- soe equiv to the number of field values per section" />
+               <variable name="section_connectivity"  layout="connectivity_size"  type="scalar" visualizable="false"  time-varying="false"  comment="n_connectivity += section->n_elements * vtk_type_stride ;"/>
+               
+               <mesh name="fluid_domain_umesh" type="unstructured" topology="3" comment="These arrays can be ragged, i.e. each rank could have a different number of sections and each section can have a diiferent number of verticies etc" >
+                  <coord                name="umesh_vars/unstructured_mesh_xyz"  unit="m"    />
+                  <vertex_global_id     name="umesh_vars/unstructured_gid"       offset="-1" />
+                  <section_types        name="umesh_vars/section_types"                      />
+                  <section_sizes        name="umesh_vars/section_sizes"                      />
+                  <section_connectivity name="umesh_vars/section_connectivity"               />
+               </mesh>
+            </group>
+
+            <group name="fields">     
+              <variable name="pressure"    layout="zonal_layout_usmesh"       mesh="fluid_domain_umesh" type="scalar"  visualizable="true"                      unit="Pa"   centering="zonal" />
+              <variable name="velocity"    layout="zonal_layout_usmesh_vect3" mesh="fluid_domain_umesh" type="vector"  visualizable="true" vectorlength="3"     unit="m/s"  centering="zonal" />
+              <variable name="mpi_rank_id" layout="zonal_layout_usmesh_int"   mesh="fluid_domain_umesh" type="scalar"  visualizable="true" time-varying="false" unit="rank" centering="zonal" comment="Compare store=MyStore with Paraview csv output" />
+            </group>
+      </data>
+      
+      <actions>
+      </actions>
+      
+      <paraview update-frequency="1" >
+        <script>damaris_slice_xy_csv.py</script>
+      </paraview>
+                
+      <storage>
+      <store name="MyStore" type="HDF5">
+         <option key="FileMode">Collective</option>
+         <option key="XDMFMode">NoIteration</option>
+         <option key="FilesPath"></option>
+      </store>
+      </storage>
+   
+         
+         <log FileName="log/damaris" RotationSize="5" LogFormat="[%TimeStamp%]: %Message%" LogLevel="info" Flush="false" />
+</simulation>

@@ -1,5 +1,7 @@
 configure_file(test.xml test.xml COPYONLY)
-	
+
+set(CMAKE_C_STANDARD 99)
+
 add_executable(TestDataSpace TestDataSpace.cpp)
 target_link_libraries(TestDataSpace ${DEP_LIBRARIES} ${CPPUNIT_LIBRARIES})
 

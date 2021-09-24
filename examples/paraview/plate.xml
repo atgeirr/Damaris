@@ -37,7 +37,7 @@
 	<actions>
 	</actions>
 	<paraview>
-	    <script>/home/hadi/Damaris/DamarisDevHadi/examples/paraview/plate.py</script>
+	    <script>/usr/local/examples/paraview/plate.py</script>
 		</paraview>
-	<log FileName="log/2dmesh" RotationSize="5" LogFormat="[%TimeStamp%]: %Message%" LogLevel="info" />
+	<log FileName="log/2dmesh" RotationSize="5" LogFormat="[%TimeStamp%]: %Message%" LogLevel="info" Flush="false" />
 </simulation>

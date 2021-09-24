@@ -92,7 +92,7 @@ class Block //: public ENABLE_SHARED_FROM_THIS(Block)
 	}
 	
 	/**
-	 * Sets an lower bound of the block.
+	 * Sets a lower bound of the block.
 	 * 
 	 * \param[in] i : index of the lower-bound.
 	 * \param[in] val : new value.
@@ -192,7 +192,9 @@ class Block //: public ENABLE_SHARED_FROM_THIS(Block)
 
 	/**
 	 * Returns the global extent along the desired dimension
-	 * at the moment of creation.
+	 * at the moment of creation. N.B. This value  may change if a
+	 * variable that owns the block relies on a paramater that is
+	 * modified in user code.
 	 */
 	virtual size_t GetGlobalExtent(unsigned int i) const {
 		return global_dims_[i];
@@ -222,7 +224,8 @@ class Block //: public ENABLE_SHARED_FROM_THIS(Block)
 		}
 		
 		for(int i=0; i < GetDimensions(); i++) {
-			upper_bounds_[i] += (p[i] - lower_bounds_[i]);
+		    upper_bounds_[i] += (p[i] - lower_bounds_[i]);
+			// upper_bounds_[i] = endp[i];
 			lower_bounds_[i] = p[i];
 		}
 		
@@ -270,6 +273,9 @@ class Block //: public ENABLE_SHARED_FROM_THIS(Block)
 		dataspace_.GainDataOwnership();
 	}
 
+
+
+
 	/**
      * \see returns the item at the ith place in the block
      */
@@ -289,6 +295,7 @@ class Block //: public ENABLE_SHARED_FROM_THIS(Block)
 	/**
 	 * Returns the extents of the block
 	 * \param[in,out] extents : The extents array to be filled by this method
+	 * \param[in] zonal : The data exists with zonal placement (as opposed to nodal placement if false)
 	 * \param[in] withGhost : should the extents be return wither with ghosts or not?
 	 */
 	void GetGridExtents(int extents[6] , bool zonal , bool withGhost=true)
@@ -299,9 +306,22 @@ class Block //: public ENABLE_SHARED_FROM_THIS(Block)
 		extents[3] = extents[4] = extents[5] = 0;
 		int dim = upper_bounds_.size();
 
-		for(int i=0; i<dim ; i++) {
-			extents[2*i] = GetStartIndex(i);
-			extents[2*i+1] = GetEndIndex(i) + offset; // #point = #cells + 1
+		// As variables can have more than 3 dimensions we should check here. Now it is implicit that
+		// the last 3 dimensions are the spatial ones and implicit Array of Structures format, with
+		// a struct at each spatial point.
+		// TODO: Check if AOS is only format to be supported by Damaris. This would be unwise as SOA
+		// is efficient for CPU and GPU based processing. Further meta-data about the spatial dims
+		// could be provided
+		int startdim = 0 ;
+		if (dim > 3)
+		{
+			startdim = dim - 3;
+		}
+		int j = 0 ;
+		for(int i=startdim; i<dim ; i++) {
+			extents[2*j] = GetStartIndex(i);
+			extents[2*j+1] = GetEndIndex(i) + offset; // #point = #cells + 1
+			j++ ;
 		}
 	}
 #endif

@@ -47,7 +47,7 @@ private:
 	 * Destructor.
 	 */
 	virtual ~PointMesh() {}
-	
+
 public:
 	
 	/**
@@ -114,6 +114,14 @@ public:
 	*/
 	virtual vtkDataSet* GetVtkGrid(int source , int iteration , int block ,
 									   const std::shared_ptr<damaris::Variable>& var) override;
+
+
+	virtual vtkDataSet* CreateVtkGrid() override
+	{
+		return nullptr ; // currently not implemented
+	}
+
+
 #endif
 
 };

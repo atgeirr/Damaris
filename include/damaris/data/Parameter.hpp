@@ -157,7 +157,8 @@ T Parameter::GetValue() const
 	if(requested_type != this_type) {
 		ERROR("Requesting access to parameter's value with"
 		<< " a wrong type (parameter type is " << GetType()
-		<< ", requested " << TypeFromCpp<T>() << ")");
+		<< ", requested " << TypeFromCpp<T>() << ") Parameter name: "
+		<< GetModel().name() );
 		return t;
 	}
 	
@@ -176,7 +177,8 @@ void Parameter::SetValue(const T& v)
 	if(requested_type != this_type) {
 		ERROR("Requesting access to parameter's value with"
 		<< " a wrong type (parameter type is " << GetType()
-		<< ", requested " << TypeFromCpp<T>() << ")");
+		<< ", requested " << TypeFromCpp<T>() << ") Parameter name: "
+		<< GetModel().name() );
 		return;
 	}
 	

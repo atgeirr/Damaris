@@ -51,7 +51,7 @@ class RectilinearMesh : public StructuredMesh {
 	public:
 
 	/**
-	 * Creats an instance of RectilinearMesh given a model and a name.
+	 * Creates an instance of RectilinearMesh given a model and a name.
 	 * Do some additional checking before creating it. 
 	 * If these verifications fail, return NULL.
 	 *

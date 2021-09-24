@@ -874,6 +874,36 @@ namespace damaris
       return visualizable_type (true);
     }
 
+    const Layout::comment_optional& Layout::
+    comment () const
+    {
+      return this->comment_;
+    }
+
+    Layout::comment_optional& Layout::
+    comment ()
+    {
+      return this->comment_;
+    }
+
+    void Layout::
+    comment (const comment_type& x)
+    {
+      this->comment_.set (x);
+    }
+
+    void Layout::
+    comment (const comment_optional& x)
+    {
+      this->comment_ = x;
+    }
+
+    void Layout::
+    comment (::std::unique_ptr< comment_type > x)
+    {
+      this->comment_.set (std::move (x));
+    }
+
 
     // VarType
     // 
@@ -1130,6 +1160,30 @@ namespace damaris
       return type_default_value_;
     }
 
+    const Variable::vectorlength_type& Variable::
+    vectorlength () const
+    {
+      return this->vectorlength_.get ();
+    }
+
+    Variable::vectorlength_type& Variable::
+    vectorlength ()
+    {
+      return this->vectorlength_.get ();
+    }
+
+    void Variable::
+    vectorlength (const vectorlength_type& x)
+    {
+      this->vectorlength_.set (x);
+    }
+
+    Variable::vectorlength_type Variable::
+    vectorlength_default_value ()
+    {
+      return vectorlength_type (1U);
+    }
+
     const Variable::centering_type& Variable::
     centering () const
     {
@@ -1236,6 +1290,36 @@ namespace damaris
     store_default_value ()
     {
       return store_default_value_;
+    }
+
+    const Variable::comment_optional& Variable::
+    comment () const
+    {
+      return this->comment_;
+    }
+
+    Variable::comment_optional& Variable::
+    comment ()
+    {
+      return this->comment_;
+    }
+
+    void Variable::
+    comment (const comment_type& x)
+    {
+      this->comment_.set (x);
+    }
+
+    void Variable::
+    comment (const comment_optional& x)
+    {
+      this->comment_ = x;
+    }
+
+    void Variable::
+    comment (::std::unique_ptr< comment_type > x)
+    {
+      this->comment_.set (std::move (x));
     }
 
 
@@ -1486,6 +1570,36 @@ namespace damaris
       this->value_.set (std::move (x));
     }
 
+    const Parameter::comment_optional& Parameter::
+    comment () const
+    {
+      return this->comment_;
+    }
+
+    Parameter::comment_optional& Parameter::
+    comment ()
+    {
+      return this->comment_;
+    }
+
+    void Parameter::
+    comment (const comment_type& x)
+    {
+      this->comment_.set (x);
+    }
+
+    void Parameter::
+    comment (const comment_optional& x)
+    {
+      this->comment_ = x;
+    }
+
+    void Parameter::
+    comment (::std::unique_ptr< comment_type > x)
+    {
+      this->comment_.set (std::move (x));
+    }
+
 
     // MeshType
     // 
@@ -1619,6 +1733,292 @@ namespace damaris
       return label_default_value_;
     }
 
+    const Coord::comment_optional& Coord::
+    comment () const
+    {
+      return this->comment_;
+    }
+
+    Coord::comment_optional& Coord::
+    comment ()
+    {
+      return this->comment_;
+    }
+
+    void Coord::
+    comment (const comment_type& x)
+    {
+      this->comment_.set (x);
+    }
+
+    void Coord::
+    comment (const comment_optional& x)
+    {
+      this->comment_ = x;
+    }
+
+    void Coord::
+    comment (::std::unique_ptr< comment_type > x)
+    {
+      this->comment_.set (std::move (x));
+    }
+
+
+    // VertexGID
+    // 
+
+    const VertexGID::name_type& VertexGID::
+    name () const
+    {
+      return this->name_.get ();
+    }
+
+    VertexGID::name_type& VertexGID::
+    name ()
+    {
+      return this->name_.get ();
+    }
+
+    void VertexGID::
+    name (const name_type& x)
+    {
+      this->name_.set (x);
+    }
+
+    void VertexGID::
+    name (::std::unique_ptr< name_type > x)
+    {
+      this->name_.set (std::move (x));
+    }
+
+    const VertexGID::offset_type& VertexGID::
+    offset () const
+    {
+      return this->offset_.get ();
+    }
+
+    VertexGID::offset_type& VertexGID::
+    offset ()
+    {
+      return this->offset_.get ();
+    }
+
+    void VertexGID::
+    offset (const offset_type& x)
+    {
+      this->offset_.set (x);
+    }
+
+    VertexGID::offset_type VertexGID::
+    offset_default_value ()
+    {
+      return offset_type (0);
+    }
+
+    const VertexGID::comment_optional& VertexGID::
+    comment () const
+    {
+      return this->comment_;
+    }
+
+    VertexGID::comment_optional& VertexGID::
+    comment ()
+    {
+      return this->comment_;
+    }
+
+    void VertexGID::
+    comment (const comment_type& x)
+    {
+      this->comment_.set (x);
+    }
+
+    void VertexGID::
+    comment (const comment_optional& x)
+    {
+      this->comment_ = x;
+    }
+
+    void VertexGID::
+    comment (::std::unique_ptr< comment_type > x)
+    {
+      this->comment_.set (std::move (x));
+    }
+
+
+    // SectionVTKTypes
+    // 
+
+    const SectionVTKTypes::name_type& SectionVTKTypes::
+    name () const
+    {
+      return this->name_.get ();
+    }
+
+    SectionVTKTypes::name_type& SectionVTKTypes::
+    name ()
+    {
+      return this->name_.get ();
+    }
+
+    void SectionVTKTypes::
+    name (const name_type& x)
+    {
+      this->name_.set (x);
+    }
+
+    void SectionVTKTypes::
+    name (::std::unique_ptr< name_type > x)
+    {
+      this->name_.set (std::move (x));
+    }
+
+    const SectionVTKTypes::comment_optional& SectionVTKTypes::
+    comment () const
+    {
+      return this->comment_;
+    }
+
+    SectionVTKTypes::comment_optional& SectionVTKTypes::
+    comment ()
+    {
+      return this->comment_;
+    }
+
+    void SectionVTKTypes::
+    comment (const comment_type& x)
+    {
+      this->comment_.set (x);
+    }
+
+    void SectionVTKTypes::
+    comment (const comment_optional& x)
+    {
+      this->comment_ = x;
+    }
+
+    void SectionVTKTypes::
+    comment (::std::unique_ptr< comment_type > x)
+    {
+      this->comment_.set (std::move (x));
+    }
+
+
+    // SectionSizes
+    // 
+
+    const SectionSizes::name_type& SectionSizes::
+    name () const
+    {
+      return this->name_.get ();
+    }
+
+    SectionSizes::name_type& SectionSizes::
+    name ()
+    {
+      return this->name_.get ();
+    }
+
+    void SectionSizes::
+    name (const name_type& x)
+    {
+      this->name_.set (x);
+    }
+
+    void SectionSizes::
+    name (::std::unique_ptr< name_type > x)
+    {
+      this->name_.set (std::move (x));
+    }
+
+    const SectionSizes::comment_optional& SectionSizes::
+    comment () const
+    {
+      return this->comment_;
+    }
+
+    SectionSizes::comment_optional& SectionSizes::
+    comment ()
+    {
+      return this->comment_;
+    }
+
+    void SectionSizes::
+    comment (const comment_type& x)
+    {
+      this->comment_.set (x);
+    }
+
+    void SectionSizes::
+    comment (const comment_optional& x)
+    {
+      this->comment_ = x;
+    }
+
+    void SectionSizes::
+    comment (::std::unique_ptr< comment_type > x)
+    {
+      this->comment_.set (std::move (x));
+    }
+
+
+    // SectionConnectivity
+    // 
+
+    const SectionConnectivity::name_type& SectionConnectivity::
+    name () const
+    {
+      return this->name_.get ();
+    }
+
+    SectionConnectivity::name_type& SectionConnectivity::
+    name ()
+    {
+      return this->name_.get ();
+    }
+
+    void SectionConnectivity::
+    name (const name_type& x)
+    {
+      this->name_.set (x);
+    }
+
+    void SectionConnectivity::
+    name (::std::unique_ptr< name_type > x)
+    {
+      this->name_.set (std::move (x));
+    }
+
+    const SectionConnectivity::comment_optional& SectionConnectivity::
+    comment () const
+    {
+      return this->comment_;
+    }
+
+    SectionConnectivity::comment_optional& SectionConnectivity::
+    comment ()
+    {
+      return this->comment_;
+    }
+
+    void SectionConnectivity::
+    comment (const comment_type& x)
+    {
+      this->comment_.set (x);
+    }
+
+    void SectionConnectivity::
+    comment (const comment_optional& x)
+    {
+      this->comment_ = x;
+    }
+
+    void SectionConnectivity::
+    comment (::std::unique_ptr< comment_type > x)
+    {
+      this->comment_.set (std::move (x));
+    }
+
 
     // Mesh
     // 
@@ -1639,6 +2039,126 @@ namespace damaris
     coord (const coord_sequence& s)
     {
       this->coord_ = s;
+    }
+
+    const Mesh::vertex_global_id_optional& Mesh::
+    vertex_global_id () const
+    {
+      return this->vertex_global_id_;
+    }
+
+    Mesh::vertex_global_id_optional& Mesh::
+    vertex_global_id ()
+    {
+      return this->vertex_global_id_;
+    }
+
+    void Mesh::
+    vertex_global_id (const vertex_global_id_type& x)
+    {
+      this->vertex_global_id_.set (x);
+    }
+
+    void Mesh::
+    vertex_global_id (const vertex_global_id_optional& x)
+    {
+      this->vertex_global_id_ = x;
+    }
+
+    void Mesh::
+    vertex_global_id (::std::unique_ptr< vertex_global_id_type > x)
+    {
+      this->vertex_global_id_.set (std::move (x));
+    }
+
+    const Mesh::section_types_optional& Mesh::
+    section_types () const
+    {
+      return this->section_types_;
+    }
+
+    Mesh::section_types_optional& Mesh::
+    section_types ()
+    {
+      return this->section_types_;
+    }
+
+    void Mesh::
+    section_types (const section_types_type& x)
+    {
+      this->section_types_.set (x);
+    }
+
+    void Mesh::
+    section_types (const section_types_optional& x)
+    {
+      this->section_types_ = x;
+    }
+
+    void Mesh::
+    section_types (::std::unique_ptr< section_types_type > x)
+    {
+      this->section_types_.set (std::move (x));
+    }
+
+    const Mesh::section_sizes_optional& Mesh::
+    section_sizes () const
+    {
+      return this->section_sizes_;
+    }
+
+    Mesh::section_sizes_optional& Mesh::
+    section_sizes ()
+    {
+      return this->section_sizes_;
+    }
+
+    void Mesh::
+    section_sizes (const section_sizes_type& x)
+    {
+      this->section_sizes_.set (x);
+    }
+
+    void Mesh::
+    section_sizes (const section_sizes_optional& x)
+    {
+      this->section_sizes_ = x;
+    }
+
+    void Mesh::
+    section_sizes (::std::unique_ptr< section_sizes_type > x)
+    {
+      this->section_sizes_.set (std::move (x));
+    }
+
+    const Mesh::section_connectivity_optional& Mesh::
+    section_connectivity () const
+    {
+      return this->section_connectivity_;
+    }
+
+    Mesh::section_connectivity_optional& Mesh::
+    section_connectivity ()
+    {
+      return this->section_connectivity_;
+    }
+
+    void Mesh::
+    section_connectivity (const section_connectivity_type& x)
+    {
+      this->section_connectivity_.set (x);
+    }
+
+    void Mesh::
+    section_connectivity (const section_connectivity_optional& x)
+    {
+      this->section_connectivity_ = x;
+    }
+
+    void Mesh::
+    section_connectivity (::std::unique_ptr< section_connectivity_type > x)
+    {
+      this->section_connectivity_.set (std::move (x));
     }
 
     const Mesh::name_type& Mesh::
@@ -1711,6 +2231,60 @@ namespace damaris
     topology_default_value ()
     {
       return topology_type (2U);
+    }
+
+    const Mesh::time_varying_type& Mesh::
+    time_varying () const
+    {
+      return this->time_varying_.get ();
+    }
+
+    Mesh::time_varying_type& Mesh::
+    time_varying ()
+    {
+      return this->time_varying_.get ();
+    }
+
+    void Mesh::
+    time_varying (const time_varying_type& x)
+    {
+      this->time_varying_.set (x);
+    }
+
+    Mesh::time_varying_type Mesh::
+    time_varying_default_value ()
+    {
+      return time_varying_type (false);
+    }
+
+    const Mesh::comment_optional& Mesh::
+    comment () const
+    {
+      return this->comment_;
+    }
+
+    Mesh::comment_optional& Mesh::
+    comment ()
+    {
+      return this->comment_;
+    }
+
+    void Mesh::
+    comment (const comment_type& x)
+    {
+      this->comment_.set (x);
+    }
+
+    void Mesh::
+    comment (const comment_optional& x)
+    {
+      this->comment_ = x;
+    }
+
+    void Mesh::
+    comment (::std::unique_ptr< comment_type > x)
+    {
+      this->comment_.set (std::move (x));
     }
 
 
@@ -2485,6 +3059,54 @@ namespace damaris
       return update_frequency_type (1U);
     }
 
+    const ParaViewParam::realtime_timestep_type& ParaViewParam::
+    realtime_timestep () const
+    {
+      return this->realtime_timestep_.get ();
+    }
+
+    ParaViewParam::realtime_timestep_type& ParaViewParam::
+    realtime_timestep ()
+    {
+      return this->realtime_timestep_.get ();
+    }
+
+    void ParaViewParam::
+    realtime_timestep (const realtime_timestep_type& x)
+    {
+      this->realtime_timestep_.set (x);
+    }
+
+    ParaViewParam::realtime_timestep_type ParaViewParam::
+    realtime_timestep_default_value ()
+    {
+      return realtime_timestep_type (.1);
+    }
+
+    const ParaViewParam::end_iteration_type& ParaViewParam::
+    end_iteration () const
+    {
+      return this->end_iteration_.get ();
+    }
+
+    ParaViewParam::end_iteration_type& ParaViewParam::
+    end_iteration ()
+    {
+      return this->end_iteration_.get ();
+    }
+
+    void ParaViewParam::
+    end_iteration (const end_iteration_type& x)
+    {
+      this->end_iteration_.set (x);
+    }
+
+    ParaViewParam::end_iteration_type ParaViewParam::
+    end_iteration_default_value ()
+    {
+      return end_iteration_type (0U);
+    }
+
 
     // PythonParam
     // 
@@ -2893,6 +3515,36 @@ namespace damaris
     LogLevel (::std::unique_ptr< LogLevel_type > x)
     {
       this->LogLevel_.set (std::move (x));
+    }
+
+    const Log::LogLevel_type& Log::
+    LogLevel_default_value ()
+    {
+      return LogLevel_default_value_;
+    }
+
+    const Log::Flush_type& Log::
+    Flush () const
+    {
+      return this->Flush_.get ();
+    }
+
+    Log::Flush_type& Log::
+    Flush ()
+    {
+      return this->Flush_.get ();
+    }
+
+    void Log::
+    Flush (const Flush_type& x)
+    {
+      this->Flush_.set (x);
+    }
+
+    Log::Flush_type Log::
+    Flush_default_value ()
+    {
+      return Flush_type (false);
     }
 
 
@@ -4385,7 +5037,8 @@ namespace damaris
       global_ (global_default_value (), this),
       ghosts_ (ghosts_default_value (), this),
       language_ (language_default_value (), this),
-      visualizable_ (visualizable_default_value (), this)
+      visualizable_ (visualizable_default_value (), this),
+      comment_ (this)
     {
     }
 
@@ -4401,7 +5054,8 @@ namespace damaris
       global_ (global_default_value (), this),
       ghosts_ (ghosts_default_value (), this),
       language_ (language_default_value (), this),
-      visualizable_ (visualizable_default_value (), this)
+      visualizable_ (visualizable_default_value (), this),
+      comment_ (this)
     {
     }
 
@@ -4417,7 +5071,8 @@ namespace damaris
       global_ (global_default_value (), this),
       ghosts_ (ghosts_default_value (), this),
       language_ (language_default_value (), this),
-      visualizable_ (visualizable_default_value (), this)
+      visualizable_ (visualizable_default_value (), this),
+      comment_ (this)
     {
     }
 
@@ -4433,7 +5088,8 @@ namespace damaris
       global_ (global_default_value (), this),
       ghosts_ (ghosts_default_value (), this),
       language_ (language_default_value (), this),
-      visualizable_ (visualizable_default_value (), this)
+      visualizable_ (visualizable_default_value (), this),
+      comment_ (this)
     {
     }
 
@@ -4448,7 +5104,8 @@ namespace damaris
       global_ (x.global_, f, this),
       ghosts_ (x.ghosts_, f, this),
       language_ (x.language_, f, this),
-      visualizable_ (x.visualizable_, f, this)
+      visualizable_ (x.visualizable_, f, this),
+      comment_ (x.comment_, f, this)
     {
     }
 
@@ -4463,7 +5120,8 @@ namespace damaris
       global_ (this),
       ghosts_ (this),
       language_ (this),
-      visualizable_ (this)
+      visualizable_ (this),
+      comment_ (this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
       {
@@ -4521,6 +5179,12 @@ namespace damaris
         if (n.name () == "visualizable" && n.namespace_ ().empty ())
         {
           this->visualizable_.set (visualizable_traits::create (i, f, this));
+          continue;
+        }
+
+        if (n.name () == "comment" && n.namespace_ ().empty ())
+        {
+          this->comment_.set (comment_traits::create (i, f, this));
           continue;
         }
       }
@@ -4587,6 +5251,7 @@ namespace damaris
         this->ghosts_ = x.ghosts_;
         this->language_ = x.language_;
         this->visualizable_ = x.visualizable_;
+        this->comment_ = x.comment_;
       }
 
       return *this;
@@ -4781,10 +5446,12 @@ namespace damaris
       enabled_ (enabled_default_value (), this),
       mesh_ (mesh_default_value (), this),
       type_ (type_default_value (), this),
+      vectorlength_ (vectorlength_default_value (), this),
       centering_ (centering_default_value (), this),
       visualizable_ (visualizable_default_value (), this),
       time_varying_ (time_varying_default_value (), this),
-      store_ (store_default_value (), this)
+      store_ (store_default_value (), this),
+      comment_ (this)
     {
     }
 
@@ -4799,10 +5466,12 @@ namespace damaris
       enabled_ (enabled_default_value (), this),
       mesh_ (mesh_default_value (), this),
       type_ (type_default_value (), this),
+      vectorlength_ (vectorlength_default_value (), this),
       centering_ (centering_default_value (), this),
       visualizable_ (visualizable_default_value (), this),
       time_varying_ (time_varying_default_value (), this),
-      store_ (store_default_value (), this)
+      store_ (store_default_value (), this),
+      comment_ (this)
     {
     }
 
@@ -4817,10 +5486,12 @@ namespace damaris
       enabled_ (enabled_default_value (), this),
       mesh_ (mesh_default_value (), this),
       type_ (type_default_value (), this),
+      vectorlength_ (vectorlength_default_value (), this),
       centering_ (centering_default_value (), this),
       visualizable_ (visualizable_default_value (), this),
       time_varying_ (time_varying_default_value (), this),
-      store_ (store_default_value (), this)
+      store_ (store_default_value (), this),
+      comment_ (this)
     {
     }
 
@@ -4835,10 +5506,12 @@ namespace damaris
       enabled_ (enabled_default_value (), this),
       mesh_ (mesh_default_value (), this),
       type_ (type_default_value (), this),
+      vectorlength_ (vectorlength_default_value (), this),
       centering_ (centering_default_value (), this),
       visualizable_ (visualizable_default_value (), this),
       time_varying_ (time_varying_default_value (), this),
-      store_ (store_default_value (), this)
+      store_ (store_default_value (), this),
+      comment_ (this)
     {
     }
 
@@ -4853,10 +5526,12 @@ namespace damaris
       enabled_ (x.enabled_, f, this),
       mesh_ (x.mesh_, f, this),
       type_ (x.type_, f, this),
+      vectorlength_ (x.vectorlength_, f, this),
       centering_ (x.centering_, f, this),
       visualizable_ (x.visualizable_, f, this),
       time_varying_ (x.time_varying_, f, this),
-      store_ (x.store_, f, this)
+      store_ (x.store_, f, this),
+      comment_ (x.comment_, f, this)
     {
     }
 
@@ -4871,10 +5546,12 @@ namespace damaris
       enabled_ (this),
       mesh_ (this),
       type_ (this),
+      vectorlength_ (this),
       centering_ (this),
       visualizable_ (this),
       time_varying_ (this),
-      store_ (this)
+      store_ (this),
+      comment_ (this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
       {
@@ -4929,6 +5606,12 @@ namespace damaris
           continue;
         }
 
+        if (n.name () == "vectorlength" && n.namespace_ ().empty ())
+        {
+          this->vectorlength_.set (vectorlength_traits::create (i, f, this));
+          continue;
+        }
+
         if (n.name () == "centering" && n.namespace_ ().empty ())
         {
           this->centering_.set (centering_traits::create (i, f, this));
@@ -4950,6 +5633,12 @@ namespace damaris
         if (n.name () == "store" && n.namespace_ ().empty ())
         {
           this->store_.set (store_traits::create (i, f, this));
+          continue;
+        }
+
+        if (n.name () == "comment" && n.namespace_ ().empty ())
+        {
+          this->comment_.set (comment_traits::create (i, f, this));
           continue;
         }
       }
@@ -4986,6 +5675,11 @@ namespace damaris
       if (!type_.present ())
       {
         this->type_.set (type_default_value ());
+      }
+
+      if (!vectorlength_.present ())
+      {
+        this->vectorlength_.set (vectorlength_default_value ());
       }
 
       if (!centering_.present ())
@@ -5028,10 +5722,12 @@ namespace damaris
         this->enabled_ = x.enabled_;
         this->mesh_ = x.mesh_;
         this->type_ = x.type_;
+        this->vectorlength_ = x.vectorlength_;
         this->centering_ = x.centering_;
         this->visualizable_ = x.visualizable_;
         this->time_varying_ = x.time_varying_;
         this->store_ = x.store_;
+        this->comment_ = x.comment_;
       }
 
       return *this;
@@ -5251,7 +5947,8 @@ namespace damaris
     : ::xml_schema::string (),
       name_ (name, this),
       type_ (type, this),
-      value_ (value, this)
+      value_ (value, this),
+      comment_ (this)
     {
     }
 
@@ -5263,7 +5960,8 @@ namespace damaris
     : ::xml_schema::string (_xsd_string_base),
       name_ (name, this),
       type_ (type, this),
-      value_ (value, this)
+      value_ (value, this),
+      comment_ (this)
     {
     }
 
@@ -5275,7 +5973,8 @@ namespace damaris
     : ::xml_schema::string (_xsd_string_base),
       name_ (name, this),
       type_ (type, this),
-      value_ (value, this)
+      value_ (value, this),
+      comment_ (this)
     {
     }
 
@@ -5287,7 +5986,8 @@ namespace damaris
     : ::xml_schema::string (_xsd_string_base),
       name_ (name, this),
       type_ (type, this),
-      value_ (value, this)
+      value_ (value, this),
+      comment_ (this)
     {
     }
 
@@ -5298,7 +5998,8 @@ namespace damaris
     : ::xml_schema::string (x, f, c),
       name_ (x.name_, f, this),
       type_ (x.type_, f, this),
-      value_ (x.value_, f, this)
+      value_ (x.value_, f, this),
+      comment_ (x.comment_, f, this)
     {
     }
 
@@ -5309,7 +6010,8 @@ namespace damaris
     : ::xml_schema::string (e, f | ::xml_schema::flags::base, c),
       name_ (this),
       type_ (this),
-      value_ (this)
+      value_ (this),
+      comment_ (this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
       {
@@ -5343,6 +6045,12 @@ namespace damaris
         if (n.name () == "value" && n.namespace_ ().empty ())
         {
           this->value_.set (value_traits::create (i, f, this));
+          continue;
+        }
+
+        if (n.name () == "comment" && n.namespace_ ().empty ())
+        {
+          this->comment_.set (comment_traits::create (i, f, this));
           continue;
         }
       }
@@ -5385,6 +6093,7 @@ namespace damaris
         this->name_ = x.name_;
         this->type_ = x.type_;
         this->value_ = x.value_;
+        this->comment_ = x.comment_;
       }
 
       return *this;
@@ -5489,7 +6198,8 @@ namespace damaris
     : ::xml_schema::type (),
       name_ (name, this),
       unit_ (unit_default_value (), this),
-      label_ (label_default_value (), this)
+      label_ (label_default_value (), this),
+      comment_ (this)
     {
     }
 
@@ -5500,7 +6210,8 @@ namespace damaris
     : ::xml_schema::type (x, f, c),
       name_ (x.name_, f, this),
       unit_ (x.unit_, f, this),
-      label_ (x.label_, f, this)
+      label_ (x.label_, f, this),
+      comment_ (x.comment_, f, this)
     {
     }
 
@@ -5511,7 +6222,8 @@ namespace damaris
     : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
       name_ (this),
       unit_ (this),
-      label_ (this)
+      label_ (this),
+      comment_ (this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
       {
@@ -5545,6 +6257,12 @@ namespace damaris
         if (n.name () == "label" && n.namespace_ ().empty ())
         {
           this->label_.set (label_traits::create (i, f, this));
+          continue;
+        }
+
+        if (n.name () == "comment" && n.namespace_ ().empty ())
+        {
+          this->comment_.set (comment_traits::create (i, f, this));
           continue;
         }
       }
@@ -5583,6 +6301,7 @@ namespace damaris
         this->name_ = x.name_;
         this->unit_ = x.unit_;
         this->label_ = x.label_;
+        this->comment_ = x.comment_;
       }
 
       return *this;
@@ -5590,6 +6309,389 @@ namespace damaris
 
     Coord::
     ~Coord ()
+    {
+    }
+
+    // VertexGID
+    //
+
+    VertexGID::
+    VertexGID (const name_type& name)
+    : ::xml_schema::type (),
+      name_ (name, this),
+      offset_ (offset_default_value (), this),
+      comment_ (this)
+    {
+    }
+
+    VertexGID::
+    VertexGID (const VertexGID& x,
+               ::xml_schema::flags f,
+               ::xml_schema::container* c)
+    : ::xml_schema::type (x, f, c),
+      name_ (x.name_, f, this),
+      offset_ (x.offset_, f, this),
+      comment_ (x.comment_, f, this)
+    {
+    }
+
+    VertexGID::
+    VertexGID (const ::xercesc::DOMElement& e,
+               ::xml_schema::flags f,
+               ::xml_schema::container* c)
+    : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+      name_ (this),
+      offset_ (this),
+      comment_ (this)
+    {
+      if ((f & ::xml_schema::flags::base) == 0)
+      {
+        ::xsd::cxx::xml::dom::parser< char > p (e, false, false, true);
+        this->parse (p, f);
+      }
+    }
+
+    void VertexGID::
+    parse (::xsd::cxx::xml::dom::parser< char >& p,
+           ::xml_schema::flags f)
+    {
+      while (p.more_attributes ())
+      {
+        const ::xercesc::DOMAttr& i (p.next_attribute ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        if (n.name () == "name" && n.namespace_ ().empty ())
+        {
+          this->name_.set (name_traits::create (i, f, this));
+          continue;
+        }
+
+        if (n.name () == "offset" && n.namespace_ ().empty ())
+        {
+          this->offset_.set (offset_traits::create (i, f, this));
+          continue;
+        }
+
+        if (n.name () == "comment" && n.namespace_ ().empty ())
+        {
+          this->comment_.set (comment_traits::create (i, f, this));
+          continue;
+        }
+      }
+
+      if (!name_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_attribute< char > (
+          "name",
+          "");
+      }
+
+      if (!offset_.present ())
+      {
+        this->offset_.set (offset_default_value ());
+      }
+    }
+
+    VertexGID* VertexGID::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class VertexGID (*this, f, c);
+    }
+
+    VertexGID& VertexGID::
+    operator= (const VertexGID& x)
+    {
+      if (this != &x)
+      {
+        static_cast< ::xml_schema::type& > (*this) = x;
+        this->name_ = x.name_;
+        this->offset_ = x.offset_;
+        this->comment_ = x.comment_;
+      }
+
+      return *this;
+    }
+
+    VertexGID::
+    ~VertexGID ()
+    {
+    }
+
+    // SectionVTKTypes
+    //
+
+    SectionVTKTypes::
+    SectionVTKTypes (const name_type& name)
+    : ::xml_schema::type (),
+      name_ (name, this),
+      comment_ (this)
+    {
+    }
+
+    SectionVTKTypes::
+    SectionVTKTypes (const SectionVTKTypes& x,
+                     ::xml_schema::flags f,
+                     ::xml_schema::container* c)
+    : ::xml_schema::type (x, f, c),
+      name_ (x.name_, f, this),
+      comment_ (x.comment_, f, this)
+    {
+    }
+
+    SectionVTKTypes::
+    SectionVTKTypes (const ::xercesc::DOMElement& e,
+                     ::xml_schema::flags f,
+                     ::xml_schema::container* c)
+    : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+      name_ (this),
+      comment_ (this)
+    {
+      if ((f & ::xml_schema::flags::base) == 0)
+      {
+        ::xsd::cxx::xml::dom::parser< char > p (e, false, false, true);
+        this->parse (p, f);
+      }
+    }
+
+    void SectionVTKTypes::
+    parse (::xsd::cxx::xml::dom::parser< char >& p,
+           ::xml_schema::flags f)
+    {
+      while (p.more_attributes ())
+      {
+        const ::xercesc::DOMAttr& i (p.next_attribute ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        if (n.name () == "name" && n.namespace_ ().empty ())
+        {
+          this->name_.set (name_traits::create (i, f, this));
+          continue;
+        }
+
+        if (n.name () == "comment" && n.namespace_ ().empty ())
+        {
+          this->comment_.set (comment_traits::create (i, f, this));
+          continue;
+        }
+      }
+
+      if (!name_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_attribute< char > (
+          "name",
+          "");
+      }
+    }
+
+    SectionVTKTypes* SectionVTKTypes::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class SectionVTKTypes (*this, f, c);
+    }
+
+    SectionVTKTypes& SectionVTKTypes::
+    operator= (const SectionVTKTypes& x)
+    {
+      if (this != &x)
+      {
+        static_cast< ::xml_schema::type& > (*this) = x;
+        this->name_ = x.name_;
+        this->comment_ = x.comment_;
+      }
+
+      return *this;
+    }
+
+    SectionVTKTypes::
+    ~SectionVTKTypes ()
+    {
+    }
+
+    // SectionSizes
+    //
+
+    SectionSizes::
+    SectionSizes (const name_type& name)
+    : ::xml_schema::type (),
+      name_ (name, this),
+      comment_ (this)
+    {
+    }
+
+    SectionSizes::
+    SectionSizes (const SectionSizes& x,
+                  ::xml_schema::flags f,
+                  ::xml_schema::container* c)
+    : ::xml_schema::type (x, f, c),
+      name_ (x.name_, f, this),
+      comment_ (x.comment_, f, this)
+    {
+    }
+
+    SectionSizes::
+    SectionSizes (const ::xercesc::DOMElement& e,
+                  ::xml_schema::flags f,
+                  ::xml_schema::container* c)
+    : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+      name_ (this),
+      comment_ (this)
+    {
+      if ((f & ::xml_schema::flags::base) == 0)
+      {
+        ::xsd::cxx::xml::dom::parser< char > p (e, false, false, true);
+        this->parse (p, f);
+      }
+    }
+
+    void SectionSizes::
+    parse (::xsd::cxx::xml::dom::parser< char >& p,
+           ::xml_schema::flags f)
+    {
+      while (p.more_attributes ())
+      {
+        const ::xercesc::DOMAttr& i (p.next_attribute ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        if (n.name () == "name" && n.namespace_ ().empty ())
+        {
+          this->name_.set (name_traits::create (i, f, this));
+          continue;
+        }
+
+        if (n.name () == "comment" && n.namespace_ ().empty ())
+        {
+          this->comment_.set (comment_traits::create (i, f, this));
+          continue;
+        }
+      }
+
+      if (!name_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_attribute< char > (
+          "name",
+          "");
+      }
+    }
+
+    SectionSizes* SectionSizes::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class SectionSizes (*this, f, c);
+    }
+
+    SectionSizes& SectionSizes::
+    operator= (const SectionSizes& x)
+    {
+      if (this != &x)
+      {
+        static_cast< ::xml_schema::type& > (*this) = x;
+        this->name_ = x.name_;
+        this->comment_ = x.comment_;
+      }
+
+      return *this;
+    }
+
+    SectionSizes::
+    ~SectionSizes ()
+    {
+    }
+
+    // SectionConnectivity
+    //
+
+    SectionConnectivity::
+    SectionConnectivity (const name_type& name)
+    : ::xml_schema::type (),
+      name_ (name, this),
+      comment_ (this)
+    {
+    }
+
+    SectionConnectivity::
+    SectionConnectivity (const SectionConnectivity& x,
+                         ::xml_schema::flags f,
+                         ::xml_schema::container* c)
+    : ::xml_schema::type (x, f, c),
+      name_ (x.name_, f, this),
+      comment_ (x.comment_, f, this)
+    {
+    }
+
+    SectionConnectivity::
+    SectionConnectivity (const ::xercesc::DOMElement& e,
+                         ::xml_schema::flags f,
+                         ::xml_schema::container* c)
+    : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+      name_ (this),
+      comment_ (this)
+    {
+      if ((f & ::xml_schema::flags::base) == 0)
+      {
+        ::xsd::cxx::xml::dom::parser< char > p (e, false, false, true);
+        this->parse (p, f);
+      }
+    }
+
+    void SectionConnectivity::
+    parse (::xsd::cxx::xml::dom::parser< char >& p,
+           ::xml_schema::flags f)
+    {
+      while (p.more_attributes ())
+      {
+        const ::xercesc::DOMAttr& i (p.next_attribute ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        if (n.name () == "name" && n.namespace_ ().empty ())
+        {
+          this->name_.set (name_traits::create (i, f, this));
+          continue;
+        }
+
+        if (n.name () == "comment" && n.namespace_ ().empty ())
+        {
+          this->comment_.set (comment_traits::create (i, f, this));
+          continue;
+        }
+      }
+
+      if (!name_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_attribute< char > (
+          "name",
+          "");
+      }
+    }
+
+    SectionConnectivity* SectionConnectivity::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class SectionConnectivity (*this, f, c);
+    }
+
+    SectionConnectivity& SectionConnectivity::
+    operator= (const SectionConnectivity& x)
+    {
+      if (this != &x)
+      {
+        static_cast< ::xml_schema::type& > (*this) = x;
+        this->name_ = x.name_;
+        this->comment_ = x.comment_;
+      }
+
+      return *this;
+    }
+
+    SectionConnectivity::
+    ~SectionConnectivity ()
     {
     }
 
@@ -5601,9 +6703,15 @@ namespace damaris
           const type_type& type)
     : ::xml_schema::type (),
       coord_ (this),
+      vertex_global_id_ (this),
+      section_types_ (this),
+      section_sizes_ (this),
+      section_connectivity_ (this),
       name_ (name, this),
       type_ (type, this),
-      topology_ (topology_default_value (), this)
+      topology_ (topology_default_value (), this),
+      time_varying_ (time_varying_default_value (), this),
+      comment_ (this)
     {
     }
 
@@ -5613,9 +6721,15 @@ namespace damaris
           ::xml_schema::container* c)
     : ::xml_schema::type (x, f, c),
       coord_ (x.coord_, f, this),
+      vertex_global_id_ (x.vertex_global_id_, f, this),
+      section_types_ (x.section_types_, f, this),
+      section_sizes_ (x.section_sizes_, f, this),
+      section_connectivity_ (x.section_connectivity_, f, this),
       name_ (x.name_, f, this),
       type_ (x.type_, f, this),
-      topology_ (x.topology_, f, this)
+      topology_ (x.topology_, f, this),
+      time_varying_ (x.time_varying_, f, this),
+      comment_ (x.comment_, f, this)
     {
     }
 
@@ -5625,9 +6739,15 @@ namespace damaris
           ::xml_schema::container* c)
     : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
       coord_ (this),
+      vertex_global_id_ (this),
+      section_types_ (this),
+      section_sizes_ (this),
+      section_connectivity_ (this),
       name_ (this),
       type_ (this),
-      topology_ (this)
+      topology_ (this),
+      time_varying_ (this),
+      comment_ (this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
       {
@@ -5657,6 +6777,62 @@ namespace damaris
           continue;
         }
 
+        // vertex_global_id
+        //
+        if (n.name () == "vertex_global_id" && n.namespace_ () == "http://damaris.gforge.inria.fr/damaris/model")
+        {
+          ::std::unique_ptr< vertex_global_id_type > r (
+            vertex_global_id_traits::create (i, f, this));
+
+          if (!this->vertex_global_id_)
+          {
+            this->vertex_global_id_.set (::std::move (r));
+            continue;
+          }
+        }
+
+        // section_types
+        //
+        if (n.name () == "section_types" && n.namespace_ () == "http://damaris.gforge.inria.fr/damaris/model")
+        {
+          ::std::unique_ptr< section_types_type > r (
+            section_types_traits::create (i, f, this));
+
+          if (!this->section_types_)
+          {
+            this->section_types_.set (::std::move (r));
+            continue;
+          }
+        }
+
+        // section_sizes
+        //
+        if (n.name () == "section_sizes" && n.namespace_ () == "http://damaris.gforge.inria.fr/damaris/model")
+        {
+          ::std::unique_ptr< section_sizes_type > r (
+            section_sizes_traits::create (i, f, this));
+
+          if (!this->section_sizes_)
+          {
+            this->section_sizes_.set (::std::move (r));
+            continue;
+          }
+        }
+
+        // section_connectivity
+        //
+        if (n.name () == "section_connectivity" && n.namespace_ () == "http://damaris.gforge.inria.fr/damaris/model")
+        {
+          ::std::unique_ptr< section_connectivity_type > r (
+            section_connectivity_traits::create (i, f, this));
+
+          if (!this->section_connectivity_)
+          {
+            this->section_connectivity_.set (::std::move (r));
+            continue;
+          }
+        }
+
         break;
       }
 
@@ -5683,6 +6859,18 @@ namespace damaris
           this->topology_.set (topology_traits::create (i, f, this));
           continue;
         }
+
+        if (n.name () == "time-varying" && n.namespace_ ().empty ())
+        {
+          this->time_varying_.set (time_varying_traits::create (i, f, this));
+          continue;
+        }
+
+        if (n.name () == "comment" && n.namespace_ ().empty ())
+        {
+          this->comment_.set (comment_traits::create (i, f, this));
+          continue;
+        }
       }
 
       if (!name_.present ())
@@ -5703,6 +6891,11 @@ namespace damaris
       {
         this->topology_.set (topology_default_value ());
       }
+
+      if (!time_varying_.present ())
+      {
+        this->time_varying_.set (time_varying_default_value ());
+      }
     }
 
     Mesh* Mesh::
@@ -5719,9 +6912,15 @@ namespace damaris
       {
         static_cast< ::xml_schema::type& > (*this) = x;
         this->coord_ = x.coord_;
+        this->vertex_global_id_ = x.vertex_global_id_;
+        this->section_types_ = x.section_types_;
+        this->section_sizes_ = x.section_sizes_;
+        this->section_connectivity_ = x.section_connectivity_;
         this->name_ = x.name_;
         this->type_ = x.type_;
         this->topology_ = x.topology_;
+        this->time_varying_ = x.time_varying_;
+        this->comment_ = x.comment_;
       }
 
       return *this;
@@ -6694,7 +7893,9 @@ namespace damaris
     ParaViewParam ()
     : ::xml_schema::type (),
       script_ (this),
-      update_frequency_ (update_frequency_default_value (), this)
+      update_frequency_ (update_frequency_default_value (), this),
+      realtime_timestep_ (realtime_timestep_default_value (), this),
+      end_iteration_ (end_iteration_default_value (), this)
     {
     }
 
@@ -6704,7 +7905,9 @@ namespace damaris
                    ::xml_schema::container* c)
     : ::xml_schema::type (x, f, c),
       script_ (x.script_, f, this),
-      update_frequency_ (x.update_frequency_, f, this)
+      update_frequency_ (x.update_frequency_, f, this),
+      realtime_timestep_ (x.realtime_timestep_, f, this),
+      end_iteration_ (x.end_iteration_, f, this)
     {
     }
 
@@ -6714,7 +7917,9 @@ namespace damaris
                    ::xml_schema::container* c)
     : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
       script_ (this),
-      update_frequency_ (this)
+      update_frequency_ (this),
+      realtime_timestep_ (this),
+      end_iteration_ (this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
       {
@@ -6758,11 +7963,33 @@ namespace damaris
           this->update_frequency_.set (update_frequency_traits::create (i, f, this));
           continue;
         }
+
+        if (n.name () == "realtime-timestep" && n.namespace_ ().empty ())
+        {
+          this->realtime_timestep_.set (realtime_timestep_traits::create (i, f, this));
+          continue;
+        }
+
+        if (n.name () == "end-iteration" && n.namespace_ ().empty ())
+        {
+          this->end_iteration_.set (end_iteration_traits::create (i, f, this));
+          continue;
+        }
       }
 
       if (!update_frequency_.present ())
       {
         this->update_frequency_.set (update_frequency_default_value ());
+      }
+
+      if (!realtime_timestep_.present ())
+      {
+        this->realtime_timestep_.set (realtime_timestep_default_value ());
+      }
+
+      if (!end_iteration_.present ())
+      {
+        this->end_iteration_.set (end_iteration_default_value ());
       }
     }
 
@@ -6781,6 +8008,8 @@ namespace damaris
         static_cast< ::xml_schema::type& > (*this) = x;
         this->script_ = x.script_;
         this->update_frequency_ = x.update_frequency_;
+        this->realtime_timestep_ = x.realtime_timestep_;
+        this->end_iteration_ = x.end_iteration_;
       }
 
       return *this;
@@ -7393,16 +8622,19 @@ namespace damaris
     // Log
     //
 
+    const Log::LogLevel_type Log::LogLevel_default_value_ (
+      "warning");
+
     Log::
     Log (const FileName_type& FileName,
          const RotationSize_type& RotationSize,
-         const LogFormat_type& LogFormat,
-         const LogLevel_type& LogLevel)
+         const LogFormat_type& LogFormat)
     : ::xml_schema::type (),
       FileName_ (FileName, this),
       RotationSize_ (RotationSize, this),
       LogFormat_ (LogFormat, this),
-      LogLevel_ (LogLevel, this)
+      LogLevel_ (LogLevel_default_value (), this),
+      Flush_ (Flush_default_value (), this)
     {
     }
 
@@ -7414,7 +8646,8 @@ namespace damaris
       FileName_ (x.FileName_, f, this),
       RotationSize_ (x.RotationSize_, f, this),
       LogFormat_ (x.LogFormat_, f, this),
-      LogLevel_ (x.LogLevel_, f, this)
+      LogLevel_ (x.LogLevel_, f, this),
+      Flush_ (x.Flush_, f, this)
     {
     }
 
@@ -7426,7 +8659,8 @@ namespace damaris
       FileName_ (this),
       RotationSize_ (this),
       LogFormat_ (this),
-      LogLevel_ (this)
+      LogLevel_ (this),
+      Flush_ (this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
       {
@@ -7468,6 +8702,12 @@ namespace damaris
           this->LogLevel_.set (LogLevel_traits::create (i, f, this));
           continue;
         }
+
+        if (n.name () == "Flush" && n.namespace_ ().empty ())
+        {
+          this->Flush_.set (Flush_traits::create (i, f, this));
+          continue;
+        }
       }
 
       if (!FileName_.present ())
@@ -7493,9 +8733,12 @@ namespace damaris
 
       if (!LogLevel_.present ())
       {
-        throw ::xsd::cxx::tree::expected_attribute< char > (
-          "LogLevel",
-          "");
+        this->LogLevel_.set (LogLevel_default_value ());
+      }
+
+      if (!Flush_.present ())
+      {
+        this->Flush_.set (Flush_default_value ());
       }
     }
 
@@ -7516,6 +8759,7 @@ namespace damaris
         this->RotationSize_ = x.RotationSize_;
         this->LogFormat_ = x.LogFormat_;
         this->LogLevel_ = x.LogLevel_;
+        this->Flush_ = x.Flush_;
       }
 
       return *this;

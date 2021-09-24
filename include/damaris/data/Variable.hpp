@@ -64,7 +64,10 @@ class Variable : public ENABLE_SHARED_FROM_THIS(Variable),
 	std::string name_; /*!< name of the Variable. 
 			(full name, including the groups) */
 	BlockIndex blocks_; /*!< Blocks container. */
-	std::shared_ptr<Layout> layout_; /*!< Layout of the variable. */
+	std::shared_ptr<Layout> layout_; /*!< Layout of the variable. 
+            Note: Only valid on client side variables as damaris_parameter_set
+            may alter dimensions which server size variables are not updated with.
+            Use the Block extents properties on a server side operation. */
 	std::shared_ptr<Buffer> buffer_; /*!< Buffer in which to allocate 
 					blocks of the variable. */
 	std::map<int32_t, std::vector<int64_t> > positions_; /*!< Positions of
@@ -165,7 +168,23 @@ class Variable : public ENABLE_SHARED_FROM_THIS(Variable),
 		positions_[block] = p;
 		return DAMARIS_OK;
 	}
-	
+    
+    /**
+	 * Gets the current positions of a domain as a std::vector<int64_t>.
+	 * Each value indicates the offset in the particular dimension into 
+     * the global size of the dataset.
+     *
+	 * \param[in] block : domain id.
+     *
+	 * \return The vector of lower bounds of the position of the data.
+     *  relative to the global dimensions (if set in the layout).
+     *  It should have the same dimension as the dimension of the layout.
+	 */
+	virtual std::vector<int64_t> GetPositions(int32_t block)
+	{
+		return positions_[block];
+	}
+
 	/**
 	 * Attach a Block already created. Since only a Variable can
 	 * create a Block, either this function will be used internally,
@@ -495,6 +514,25 @@ class Variable : public ENABLE_SHARED_FROM_THIS(Variable),
 		return false;
 	}
 	
+	/**
+	* Obtain the size of the (final) dimension of a Variable that is specified as
+	* a "vector" type. Otherwise return the dimension as 1.
+	* N.B. This is an assumed data layout for a type="vector" type variable.
+	* The Variable should be specified with a multi-dimensional Layout dimension
+	* i.e. as something like:
+	*   <layout name="zonal_vect" type="double"  dimensions="x,y,z,3"/>
+	* And the variable that uses the Layout, has type="vector"
+	* e.g.
+	*   <variable name="my_vector" layout="zonal_vect" type="vector" .. />
+	*
+	* This function would return 3 as the vector size.
+	*
+	* This value is used by Paraview vtkDataSet::SetNumberOfComponents() for
+	* passing multi-dimensional data to paraview, such as for Velocity field data
+	* that has 3 components (vx,vy,vz) per zonal spatial location.
+	*/
+	int GetVectorSizeFromBlock(std::shared_ptr<Block> b, int dim);
+
 #ifdef HAVE_VISIT_ENABLED
 	public:
 	
@@ -545,16 +583,49 @@ class Variable : public ENABLE_SHARED_FROM_THIS(Variable),
 #endif
 
 #ifdef HAVE_PARAVIEW_ENABLED
-
     public:
 
     /**
 	* Adds different blocks of a variable into the passed multi piece grid
+	* Requires 1 block per client (i.e. not multiple domains)
 	*
 	* \param[in,out] vtkMPGrid : the root multi piece grid for an specific mesh
 	* \param[in] iteration : the Damaris iteration
 	*/
     bool AddBlocksToVtkGrid(vtkMultiPieceDataSet* vtkMPGrid , int iteration);
+
+    /**
+   	* A more involved version of AddBlocksToVtkGrid for variables with UnstructuredMesh
+   	* mesh types that may have multiple sections per block.
+   	* Requires 1 block per client (i.e. not multiple domains)
+   	*
+   	* \param[in,out] vtkMPGrid : the root multi piece grid for an specific mesh
+   	* \param[in] iteration : the Damaris iteration
+   	*/
+    bool AddBlocksToUnstructuredMesh(vtkMultiPieceDataSet* vtkMPGrid , int iteration);
+
+
+    /**
+	* Determines buffer type and calls AddBufferToVtkGrid<T>
+	*
+	* \param[in,out] grid : the Damaris iteration
+	* \param[in] buffer : the buffer of type T* to be added to the grid as the field data
+	* \param[in] buffer_offset : offset within the buffer to find the start of the section
+	* \param[in] size   : The number of elements in the buffer of type T
+	* \param[in] numVectComponents : The number of vector components of the field type (size of 1st dimension of array)
+	*/
+    bool InstantiateBufferAndAddToVtkGrid(vtkDataSet*  vtkGrid , void *buffer , size_t buffer_offset, int64_t size, int numVectComponents);
+
+	/**
+	* Adds the variable's main data as a grid field data. This is the default function
+	* for Variables that are type="scalar"
+	*
+	* \param[in,out] grid : the Damaris iteration
+	* \param[in] buffer : the buffer of type T* to be added to the grid as the field data
+	*/
+	template <typename T>
+	bool AddBufferToVtkGrid(vtkDataSet* grid , T* buffer , int64_t size);
+
 
 	/**
 	* Adds the variable's main data as a grid field data
@@ -563,7 +634,7 @@ class Variable : public ENABLE_SHARED_FROM_THIS(Variable),
 	* \param[in] buffer : the buffer of type T* to be added to the grid as the field data
 	*/
 	template <typename T>
-	bool AddBufferToVtkGrid(vtkDataSet* grid , T* buffer , int64_t size);
+	bool AddBufferToVtkGrid(vtkDataSet* grid , T* buffer , int64_t size, int numVectComponents);
 #endif
 
 };

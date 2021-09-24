@@ -38,6 +38,6 @@
 	<visit>
 		<path></path>
 	</visit>
-	<log FileName="log/cube" RotationSize="5" LogFormat="[%TimeStamp%]: %Message%" LogLevel="info" />
+	<log FileName="log/cube" RotationSize="5" LogFormat="[%TimeStamp%]: %Message%" LogLevel="info" Flush="false" />
 </simulation>
 

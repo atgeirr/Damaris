@@ -22,7 +22,9 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "data/Variable.hpp"
 #include "data/Type.hpp"
 
+
 #ifdef HAVE_PARAVIEW_ENABLED
+#include "data/UnstructuredMesh.hpp"
 #include "damaris/paraview/ParaViewHeaders.hpp"
 #endif
 
@@ -560,90 +562,245 @@ VisIt_VarCentering Variable::VarCenteringToVisIt(const model::VarCentering& vc)
 
 #endif
 
+
+int Variable::GetVectorSizeFromBlock(std::shared_ptr<Block> b, int dim)
+{
+	int retVectComponents = 1 ;
+	// numVectComponents = GetModel().vectorlength() ;
+
+	if (GetModel().type() == "vector")
+	{
+		retVectComponents  = b->GetEndIndex(dim) - b->GetStartIndex(dim) + 1;
+	}
+
+	return retVectComponents;
+}
+
+
 #ifdef HAVE_PARAVIEW_ENABLED
 
 bool Variable::AddBlocksToVtkGrid(vtkMultiPieceDataSet* vtkMPGrid , int iteration)
 {
-    int index = 0;
+	bool retval = false ;
+	std::shared_ptr<Mesh> mesh = GetMesh();
 
-    // Setting the number of pieces in MultiPieceGrid
-    int serversNo = Environment::CountTotalServers();
-    int serverId = Environment::GetEntityProcessID();
-    int localBlocks = CountLocalBlocks(iteration);
+	// write time-invarying variables only in first iteration
+	if ( IsTimeVarying() == false){
+	   iteration = 0;
+	}
 
-	// Should be changed in future. Check issue #2 in Damaris GitLab
-	vtkMPGrid->SetNumberOfPieces(localBlocks*serversNo);
 
-    //Getting the variable type (e.g. long, int, etc.) from its layout
-    auto type = GetLayout()->GetType();
+	if ( mesh->GetModel().type() == model::MeshType::unstructured )
+	{
+		retval = AddBlocksToUnstructuredMesh(vtkMPGrid , iteration);
 
-    // for each block in the iteration do:
-    BlocksByIteration::iterator begin , end;
-    GetBlocksByIteration(iteration, begin, end);
-    for(auto it = begin; it != end; it++) {
+	} else {
+		// for each block in the iteration do:
+		BlocksByIteration::iterator begin , end;
+		// Get the vtkGrid from its mesh
 
-        // Get block data
-        void* buffer = (*it)->GetDataSpace().GetData();
-        int source = (*it)->GetSource();
-        int block = (*it)->GetID();
-		int size = (*it)->GetNumberOfItems();
 
-        // Get the vtkGrid from its mesh
-		std::shared_ptr<Mesh> mesh = GetMesh();
-		int pieceId = serverId*localBlocks+index;
-		vtkDataSet* vtkGrid = vtkMPGrid->GetPiece(pieceId);
+		// Setting the number of pieces in MultiPieceGrid
+		int serversNo = Environment::CountTotalServers();
+		int serverId = Environment::GetEntityProcessID();
+		int localBlocks = CountLocalBlocks(iteration);
+		int source_range_low, source_range_high ;
+		GetSourceRange(source_range_low, source_range_high);
+		int numberOfClientsOnServer = source_range_high-source_range_low+1;
 
-		if (vtkGrid == nullptr) { // This is the first (or maybe the only) variable of the mesh
-			vtkGrid = mesh->GetVtkGrid(source , iteration , block , shared_from_this());
-			vtkMPGrid->SetPiece(serverId*localBlocks+index , vtkGrid);
+		// Should be changed in future. Check issue #2 in Damaris GitLab
+		// We would need a gather the number of blocks per iteration to compute
+		// a correct value when each client may have a different number of
+		// blocks in each iteration
+		// vtkMPGrid->SetNumberOfPieces(localBlocks*serversNo);
+		// Now assuming one block per client
+		vtkMPGrid->SetNumberOfPieces(numberOfClientsOnServer*serversNo);
+
+	    GetBlocksByIteration(iteration, begin, end);
+		for(auto it = begin; it != end; it++) {
+
+			// Get block data
+			void* buffer = (*it)->GetDataSpace().GetData();
+			int source = (*it)->GetSource();
+			int block = (*it)->GetID();
+			int64_t size = (*it)->GetNumberOfItems();
+
+			// unsigned int pieceId = serverId*localBlocks+index;
+			// unsigned int pieceId = serverId*localBlocks+source;
+			unsigned int pieceId = source;  // ToDo Guard as this line requires only one block per client.
+			vtkDataSet* vtkGrid = vtkMPGrid->GetPiece(pieceId);
+
+
+			if (vtkGrid == nullptr) { // This is the first (or maybe the only) variable of the mesh
+				vtkGrid = mesh->GetVtkGrid(source , 0 , block , shared_from_this());
+				// INFO("AddBlocksToVtkGrid():  Mesh:" << mesh->GetName() << "  Variable: " << this->GetName() <<" Source: " << source  <<" Iteration: " << iteration << " Server: " << serverId << " localBlocks: " << localBlocks << " Index: " << index << " PieceId: " << pieceId)
+				vtkMPGrid->SetPiece(pieceId , vtkGrid);
+			}
+
+			std::shared_ptr<Block> b = *it;
+			// We are assuming the first dimension is the vector
+			int vectorDimIndex = 0 ;
+			// numVectComponents = b->GetGlobalExtent(lastDimIndex) ; // this is value "on creation" which may have changed due to setting a paramater
+			int numVectComponents =  GetVectorSizeFromBlock(b, vectorDimIndex);
+
+			retval = InstantiateBufferAndAddToVtkGrid(vtkGrid , buffer , 0, size, numVectComponents);
+			if (retval == false)
+				return false ;
 		}
-        index++;
-
-        switch(type)
-        {
-        case model::Type::short_:
-			if (not AddBufferToVtkGrid<short>(vtkGrid , (short*)buffer , size)) {
-                ERROR("Error adding buffer to vtkGrid for short type.");
-                return false;
-            }
-            break;
-        case model::Type::int_:
-        case model::Type::integer:
-			if (not AddBufferToVtkGrid<int>(vtkGrid , (int*)buffer , size)) {
-                ERROR("Error adding buffer to vtkGrid for int type.");
-                return false;
-            }
-            break;
-        case model::Type::long_:
-			if (not AddBufferToVtkGrid<long>(vtkGrid , (long*)buffer , size)) {
-                ERROR("Error adding buffer to vtkGrid for long type.");
-                return false;
-            }
-            break;
-        case model::Type::float_:
-        case model::Type::real:
-			if (not AddBufferToVtkGrid<float>(vtkGrid , (float*)buffer , size)) {
-                ERROR("Error adding buffer to vtkGrid for float type.");
-                return false;
-            }
-            break;
-        case model::Type::double_:
-			if (not AddBufferToVtkGrid<double>(vtkGrid , (double*)buffer , size)) {
-                ERROR("Error adding buffer to vtkGrid for double type.");
-                return false;
-            }
-            break;
-        default:
-            ERROR("Layout type is undefined for variable " << GetName() << " " << type.c_str() );
-            return false;
-        }
-    }
-
-    return true;
+	}
+    return retval;
 }
+
+
+
+
+bool Variable::AddBlocksToUnstructuredMesh(vtkMultiPieceDataSet* vtkMPGrid , int iteration)
+{
+
+    bool retval = false ;
+    std::shared_ptr<UnstructuredMesh> us_mesh;
+    us_mesh = std::dynamic_pointer_cast<UnstructuredMesh>(GetMesh());
+   
+    BlocksByIteration::iterator begin , end;
+
+    // Used to work out how many mesh sections the local UnstructuredMesh should look after.
+    // Combined with num_sections of the mesh
+    int clientsPerNode = Environment::ClientsPerNode();
+
+    int    n_sections_total  = us_mesh->GetTotalMeshSections(0) ;
+	vtkMPGrid->SetNumberOfPieces(n_sections_total);
+
+	int source_range_low, source_range_high ;
+	// continue if there are blocks for this iteration - i.e. GetSourceRange() returns true
+	if ( GetSourceRange(source_range_low, source_range_high) == true ) {
+
+		//INFO("SourceRange    Variable:" << this->GetName()  << "  clientsPerNode: " << clientsPerNode << "  source_range_low: " << source_range_low << "  source_range_high: " << source_range_high)
+		us_mesh->SetSourceRange(source_range_low, source_range_high); // only does something on first call.
+
+		// for each block in the iteration available to this server
+		GetBlocksByIteration(iteration, begin, end);
+		int    num_sections ;
+		int    section_size ;  // how many VTK elements in the section
+		int    global_section_offset_of_source ;  // the number of sections allocated in ranks less than the variable/blocks source
+
+		for(auto it = begin; it != end; it++) {
+			// Get block data
+			void* buffer = (*it)->GetDataSpace().GetData();
+			int   source = (*it)->GetSource();
+			int   block  = (*it)->GetID();
+
+			std::shared_ptr<Block> b = *it;
+			// We are assuming the first dimension is the length of the vector, but only if there is more than one dimension for the Variable
+			int vectorDimIndex = 0 ;
+			int numVectComponents =  GetVectorSizeFromBlock(b, vectorDimIndex);
+
+			size_t buffer_offset = 0 ;
+			// Get the variable of the mesh that holds the section sizes
+			// Get the block (that corresponds to the block of the enclosing field Variable)
+			// Get the number of sections of the mesh held by this block
+			num_sections = us_mesh->GetNumberOfSections(source);
+
+			global_section_offset_of_source = us_mesh->GetGlobalOffsetOfSections(source);
+			// sect_offset  = us_mesh->GetSectionOffset(source);
+			for (int sectn_num = 0 ; sectn_num < num_sections; sectn_num++)
+			{
+				// unsigned int pieceId = serverId*localBlocks+source;
+				// unsigned int pieceId = source;
+				vtkDataSet* vtkGrid = vtkMPGrid->GetPiece(global_section_offset_of_source + sectn_num);
+
+				// Get the number of elements in the section (i.e. number of hexahedrals or quads etc.)
+				// This will be how many field elements are in the Variable block if we have a 'zonal' variable
+				// section_size = sectn_size_ptr[sectn_num] ;
+				section_size = us_mesh->GetSectionSize(source, sectn_num);
+
+				if (vtkGrid == nullptr) { // This is the first (or maybe the only) variable of the mesh
+					vtkGrid = us_mesh->GetVtkGrid(source , 0 , block , shared_from_this());
+					//INFO("AddBlocksToVtkGrid():  Mesh:" << us_mesh->GetName() << "  Variable: " << this->GetName() <<" Source: " << source  <<" Iteration: " << iteration  << " PieceId: " << global_section_offset_of_source + sectn_num)
+					vtkMPGrid->SetPiece(global_section_offset_of_source + sectn_num , vtkGrid);
+				}
+
+				retval = InstantiateBufferAndAddToVtkGrid(vtkGrid , buffer, buffer_offset, (section_size*numVectComponents), numVectComponents);
+				if (retval == false)
+					return false ;
+
+				buffer_offset += section_size ;
+			}
+
+			//INFO("section_sizes mesh     Mesh:" << mesh->GetName() << "  Variable: " << this->GetName() << " Source: " << source <<  " Iteration: " << iteration <<  " num_sections: " << num_sections <<  " section_size: " << section_size  )
+			// unsigned int pieceId = serverId*localBlocks+index;
+		}
+		return true;
+	} else {
+		return false;
+	}
+
+
+}
+
+
+bool Variable::InstantiateBufferAndAddToVtkGrid(vtkDataSet*  vtkGrid , void *buffer , size_t buffer_offset, int64_t size, int numVectComponents)
+{
+	auto type = GetLayout()->GetType(); //Getting the variable type (e.g. long, int, etc.) from its layout
+    
+	switch(type)
+	{
+	case model::Type::short_:
+		if (not AddBufferToVtkGrid<short>(vtkGrid , ((short*)buffer )+buffer_offset , size, numVectComponents)) {
+			ERROR("Error adding buffer to vtkGrid for short type.");
+			return false;
+		}
+		break;
+	case model::Type::int_:
+	case model::Type::integer:
+		if (not AddBufferToVtkGrid<int>(vtkGrid , ((int*)buffer )+buffer_offset , size, numVectComponents)) {
+			ERROR("Error adding buffer to vtkGrid for int type.");
+			return false;
+		}
+		break;
+	case model::Type::long_:
+		if (not AddBufferToVtkGrid<long>(vtkGrid , ((long*)buffer )+buffer_offset, size, numVectComponents)) {
+			ERROR("Error adding buffer to vtkGrid for long type.");
+			return false;
+		}
+		break;
+	case model::Type::float_:
+	case model::Type::real:
+		if (not AddBufferToVtkGrid<float>(vtkGrid , ((float*)buffer )+buffer_offset , size, numVectComponents)) {
+			ERROR("Error adding buffer to vtkGrid for float type.");
+			return false;
+		}
+		break;
+	case model::Type::double_:
+		if (not AddBufferToVtkGrid<double>(vtkGrid , ((double*)buffer )+buffer_offset , size, numVectComponents)) {
+			ERROR("Error adding buffer to vtkGrid for double type.");
+			return false;
+		}
+		break;
+	default:
+		ERROR("Layout type is undefined for variable " << GetName() << " " << type.c_str() );
+		return false;
+	}
+
+	return true;
+}
+
 
 template <typename T>
 bool Variable::AddBufferToVtkGrid(vtkDataSet* grid , T* buffer , int64_t size)
+{
+	vtkAOSDataArrayTemplate<T>* varData = nullptr;
+	std::string varName = GetName();
+    int numVectComponents = 1;
+
+    bool retval = AddBufferToVtkGrid<double>(grid , buffer , size, numVectComponents);
+    return true;
+}
+
+
+
+
+template <typename T>
+bool Variable::AddBufferToVtkGrid(vtkDataSet* grid , T* buffer , int64_t size, int numVectComponents)
 {
 	vtkAOSDataArrayTemplate<T>* varData = nullptr;
 	std::string varName = GetName();
@@ -655,7 +812,7 @@ bool Variable::AddBufferToVtkGrid(vtkDataSet* grid , T* buffer , int64_t size)
             vtkNew<vtkAOSDataArrayTemplate<T>> pointData;
 
 			pointData->SetName(varName.c_str());
-			pointData->SetNumberOfComponents(1);   // Always 1 for scalar data
+			pointData->SetNumberOfComponents(numVectComponents);   // Always 1 for scalar data
             grid->GetPointData()->AddArray(pointData.GetPointer());
         }
         varData = vtkAOSDataArrayTemplate<T>::SafeDownCast(grid->GetPointData()->GetArray(GetName().c_str()));
@@ -663,13 +820,15 @@ bool Variable::AddBufferToVtkGrid(vtkDataSet* grid , T* buffer , int64_t size)
 	else if (IsZonal()) { // Data is stored on the cells
 
 		if (grid->GetCellData()->GetArray(varName.c_str()) == nullptr) {
-            // Create relevant vtkDataArray for Cell data
-            vtkNew<vtkAOSDataArrayTemplate<T>> cellData;
+          // Create relevant vtkDataArray for Cell data
+          vtkNew<vtkAOSDataArrayTemplate<T>> cellData;
 
 			cellData->SetName(varName.c_str());
-            cellData->SetNumberOfComponents(1);  // Always 1???
-            grid->GetCellData()->AddArray(cellData.GetPointer());
-        }
+
+         
+          cellData->SetNumberOfComponents(numVectComponents);  // Always 1??? No, variables such as velocity have 3 vector components
+          grid->GetCellData()->AddArray(cellData.GetPointer());
+      }
         varData = vtkAOSDataArrayTemplate<T>::SafeDownCast(grid->GetCellData()->GetArray(GetName().c_str()));
 	}
 	else {

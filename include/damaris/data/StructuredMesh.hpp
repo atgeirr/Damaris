@@ -88,11 +88,7 @@ protected:
 	virtual bool SetGridExtents(vtkDataSet* grid , int source , int iteration , int block ,
 								const std::shared_ptr<Variable>& var) = 0;
 
-    /**
-     * Every derived class, should implement this method and
-     * create the appropriate vtkDataSet and return it.
-     */
-    virtual vtkDataSet* CreateVtkGrid() = 0;
+
 
     /**
      * Creates and returns a typed vtkDataArray object based
