@@ -38,11 +38,28 @@ namespace damaris {
  * ScriptAction describes an Action that wraps an interpretable script,
  * such as a Python script. This class is virtual and inherited, for
  * example, by PyAction.
+ * 
  */
+<xs:complexType name="Script">
+		<xs:attribute name="name"      type="xs:string"  use="required"/>
+		<xs:attribute name="file"      type="xs:string"  use="required"/>
+		<xs:attribute name="execution" type="mdl:Exec"   use="optional" default="remote"/>
+		<xs:attribute name="language"  type="mdl:Language"  use="required"/>
+		<xs:attribute name="scope"     type="mdl:Scope"  use="optional" default="core"/>
+		<xs:attribute name="external"  type="xs:boolean" use="optional" default="false"/>
+        <xs:attribute name="frequency" type="xs:unsignedInt" use="optional" default="1" />
+	</xs:complexType>
+	
 class PyAction : public ScriptAction , public Configurable<model::Script> {
     
-    void Output(int32_t iteration);
-
+    //void Output(int32_t iteration);
+    
+    // execution
+    std::string name_ ;
+    std::string language_ ;
+    std::string file_ ;
+    unsigned int frequency_ ;
+    
 	protected:
 	/**
 	 * Condtructor.
@@ -91,6 +108,12 @@ class PyAction : public ScriptAction , public Configurable<model::Script> {
 	 */
 	template<typename SUPER>
 	static std::shared_ptr<SUPER> New(const model::Script& mdl, const std::string& name) {
+        
+        name_     = name ;
+        language_ = mdl.language() ;
+        file_     = mdl.file() ;
+        frequency_= mdl.frequency() ;
+        
 		return std::shared_ptr<SUPER>(new PyAction(mdl), Deleter<PyAction>());
 	}
 

@@ -98,7 +98,7 @@ namespace damaris {
 
 */
 
-    void PyAction::Output(int32_t sourceID, int32_t iteration, const char* args){
+    void PyAction::Call(int32_t sourceID, int32_t iteration, const char* args){
 /*
         if (IterationIsEmpty(iteration))
             return;
