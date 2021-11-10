@@ -346,5 +346,6 @@ if(ENABLE_EXAMPLES)
 	  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/fortran/cube" DESTINATION examples/fortran)
 	endif(ENABLE_FORTRAN)
 	install(FILES "${CMAKE_BINARY_DIR}/examples/plugin/libgc.so" DESTINATION examples/plugin)
+	install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/Example" DESTINATION examples)
 endif(ENABLE_EXAMPLES)
 

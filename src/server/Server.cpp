@@ -165,6 +165,8 @@ void Server::EndOfIterationCallback(int tag, int source,
 #endif
 
 	StorageManager::Update(iteration);
+    
+    ActionManager::RunActions(iteration);
 
 	Environment::Log("Server::EndOfIterationCallback method finished.", EventLogger::Info);
     if (Environment::GetModel()->log().present()) {

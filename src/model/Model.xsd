@@ -37,6 +37,16 @@
 	<xs:complexType name="Domains">
 		<xs:attribute name="count" type="xs:unsignedInt" use="optional" default="1"/>
 	</xs:complexType>
+    
+ <!-- Placement tags are used to set the 'color' in MPI_Comm_split function to specify which  -->   
+    <xs:complexType name="Placement">
+        <!-- a mask indicates 0 for computational core and 1 for Damaris core -->
+        <xs:attribute name="mask"            type="xs:string"      use="optional" default="" />
+		<xs:attribute name="start"           type="xs:int"         use="optional" default="0"/>
+        <xs:attribute name="step"            type="xs:unsignedInt" use="optional" default="0"/>
+        <xs:attribute name="blocksize"       type="xs:unsignedInt" use="optional" default="0"/>
+        <xs:attribute name="comment"         type="xs:string"  use="optional"/>
+	</xs:complexType>
 
 	<!-- Type of shared memory (POSIX or System-V) -->
 	<xs:simpleType name="ShmType">
@@ -67,6 +77,7 @@
 		<!--	<xs:element name="cores"  type="mdl:DeprecatedCores" /> -->
 			<xs:element name="domains" type="mdl:Domains" />
 			<xs:element name="dedicated" type="mdl:Dedicated"/>
+            <xs:element name="placement" type="mdl:Placement"/>
 			<xs:element name="buffer" type="mdl:Buffer" />
 			<xs:element name="queue"  type="mdl:Queue" />
 		</xs:all>
@@ -81,6 +92,7 @@
 			<xs:enumeration value="c"/>
 			<xs:enumeration value="cpp"/>
 			<xs:enumeration value="python"/>
+            <xs:enumeration value="r"/>
 		</xs:restriction>
 	</xs:simpleType>
 
@@ -143,6 +155,7 @@
 	</xs:simpleType>
 
 	<!-- Variable node -->
+    <!-- N.B. store and script may not be used -->
 	<xs:complexType name="Variable">
 		<xs:simpleContent>
 		<xs:extension base="xs:string">
@@ -152,11 +165,12 @@
 			<xs:attribute name="enabled"    type="xs:boolean"  use="optional" default="true"/>
 			<xs:attribute name="mesh"	     type="xs:string"   use="optional" default="#"/>
 			<xs:attribute name="type"       type="mdl:VarType" use="optional" default="scalar"/>
-         <xs:attribute name="vectorlength" type="xs:unsignedInt"  use="optional" default="1" />
+            <xs:attribute name="vectorlength" type="xs:unsignedInt"  use="optional" default="1" />
 			<xs:attribute name="centering"    type="mdl:VarCentering" use="optional" default="zonal"/>
 			<xs:attribute name="visualizable" type="xs:boolean" use="optional" default="true"/>
 			<xs:attribute name="time-varying" type="xs:boolean" use="optional" default="true"/>
 			<xs:attribute name="store"	   type="xs:string"  use="optional" default="#"/>
+            <xs:attribute name="script"	   type="xs:string"  use="optional" default="#"/>
          <xs:attribute name="comment"      type="xs:string"  use="optional"/>
 
 		</xs:extension>
@@ -314,12 +328,13 @@
 
 	<!-- Script node -->
 	<xs:complexType name="Script">
-		<xs:attribute name="name"     type="xs:string"  use="required"/>
-		<xs:attribute name="file"     type="xs:string"  use="required"/>
+		<xs:attribute name="name"      type="xs:string"  use="required"/>
+		<xs:attribute name="file"      type="xs:string"  use="required"/>
 		<xs:attribute name="execution" type="mdl:Exec"   use="optional" default="remote"/>
-		<xs:attribute name="language" type="mdl:Language"  use="required"/>
-		<xs:attribute name="scope"    type="mdl:Scope"  use="optional" default="core"/>
-		<xs:attribute name="external" type="xs:boolean" use="optional" default="false"/>
+		<xs:attribute name="language"  type="mdl:Language"  use="required"/>
+		<xs:attribute name="scope"     type="mdl:Scope"  use="optional" default="core"/>
+		<xs:attribute name="external"  type="xs:boolean" use="optional" default="false"/>
+        <xs:attribute name="frequency" type="xs:unsignedInt" use="optional" default="1" />
 	</xs:complexType>
 
 	<!-- Exception node -->
@@ -350,13 +365,15 @@
       <xs:attribute name="end-iteration" type="xs:unsignedInt" use="optional" default="0"/>
    </xs:complexType>
 
-	<!-- Parameters related to Python -->
+	<!-- Parameters related to Python
 	<xs:complexType name="PythonParam">
 		<xs:sequence>	
 			<xs:element name="path" type="xs:string"/>
-			<xs:element name="home" type="xs:string"/>
+			<xs:element name="home" type="xs:string"/>            
 		</xs:sequence>
+        <xs:attribute name="frequency" type="xs:unsignedInt" use="optional" default="1" />
 	</xs:complexType>
+    -->
 
 	<!-- Actions node -->
 	<xs:complexType name="Actions">
@@ -426,7 +443,7 @@
 			<xs:element name="data" type="mdl:Data" maxOccurs="1"/>
 			<xs:element name="storage" type="mdl:Storage" maxOccurs="1" minOccurs="0"/>
 			<xs:element name="actions" type="mdl:Actions" maxOccurs="1"/>
-			<xs:element name="python" type="mdl:PythonParam" maxOccurs="1" minOccurs="0"/>
+            <!-- <xs:element name="python" type="mdl:PythonParam" maxOccurs="1" minOccurs="0"/> -->
 			<xs:element name="visit" type="mdl:VisitParam" maxOccurs="1" minOccurs="0"/>
 			<xs:element name="paraview" type="mdl:ParaViewParam" maxOccurs="1" minOccurs="0"/>
 			<xs:element name="log" type="mdl:Log" maxOccurs="1" minOccurs="0"/>

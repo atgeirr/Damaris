@@ -21,7 +21,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 namespace damaris {
 
 /**
- * Configurable is an abstract class for any object that is build uppon a model 
+ * Configurable is an abstract class for any object that is built upon a model 
  * (instance of M class) and keeps a reference over this model.
  */
 template<typename M>

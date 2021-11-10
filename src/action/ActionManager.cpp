@@ -78,6 +78,133 @@ void ActionManager::Init(const model::Actions& mdl)
 		<< " garbage collector.");
 		Add(GarbageCollector::New());
 	}
+	
+//mdl_= mdl ;
+}
 
-}
-}
+bool ActionManager::RunActions(const int iteration)
+{
+    
+    iterator s = Begin();
+	for(; s != End(); s++) {
+		(*s)->Call(iteration, iteration);
+	}
+    
+    
+   /*
+    // loop through actions looking for the script() actions
+	auto actnItr = Begin();
+    for(; actnItr != End(); actnItr++) {
+        std::shared_ptr<Action> action = *actnItr;
+
+       // action->CoProcess(iteration) ;
+      //const model::Actions& actn_mdl = action->GetModel();  
+       
+       if (action::language().present() ) {
+           
+           std::string file_ = actn_mdl.get().file() ;
+           std::cout << "RunActions has found a script which has a file field named: " << file_ << std::endl ;
+       }
+     //
+       
+       */
+ //  model::Actions::script_sequence scripts = mdl_.get().script();
+ //      model::Actions::script_const_iterator it ;
+
+ //   for(it = scripts.begin(); it != scripts.end(); ++it) {
+       
+       //actnmdl
+       // actnmdl::action_const_iterator s(mdl.store().begin());   
+ //   }
+
+   // }
+    
+    return true ;
+} // end of RunActions
+
+}  // end damaris namespace
+
+/*
+	
+	 * This function creates an object of type SUBCLASS (which must be a 
+	 * subclass of the class T) by calling its "New" function with a MODEL 
+	 * parameter. The object is stored in the multiindex structure and a 
+	 * pointer to it is returned. If another object with the same name
+	 * already exists, the object is not created but the old object is 
+	 * returned instead. A configuration warning is output on stderr.
+	 * 
+	 * Example: in a Manager<Action>, one can use
+	 * Manager<Action>::Create<DynamicAction>(Model::Event mdl)
+	 * since DynamicAction inherites from Action and has a constructor that
+	 * takes a Model::Event instance.
+	 *
+	 * \param[in] mdl : model from which to create the object.
+	 * \param[in] name : name to give to the object (if it needs to be renamed).
+	 *
+	template<typename SUBCLASS, typename MODEL>
+	static std::shared_ptr<T> Manager::Create(const MODEL &mdl, const std::string& name)
+	{
+		std::shared_ptr<T> t(
+		SUBCLASS::template New<T>(mdl,name));
+		if(not (bool)t) return t;
+
+		t->id_ = GetNumObjects();
+		//t->name_ = name;
+
+		std::pair<typename ObjectSet::iterator,bool> ret
+			= _objects_.insert(t);
+		if(ret.second == false) {
+			CFGERROR("Duplicate element \""<< name << 
+				"\" not created, " 
+				<< "returning previous value instead.");
+			// no need to delete t here, the shared_ptr does it for us
+			return *(ret.first);
+		}
+		
+		return t;
+	}
+	
+	
+		
+	 * Creates a new instance of an inherited class of ScriptAction 
+	 * according to the "language" field in the description.
+	 
+	template<typename SUPER>
+	static std::shared_ptr<SUPER> ScriptAction::New(const model::Script& mdl, 
+				     const std::string& name) {
+		switch(mdl.scope()) {
+		case model::Scope::core :
+		case model::Scope::bcast :
+
+			if(mdl.language() == model::Language::python) {
+#ifdef HAVE_PYTHON_ENABLED
+				return PyAction::New(mdl,name);
+#else
+				CFGERROR("Damaris has not been compiled"
+					<< " with Python support.");
+#endif
+			} else {
+				CFGERROR("\"" << mdl.language() 
+				<< "\" is not a valid scripting language.");
+			}
+			break;
+
+		case model::Scope::group :
+			if(mdl.language() == model::Language::python) {
+#ifdef HAVE_PYTHON_ENABLED
+				return NodeAction<Python::PyAction,
+					model::Script>::New(mdl,name);
+#else
+				CFGERROR("Damaris has not been compiled"
+				<< " with Python support.");
+#endif
+			} else {
+				CFGERROR("\"" << mdl.language() 
+				<< "\" is not a valid scripting language.");
+			}
+			break;
+		}
+		return std::shared_ptr<SUPER>();
+	}
+ * 
+ * */

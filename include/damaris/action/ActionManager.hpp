@@ -29,14 +29,21 @@ namespace damaris {
  * actions managed by the program. It inherites from Manage<Action>.
  */
 class ActionManager : public Manager<Action> {
-
+private:
+    // model::Actions  mdl_;
 public:
+    
 	/**
 	 * Initialize the ActionManager with a model: goes through all the 
 	 * events and scripts described in the XML file, creates the appropriate
 	 * Actions instances, and stores them.
 	 */
 	static void Init(const model::Actions& mdl);
+    
+    /**
+	 * Loop through and execute the actions in the ActionManager
+	 */
+    static bool RunActions(const int iteration);
 };
 
 }

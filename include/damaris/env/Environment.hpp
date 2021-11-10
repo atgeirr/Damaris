@@ -22,6 +22,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <algorithm>
 #include <mpi.h>
 
 #include "damaris/util/Pointers.hpp"
@@ -91,6 +92,12 @@ private:
     static bool InitDedicatedCores(MPI_Comm comm);
     static bool InitDedicatedNodes();
     static bool InitStandalone(MPI_Comm comm);
+    
+    /**
+     * Used to set _isClient_ by either using the Placement XML tag data or 
+     * the default mapping (the server ranks are last within a node)
+     */
+    static bool ReturnTrueIfClientFromPlacement(int rankInNode); 
 
     /**
    	* Writes out string of values describing the environment of current process to std::string _environment_print_string_
