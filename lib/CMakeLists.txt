@@ -23,7 +23,7 @@ set(DAMARIS_SRC
 	${DAMARIS_SOURCE_DIR}/src/data/ParameterManager.cpp
 	${DAMARIS_SOURCE_DIR}/src/data/Mesh.cpp
 	${DAMARIS_SOURCE_DIR}/src/data/MeshManager.cpp
-    ${DAMARIS_SOURCE_DIR}/src/data/StructuredMesh.cpp
+  ${DAMARIS_SOURCE_DIR}/src/data/StructuredMesh.cpp
 	${DAMARIS_SOURCE_DIR}/src/data/RectilinearMesh.cpp
 	${DAMARIS_SOURCE_DIR}/src/data/CurvilinearMesh.cpp
 	${DAMARIS_SOURCE_DIR}/src/data/PointMesh.cpp
@@ -64,6 +64,10 @@ endif(ENABLE_CATALYST)
 if(ENABLE_FORTRAN)
   set(DAMARIS_FORTRAN_MODULE ${DAMARIS_SOURCE_DIR}/src/main/Damaris.F90)
 endif(ENABLE_FORTRAN)
+
+if(ENABLE_PYTHON)
+	set(DAMARIS_PYTHONACTION_SRC ${DAMARIS_SOURCE_DIR}/src/scripts/PyAction.cpp) 
+endif(ENABLE_PYTHON)
 
 # add the Dependency on XSD-generated files
 set_source_files_properties(
@@ -109,7 +113,8 @@ add_library(damaris 	${DAMARIS_SRC}
 			${DAMARIS_VISIT_SRC}
 			${DAMARIS_HDF5_SRC} 
 			${DAMARIS_PARAVIEW_SRC}
-			${DAMARIS_FORTRAN_MODULE})
+			${DAMARIS_FORTRAN_MODULE}
+			${DAMARIS_PYTHONACTION_SRC})
 
 include_directories(${CMAKE_BINARY_DIR}/include/damaris
 		${CMAKE_BINARY_DIR}/include)
@@ -130,6 +135,12 @@ if(ENABLE_CATALYST)
 	target_include_directories(damaris PUBLIC ${PARAVIEW_INCLUDE_DIRS})
 	target_include_directories(damaris PUBLIC ${ParaView_INCLUDE_DIRS})
 endif(ENABLE_CATALYST)
+
+
+if(ENABLE_PYTHON)
+  target_include_directories(damaris PUBLIC  ${PYTHON_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${NUMPY_INCLUDE_PATH})
+endif(ENABLE_PYTHON)
+
 
 # for shared libs, establish the lib version
 set_target_properties(damaris

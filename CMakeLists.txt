@@ -38,6 +38,7 @@ option(ENABLE_FORTRAN  "Build Fortran support. Requires CMAKE_Fortran_COMPILER t
 option(ENABLE_VISIT    "Build VisIt support. May requires VisIt_ROOT to be set." OFF)
 option(ENABLE_CATALYST "Build Catalyst support. May requires ParaView_DIR to be set." OFF)
 option(ENABLE_HDF5     "Build with HDF5 support. May requires HDF5_ROOT to be set." OFF)
+option(ENABLE_PYTHON   "Build with Python+ NumPy scripting capabilties." OFF)
 option(GENERATE_MODEL  "Regenerates the XSD model instead of using existing ones." OFF)
 
 #----------------------------------------------------------------------------#
@@ -140,6 +141,28 @@ if(ENABLE_HDF5)
   list(APPEND DEP_LIBRARIES ${HDF5_LIBRARIES})
   include_directories(${HDF5_INCLUDE_DIRS})
 endif(ENABLE_HDF5)
+
+#----------------------------------------------------------------------------#
+# Set everything related to Python
+#----------------------------------------------------------------------------#
+if(ENABLE_PYTHON)
+  execute_process(
+  COMMAND python -c "import numpy; print numpy.get_include()"
+  OUTPUT_VARIABLE NUMPY_INCLUDE_PATH
+  ERROR_QUIET
+  )
+  find_package(Boost COMPONENTS python REQUIRED)
+  find_package(Boost COMPONENTS numpy REQUIRED)
+  find_package( PythonLibs 3 REQUIRED )
+  set(HAVE_PYTHON_ENABLED 1)
+  list(APPEND DEP_LIBRARIES ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} )
+#   include_directories(
+#  ${PYTHON_INCLUDE_DIRS}
+#  ${Boost_INCLUDE_DIRS}
+#  ${NUMPY_INCLUDE_PATH}
+#  )
+endif(ENABLE_PYTHON)
+
 
 #----------------------------------------------------------------------------#
 # Set everything related to ParaView

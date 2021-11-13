@@ -22,7 +22,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 // #include "damaris_data.hpp"
 
-/*
+
+/*
   * The XSD model is something like this:
   * <!-- Script node -->
 	<xs:complexType name="Script">
@@ -47,8 +48,8 @@ namespace damaris {
     PyAction::PyAction(const model::Action &mdl)
             : ScriptAction(mdl) {
 
-        fileMode_= FilePerCore;
-        xdmfMode_= NoIteration;
+       // fileMode_= FilePerCore;
+       // xdmfMode_= NoIteration;
 
         //if (!ReadKeyValues(mdl))
         //    ERROR("Bad KeyValue Parameters for HDF5 Store");
