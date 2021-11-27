@@ -80,7 +80,7 @@ private:
    /**
 	* This function writes the data of an iteration into a single HDF5 file using collective I/O.
 	* Parallel HDF5 has been used as an I/O middleware here.
-	* Collective I/O be used by specifying "CollectiveTest" in the Damaris
+	* Collective I/O be used by specifying "Collective" in the Damaris
 	* XML config file <store> section:
 	*  <option key="FileMode">Collective</option>
 	*/
@@ -98,7 +98,7 @@ private:
 	/**
 	* This function writes the data of an iteration into multiple files in a file-per-dedicated-core manner.
 	* No collective I/O is used in this case.
-	* Is enabled by specifying "CollectiveTest" in the Damaris
+	* Is enabled by specifying "FilePerCore" in the Damaris
 	* XML config file <store> section:
 	*  <option key="FileMode">FilePerCore</option>
 	*/

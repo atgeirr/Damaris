@@ -1,0 +1,122 @@
+Bootstrap: docker
+From: ubuntu:20.04
+Stage: build
+
+%help
+    To build the container you will need Singularity installed
+       https://sylabs.io/guides/latest/user-guide/quick_start.html
+      
+    This container was built from the following repositpory of Singularity definition files:
+        git clone  https://gitlab.inria.fr/Damaris/damaris-development.git
+        cd damaris/build/singlarity/damaris_bindeps_nopv.def
+        
+    This version builds damaris with the following dependencies:
+    
+    |     | xerces-c | xsd   |  HDF5       |    mpi        | Paraview |
+    |-----|----------|-------|-------------|---------------|----------|
+    | src |          |       |             |               |          |
+    | bin |   3.2.2  | 4.0.0 | 1.10.4-mpi  | OpenMPI 4.0.3 |          |
+    
+    
+    Please add your own software to this definition file and then build
+      or
+    Build a writable container and then add your software to the image (less recomended)
+    
+    To build a container from a definition file:
+    As a writable container (remove --sandbox if you want a read-only container)
+        sudo singularity build --sandbox damaris_container damaris_bindeps_nopv.def
+        
+    To get a shell into the container:
+        sudo singularity shell [--writable] damaris_container
+        # you can run a Damris example
+        export INSTALL_PREFIX=/opt/damaris
+        mpirun -np 4 $INSTALL_PREFIX/examples/storage/3dmesh $INSTALL_PREFIX/examples/storage/3dmesh.xml -v
+        
+        # view contents of output 
+        h5dump -w 100 3dmesh_wf_It4.h5
+        
+    N.B. The install directory is: /opt/damaris
+  
+%setup
+
+%files
+
+%environment
+    export LC_ALL=C
+    export DEBIAN_FRONTEND=noninteractive   
+    export INSTALL_PREFIX=/opt/damaris
+    
+    export PATH=$INSTALL_PREFIX/bin:$PATH
+    export LD_LIBRARY_PATH=$INSTALL_PREFIX/lib:$LD_LIBRARY_PATH
+    export LD_LIBRARY_PATH=$INSTALL_PREFIX/lib64:$LD_LIBRARY_PATH
+
+%post
+    # Install paths variables and software versions
+    NUMCORES=4
+    export BUILDDIR=/tmp/builddamaris
+    export INSTALL_PREFIX=/opt/damaris
+    export CMAKE_BUILD_TYPE=Debug
+    
+    
+    mkdir -p ${BUILDDIR}
+    cd ${BUILDDIR}
+    
+    apt-get update -y && \
+    apt-get install -y software-properties-common
+    add-apt-repository -y ppa:opm/ppa 
+
+
+    echo "debconf debconf/frontend select Noninteractive" | debconf-set-selections 
+    apt-get -y install apt-utils build-essential gfortran \
+        pkg-config cmake \
+        git-core wget \
+        libboost-all-dev \
+        unzip nano  \
+        libopenmpi-dev libxerces-c-dev  libhdf5-openmpi-dev  hdf5-tools \
+        xsdcxx 
+
+    # Use the xsdcxx package
+    # cd ${BUILDDIR}
+    # wget https://www.codesynthesis.com/download/xsd/4.0/linux-gnu/x86_64/xsd_4.0.0-1_amd64.deb
+    # dpkg -i xsd_4.0.0-1_amd64.deb
+        
+    cd ${BUILDDIR}
+    # tar -xf damaris-development-code_saturne.tar.gz
+    if [ -d ./damaris ] ; then
+      rm -fr ./damaris
+    fi
+    git clone https://gitlab.inria.fr/Damaris/damaris.git
+    if [ -d ./build/damaris ] ; then
+      rm -fr ./build/damaris
+    fi
+    mkdir -p ./build/damaris
+    cd build/damaris
+
+    cmake ../../damaris -DCMAKE_INSTALL_PREFIX:PATH=$INSTALL_PREFIX \
+      -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
+      -DCMAKE_CXX_COMPILER=mpicxx \
+      -DCMAKE_C_COMPILER=mpicc \
+      -DENABLE_TESTS=OFF \
+      -DENABLE_EXAMPLES=ON \
+      -DBUILD_SHARED_LIBS=ON \
+      -DENABLE_HDF5=ON \
+      -DGENERATE_MODEL=ON 
+      
+    make -j${NUMCORES}
+    make install
+   
+   find ${INSTALL_PREFIX}/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples|"
+   
+   
+
+%runscript
+    
+
+%startscript
+    
+
+%test
+
+%labels
+    Author joshua-charles.bowden@inria.fr
+    Version v0.0.1

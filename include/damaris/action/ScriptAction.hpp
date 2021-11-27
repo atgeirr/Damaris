@@ -21,6 +21,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "damaris/util/Manager.hpp"
 #include "damaris/util/Configurable.hpp"
 #include "damaris/action/Action.hpp"
+#include "damaris/data/Variable.hpp"
+
 
 // #undef __ENABLE_PYTHON // TODO
 
