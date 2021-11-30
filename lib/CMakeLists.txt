@@ -359,6 +359,6 @@ if(ENABLE_EXAMPLES)
 	install(FILES "${CMAKE_BINARY_DIR}/examples/plugin/libgc.so" DESTINATION examples/plugin)
 	install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/Example" DESTINATION examples)
     install(FILES "${CMAKE_BINARY_DIR}/examples/libexample.so" DESTINATION examples)
-    install(FILES "${CMAKE_BINARY_DIR}/examples/example.xml" DESTINATION examples)
+    install(FILES "${DAMARIS_SOURCE_DIR}/examples/example.xml" DESTINATION examples)
 endif(ENABLE_EXAMPLES)
 
