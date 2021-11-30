@@ -35,11 +35,10 @@
 		</group>
 	</data>
 	<actions>
-		<event name="test_event" action="my_function" scope="core" />
-		<event name="test_local_event" action="called_locally" 
-				execution="local" />
-		<event name="test_bcast_event" action="bcasted_event" />
-		<script name="test_script" language="python" file="test.py" />
+		<event name="test_event"       action="my_function"      scope="core" library="libexample.so" />
+		<event name="test_local_event" action="called_locally"   library="libexample.so"  />
+		<event name="test_bcast_event" action="bcasted_event"    library="libexample.so" />
+
 	</actions>
   	<log FileName="log/damaris" RotationSize="5" LogFormat="[%TimeStamp%]: %Message%" LogLevel="info" Flush="false" />
 </simulation>

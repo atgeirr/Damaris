@@ -49,11 +49,12 @@ Stage: build
     export PATH=$INSTALL_PREFIX/bin:$PATH
     export LD_LIBRARY_PATH=$INSTALL_PREFIX/lib:$LD_LIBRARY_PATH
     export LD_LIBRARY_PATH=$INSTALL_PREFIX/lib64:$LD_LIBRARY_PATH
-
+    export PKG_CONFIG_PATH=$INSTALL_PREFIX/lib/pkgconfig:$PKG_CONFIG_PATH
+    export PKG_CONFIG_PATH=$INSTALL_PREFIX/lib64/pkgconfig:$PKG_CONFIG_PATH
 %post
     # Install paths variables and software versions
     NUMCORES=4
-    export BUILDDIR=/tmp/builddamaris
+    export BUILDDIR=/builddamaris
     export INSTALL_PREFIX=/opt/damaris
     export CMAKE_BUILD_TYPE=Debug
     
@@ -65,7 +66,6 @@ Stage: build
     apt-get install -y software-properties-common
     add-apt-repository -y ppa:opm/ppa 
 
-
     echo "debconf debconf/frontend select Noninteractive" | debconf-set-selections 
     apt-get -y install apt-utils build-essential gfortran \
         pkg-config cmake \
@@ -73,19 +73,24 @@ Stage: build
         libboost-all-dev \
         unzip nano  \
         libopenmpi-dev libxerces-c-dev  libhdf5-openmpi-dev  hdf5-tools \
-        xsdcxx 
+        xsdcxx libcppunit-dev
+        
+    if [ ! -f /usr/bin/xsd ] ; then
+      ln -s /usr/bin/xsdcxx /usr/bin/xsd
+    fi
 
-    # Use the xsdcxx package
+    # Use the xsdcxx debian apt package
     # cd ${BUILDDIR}
     # wget https://www.codesynthesis.com/download/xsd/4.0/linux-gnu/x86_64/xsd_4.0.0-1_amd64.deb
     # dpkg -i xsd_4.0.0-1_amd64.deb
-        
+    mkdir -p ${BUILDDIR}    
     cd ${BUILDDIR}
     # tar -xf damaris-development-code_saturne.tar.gz
     if [ -d ./damaris ] ; then
       rm -fr ./damaris
     fi
     git clone https://gitlab.inria.fr/Damaris/damaris.git
+    
     if [ -d ./build/damaris ] ; then
       rm -fr ./build/damaris
     fi
@@ -96,18 +101,36 @@ Stage: build
       -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
       -DCMAKE_CXX_COMPILER=mpicxx \
       -DCMAKE_C_COMPILER=mpicc \
-      -DENABLE_TESTS=OFF \
+      -DCMAKE_Fortran_COMPILER=mpifort \
+      -DXSD_EXECUTABLE=/usr/bin/xsd \
+      -DENABLE_FORTRAN=ON \
+      -DENABLE_TESTS=ON \
       -DENABLE_EXAMPLES=ON \
       -DBUILD_SHARED_LIBS=ON \
-      -DENABLE_HDF5=ON \
+      -DENABLE_CATALYST=OFF -DParaView_DIR=$CATALYSTDIR \
+      -DENABLE_HDF5=ON   \
       -DGENERATE_MODEL=ON 
+
+    
+
+#    cmake ../../damaris -DCMAKE_INSTALL_PREFIX:PATH=$INSTALL_PREFIX \
+#      -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
+#      -DCMAKE_CXX_COMPILER=mpicxx \
+#      -DCMAKE_C_COMPILER=mpicc \
+#      -DENABLE_TESTS=OFF \
+#      -DENABLE_EXAMPLES=ON \
+#      -DBUILD_SHARED_LIBS=ON \
+#      -DENABLE_HDF5=ON \
+#      -DGENERATE_MODEL=ON 
       
     make -j${NUMCORES}
     make install
+    make clean
    
-   find ${INSTALL_PREFIX}/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples|"
+    find ${INSTALL_PREFIX}/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples|"
    
-   
+   chmod -R a+rw $BUILDDIR
+   chmod -R a+rw $INSTALL_PREFIX
 
 %runscript
     
