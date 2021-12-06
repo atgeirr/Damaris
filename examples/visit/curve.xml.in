@@ -1,33 +1,34 @@
 <?xml version="1.0"?>
 <simulation name="curve" language="c" xmlns="http://damaris.gforge.inria.fr/damaris/model">
-	<architecture>
-		<domains count="1"/>
-		<dedicated cores="1" nodes="0" />
-		<buffer name="buffer" size="67108864" />
-		<queue  name="queue" size="100" />
-	</architecture>
-	<data>
-		<parameter name="NPTS" type="int" value="10000" />
+    <architecture>
+        <domains count="1"/>
+        <dedicated cores="1" nodes="0" />
+        <placement />                
+        <buffer name="buffer" size="67108864" />
+        <queue  name="queue" size="100" />
+    </architecture>
+    <data>
+        <parameter name="NPTS" type="int" value="10000" />
 
-		<layout name="lt" type="float" dimensions="NPTS" />
+        <layout name="lt" type="float" dimensions="NPTS" />
 
-		<curve name="sine">
-			<coord name="coordinates/x" unit="radians" 
-				label="Angle"/>
-			<coord name="coordinates/y" label="Amplitude"/>
-		</curve>
+        <curve name="sine">
+            <coord name="coordinates/x" unit="radians" 
+                label="Angle"/>
+            <coord name="coordinates/y" label="Amplitude"/>
+        </curve>
 
-		<group name="coordinates">
-			<variable name="x" layout="lt" visualizable="false" time-varying="true" />
-			<variable name="y" layout="lt" visualizable="false" time-varying="true" />
-		</group>
-	</data>
-	<storage>
-	</storage>
-	<actions>
-	</actions>
-	<visit>
-		<path>@VisIt_ROOT@</path>
-	</visit>
-	<log FileName="log/curve" RotationSize="5" LogFormat="[%TimeStamp%]: %Message%" LogLevel="info" Flush="false" />
+        <group name="coordinates">
+            <variable name="x" layout="lt" visualizable="false" time-varying="true" />
+            <variable name="y" layout="lt" visualizable="false" time-varying="true" />
+        </group>
+    </data>
+    <storage>
+    </storage>
+    <actions>
+    </actions>
+    <visit>
+        <path>@VisIt_ROOT@</path>
+    </visit>
+    <log FileName="log/curve" RotationSize="5" LogFormat="[%TimeStamp%]: %Message%" LogLevel="info" Flush="false" />
 </simulation>

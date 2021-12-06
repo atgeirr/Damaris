@@ -38,15 +38,15 @@ namespace damaris {
 /*
   * The XSD model is something like this:
   * <!-- Script node -->
-	<xs:complexType name="Script">
-		<xs:attribute name="name"      type="xs:string"  use="required"/>
-		<xs:attribute name="file"      type="xs:string"  use="required"/>
-		<xs:attribute name="execution" type="mdl:Exec"   use="optional" default="remote"/>
-		<xs:attribute name="language"  type="mdl:Language"  use="required"/>
-		<xs:attribute name="scope"     type="mdl:Scope"  use="optional" default="core"/>
-		<xs:attribute name="external"  type="xs:boolean" use="optional" default="false"/>
+    <xs:complexType name="Script">
+        <xs:attribute name="name"      type="xs:string"  use="required"/>
+        <xs:attribute name="file"      type="xs:string"  use="required"/>
+        <xs:attribute name="execution" type="mdl:Exec"   use="optional" default="remote"/>
+        <xs:attribute name="language"  type="mdl:Language"  use="required"/>
+        <xs:attribute name="scope"     type="mdl:Scope"  use="optional" default="core"/>
+        <xs:attribute name="external"  type="xs:boolean" use="optional" default="false"/>
         <xs:attribute name="frequency" type="xs:unsignedInt" use="optional" default="1" />
-	</xs:complexType>
+    </xs:complexType>
   * 
   * */
 
@@ -57,11 +57,11 @@ namespace np = boost::python::numpy;
 namespace damaris {
 
     /**
-	 * Constructor.
-	 */
-	PyAction::PyAction(const model::Script& mdl)
-	: ScriptAction(mdl)
-	{ 
+     * Constructor.
+     */
+    PyAction::PyAction(const model::Script& mdl)
+                            : ScriptAction(mdl)
+    { 
         name_     = mdl.name() ;
         language_ = mdl.language() ;
         file_     = mdl.file() ;
@@ -88,37 +88,68 @@ namespace damaris {
 
     }
     
+    
     void PyAction::Call(int32_t sourceID, int32_t iteration, const char* args){
         if (iteration % frequency_ == 0){
             PassDataToPython( iteration );
         }
     }
 
-    bool PyAction::GetNumPyType(model::Type mdlType, np::dtype &dt) {
+    
+    np::dtype PyAction::GetNumPyType(model::Type mdlType) {
+        // np::dtype &dt
         if (mdlType.compare("int") == 0) {
-            dt = np::dtype::get_builtin<int>();
+            return(np::dtype::get_builtin<int>());
         } else if (mdlType.compare("float") == 0) {
-            dt = np::dtype::get_builtin<float>();
+            return(np::dtype::get_builtin<float>());
         } else if (mdlType.compare("real") == 0) {
-            dt = np::dtype::get_builtin<float>();
+            return(np::dtype::get_builtin<float>());
         } else if (mdlType.compare("integer") == 0) {
-            dt = np::dtype::get_builtin<int>();
+            return(np::dtype::get_builtin<int>());
         } else if (mdlType.compare("double") == 0) {
-            dt = np::dtype::get_builtin<double>();
+            return(np::dtype::get_builtin<double>());
         } else if (mdlType.compare("long") == 0) {
-            dt = np::dtype::get_builtin<long int>();
+            return(np::dtype::get_builtin<long int>());
         } else if (mdlType.compare("short") == 0) {
-            dt = np::dtype::get_builtin<short>();;
+            return(np::dtype::get_builtin<short>());
         } else if (mdlType.compare("char") == 0) {
-            dt = np::dtype::get_builtin<char>();
+            return(np::dtype::get_builtin<char>());
         } else if (mdlType.compare("character") == 0) {
-            dt = np::dtype::get_builtin<char>();
+            return(np::dtype::get_builtin<char>());
         } else {
-            return false;
+             std::cerr << "PyAction::GetNumPyType() no matching type supported found" ;
         }
-        return true;
+
     }
     
+    
+    std::string PyAction::GetTypeString(model::Type mdlType) {
+        std::string retstr ;
+        if (mdlType.compare("int") == 0) {
+            retstr = "_int";
+        } else if (mdlType.compare("float") == 0) {
+            retstr = "_float";
+        } else if (mdlType.compare("real") == 0) {
+            retstr = "_float";
+        } else if (mdlType.compare("integer") == 0) {
+            retstr = "_int";
+        } else if (mdlType.compare("double") == 0) {
+            retstr = "_double";
+        } else if (mdlType.compare("long") == 0) {
+            retstr = "_longint";
+        } else if (mdlType.compare("short") == 0) {
+            retstr = "_short";
+        } else if (mdlType.compare("char") == 0) {
+            retstr = "_char";
+        } else if (mdlType.compare("character") == 0) {
+            retstr = "_char";
+        } else {
+            return "" ;
+        }
+        return retstr;
+    }
+    
+    /*
     bool PyAction::StaticConstCast(void * serv_ptr) {
         if (mdlType.compare("int") == 0) {
             return StaticCast<int>();
@@ -143,6 +174,8 @@ namespace damaris {
         }
         return true;
     }
+    */
+    
     
     
     std::string PyAction::GetVariableFullName(std::shared_ptr<Variable> v , std::shared_ptr<Block> *b){
@@ -152,13 +185,14 @@ namespace damaris {
 
         baseName = Environment::GetSimulationName();
         numDomains = Environment::NumDomainsPerClient();
-
+        std::string typestr ;
         // (b == NULL) means that there is no access to block data, i.e. in file-per-core mode or future modes.
         
+        
         if (numDomains == 1){
-            varName << v->GetName() << "_P" << (*b)->GetSource(); // e.g. varName_P2
+            varName << v->GetName() << typestr << "_P" << (*b)->GetSource(); // e.g. varName_P2
         } else {// more than one domain
-            varName << v->GetName() << "_P" << (*b)->GetSource() << "_B" << (*b)->GetID(); // e.g. varName_P2_B3
+            varName << v->GetName() << typestr << "_P" << (*b)->GetSource() << "_B" << (*b)->GetID(); // e.g. varName_P2_B3
         }
 
         return  varName.str();
@@ -172,40 +206,43 @@ namespace damaris {
     {
         
         bp::object own_local = bp::object() ;
-        np::dtype dt = np::dtype::get_builtin<int>();
+        // np::dtype dt ;  //= np::dtype::get_builtin<int>()
         
-        std::vector<std::weak_ptr<Variable> >::const_iterator w;
-        w = GetVariables().begin();
+        // std::vector<std::weak_ptr<Variable> >::const_iterator w;
+        // w = GetVariables().begin();
         
-        // for each variable ...
-        for (; w != GetVariables().end(); w++) {
-            std::shared_ptr<Variable> v = w->lock();
+        // for each variable ... (unlike HDF5 storage, which can have a <variable ... store="" /> attribute 
+        VariableManager::iterator v = VariableManager::Begin();
+        for(; v != VariableManager::End(); v++) {
+        
+        // for (; w != GetVariables().end(); w++) {
+            // std::shared_ptr<Variable> v = w->lock();
 
             // non TimeVarying variables only are written in the first iteration.
-            if ((not v->IsTimeVarying()) && (iteration > 0))
+            if ((not v->get()->IsTimeVarying()) && (iteration > 0))
                 continue;
 
             // Getting the dimensions of the variable
             int varDimention;
-            varDimention = v->GetLayout()->GetDimensions();
+            varDimention = v->get()->GetLayout()->GetDimensions();
 
-            // Create a array for dimentions
+            // Create a array for dimensions
             int *globalDims;
             int *localDims;
             globalDims = new (std::nothrow) int[varDimention];
             localDims = new (std::nothrow)  int[varDimention];
 
             if ((globalDims == NULL) || (localDims == NULL)) {
-                ERROR("Failed to allocate memory for dim arrays!");
+                ERROR("in PyAction::PassDataToPython(): Failed to allocate memory for dim arrays!");
             }
 
-            // Getting the equivalent hDF5 Variable Type
-            if (not GetHDF5Type(v->GetLayout()->GetType(), dt)) 
-                ERROR("HDF5:Unknown variable type " << v->GetLayout()->GetType());
+            // Getting the equivalent boost  Variable Type
+            // if (not GetNumPyType(v->GetLayout()->GetType(), dt)) 
+            //    ERROR("in PyAction::PassDataToPython(): Unknown variable type " << v->GetLayout()->GetType());
 
             BlocksByIteration::iterator begin;
             BlocksByIteration::iterator end;
-            v->GetBlocksByIteration(iteration, begin, end);
+            v->get()->GetBlocksByIteration(iteration, begin, end);
             std::string varName;
 
             for (BlocksByIteration::iterator bid = begin; bid != end; bid++) {
@@ -216,11 +253,11 @@ namespace damaris {
 
                 int *blockDim = new (std::nothrow) int[blockDimension];
                 if (blockDim == NULL)
-                    ERROR("HDF5:Failed to allocate memory ");
+                    ERROR("in PyAction::PassDataToPython(): Failed to allocate blockDim memory ");
 
                 // Obtain the block size
                 // Numpy uses C storage conventions, assuming that the last listed
-				// dimension is the fastest-changing dimension and the first-listed
+                // dimension is the fastest-changing dimension and the first-listed
                 // dimension is the slowest changing.
                 // So here we are assuming that Damaris has stored the fastest moving dimension
                 // in the 1st ([0]) position of the lower_bounds_ and upper_bounds_ arrays
@@ -243,21 +280,24 @@ namespace damaris {
                     globalDims[i] = b->GetGlobalExtent(i) ;
                 }
 
-                // Create Dataset name for this block
-                varName = GetVariableFullName(v , &b);
+                // Create Dataset name for this block- includes the data type string: _<type>_P<X>[_B<Y>]
+                // <type> as C named data type
+                // <X> is the variable source rank
+                // <Y> is the block number for the rank
+                varName = GetVariableFullName((*v) , &b);
 
                 // Update ghost zones
                 // UpdateGhostZones(v , memSpace , blockDim);
 
                 // Getting the data
-                void *ptr = b->GetDataSpace().GetData();
+                void *np_ptr = b->GetDataSpace().GetData();
 
                 // Writing data
                 damarisData["iteration"] = iteration ;  // This is the current iteration
                 
-                 np::ndarray mul_data_ex = np::from_data( static_cast<const int *>( np_ptr ), dt,
-                                            bp::make_tuple(t1_sz,t2_sz,t3_sz),
-                                            bp::make_tuple(sizeof(int)*t3_sz*t2_sz,sizeof(int)*t3_sz,sizeof(int)),
+                 np::ndarray mul_data_ex = np::from_data( static_cast<const int *>( np_ptr ), GetNumPyType(v->get()->GetLayout()->GetType()) ,
+                                            bp::make_tuple(localDims[0],localDims[1],localDims[2]),
+                                            bp::make_tuple(sizeof(int)*localDims[2]*localDims[1],sizeof(int)*localDims[2],sizeof(int)),
                                              own_local);
                 std::string numpy_name =  varName + "_" + std::to_string(iteration) ;
                 damarisData[numpy_name]  = mul_data_ex ;
@@ -350,7 +390,7 @@ namespace damaris {
 
                 // Obtain the block size
                 // HDF5 uses C storage conventions, assuming that the last listed
-				// dimension is the fastest-changing dimension and the first-listed
+                // dimension is the fastest-changing dimension and the first-listed
                 // dimension is the slowest changing.
                 // So here we are assuming that Damaris has stored the fastest moving dimension
                 // in the 1st ([0]) position of the lower_bounds_ and upper_bounds_ arrays

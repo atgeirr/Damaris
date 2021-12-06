@@ -19,6 +19,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 
 #include "damaris/action/ScriptAction.hpp"
+#include "data/VariableManager.hpp"
 
 #include <iostream>
 #include <regex>
@@ -37,21 +38,21 @@ namespace np = boost::python::numpy;
  * example, by PyAction.
  * 
     <xs:complexType name="Script">
-		<xs:attribute name="name"      type="xs:string"  use="required"/>
-		<xs:attribute name="file"      type="xs:string"  use="required"/>
-		<xs:attribute name="execution" type="mdl:Exec"   use="optional" default="remote"/>
-		<xs:attribute name="language"  type="mdl:Language"  use="required"/>
-		<xs:attribute name="scope"     type="mdl:Scope"  use="optional" default="core"/>
-		<xs:attribute name="external"  type="xs:boolean" use="optional" default="false"/>
+        <xs:attribute name="name"      type="xs:string"  use="required"/>
+        <xs:attribute name="file"      type="xs:string"  use="required"/>
+        <xs:attribute name="execution" type="mdl:Exec"   use="optional" default="remote"/>
+        <xs:attribute name="language"  type="mdl:Language"  use="required"/>
+        <xs:attribute name="scope"     type="mdl:Scope"  use="optional" default="core"/>
+        <xs:attribute name="external"  type="xs:boolean" use="optional" default="false"/>
         <xs:attribute name="frequency" type="xs:unsignedInt" use="optional" default="1" />
-	</xs:complexType>
+    </xs:complexType>
 */
 
 namespace damaris {
 
 
 
-class PyAction : public ScriptAction {
+class PyAction : public ScriptAction  {
     
     //void Output(int32_t iteration);
     friend class Deleter<PyAction>;
@@ -67,9 +68,9 @@ class PyAction : public ScriptAction {
     */
     bp::dict locals;
     /**
-    * The dictionary that wil lstroe the created numpy arrays that 
+    * The dictionary that wil store the created numpy arrays that 
     * wrap the Damaris data. The dictionary will be added to the Python 
-    * local dictionary
+    * local dictionary and be named DamarisData['varname_is_key_<type>_<iteration>']
     */
     bp::dict damarisData;
     
@@ -89,18 +90,25 @@ class PyAction : public ScriptAction {
     */
     std::string regex_string_with_python_code; 
     
-	protected:
-	/**
-	 * Constructor. Initailizes Pyhton and boost::numpy
-	 */
-	PyAction(const model::Script& mdl);
+    protected:
+    /**
+     * Constructor. Initailizes Pyhton and boost::numpy
+     */
+    PyAction(const model::Script& mdl);
 
     
     /**
     * Uses boost::Numpy data types to convert a Damaris variable 
     * (as given in the XML model) to a numpy data type.
     */
-     bool GetNumPyType(model::Type mdlType, np::dtype &dt);
+    np::dtype GetNumPyType(model::Type mdlType);
+    // bool GetNumPyType(model::Type mdlType, np::dtype &dt);
+     
+     
+    /**
+    * Retruns a string indicating the type of the variable data
+    */
+     std::string GetTypeString(model::Type mdlType);
 
 
     /**
@@ -123,49 +131,49 @@ class PyAction : public ScriptAction {
     bool PassDataToPython(int iteration );
 
 
-	/**
-	 * Destructor.
-	 */
-	virtual ~PyAction() {}
+    /**
+     * Destructor.
+     */
+    virtual ~PyAction() {}
 
-	public:	
+    public:    
     
-	/**
-	 * \see damaris::Action::operator()
-	 */
-	virtual void Call(int32_t sourceID, int32_t iteration,
-				const char* args = NULL) ;
+    /**
+     * \see damaris::Action::operator()
+     */
+    virtual void Call(int32_t sourceID, int32_t iteration,
+                const char* args = NULL) ;
 
-	/**
-	 * Tells if the action can be called from outside the simulation.
-	 */
-	virtual bool IsExternallyVisible() const { 
-		return GetModel().external(); 
-	}
+    /**
+     * Tells if the action can be called from outside the simulation.
+     */
+    virtual bool IsExternallyVisible() const { 
+        return GetModel().external(); 
+    }
 
-	/**
-	 * \see Action::GetExecLocation
-	 */
-	virtual model::Exec GetExecLocation() const {
-		return GetModel().execution();
-	}
+    /**
+     * \see Action::GetExecLocation
+     */
+    virtual model::Exec GetExecLocation() const {
+        return GetModel().execution();
+    }
 
-	/**
-	 * \see Action::GetScope
-	 */
-	virtual model::Scope GetScope() const {
-		return GetModel().scope();
-	}
+    /**
+     * \see Action::GetScope
+     */
+    virtual model::Scope GetScope() const {
+        return GetModel().scope();
+    }
 
-	/**
-	 * Creates a new instance of an inherited class of ScriptAction 
-	 * according to the "language" field in the description.
-	 */
-	template<typename SUPER>
-	static std::shared_ptr<SUPER> New(const model::Script& mdl) {
+    /**
+     * Creates a new instance of an inherited class of ScriptAction 
+     * according to the "language" field in the description.
+     */
+    template<typename SUPER>
+    static std::shared_ptr<SUPER> New(const model::Script& mdl) {
         
-		return std::shared_ptr<SUPER>(new PyAction(mdl), Deleter<PyAction>());
-	}
+        return std::shared_ptr<SUPER>(new PyAction(mdl), Deleter<PyAction>());
+    }
 
 
 };

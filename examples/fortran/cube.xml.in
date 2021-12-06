@@ -3,6 +3,7 @@
 	<architecture>
 		<domains count="1" />
 		<dedicated cores="1" nodes="0" />
+        <placement />
 		<buffer name="damaris-buffer" size="536870912" />
 		<queue  name="damaris-queue" size="100" />
 	</architecture>

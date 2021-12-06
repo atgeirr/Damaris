@@ -3,7 +3,8 @@
 	<architecture>
 		<domains count="4"/>
 		<dedicated cores="1" nodes="0"/>
-		<buffer name="buffer" size="67108864" />
+        <placement />
+        <buffer name="buffer" size="67108864" />
 		<queue  name="queue" size="100" />
 	</architecture>
 	<data>

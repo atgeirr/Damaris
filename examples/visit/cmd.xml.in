@@ -1,24 +1,25 @@
 <?xml version="1.0"?>
 <simulation name="cmd" language="c" xmlns="http://damaris.gforge.inria.fr/damaris/model">
-	<architecture>
-		<domains count="1"/>
-		<dedicated cores="1" nodes="0" />
-		<buffer name="buffer" size="67108864" />
-		<queue  name="queue" size="100" />
-	</architecture>
-	<data>
-	</data>
-	<storage>
-	</storage>
-	<actions>
-		<event name="say_hello1" action="hello_world" library="libhello.so" external="true"/>
-		<script name="say_hello2" file="cmd.py" language="python" external="true"/>
-	</actions>
-	<visit>
-		<path>@VisIt_ROOT@</path>
-	</visit>
-	<python>
-		<path>/home/mdorier/deploy/lib/python2.6</path>
-		<home>/home/mdorier/deploy</home>
-	</python>
+    <architecture>
+        <domains count="1"/>
+        <dedicated cores="1" nodes="0" />
+        <placement />                
+       <buffer name="buffer" size="67108864" />
+        <queue  name="queue" size="100" />
+    </architecture>
+    <data>
+    </data>
+    <storage>
+    </storage>
+    <actions>
+        <event name="say_hello1" action="hello_world" library="libhello.so" external="true"/>
+        <script name="say_hello2" file="cmd.py" language="python" external="true"/>
+    </actions>
+    <visit>
+        <path>@VisIt_ROOT@</path>
+    </visit>
+    <python>
+        <path>/home/mdorier/deploy/lib/python2.6</path>
+        <home>/home/mdorier/deploy</home>
+    </python>
 </simulation>

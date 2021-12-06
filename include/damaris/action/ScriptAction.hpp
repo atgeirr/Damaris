@@ -26,7 +26,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 // #undef __ENABLE_PYTHON // TODO
 
-#ifdef HAVE_PYHTON_ENABLED
+#ifdef HAVE_PYTHON_ENABLED
 #include "damaris/scripts/PyAction.hpp"
 #endif
 
@@ -39,95 +39,95 @@ namespace damaris {
  */
 class ScriptAction : public Action, public Configurable<model::Script> {
 
-	protected:
-	/**
-	 * Condtructor.
-	 */
-	ScriptAction(const model::Script& mdl)
-	: Action(mdl.name()), Configurable<model::Script>(mdl)
-	{ }
+    protected:
+    /**
+     * Condtructor.
+     */
+    ScriptAction(const model::Script& mdl)
+    : Action(mdl.name()), Configurable<model::Script>(mdl)
+    { }
 
-	/**
-	 * Destructor.
-	 */
-	virtual ~ScriptAction() {}
+    /**
+     * Destructor.
+     */
+    virtual ~ScriptAction() {}
 
-	public:	
-	
-	/**
-	 * \see damaris::Action::operator()
-	 */
-	virtual void Call(int32_t sourceID, int32_t iteration,
-				const char* args = NULL) = 0;
+    public:    
+    
+    /**
+     * \see damaris::Action::operator()
+     */
+    virtual void Call(int32_t sourceID, int32_t iteration,
+                const char* args = NULL) = 0;
 
-	/**
-	 * Tells if the action can be called from outside the simulation.
-	 */
-	virtual bool IsExternallyVisible() const { 
-		return GetModel().external(); 
-	}
+    /**
+     * Tells if the action can be called from outside the simulation.
+     */
+    virtual bool IsExternallyVisible() const { 
+        return GetModel().external(); 
+    }
 
-	/**
-	 * \see Action::GetExecLocation
-	 */
-	virtual model::Exec GetExecLocation() const {
-		return GetModel().execution();
-	}
+    /**
+     * \see Action::GetExecLocation
+     */
+    virtual model::Exec GetExecLocation() const {
+        return GetModel().execution();
+    }
 
-	/**
-	 * \see Action::GetScope
-	 */
-	virtual model::Scope GetScope() const {
-		return GetModel().scope();
-	}
+    /**
+     * \see Action::GetScope
+     */
+    virtual model::Scope GetScope() const {
+        return GetModel().scope();
+    }
 
-	/**
-	 * Creates a new instance of an inherited class of ScriptAction 
-	 * according to the "language" field in the description.
-	 */
-	template<typename SUPER>
-	static std::shared_ptr<SUPER> New(const model::Script& mdl, 
-				     const std::string& name) {
-		switch(mdl.scope()) {
-		case model::Scope::core :
-		case model::Scope::bcast :
+    /**
+     * Creates a new instance of an inherited class of ScriptAction 
+     * according to the "language" field in the description.
+     */
+    template<typename SUPER>
+    static std::shared_ptr<SUPER> New(const model::Script& mdl, 
+                     const std::string& name) {
+        switch(mdl.scope()) {
+        case model::Scope::core :
+        case model::Scope::bcast :
 
-			if(mdl.language() == model::Language::python) {
+            if(mdl.language() == model::Language::python) {
 #ifdef HAVE_PYTHON_ENABLED
-				return PyAction::New(mdl,name);
+                return PyAction::New(mdl,name);
 #else
-				CFGERROR("Damaris has not been compiled"
-					<< " with Python support.");
+                CFGERROR("ScriptAction 1: Damaris has not been compiled"
+                    << " with Python support.");
 #endif
-			} else {
-				CFGERROR("\"" << mdl.language() 
-				<< "\" is not a valid scripting language.");
-			}
-			break;
+            } else {
+                CFGERROR("ScriptAction \"" << mdl.language() 
+                << "\" is not a valid scripting language.");
+            }
+            break;
 
-		case model::Scope::group :
-			if(mdl.language() == model::Language::python) {
+        case model::Scope::group :
+            if(mdl.language() == model::Language::python) {
 #ifdef HAVE_PYTHON_ENABLED
-				return NodeAction<Python::PyAction,
-					model::Script>::New(mdl,name);
+                return NodeAction<Python::PyAction,
+                    model::Script>::New(mdl,name);
 #else
-				CFGERROR("Damaris has not been compiled"
-				<< " with Python support.");
+                CFGERROR("ScriptAction 2: Damaris has not been compiled"
+                << " with Python support.");
 #endif
-			} else {
-				CFGERROR("\"" << mdl.language() 
-				<< "\" is not a valid scripting language.");
-			}
-			break;
-		}
-		return std::shared_ptr<SUPER>();
-	}
+            } else {
+                CFGERROR("\"" << mdl.language() 
+                << "\" is not a supported scripting language.");
+            }
+            break;
+        }
+        return std::shared_ptr<SUPER>();
+    }
 
-	template<typename SUPER>
-	static std::shared_ptr<SUPER> New(const model::Script& mdl)
-	{
-		return New<SUPER>(mdl,mdl.name());
-	}
+    template<typename SUPER>
+    static std::shared_ptr<SUPER> New(const model::Script& mdl)
+    {
+        return New<SUPER>(mdl,mdl.name());
+    }
 };
 
 }

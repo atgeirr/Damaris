@@ -1,59 +1,60 @@
 <?xml version="1.0"?>
 <simulation name="mesh" language="c" xmlns="http://damaris.gforge.inria.fr/damaris/model">
-	<architecture>
-		<domains count="1" />
-                <dedicated cores="1" nodes="0" />
-		<buffer name="buffer" size="67108864" />
-		<queue  name="queue" size="100" />
-	</architecture>
-	<data>
-		<parameter name="w" type="int" value="2" />
-		<parameter name="h" type="int" value="3" />
-		<parameter name="d" type="int" value="4" />
+    <architecture>
+        <domains count="1" />
+        <dedicated cores="1" nodes="0" />                
+        <placement />                
+        <buffer name="buffer" size="67108864" />
+        <queue  name="queue" size="100" />
+    </architecture>
+    <data>
+        <parameter name="w" type="int" value="2" />
+        <parameter name="h" type="int" value="3" />
+        <parameter name="d" type="int" value="4" />
 
-		<layout name="rmeshX" type="float" dimensions="4" />
-		<layout name="rmeshY" type="float" dimensions="5" />
+        <layout name="rmeshX" type="float" dimensions="4" />
+        <layout name="rmeshY" type="float" dimensions="5" />
 
-		<layout name="cmesh" type="float" dimensions="w,h,d" />
+        <layout name="cmesh" type="float" dimensions="w,h,d" />
 
-		<layout name="cmesh2" type="float" dimensions="10,10" />
+        <layout name="cmesh2" type="float" dimensions="10,10" />
 
-		<mesh name="mesh2d" type="rectilinear" topology="2">
-			<coord name="coordinates/x2d" unit="cm" label="Width"/>
-			<coord name="coordinates/y2d" unit="cm" label="Height"/>
-		</mesh>
+        <mesh name="mesh2d" type="rectilinear" topology="2">
+            <coord name="coordinates/x2d" unit="cm" label="Width"/>
+            <coord name="coordinates/y2d" unit="cm" label="Height"/>
+        </mesh>
 
-		<mesh name="mesh3d" type="curvilinear" topology="3">
-			<coord name="coordinates/x3d" unit="cm" label="Width"/>
-			<coord name="coordinates/y3d" unit="cm" label="Height"/>
-			<coord name="coordinates/z3d" unit="cm" label="Depth"/>
-		</mesh>
+        <mesh name="mesh3d" type="curvilinear" topology="3">
+            <coord name="coordinates/x3d" unit="cm" label="Width"/>
+            <coord name="coordinates/y3d" unit="cm" label="Height"/>
+            <coord name="coordinates/z3d" unit="cm" label="Depth"/>
+        </mesh>
 
-		<mesh name="mesh3d2" type="curvilinear" topology="2">
-			<coord name="coordinates/x3d2" unit="cm" label="Width"/>
-			<coord name="coordinates/y3d2" unit="cm" label="Height"/>
-			<coord name="coordinates/z3d2" unit="cm" label="Depth"/>
-		</mesh>
+        <mesh name="mesh3d2" type="curvilinear" topology="2">
+            <coord name="coordinates/x3d2" unit="cm" label="Width"/>
+            <coord name="coordinates/y3d2" unit="cm" label="Height"/>
+            <coord name="coordinates/z3d2" unit="cm" label="Depth"/>
+        </mesh>
 
-		<group name="coordinates">
-			<variable name="x2d" layout="rmeshX" visualizable="false" time-varying="false" />
-			<variable name="y2d" layout="rmeshY" visualizable="false" time-varying="false" />
+        <group name="coordinates">
+            <variable name="x2d" layout="rmeshX" visualizable="false" time-varying="false" />
+            <variable name="y2d" layout="rmeshY" visualizable="false" time-varying="false" />
 
-			<variable name="x3d" layout="cmesh" visualizable="false"  time-varying="false" />
-			<variable name="y3d" layout="cmesh" visualizable="false"  time-varying="false" />
-			<variable name="z3d" layout="cmesh" visualizable="false"  time-varying="false" />
+            <variable name="x3d" layout="cmesh" visualizable="false"  time-varying="false" />
+            <variable name="y3d" layout="cmesh" visualizable="false"  time-varying="false" />
+            <variable name="z3d" layout="cmesh" visualizable="false"  time-varying="false" />
 
-			<variable name="x3d2" layout="cmesh2" visualizable="false"  time-varying="false" />
-			<variable name="y3d2" layout="cmesh2" visualizable="false"  time-varying="false" />
-			<variable name="z3d2" layout="cmesh2" visualizable="false"  time-varying="false" />
-		</group>
-	</data>
-	<storage>
-	</storage>
-	<actions>
-	</actions>
-	<visit>
-		<path>@VisIt_ROOT@</path>
-	</visit>
-	<log FileName="log/mesh" RotationSize="5" LogFormat="[%TimeStamp%]: %Message%" LogLevel="info" Flush="false" />
+            <variable name="x3d2" layout="cmesh2" visualizable="false"  time-varying="false" />
+            <variable name="y3d2" layout="cmesh2" visualizable="false"  time-varying="false" />
+            <variable name="z3d2" layout="cmesh2" visualizable="false"  time-varying="false" />
+        </group>
+    </data>
+    <storage>
+    </storage>
+    <actions>
+    </actions>
+    <visit>
+        <path>@VisIt_ROOT@</path>
+    </visit>
+    <log FileName="log/mesh" RotationSize="5" LogFormat="[%TimeStamp%]: %Message%" LogLevel="info" Flush="false" />
 </simulation>

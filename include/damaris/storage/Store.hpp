@@ -36,80 +36,80 @@ namespace damaris {
  * Store::Start, Store::Add, and Store::Complete functions.
  */
 class Store : public Configurable<model::Store> {
-	
-	friend class Manager<Store>;
-	friend class Deleter<Store>;
+    
+    friend class Manager<Store>;
+    friend class Deleter<Store>;
 
-	std::string name_; /*!< Name of the Store. */
-	int id_; 	  /*!< ID given to the store when set in
-				the StorageManager. */
+    std::string name_; /*!< Name of the Store. */
+    int id_;       /*!< ID given to the store when set in
+                the StorageManager. */
     std::vector<std::weak_ptr<Variable> > vars_; /*!< List of variables managed by this Store. */
 
-	protected:
-		
-	/**
-	 * Constructor. 
-	 */
-	Store(const model::Store& mdl) 
-	: Configurable<model::Store>(mdl), name_(mdl.name()), id_(-1) {}
-			
-	/**
-	 * Destructor.
-	 */
-	virtual ~Store() {}
-		
-	public:
-	
-	/**
-	 * Gets the ID of the action.
-	 */		
-	int GetID() const { return id_; }
+    protected:
+        
+    /**
+     * Constructor. 
+     */
+    Store(const model::Store& mdl) 
+    : Configurable<model::Store>(mdl), name_(mdl.name()), id_(-1) {}
+            
+    /**
+     * Destructor.
+     */
+    virtual ~Store() {}
+        
+    public:
+    
+    /**
+     * Gets the ID of the action.
+     */        
+    int GetID() const { return id_; }
 
-	/**
-	 * Gets the name of the action.
-	 */
-	const std::string& GetName() const { return name_; }	
+    /**
+     * Gets the name of the action.
+     */
+    const std::string& GetName() const { return name_; }    
 
-	/**
-	 * This function is called on all variables that require to be
-	 * stored using this Store object.
-	 */
-	void AddVariable(const std::shared_ptr<Variable>& v) {
-		vars_.push_back(v);
-	}
+    /**
+     * This function is called on all variables that require to be
+     * stored using this Store object.
+     */
+    void AddVariable(const std::shared_ptr<Variable>& v) {
+        vars_.push_back(v);
+    }
 
-	/**
-	 * Returns a reference to the list of variables this store is in
-	 * charge of.
-	 */
-	 const std::vector< std::weak_ptr<Variable> >& GetVariables() const {
-		return vars_;
-	}
+    /**
+     * Returns a reference to the list of variables this store is in
+     * charge of.
+     */
+     const std::vector< std::weak_ptr<Variable> >& GetVariables() const {
+        return vars_;
+    }
 
-	/**
-	 * This function is called after an iteration completed
-	 * and is meant to output all variables into files.
-	 */
-	virtual void Output(int32_t iteration) = 0;
+    /**
+     * This function is called after an iteration completed
+     * and is meant to output all variables into files.
+     */
+    virtual void Output(int32_t iteration) = 0;
 
-	/**
- 	* This function checks to see if there is any data to be written into an store object or not.
- 	* If there is no data, the Update function in each store will return. <Maybe set it as configuratble at future>
- 	*/
-	virtual bool IterationIsEmpty(int iteration){
+    /**
+     * This function checks to see if there is any data to be written into an store object or not.
+     * If there is no data, the Update function in each store will return. <Maybe set it as configuratble at future>
+     */
+    virtual bool IterationIsEmpty(int iteration){
         std::vector<std::weak_ptr<Variable> >::const_iterator w;
-		w = GetVariables().begin();
+        w = GetVariables().begin();
 
-		// for each variable ...
-		for (; w != GetVariables().end(); w++) {
-			std::shared_ptr<Variable> v = w->lock();
+        // for each variable ...
+        for (; w != GetVariables().end(); w++) {
+            std::shared_ptr<Variable> v = w->lock();
 
-			if (v->CountTotalBlocks(iteration) > 0)
-				return false;
-		}
+            if (v->CountTotalBlocks(iteration) > 0)
+                return false;
+        }
 
-		return true;
-	}
+        return true;
+    }
 };
 
 }
