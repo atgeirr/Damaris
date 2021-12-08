@@ -265,6 +265,7 @@ namespace damaris
     class VisitParam;
     class ParaViewParam;
     class Actions;
+    class Scripts;
     class StoreType;
     class Store;
     class Storage;
@@ -3933,23 +3934,6 @@ namespace damaris
       void
       event (const event_sequence& s);
 
-      // script
-      //
-      typedef ::damaris::model::Script script_type;
-      typedef ::xsd::cxx::tree::sequence< script_type > script_sequence;
-      typedef script_sequence::iterator script_iterator;
-      typedef script_sequence::const_iterator script_const_iterator;
-      typedef ::xsd::cxx::tree::traits< script_type, char > script_traits;
-
-      const script_sequence&
-      script () const;
-
-      script_sequence&
-      script ();
-
-      void
-      script (const script_sequence& s);
-
       // error
       //
       typedef ::damaris::model::Exception error_type;
@@ -3998,8 +3982,60 @@ namespace damaris
 
       protected:
       event_sequence event_;
-      script_sequence script_;
       error_sequence error_;
+    };
+
+    class Scripts: public ::xml_schema::type
+    {
+      public:
+      // pyscript
+      //
+      typedef ::damaris::model::Script pyscript_type;
+      typedef ::xsd::cxx::tree::sequence< pyscript_type > pyscript_sequence;
+      typedef pyscript_sequence::iterator pyscript_iterator;
+      typedef pyscript_sequence::const_iterator pyscript_const_iterator;
+      typedef ::xsd::cxx::tree::traits< pyscript_type, char > pyscript_traits;
+
+      const pyscript_sequence&
+      pyscript () const;
+
+      pyscript_sequence&
+      pyscript ();
+
+      void
+      pyscript (const pyscript_sequence& s);
+
+      // Constructors.
+      //
+      Scripts ();
+
+      Scripts (const ::xercesc::DOMElement& e,
+               ::xml_schema::flags f = 0,
+               ::xml_schema::container* c = 0);
+
+      Scripts (const Scripts& x,
+               ::xml_schema::flags f = 0,
+               ::xml_schema::container* c = 0);
+
+      virtual Scripts*
+      _clone (::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0) const;
+
+      Scripts&
+      operator= (const Scripts& x);
+
+      virtual 
+      ~Scripts ();
+
+      // Implementation.
+      //
+      protected:
+      void
+      parse (::xsd::cxx::xml::dom::parser< char >&,
+             ::xml_schema::flags);
+
+      protected:
+      pyscript_sequence pyscript_;
     };
 
     class StoreType: public ::xml_schema::string
@@ -4468,19 +4504,44 @@ namespace damaris
       // actions
       //
       typedef ::damaris::model::Actions actions_type;
+      typedef ::xsd::cxx::tree::optional< actions_type > actions_optional;
       typedef ::xsd::cxx::tree::traits< actions_type, char > actions_traits;
 
-      const actions_type&
+      const actions_optional&
       actions () const;
 
-      actions_type&
+      actions_optional&
       actions ();
 
       void
       actions (const actions_type& x);
 
       void
+      actions (const actions_optional& x);
+
+      void
       actions (::std::unique_ptr< actions_type > p);
+
+      // scripts
+      //
+      typedef ::damaris::model::Scripts scripts_type;
+      typedef ::xsd::cxx::tree::optional< scripts_type > scripts_optional;
+      typedef ::xsd::cxx::tree::traits< scripts_type, char > scripts_traits;
+
+      const scripts_optional&
+      scripts () const;
+
+      scripts_optional&
+      scripts ();
+
+      void
+      scripts (const scripts_type& x);
+
+      void
+      scripts (const scripts_optional& x);
+
+      void
+      scripts (::std::unique_ptr< scripts_type > p);
 
       // visit
       //
@@ -4586,12 +4647,10 @@ namespace damaris
       //
       Simulation (const architecture_type&,
                   const data_type&,
-                  const actions_type&,
                   const name_type&);
 
       Simulation (::std::unique_ptr< architecture_type >,
                   ::std::unique_ptr< data_type >,
-                  ::std::unique_ptr< actions_type >,
                   const name_type&);
 
       Simulation (const ::xercesc::DOMElement& e,
@@ -4623,7 +4682,8 @@ namespace damaris
       ::xsd::cxx::tree::one< architecture_type > architecture_;
       ::xsd::cxx::tree::one< data_type > data_;
       storage_optional storage_;
-      ::xsd::cxx::tree::one< actions_type > actions_;
+      actions_optional actions_;
+      scripts_optional scripts_;
       visit_optional visit_;
       paraview_optional paraview_;
       log_optional log_;

@@ -22,6 +22,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "data/VariableManager.hpp"
 
 #include <iostream>
+#include <string>
 #include <regex>
 #include <iterator>
 
@@ -52,13 +53,16 @@ namespace damaris {
 
 
 
-class PyAction : public ScriptAction  {
+//class PyAction : public ScriptAction  {
+    
+class PyAction : public Action, public Configurable<model::Script> {
     
     //void Output(int32_t iteration);
     friend class Deleter<PyAction>;
-     
+    
+  private:
     // Data obtained from the XML model file
-    std::string name_ ;
+    //std::string name_ ;  We get this from inheriting from Action
     std::string language_ ;
     std::string file_ ;
     unsigned int frequency_ ;
@@ -90,11 +94,39 @@ class PyAction : public ScriptAction  {
     */
     std::string regex_string_with_python_code; 
     
-    protected:
+  protected:
     /**
-     * Constructor. Initailizes Pyhton and boost::numpy
+     * Constructor. Initailizes Python and boost::numpy
      */
-    PyAction(const model::Script& mdl);
+    PyAction(const model::Script& mdl)
+        : Action(mdl.name()), Configurable<model::Script>(mdl)
+    { 
+        // name_     = mdl.name() ;
+        language_ = mdl.language() ;
+        file_     = mdl.file() ;
+        frequency_= mdl.frequency() ;
+        
+        Py_Initialize();
+        np::initialize();
+  
+        /**
+        * import the __main__ module and obtain the globals dict
+        * assign to the bp::object 
+        */
+        main     = bp::import("__main__");
+        globals  = main.attr("__dict__");
+      
+        /**
+        * String of Python code used to remove datasets from Pyhton environment when the 
+        * Damris data they use  is invalidated/deleted
+        */
+        regex_string_with_python_code = "try :               \n"
+                                        "  del DamarisData['REPLACE']   \n"
+                                        "except KeyError as err:             \n"
+                                        "  print('Damaris Server: KeyError could not delete key: ', err) \n" ;; 
+
+    }
+    
 
     
     /**
@@ -166,13 +198,15 @@ class PyAction : public ScriptAction  {
     }
 
     /**
-     * Creates a new instance of an inherited class of ScriptAction 
-     * according to the "language" field in the description.
+     * Creates a new instance of an inherited class of PyAction 
+     * according to the "language" field in the description. 
+     * This will be called from the ScriptManager object
      */
     template<typename SUPER>
-    static std::shared_ptr<SUPER> New(const model::Script& mdl) {
+    static std::shared_ptr<SUPER> New(const model::Script& mdl, const std::string name) {
         
         return std::shared_ptr<SUPER>(new PyAction(mdl), Deleter<PyAction>());
+        //return std::shared_ptr<PyAction>(PyAction::New(mdl,name));
     }
 
 

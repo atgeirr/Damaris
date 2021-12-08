@@ -29,6 +29,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "data/CurveManager.hpp"
 #include "storage/StorageManager.hpp"
 #include "action/ActionManager.hpp"
+#include "action/ScriptManager.hpp"
 #include "client/StandaloneClient.hpp"
 #include "client/RemoteClient.hpp"
 
@@ -436,7 +437,12 @@ bool Environment::InitManagers()
 	VariableManager::Init(_baseModel_->data());
 	MeshManager::Init(_baseModel_->data());
 	CurveManager::Init(_baseModel_->data());
-	ActionManager::Init(_baseModel_->actions());
+    if (_baseModel_->actions().present()) {
+	    ActionManager::Init(_baseModel_->actions().get());
+    }
+    if (_baseModel_->scripts().present()) {
+        ScriptManager::Init(_baseModel_->scripts().get());
+    }
 	if((_isDedicatedCore_ || _isDedicatedNode_ || (_serversPerNode_ == 0))
 	   && (_baseModel_->storage().present())) {
 		StorageManager::Init(_baseModel_->storage().get());

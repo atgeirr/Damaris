@@ -22,6 +22,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "msg/Signals.hpp"
 #include "env/Environment.hpp"
 #include "action/ActionManager.hpp"
+#include "action/ScriptManager.hpp"
 #include "data/VariableManager.hpp"
 #include "storage/StorageManager.hpp"
 #include "server/Server.hpp"
@@ -167,6 +168,10 @@ void Server::EndOfIterationCallback(int tag, int source,
     StorageManager::Update(iteration);
     
     ActionManager::RunActions(iteration);
+    
+#ifdef HAVE_PYTHON_ENABLED
+    ScriptManager::RunScripts(iteration);
+#endif
 
     Environment::Log("Server::EndOfIterationCallback method finished.", EventLogger::Info);
     if (Environment::GetModel()->log().present()) {

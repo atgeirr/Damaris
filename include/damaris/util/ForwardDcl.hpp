@@ -39,6 +39,7 @@ namespace damaris {
 	class ScriptAction;
 	class BoundAction;
 	class GarbageCollector;
+    class PyAction;
 	template<class BASE, typename MODEL> class NodeAction;
 	
 	// Utility

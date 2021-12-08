@@ -27,10 +27,10 @@
         <variable name="cube" type="scalar" layout="cells_whd_wf" mesh="mesh" centering="nodal" />
     </data>
     <actions>
-        <script name="pyaction" file="3dmesh_py.py" language="python" frequency="1" />
     </actions>
-    </storage>
-    <actions>
-    </actions>
+    <scripts>
+        <pyscript name="pyaction" file="3dmesh_py.py" language="python" frequency="1" />
+    </scripts>
+
     <log FileName="log/3dmesh" RotationSize="5" LogFormat="[%TimeStamp%]: %Message%" LogLevel="info" Flush="false" />
 </simulation>

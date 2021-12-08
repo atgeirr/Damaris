@@ -3343,24 +3343,6 @@ namespace damaris
       this->event_ = s;
     }
 
-    const Actions::script_sequence& Actions::
-    script () const
-    {
-      return this->script_;
-    }
-
-    Actions::script_sequence& Actions::
-    script ()
-    {
-      return this->script_;
-    }
-
-    void Actions::
-    script (const script_sequence& s)
-    {
-      this->script_ = s;
-    }
-
     const Actions::error_sequence& Actions::
     error () const
     {
@@ -3377,6 +3359,28 @@ namespace damaris
     error (const error_sequence& s)
     {
       this->error_ = s;
+    }
+
+
+    // Scripts
+    // 
+
+    const Scripts::pyscript_sequence& Scripts::
+    pyscript () const
+    {
+      return this->pyscript_;
+    }
+
+    Scripts::pyscript_sequence& Scripts::
+    pyscript ()
+    {
+      return this->pyscript_;
+    }
+
+    void Scripts::
+    pyscript (const pyscript_sequence& s)
+    {
+      this->pyscript_ = s;
     }
 
 
@@ -3791,16 +3795,16 @@ namespace damaris
       this->storage_.set (std::move (x));
     }
 
-    const Simulation::actions_type& Simulation::
+    const Simulation::actions_optional& Simulation::
     actions () const
     {
-      return this->actions_.get ();
+      return this->actions_;
     }
 
-    Simulation::actions_type& Simulation::
+    Simulation::actions_optional& Simulation::
     actions ()
     {
-      return this->actions_.get ();
+      return this->actions_;
     }
 
     void Simulation::
@@ -3810,9 +3814,45 @@ namespace damaris
     }
 
     void Simulation::
+    actions (const actions_optional& x)
+    {
+      this->actions_ = x;
+    }
+
+    void Simulation::
     actions (::std::unique_ptr< actions_type > x)
     {
       this->actions_.set (std::move (x));
+    }
+
+    const Simulation::scripts_optional& Simulation::
+    scripts () const
+    {
+      return this->scripts_;
+    }
+
+    Simulation::scripts_optional& Simulation::
+    scripts ()
+    {
+      return this->scripts_;
+    }
+
+    void Simulation::
+    scripts (const scripts_type& x)
+    {
+      this->scripts_.set (x);
+    }
+
+    void Simulation::
+    scripts (const scripts_optional& x)
+    {
+      this->scripts_ = x;
+    }
+
+    void Simulation::
+    scripts (::std::unique_ptr< scripts_type > x)
+    {
+      this->scripts_.set (std::move (x));
     }
 
     const Simulation::visit_optional& Simulation::
@@ -8363,7 +8403,6 @@ namespace damaris
     Actions ()
     : ::xml_schema::type (),
       event_ (this),
-      script_ (this),
       error_ (this)
     {
     }
@@ -8374,7 +8413,6 @@ namespace damaris
              ::xml_schema::container* c)
     : ::xml_schema::type (x, f, c),
       event_ (x.event_, f, this),
-      script_ (x.script_, f, this),
       error_ (x.error_, f, this)
     {
     }
@@ -8385,7 +8423,6 @@ namespace damaris
              ::xml_schema::container* c)
     : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
       event_ (this),
-      script_ (this),
       error_ (this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
@@ -8413,17 +8450,6 @@ namespace damaris
             event_traits::create (i, f, this));
 
           this->event_.push_back (::std::move (r));
-          continue;
-        }
-
-        // script
-        //
-        if (n.name () == "script" && n.namespace_ () == "http://damaris.gforge.inria.fr/damaris/model")
-        {
-          ::std::unique_ptr< script_type > r (
-            script_traits::create (i, f, this));
-
-          this->script_.push_back (::std::move (r));
           continue;
         }
 
@@ -8456,7 +8482,6 @@ namespace damaris
       {
         static_cast< ::xml_schema::type& > (*this) = x;
         this->event_ = x.event_;
-        this->script_ = x.script_;
         this->error_ = x.error_;
       }
 
@@ -8465,6 +8490,88 @@ namespace damaris
 
     Actions::
     ~Actions ()
+    {
+    }
+
+    // Scripts
+    //
+
+    Scripts::
+    Scripts ()
+    : ::xml_schema::type (),
+      pyscript_ (this)
+    {
+    }
+
+    Scripts::
+    Scripts (const Scripts& x,
+             ::xml_schema::flags f,
+             ::xml_schema::container* c)
+    : ::xml_schema::type (x, f, c),
+      pyscript_ (x.pyscript_, f, this)
+    {
+    }
+
+    Scripts::
+    Scripts (const ::xercesc::DOMElement& e,
+             ::xml_schema::flags f,
+             ::xml_schema::container* c)
+    : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+      pyscript_ (this)
+    {
+      if ((f & ::xml_schema::flags::base) == 0)
+      {
+        ::xsd::cxx::xml::dom::parser< char > p (e, true, false, false);
+        this->parse (p, f);
+      }
+    }
+
+    void Scripts::
+    parse (::xsd::cxx::xml::dom::parser< char >& p,
+           ::xml_schema::flags f)
+    {
+      for (; p.more_content (); p.next_content (false))
+      {
+        const ::xercesc::DOMElement& i (p.cur_element ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        // pyscript
+        //
+        if (n.name () == "pyscript" && n.namespace_ () == "http://damaris.gforge.inria.fr/damaris/model")
+        {
+          ::std::unique_ptr< pyscript_type > r (
+            pyscript_traits::create (i, f, this));
+
+          this->pyscript_.push_back (::std::move (r));
+          continue;
+        }
+
+        break;
+      }
+    }
+
+    Scripts* Scripts::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class Scripts (*this, f, c);
+    }
+
+    Scripts& Scripts::
+    operator= (const Scripts& x)
+    {
+      if (this != &x)
+      {
+        static_cast< ::xml_schema::type& > (*this) = x;
+        this->pyscript_ = x.pyscript_;
+      }
+
+      return *this;
+    }
+
+    Scripts::
+    ~Scripts ()
     {
     }
 
@@ -8997,13 +9104,13 @@ namespace damaris
     Simulation::
     Simulation (const architecture_type& architecture,
                 const data_type& data,
-                const actions_type& actions,
                 const name_type& name)
     : ::xml_schema::type (),
       architecture_ (architecture, this),
       data_ (data, this),
       storage_ (this),
-      actions_ (actions, this),
+      actions_ (this),
+      scripts_ (this),
       visit_ (this),
       paraview_ (this),
       log_ (this),
@@ -9015,13 +9122,13 @@ namespace damaris
     Simulation::
     Simulation (::std::unique_ptr< architecture_type > architecture,
                 ::std::unique_ptr< data_type > data,
-                ::std::unique_ptr< actions_type > actions,
                 const name_type& name)
     : ::xml_schema::type (),
       architecture_ (std::move (architecture), this),
       data_ (std::move (data), this),
       storage_ (this),
-      actions_ (std::move (actions), this),
+      actions_ (this),
+      scripts_ (this),
       visit_ (this),
       paraview_ (this),
       log_ (this),
@@ -9039,6 +9146,7 @@ namespace damaris
       data_ (x.data_, f, this),
       storage_ (x.storage_, f, this),
       actions_ (x.actions_, f, this),
+      scripts_ (x.scripts_, f, this),
       visit_ (x.visit_, f, this),
       paraview_ (x.paraview_, f, this),
       log_ (x.log_, f, this),
@@ -9056,6 +9164,7 @@ namespace damaris
       data_ (this),
       storage_ (this),
       actions_ (this),
+      scripts_ (this),
       visit_ (this),
       paraview_ (this),
       log_ (this),
@@ -9128,9 +9237,23 @@ namespace damaris
           ::std::unique_ptr< actions_type > r (
             actions_traits::create (i, f, this));
 
-          if (!actions_.present ())
+          if (!this->actions_)
           {
             this->actions_.set (::std::move (r));
+            continue;
+          }
+        }
+
+        // scripts
+        //
+        if (n.name () == "scripts" && n.namespace_ () == "http://damaris.gforge.inria.fr/damaris/model")
+        {
+          ::std::unique_ptr< scripts_type > r (
+            scripts_traits::create (i, f, this));
+
+          if (!this->scripts_)
+          {
+            this->scripts_.set (::std::move (r));
             continue;
           }
         }
@@ -9194,13 +9317,6 @@ namespace damaris
           "http://damaris.gforge.inria.fr/damaris/model");
       }
 
-      if (!actions_.present ())
-      {
-        throw ::xsd::cxx::tree::expected_element< char > (
-          "actions",
-          "http://damaris.gforge.inria.fr/damaris/model");
-      }
-
       while (p.more_attributes ())
       {
         const ::xercesc::DOMAttr& i (p.next_attribute ());
@@ -9250,6 +9366,7 @@ namespace damaris
         this->data_ = x.data_;
         this->storage_ = x.storage_;
         this->actions_ = x.actions_;
+        this->scripts_ = x.scripts_;
         this->visit_ = x.visit_;
         this->paraview_ = x.paraview_;
         this->log_ = x.log_;

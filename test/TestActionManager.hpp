@@ -49,7 +49,7 @@ protected:
 	void InitActionManager() {
 		CPPUNIT_ASSERT(ActionManager::GetNumObjects() == 0);
 		CPPUNIT_ASSERT(ActionManager::IsEmpty());
-		ActionManager::Init(mdl->actions());
+		ActionManager::Init(mdl->actions().get());
 		CPPUNIT_ASSERT(not ActionManager::IsEmpty());
 		ActionManager::DeleteAll();
 		CPPUNIT_ASSERT(ActionManager::GetNumObjects() == 0);
@@ -58,7 +58,7 @@ protected:
 	
 	void SearchAction() {
 		// initialization
-		ActionManager::Init(mdl->actions());
+		ActionManager::Init(mdl->actions().get());
 		// search an existing action
 		std::shared_ptr<Action> a1 
 			= ActionManager::Search("test_event");

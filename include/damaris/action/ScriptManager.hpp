@@ -14,8 +14,8 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ***************************************************************************/
-#ifndef __DAMARIS_ACTION_MANAGER_H
-#define __DAMARIS_ACTION_MANAGER_H
+#ifndef __DAMARIS_SCRIPT_MANAGER_H
+#define __DAMARIS_SCRIPT_MANAGER_H
 
 #include "damaris/model/Model.hpp"
 #include "damaris/util/Manager.hpp"
@@ -25,25 +25,27 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 namespace damaris {
 
 /**
- * ActionManager is a class that offers an access by name and by id to all 
- * actions managed by the program. It inherites from Manage<Action>.
+ * ScriptManager is a class that offers an access by name and by id to all 
+ * scripts managed by the program. It inherites from Manage<Action>.
  */
-class ActionManager : public Manager<Action> {
+class ScriptManager : public Manager<Action> {
 private:
 //     model::Actions  mdl_;
 public:
     
     /**
-     * Initialize the ActionManager with a model: goes through all the 
+     * Initialize the ScriptManager with a model: goes through all the 
      * events and scripts described in the XML file, creates the appropriate
      * Actions instances, and stores them.
      */
-    static void Init(const model::Actions& mdl);
+    static void Init(const model::Scripts& mdl_script);
     
     /**
-     * Loop through and execute the actions in the ActionManager
+     * Loop through and execute the actions in the ScriptManager
+     * 
+     * Called in src/server/Server.cpp after damaris_end_iteration() is called
      */
-    static bool RunActions(const int iteration);
+    static bool RunScripts(const int iteration);   // static bool RunActions(const int iteration);
 };
 
 }

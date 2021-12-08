@@ -326,7 +326,7 @@
         <xs:attribute name="external"  type="xs:boolean" use="optional" default="false"/>
     </xs:complexType>
 
-    <!-- Script node -->
+    <!-- PyScript node -->
     <xs:complexType name="Script">
         <xs:attribute name="name"      type="xs:string"  use="required"/>
         <xs:attribute name="file"      type="xs:string"  use="required"/>
@@ -375,14 +375,22 @@
     </xs:complexType>
     -->
 
-    <!-- Actions node -->
+    <!-- Actions node  <xs:element name="pyscript" type="mdl:Script"/> -->
     <xs:complexType name="Actions">
         <xs:sequence>
             <xs:choice minOccurs="0" maxOccurs="unbounded">
-                <xs:element name="event" type="mdl:Event"/>
-                <xs:element name="script" type="mdl:Script"/>
+                <xs:element name="event" type="mdl:Event"/>               
                 <xs:element name="error" type="mdl:Exception"/>
             </xs:choice>
+        </xs:sequence>
+    </xs:complexType>
+    
+    
+    <xs:complexType name="Scripts">
+        <xs:sequence>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+               <xs:element name="pyscript" type="mdl:Script"/>
+           </xs:choice>
         </xs:sequence>
     </xs:complexType>
 
@@ -442,7 +450,8 @@
             <xs:element name="architecture" type="mdl:Architecture" minOccurs="1" maxOccurs="1"/>
             <xs:element name="data" type="mdl:Data" maxOccurs="1"/>
             <xs:element name="storage" type="mdl:Storage" maxOccurs="1" minOccurs="0"/>
-            <xs:element name="actions" type="mdl:Actions" maxOccurs="1"/>
+            <xs:element name="actions" type="mdl:Actions" maxOccurs="1" minOccurs="0"/>
+            <xs:element name="scripts" type="mdl:Scripts" maxOccurs="1" minOccurs="0"/>
             <!-- <xs:element name="python" type="mdl:PythonParam" maxOccurs="1" minOccurs="0"/> -->
             <xs:element name="visit" type="mdl:VisitParam" maxOccurs="1" minOccurs="0"/>
             <xs:element name="paraview" type="mdl:ParaViewParam" maxOccurs="1" minOccurs="0"/>

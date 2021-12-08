@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <unistd.h>
+
 #include <mpi.h>
 #include "Damaris.h"
 
@@ -16,7 +18,10 @@ int main(int argc, char** argv)
 {
    if(argc < 2)
    {
-      fprintf(stderr,"Usage: %s <3dmesh.xml> [-v] [-r] \n",argv[0]);
+      fprintf(stderr,"Usage: %s <3dmesh_py.xml> [-v] [-r] [-s X]\n",argv[0]);
+      fprintf(stderr,"-v      Verbose mode, prints arrays\n");
+      fprintf(stderr,"-r      Array values set as rank of process\n");
+      fprintf(stderr,"-s      X is integer value for time to sleep between iterations\n");
       exit(0);
    }
 
@@ -25,32 +30,22 @@ int main(int argc, char** argv)
    damaris_initialize(argv[1],MPI_COMM_WORLD);
    
   int verbose = 0;
-  int rank_only = 0;  
-  if(argc >= 3)
+  int rank_only = 0;
+  int current_arg = 2 ;  
+  int time = 1 ;
+  while (current_arg < argc ) 
   {
-    if (strcmp(argv[2],"-v") == 0)
+    if (strcmp(argv[current_arg],"-v") == 0)
       verbose = 1 ;
-    else if (strcmp(argv[2],"-r") == 0)
+    else if (strcmp(argv[current_arg],"-r") == 0)
       rank_only = 1 ;
-    else {
-      fprintf(stderr,"ERROR: Incorrect argument: %s \n",argv[2]);
-      fprintf(stderr,"Usage: %s <3dmesh.xml> [-v] [-r] \n",argv[0]);
-      exit(0);
-    } 
+    else if (strcmp(argv[current_arg],"-s") == 0) {
+        current_arg++;
+        time = atoi(argv[current_arg]);
+    }
+      current_arg++;
   }
 
-  if(argc == 4)
-  {
-    if (strcmp(argv[3],"-v") == 0)
-      verbose = 1 ;
-    else if (strcmp(argv[3],"-r") == 0)
-      rank_only = 1 ;
-    else {
-      fprintf(stderr,"ERROR: Incorrect argument: %s \n",argv[3]);
-      fprintf(stderr,"Usage: %s <3dmesh.xml> [-v] [-r] \n",argv[0]);
-      exit(0);
-    } 
-  }
   
 
    int size, rank, whd_layout;
@@ -173,10 +168,14 @@ int main(int argc, char** argv)
                sending_rank = current_rank ;
             } // end of in-order loop over ranks
          }
+         
+         
 
          damaris_write("cube" , cube);
          damaris_end_iteration();
          MPI_Barrier(comm);
+         
+         sleep(time);
 
          double t2 = MPI_Wtime();
 

@@ -56,43 +56,15 @@ namespace np = boost::python::numpy;
 
 namespace damaris {
 
-    /**
-     * Constructor.
-     */
-    PyAction::PyAction(const model::Script& mdl)
-                            : ScriptAction(mdl)
-    { 
-        name_     = mdl.name() ;
-        language_ = mdl.language() ;
-        file_     = mdl.file() ;
-        frequency_= mdl.frequency() ;
-        
-        Py_Initialize();
-        np::initialize();
-  
-        /**
-        * import the __main__ module and obtain the globals dict
-        * assign to the bp::object 
-        */
-        main     = bp::import("__main__");
-        globals  = main.attr("__dict__");
-      
-        /**
-        * String of Python code used to remove datasets from Pyhton environment when the 
-        * Damris data they use  is invalidated/deleted
-        */
-        regex_string_with_python_code = "try :               \n"
-                                        "  del DamarisData['REPLACE']   \n"
-                                        "except KeyError as err:             \n"
-                                        "  print('Damaris Server: KeyError could not delete key: ', err) \n" ;; 
-
-    }
+    
     
     
     void PyAction::Call(int32_t sourceID, int32_t iteration, const char* args){
+        
         if (iteration % frequency_ == 0){
             PassDataToPython( iteration );
         }
+        
     }
 
     
