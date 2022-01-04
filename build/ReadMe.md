@@ -1,3 +1,9 @@
+The **offical documentation** for Damaris is available here: https://project.inria.fr/damaris/documentation/ 
+
+The following may be out of date, however provides some extra information
+for installing Damaris using Spack and in a container via Docker.
+
+
 Installing Damaris
 ==================
 
