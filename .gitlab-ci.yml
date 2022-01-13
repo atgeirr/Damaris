@@ -33,10 +33,10 @@ docker-build:
         echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
       fi
     - cd build/docker
-    - docker build --pull -t "$CI_REGISTRY_IMAGE${tag}" .
+    - docker build --pull -t "$CI_REGISTRY_IMAGE${tag}" -f ./Dockerfile.ubuntu20 .
     - docker push "$CI_REGISTRY_IMAGE${tag}"
   # Run this job in a branch where a Dockerfile exists
   rules:
     - if: $CI_COMMIT_BRANCH
       exists:
-        - build/docker/Dockerfile
+        - build/docker/Dockerfile.ubuntu20
