@@ -97,6 +97,7 @@ RUN --mount=type=secret,id=thepassword mkdir -p ${INSTALLTMDIR} \
       -DENABLE_TESTS=OFF \
       -DENABLE_EXAMPLES=$EXAMPLES_ON_OFF \
       -DBUILD_SHARED_LIBS=$SHLIBS_ON_OFF \
+      -DENABLE_PYTHON=OFF \
       -DENABLE_CATALYST=OFF \
       -DGENERATE_MODEL=$REGEN_ON_OFF \
       -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi \

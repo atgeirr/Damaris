@@ -17,6 +17,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __DAMARIS_PYACTION_H
 #define __DAMARIS_PYACTION_H
 
+#ifdef HAVE_PYTHON_ENABLED
+
 
 #include "damaris/action/ScriptAction.hpp"
 #include "data/VariableManager.hpp"
@@ -214,4 +216,5 @@ class PyAction : public Action, public Configurable<model::Script> {
 
 }
 
+#endif  // HAVE_PYTHON_ENABLED
 #endif
