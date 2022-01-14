@@ -68,9 +68,8 @@ ENV repo=$INPUT_repo
 # ENV ENABLE_PYTHON=
 
 
-if [ -f /run/secrets/thepassword ]; then
-   export THEPASSWORD=$(cat /run/secrets/thepassword)
-fi
+# RUN export THEPASSWORD=$(cat /run/secrets/thepassword)
+
 
 
 # Regenerate the xml model in C using XSD
@@ -87,7 +86,7 @@ ENV NUMCORES=4
 RUN  mkdir -p ${INSTALLTMDIR} \
   && cd ${INSTALLTMDIR} \
   && echo "Damaris Version: $DAMARIS_VERSION" \
-  && git clone --username --depth 1 --branch $DAMARIS_VERSION https://gitlab-read-repo:$THEPASSWORD@gitlab.inria.fr/Damaris/$repo.git \
+  && git clone --username --depth 1 --branch $DAMARIS_VERSION https://gitlab-read-repo:$(cat /run/secrets/thepassword)@gitlab.inria.fr/Damaris/$repo.git \
   && mkdir -p ${INSTALLTMDIR}/build/$repo \
   && cd ${INSTALLTMDIR}/build/$repo \
   && cmake ../../$repo -DCMAKE_INSTALL_PREFIX:PATH=$INSTALL_PREFIX \
