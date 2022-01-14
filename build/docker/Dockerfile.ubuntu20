@@ -56,8 +56,8 @@ RUN apt-get update -y \
 #  	libpython3-dev \
 #   libpython3-dev libboost-python-dev libboost-numpy-dev \
   
-RUN --mount=type=secret,id=thepassword  ls -l /run/secrets/thepassword
-USER docker
+# RUN --mount=type=secret,id=thepassword  ls -l /run/secrets/thepassword
+# USER docker
 
 # N.B INPUT_damaris_ver to be provided on the docker build --build-arg INPUT_damaris_ver=v1.5.0 --build-arg INPUT_repo="damaris-development" .
 ARG INPUT_damaris_ver
@@ -84,7 +84,7 @@ ENV NUMCORES=4
 
   
 # && git clone --depth 1 --branch $DAMARIS_VERSION https://gitlab.inria.fr/Damaris/$repo.git \
-RUN  mkdir -p ${INSTALLTMDIR} \
+RUN --mount=type=secret,id=thepassword mkdir -p ${INSTALLTMDIR} \
   && cd ${INSTALLTMDIR} \
   && echo "Damaris Version: $DAMARIS_VERSION" \
   && git clone  --depth 1 --branch $DAMARIS_VERSION https://gitlab-read-repo:$(cat /run/secrets/thepassword)@gitlab.inria.fr/Damaris/$repo.git \
@@ -104,6 +104,8 @@ RUN  mkdir -p ${INSTALLTMDIR} \
   && make install 
   
   RUN find ${INSTALL_PREFIX}/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples|"
+  RUN chown -r docker:docker /home/docker/*
+USER docker
 
 ########################################
 ## Stage 2 of build
