@@ -56,7 +56,7 @@ RUN apt-get update -y \
 #  	libpython3-dev \
 #   libpython3-dev libboost-python-dev libboost-numpy-dev \
   
-RUN --mount=type=secret,id=thepassword  chmod o+r /run/secrets/thepassword
+RUN --mount=type=secret,id=thepassword  ls -l /run/secrets/thepassword
 USER docker
 
 # N.B INPUT_damaris_ver to be provided on the docker build --build-arg INPUT_damaris_ver=v1.5.0 --build-arg INPUT_repo="damaris-development" .
