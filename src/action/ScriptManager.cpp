@@ -30,6 +30,7 @@ void ScriptManager::Init(const model::Scripts& mdl_script)
     std::string handler_name;
     bool handler_is_event = true;
 
+#ifdef HAVE_PYTHON_ENABLED
     model::Scripts::pyscript_const_iterator s(mdl_script.pyscript().begin());
     for(; s != mdl_script.pyscript().end(); s++) {
         Create<PyAction>(*s);  // (std::string)s->name() this is actually a cal to PyAction::New(mdl)
@@ -40,7 +41,7 @@ void ScriptManager::Init(const model::Scripts& mdl_script)
             Create<PyAction>(*s,"#error");
         }
     }
-
+#endif  // HAVE_PYTHON_ENABLED
     
   // mdl_= mdl ;
 }
