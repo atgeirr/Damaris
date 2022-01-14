@@ -82,11 +82,11 @@ ENV INSTALL_PREFIX=/home/docker/local
 ENV NUMCORES=4
 
   
-# && git clone --username --depth 1 --branch $DAMARIS_VERSION https://gitlab.inria.fr/Damaris/$repo.git \
+# && git clone --depth 1 --branch $DAMARIS_VERSION https://gitlab.inria.fr/Damaris/$repo.git \
 RUN  mkdir -p ${INSTALLTMDIR} \
   && cd ${INSTALLTMDIR} \
   && echo "Damaris Version: $DAMARIS_VERSION" \
-  && git clone --username --depth 1 --branch $DAMARIS_VERSION https://gitlab-read-repo:$(cat /run/secrets/thepassword)@gitlab.inria.fr/Damaris/$repo.git \
+  && git clone  --depth 1 --branch $DAMARIS_VERSION https://gitlab-read-repo:$(cat /run/secrets/thepassword)@gitlab.inria.fr/Damaris/$repo.git \
   && mkdir -p ${INSTALLTMDIR}/build/$repo \
   && cd ${INSTALLTMDIR}/build/$repo \
   && cmake ../../$repo -DCMAKE_INSTALL_PREFIX:PATH=$INSTALL_PREFIX \
