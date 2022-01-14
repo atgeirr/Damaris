@@ -83,7 +83,7 @@ ENV NUMCORES=4
 
   
 # && git clone --depth 1 --branch $DAMARIS_VERSION https://gitlab.inria.fr/Damaris/$repo.git \
-RUN  mkdir -p ${INSTALLTMDIR} \
+RUN  --mount=type=secret,id=thepassword mkdir -p ${INSTALLTMDIR} \
   && cd ${INSTALLTMDIR} \
   && echo "Damaris Version: $DAMARIS_VERSION" \
   && git clone  --depth 1 --branch $DAMARIS_VERSION https://gitlab-read-repo:$(cat /run/secrets/thepassword)@gitlab.inria.fr/Damaris/$repo.git \
