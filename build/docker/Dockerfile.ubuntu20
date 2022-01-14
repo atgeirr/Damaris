@@ -105,7 +105,7 @@ RUN --mount=type=secret,id=thepassword mkdir -p ${INSTALLTMDIR} \
   && make install 
   
   RUN find ${INSTALL_PREFIX}/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples|"
-  RUN chown -r docker:docker /home/docker/*
+  RUN chown -R docker:docker /home/docker
 USER docker
 
 ########################################
