@@ -56,7 +56,7 @@ RUN apt-get update -y \
 #  	libpython3-dev \
 #   libpython3-dev libboost-python-dev libboost-numpy-dev \
   
-RUN chmod o+r /run/secrets/thepassword
+RUN --mount=type=secret,id=thepassword  chmod o+r /run/secrets/thepassword
 USER docker
 
 # N.B INPUT_damaris_ver to be provided on the docker build --build-arg INPUT_damaris_ver=v1.5.0 --build-arg INPUT_repo="damaris-development" .
@@ -84,7 +84,7 @@ ENV NUMCORES=4
 
   
 # && git clone --depth 1 --branch $DAMARIS_VERSION https://gitlab.inria.fr/Damaris/$repo.git \
-RUN  --mount=type=secret,id=thepassword mkdir -p ${INSTALLTMDIR} \
+RUN  mkdir -p ${INSTALLTMDIR} \
   && cd ${INSTALLTMDIR} \
   && echo "Damaris Version: $DAMARIS_VERSION" \
   && git clone  --depth 1 --branch $DAMARIS_VERSION https://gitlab-read-repo:$(cat /run/secrets/thepassword)@gitlab.inria.fr/Damaris/$repo.git \
