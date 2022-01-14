@@ -4,11 +4,55 @@
 # Company: Inria
 # Date: 13/01/2022
 #
-# Usage: 
-# sudo docker build -t registry.gitlab.inria.fr/damaris:v1.5.0 --build-arg INPUT_damaris_ver=v1.5.0 --build-arg INPUT_repo=damaris -f ./Dockerfile.ubuntu20 .
+# This Dockerfile file is automatically built by gitlab on push to the 
+# damaris-development repository. It works in concert with the .gitlab-ci.yml 
+# file and a required gitlab-runner process that is currently running on my laptop.
+# The .gitlab-ci.yml requires a gitlab CI 'file' variable that contains a 
+# gitlab token for a user that has read access to the damaris-development repository.
+# This variable is passed as a Docker secret on the docker build command line.
+# As the gitlab-runner uses docker in docker the /srv/gitlab-runner/config/config.toml file
+# needs to passed in and contain
 #
-# USe docker run as it does not leave the container running on exit:
-# docker run -it registry.gitlab.inria.fr/damaris:v1.5.0 /bin/bash
+# To set up, monitor and restart the gitlab-runner as a deamon on a system:
+#  docker run -d --name gitlab-runner-ubu21 --restart always \
+#                 -v /var/run/docker.sock:/var/run/docker.sock \
+#                 -v /srv/gitlab-runner/config:/etc/gitlab-runner \ 
+#                    gitlab/gitlab-runner:latest
+# docker logs gitlab-runner-ubu21
+# docker stop gitlab-runner-ubu21
+# docker rm gitlab-runner-ubu21
+#
+# N.B. Check the contents of the file : /srv/gitlab-runner/config/config.toml
+#  concurrent = 1
+#  check_interval = 0
+# [session_server]
+#  session_timeout = 1800
+# [[runers]]
+#  name = "docker-on-ubu21-vm"
+#  url = "https://gitlab.inria.fr"
+#  token = "9ZWpjGZpxY5BCco3ChCV"  # This is obtained from gitlab Settings->CI/CD->Runners
+#  executor = "docker"
+#  [runners.custom_build_dir]
+#  [runners.cache]
+#    Insecure = false
+#  [runners.docker]
+#    tls_verify = false
+#   image = "alpine:latest"
+#    privileged = true            # Check this is true
+#    disable_entrypoint_overwrite = false
+#    oom_kill_disable = false
+#    disable_cache = false
+#    volumes = ["/var/run/docker.sock:/var/run/docker.sock", "/cache"]  # the sock has to be passed through
+#    shm_size = 0
+#   cache_dir = "/cache"
+#
+# Usage: 
+# sudo DOCKER_BUILDKIT=1 docker build -t registry.gitlab.inria.fr/damaris-development:v1.5.0 --secret id=thepassword,src=$MY_CI_READ_REPO_PWD --build-arg INPUT_damaris_ver=v1.5.0 --build-arg INPUT_repo=damaris -f ./Dockerfile.ubuntu20 .
+# where:
+# MY_CI_READ_REPO_PWD is the filename that contains the token for user gitlab-read-repo 
+# User gitlab-read-repo is created in the Settings->Access tokens page
+# Use docker run as it does not leave the container running on exit:
+# docker run -it registry.gitlab.inria.fr/damaris-development:<branch> /bin/bash
 
 
 ########################################
