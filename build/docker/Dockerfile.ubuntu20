@@ -148,8 +148,8 @@ ENV INSTALL_PREFIX=/home/docker/local
 ENV NUMCORES=4
 
 # Deal with different access rights to damaris-development (private) and damaris (public) repository
-ENV GITLABUSERNAME=
-RUN --mount=type=secret,id=thepassword if [ "$repo" == "damaris-development" ] ; then GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi
+# ENV GITLABUSERNAME=
+# RUN --mount=type=secret,id=thepassword if [ "$repo" == "damaris-development" ] ; then GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi
 
 # USER docker
 
@@ -157,7 +157,7 @@ RUN --mount=type=secret,id=thepassword if [ "$repo" == "damaris-development" ] ;
 # && git clone --depth 1 --branch $DAMARIS_VERSION https://gitlab-read-repo:$(cat /run/secrets/thepassword)@gitlab.inria.fr/Damaris/$repo.git \
 
 
-RUN RUN --mount=type=secret,id=thepassword  mkdir -p ${INSTALLTMDIR} \
+RUN --mount=type=secret,id=thepassword  mkdir -p ${INSTALLTMDIR} \
   && cd ${INSTALLTMDIR} \
   && echo "Damaris Version: $DAMARIS_VERSION" \
   && git clone  --depth 1 --branch $DAMARIS_VERSION https://gitlab-read-repo:$(cat /run/secrets/thepassword)@gitlab.inria.fr/Damaris/$repo.git \
