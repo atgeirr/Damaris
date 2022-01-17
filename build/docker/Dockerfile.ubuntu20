@@ -223,9 +223,9 @@ RUN apt-get update -y \
 #   libpython3-dev libboost-python-dev libboost-numpy-dev \
 
  USER docker
- COPY --from=builder /home/docker/local/ /home/docker/local/
- COPY --from=builder ${INSTALLTMDIR}/build/$rep/test/ /home/docker/local/examples/test/
+ COPY --from=builder /home/docker/ /home/docker/
+ # COPY --from=builder ${INSTALLTMDIR}/build/$rep/test/ /home/docker/local/examples/test/
  
- WORKDIR /home/docker/local/examples/test
+ WORKDIR /home/docker/local/examples
  
  CMD ["/bin/bash"]
