@@ -116,7 +116,7 @@ RUN apt-get update -y \
 	libhdf5-openmpi-dev \
 	libxerces-c-dev  \
 	xsdcxx \
-    libcppunit \
+    libcppunit-dev \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* \
   && ln -s /usr/bin/xsdcxx /usr/bin/xsd 
