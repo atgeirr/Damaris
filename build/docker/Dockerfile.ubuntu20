@@ -151,14 +151,16 @@ ENV NUMCORES=4
 ENV GITLABUSERNAME=
 RUN --mount=type=secret,id=thepassword if [ "$repo" == "damaris-development" ] ; then GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi
 
-USER docker
+# USER docker
 
 
-# && git clone --depth 1 --branch $DAMARIS_VERSION https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/$repo.git \
-RUN  mkdir -p ${INSTALLTMDIR} \
+# && git clone --depth 1 --branch $DAMARIS_VERSION https://gitlab-read-repo:$(cat /run/secrets/thepassword)@gitlab.inria.fr/Damaris/$repo.git \
+
+
+RUN RUN --mount=type=secret,id=thepassword  mkdir -p ${INSTALLTMDIR} \
   && cd ${INSTALLTMDIR} \
   && echo "Damaris Version: $DAMARIS_VERSION" \
-  && git clone  --depth 1 --branch $DAMARIS_VERSION https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/$repo.git \
+  && git clone  --depth 1 --branch $DAMARIS_VERSION https://gitlab-read-repo:$(cat /run/secrets/thepassword)@gitlab.inria.fr/Damaris/$repo.git \
   && mkdir -p ${INSTALLTMDIR}/build/$repo \
   && cd ${INSTALLTMDIR}/build/$repo \
   && cmake ../../$repo -DCMAKE_INSTALL_PREFIX:PATH=$INSTALL_PREFIX \
@@ -178,8 +180,8 @@ RUN  mkdir -p ${INSTALLTMDIR} \
   
  # && echo "localhost" > ${INSTALLTMDIR}/build/$repo/test/my-hostfile 
   
-  RUN find ${INSTALL_PREFIX}/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples|"
-#  RUN chown -R docker:docker /home/docker
+RUN find ${INSTALL_PREFIX}/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples|"
+RUN chown -R docker:docker /home/docker
 
 
 ########################################
