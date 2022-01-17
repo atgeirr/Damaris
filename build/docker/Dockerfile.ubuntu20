@@ -167,7 +167,7 @@ RUN --mount=type=secret,id=thepassword  mkdir -p ${INSTALLTMDIR} \
       -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
       -DCMAKE_CXX_COMPILER=mpicxx \
       -DCMAKE_C_COMPILER=mpicc \
-      -DENABLE_TESTS=OFF \
+      -DENABLE_TESTS=ON \
       -DENABLE_EXAMPLES=$EXAMPLES_ON_OFF \
       -DBUILD_SHARED_LIBS=$SHLIBS_ON_OFF \
       -DENABLE_PYTHON=OFF \
@@ -223,8 +223,8 @@ RUN apt-get update -y \
 #   libpython3-dev libboost-python-dev libboost-numpy-dev \
 
  USER docker
- COPY --from=builder /home/docker/ /home/docker/
- # COPY --from=builder ${INSTALLTMDIR}/build/$rep/test/ /home/docker/local/examples/test/
+ COPY --from=builder /home/docker/local/ /home/docker/local/
+COPY --from=builder ${INSTALLTMDIR}/build/$rep/test/ /home/docker/local/examples/test/
  
  WORKDIR /home/docker/local/examples
  
