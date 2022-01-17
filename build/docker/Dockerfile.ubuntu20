@@ -225,7 +225,7 @@ RUN apt-get update -y \
 
  USER docker
  COPY --from=builder /home/docker/local/ /home/docker/local/
-COPY --from=builder ${INSTALLTMDIR}/build/$rep/test/ /home/docker/local/examples/test/
+COPY --from=builder ${INSTALLTMDIR}/build/$repo/test/ /home/docker/local/examples/test/
  
  WORKDIR /home/docker/local/examples
  
