@@ -133,6 +133,7 @@ RUN apt-get update -y \
 
 # N.B INPUT_damaris_ver to be provided on the docker build -t registry.gitlab.inria.fr/damaris-development:${TAG}  --build-arg INPUT_damaris_ver=v1.5.0 --build-arg INPUT_repo="damaris-development" -f Dockerfile.ubuntu20 .
 ARG INPUT_damaris_ver
+ARG INPUT_repo
 # ARG INPUT_repo  # making this a global arge and defining before stage 1
 ENV DAMARIS_VERSION=$INPUT_damaris_ver
 ENV repo=$INPUT_repo
