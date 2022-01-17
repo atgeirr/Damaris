@@ -80,7 +80,7 @@
 # docker run --rm -it registry.gitlab.inria.fr/damaris-development:<branch> /bin/bash
 
 # This is a global arg that can be used in all stages of the build
-ARG INPUT_repo
+ARG INPUT_repo=damaris
 
 ########################################
 ## Stage 1 of build
