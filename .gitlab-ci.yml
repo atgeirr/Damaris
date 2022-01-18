@@ -23,6 +23,7 @@ docker-build:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
     - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
     - eval $(ssh-agent -s)
+    - ping -c 2 $MY_CI_REMOTETEST_HOST
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
     - echo "$MY_CI_SSH_KEY_VAR" | tr -d '\r' | ssh-add -
