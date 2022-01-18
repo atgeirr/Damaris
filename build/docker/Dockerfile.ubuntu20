@@ -86,6 +86,7 @@ ARG INPUT_repo
 ## Stage 1 of build
 ########################################
 FROM ubuntu:20.04 AS builder
+SHELL ["/bin/bash", "-c"]
 
 RUN useradd docker \
 	&& mkdir /home/docker \
