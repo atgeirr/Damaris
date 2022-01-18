@@ -199,6 +199,7 @@ RUN useradd docker \
 	&& addgroup docker staff
 
 # INPUT_repo is a global argument
+ARG INPUT_repo
 ENV repo=$INPUT_repo
 ENV INSTALLTMDIR=/home/docker/installdir
 
