@@ -1,1 +1,1 @@
-echo "This was executed on: $HOSTNAME under user account "$USER"
+echo "This was executed on: $HOSTNAME under user account $USER"
