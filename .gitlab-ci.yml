@@ -33,6 +33,7 @@ docker-build:
         echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
       fi
     - ls -l $MY_CI_SSH_KEY_FILE
+    - chmod 600 $MY_CI_SSH_KEY_FILE
     - pwd
     - cd build/docker
     - ssh jbowden@$MY_CI_REMOTETEST_HOST -i $MY_CI_SSH_KEY_FILE 'bash -s' < ../../test/run_on_remote.sh
