@@ -157,15 +157,13 @@ ENV GITLABUSERNAME=""
 RUN --mount=type=secret,id=thepassword if [ "$repo" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi
 
 # USER docker
-
-
 #  && git clone  --depth 1 --branch $DAMARIS_VERSION https://gitlab-read-repo:$(cat /run/secrets/thepassword)@gitlab.inria.fr/Damaris/$repo.git \
 
 
 RUN --mount=type=secret,id=thepassword  mkdir -p ${INSTALLTMDIR} \
   && cd ${INSTALLTMDIR} \
   && echo "Damaris Version: $DAMARIS_VERSION" \
-  && git clone  --depth 1 --branch $DAMARIS_VERSION https://$DAMARIS_VERSIONgitlab.inria.fr/Damaris/$repo.git \
+  && git clone  --depth 1 --branch $DAMARIS_VERSION https://${DAMARIS_VERSION}gitlab.inria.fr/Damaris/$repo.git \
   && mkdir -p ${INSTALLTMDIR}/build/$repo \
   && cd ${INSTALLTMDIR}/build/$repo \
   && cmake ../../$repo -DCMAKE_INSTALL_PREFIX:PATH=$INSTALL_PREFIX \
