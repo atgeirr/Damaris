@@ -24,10 +24,12 @@ docker-build:
     - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
     - eval $(ssh-agent -s)
     - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh 
-#    - echo "$MY_CI_SSH_KEY_VAR" | tr -d '\r' | ssh-add -
-    - ssh-add < (echo "$MY_CI_SSH_KEY_VAR" | base64 -d)
+    - chmod 700 ~/.ssh
+    - echo -e "$MY_CI_SSH_KEY_VAR" | base64 -d |  ssh-add -
     - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+#    - ssh-add < (echo "$MY_CI_SSH_KEY_VAR" | base64 -d)
+#    - echo "$MY_CI_SSH_KEY_VAR" | tr -d '\r' | ssh-add -
+    
   # Default branch leaves tag empty (= latest tag)
   # All other branches are tagged with the escaped branch name (commit ref slug)
   script:
