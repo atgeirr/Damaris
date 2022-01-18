@@ -231,7 +231,10 @@ RUN apt-get update -y \
  USER docker
 COPY --from=builder /home/docker/local/ /home/docker/local/
 COPY --from=builder ${INSTALLTMDIR}/build/$repo/test/ /home/docker/local/examples/test/
- 
- WORKDIR /home/docker/local/examples
+COPY --from=builder ${INSTALLTMDIR}/build/$repo/CTestTestfile.cmake /home/docker/local/examples/
+RUN chown -R docker:docker /home/docker/local/examples/test \
+  && RUN chown -R docker:docker /home/docker/local/examples/CTestTestfile.cmake
+
+WORKDIR /home/docker/local/examples
  
  CMD ["/bin/bash"]
