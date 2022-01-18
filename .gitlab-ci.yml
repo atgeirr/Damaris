@@ -26,6 +26,7 @@ docker-build:
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh 
     - echo "$MY_CI_SSH_KEY_VAR" | tr -d '\r' | ssh-add -
+    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
   # Default branch leaves tag empty (= latest tag)
   # All other branches are tagged with the escaped branch name (commit ref slug)
   script:
@@ -39,7 +40,7 @@ docker-build:
       fi
     - pwd
     - cd build/docker
-    - ssh jbowden@$MY_CI_REMOTETEST_HOST  'bash -s' < ../../test/run_on_remote.sh
+    - ssh jbowden@"$MY_CI_REMOTETEST_HOST"  'bash -s' < ../../test/run_on_remote.sh
     # - DOCKER_BUILDKIT=1 docker build --no-cache --pull -t "$CI_REGISTRY_IMAGE${tag}" --secret id=thepassword,src=$MY_CI_READ_REPO_PWD --build-arg INPUT_damaris_ver=$CI_COMMIT_BRANCH --build-arg INPUT_repo=$CI_PROJECT_NAME -f ./Dockerfile.ubuntu20 .
     # - docker push "$CI_REGISTRY_IMAGE${tag}"
   # Run this job in a branch where a Dockerfile exists
