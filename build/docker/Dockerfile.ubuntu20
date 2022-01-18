@@ -179,13 +179,12 @@ RUN --mount=type=secret,id=thepassword  mkdir -p ${INSTALLTMDIR} \
       -DGENERATE_MODEL=$REGEN_ON_OFF \
       -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi \
   && make -j${NUMCORES} \
-  && ls -l ${INSTALLTMDIR}/build/$repo && sleep 10 \  
   && make install 
   
  # && echo "localhost" > ${INSTALLTMDIR}/build/$repo/test/my-hostfile 
   
 RUN find ${INSTALL_PREFIX}/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples|"
-RUN chown -R docker:docker /home/docker
+# RUN chown -R docker:docker /home/docker 
 
 
 ########################################
@@ -228,12 +227,14 @@ RUN apt-get update -y \
 #  	libpython3-dev \
 #   libpython3-dev libboost-python-dev libboost-numpy-dev \
 
- USER docker
 COPY --from=builder /home/docker/local/ /home/docker/local/
 COPY --from=builder ${INSTALLTMDIR}/build/$repo/test/ /home/docker/local/examples/test/
 COPY --from=builder ${INSTALLTMDIR}/build/$repo/CTestTestfile.cmake /home/docker/local/examples/
-RUN chown -R docker:docker /home/docker/local/examples/test \
-  && RUN chown -R docker:docker /home/docker/local/examples/CTestTestfile.cmake
+
+RUN sed -i "s|${INSTALLTMDIR}/build/$repo/|/home/docker/local/examples/|"
+
+RUN chown -R docker:docker /home/docker
+USER docker
 
 WORKDIR /home/docker/local/examples
  
