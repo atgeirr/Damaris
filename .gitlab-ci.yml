@@ -26,8 +26,8 @@ docker-build:
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
     - echo "$MY_CI_SSH_KEY_VAR" | tr -d '\r' | ssh-add -
-    - ssh-add -l -L
-    - ls -l ~/.ssh  
+    - ssh-add -l 
+    - ssh-add -L
   # Default branch leaves tag empty (= latest tag)
   # All other branches are tagged with the escaped branch name (commit ref slug)
   script:
