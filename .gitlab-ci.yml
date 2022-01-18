@@ -23,7 +23,7 @@ docker-build:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
     - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
     - eval $(ssh-agent -s)
-    - echo "$MY_CI_SSH_KEY_FILE" | tr -d '\r' | ssh-add -
+    - echo "$MY_CI_SSH_KEY_VAR" | tr -d '\r' | ssh-add -
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
   # Default branch leaves tag empty (= latest tag)
@@ -37,8 +37,6 @@ docker-build:
         tag=":$CI_COMMIT_REF_SLUG"
         echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
       fi
-    - ls -l $MY_CI_SSH_KEY_FILE
-    - chmod 600 $MY_CI_SSH_KEY_FILE
     - pwd
     - cd build/docker
     - ssh jbowden@$MY_CI_REMOTETEST_HOST  'bash -s' < ../../test/run_on_remote.sh
