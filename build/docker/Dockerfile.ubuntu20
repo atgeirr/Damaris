@@ -218,6 +218,7 @@ RUN apt-get update -y \
 	libhdf5-openmpi-dev \
 	libxerces-c-dev  \
 	xsdcxx \
+    libcppunit-dev \
 	hdf5-tools \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
@@ -231,7 +232,7 @@ COPY --from=builder /home/docker/local/ /home/docker/local/
 COPY --from=builder ${INSTALLTMDIR}/build/$repo/test/ /home/docker/local/examples/test/
 COPY --from=builder ${INSTALLTMDIR}/build/$repo/CTestTestfile.cmake /home/docker/local/examples/
 
-RUN sed -i "s|${INSTALLTMDIR}/build/$repo/|/home/docker/local/examples/|" /home/docker/local/examples/test/CTestTestfile.cmake
+RUN sed -i "s|${INSTALLTMDIR}/build/$repo/|/home/docker/local/examples/|g" /home/docker/local/examples/test/CTestTestfile.cmake
 
 RUN chown -R docker:docker /home/docker
 USER docker
