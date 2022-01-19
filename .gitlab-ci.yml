@@ -27,7 +27,6 @@ docker-build:
     - chmod 700 ~/.ssh
     - echo -e "$MY_CI_SSH_KEY_VAR" | base64 -d |  ssh-add -
     - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
-    - cat ~/.ssh/config
 #    - ssh-add < (echo "$MY_CI_SSH_KEY_VAR" | base64 -d)
 #    - echo "$MY_CI_SSH_KEY_VAR" | tr -d '\r' | ssh-add -
     
