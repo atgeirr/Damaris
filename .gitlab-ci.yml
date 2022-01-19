@@ -33,7 +33,7 @@ docker-build:
     - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config 
 #    - ssh-add < (echo "$MY_CI_SSH_KEY_VAR" | base64 -d)
 #    - echo "$MY_CI_SSH_KEY_VAR" | tr -d '\r' | ssh-add -
-    
+     
   # Default branch leaves tag empty (= latest tag)
   # All other branches are tagged with the escaped branch name (commit ref slug)
   script:
@@ -49,11 +49,11 @@ docker-build:
     - cd build/docker
     # - ssh jbowden@"$MY_CI_REMOTETEST_HOST"  'bash -s' < ../../test/run_on_remote.sh
     # Build Ubuntu 20.04 version
-    # - DOCKER_BUILDKIT=1 docker build --no-cache --pull -t "${CI_REGISTRY_IMAGE}-ubu20${tag}" --secret id=thepassword,src=$MY_CI_READ_REPO_PWD --build-arg INPUT_damaris_ver=$CI_COMMIT_BRANCH --build-arg INPUT_repo=$CI_PROJECT_NAME -f ./Dockerfile.ubuntu20 .
+    - DOCKER_BUILDKIT=1 docker build --no-cache --pull -t "${CI_REGISTRY_IMAGE}-ubu20${tag}" --secret id=thepassword,src=$MY_CI_READ_REPO_PWD --build-arg INPUT_damaris_ver=$CI_COMMIT_BRANCH --build-arg INPUT_repo=$CI_PROJECT_NAME -f ./Dockerfile.ubuntu20 .
+    - docker push "$CI_REGISTRY_IMAGE-ubu20${tag}"
     # Build CentOS8  version
     - DOCKER_BUILDKIT=1 docker build --no-cache --pull -t "${CI_REGISTRY_IMAGE}-centos8${tag}" --secret id=thepassword,src=$MY_CI_READ_REPO_PWD --build-arg INPUT_damaris_ver=$CI_COMMIT_BRANCH --build-arg INPUT_repo=$CI_PROJECT_NAME -f ./Dockerfile.centos8 .
-    
-    # - docker push "$CI_REGISTRY_IMAGE${tag}"
+    - docker push "$CI_REGISTRY_IMAGE-centos8${tag}"
   # Run this job in a branch where a Dockerfile exists
   rules:
     - if: $CI_COMMIT_BRANCH
