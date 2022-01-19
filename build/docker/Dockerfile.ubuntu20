@@ -33,7 +33,7 @@
 # 
 # Now, register the runner:
 # >sudo docker run --rm -it -v /srv/gitlab-runner/config:/etc/gitlab-runner \
-                              gitlab/gitlab-runner register [--non-interactive ...]
+#                              gitlab/gitlab-runner register [--non-interactive ...]
 # >sudo docker stop gitlab-runner-g5k-vm
 # >sudo docker rm gitlab-runner-g5k-vm
 # Now, edit the file : /srv/gitlab-runner/config/config.toml
