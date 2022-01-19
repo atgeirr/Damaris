@@ -173,8 +173,8 @@ RUN dnf -y install dnf-plugins-core \
 # redhat-rpm-config is needed for cmake to detect hdf5 as h5pcc compiler wrapper uses redhat-hardened-cc1
  
 # N.B. MPI_BINDIR=/usr/lib64/openmpi/bin has to be on the PATH
-ENV MPICXX_PATH=$(which mpicxx)
-ENV MPICC_PATH=$(which mpicc)
+# ENV MPICXX_PATH=$(which mpicxx)
+# ENV MPICC_PATH=$(which mpicc)
   
    
 # RUN apt-get install -y --no-install-recommends \ 
@@ -214,8 +214,8 @@ RUN --mount=type=secret,id=thepassword if [ "$repo" == "damaris-development" ] ;
   && cd ${INSTALLTMDIR}/build/$repo \
   && cmake ../../$repo -DCMAKE_INSTALL_PREFIX:PATH=$INSTALL_PREFIX \
       -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
-      -DCMAKE_CXX_COMPILER=mpicxx \
-      -DCMAKE_C_COMPILER=mpicc \
+      -DCMAKE_CXX_COMPILER=$(which mpicxx) \
+      -DCMAKE_C_COMPILER=$(which mpicc) \
       -DENABLE_TESTS=ON \
       -DENABLE_EXAMPLES=$EXAMPLES_ON_OFF \
       -DBUILD_SHARED_LIBS=$SHLIBS_ON_OFF \
