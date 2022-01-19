@@ -6,16 +6,37 @@
 #
 # This Dockerfile file is automatically built by gitlab on push to the 
 # damaris-development repository. It works in concert with the .gitlab-ci.yml 
-# file and a required gitlab-runner process that is currently running on my laptop.
-# For protected gitlab repositories (non-public) the .gitlab-ci.yml requires a 
-# gitlab CI 'file' variable that contains a gitlab token for a user that has read 
-# access to the damaris-development repository.
-# This variable is passed as a Docker secret on the docker build command line.
-# As the gitlab-runner uses docker in docker the /srv/gitlab-runner/config/config.toml file
-# needs to passed in. This file is created on after the runner is registered:
-# sudo docekr run --rm -it -v /srv/gitlab-runner/config:/etc/gitlab-runner gitlab/gitlab-runner register [--non-interactive ...]
+# file and a required gitlab-runner process that is currently running somewhere.
+# To start a gitlab-runner, you need sudo/admin access to a machine that has
+# docker installed and can start a runner (in daemon mode) like this:
+# 
+# sudo docker run -d --name gitlab-runner-g5k-vm --restart always \
+#  -v /var/run/docker.sock:/var/run/docker.sok \
+#  -v /srv/gitlab-runner/config:/etc/gitlab-runner  \
+#  gitlab/gitlab-runner:latest 
 #
-# N.B. Check the contents of the file : /srv/gitlab-runner/config/config.toml
+# You then need to register the runner, then stop and edit the config.toml and restart.
+# Make sure you have:
+# 1/ The gitlab-runner registration URL: https://gitlab.inria.fr/
+# 2/ The token obtained from:
+#  gitlab -> Settings -> CI/CD -> Runners ->Specific runners
+# 3/ A description for the runner - I reuse the docker container name: gitlab-runner-g5k-vm
+# 4/ Other tags : docker,ostype,grid500,inria-ci
+# 5/ An image to use to run docker-in-docker: alpine:latest
+# 
+# Now, register the runner:
+# >sudo docker run --rm -it -v /srv/gitlab-runner/config:/etc/gitlab-runner \
+                              gitlab/gitlab-runner register [--non-interactive ...]
+# >sudo docker stop gitlab-runner-g5k-vm
+# >sudo docker rm gitlab-runner-g5k-vm
+# Now, edit the file : /srv/gitlab-runner/config/config.toml
+# And then restart the runner
+# > sudo docker run -d --name gitlab-runner-g5k-vm --restart always \
+#  -v /var/run/docker.sock:/var/run/docker.sok \
+#  -v /srv/gitlab-runner/config:/etc/gitlab-runner  \
+#  gitlab/gitlab-runner:latest 
+#
+# Contents of the file : /srv/gitlab-runner/config/config.toml
 #  concurrent = 1
 #  check_interval = 0
 # [session_server]
@@ -39,45 +60,51 @@
 #    shm_size = 0
 #   cache_dir = "/cache"
 #
-## To set up, monitor and restart the gitlab-runner as a daemon on a system:
-#  docker run -d --name gitlab-runner-ubu21 --restart always \
-#                 -v /var/run/docker.sock:/var/run/docker.sock \
-#                 -v /srv/gitlab-runner/config:/etc/gitlab-runner \ 
-#                    gitlab/gitlab-runner:latest
-# docker logs gitlab-runner-ubu21
-# docker stop gitlab-runner-ubu21
-# docker rm gitlab-runner-ubu21
+## To monitor and restart the gitlab-runner daemon on a system:
+# sudo docker logs gitlab-runner-g5k-vm
+# sudo docker stop gitlab-runner-g5k-vm
+# sudo docker rm gitlab-runner-g5k-vm
 #
-# Usage: 
-# N.B. The damaris-development repo will only build from the gitlab CI setup due to the 
-#      password being setup for gitlab-read-repo user. 
-#      The damaris repo should build without the secret setup.
+## Usage of this file (standalone or automated via gitlab CI): 
+# The damaris repo should build without the secret setup.
 # 
-# To build the damaris-devlopment repo (within gitlab CI only):
-#          DOCKER_BUILDKIT=1 docker build -t \
+# To build the damaris repo (no password needed):
+# sudo TAG=v1.5.0 DOCKER_BUILDKIT=1 docker build -t \
+#            registry.gitlab.inria.fr/damaris:${TAG} \
+#            --build-arg INPUT_damaris_ver=${TAG} \
+#            --build-arg INPUT_repo=damaris \
+#                -f ./Dockerfile.ubuntu20
+#
+# The damaris-development repo will build from the gitlab CI setup due to the 
+# password being setup for gitlab-read-repo user (within gitlab CI) in the 
+# MY_CI_READ_REPO_PWD variable:
+# see the .gitlab-ci.yml file, but it follows this pattern:
+#  sudo DOCKER_BUILDKIT=1 docker build -t \
 #          registry.gitlab.inria.fr/damaris-development:${TAG} \
 #          --secret id=thepassword,src=$MY_CI_READ_REPO_PWD \
 #              --build-arg INPUT_damaris_ver=${TAG} \
 #              --build-arg INPUT_repo=damaris-development \
-#                        -f ./Dockerfile.ubuntu20 .
+#                  -f ./Dockerfile.ubuntu20 .
 #
-# To build the damaris repo:
-# sudo TAG=v1.5.0 DOCKER_BUILDKIT=1 docker build -t \
-#             registry.gitlab.inria.fr/damaris:${TAG} \
-#             --build-arg INPUT_damaris_ver=${TAG} \
-#            --build-arg INPUT_repo=damaris \
-#                -f ./Dockerfile.ubuntu20
-#                         
-# where:
-# MY_CI_READ_REPO_PWD is the filename that contains the token for user gitlab-read-repo 
-# User gitlab-read-repo is created in the Settings->Access tokens page
+# N.B. MY_CI_READ_REPO_PWD is the filename that contains the token for user 'gitlab-read-repo' 
+# User 'gitlab-read-repo' is created in the 
+# Settings -> Access tokens page
+# and MY_CI_READ_REPO_PWD is a gitlab CI 'file' variable that contains a gitlab token
+# just created and the variable is created in the 
+# Settings -> CI/CD -> Variables page
+#
 # To test the created docker image:
 # 1/ Log in to the gitlab repository 
-# # N.B. You may need a ~/.docker/config.json file configured with an access token
+# N.B. You may need a ~/.docker/config.json file configured with an access token
 # > docker login registry.gitlab.inria.fr
-# 2/ 
-# Use docker run as it does not leave the container running on exit:
-# docker run --rm -it registry.gitlab.inria.fr/damaris-development:<branch> /bin/bash
+# 
+# 2/ Use docker run as it does not leave the container running on exit and run Damaris tests:
+#
+# > docker run --rm -it registry.gitlab.inria.fr/damaris-development:<branch> /bin/bash
+# <container prompt> ctest
+#
+######################################################################################
+
 
 # This is a global arg that can be used in all stages of the build
 ARG INPUT_repo

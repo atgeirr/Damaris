@@ -21,6 +21,9 @@ docker-build:
     - docker:dind
   before_script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    
+    # This is all needed to get accessto Grid5000, which requires the gitlab-runner to be 
+    # running on grid5000.fr or connected to it via VPN
     - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
     - eval $(ssh-agent -s)
     - mkdir -p ~/.ssh
