@@ -238,7 +238,6 @@ RUN find ${INSTALL_PREFIX}/examples/ -type f -name *.xml  | xargs sed -i "s|<scr
 FROM centos:8 AS testing  
 
 RUN useradd docker \
-	&& mkdir /home/docker \
 	&& chown docker:docker /home/docker \
 	&& addgroup docker staff
 
