@@ -197,7 +197,7 @@ ENV repo=$INPUT_repo
 # ENV ENABLE_PYTHON=
 
 # N.B. MPI_BINDIR=/usr/lib64/openmpi/bin has to be on the PATH
-ENV MPICPP_PATH$(which mpicxx)
+ENV MPICPP_PATH=$(which mpicxx)
 ENV MPICC_PATH=$(which mpicc)
 ENV MPIFORT_PATH=$(which mpifort))
 
