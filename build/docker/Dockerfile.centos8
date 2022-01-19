@@ -197,9 +197,9 @@ ENV repo=$INPUT_repo
 # ENV ENABLE_PYTHON=
 
 # N.B. MPI_BINDIR=/usr/lib64/openmpi/bin has to be on the PATH
-ENV MPICPP_PATH=$(which mpicxx)
-ENV MPICC_PATH=$(which mpicc)
-ENV MPIFORT_PATH=$(which mpifort))
+ENV MPICPP_PATH=$MPI_BINDIR/mpicxx
+ENV MPICC_PATH=$MPI_BINDIR/mpicc
+ENV MPIFORT_PATH=$MPI_BINDIR/mpifort
 
 # Regenerate the xml model in C using XSD
 ENV REGEN_ON_OFF=ON
@@ -247,6 +247,8 @@ RUN useradd docker \
 	&& chown docker:docker /home/docker \
 	&& groupadd staff \
     && usermod -a -G staff docker
+    
+
 
 # INPUT_repo is a global argument
 ARG INPUT_repo
@@ -280,6 +282,12 @@ RUN dnf -y install dnf-plugins-core \
 # RUN apt-get install -y --no-install-recommends \ 
 #  	libpython3-dev \
 #   libpython3-dev libboost-python-dev libboost-numpy-dev \
+
+ENV INSTALL_PREFIX=/home/docker/local
+ENV MPI_BINDIR=/usr/lib64/openmpi/bin 
+ENV PATH=$INSTALL_PREFIX/bin:${MPI_BINDIR}:$PATH  
+ENV LD_LIBRARY_PATH=$INSTALL_PREFIX/lib:$INSTALL_PREFIX/lib64:$MPI_LIBDIR:$LD_LIBRARY_PATH
+
 
 COPY --from=builder /home/docker/local/ /home/docker/local/
 COPY --from=builder ${INSTALLTMDIR}/build/$repo/test/ /home/docker/local/examples/test/
