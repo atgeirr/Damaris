@@ -132,9 +132,9 @@ FROM centos:8 AS builder
 SHELL ["/bin/bash", "-c"]
 
 RUN useradd docker \
-	&& mkdir /home/docker \
 	&& chown docker:docker /home/docker \
-	&& addgroup docker staff
+	&& groupadd staff \
+    && usermod -a -G staff docker
 
 
 ENV INSTALLTMDIR=/home/docker/installdir
@@ -239,7 +239,8 @@ FROM centos:8 AS testing
 
 RUN useradd docker \
 	&& chown docker:docker /home/docker \
-	&& addgroup docker staff
+	&& groupadd staff \
+    && usermod -a -G staff docker
 
 # INPUT_repo is a global argument
 ARG INPUT_repo
