@@ -149,7 +149,7 @@ RUN dnf -y install dnf-plugins-core \
    xsd \
    &&  dnf -y --enablerepo=powertools install \
    cppunit-devel \
-   &&  dnf -y install redhat-rpm-config
+   &&  dnf -y install redhat-rpm-config \
    &&  dnf -y install hdf5-openmpi-devel \
    hdf5-openmpi-static \
    boost-devel \
