@@ -172,9 +172,7 @@ RUN dnf -y install dnf-plugins-core \
 # e.g. >rmp -ql  hdf-openmpi-devel
 # redhat-rpm-config is needed for cmake to detect hdf5 as h5pcc compiler wrapper uses redhat-hardened-cc1
  
-# N.B. MPI_BINDIR=/usr/lib64/openmpi/bin has to be on the PATH
-# ENV MPICXX_PATH=$(which mpicxx)
-# ENV MPICC_PATH=$(which mpicc)
+
   
    
 # RUN apt-get install -y --no-install-recommends \ 
@@ -193,6 +191,10 @@ ENV repo=$INPUT_repo
 
 # These should also be supplied on the command line as --build-arg 
 # ENV ENABLE_PYTHON=
+
+# N.B. MPI_BINDIR=/usr/lib64/openmpi/bin has to be on the PATH
+RUN echo $(which mpicxx)
+# ENV MPICC_PATH=$(which mpicc)
 
 
 # Regenerate the xml model in C using XSD
