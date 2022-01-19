@@ -128,7 +128,7 @@ ARG INPUT_repo
 ########################################
 ## Stage 1 of build
 ########################################
-FROM ubuntu:20.04 AS builder
+FROM centos:8 AS builder
 SHELL ["/bin/bash", "-c"]
 
 RUN useradd docker \
@@ -140,32 +140,41 @@ RUN useradd docker \
 ENV INSTALLTMDIR=/home/docker/installdir
 
 ## Install build tools and dependencies for Damaris
-RUN apt-get update -y \
-  && echo "debconf debconf/frontend select Noninteractive" | debconf-set-selections \
-  && apt-get install -y --no-install-recommends \ 
-	software-properties-common \
-    apt-utils \
-    build-essential \
-    gfortran \
-    pkg-config \
-    git-core \
-    cmake \
-    wget unzip nano \
-	libpython3-dev libboost-python-dev libboost-numpy-dev \
-	libboost-dev \
-	libboost-regex-dev \
-	libboost-date-time-dev \
-	libboost-log-dev \
-	libboost-system-dev \
-	libboost-filesystem-dev \
-	libboost-thread-dev \
-	libhdf5-openmpi-dev \
-	libxerces-c-dev  \
-	xsdcxx \
-    libcppunit-dev \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/* \
-  && ln -s /usr/bin/xsdcxx /usr/bin/xsd 
+RUN dnf -y install dnf-plugins-core \
+   && dnf config-manager --set-enabled powertools \
+   &&  dnf makecache --refresh \
+   &&  dnf update -y \
+   &&  dnf install -y epel-release \
+   xerces-c-devel \
+   xsd \
+   &&  dnf -y --enablerepo=powertools install \
+   cppunit-devel \
+   &&  dnf -y install redhat-rpm-config
+   &&  dnf -y install hdf5-openmpi-devel \
+   hdf5-openmpi-static \
+   boost-devel \
+   git \
+   gcc-gfortran \
+   gcc-c++ \
+   openssl-devel \
+   libcurl-devel \
+   xz-devel \
+   nano \
+   wget \
+   cmake \
+   && cp /usr/bin/xsdcxx /usr/bin/xsd
+   
+# openmpi comes with hdf-openmpi
+# paraview-devel is ~3GB in size, I have not yet tested it with Damaris
+# dnf -y install paraview-devel
+
+# Check what is installed and where: 
+# e.g. >rmp -ql  hdf-openmpi-devel
+# redhat-rpm-config is needed for cmake to detect hdf5 as h5pcc compiler wrapper uses redhat-hardened-cc1
+ 
+# N.B. MPI_BINDIR=/usr/lib64/openmpi/bin has to be on the PATH
+ENV MPICXX_PATH=$(which mpicxx)
+ENV MPICC_PATH=$(which mpicc)
   
    
 # RUN apt-get install -y --no-install-recommends \ 
@@ -226,7 +235,7 @@ RUN find ${INSTALL_PREFIX}/examples/ -type f -name *.xml  | xargs sed -i "s|<scr
 ########################################
 ## Stage 2 of build
 ########################################
-FROM ubuntu:20.04 AS testing  
+FROM centos:8 AS testing  
 
 RUN useradd docker \
 	&& mkdir /home/docker \
@@ -238,26 +247,29 @@ ARG INPUT_repo
 ENV repo=$INPUT_repo
 ENV INSTALLTMDIR=/home/docker/installdir
 
-RUN apt-get update -y \
-  && echo "debconf debconf/frontend select Noninteractive" | debconf-set-selections \
-  && apt-get install -y --no-install-recommends \ 
-	software-properties-common \
-    cmake \
-    wget unzip nano \
-	libhdf5-openmpi-dev \
-	libboost-regex-dev \
-	libboost-date-time-dev \
-	libboost-log-dev \
-	libboost-system-dev \
-	libboost-filesystem-dev \
-	libboost-thread-dev \
-	libhdf5-openmpi-dev \
-	libxerces-c-dev  \
-	xsdcxx \
-    libcppunit-dev \
-	hdf5-tools \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/*
+RUN dnf -y install dnf-plugins-core \
+   && dnf config-manager --set-enabled powertools \
+   &&  dnf makecache --refresh \
+   &&  dnf update -y \
+   &&  dnf install -y epel-release \
+         xerces-c-devel \
+         xsd \
+   &&  dnf -y --enablerepo=powertools install \
+         cppunit-devel \
+   &&  dnf -y install redhat-rpm-config
+   &&  dnf -y install hdf5-openmpi-devel \
+   hdf5-openmpi-static \
+   boost-devel \
+   git \
+   gcc-gfortran \
+   gcc-c++ \
+   openssl-devel \
+   libcurl-devel \
+   xz-devel \
+   nano \
+   wget \
+   cmake \
+   && cp /usr/bin/xsdcxx /usr/bin/xsd
   
   
 # RUN apt-get install -y --no-install-recommends \ 
@@ -268,6 +280,7 @@ COPY --from=builder /home/docker/local/ /home/docker/local/
 COPY --from=builder ${INSTALLTMDIR}/build/$repo/test/ /home/docker/local/examples/test/
 COPY --from=builder ${INSTALLTMDIR}/build/$repo/CTestTestfile.cmake /home/docker/local/examples/
 
+# Change the paths in the ctest unit test runner (CTestTestfile.cmake)
 RUN sed -i "s|${INSTALLTMDIR}/build/$repo/|/home/docker/local/examples/|g" /home/docker/local/examples/test/CTestTestfile.cmake
 
 RUN chown -R docker:docker /home/docker

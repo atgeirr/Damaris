@@ -22,8 +22,9 @@ docker-build:
   before_script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
     
-    # This is all needed to get accessto Grid5000, which requires the gitlab-runner to be 
-    # running on grid5000.fr or connected to it via VPN
+    # This code section is needed to get access to a specific machine (MY_CI_REMOTETEST_HOST) which 
+    # is on Grid5000. The gitlab-runner needs to be running on a machine in grid5000.fr or connected 
+    # to it via VPN.
     - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
     - eval $(ssh-agent -s)
     - mkdir -p ~/.ssh
@@ -46,8 +47,12 @@ docker-build:
       fi
     - pwd
     - cd build/docker
-    - ssh jbowden@"$MY_CI_REMOTETEST_HOST"  'bash -s' < ../../test/run_on_remote.sh
-    # - DOCKER_BUILDKIT=1 docker build --no-cache --pull -t "$CI_REGISTRY_IMAGE${tag}" --secret id=thepassword,src=$MY_CI_READ_REPO_PWD --build-arg INPUT_damaris_ver=$CI_COMMIT_BRANCH --build-arg INPUT_repo=$CI_PROJECT_NAME -f ./Dockerfile.ubuntu20 .
+    # - ssh jbowden@"$MY_CI_REMOTETEST_HOST"  'bash -s' < ../../test/run_on_remote.sh
+    # Build Ubuntu 20.04 version
+    # - DOCKER_BUILDKIT=1 docker build --no-cache --pull -t "${CI_REGISTRY_IMAGE}_UBU20${tag}" --secret id=thepassword,src=$MY_CI_READ_REPO_PWD --build-arg INPUT_damaris_ver=$CI_COMMIT_BRANCH --build-arg INPUT_repo=$CI_PROJECT_NAME -f ./Dockerfile.ubuntu20 .
+    # Build CentOS8  version
+    - DOCKER_BUILDKIT=1 docker build --no-cache --pull -t "${CI_REGISTRY_IMAGE}_CENTOS8${tag}" --secret id=thepassword,src=$MY_CI_READ_REPO_PWD --build-arg INPUT_damaris_ver=$CI_COMMIT_BRANCH --build-arg INPUT_repo=$CI_PROJECT_NAME -f ./Dockerfile.centos8 .
+    
     # - docker push "$CI_REGISTRY_IMAGE${tag}"
   # Run this job in a branch where a Dockerfile exists
   rules:
