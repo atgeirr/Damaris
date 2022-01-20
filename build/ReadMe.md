@@ -1,4 +1,17 @@
-Installing Damaris
+The **offical documentation** for Damaris is available here: https://project.inria.fr/damaris/documentation/ 
+
+The following procedures may be out of date, however provides some extra information
+for installing Damaris using Spack and in a container via Docker.
+
+# Table of Contents
+1. [Dependencies](#dependencies)
+2. [Building Damaris using Spack](#building-damaris-using-spack)
+3. [Building a Docker image with Damaris](#building-a-docker-image-with-damaris)
+4. [Building Damaris using the env_prep.sh script](#building-damaris-using-the-env_prepsh-script)
+5. [Building dependencies and Damaris manually](#building-dependencies-and-damaris-manually)
+
+
+# Installing Damaris
 ==================
 
 This file documents different ways from installing Damaris along
@@ -10,7 +23,7 @@ necessary dependencies. Other sections document alternate ways to
 build Damaris and its dependencies.
 
 
-1) Dependencies
+## Dependencies
 ---------------
 
 Damaris requires the following dependencies.
@@ -25,7 +38,7 @@ Damaris requires the following dependencies.
   * (optional) ParaView (version 5.8 is recomended)
 
 
-2) Building Damaris using Spack
+## Building Damaris using Spack
 -------------------------------
 
 Spack (https://spack.io/) is a powerful package manager that is often
@@ -91,7 +104,7 @@ command. If you want to enable HDF5, add -DENABLE_HDF5=ON to the cmake
 command. To build the examples add -DENABLE_EXAMPLES=ON to the cmake command.
 
 
-3) Building a Docker image with Damaris
+## Building a Docker image with Damaris
 ---------------------------------------
 
 Go to the build folder inside the Damaris source tree. You will find
@@ -122,7 +135,7 @@ with 1.0 as its tag, and runs the env_prep.sh scrip inside it.
 Do no forget to update env_prep.sh script beforehand. 
 
 
-4) Building Damaris using the env_prep.sh script
+## Building Damaris using the env_prep.sh script
 ------------------------------------------------
 
 Although this script has been written primarily to be called when
@@ -136,7 +149,7 @@ Simply edit the script as instructed in the previous section and call:
 This will install everything from MPI to Damaris itself.
 
 
-5) Building dependencies and Damaris manually
+## Building dependencies and Damaris manually
 ---------------------------------------------
 
 This section can help building Damaris and its dependencies manually.
