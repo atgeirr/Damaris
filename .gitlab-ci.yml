@@ -49,11 +49,11 @@ docker-build:
     - cd build/docker
     # - ssh jbowden@"$MY_CI_REMOTETEST_HOST"  'bash -s' < ../../test/run_on_remote.sh
     # Build Ubuntu 20.04 version
-    - DOCKER_BUILDKIT=1 docker build --no-cache --pull -t "${CI_REGISTRY_IMAGE}-ubu20${tag}" --secret id=thepassword,src=$MY_CI_READ_REPO_PWD --build-arg INPUT_damaris_ver=$CI_COMMIT_BRANCH --build-arg INPUT_repo=$CI_PROJECT_NAME -f ./Dockerfile.ubuntu20 .
-    - docker push "$CI_REGISTRY_IMAGE-ubu20${tag}"
+    - DOCKER_BUILDKIT=1 docker build --no-cache --pull -t "${CI_REGISTRY_IMAGE}${tag}-ubu20" --secret id=thepassword,src=$MY_CI_READ_REPO_PWD --build-arg INPUT_damaris_ver=$CI_COMMIT_BRANCH --build-arg INPUT_repo=$CI_PROJECT_NAME -f ./Dockerfile.ubuntu20 .
+    - docker push "$CI_REGISTRY_IMAGE${tag}-ubu20"
     # Build CentOS8  version
-    - DOCKER_BUILDKIT=1 docker build --no-cache --pull -t "${CI_REGISTRY_IMAGE}-centos8${tag}" --secret id=thepassword,src=$MY_CI_READ_REPO_PWD --build-arg INPUT_damaris_ver=$CI_COMMIT_BRANCH --build-arg INPUT_repo=$CI_PROJECT_NAME -f ./Dockerfile.centos8 .
-    - docker push "$CI_REGISTRY_IMAGE-centos8${tag}"
+    - DOCKER_BUILDKIT=1 docker build --no-cache --pull -t "${CI_REGISTRY_IMAGE}${tag}-centos8" --secret id=thepassword,src=$MY_CI_READ_REPO_PWD --build-arg INPUT_damaris_ver=$CI_COMMIT_BRANCH --build-arg INPUT_repo=$CI_PROJECT_NAME -f ./Dockerfile.centos8 .
+    - docker push "$CI_REGISTRY_IMAGE${tag}-centos8"
   # Run this job in a branch where a Dockerfile exists
   rules:
     - if: $CI_COMMIT_BRANCH
