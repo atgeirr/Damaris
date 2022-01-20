@@ -1,4 +1,18 @@
-Installing Damaris
+The **offical documentation** for Damaris is available here: https://project.inria.fr/damaris/documentation/ 
+
+The following procedures may be out of date, however provides some extra information
+for installing Damaris using Spack and in a container via Docker.
+
+# Table of Contents
+1. [Dependencies](#dependencies)
+2. [Building Damaris using Spack](#building-damaris-using-spack)
+3. [Building a Docker image containing Damaris](#building-a-docker-image-containing-damaris)
+4. [Building a Singularity image containing  Damaris](#building-a-singularity-image-containing-damaris)
+5. [Building Damaris using the env_prep.sh script](#building-damaris-using-the-env_prepsh-script)
+6. [Building dependencies and Damaris manually](#building-dependencies-and-damaris-manually)
+
+
+# Installing Damaris
 ==================
 
 This file documents different ways from installing Damaris along
@@ -10,7 +24,7 @@ necessary dependencies. Other sections document alternate ways to
 build Damaris and its dependencies.
 
 
-1) Dependencies
+## Dependencies
 ---------------
 
 Damaris requires the following dependencies.
@@ -25,7 +39,7 @@ Damaris requires the following dependencies.
   * (optional) ParaView (version 5.8 is recomended)
 
 
-2) Building Damaris using Spack
+## Building Damaris using Spack
 -------------------------------
 
 Spack (https://spack.io/) is a powerful package manager that is often
@@ -91,38 +105,106 @@ command. If you want to enable HDF5, add -DENABLE_HDF5=ON to the cmake
 command. To build the examples add -DENABLE_EXAMPLES=ON to the cmake command.
 
 
-3) Building a Docker image with Damaris
+## Building a Docker image containing Damaris
 ---------------------------------------
+There are Dockerfiles in the ```build/docker``` directory based on Ubuntu (apt-get)
+or Centos 8 (Yum / dnf) that can be used to build containers with Damaris 
+installed. Both use the pre-built Damaris prerequisite libraries (Boost,
+XSD and xerces-c), OpenMPI, HDF5 and CppUnit of thoses distributions. 
 
-Go to the build folder inside the Damaris source tree. You will find
-a number of scripts available, in particular a env_prep.sh script
-that can be used to download, compile, and install all the dependencies
-as well as Damaris. This script will be used during the process of
-building the Docker image.
+The *docker build* command line uses:  
+```bash
+--build-arg INPUT_repo=damaris  
+```
+ to specify the Damaris gitlab repository, and  
+```bash
+--build-arg INPUT_damaris_ver=${TAG}  
+```
+where TAG is defined as the repository branch to build (e.g. v1.5.0 or master etc.)
 
-Edit this script as follows:
-  * Change the install_path variable to the desired location. 
-  * Change install_visit to 1 if you want VisIt support.
-  * Change install_hdf5 to 1 if you want HDF5 support.
-  * Change the desired MPI library (options are mpich or openmpi).
-  * Change the number of jobs Make can run concurrently with make_jobs=X
+### To build the damaris repo (no password needed):
+```bash
+ sudo TAG=v1.5.0 DOCKER_BUILDKIT=1 docker build -t \
+            registry.gitlab.inria.fr/damaris/damaris-ubu20:${TAG} \
+            --build-arg INPUT_damaris_ver=${TAG} \
+            --build-arg INPUT_repo=damaris \
+                -f ./Dockerfile.ubuntu20 .
+```
+The Dockerfiles in ```build/docker``` are used in the Gitlab enabled continuous integration system
+so please do not change them without testing carefully. As part of the CI system, the containers are
+pushed to Gitlab container registry *[registry.gitlab.inria.fr](https://gitlab.inria.fr/Damaris/damaris/container_registry)*.  
+  
+### Log in to the gitlab repository 
+ N.B. You may need a ~/.docker/config.json file configured with an access token
+```bash
+ sudo docker login registry.gitlab.inria.fr
 
-Call the following command to build a Docker image based on a SUSE
-operating system:
+# pull the latest version (or another tagged version)
+docker pull registry.gitlab.inria.fr/damaris/damaris:latest"
+```
 
-    docker build -f Dockerfile.suse -t damaris-suse:1.0 .
+### To test the created docker image:
+```bash
+# Get a shell into the container
+sudo docker run --rm -it registry.gitlab.inria.fr/damaris/damaris:<branch> /bin/bash
+ 
+# Run unit tests:
+<container prompt> cd /home/docker/local/examples
+<container prompt> ctest
+ 
+# run and example:
+<container prompt> mpirun -np 4  /home/docker/local/examples/storage/3dmesh /home/docker/local/examples/storage/3dmesh.xml [-v] [-r]
+ 
+# Should find HDF5 output
+<container prompt> ls *.h5
+<container prompt> h5dump *.h5
+```
 
-Call the following command to build a Docker image based on a Debian
-operating system:
+## Building a Singularity image containing Damaris
+---------------------------------------
+### Introduction
+On systems you do not have admin/sudo rights you may have access to the Singularity container system.
+If available, Singularity will let you run containers, however the creation of the container will need to 
+be done on a system where you do have admin/sudo rights. You then need to copy the image to the system 
+where you only have normal user rights and you will then be able to run the container.
 
-    docker build -f Dockerfile.debian -t damaris-debian:1.0
+### Build Singularity container from a Singularity definition file 
+There are Singularity definition files in the ```build/singularity``` directory that are based on Ubuntu (apt-get)
+or Centos 8 (Yum / dnf) that can be used to build containers with Damaris installed. Similar to the Dockerfiles,
+both use the pre-built Damaris prerequisite libraries (Boost,XSD and xerces-c), OpenMPI, HDF5 and CppUnit of thoses distributions. 
 
-This command creates an image, namely damaris-suse or damaris-debian,
-with 1.0 as its tag, and runs the env_prep.sh scrip inside it. 
-Do no forget to update env_prep.sh script beforehand. 
+1/ Build the container on your system with sudo access
+```
+    # add --sandbox if you want to mount and modify the container
+    sudo singularity build  damaris_centos8 damaris_centos8.def
 
+    # To enter the container in writable mode
+    sudo singularity shell --writable damaris_centos8
 
-4) Building Damaris using the env_prep.sh script
+    # 
+```
+2/ Copy to your machine (e.g. HPC cluster)
+```
+    scp damaris_centos8 <user>@headnode.system.xyz:~/
+```
+3/ From the machine, run the example code (using PBS to obtain an interactive job first ) 
+```
+qsub -I <arguments for qsub interactive job>
+# ... wait for job resources to be provided ...
+
+# Load modules needed
+module load singularity openmpi
+cd ~
+# run the example code that is inside the container
+mpirun -np 4 singularity exec ./damaris_centos8  /usr/local/examples/storage/3dmesh /usr/local/examples/storage/3dmesh.xml [-v] [-r]
+
+```
+
+### Build Singularity container from a Docker image 
+Singularity can pull and build containers from Docker reporitories.
+
+  
+## Building Damaris using the env_prep.sh script
 ------------------------------------------------
 
 Although this script has been written primarily to be called when
@@ -136,7 +218,7 @@ Simply edit the script as instructed in the previous section and call:
 This will install everything from MPI to Damaris itself.
 
 
-5) Building dependencies and Damaris manually
+## Building dependencies and Damaris manually
 ---------------------------------------------
 
 This section can help building Damaris and its dependencies manually.
