@@ -31,8 +31,8 @@ docker-build:
     - chmod 700 ~/.ssh
     - echo -e "$MY_CI_SSH_KEY_VAR" | base64 -d |  ssh-add -
     - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config 
-#    - ssh-add < (echo "$MY_CI_SSH_KEY_VAR" | base64 -d)
-#    - echo "$MY_CI_SSH_KEY_VAR" | tr -d '\r' | ssh-add -
+    # Instead of "StrictHostKeyChecking no" you could try the following:
+    # - ssh-keyscan example.com >> ~/.ssh/known_hosts
      
   # Default branch leaves tag empty (= latest tag)
   # All other branches are tagged with the escaped branch name (commit ref slug)
@@ -47,6 +47,9 @@ docker-build:
       fi
     - pwd
     - cd build/docker
+    # - docker image prune -f
+    # - docker container prune -f
+    # - docker builder prune -f
     # - ssh jbowden@"$MY_CI_REMOTETEST_HOST"  'bash -s' < ../../test/run_on_remote.sh
     # Build Ubuntu 20.04 version
     - DOCKER_BUILDKIT=1 docker build --no-cache --pull -t "${CI_REGISTRY_IMAGE}${tag}-ubu20" --secret id=thepassword,src=$MY_CI_READ_REPO_PWD --build-arg INPUT_damaris_ver=$CI_COMMIT_BRANCH --build-arg INPUT_repo=$CI_PROJECT_NAME -f ./Dockerfile.ubuntu20 .
