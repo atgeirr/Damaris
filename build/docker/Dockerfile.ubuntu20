@@ -141,7 +141,7 @@ ENV INSTALLTMDIR=/home/docker/installdir
 
 ## Install build tools and dependencies for Damaris
 RUN apt-get update -y \
-  && apt clean\
+  && apt clean \
   && echo "debconf debconf/frontend select Noninteractive" | debconf-set-selections \
   && apt-get install -y --no-install-recommends \ 
 	software-properties-common \
