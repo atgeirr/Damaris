@@ -6,9 +6,10 @@ for installing Damaris using Spack and in a container via Docker.
 # Table of Contents
 1. [Dependencies](#dependencies)
 2. [Building Damaris using Spack](#building-damaris-using-spack)
-3. [Building a Docker image with Damaris](#building-a-docker-image-with-damaris)
-4. [Building Damaris using the env_prep.sh script](#building-damaris-using-the-env_prepsh-script)
-5. [Building dependencies and Damaris manually](#building-dependencies-and-damaris-manually)
+3. [Building a Docker image containing Damaris](#building-a-docker-image-containing-damaris)
+4. [Building a Singularity image containing  Damaris](#building-a-singularity-image-containing-damaris)
+5. [Building Damaris using the env_prep.sh script](#building-damaris-using-the-env_prepsh-script)
+6. [Building dependencies and Damaris manually](#building-dependencies-and-damaris-manually)
 
 
 # Installing Damaris
@@ -104,7 +105,7 @@ command. If you want to enable HDF5, add -DENABLE_HDF5=ON to the cmake
 command. To build the examples add -DENABLE_EXAMPLES=ON to the cmake command.
 
 
-## Building a Docker image with Damaris
+## Building a Docker image containing Damaris
 ---------------------------------------
 There are Dockerfiles in the ```build/docker``` directory based on Ubuntu (apt-get)
 or Centos 8 (Yum / dnf) that can be used to build containers with Damaris 
