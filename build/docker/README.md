@@ -2,7 +2,7 @@
 These files will build the Damaris library, it's unit tests and examples within a docker container.
 The Docker files (Dockerfile.ubuntu20 and Dockerfile.centos8) are currently used by the Gitlab CI system,
 so should remain in this directory (build/docker) and not be modified without careful testing.
-They currently compile the HDF5 compatable version. The Python capable version should also be implemented sometime.
+They currently compile the HDF5 compatible  version. The Python capable version should also be implemented sometime.
 
 ### To build the damaris repo (no password needed):
 ```bash
@@ -17,7 +17,7 @@ They currently compile the HDF5 compatable version. The Python capable version s
 ## Log in to the gitlab repository 
  N.B. You may need a ~/.docker/config.json file configured with an access token
 ```bash
- sudo docker login registry.gitlab.inria.fr
+ docker login registry.gitlab.inria.fr
  
  docker push registry.gitlab.inria.fr/damaris/damaris:${TAG}"
 ```

@@ -1,0 +1,161 @@
+Bootstrap: docker
+From: centos:8
+Stage: build
+
+%help
+    This container was built from the following repositpory of Singularity definition files:
+        git clone https://gitlab.inria.fr/Damaris/Simulations/across_wp7_opmflow_scripts.git
+        cd across_wp7_opmflow_scripts/singularity/centos8
+        
+    This version builds damaris with the following dependencies:
+    
+    |     | xerces-c | xsd   |  HDF5         |     mpi         | Paraview |
+    |-----|----------|-------|---------------|-----------------|----------|
+    | src |          |       |               |                 |          |
+    | bin |  3.2.2   | 4.0.0 |  1.10.5-4.el8 | OpenMPI 4.1.1-2 |  5.9     |
+    
+    
+    To build a container from a definition file:
+        # build the container
+        sudo singularity build --sandbox damaris_centos8 damaris_centos8.def
+
+        # run the example:
+        mpirun -np 4 singularity exec ./damaris_centos8   /usr/local/examples/storage/3dmesh /usr/local/examples/storage/3dmesh.xml [-v] [-r]
+       
+        # -v is for verbose output (prints arrays)
+        # -r prints the mpi rank that will write the array data
+        
+        # edit the file: /usr/local/examples/storage/3dmesh.xml to change the <parameter name="whd_layout" ...> value to change the layout used to write the data in memory        
+    To get a shell into the container:
+        sudo singularity shell --writable damaris_centos8
+        nano /usr/local/examples/storage/3dmesh.xml
+        exit
+        
+    N.B. The install directory for all code built from source is: /usr/local        
+    To locate the source repositories for Damaris and OPM software:
+        cd /installdir
+%setup
+
+%files
+
+
+%environment
+    export LC_ALL=C
+    export INSTALL_PREFIX=/usr/local
+    export MPI_BINDIR=/usr/lib64/openmpi/bin
+    export PATH=$INSTALL_PREFIX/bin:$INSTALL_PREFIX/examples/storage:$PATH
+    export PATH=${MPI_BINDIR}:$PATH
+    export LD_LIBRARY_PATH=$INSTALL_PREFIX/lib:$LD_LIBRARY_PATH
+    export LD_LIBRARY_PATH=$INSTALL_PREFIX/lib64:$LD_LIBRARY_PATH
+
+%post
+    ###########
+    # Install paths variables and software versions
+    
+    MPI_BINDIR=/usr/lib64/openmpi/bin
+    
+    export INSTALL_PREFIX=/usr/local
+    export PATH=$INSTALL_PREFIX/bin:$PATH
+    export PATH=${MPI_BINDIR}:$PATH
+    export LD_LIBRARY_PATH=$INSTALL_PREFIX/lib:$INSTALL_PREFIX/lib64:$MPI_LIBDIR:$LD_LIBRARY_PATH
+
+    # Build with this many cores
+    NUMCORES=1
+
+    DAMARIS_VERSION=1.5.0
+    # Build damaris as shared library (N.B. static library build has problems)    
+    SHLIBS_ON_OFF=ON
+    # Build examples
+    EXAMPLES_ON_OFF=ON
+    # Regenerate the xml model in C using XSD
+    REGEN_ON_OFF=ON
+    TESTS_ON_OFF=ON
+
+
+    ############
+    ## Where to build from
+    
+    INSTALLTMDIR=/installdir
+    mkdir $INSTALLTMDIR
+
+
+    ###########
+    ## Update and install packages
+    dnf -y install dnf-plugins-core
+    dnf config-manager --set-enabled powertools
+    
+    dnf makecache --refresh
+    
+    dnf update -y
+    dnf install -y epel-release 
+    dnf install -y xerces-c-devel xsd
+    dnf -y --enablerepo=powertools install cppunit-devel
+    # ln -s /usr/bin/xsdxx /usr/bin/xsd
+    cp /usr/bin/xsdcxx /usr/bin/xsd
+
+    # Check what is installed and where: 
+    # e.g. >rmp -ql  hdf-openmpi-devel
+    
+    # redhat-rpm-config is needed for cmake to detect hdf5 as h5pcc compiler wrapper uses redhat-hardened-cc1
+    dnf -y install redhat-rpm-config
+    dnf -y install hdf5-openmpi-devel
+    dnf -y install hdf5-openmpi-static
+    dnf -y install boost-devel 
+    # openmpi comes with hdf-openmpi
+    # paraview-devel is ~3GB in size, I have not yet tested it with Damaris
+    # dnf -y install paraview-devel
+    dnf -y install git
+    
+    dnf -y install gcc-gfortran gcc-c++ openssl-devel libcurl-devel xz-devel nano wget cmake
+    # yum -y groupinstall "Development Tools"
+    
+    
+    INSTALLTMDIR=/installdir
+ 
+    # N.B. MPI_BINDIR=/usr/lib64/openmpi/bin has to be on the PATH
+    MPICXX=$(which mpicxx)
+    MPICC=$(which mpicc)
+    ##############
+    ## Install Damaris
+    
+    cd ${INSTALLTMDIR}
+    ###### Install Damaris
+    echo "Damaris Version: ${DAMARIS_VERSION}"
+    git clone  --depth 1 --branch v${DAMARIS_VERSION}  https://gitlab.inria.fr/Damaris/damaris.git
+    mkdir -p ${INSTALLTMDIR}/build/damaris
+    cd ${INSTALLTMDIR}/build/damaris
+
+    
+    export HDF5_ROOT=/usr/lib64/openmpi
+    cmake ../../damaris -DCMAKE_INSTALL_PREFIX:PATH=$INSTALL_PREFIX \
+      -DCMAKE_BUILD_TYPE=Debug \
+      -DCMAKE_CXX_COMPILER=$MPICXX \
+      -DCMAKE_C_COMPILER=$MPICC \
+      -DENABLE_TESTS=$TESTS_ON_OFF \
+      -DENABLE_EXAMPLES=$EXAMPLES_ON_OFF \
+      -DBUILD_SHARED_LIBS=$SHLIBS_ON_OFF \
+      -DENABLE_CATALYST=OFF -DParaView_DIR=/usr/lib64/cmake/paraview  \
+      -DGENERATE_MODEL=ON \
+      -DENABLE_HDF5=ON 
+      
+    make -j${NUMCORES}
+    make install
+    
+    find ${INSTALL_PREFIX}/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples|"
+   
+
+   
+  
+%test    
+ 
+
+%runscript
+
+    
+%startscript
+    
+
+
+%labels
+    Author joshua-charles.bowden@inria.fr
+    Version v0.0.1

@@ -1,0 +1,188 @@
+Bootstrap: docker
+From: ubuntu:20.04
+Stage: build
+
+%help
+    This container was built from the following repositpory of Singularity definition files:
+        git clone https://gitlab.inria.fr/Damaris/Simulations/across_wp7_opmflow_scripts.git
+        
+    This version builds damaris with the following dependencies:
+    
+    |     | xerces-c | xsd   |  HDF5  | mpi           | Paraview |
+    |-----|----------|-------|--------|---------------|----------|
+    | src |    3.2.2 | 4.0.0 | 1.12.1 |               |   5.8.0  |
+    | bin |          |       |        | OpenMPI 4.0.3 |          |
+    
+    
+    To build a container from a definition file:
+        cp across_wp7_opmflow_scripts/singularity/ubuntu/opm_stack_build_vars.sh .
+        # set the build variables in opm_stack_build_vars.sh to suite
+        cp across_wp7_opmflow_scripts/singularity/ubuntu/opm_damaris_srcdeps.def .
+        sudo singularity build --sandbox opm_container opm_damaris_srcdeps.def
+        
+    To get a shell into the container:
+        sudo singularity shell --writable opm_container
+        
+    N.B. The install directory for all code built from source is: /usr/local
+        
+    To locate the source repositories for Damaris and OPM software:
+        cd /builddir
+        
+
+%setup
+
+%files
+    # damaris-development-code_saturne.tar.gz /builddir/damaris-development-code_saturne.tar.gz
+    # cppunit-1.12.1.tar.gz /builddir/cppunit-1.12.1.tar.gz
+    
+    # Copy in the environment variable file - the directory will be created and is also to
+    # be matched within the file with variable OMPBUILDSTACKDIR=/opmbuildstackdir 
+    opm_stack_build_vars_ubu.sh /opmbuildstackdir/opm_stack_build_vars.sh
+
+%environment
+    export LC_ALL=C
+    export DEBIAN_FRONTEND=noninteractive   
+    export INSTALL_PREFIX=/opt/damaris/local
+    export PATH=$INSTALL_PREFIX/bin:$PATH
+    export LD_LIBRARY_PATH=$INSTALL_PREFIX/lib:$LD_LIBRARY_PATH
+    export LD_LIBRARY_PATH=$INSTALL_PREFIX/lib64:$LD_LIBRARY_PATH
+    export OMPBUILDSTACKDIR=/opmbuildstackdir
+
+%post
+    # Install paths variables and software versions
+    export OMPBUILDSTACKDIR=/opmbuildstackdir
+    . ${OMPBUILDSTACKDIR}/opm_stack_build_vars.sh
+    
+    
+    cd ${OMPBUILDSTACKDIR}
+    INSTALLTMDIR=$(pwd)
+
+
+    apt-get update -y && \
+    apt-get install -y software-properties-common
+    add-apt-repository -y ppa:opm/ppa && \
+    apt-get update -y 
+    # pgf
+    echo "debconf debconf/frontend select Noninteractive" | debconf-set-selections 
+    apt-get -y install build-essential gfortran pkg-config cmake \
+    doxygen ghostscript texlive-latex-recommended  gnuplot \
+    git-core wget \
+    libblas-dev libboost-all-dev \ 
+    apt-get -y install libosmesa6-dev libgl1-mesa-dev 
+    apt-get -y install libglu1-mesa-dev mesa-common-dev
+    apt-get -y install mesa-utils freeglut3-dev 
+    apt-get -y install python3-dev python3-numpy 
+    apt-get -y install unzip ninja-build nano
+    apt-get -y install libtbb-dev
+    apt-get -y  install libopenmpi-dev 
+
+    
+    
+    cd ${INSTALLTMDIR} 
+    wget --no-check-certificate https://archive.apache.org/dist/xerces/c/3/sources/xerces-c-${XERCES_VERSION}.tar.gz
+    tar -xzf xerces-c-${XERCES_VERSION}.tar.gz
+    cd xerces-c-${XERCES_VERSION}
+    ./configure --prefix=$INSTALL_PREFIX --disable-threads --disable-network
+    make -j${NUMCORES}
+    make install
+    
+
+    cd ${INSTALLTMDIR}    
+    wget http://www.codesynthesis.com/download/xsd/4.0/xsd-${XSD_VERSION}+dep.tar.bz2
+    tar -xjf xsd-${XSD_VERSION}+dep.tar.bz2
+    cd xsd-${XSD_VERSION}+dep
+    make -j${NUMCORES} LDFLAGS="-L${INSTALL_PREFIX}/lib/" CFLAGS="-I ${INSTALL_PREFIX}/include" CXXFLAGS="-I ${INSTALL_PREFIX}/include/"
+    make install_prefix=$INSTALL_PREFIX install LDFLAGS="-L${INSTALL_PREFIX}/lib/" CFLAGS="-I ${INSTALL_PREFIX}/include" CXXFLAGS="-I ${INSTALL_PREFIX}/include/"
+   
+  
+    cd ${INSTALLTMDIR}    
+    wget --no-check-certificate https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-${HDFVERSION}/hdf5-${HDFVERSION}${HDFVERPOINT}/src/hdf5-${HDFVERSION}${HDFVERPOINT}.tar.gz
+    tar -xvf hdf5-${HDFVERSION}${HDFVERPOINT}.tar.gz
+    cd hdf5-${HDFVERSION}${HDFVERPOINT}
+    ./configure --enable-parallel --prefix=$INSTALL_PREFIX
+    make -j${NUMCORES}
+    make install
+
+    
+    cd ${INSTALLTMDIR} 
+    # cppunit tar file is copied from local file system in %files section above
+    # wget --no-check-certificate  http://sourceforge.net/projects/cppunit/files/cppunit/${CPPUNIT_VERSION}/cppunit-${CPPUNIT_VERSION}.tar.gz
+    tar -xzf cppunit-${CPPUNIT_VERSION}.tar.gz
+    cd cppunit-${CPPUNIT_VERSION}
+    ./configure --prefix=$INSTALL_PREFIX LDFLAGS="-ldl"
+    make -j${NUMCORES}
+    make install
+    
+    
+   cd ${INSTALLTMDIR}
+    ###### Install ParaView - 
+    echo "ParaView Version: ${PV_VERSION}"
+    # N.B. The version installed here must match exactly the version of Paraview used to connect to the simulation via Catalyst
+    git clone --depth 1 --branch v${PV_VERSION} https://gitlab.kitware.com/paraview/paraview.git
+    cd paraview
+    git submodule update --init --recursive
+    
+    mkdir -p ${INSTALLTMDIR}/build/pv
+    cd ${INSTALLTMDIR}/build/pv
+    
+
+    cmake -GNinja ../../paraview -DCMAKE_INSTALL_PREFIX=$INSTALL_PREFIX \
+       -DBUILD_TESTING=OFF \
+       -DVTK_SMP_IMPLEMENTATION_TYPE=TBB \
+       -DCMAKE_BUILD_TYPE=Release \
+       -DPARAVIEW_BUILD_EDITION=CATALYST_RENDERING \
+       -DPARAVIEW_USE_PYTHON=ON \
+       -DPARAVIEW_BUILD_SHARED_LIBS=OFF \
+       -DPARAVIEW_USE_MPI=ON \
+       -DPARAVIEW_USE_QT=OFF \
+       -DVTK_USE_X=OFF \
+       -DVTK_OPENGL_HAS_OSMESA=ON \
+       -DOSMESA_INCLUDE_DIR=$GL_HEADER_PATH/include \
+       -DOSMESA_LIBRARY=$GL_INSTALL_PATH/libOSMesa.so
+    ninja -j${NUMCORES}
+    ninja install
+    
+
+    
+    CATALYSTDIR=$INSTALL_PREFIX/lib/cmake/paraview-$PV_VERSION
+    
+    cd ${INSTALLTMDIR}
+    tar -xf damaris-development-code_saturne.tar.gz
+    cd damaris-development-code_saturne
+    mkdir -p damaris-build
+    cd damaris-build
+    cmake ../ -DCMAKE_INSTALL_PREFIX:PATH=$INSTALL_PREFIX \
+      -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
+      -DXSD_ROOT=$INSTALL_PREFIX \
+      -DXercesC_ROOT=$INSTALL_PREFIX \
+      -DCppUnit_ROOT=$INSTALL_PREFIX \
+      -DCMAKE_CXX_COMPILER=mpicxx \
+      -DCMAKE_C_COMPILER=mpicc \
+      -DENABLE_TESTS=ON \
+      -DENABLE_EXAMPLES=$EXAMPLES_ON_OFF \
+      -DBUILD_SHARED_LIBS=$SHLIBS_ON_OFF \
+      -DENABLE_CATALYST=ON -DParaView_DIR=$CATALYSTDIR \
+      -DENABLE_HDF5=ON  -DHDF5_ROOT=$INSTALL_PREFIX \
+      -DGENERATE_MODEL=$REGEN_ON_OFF 
+      
+   make -j${NUMCORES}
+   make install
+   
+  find ${INSTALL_PREFIX}/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples|"
+   
+   
+  cd ${INSTALLTMDIR} 
+   
+
+%runscript
+    
+
+%startscript
+    
+
+%test
+
+%labels
+    Author joshua-charles.bowden@inria.fr
+    Version v0.0.1
+
