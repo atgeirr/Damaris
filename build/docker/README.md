@@ -27,7 +27,7 @@ sudo  DOCKER_BUILDKIT=1 docker build -t \
 ### To test the created docker image:
 ```bash
 # pull the latest version (or another tagged version)
-docker pull registry.gitlab.inria.fr/damaris/damaris:latest"
+docker pull registry.gitlab.inria.fr/damaris/damaris:latest
 
 # Get a shell into the container
 sudo docker run --rm -it registry.gitlab.inria.fr/damaris/damaris:<branch> /bin/bash
