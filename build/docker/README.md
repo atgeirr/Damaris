@@ -7,11 +7,12 @@ They currently compile the HDF5 compatible  version. The Python capable version 
 
 ### To build the damaris repo (no password needed):
 ```bash
- sudo TAG=v1.5.0 DOCKER_BUILDKIT=1 docker build -t \
-            registry.gitlab.inria.fr/damaris/damaris-ubu20:${TAG} \
-            --build-arg INPUT_damaris_ver=${TAG} \
-            --build-arg INPUT_repo=damaris \
-                -f ./Dockerfile.ubuntu20 .
+export TAG=v1.5.0
+sudo  DOCKER_BUILDKIT=1 docker build -t \
+        registry.gitlab.inria.fr/damaris/damaris:${TAG}-ubu20 \
+        --build-arg INPUT_damaris_ver=${TAG} \
+        --build-arg INPUT_repo=damaris \
+            -f ./Dockerfile.ubuntu20 .
 ```
 
 
