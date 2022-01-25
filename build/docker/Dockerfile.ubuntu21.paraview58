@@ -5,10 +5,10 @@
 # To build the damaris repo (no password needed):
 # export TAG=v1.5.0
 # sudo  DOCKER_BUILDKIT=1 docker build -t \
-#            registry.gitlab.inria.fr/damaris/damaris:${TAG}-paraview \
+#            registry.gitlab.inria.fr/damaris/damaris:${TAG}-ubu21-paraview \
 #            --build-arg INPUT_damaris_ver=${TAG} \
 #            --build-arg INPUT_repo=damaris \
-#                -f ./Dockerfile.ubuntu20.paraview58 .
+#                -f ./Dockerfile.ubuntu21.paraview58 .
 # 
 # mpirun -np 4 singularity exec ubuntu20_paraview58  /usr/local/damaris/examples/paraview/image /usr/local/damaris/examples/paraview/image.xml
 
@@ -18,7 +18,7 @@ ARG INPUT_repo
 ########################################
 ## Stage 1 of build
 ########################################
-FROM ubuntu:20.04 AS builder
+FROM ubuntu:21.10 AS builder
 SHELL ["/bin/bash", "-c"]
 
 USER root
@@ -36,7 +36,7 @@ ENV INSTALL_PREFIX=/home/docker/local
 ENV PATH=${INSTALL_PREFIX}/bin:${PATH}
 ENV LD_LIBRARY_PATH=${INSTALL_PREFIX}/lib:${LD_LIBRARY_PATH}
 
-ENV PV_VERSION=5.8.0
+ENV PV_VERSION=5.9.1
 # ENV PYTHON_INCLUDE_DIR=/usr/include/python3.8
 ENV GL_INSTALL_PATH=/usr/lib/x86_64-linux-gnu
 ENV GL_HEADER_PATH=/usr
@@ -104,7 +104,7 @@ RUN echo "debconf debconf/frontend select Noninteractive" | debconf-set-selectio
 # RUN mkdir -p ${INSTALLTMDIR}
 # COPY cmake-${CMAKE_VERSION_FULL}-linux-x86_64.tar.gz ${INSTALLTMDIR}/cmake-${CMAKE_VERSION_FULL}-linux-x86_64.tar.gz 
 # RUN  cd ${INSTALLTMDIR} && pwd && tar -xf ${INSTALLTMDIR}/cmake-${CMAKE_VERSION_FULL}-linux-x86_64.tar.gz \
-#  && cp -r ${INSTALLTMDIR}/cmake-${CMAKE_VERSION_FULL}-linux-x86_64/bin /usr/local \
+#  && cp -r ${INSTALLTMDIR}/cmake-${CMAKE_VERSION_FULL}-linux-x86_64/bin /usr \
 #  && cp -r ${INSTALLTMDIR}/cmake-${CMAKE_VERSION_FULL}-linux-x86_64/share/cmake-${CMAKE_VERSION} /usr/local/share
     
 
@@ -118,7 +118,8 @@ RUN echo "debconf debconf/frontend select Noninteractive" | debconf-set-selectio
 #  &&  ./b2 threading=multi \
 #  &&  ./b2 install 
 
-
+# ssh-keyscan -H gitlab.kitware.com >> ~/.ssh/known_hosts
+# git clone --depth 1 --branch v${PV_VERSION} git@gitlab.kitware.com:paraview/paraview.git
 
 ###### Install ParaView - 
 # N.B. The version installed here must match exactly the version of Paraview used to connect to the simulation via Catalyst
@@ -200,7 +201,7 @@ WORKDIR ${INSTALL_PREFIX}/examples
 ########################################
 ## Stage 2 of build
 ########################################
-# FROM ubuntu:20.04 AS testing  
+# FROM ubuntu:21.10 AS testing  
 
 # USER root
 # RUN useradd docker \
