@@ -218,10 +218,8 @@ RUN  cp -r ${INSTALLTMDIR}/build/$repo/test/ ${INSTALL_PREFIX}/examples/test/ \
  
 RUN rm -fr ${INSTALLTMDIR}
 # RUN chown -R docker:docker /home/docker
+WORKDIR ${INSTALL_PREFIX}/examples
 
-
-ENV PATH=/usr/local/bin:${PATH}
-ENV LD_LIBRARY_PATH=/usr/local/bin:${LD_LIBRARY_PATH}
 ENV PYTHONPATH=/usr/local/lib/python3.8/site-packages/_paraview.zip:/usr/local/lib/python3.8/site-packages/_vtk.zip:/usr/local/lib/python3.8/site-packages:/usr/lib/python38.zip:/usr/lib/python3.8:/usr/lib/python3.8/lib-dynload:/usr/local/lib/python3.8/dist-packages:/usr/lib/python3/dist-packages
 
 
