@@ -38,8 +38,9 @@
 # > docker login registry.gitlab.inria.fr
 # 
 # 2/ Use docker run as it does not leave the container running on exit and run Damaris tests:
-#
-# > docker run --rm -it registry.gitlab.inria.fr/damaris/damaris:<branch> /bin/bash
+#    Map the shared memory filesystem and the Paraview Catalyst port
+# 
+# > docker run --rm -v /dev/shm:/dev/shm -p 22222:22222 -it registry.gitlab.inria.fr/damaris/damaris:<branch>-<OS>-<Paraview_version> /bin/bash
 # <container prompt> ctest
 #
 # > sudo docker run --rm -v /dev/shm:/dev/shm -p 22222:22222 -it registry.gitlab.inria.fr/damaris/damaris:v1.5.0-archlinux-pvv5100 /bin/bash

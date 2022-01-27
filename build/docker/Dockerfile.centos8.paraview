@@ -35,10 +35,14 @@
 # > docker login registry.gitlab.inria.fr
 # 
 # 2/ Use docker run as it does not leave the container running on exit and run Damaris tests:
-#
-# > docker run --rm -it registry.gitlab.inria.fr/damaris/damaris:v1.5.0-cent8-paraview591 /bin/bash
+#    Map the shared memory filesystem and the Paraview Catalyst port
+# 
+# > docker run --rm -v /dev/shm:/dev/shm -p 22222:22222 -it registry.gitlab.inria.fr/damaris/damaris:<branch>-<OS>-<Paraview_version> /bin/bash
 # <container prompt> ctest
 #
+# > sudo docker run --rm -v /dev/shm:/dev/shm -p 22222:22222 -it registry.gitlab.inria.fr/damaris/damaris:v1.5.0-centos8-pv5100 /bin/bash
+# > cd /home/docker/local/examples/storage/
+# > mpirun -np 4 ./3dmesh 3dmesh.xml
 ######################################################################################
 
 
@@ -197,8 +201,8 @@ RUN export PV_VERSION_SHORT=${PV_VERSION:1:-2} \
       -DBUILD_SHARED_LIBS=$SHLIBS_ON_OFF \
       -DENABLE_PYTHON=OFF \
       -DGENERATE_MODEL=$REGEN_ON_OFF \
-      -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi \
-      -DENABLE_CATALYST=ON -DParaView_DIR=${INSTALL_PREFIX}/lib/cmake/paraview-${PV_VERSION_SHORT} \
+      -DENABLE_HDF5=ON  \
+      -DENABLE_CATALYST=ON -DParaView_DIR=${INSTALL_PREFIX}/lib64/cmake/paraview-${PV_VERSION_SHORT} \
   && make -j${NUMCORES} \
   && make install 
   

@@ -35,10 +35,14 @@
 # > docker login registry.gitlab.inria.fr
 # 
 # 2/ Use docker run as it does not leave the container running on exit and run Damaris tests:
-#
-# > docker run --rm -it registry.gitlab.inria.fr/damaris/damaris:v1.5.0-cent8-paraview591 /bin/bash
+#    Map the shared memory filesystem and the Paraview Catalyst port
+# 
+# > docker run --rm -v /dev/shm:/dev/shm -p 22222:22222 -it registry.gitlab.inria.fr/damaris/damaris:<branch>-<OS>-<Paraview_version> /bin/bash
 # <container prompt> ctest
 #
+# > sudo docker run --rm -v /dev/shm:/dev/shm -p 22222:22222 -it registry.gitlab.inria.fr/damaris/damaris:v1.5.0-opensuse-pv5100 /bin/bash
+# > cd /home/docker/local/examples/storage/
+# > mpirun -np 4 ./3dmesh 3dmesh.xml
 ######################################################################################
 
 
@@ -53,9 +57,18 @@ SHELL ["/bin/bash", "-c"]
 
 
 RUN useradd -m --create-home -s /bin/bash docker \
-	&& chown docker:docker /home/docker \
 	&& groupadd staff \
-    && usermod -a -G staff docker
+    && groupadd docker \
+    && usermod -a -G staff docker \
+    && mkdir -p  /home/docker \
+    && chown docker:docker /home/docker
+
+
+# opensuse:hdf5-openmpi4-devel
+# /usr/lib64/mpi/gcc/openmpi4/lib64/libhdf5.so
+# /usr/lib64/mpi/gcc/openmpi4/bin/h5c++
+# 
+
 
 ENV INSTALL_PREFIX=/home/docker/local
 ENV MPI_BINDIR=/usr/lib64/openmpi/bin 
@@ -77,7 +90,7 @@ ENV NUMCORES=4
 # ARG INPUT_pv_ver=5.8.0
 # ENV PV_VERSION=$INPUT_pv_ver
 # ENV PYTHON_INCLUDE_DIR=/usr/include/python3.8
-ENV GL_INSTALL_PATH=/usr/lib64
+ENV GL_INSTALL_PATH=/usr/lib
 ENV GL_HEADER_PATH=/usr/include
 # ENV PYTHON_INCLUDE_DIR=/usr/include/python3.8
 # ENV GL_INSTALL_PATH=/usr/lib/x86_64-linux-gnu
@@ -110,12 +123,12 @@ RUN zypper --non-interactive install libxerces-c-devel \
    && cp /usr/bin/xsdcxx /usr/bin/xsd
 
 ## For Paraview
-RUN zypper --non-interactive mesa-libOSMesa-devel \
+RUN zypper --non-interactive install libOSMesa-devel \
     freeglut-devel \
-    ninja-build \
+    ninja \
     tbb-devel 
 
-RUN  dnf -y --enablerepo=powertools install python3 platform-python-devel boost-python3-devel  
+RUN zypper --non-interactive install python3-devel  
 
 USER docker
 
@@ -147,7 +160,7 @@ RUN   cd ${INSTALLTMDIR}/paraview   \
        -DVTK_USE_X=OFF \
        -DVTK_OPENGL_HAS_OSMESA=ON \
        -DPARAVIEW_USE_FORTRAN=OFF \
-       -DOSMESA_INCLUDE_DIR=$GL_HEADER_PATH/include \
+       -DOSMESA_INCLUDE_DIR=$GL_HEADER_PATH \
        -DOSMESA_LIBRARY=$GL_INSTALL_PATH/libOSMesa.so 
        
 RUN   cd ${INSTALLTMDIR}/build/pv  \
