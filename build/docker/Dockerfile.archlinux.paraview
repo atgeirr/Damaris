@@ -12,11 +12,15 @@
 # The gitlab.inria.fr/Damaris/damaris repo should build without the secret setup.
 # 
 # To build the damaris repo (no password needed):
-# sudo TAG=v1.5.0 DOCKER_BUILDKIT=1 docker build -t \
-#            registry.gitlab.inria.fr/damaris:${TAG} \
+# export TAG=v1.5.0
+# export PV_VERSION=v5.9.1
+# export PVSHORT=${PV_VERSION//./}
+# sudo  DOCKER_BUILDKIT=1 docker build -t \
+#            registry.gitlab.inria.fr/damaris/damaris:${TAG}-archlinux-p${PVSHORT} \
 #            --build-arg INPUT_damaris_ver=${TAG} \
 #            --build-arg INPUT_repo=damaris \
-#                -f ./Dockerfile.ubuntu20
+#            --build-arg INPUT_pv_ver=${PV_VERSION} \
+#                -f ./Dockerfile.archlinux.paraview
 #
 #
 # N.B. MY_CI_READ_REPO_PWD is the filename that contains the token for user 'gitlab-read-repo' 
@@ -35,9 +39,12 @@
 # 
 # 2/ Use docker run as it does not leave the container running on exit and run Damaris tests:
 #
-# > docker run --rm -it registry.gitlab.inria.fr/damaris-development:<branch> /bin/bash
+# > docker run --rm -it registry.gitlab.inria.fr/damaris/damaris:<branch> /bin/bash
 # <container prompt> ctest
 #
+# > sudo docker run --rm -v /dev/shm:/dev/shm -p 22222:22222 -it registry.gitlab.inria.fr/damaris/damaris:v1.5.0-archlinux-pvv5100 /bin/bash
+# > cd /home/docker/local/examples/storage/
+# > mpirun -np 4 ./3dmesh 3dmesh.xml
 ######################################################################################
 
 
@@ -47,44 +54,117 @@ ARG INPUT_repo
 ########################################
 ## Stage 1 of build
 ########################################
-FROM centos:8 AS builder
+FROM archlinux:base-devel AS builder
 SHELL ["/bin/bash", "-c"]
 
 
 
-RUN useradd docker \
+RUN useradd -m --create-home -s /bin/bash docker \
 	&& chown docker:docker /home/docker \
 	&& groupadd staff \
     && usermod -a -G staff docker
 
 ENV INSTALL_PREFIX=/home/docker/local
-ENV MPI_BINDIR=/usr/bin 
-ENV PATH=$INSTALL_PREFIX/bin:${MPI_BINDIR}:$PATH  
-ENV LD_LIBRARY_PATH=$INSTALL_PREFIX/lib:$INSTALL_PREFIX/lib64:$MPI_LIBDIR:$LD_LIBRARY_PATH
+# ENV MPI_BINDIR=/usr/bin 
+# ENV PATH=$INSTALL_PREFIX/bin:${MPI_BINDIR}:$PATH  
 ENV PATH=${INSTALL_PREFIX}/bin:${PATH}
 ENV LD_LIBRARY_PATH=${INSTALL_PREFIX}/lib:${INSTALL_PREFIX}/lib64:${LD_LIBRARY_PATH}
-
-
-# N.B. MPI_BINDIR=/usr/lib64/openmpi/bin has to be on the PATH
-ENV MPICXX_PATH=$MPI_BINDIR/mpicxx
-ENV MPICC_PATH=$MPI_BINDIR/mpicc
-ENV MPIFORT_PATH=$MPI_BINDIR/mpifort
 
 ENV INSTALLTMDIR=/home/docker/installdir
 ENV CMAKE_BUILD_TYPE=Release
 ENV NUMCORES=4
 
 
-ENV PV_VERSION=5.8.0
 ENV GL_INSTALL_PATH=/usr/lib
 ENV GL_HEADER_PATH=/usr/include
-# ENV PYTHON_INCLUDE_DIR=/usr/include/python3.8
-# ENV GL_INSTALL_PATH=/usr/lib/x86_64-linux-gnu
-# ENV GL_HEADER_PATH=/usr
 
-# These should also be supplied on the command line as --build-arg 
-# ENV ENABLE_PYTHON=
-# Regenerate the xml model in C using XSD
+
+## Good to look at: https://centos.pkgs.org/
+## Install build tools and dependencies for Damaris
+RUN yes| pacman -Syu 
+
+RUN  yes | pacman -Syu xerces-c \
+    xsd \
+    cppunit \
+    hdf5-openmpi \
+    boost \
+    boost-libs \
+    git \
+    openssl \
+    curl \
+    xz \
+    nano \
+    wget \
+    cmake \
+    && cp /usr/bin/xsdcxx /usr/bin/xsd
+
+# Archlinux: https://archlinux.org/packages/community/x86_64/paraview/
+## For Paraview
+RUN yes | pacman -Syu mesa \
+    freeglut \
+    ninja \
+    tbb \
+    libpng \
+    cgns \
+    libtiff \
+    lz4 \
+    libjpeg-turbo \
+    jsoncpp \
+    protobuf \
+    zlib \
+    double-conversion \
+    gcc-fortran
+    
+
+RUN yes | pacman -Syu python python-mpi4py python-numpy
+
+USER docker
+
+ENV MPI_BINDIR=/usr/bin 
+ENV PATH=$INSTALL_PREFIX/bin:${MPI_BINDIR}:$PATH  
+# N.B. MPI_BINDIR=/usr/lib64/openmpi/bin has to be on the PATH
+ENV MPICXX_PATH=$MPI_BINDIR/mpicxx
+ENV MPICC_PATH=$MPI_BINDIR/mpicc
+ENV MPIFORT_PATH=$MPI_BINDIR/mpifort
+
+ARG INPUT_pv_ver=v5.8.0
+ENV PV_VERSION=$INPUT_pv_ver
+
+RUN   mkdir -p ${INSTALLTMDIR} \
+  &&   cd ${INSTALLTMDIR} \
+  &&   git clone  https://gitlab.kitware.com/paraview/paraview.git \
+  &&   cd ${INSTALLTMDIR}/paraview   \
+  &&   git fetch --all 
+
+ARG INPUT_pv_ver=v5.8.0
+ENV PV_VERSION=$INPUT_pv_ver
+  
+RUN   cd ${INSTALLTMDIR}/paraview   \
+  &&   git checkout ${PV_VERSION}  \
+  &&   git submodule update --init --recursive \
+  &&   mkdir -p ${INSTALLTMDIR}/build/pv \
+  &&   cd ${INSTALLTMDIR}/build/pv   \
+  &&   cmake -GNinja ../../paraview -DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX} \
+       -DBUILD_TESTING=OFF \
+       -DVTK_SMP_IMPLEMENTATION_TYPE=openmp \
+       -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} \
+       -DPARAVIEW_BUILD_EDITION=CATALYST \
+       -DPARAVIEW_INSTALL_DEVELOPMENT_FILES=ON \
+       -DPARAVIEW_USE_PYTHON=ON \
+       -DPARAVIEW_BUILD_SHARED_LIBS=ON \
+       -DPARAVIEW_USE_MPI=ON \
+       -DPARAVIEW_USE_QT=OFF \
+       -DVTK_USE_X=OFF \
+       -DVTK_OPENGL_HAS_OSMESA=ON \
+       -DPARAVIEW_USE_FORTRAN=OFF \
+       -DOSMESA_INCLUDE_DIR=$GL_HEADER_PATH/include \
+       -DOSMESA_LIBRARY=$GL_INSTALL_PATH/libOSMesa.so \
+       || cat /home/docker/installdir/build/pv/CMakeFiles/*.log
+       
+RUN   cd ${INSTALLTMDIR}/build/pv  \
+  && ninja -j${NUMCORES} \
+  && ninja install 
+    
 ENV REGEN_ON_OFF=ON
 ENV SHLIBS_ON_OFF=ON
 # Build examples
@@ -98,78 +178,10 @@ ENV DAMARIS_VERSION=$INPUT_damaris_ver
 ENV repo=$INPUT_repo
 
 
-# [core]
-# Include = /etc/pacman.d/mirrorlist
-# Install python zst package:
-# pacman -Syu python
-
-## Good to look at: https://centos.pkgs.org/
-
-## Install build tools and dependencies for Damaris
-RUN pacman -Syyu \
-   &&  pacman -Syu xerces-c xsd cppunit \
-   &&  dpacman -Syu hdf5-openmpi \
-   boost-libs \
-   git \
-   openssl \
-   curl \
-   xz \
-   nano \
-   wget \
-   cmake \
-   && cp /usr/bin/xsdcxx /usr/bin/xsd
-
-# Archlinux: https://archlinux.org/packages/community/x86_64/paraview/
-## For Paraview
-RUN pacman -Syu mesa \
-    freeglut \
-    ninja \
-    tbb \
-    libpng \
-    cgns \
-    libtiff \
-    lz4 \
-    libjpeg-turbo \
-    jsoncpp \
-    protobuf \
-    zlib \
-    double-conversion
-    
-
-RUN  pacman -Syu python python-mpi4py python-numpy
-
-USER docker
-
-
-RUN   mkdir -p ${INSTALLTMDIR} \
-  &&   cd ${INSTALLTMDIR} \
-  &&   git clone --depth 1 --branch v${PV_VERSION} https://gitlab.kitware.com/paraview/paraview.git \
-  &&   cd paraview \
-  &&   git submodule update --init --recursive \
-  &&   mkdir -p ${INSTALLTMDIR}/build/pv \
-  &&   cd ${INSTALLTMDIR}/build/pv   \
-  &&   cmake -GNinja ../../paraview -DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX} \
-       -DBUILD_TESTING=OFF \
-       -DVTK_SMP_IMPLEMENTATION_TYPE=TBB \
-       -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} \
-       -DPARAVIEW_BUILD_EDITION=CATALYST \
-       -DPARAVIEW_INSTALL_DEVELOPMENT_FILES=ON \
-       -DPARAVIEW_USE_PYTHON=ON \
-       -DPARAVIEW_BUILD_SHARED_LIBS=ON \
-       -DPARAVIEW_USE_MPI=ON \
-       -DPARAVIEW_USE_QT=OFF \
-       -DVTK_USE_X=OFF \
-       -DVTK_OPENGL_HAS_OSMESA=ON \
-       -DPARAVIEW_USE_FORTRAN=OFF \
-       -DOSMESA_INCLUDE_DIR=$GL_HEADER_PATH/include \
-       -DOSMESA_LIBRARY=$GL_INSTALL_PATH/libOSMesa.so \
-  && ninja -j${NUMCORES} \
-  && ninja install 
-    
-
 
 # The first line deals with different access rights to damaris-development (private) and damaris (public) repository
-RUN --mount=type=secret,id=thepassword if [ "$repo" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi \
+# --mount=type=secret,id=thepassword if [ "$repo" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi
+RUN export PV_VERSION_SHORT=${PV_VERSION:1:-2} \
   && mkdir -p ${INSTALLTMDIR} \
   && cd ${INSTALLTMDIR} \
   && echo "Damaris Version: $DAMARIS_VERSION" \
@@ -186,8 +198,8 @@ RUN --mount=type=secret,id=thepassword if [ "$repo" == "damaris-development" ] ;
       -DBUILD_SHARED_LIBS=$SHLIBS_ON_OFF \
       -DENABLE_PYTHON=OFF \
       -DENABLE_FORTRAN=ON \
-      -DENABLE_CATALYST=OFF \
       -DGENERATE_MODEL=$REGEN_ON_OFF \
+      -DENABLE_CATALYST=ON -DParaView_DIR=${INSTALL_PREFIX}/lib64/cmake/paraview-${PV_VERSION_SHORT}  \
       -DENABLE_HDF5=ON  \
   && make -j${NUMCORES} \
   && make install 
@@ -204,9 +216,9 @@ RUN rm -fr ${INSTALLTMDIR}
 RUN chown -R docker:docker /home/docker
 
 
-ENV PATH=/usr/local/bin:${PATH}
-ENV LD_LIBRARY_PATH=/usr/local/bin:${LD_LIBRARY_PATH}
-ENV PYTHONPATH=/usr/local/lib/python3.8/site-packages/_paraview.zip:/usr/local/lib/python3.8/site-packages/_vtk.zip:/usr/local/lib/python3.8/site-packages:/usr/lib/python38.zip:/usr/lib/python3.8:/usr/lib/python3.8/lib-dynload:/usr/local/lib/python3.8/dist-packages:/usr/lib/python3/dist-packages
+# ENV PATH=/usr/local/bin:${PATH}
+# ENV LD_LIBRARY_PATH=/usr/local/bin:${LD_LIBRARY_PATH}
+# ENV PYTHONPATH=/usr/local/lib/python3.8/site-packages/_paraview.zip:/usr/local/lib/python3.8/site-packages/_vtk.zip:/usr/local/lib/python3.8/site-packages:/usr/lib/python38.zip:/usr/lib/python3.8:/usr/lib/python3.8/lib-dynload:/usr/local/lib/python3.8/dist-packages:/usr/lib/python3/dist-packages
 
 
 

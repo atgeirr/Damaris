@@ -94,7 +94,7 @@ void Server::Run() {
                                  Environment::GetSimulationName());
         }
         else
-            ERROR("Damaris is compiled with ParaView, but ParaView is not enabled in the XML configuration file. ");
+            ERROR("Damaris is compiled with ParaView (vPARAVIEW_VERSION), but ParaView is not enabled in the XML configuration file. ");
 #endif
 
         reactor_->Bind(ITERATION_SYNC, 

@@ -33,22 +33,26 @@ RUN useradd docker \
 ENV INSTALLTMDIR=/home/docker/installdir
 ENV NUMCORES=4
 ## Install build tools and dependencies for Damaris
-USER docker
-ARG INPUT_visit=3.2.0
-ENV VISIT_VERSION=$INPUT_visit
-ENV VISIT_VER_UNDERSCORE=$(echo $VISIT_VERSION  | tr '.' '_')
-ENV PV_VERSION=5.8.0
+ENV INSTALL_PREFIX=/home/docker/local
+
+ENV PATH=${INSTALL_PREFIX}/bin:$PATH
+ENV LD_LIBRARY_PATH=${INSTALL_PREFIX}/lib:${INSTALL_PREFIX}/lib64:$LD_LIBRARY_PATH
+
+
+
+
+# ENV PV_VERSION=5.8.0
 # ENV PYTHON_INCLUDE_DIR=/usr/include/python3.8
 # ENV GL_INSTALL_PATH=/usr/lib/x86_64-linux-gnu
 # ENV GL_HEADER_PATH=/usr
 
 ###### Install VisIt  - from binary package
-RUN   mkdir -p ${INSTALLTMDIR} \
-  &&  cd ${INSTALLTMDIR} \
-  &&  wget  https://github.com/visit-dav/visit/releases/download/v${VISIT_VERSION}/visit${VISIT_VER_UNDERSCORE}.linux-x86_64-ubuntu20.tar.gz \
-  &&  wget  https://github.com/visit-dav/visit/releases/download/v3.2.1/visit-install${VISIT_VER_UNDERSCORE} \
-  && chmod +x visit-install${VISIT_VER_UNDERSCORE} \
-  && echo "1" | visit-install${VISIT_VER_UNDERSCORE} linux-x86_64-ubuntu20 /home/docker/visit 
+# RUN   mkdir -p ${INSTALLTMDIR} \
+  # &&  cd ${INSTALLTMDIR} \
+  # &&  wget  https://github.com/visit-dav/visit/releases/download/v${VISIT_VERSION}/visit${VISIT_VER_UNDERSCORE}.linux-x86_64-ubuntu20.tar.gz \
+  # &&  wget  https://github.com/visit-dav/visit/releases/download/v${VISIT_VERSION}/visit-install${VISIT_VER_UNDERSCORE} \
+  # && chmod +x visit-install${VISIT_VER_UNDERSCORE} \
+  # && echo "1" | visit-install${VISIT_VER_UNDERSCORE} linux-x86_64-ubuntu20 /home/docker/visit 
   
 USER root
   
@@ -65,7 +69,6 @@ RUN apt-get update -y \
     wget unzip nano \
 	libhdf5-openmpi-dev \
     libboost-all-dev \
-	libpython3-dev  \
 	libxerces-c-dev  \
 	xsdcxx \
     libcppunit-dev \
@@ -74,32 +77,36 @@ RUN apt-get update -y \
   && apt-get clean \
   && ln -s /usr/bin/xsdcxx /usr/bin/xsd 
   
-  
-   
-# RUN apt-get install -y --no-install-recommends \ 
-#  	libpython3-dev \ 
-#   libboost-python-dev libboost-numpy-dev \
-#   libboost-dev \
-#	libboost-regex-dev \
-#	libboost-date-time-dev \
-#	libboost-log-dev \
-#	libboost-system-dev \
-#	libboost-filesystem-dev \
+
+RUN  apt-get -y install libosmesa6-dev llvm-dev
   
 
-
-
+USER docker
+ARG INPUT_visit=3.2.1
+ENV VISIT_VERSION=$INPUT_visit
+ENV VISIT_VER_UNDERSCORE=$(echo $VISIT_VERSION  | tr '.' '_')
 # This is for building from source: ./build_visit2_13_2 --server-components-only --mesa --system-cmake --parallel --prefix $install_path/visit
-# PAR_COMPILER=$(which mpicc) \
-# PAR_COMPILER_CXX=$(which mpicxx) \
-# PAR_INCLUDE=-I$install_path/include \
-# PAR_LIBS=-lmpi \
-# ./build_visit3_1_1 --server-components-only --mesagl --system-cmake --parallel --prefix $install_path/visit
-  # visit_arg="-DENABLE_VISIT=ON -DVisIt_ROOT=$install_path"
+RUN mkdir -p ${INSTALLTMDIR} \
+    && cd ${INSTALLTMDIR} \
+    && mkdir ./third_party \
+    && wget  https://github.com/visit-dav/visit/releases/download/v${VISIT_VERSION}/build_visit${VISIT_VER_UNDERSCORE} \
+    && export PAR_COMPILER=$(which mpicc) \
+    && export PAR_COMPILER_CXX=$(which mpicxx) \
+    && export PAR_INCLUDE="\"$(mpicc  --showme:compile)\"" \
+    && export PAR_LIBS="\"$(mpicc  --showme:link)\""  \
+    && ./build_visit${VISIT_VER_UNDERSCORE} --server-components-only --osmesa --llvm --system-python --system-cmake --parallel --download-only --prefix $INSTALL_PREFIX/visit
 
-RUN ./visit-install3_2_1 $VISIT_VERSION linux-x86_64-ubuntu20 /home/docker/visit
-ENV PATH=/home/docker/visit/bin:$PATH
-ENV LD_LIBRARY_PATH=/home/docker/3.2.0/linux-x86_64/lib:$LD_LIBRARY_PATH
+RUN  cd ${INSTALLTMDIR} \
+    && export PAR_COMPILER=$(which mpicc) \
+    && export PAR_COMPILER_CXX=$(which mpicxx) \
+    && export PAR_INCLUDE="\"$(mpicc  --showme:compile)\"" \
+    && export PAR_LIBS="\"$(mpicc  --showme:link)\""  \
+    && ./build_visit${VISIT_VER_UNDERSCORE} --server-components-only --osmesa --llvm --system-python --system-cmake --parallel --prefix $INSTALL_PREFIX/visit
+  
+  # /usr/lib/x86_64-linux-gnu/hdf5/openmpi
+  # DAMARIS_visit_arg="-DENABLE_VISIT=ON -DVisIt_ROOT=$install_path"
+
+# RUN ./visit-install3_2_1 $VISIT_VERSION linux-x86_64-ubuntu20 /home/docker/visit
 
 # N.B INPUT_damaris_ver to be provided on the docker build -t registry.gitlab.inria.fr/damaris-development:${TAG}  --build-arg INPUT_damaris_ver=v1.5.0 --build-arg INPUT_repo="damaris-development" -f Dockerfile.ubuntu20 .
 ARG INPUT_damaris_ver
@@ -108,21 +115,16 @@ ARG INPUT_repo
 ENV DAMARIS_VERSION=$INPUT_damaris_ver
 ENV repo=$INPUT_repo
 
-# These should also be supplied on the command line as --build-arg 
-# ENV ENABLE_PYTHON=
-
-
 # Regenerate the xml model in C using XSD
 ENV REGEN_ON_OFF=ON
 ENV SHLIBS_ON_OFF=OFF
 # Build examples
 ENV EXAMPLES_ON_OFF=ON
 
-ENV INSTALL_PREFIX=/home/docker/local
-
 # may need this:  -DParaView_DIR=$CATALYSTDIR
 # The first line deals with different access rights to damaris-development (private) and damaris (public) repository
 RUN --mount=type=secret,id=thepassword if [ "$repo" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi \
+  && export PV_VERSION_SHORT=${PV_VERSION:1:-2} \
   && mkdir -p ${INSTALLTMDIR} \
   && cd ${INSTALLTMDIR} \
   && echo "Damaris Version: $DAMARIS_VERSION" \
@@ -140,7 +142,7 @@ RUN --mount=type=secret,id=thepassword if [ "$repo" == "damaris-development" ] ;
       -DENABLE_CATALYST=OFF \
       -DGENERATE_MODEL=$REGEN_ON_OFF \
       -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi \
-      -DENABLE_CATALYST=OFF -DParaView_DIR=/usr/local/lib/paraview5.8.0 \
+      -DENABLE_CATALYST=OFF -DParaView_DIR=${INSTALL_PREFIX}/lib/paraview-${PV_VERSION_SHORT} \
       -DENABLE_VISIT=ON \
   && make -j${NUMCORES} \
   && make install 
@@ -150,80 +152,89 @@ RUN --mount=type=secret,id=thepassword if [ "$repo" == "damaris-development" ] ;
 RUN find ${INSTALL_PREFIX}/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples|"
 # RUN chown -R docker:docker /home/docker 
 
-
-########################################
-## Stage 2 of build
-########################################
-FROM kitware/paraview:pv-v5.8.0-osmesa-py3 AS testing  
-
-USER root
-RUN useradd docker \
-	&& mkdir /home/docker \
-	&& chown docker:docker /home/docker \
-	&& addgroup docker staff
-
-
-# INPUT_repo is a global argument
-ARG INPUT_repo
-ENV repo=$INPUT_repo
-ENV INSTALLTMDIR=/home/pv-local/installdir
-
-
-RUN apt-get update -y \
-  && echo "debconf debconf/frontend select Noninteractive" | debconf-set-selections \
-  && apt-get install -y --no-install-recommends \ 
-	software-properties-common \
-    wget unzip nano \
-	libhdf5-openmpi-dev \
-    libboost-all-dev \
-	libpython3-dev  \
-	libxerces-c-dev  \
-	xsdcxx \
-    libcppunit-dev \
-	hdf5-tools \
-    cmake \
-  && apt-get clean \
-  && ln -s /usr/bin/xsdcxx /usr/bin/xsd 
-  
-  
-# RUN apt-get install -y --no-install-recommends \ 
-#  	libpython3-dev \
-#   libpython3-dev libboost-python-dev libboost-numpy-dev \
-
-# ENV CMAKE_VERSION=3.20
-# ENV CMAKE_VERSION_FULL=${CMAKE_VERSION}.1
-###### Install CMake - from binary (fast)
-# RUN mkdir -p ${INSTALLTMDIR}
-# COPY --from=builder ${INSTALLTMDIR}/cmake-${CMAKE_VERSION_FULL}-linux-x86_64/bin /usr/local \
-# COPY --from=builder ${INSTALLTMDIR}/cmake-${CMAKE_VERSION_FULL}-linux-x86_64/share/cmake-${CMAKE_VERSION} /usr/local/share
-    
-# COPY --from=builder ${INSTALLTMDIR}/-xzf boost_1_78_0.tar.gz ${INSTALLTMDIR}/-xzf boost_1_78_0.tar.gz \
-# &&  cd boost_1_78_0  \
-# && ./bootstrap.sh --prefix=$install_path --with-libraries=thread,log,date_time,program_options,filesystem,system,python \
-# &&  ./b2 threading=multi \
-# &&  ./b2 install 
-
-
-ENV PATH=/usr/local/bin:${PATH}
-ENV LD_LIBRARY_PATH=/usr/local/bin:${LD_LIBRARY_PATH}
-
-# This first copy gets the paraview installation
-COPY --from=builder /usr/local/ /usr/local/   
-COPY --from=builder /home/docker/local/ /home/docker/local/
-COPY --from=builder ${INSTALLTMDIR}/build/$repo/test/ /home/docker/local/examples/test/
-COPY --from=builder ${INSTALLTMDIR}/build/$repo/CTestTestfile.cmake /home/docker/local/examples/
-
-RUN sed -i "s|${INSTALLTMDIR}/build/$repo/|/home/docker/local/examples/|g" /home/docker/local/examples/test/CTestTestfile.cmake
-
+RUN  cp -r ${INSTALLTMDIR}/build/$repo/test/ ${INSTALL_PREFIX}/examples/test/ \
+ && cp  ${INSTALLTMDIR}/build/$repo/CTestTestfile.cmake ${INSTALL_PREFIX}/examples/ \
+ && sed -i "s|${INSTALLTMDIR}/build/$repo/|${INSTALL_PREFIX}/examples/|g" ${INSTALL_PREFIX}/examples/test/CTestTestfile.cmake
+ 
+RUN rm -fr ${INSTALLTMDIR}/
 
 RUN chown -R docker:docker /home/docker
 
 USER docker
-ENV PATH=/usr/local/bin:${PATH}
-ENV LD_LIBRARY_PATH=/usr/local/bin:${LD_LIBRARY_PATH}
-ENV PATH=/home/docker/visit3_2_0.linux-x86_64/bin:${PATH}
-ENV LD_LIBRARY_PATH=/home/docker/visit3_2_0.linux-x86_64/3.2.0/linux-x86_64/lib:${LD_LIBRARY_PATH}
+# ########################################
+# ## Stage 2 of build
+# ########################################
+# FROM kitware/paraview:pv-v5.8.0-osmesa-py3 AS testing  
+
+# USER root
+# RUN useradd docker \
+	# && mkdir /home/docker \
+	# && chown docker:docker /home/docker \
+	# && addgroup docker staff
+
+
+# # INPUT_repo is a global argument
+# ARG INPUT_repo
+# ENV repo=$INPUT_repo
+# ENV INSTALLTMDIR=/home/pv-local/installdir
+
+
+# RUN apt-get update -y \
+  # && echo "debconf debconf/frontend select Noninteractive" | debconf-set-selections \
+  # && apt-get install -y --no-install-recommends \ 
+	# software-properties-common \
+    # wget unzip nano \
+	# libhdf5-openmpi-dev \
+    # libboost-all-dev \
+	# libpython3-dev  \
+	# libxerces-c-dev  \
+	# xsdcxx \
+    # libcppunit-dev \
+	# hdf5-tools \
+    # cmake \
+  # && apt-get clean \
+  # && ln -s /usr/bin/xsdcxx /usr/bin/xsd 
+  
+  
+# # RUN apt-get install -y --no-install-recommends \ 
+# #  	libpython3-dev \
+# #   libpython3-dev libboost-python-dev libboost-numpy-dev \
+
+# # ENV CMAKE_VERSION=3.20
+# # ENV CMAKE_VERSION_FULL=${CMAKE_VERSION}.1
+# ###### Install CMake - from binary (fast)
+# # RUN mkdir -p ${INSTALLTMDIR}
+# # COPY --from=builder ${INSTALLTMDIR}/cmake-${CMAKE_VERSION_FULL}-linux-x86_64/bin /usr/local \
+# # COPY --from=builder ${INSTALLTMDIR}/cmake-${CMAKE_VERSION_FULL}-linux-x86_64/share/cmake-${CMAKE_VERSION} /usr/local/share
+    
+# # COPY --from=builder ${INSTALLTMDIR}/-xzf boost_1_78_0.tar.gz ${INSTALLTMDIR}/-xzf boost_1_78_0.tar.gz \
+# # &&  cd boost_1_78_0  \
+# # && ./bootstrap.sh --prefix=$install_path --with-libraries=thread,log,date_time,program_options,filesystem,system,python \
+# # &&  ./b2 threading=multi \
+# # &&  ./b2 install 
+
+
+# # ENV PATH=/usr/local/bin:${PATH}
+# # ENV LD_LIBRARY_PATH=/usr/local/bin:${LD_LIBRARY_PATH}
+
+# # This first copy gets the paraview installation
+# COPY --from=builder /usr/local/ /usr/local/   
+# COPY --from=builder /home/docker/local/ /home/docker/local/
+# COPY --from=builder ${INSTALLTMDIR}/build/$repo/test/ /home/docker/local/examples/test/
+# COPY --from=builder ${INSTALLTMDIR}/build/$repo/CTestTestfile.cmake /home/docker/local/examples/
+
+# RUN sed -i "s|${INSTALLTMDIR}/build/$repo/|/home/docker/local/examples/|g" /home/docker/local/examples/test/CTestTestfile.cmake
+
+
+# RUN chown -R docker:docker /home/docker
+
+# USER docker
+# ENV PATH=/usr/local/bin:${PATH}
+# ENV LD_LIBRARY_PATH=/usr/local/bin:${LD_LIBRARY_PATH}
+# ENV PATH=/home/docker/visit3_2_0.linux-x86_64/bin:${PATH}
+# ENV LD_LIBRARY_PATH=/home/docker/visit3_2_0.linux-x86_64/3.2.0/linux-x86_64/lib:${LD_LIBRARY_PATH}
+
+# WORKDIR /home/docker/local/examples
 
 WORKDIR /home/docker/local/examples
- 
 CMD ["/bin/bash"]

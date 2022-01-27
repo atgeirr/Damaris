@@ -17,14 +17,14 @@
 # 
 # To build the damaris repo (no password needed):
 # export TAG=v1.5.0
-# export PV_VER=v5.9.0
-# export PVSHORT=${PV_VERSION//./})
+# export PV_VERSION=v5.9.1
+# export PVSHORT=${PV_VERSION//./}
 # sudo  DOCKER_BUILDKIT=1 docker build -t \
-#            registry.gitlab.inria.fr/damaris/damaris:${TAG}-centos8-p${PVSHORT} \
+#            registry.gitlab.inria.fr/damaris/damaris:${TAG}-opensuse-p${PVSHORT} \
 #            --build-arg INPUT_damaris_ver=${TAG} \
 #            --build-arg INPUT_repo=damaris \
-#            --build-arg INPUT_pv_ver=${PV_VER} \
-#                -f ./Dockerfile.centos8.paraview .
+#            --build-arg INPUT_pv_ver=${PV_VERSION} \
+#                -f ./Dockerfile.opensuse.paraview .
 #
 #
 ###################
@@ -48,12 +48,11 @@ ARG INPUT_repo
 ########################################
 ## Stage 1 of build
 ########################################
-FROM centos:8 AS builder
+FROM opensuse/leap:15.4 AS builder
 SHELL ["/bin/bash", "-c"]
 
 
-
-RUN useradd docker \
+RUN useradd -m --create-home -s /bin/bash docker \
 	&& chown docker:docker /home/docker \
 	&& groupadd staff \
     && usermod -a -G staff docker
@@ -75,29 +74,33 @@ ENV INSTALLTMDIR=/home/docker/installdir
 ENV CMAKE_BUILD_TYPE=Release
 ENV NUMCORES=4
 
+# ARG INPUT_pv_ver=5.8.0
+# ENV PV_VERSION=$INPUT_pv_ver
+# ENV PYTHON_INCLUDE_DIR=/usr/include/python3.8
 ENV GL_INSTALL_PATH=/usr/lib64
 ENV GL_HEADER_PATH=/usr/include
+# ENV PYTHON_INCLUDE_DIR=/usr/include/python3.8
+# ENV GL_INSTALL_PATH=/usr/lib/x86_64-linux-gnu
+# ENV GL_HEADER_PATH=/usr
 
 
+# /usr/lib64/mpi/gcc/openmpi4/lib64/
+# /usr/lib64/mpi/gcc/openmpi4/bin
+# /usr/lib64/mpi/gcc/openmpi4/bin/mpicxx
+# /usr/lib64/mpi/gcc/openmpi4/lib64/libmpi.so
 
 ## Good to look at: https://centos.pkgs.org/
 
 ## Install build tools and dependencies for Damaris
-RUN dnf -y install dnf-plugins-core \
-   && dnf config-manager --set-enabled powertools \
-   &&  dnf makecache --refresh \
-   &&  dnf update -y \
-   &&  dnf install -y epel-release \
-   &&  dnf install -y xerces-c-devel \
-   &&  dnf install -y xsd \
-   &&  dnf -y --enablerepo=powertools install cppunit-devel \
-   &&  dnf -y install redhat-rpm-config \
-   &&  dnf -y install hdf5-openmpi-devel \
-   hdf5-openmpi-static \
-   boost-devel \
-   git \
-   gcc-gfortran \
-   gcc-c++ \
+RUN zypper --non-interactive install libxerces-c-devel \
+   &&  zypper -n install libxerces-c-devel \
+   &&  zypper -n install -y xsd \
+   &&  zypper -n install cppunit-devel \
+   &&  zypper -n install openmpi4-devel \
+   &&  zypper -n install hdf5-openmpi4-devel \
+   &&  zypper -n install boost-gnu-openmpi4-hpc-python3 boost-gnu-openmpi4-hpc-devel \
+   libgfortran5 \
+   git-core \
    openssl-devel \
    libcurl-devel \
    xz-devel \
@@ -107,7 +110,7 @@ RUN dnf -y install dnf-plugins-core \
    && cp /usr/bin/xsdcxx /usr/bin/xsd
 
 ## For Paraview
-RUN dnf install -y --enablerepo=powertools mesa-libOSMesa-devel \
+RUN zypper --non-interactive mesa-libOSMesa-devel \
     freeglut-devel \
     ninja-build \
     tbb-devel 
@@ -116,17 +119,6 @@ RUN  dnf -y --enablerepo=powertools install python3 platform-python-devel boost-
 
 USER docker
 
-# openmpi comes with hdf-openmpi
-# paraview-devel is ~3GB in size, I have not yet tested it with Damaris
-# dnf -y install paraview-devel
-
-# Check what is installed and where: 
-# e.g. >rmp -ql  hdf-openmpi-devel
-# redhat-rpm-config is needed for cmake to detect hdf5 as h5pcc compiler wrapper uses redhat-hardened-cc1
- 
-# RUN apt-get install -y --no-install-recommends \ 
-#  	libpython3-dev \
-#   libpython3-dev libboost-python-dev libboost-numpy-dev \
  
 RUN   mkdir -p ${INSTALLTMDIR} \
   &&   cd ${INSTALLTMDIR} \
@@ -162,7 +154,6 @@ RUN   cd ${INSTALLTMDIR}/build/pv  \
   && ninja -j${NUMCORES} \
   && ninja install 
     
- 
 # These should also be supplied on the command line as --build-arg 
 # ENV ENABLE_PYTHON=
 # Regenerate the xml model in C using XSD
@@ -178,7 +169,8 @@ ARG INPUT_repo
 ENV DAMARIS_VERSION=$INPUT_damaris_ver
 ENV repo=$INPUT_repo
 
-   
+
+
 # The first line deals with different access rights to damaris-development (private) and damaris (public) repository
 RUN --mount=type=secret,id=thepassword if [ "$repo" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi \
   && export PV_VERSION_SHORT=${PV_VERSION:1:-2} \
@@ -224,7 +216,7 @@ ENV PYTHONPATH=/usr/local/lib/python3.8/site-packages/_paraview.zip:/usr/local/l
 # ########################################
 # ## Stage 2 of build
 # ########################################
-# FROM centos:8 AS testing  
+# FROM opensuse/leap:15.4  AS testing  
 
 # RUN useradd docker \
 	# && chown docker:docker /home/docker \

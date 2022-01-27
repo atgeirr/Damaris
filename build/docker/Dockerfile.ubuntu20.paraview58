@@ -4,10 +4,13 @@
 # 
 # To build the damaris repo (no password needed):
 # export TAG=v1.5.0
+# export PV_VERSION=v5.9.0
+# export PVSHORT=$(echo $PV_VERSION | sed 's|\.||g'))
 # sudo  DOCKER_BUILDKIT=1 docker build -t \
-#            registry.gitlab.inria.fr/damaris/damaris:${TAG}-paraview \
+#            registry.gitlab.inria.fr/damaris/damaris:${TAG}-ubu20-p${PVSHORT} \
 #            --build-arg INPUT_damaris_ver=${TAG} \
 #            --build-arg INPUT_repo=damaris \
+#            --build-arg INPUT_pv_ver=${PV_VERSION} \
 #                -f ./Dockerfile.ubuntu20.paraview58 .
 # 
 # mpirun -np 4 singularity exec ubuntu20_paraview58  /usr/local/damaris/examples/paraview/image /usr/local/damaris/examples/paraview/image.xml
@@ -35,26 +38,6 @@ ENV NUMCORES=4
 ENV INSTALL_PREFIX=/home/docker/local
 ENV PATH=${INSTALL_PREFIX}/bin:${PATH}
 ENV LD_LIBRARY_PATH=${INSTALL_PREFIX}/lib:${LD_LIBRARY_PATH}
-
-ENV PV_VERSION=5.8.0
-# ENV PYTHON_INCLUDE_DIR=/usr/include/python3.8
-ENV GL_INSTALL_PATH=/usr/lib/x86_64-linux-gnu
-ENV GL_HEADER_PATH=/usr
-
-# These should also be supplied on the command line as --build-arg 
-# ENV ENABLE_PYTHON=
-# Regenerate the xml model in C using XSD
-ENV REGEN_ON_OFF=ON
-ENV SHLIBS_ON_OFF=ON
-# Build examples
-ENV EXAMPLES_ON_OFF=ON
-
-# N.B INPUT_damaris_ver to be provided on the docker build -t registry.gitlab.inria.fr/damaris-development:${TAG}  --build-arg INPUT_damaris_ver=v1.5.0 --build-arg INPUT_repo="damaris-development" -f Dockerfile.ubuntu20 .
-ARG INPUT_damaris_ver
-ARG INPUT_repo
-# ARG INPUT_repo  # making this a global arge and defining before stage 1
-ENV DAMARIS_VERSION=$INPUT_damaris_ver
-ENV repo=$INPUT_repo
 
 
   
@@ -118,16 +101,23 @@ RUN echo "debconf debconf/frontend select Noninteractive" | debconf-set-selectio
 #  &&  ./b2 threading=multi \
 #  &&  ./b2 install 
 
-
-
+# ssh-keyscan -H gitlab.kitware.com >> ~/.ssh/known_hosts
+# git clone --depth 1 --branch v${PV_VERSION} git@gitlab.kitware.com:paraview/paraview.git
 ###### Install ParaView - 
 # N.B. The version installed here must match exactly the version of Paraview used to connect to the simulation via Catalyst
 # -DPARAVIEW_BUILD_EDITION=CATALYST_RENDERING includes more (for rendering screen shots), but may not be needed
 # see https://www.kitware.com/paraview-catalyst-editions-what-are-they/ for some more details
 RUN   mkdir -p ${INSTALLTMDIR} \
   &&   cd ${INSTALLTMDIR} \
-  &&   git clone --depth 1 --branch v${PV_VERSION} https://gitlab.kitware.com/paraview/paraview.git \
-  &&   cd paraview \
+  &&   git clone  https://gitlab.kitware.com/paraview/paraview.git \
+  &&   cd ${INSTALLTMDIR}/paraview   \
+  &&   git fetch --all 
+
+ARG INPUT_pv_ver=v5.8.0
+ENV PV_VERSION=$INPUT_pv_ver
+  
+RUN   cd ${INSTALLTMDIR}/paraview   \
+  &&   git checkout ${PV_VERSION}  \
   &&   git submodule update --init --recursive \
   &&   mkdir -p ${INSTALLTMDIR}/build/pv \
   &&   cd ${INSTALLTMDIR}/build/pv   \
@@ -145,15 +135,37 @@ RUN   mkdir -p ${INSTALLTMDIR} \
        -DVTK_OPENGL_HAS_OSMESA=ON \
        -DPARAVIEW_USE_FORTRAN=OFF \
        -DOSMESA_INCLUDE_DIR=$GL_HEADER_PATH/include \
-       -DOSMESA_LIBRARY=$GL_INSTALL_PATH/libOSMesa.so \
+       -DOSMESA_LIBRARY=$GL_INSTALL_PATH/libOSMesa.so 
+       
+RUN   cd ${INSTALLTMDIR}/build/pv  \
   && ninja -j${NUMCORES} \
   && ninja install 
     
+
+# ENV PYTHON_INCLUDE_DIR=/usr/include/python3.8
+ENV GL_INSTALL_PATH=/usr/lib/x86_64-linux-gnu
+ENV GL_HEADER_PATH=/usr
+
+# These should also be supplied on the command line as --build-arg 
+# ENV ENABLE_PYTHON=
+# Regenerate the xml model in C using XSD
+ENV REGEN_ON_OFF=ON
+ENV SHLIBS_ON_OFF=ON
+# Build examples
+ENV EXAMPLES_ON_OFF=ON
+
+# N.B INPUT_damaris_ver to be provided on the docker build -t registry.gitlab.inria.fr/damaris-development:${TAG}  --build-arg INPUT_damaris_ver=v1.5.0 --build-arg INPUT_repo="damaris-development" -f Dockerfile.ubuntu20 .
+ARG INPUT_damaris_ver
+ARG INPUT_repo
+# ARG INPUT_repo  # making this a global arge and defining before stage 1
+ENV DAMARIS_VERSION=$INPUT_damaris_ver
+ENV repo=$INPUT_repo
 
 
 # may need this:  -DParaView_DIR=$CATALYSTDIR
 # The first line deals with different access rights to damaris-development (private) and damaris (public) repository
 RUN --mount=type=secret,id=thepassword if [ "$repo" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi \
+  && export PV_VERSION_SHORT=${PV_VERSION:1:-2} \
   && mkdir -p ${INSTALLTMDIR} \
   && cd ${INSTALLTMDIR} \
   && echo "Damaris Version: $DAMARIS_VERSION" \
@@ -170,7 +182,7 @@ RUN --mount=type=secret,id=thepassword if [ "$repo" == "damaris-development" ] ;
       -DENABLE_PYTHON=OFF \
       -DGENERATE_MODEL=$REGEN_ON_OFF \
       -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi \
-      -DENABLE_CATALYST=ON -DParaView_DIR=${INSTALL_PREFIX}/lib/paraview-5.8 \
+      -DENABLE_CATALYST=ON -DParaView_DIR=${INSTALL_PREFIX}/lib/cmake/paraview-${PV_VERSION_SHORT} \
   && make -j${NUMCORES} \
   && make install 
   
