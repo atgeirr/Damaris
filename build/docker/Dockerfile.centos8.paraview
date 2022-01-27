@@ -185,7 +185,7 @@ RUN --mount=type=secret,id=thepassword if [ "$repo" == "damaris-development" ] ;
   && chown -R docker:docker ${INSTALLTMDIR}
 
 USER docker
-RUN export PV_VERSION_SHORT=${PV_VERSION:1:-2}
+RUN export PV_VERSION_SHORT=${PV_VERSION:1:-2} \
   && mkdir -p ${INSTALLTMDIR}/build/$repo \
   && cd ${INSTALLTMDIR}/build/$repo \
   && cmake ../../$repo -DCMAKE_INSTALL_PREFIX:PATH=$INSTALL_PREFIX \
