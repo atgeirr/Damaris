@@ -124,7 +124,8 @@ where TAG is defined as the repository branch to build (e.g. v1.5.0 or master et
 
 ### To build the damaris repo (no password needed):
 ```bash
- sudo TAG=v1.5.0 DOCKER_BUILDKIT=1 docker build -t \
+export TAG=v1.5.0 
+sudo  DOCKER_BUILDKIT=1 docker build -t \
             registry.gitlab.inria.fr/damaris/damaris-ubu20:${TAG} \
             --build-arg INPUT_damaris_ver=${TAG} \
             --build-arg INPUT_repo=damaris \
@@ -135,13 +136,17 @@ so please do not change them without testing carefully. As part of the CI system
 pushed to Gitlab container registry *[registry.gitlab.inria.fr](https://gitlab.inria.fr/Damaris/damaris/container_registry)*.  
   
 ### Log in to the gitlab repository 
- N.B. You may need a ~/.docker/config.json file configured with an access token
+ N.B. You may need a ~/.docker/config.json file configured with an access token, obtained from Gitlab Settings -> Access Tokens page)
 ```bash
  sudo docker login registry.gitlab.inria.fr
 
 # pull the latest version (or another tagged version)
 docker pull registry.gitlab.inria.fr/damaris/damaris:latest"
 ```
+Available images can be browsed via the Gitlab site:  
+[https://gitlab.inria.fr/Damaris/damaris/container_registry](damaris/container_registry)
+And if you have access rights:  
+[https://gitlab.inria.fr/Damaris/damaris-development/container_registry](damaris-development/container_registry)
 
 ### To test the created docker image:
 ```bash

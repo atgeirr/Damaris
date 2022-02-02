@@ -39,6 +39,7 @@ option(ENABLE_VISIT    "Build VisIt support. May requires VisIt_ROOT to be set."
 option(ENABLE_CATALYST "Build Catalyst support. May requires ParaView_DIR to be set." OFF)
 option(ENABLE_HDF5     "Build with HDF5 support. May requires HDF5_ROOT to be set." OFF)
 option(ENABLE_PYTHON   "Build with Python+ NumPy scripting capabilties." OFF)
+option(ENABLE_DOCS     "Configure DOxygen documentation build feature." ON)
 option(GENERATE_MODEL  "Regenerates the XSD model instead of using existing ones." OFF)
 
 #----------------------------------------------------------------------------#
@@ -153,9 +154,10 @@ if(ENABLE_PYTHON)
   )
   find_package(Boost COMPONENTS python REQUIRED)
   find_package(Boost COMPONENTS numpy REQUIRED)
+  find_package(PythonInterp 3 )
   find_package( PythonLibs 3 REQUIRED )
   set(HAVE_PYTHON_ENABLED 1)
-  list(APPEND DEP_LIBRARIES ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} )
+  list(APPEND DEP_LIBRARIES  ${PYTHON_LIBRARIES} ${Boost_LIBRARIES} )
 #   include_directories(
 #  ${PYTHON_INCLUDE_DIRS}
 #  ${Boost_INCLUDE_DIRS}
@@ -231,3 +233,7 @@ endif(ENABLE_EXAMPLES)
 if(ENABLE_TESTS)
   add_subdirectory (test)
 endif(ENABLE_TESTS)
+
+if(ENABLE_DOCS)
+  add_subdirectory (docs)
+endif(ENABLE_DOCS)

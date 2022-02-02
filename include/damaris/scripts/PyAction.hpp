@@ -35,11 +35,15 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 namespace bp = boost::python;
 namespace np = boost::python::numpy;
 
-/**
- * ScriptAction describes an Action that wraps an interpretable script,
- * such as a Python script. This class is virtual and inherited, for
- * example, by PyAction.
- * 
+
+
+namespace damaris {
+
+
+
+ /**
+ * PyAction describes an Action that wraps an interpretable Python script. 
+ * The XML XSD definition that describes XSD model is as follows
     <xs:complexType name="Script">
         <xs:attribute name="name"      type="xs:string"  use="required"/>
         <xs:attribute name="file"      type="xs:string"  use="required"/>
@@ -49,14 +53,9 @@ namespace np = boost::python::numpy;
         <xs:attribute name="external"  type="xs:boolean" use="optional" default="false"/>
         <xs:attribute name="frequency" type="xs:unsignedInt" use="optional" default="1" />
     </xs:complexType>
-*/
-
-namespace damaris {
-
-
-
-//class PyAction : public ScriptAction  {
     
+  This class heavily makes use of Boost::Python and Boost:Numpy
+*/   
 class PyAction : public Action, public Configurable<model::Script> {
     
     //void Output(int32_t iteration);
@@ -168,34 +167,34 @@ class PyAction : public Action, public Configurable<model::Script> {
     /**
      * Destructor.
      */
-    virtual ~PyAction() {}
+    ~PyAction() {}
 
     public:    
     
     /**
      * \see damaris::Action::operator()
      */
-    virtual void Call(int32_t sourceID, int32_t iteration,
-                const char* args = NULL) ;
+     void Call(int32_t sourceID, int32_t iteration,
+                const char* args = NULL) override {} ;
 
     /**
      * Tells if the action can be called from outside the simulation.
      */
-    virtual bool IsExternallyVisible() const { 
+      bool IsExternallyVisible() const final  { 
         return GetModel().external(); 
     }
 
     /**
      * \see Action::GetExecLocation
      */
-    virtual model::Exec GetExecLocation() const {
+     model::Exec GetExecLocation() const final   {
         return GetModel().execution();
     }
 
     /**
      * \see Action::GetScope
      */
-    virtual model::Scope GetScope() const {
+     model::Scope GetScope() const final {
         return GetModel().scope();
     }
 
@@ -207,8 +206,8 @@ class PyAction : public Action, public Configurable<model::Script> {
     template<typename SUPER>
     static std::shared_ptr<SUPER> New(const model::Script& mdl, const std::string name) {
         
-        return std::shared_ptr<SUPER>(new PyAction(mdl), Deleter<PyAction>());
-        //return std::shared_ptr<PyAction>(PyAction::New(mdl,name));
+         return std::shared_ptr<SUPER>(new PyAction(mdl), Deleter<PyAction>());
+    
     }
 
 

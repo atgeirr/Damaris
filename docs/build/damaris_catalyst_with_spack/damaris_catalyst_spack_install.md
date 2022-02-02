@@ -6,6 +6,11 @@ output: pdf_document
 build_command: pandoc  --pdf-engine=xelatex -s --highlight-style haddock --listings -H listings-setup.tex --variable urlcolor=cyan -M date="$(date "+%B %e, %Y")" damaris_catalyst_spack_install.md --toc -o damaris_catalyst_spack_install.pdf
 ---
 
+The **offical documentation** for Damaris is available here: https://project.inria.fr/damaris/documentation/ 
+
+The following procedures is out of date, however provides some extra information
+for installing Damaris using Spack with Catalyst support.
+
 # Installation of Damaris with Catalyst Support using Spack 
 This documentation is currently augmenting what is available on [https://project.inria.fr/damaris/](https://project.inria.fr/damaris/paraview-connector/). It is targeted to software versions Damaris 1.3.1, Catalyst 5.6.0 and Spack 0.14.2.
 
