@@ -90,10 +90,11 @@ Load all the packages you just installed by calling spack load, e.g.
     spack load mpi
     ...
 
-From the build directory of the Damaris source tree, call the following
+Created a build directory (not in the Damaris source tree), call the following
 commands:
-
-    cmake ../.. -DCMAKE_INSTALL_PREFIX=$HOME/local \
+    mkdir -p ./build/damaris
+    cd ./build/damaris
+    cmake ../../damaris -DCMAKE_INSTALL_PREFIX=$HOME/local \
 	-DBUILD_SHARED_LIBS=ON \
 	-DCMAKE_C_COMPILER=mpicc \
 	-DCMAKE_CXX_COMPILER=mpicxx
@@ -107,10 +108,10 @@ command. To build the examples add -DENABLE_EXAMPLES=ON to the cmake command.
 
 ## Building a Docker image containing Damaris
 ---------------------------------------
-There are Dockerfiles in the ```build/docker``` directory based on Ubuntu (apt-get)
-or Centos 8 (Yum / dnf) that can be used to build containers with Damaris 
-installed. Both use the pre-built Damaris prerequisite libraries (Boost,
-XSD and xerces-c), OpenMPI, HDF5 and CppUnit of thoses distributions. 
+There are Dockerfiles in the ```build/docker``` directory based various base OS images
+that can be used to build containers with Damaris installed. Both use the pre-built Damaris 
+prerequisite libraries (Boost, XSD and xerces-c), OpenMPI, HDF5 and CppUnit of thoses 
+distributions. 
 
 The *docker build* command line uses:  
 ```bash
@@ -131,9 +132,27 @@ sudo  DOCKER_BUILDKIT=1 docker build -t \
             --build-arg INPUT_repo=damaris \
                 -f ./Dockerfile.ubuntu20 .
 ```
+There are separate Dockerfiles (ending with *.paraview*) to build containers with Damaris and Paraview support.  
+If you plan to use Paraview, the client version of Paraview (used as the GUI) installed must match the exact version
+used in the container. Set PV_VER to the appropriate value.  
+  
+N.B. Some builds of Paraview fail due to a CMake issue not finding Python. Be cautious of PV 5.8.X on Debian 11 and Ubuntu 21. 
+```
+ export TAG=v1.5.0
+ export PV_VER=v5.9.0
+ export PVSHORT=$(echo $PV_VER | sed 's|\.||g'))
+ sudo  DOCKER_BUILDKIT=1 docker build -t \
+            registry.gitlab.inria.fr/damaris/damaris:${TAG} \
+            --build-arg INPUT_damaris_ver=${TAG}-centos8-${PVSHORT} \
+            --build-arg INPUT_repo=damaris \
+            --build-arg INPUT_pv_ver=${PV_VER} \
+                -f ./Dockerfile.centos8.paraview .
+                
+```
+
 The Dockerfiles in ```build/docker``` are used in the Gitlab enabled continuous integration system
 so please do not change them without testing carefully. As part of the CI system, the containers are
-pushed to Gitlab container registry *[registry.gitlab.inria.fr](https://gitlab.inria.fr/Damaris/damaris/container_registry)*.  
+pushed to Gitlab container registry.  
   
 ### Log in to the gitlab repository 
  N.B. You may need a ~/.docker/config.json file configured with an access token, obtained from Gitlab Settings -> Access Tokens page)
@@ -144,9 +163,9 @@ pushed to Gitlab container registry *[registry.gitlab.inria.fr](https://gitlab.i
 docker pull registry.gitlab.inria.fr/damaris/damaris:latest"
 ```
 Available images can be browsed via the Gitlab site:  
-[https://gitlab.inria.fr/Damaris/damaris/container_registry](damaris/container_registry)
+*[registry.gitlab.inria.fr](https://gitlab.inria.fr/Damaris/damaris/container_registry)*  
 And if you have access rights:  
-[https://gitlab.inria.fr/Damaris/damaris-development/container_registry](damaris-development/container_registry)
+*[registry.gitlab.inria.fr  damaris-development](https://gitlab.inria.fr/Damaris/damaris-development/container_registry)*  
 
 ### To test the created docker image:
 ```bash
