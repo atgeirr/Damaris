@@ -39,7 +39,7 @@ option(ENABLE_VISIT    "Build VisIt support. May requires VisIt_ROOT to be set."
 option(ENABLE_CATALYST "Build Catalyst support. May requires ParaView_DIR to be set." OFF)
 option(ENABLE_HDF5     "Build with HDF5 support. May requires HDF5_ROOT to be set." OFF)
 option(ENABLE_PYTHON   "Build with Python+ NumPy scripting capabilties." OFF)
-option(ENABLE_DOCS     "Configure DOxygen documentation build feature." ON)
+option(ENABLE_DOCS     "Configure DOxygen documentation build feature." OFF)
 option(GENERATE_MODEL  "Regenerates the XSD model instead of using existing ones." OFF)
 
 #----------------------------------------------------------------------------#
