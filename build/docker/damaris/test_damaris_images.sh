@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#! /bin/bash
 
 # Author: Josh Bowden, Inria
 # Date: 4/2/2022
