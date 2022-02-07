@@ -24,7 +24,7 @@
 #        where BASEIMAGETAG == $(echo $BASE_IMAGE_SHORT-p${PVSHORT})
 #        and BASE_IMAGE_SHORT is derived from the FROM tag in the base Dockerfiles 
 #        (i.e. derived from  ../bases/Dockerfile.${DOCKERFILE}.paraview using function get_tag_name() below)
-#    
+#     
 #            > docker login registry.gitlab.inria.fr
 
 if [[ "$1" != "" ]] ; then
