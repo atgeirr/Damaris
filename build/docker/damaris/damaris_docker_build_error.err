@@ -1,0 +1,1433 @@
+#1 [internal] load build definition from Dockerfile.out
+#1 sha256:f993bc3a4f612d619fa4e4165b782a79b53fdc19d20b9c4acfb9aa81170df2bf
+#1 transferring dockerfile: 4.09kB done
+#1 DONE 0.0s
+
+#2 [internal] load .dockerignore
+#2 sha256:25eace5d335007de43473317f22d35e91e800ea23ad16f1db8ef0361fa0c7842
+#2 transferring context: 2B done
+#2 DONE 0.0s
+
+#3 resolve image config for docker.io/docker/dockerfile:1
+#3 sha256:ac072d521901222eeef550f52282877f196e16b0247844be9ceb1ccc1eac391d
+#3 DONE 1.0s
+
+#4 docker-image://docker.io/docker/dockerfile:1@sha256:42399d4635eddd7a9b8a24be879d2f9a930d0ed040a61324cfdf59ef1357b3b2
+#4 sha256:e7000a2113ce0d8d3e5eb20bd235706bb1408cc39fef67c756c938ffe32b6067
+#4 CACHED
+
+#6 [internal] load .dockerignore
+#6 sha256:e8123e6a6e1de3bae59e6cee56efc1bf69c0d82f729370b323426a296ce1006b
+#6 DONE 0.0s
+
+#5 [internal] load build definition from Dockerfile.out
+#5 sha256:7633ef88537e2ea652d890245d32afbbd0e293d93983c5238621c333302bfff8
+#5 DONE 0.0s
+
+#7 [internal] load metadata for registry.gitlab.inria.fr/damaris/damaris-development:ubuntu-20.04-pv580
+#7 sha256:d8f3131be259fd3a91c1808fedde19c8c239fcaae85e5f9f48e144c64a981040
+#7 DONE 0.0s
+
+#8 [builder 1/3] FROM registry.gitlab.inria.fr/damaris/damaris-development:ubuntu-20.04-pv580
+#8 sha256:71128cb5b4536b7371dfb220b4d127c319f4e4b645097567c4c31b316fc634b8
+#8 DONE 0.0s
+
+#9 [builder 2/3] RUN --mount=type=secret,id=thepassword if [ "damaris" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi   && mkdir -p /home/docker/installdir   && cd /home/docker/installdir   && echo "Damaris Version: v1.5.0"   && git clone  --depth 1 --branch v1.5.0 https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/damaris.git   && mkdir -p /home/docker/installdir/build/damaris   && cd /home/docker/installdir/build/damaris   && if [ "$MPI_BINDIR" != "" ] ; then export MPI_BINDIR=$MPI_BINDIR/;  fi   && cmake ../../damaris -DCMAKE_INSTALL_PREFIX:PATH=/home/docker/local       -DCMAKE_BUILD_TYPE=Release       -DCMAKE_CXX_COMPILER=mpicxx       -DCMAKE_C_COMPILER=mpicc       -DCMAKE_Fortran_COMPILER=mpifort       -DENABLE_TESTS=ON       -DENABLE_EXAMPLES=ON       -DBUILD_SHARED_LIBS=ON       -DENABLE_PYTHON=OFF       -DENABLE_FORTRAN=ON       -DGENERATE_MODEL=ON       -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi       -DENABLE_CATALYST=ON -DParaView_DIR=/home/docker/local/lib/cmake/paraview-5.8   && make -j4   && make install   && find /home/docker/local/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>/home/docker/local/examples|"   && cp -r /home/docker/installdir/build/damaris/test/ /home/docker/local/examples/test/   && cp  /home/docker/installdir/build/damaris/CTestTestfile.cmake /home/docker/local/examples/   && sed -i "s|/home/docker/installdir/build/damaris/|/home/docker/local/examples/|g" /home/docker/local/examples/test/CTestTestfile.cmake   && rm -fr /home/docker/installdir/    && chown -R docker:docker /home/docker
+#9 sha256:dcea6c1a16581a354b5c9f2cc062c26022076e24127bee350b93d44429e4b9f2
+#9 CACHED
+
+#10 [builder 3/3] WORKDIR /home/docker/local/examples
+#10 sha256:3d83f9e9fe5de5a96947d34f11a3fc2890cd1f4a4d64b647537bf7df312d9b37
+#10 CACHED
+
+#11 exporting to image
+#11 sha256:e8c613e07b0b7ff33893b694f7759a10d42e180f2b4dc349fb57dc6b71dcab00
+#11 exporting layers done
+#11 writing image sha256:5f3c853d1e3a7f3518a3977e87c5b1f034dba826b2f8dd5fa0371ebf4220f2c8 done
+#11 naming to registry.gitlab.inria.fr/damaris/damaris:ubuntu-20.04-pv580-damaris-v1.5.0 done
+#11 DONE 0.0s
+#1 [internal] load build definition from Dockerfile.out
+#1 sha256:f6ee0f35cb1e94dc92792bac3be1021410631812ddba72bfcfe5e6bc04a1e282
+#1 transferring dockerfile: 4.09kB done
+#1 DONE 0.0s
+
+#2 [internal] load .dockerignore
+#2 sha256:eadf07db937151e1d67b6d2588a9cd5db2e2c1c4e355da73da4f42e53bac70ec
+#2 transferring context: 2B done
+#2 DONE 0.0s
+
+#3 resolve image config for docker.io/docker/dockerfile:1
+#3 sha256:ac072d521901222eeef550f52282877f196e16b0247844be9ceb1ccc1eac391d
+#3 DONE 0.2s
+
+#4 docker-image://docker.io/docker/dockerfile:1@sha256:42399d4635eddd7a9b8a24be879d2f9a930d0ed040a61324cfdf59ef1357b3b2
+#4 sha256:e7000a2113ce0d8d3e5eb20bd235706bb1408cc39fef67c756c938ffe32b6067
+#4 CACHED
+
+#6 [internal] load .dockerignore
+#6 sha256:47bc0e0d6e05b1e13ec0df5224054944a5f5f566d779bde2cf0f1c9d085d9c38
+#6 DONE 0.0s
+
+#5 [internal] load build definition from Dockerfile.out
+#5 sha256:c4f91021681fe2e01b137ccf55ef12f2f683288f74fd81cf8e4c5cc1553172fc
+#5 DONE 0.0s
+
+#7 [internal] load metadata for registry.gitlab.inria.fr/damaris/damaris-development:ubuntu-20.04-pv581
+#7 sha256:ed8bf2117004f71a25de534988c4a5a5a6f67e1c86dd725e0022cbac4d32ca51
+#7 DONE 0.0s
+
+#8 [builder 1/3] FROM registry.gitlab.inria.fr/damaris/damaris-development:ubuntu-20.04-pv581
+#8 sha256:ad0b46b83d7f56a87838735742b183c0ccbea9c4d5cb079d1be1d7b13c70964f
+#8 DONE 0.0s
+
+#9 [builder 2/3] RUN --mount=type=secret,id=thepassword if [ "damaris" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi   && mkdir -p /home/docker/installdir   && cd /home/docker/installdir   && echo "Damaris Version: v1.5.0"   && git clone  --depth 1 --branch v1.5.0 https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/damaris.git   && mkdir -p /home/docker/installdir/build/damaris   && cd /home/docker/installdir/build/damaris   && if [ "$MPI_BINDIR" != "" ] ; then export MPI_BINDIR=$MPI_BINDIR/;  fi   && cmake ../../damaris -DCMAKE_INSTALL_PREFIX:PATH=/home/docker/local       -DCMAKE_BUILD_TYPE=Release       -DCMAKE_CXX_COMPILER=mpicxx       -DCMAKE_C_COMPILER=mpicc       -DCMAKE_Fortran_COMPILER=mpifort       -DENABLE_TESTS=ON       -DENABLE_EXAMPLES=ON       -DBUILD_SHARED_LIBS=ON       -DENABLE_PYTHON=OFF       -DENABLE_FORTRAN=ON       -DGENERATE_MODEL=ON       -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi       -DENABLE_CATALYST=ON -DParaView_DIR=/home/docker/local/lib/cmake/paraview-5.8   && make -j4   && make install   && find /home/docker/local/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>/home/docker/local/examples|"   && cp -r /home/docker/installdir/build/damaris/test/ /home/docker/local/examples/test/   && cp  /home/docker/installdir/build/damaris/CTestTestfile.cmake /home/docker/local/examples/   && sed -i "s|/home/docker/installdir/build/damaris/|/home/docker/local/examples/|g" /home/docker/local/examples/test/CTestTestfile.cmake   && rm -fr /home/docker/installdir/    && chown -R docker:docker /home/docker
+#9 sha256:a24520adc00696655cdbd7d7048b6a85b9ad9b0bfc65dbbeab5bb99f9eca34a5
+#9 CACHED
+
+#10 [builder 3/3] WORKDIR /home/docker/local/examples
+#10 sha256:6365d65a7c1b8bbfd7fa75afeee1257e38882fa4032549b6d319436280e8e08f
+#10 CACHED
+
+#11 exporting to image
+#11 sha256:e8c613e07b0b7ff33893b694f7759a10d42e180f2b4dc349fb57dc6b71dcab00
+#11 exporting layers done
+#11 writing image sha256:764fc0301a7ad1f4a1a25bd87ad9f5e4634e9b5915945e039aa512270c2831f7 done
+#11 naming to registry.gitlab.inria.fr/damaris/damaris:ubuntu-20.04-pv581-damaris-v1.5.0 done
+#11 DONE 0.0s
+#1 [internal] load build definition from Dockerfile.out
+#1 sha256:a17acd4b5db8589e002b1433770a0fb12f793ab8e67b7f930c684fecec205f09
+#1 transferring dockerfile: 4.09kB done
+#1 DONE 0.0s
+
+#2 [internal] load .dockerignore
+#2 sha256:9e6e20186e2c7190008f3d637a3748958b41d30692fad78e2c82ab46d7dd4362
+#2 transferring context: 2B done
+#2 DONE 0.0s
+
+#3 resolve image config for docker.io/docker/dockerfile:1
+#3 sha256:ac072d521901222eeef550f52282877f196e16b0247844be9ceb1ccc1eac391d
+#3 DONE 0.2s
+
+#4 docker-image://docker.io/docker/dockerfile:1@sha256:42399d4635eddd7a9b8a24be879d2f9a930d0ed040a61324cfdf59ef1357b3b2
+#4 sha256:e7000a2113ce0d8d3e5eb20bd235706bb1408cc39fef67c756c938ffe32b6067
+#4 CACHED
+
+#6 [internal] load .dockerignore
+#6 sha256:4ac64c5f21f8389c2979e9e810e98cb66ff64dafe445480515ec5fae3b04264b
+#6 DONE 0.0s
+
+#5 [internal] load build definition from Dockerfile.out
+#5 sha256:6c623fd7bf37857ad8759c8da6e46586d282570c0deae811577c792c2117de6e
+#5 DONE 0.0s
+
+#7 [internal] load metadata for registry.gitlab.inria.fr/damaris/damaris-development:ubuntu-20.04-pv590
+#7 sha256:11a5927947e67734748eca08cb026696eeca24ab5d86822e3bcdfc3e95c32b37
+#7 DONE 0.0s
+
+#8 [builder 1/3] FROM registry.gitlab.inria.fr/damaris/damaris-development:ubuntu-20.04-pv590
+#8 sha256:752c09894b5b4d3bfc1fe548a4831de74293954f0d976fe21569f613293a07af
+#8 DONE 0.0s
+
+#9 [builder 2/3] RUN --mount=type=secret,id=thepassword if [ "damaris" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi   && mkdir -p /home/docker/installdir   && cd /home/docker/installdir   && echo "Damaris Version: v1.5.0"   && git clone  --depth 1 --branch v1.5.0 https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/damaris.git   && mkdir -p /home/docker/installdir/build/damaris   && cd /home/docker/installdir/build/damaris   && if [ "$MPI_BINDIR" != "" ] ; then export MPI_BINDIR=$MPI_BINDIR/;  fi   && cmake ../../damaris -DCMAKE_INSTALL_PREFIX:PATH=/home/docker/local       -DCMAKE_BUILD_TYPE=Release       -DCMAKE_CXX_COMPILER=mpicxx       -DCMAKE_C_COMPILER=mpicc       -DCMAKE_Fortran_COMPILER=mpifort       -DENABLE_TESTS=ON       -DENABLE_EXAMPLES=ON       -DBUILD_SHARED_LIBS=ON       -DENABLE_PYTHON=OFF       -DENABLE_FORTRAN=ON       -DGENERATE_MODEL=ON       -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi       -DENABLE_CATALYST=ON -DParaView_DIR=/home/docker/local/lib/cmake/paraview-5.9   && make -j4   && make install   && find /home/docker/local/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>/home/docker/local/examples|"   && cp -r /home/docker/installdir/build/damaris/test/ /home/docker/local/examples/test/   && cp  /home/docker/installdir/build/damaris/CTestTestfile.cmake /home/docker/local/examples/   && sed -i "s|/home/docker/installdir/build/damaris/|/home/docker/local/examples/|g" /home/docker/local/examples/test/CTestTestfile.cmake   && rm -fr /home/docker/installdir/    && chown -R docker:docker /home/docker
+#9 sha256:6548258b691ead25548d06e8bf3f04d8e855e367e0d6875afc530d68bf674a92
+#9 CACHED
+
+#10 [builder 3/3] WORKDIR /home/docker/local/examples
+#10 sha256:8e79a648ed67b4053a33ba9a6df2ecbfb90a3b2919d8f100d5fd808a4d82bbb0
+#10 CACHED
+
+#11 exporting to image
+#11 sha256:e8c613e07b0b7ff33893b694f7759a10d42e180f2b4dc349fb57dc6b71dcab00
+#11 exporting layers done
+#11 writing image sha256:88b79f73c76a83e8e23de00f0ae6d1831ceb168bdbca0c72ec059cb9981cf797 done
+#11 naming to registry.gitlab.inria.fr/damaris/damaris:ubuntu-20.04-pv590-damaris-v1.5.0 done
+#11 DONE 0.0s
+#1 [internal] load build definition from Dockerfile.out
+#1 sha256:2b8e3a88a8ebce3dd7a981af419b9fd8c81b1bb242f96dceaa4aaf94784a2d16
+#1 transferring dockerfile: 4.09kB done
+#1 DONE 0.0s
+
+#2 [internal] load .dockerignore
+#2 sha256:2f277ca79796670c12adf4ef8e1905ed346c10460d64d1e4a20cb7bea270b86d
+#2 transferring context: 2B done
+#2 DONE 0.0s
+
+#3 resolve image config for docker.io/docker/dockerfile:1
+#3 sha256:ac072d521901222eeef550f52282877f196e16b0247844be9ceb1ccc1eac391d
+#3 DONE 0.2s
+
+#4 docker-image://docker.io/docker/dockerfile:1@sha256:42399d4635eddd7a9b8a24be879d2f9a930d0ed040a61324cfdf59ef1357b3b2
+#4 sha256:e7000a2113ce0d8d3e5eb20bd235706bb1408cc39fef67c756c938ffe32b6067
+#4 CACHED
+
+#6 [internal] load build definition from Dockerfile.out
+#6 sha256:3bbe571dc6960e62f6f968c2b6c3cd0e2df12ec1ea2ad3a6b3779a0b7a3e6065
+#6 DONE 0.0s
+
+#5 [internal] load .dockerignore
+#5 sha256:5abfc97e580e405422eed144897b2128de552db723bc4a94c9df29cffa0b1f71
+#5 DONE 0.0s
+
+#7 [internal] load metadata for registry.gitlab.inria.fr/damaris/damaris-development:ubuntu-20.04-pv591
+#7 sha256:6eefba448bbeb436bf94a1bbc9d9a79c176d3e9a50adf17302500fb7c204be96
+#7 DONE 0.0s
+
+#8 [builder 1/3] FROM registry.gitlab.inria.fr/damaris/damaris-development:ubuntu-20.04-pv591
+#8 sha256:d55249277890f007e727dc3b4ba1d2d8c20b7d33942f2ecee4ff02d48efe5c5a
+#8 DONE 0.0s
+
+#9 [builder 2/3] RUN --mount=type=secret,id=thepassword if [ "damaris" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi   && mkdir -p /home/docker/installdir   && cd /home/docker/installdir   && echo "Damaris Version: v1.5.0"   && git clone  --depth 1 --branch v1.5.0 https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/damaris.git   && mkdir -p /home/docker/installdir/build/damaris   && cd /home/docker/installdir/build/damaris   && if [ "$MPI_BINDIR" != "" ] ; then export MPI_BINDIR=$MPI_BINDIR/;  fi   && cmake ../../damaris -DCMAKE_INSTALL_PREFIX:PATH=/home/docker/local       -DCMAKE_BUILD_TYPE=Release       -DCMAKE_CXX_COMPILER=mpicxx       -DCMAKE_C_COMPILER=mpicc       -DCMAKE_Fortran_COMPILER=mpifort       -DENABLE_TESTS=ON       -DENABLE_EXAMPLES=ON       -DBUILD_SHARED_LIBS=ON       -DENABLE_PYTHON=OFF       -DENABLE_FORTRAN=ON       -DGENERATE_MODEL=ON       -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi       -DENABLE_CATALYST=ON -DParaView_DIR=/home/docker/local/lib/cmake/paraview-5.9   && make -j4   && make install   && find /home/docker/local/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>/home/docker/local/examples|"   && cp -r /home/docker/installdir/build/damaris/test/ /home/docker/local/examples/test/   && cp  /home/docker/installdir/build/damaris/CTestTestfile.cmake /home/docker/local/examples/   && sed -i "s|/home/docker/installdir/build/damaris/|/home/docker/local/examples/|g" /home/docker/local/examples/test/CTestTestfile.cmake   && rm -fr /home/docker/installdir/    && chown -R docker:docker /home/docker
+#9 sha256:cf3c7927f929840f1408cd270f80f9bb055061fa8b0778ee920ee7c0e2f98108
+#9 CACHED
+
+#10 [builder 3/3] WORKDIR /home/docker/local/examples
+#10 sha256:38545b5d5a216dcb322892f4a042e68c0a15ba2d479a4eca727b3a5bcef47fe8
+#10 CACHED
+
+#11 exporting to image
+#11 sha256:e8c613e07b0b7ff33893b694f7759a10d42e180f2b4dc349fb57dc6b71dcab00
+#11 exporting layers done
+#11 writing image sha256:9dc654e6753f5ff5fc4bd92ecebbb5039f243399bc50923dfb6a249e6b839c9d done
+#11 naming to registry.gitlab.inria.fr/damaris/damaris:ubuntu-20.04-pv591-damaris-v1.5.0 done
+#11 DONE 0.0s
+#1 [internal] load build definition from Dockerfile.out
+#1 sha256:a2299ce52d7363bf3f1a11326553320554b8adc1255ba8367a6788dc621026d7
+#1 transferring dockerfile: 4.09kB done
+#1 DONE 0.0s
+
+#2 [internal] load .dockerignore
+#2 sha256:99466b53242fee575a554c5e1b16905777ea433e35a39c59c88892c7d65af87f
+#2 transferring context: 2B done
+#2 DONE 0.0s
+
+#3 resolve image config for docker.io/docker/dockerfile:1
+#3 sha256:ac072d521901222eeef550f52282877f196e16b0247844be9ceb1ccc1eac391d
+#3 DONE 0.2s
+
+#4 docker-image://docker.io/docker/dockerfile:1@sha256:42399d4635eddd7a9b8a24be879d2f9a930d0ed040a61324cfdf59ef1357b3b2
+#4 sha256:e7000a2113ce0d8d3e5eb20bd235706bb1408cc39fef67c756c938ffe32b6067
+#4 CACHED
+
+#6 [internal] load .dockerignore
+#6 sha256:b9ff19b7f20f97e52894ca72250a5f89245ac7ee188bac4befe3fb06e5f7c37d
+#6 DONE 0.0s
+
+#5 [internal] load build definition from Dockerfile.out
+#5 sha256:512033515ecd0a9490ccb3fcb34e62ea7f148da37078213dbceb7e9ea7effa3c
+#5 DONE 0.0s
+
+#7 [internal] load metadata for registry.gitlab.inria.fr/damaris/damaris-development:ubuntu-20.04-pv5100
+#7 sha256:5b93b6691897d51710a61cf2340046a2f9186398e876efa599f32cb6fa3cb8ec
+#7 DONE 0.0s
+
+#8 [builder 1/3] FROM registry.gitlab.inria.fr/damaris/damaris-development:ubuntu-20.04-pv5100
+#8 sha256:132ca732314d28493f6ef22c63e643987a0cdb1735a962433d064a0114abf9b9
+#8 CACHED
+
+#9 [builder 2/3] RUN --mount=type=secret,id=thepassword if [ "damaris" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi   && mkdir -p /home/docker/installdir   && cd /home/docker/installdir   && echo "Damaris Version: v1.5.0"   && git clone  --depth 1 --branch v1.5.0 https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/damaris.git   && mkdir -p /home/docker/installdir/build/damaris   && cd /home/docker/installdir/build/damaris   && if [ "$MPI_BINDIR" != "" ] ; then export MPI_BINDIR=$MPI_BINDIR/;  fi   && cmake ../../damaris -DCMAKE_INSTALL_PREFIX:PATH=/home/docker/local       -DCMAKE_BUILD_TYPE=Release       -DCMAKE_CXX_COMPILER=mpicxx       -DCMAKE_C_COMPILER=mpicc       -DCMAKE_Fortran_COMPILER=mpifort       -DENABLE_TESTS=ON       -DENABLE_EXAMPLES=ON       -DBUILD_SHARED_LIBS=ON       -DENABLE_PYTHON=OFF       -DENABLE_FORTRAN=ON       -DGENERATE_MODEL=ON       -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi       -DENABLE_CATALYST=ON -DParaView_DIR=/home/docker/local/lib/cmake/paraview-5.10   && make -j4   && make install   && find /home/docker/local/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>/home/docker/local/examples|"   && cp -r /home/docker/installdir/build/damaris/test/ /home/docker/local/examples/test/   && cp  /home/docker/installdir/build/damaris/CTestTestfile.cmake /home/docker/local/examples/   && sed -i "s|/home/docker/installdir/build/damaris/|/home/docker/local/examples/|g" /home/docker/local/examples/test/CTestTestfile.cmake   && rm -fr /home/docker/installdir/    && chown -R docker:docker /home/docker
+#9 sha256:ccd16e4e3e93181586c7386fcbc580fc51a340c38204f68b909352657e400816
+#9 0.218 Damaris Version: v1.5.0
+#9 0.228 Cloning into 'damaris'...
+#9 0.996 Note: switching to '68206a696ad430aa8426ca370501aa71914fbc87'.
+#9 0.996 
+#9 0.996 You are in 'detached HEAD' state. You can look around, make experimental
+#9 0.996 changes and commit them, and you can discard any commits you make in this
+#9 0.996 state without impacting any branches by switching back to a branch.
+#9 0.996 
+#9 0.996 If you want to create a new branch to retain commits you create, you may
+#9 0.996 do so (now or later) by using -c with the switch command. Example:
+#9 0.996 
+#9 0.996   git switch -c <new-branch-name>
+#9 0.996 
+#9 0.996 Or undo this operation with:
+#9 0.996 
+#9 0.996   git switch -
+#9 0.996 
+#9 0.996 Turn off this advice by setting config variable advice.detachedHead to false
+#9 0.996 
+#9 1.097 -- The C compiler identification is GNU 9.3.0
+#9 1.185 -- The CXX compiler identification is GNU 9.3.0
+#9 1.189 -- Check for working C compiler: /usr/bin/mpicc
+#9 1.261 -- Check for working C compiler: /usr/bin/mpicc -- works
+#9 1.262 -- Detecting C compiler ABI info
+#9 1.327 -- Detecting C compiler ABI info - done
+#9 1.338 -- Detecting C compile features
+#9 1.338 -- Detecting C compile features - done
+#9 1.341 -- Check for working CXX compiler: /usr/bin/mpicxx
+#9 1.410 -- Check for working CXX compiler: /usr/bin/mpicxx -- works
+#9 1.411 -- Detecting CXX compiler ABI info
+#9 1.482 -- Detecting CXX compiler ABI info - done
+#9 1.493 -- Detecting CXX compile features
+#9 1.493 -- Detecting CXX compile features - done
+#9 1.625 -- The Fortran compiler identification is GNU 9.3.0
+#9 1.634 -- Check for working Fortran compiler: /usr/bin/mpifort
+#9 1.713 -- Check for working Fortran compiler: /usr/bin/mpifort  -- works
+#9 1.715 -- Detecting Fortran compiler ABI info
+#9 1.799 -- Detecting Fortran compiler ABI info - done
+#9 1.810 -- Checking whether /usr/bin/mpifort supports Fortran 90
+#9 1.892 -- Checking whether /usr/bin/mpifort supports Fortran 90 -- yes
+#9 1.893 -- Detecting Fortran/C Interface
+#9 3.598 -- Detecting Fortran/C Interface - Found GLOBAL and MODULE mangling
+#9 3.599 -- Looking for pthread.h
+#9 3.674 -- Looking for pthread.h - found
+#9 3.674 -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+#9 3.748 -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+#9 3.750 -- Found Threads: TRUE  
+#9 3.772 -- Found Boost: /usr/lib/x86_64-linux-gnu/cmake/Boost-1.71.0/BoostConfig.cmake (found suitable version "1.71.0", minimum required is "1.65.0") found components: thread log log_setup filesystem system date_time 
+#9 3.774 CMake Warning at CMakeLists.txt:95 (message):
+#9 3.774   WARNING Boost BOOST_BIND_GLOBAL_PLACEHOLDERS defined to remove warnings -
+#9 3.774   perhaps check for issue?
+#9 3.774 
+#9 3.774 
+#9 3.775 -- Found XSD: /bin/xsd  
+#9 3.781 -- Found XercesC: /usr/lib/x86_64-linux-gnu/libxerces-c.so (found version "3.2.2") 
+#9 3.812 -- Found HDF5: /usr/lib/x86_64-linux-gnu/hdf5/openmpi/lib/libhdf5.so (found version "1.10.4") found components: C 
+#9 3.904 CMake Error at /home/docker/local/lib/cmake/paraview-5.10/paraview-config.cmake:163 (list):
+#9 3.904   list sub-command REMOVE_ITEM requires two or more arguments.
+#9 3.904 Call Stack (most recent call first):
+#9 3.904   CMakeLists.txt:149 (find_package)
+#9 3.904 
+#9 3.904 
+#9 4.016 -- Found MPI_C: /usr/bin/mpicc (found version "3.1") 
+#9 4.016 -- Found MPI: TRUE (found version "3.1") found components: C 
+#9 4.245 -- Found Python3: /usr/bin/python3.8 (found suitable version "3.8.10", minimum required is "3.8") found components: Interpreter Development.Module Development.Embed 
+#9 4.268 -- ParaView >= 5.7 found
+#9 4.341 -- ParaView_LIBRARIES: ParaView::PythonCatalyst
+#9 4.341 -- VTK_LIBRARIES: VTK::PythonInterpreter;VTK::ParallelCore;VTK::WrappingPythonCore
+#9 4.345 -- ParaView >= 5.7 setting pkg-config libraries
+#9 4.367 -- Configuring incomplete, errors occurred!
+#9 4.367 See also "/home/docker/installdir/build/damaris/CMakeFiles/CMakeOutput.log".
+#9 ERROR: executor failed running [/bin/bash -c if [ "$repo" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi   && mkdir -p ${INSTALLTMDIR}   && cd ${INSTALLTMDIR}   && echo "Damaris Version: $DAMARIS_VERSION"   && git clone  --depth 1 --branch $DAMARIS_VERSION https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/$repo.git   && mkdir -p ${INSTALLTMDIR}/build/$repo   && cd ${INSTALLTMDIR}/build/$repo   && if [ "$MPI_BINDIR" != "" ] ; then export MPI_BINDIR=$MPI_BINDIR/;  fi   && cmake ../../$repo -DCMAKE_INSTALL_PREFIX:PATH=$INSTALL_PREFIX       -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}       -DCMAKE_CXX_COMPILER=mpicxx       -DCMAKE_C_COMPILER=mpicc       -DCMAKE_Fortran_COMPILER=mpifort       -DENABLE_TESTS=ON       -DENABLE_EXAMPLES=$EXAMPLES_ON_OFF       -DBUILD_SHARED_LIBS=$SHLIBS_ON_OFF       -DENABLE_PYTHON=OFF       -DENABLE_FORTRAN=ON       -DGENERATE_MODEL=$REGEN_ON_OFF       -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi       -DENABLE_CATALYST=ON -DParaView_DIR=${INSTALL_PREFIX}/lib/cmake/paraview-5.10   && make -j${NUMCORES}   && make install   && find ${INSTALL_PREFIX}/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples|"   && cp -r ${INSTALLTMDIR}/build/$repo/test/ ${INSTALL_PREFIX}/examples/test/   && cp  ${INSTALLTMDIR}/build/$repo/CTestTestfile.cmake ${INSTALL_PREFIX}/examples/   && sed -i "s|${INSTALLTMDIR}/build/$repo/|${INSTALL_PREFIX}/examples/|g" ${INSTALL_PREFIX}/examples/test/CTestTestfile.cmake   && rm -fr ${INSTALLTMDIR}/    && chown -R docker:docker /home/docker]: exit code: 1
+------
+ > [builder 2/3] RUN --mount=type=secret,id=thepassword if [ "damaris" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi   && mkdir -p /home/docker/installdir   && cd /home/docker/installdir   && echo "Damaris Version: v1.5.0"   && git clone  --depth 1 --branch v1.5.0 https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/damaris.git   && mkdir -p /home/docker/installdir/build/damaris   && cd /home/docker/installdir/build/damaris   && if [ "$MPI_BINDIR" != "" ] ; then export MPI_BINDIR=$MPI_BINDIR/;  fi   && cmake ../../damaris -DCMAKE_INSTALL_PREFIX:PATH=/home/docker/local       -DCMAKE_BUILD_TYPE=Release       -DCMAKE_CXX_COMPILER=mpicxx       -DCMAKE_C_COMPILER=mpicc       -DCMAKE_Fortran_COMPILER=mpifort       -DENABLE_TESTS=ON       -DENABLE_EXAMPLES=ON       -DBUILD_SHARED_LIBS=ON       -DENABLE_PYTHON=OFF       -DENABLE_FORTRAN=ON       -DGENERATE_MODEL=ON       -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi       -DENABLE_CATALYST=ON -DParaView_DIR=/home/docker/local/lib/cmake/paraview-5.10   && make -j4   && make install   && find /home/docker/local/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>/home/docker/local/examples|"   && cp -r /home/docker/installdir/build/damaris/test/ /home/docker/local/examples/test/   && cp  /home/docker/installdir/build/damaris/CTestTestfile.cmake /home/docker/local/examples/   && sed -i "s|/home/docker/installdir/build/damaris/|/home/docker/local/examples/|g" /home/docker/local/examples/test/CTestTestfile.cmake   && rm -fr /home/docker/installdir/    && chown -R docker:docker /home/docker:
+------
+executor failed running [/bin/bash -c if [ "$repo" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi   && mkdir -p ${INSTALLTMDIR}   && cd ${INSTALLTMDIR}   && echo "Damaris Version: $DAMARIS_VERSION"   && git clone  --depth 1 --branch $DAMARIS_VERSION https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/$repo.git   && mkdir -p ${INSTALLTMDIR}/build/$repo   && cd ${INSTALLTMDIR}/build/$repo   && if [ "$MPI_BINDIR" != "" ] ; then export MPI_BINDIR=$MPI_BINDIR/;  fi   && cmake ../../$repo -DCMAKE_INSTALL_PREFIX:PATH=$INSTALL_PREFIX       -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}       -DCMAKE_CXX_COMPILER=mpicxx       -DCMAKE_C_COMPILER=mpicc       -DCMAKE_Fortran_COMPILER=mpifort       -DENABLE_TESTS=ON       -DENABLE_EXAMPLES=$EXAMPLES_ON_OFF       -DBUILD_SHARED_LIBS=$SHLIBS_ON_OFF       -DENABLE_PYTHON=OFF       -DENABLE_FORTRAN=ON       -DGENERATE_MODEL=$REGEN_ON_OFF       -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi       -DENABLE_CATALYST=ON -DParaView_DIR=${INSTALL_PREFIX}/lib/cmake/paraview-5.10   && make -j${NUMCORES}   && make install   && find ${INSTALL_PREFIX}/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples|"   && cp -r ${INSTALLTMDIR}/build/$repo/test/ ${INSTALL_PREFIX}/examples/test/   && cp  ${INSTALLTMDIR}/build/$repo/CTestTestfile.cmake ${INSTALL_PREFIX}/examples/   && sed -i "s|${INSTALLTMDIR}/build/$repo/|${INSTALL_PREFIX}/examples/|g" ${INSTALL_PREFIX}/examples/test/CTestTestfile.cmake   && rm -fr ${INSTALLTMDIR}/    && chown -R docker:docker /home/docker]: exit code: 1
+#1 [internal] load .dockerignore
+#1 sha256:9f2ae145d7f2bff237279b5d8bdb0dfffec30840b5b4fd19acabbb9be88864be
+#1 transferring context: 2B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile.out
+#2 sha256:e8bb40a7984c90d7318a0dde09d2643f495607348224514943d987f931b77f1c
+#2 transferring dockerfile: 34B
+#2 transferring dockerfile: 4.09kB 0.0s done
+#2 DONE 0.4s
+
+#3 resolve image config for docker.io/docker/dockerfile:1
+#3 sha256:ac072d521901222eeef550f52282877f196e16b0247844be9ceb1ccc1eac391d
+#3 DONE 0.5s
+
+#4 docker-image://docker.io/docker/dockerfile:1@sha256:42399d4635eddd7a9b8a24be879d2f9a930d0ed040a61324cfdf59ef1357b3b2
+#4 sha256:e7000a2113ce0d8d3e5eb20bd235706bb1408cc39fef67c756c938ffe32b6067
+#4 CACHED
+
+#6 [internal] load .dockerignore
+#6 sha256:1e32fca405ecc4b924b109b83377d9245977ea69b56487f86b1b359efe758af4
+#6 DONE 0.0s
+
+#5 [internal] load build definition from Dockerfile.out
+#5 sha256:eeab4d8aca2bb5208a4036ceecdb07e1e3dbed51bb95b0734e0d1daa559c56d7
+#5 DONE 0.0s
+
+#7 [internal] load metadata for registry.gitlab.inria.fr/damaris/damaris-development:ubuntu-21.10-pv5100
+#7 sha256:1ad3acb4e3e44dce554c6cd515d3e4203532174488b232f28a1bf04c5e048fe2
+#7 DONE 0.0s
+
+#8 [builder 1/3] FROM registry.gitlab.inria.fr/damaris/damaris-development:ubuntu-21.10-pv5100
+#8 sha256:b554a6f8ed0b4507819ffa1d11ce89596ef7da6380c646bc9305c5ebf35d86c6
+#8 CACHED
+
+#9 [builder 2/3] RUN --mount=type=secret,id=thepassword if [ "damaris" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi   && mkdir -p /home/docker/installdir   && cd /home/docker/installdir   && echo "Damaris Version: v1.5.0"   && git clone  --depth 1 --branch v1.5.0 https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/damaris.git   && mkdir -p /home/docker/installdir/build/damaris   && cd /home/docker/installdir/build/damaris   && if [ "$MPI_BINDIR" != "" ] ; then export MPI_BINDIR=$MPI_BINDIR/;  fi   && cmake ../../damaris -DCMAKE_INSTALL_PREFIX:PATH=/home/docker/local       -DCMAKE_BUILD_TYPE=Release       -DCMAKE_CXX_COMPILER=mpicxx       -DCMAKE_C_COMPILER=mpicc       -DCMAKE_Fortran_COMPILER=mpifort       -DENABLE_TESTS=ON       -DENABLE_EXAMPLES=ON       -DBUILD_SHARED_LIBS=ON       -DENABLE_PYTHON=OFF       -DENABLE_FORTRAN=ON       -DGENERATE_MODEL=ON       -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi       -DENABLE_CATALYST=ON -DParaView_DIR=/home/docker/local/lib/cmake/paraview-5.10   && make -j4   && make install   && find /home/docker/local/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>/home/docker/local/examples|"   && cp -r /home/docker/installdir/build/damaris/test/ /home/docker/local/examples/test/   && cp  /home/docker/installdir/build/damaris/CTestTestfile.cmake /home/docker/local/examples/   && sed -i "s|/home/docker/installdir/build/damaris/|/home/docker/local/examples/|g" /home/docker/local/examples/test/CTestTestfile.cmake   && rm -fr /home/docker/installdir/    && chown -R docker:docker /home/docker
+#9 sha256:696c111bb9c62a57e87c14706b63f1381f296ff9e676bcfbac983a6649ec1ef5
+#9 0.736 Damaris Version: v1.5.0
+#9 0.747 Cloning into 'damaris'...
+#9 1.376 Note: switching to '68206a696ad430aa8426ca370501aa71914fbc87'.
+#9 1.376 
+#9 1.376 You are in 'detached HEAD' state. You can look around, make experimental
+#9 1.376 changes and commit them, and you can discard any commits you make in this
+#9 1.376 state without impacting any branches by switching back to a branch.
+#9 1.376 
+#9 1.376 If you want to create a new branch to retain commits you create, you may
+#9 1.376 do so (now or later) by using -c with the switch command. Example:
+#9 1.376 
+#9 1.376   git switch -c <new-branch-name>
+#9 1.376 
+#9 1.376 Or undo this operation with:
+#9 1.376 
+#9 1.376   git switch -
+#9 1.376 
+#9 1.376 Turn off this advice by setting config variable advice.detachedHead to false
+#9 1.376 
+#9 1.821 -- The C compiler identification is GNU 11.2.0
+#9 1.948 -- The CXX compiler identification is GNU 11.2.0
+#9 1.965 -- Detecting C compiler ABI info
+#9 2.036 -- Detecting C compiler ABI info - done
+#9 2.046 -- Check for working C compiler: /usr/bin/mpicc - skipped
+#9 2.047 -- Detecting C compile features
+#9 2.048 -- Detecting C compile features - done
+#9 2.052 -- Detecting CXX compiler ABI info
+#9 2.121 -- Detecting CXX compiler ABI info - done
+#9 2.132 -- Check for working CXX compiler: /usr/bin/mpicxx - skipped
+#9 2.132 -- Detecting CXX compile features
+#9 2.133 -- Detecting CXX compile features - done
+#9 2.290 -- The Fortran compiler identification is GNU 11.2.0
+#9 2.308 -- Detecting Fortran compiler ABI info
+#9 2.704 -- Detecting Fortran compiler ABI info - done
+#9 2.716 -- Check for working Fortran compiler: /usr/bin/mpifort - skipped
+#9 2.716 -- Checking whether /usr/bin/mpifort supports Fortran 90
+#9 2.805 -- Checking whether /usr/bin/mpifort supports Fortran 90 - yes
+#9 2.809 -- Detecting Fortran/C Interface
+#9 4.674 CMake Warning at CMakeLists.txt:95 (message):
+#9 4.674   WARNING Boost BOOST_BIND_GLOBAL_PLACEHOLDERS defined to remove warnings -
+#9 4.674   perhaps check for issue?
+#9 4.674 
+#9 4.674 
+#9 4.697 -- Detecting Fortran/C Interface - Found GLOBAL and MODULE mangling
+#9 4.697 -- Looking for pthread.h
+#9 4.697 -- Looking for pthread.h - found
+#9 4.697 -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+#9 4.697 -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+#9 4.697 -- Found Threads: TRUE  
+#9 4.697 -- Found Boost: /usr/lib/x86_64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found suitable version "1.74.0", minimum required is "1.65.0") found components: thread log log_setup filesystem system date_time 
+#9 4.697 -- Found XSD: /bin/xsd  
+#9 4.697 -- Found XercesC: /usr/lib/x86_64-linux-gnu/libxerces-c.so (found version "3.2.3") 
+#9 4.711 -- Found HDF5: /usr/lib/x86_64-linux-gnu/hdf5/openmpi/lib/libhdf5.so (found version "1.10.6") found components: C 
+#9 4.788 CMake Error at /home/docker/local/lib/cmake/paraview-5.10/paraview-config.cmake:163 (list):
+#9 4.788   list sub-command REMOVE_ITEM requires two or more arguments.
+#9 4.788 Call Stack (most recent call first):
+#9 4.788   CMakeLists.txt:149 (find_package)
+#9 4.788 
+#9 4.788 
+#9 4.905 -- Found MPI_C: /usr/bin/mpicc (found version "3.1") 
+#9 4.906 -- Found MPI: TRUE (found version "3.1") found components: C 
+#9 5.540 -- Found Python3: /usr/bin/python3.9 (found suitable version "3.9.7", minimum required is "3.9") found components: Interpreter Development.Module Development.Embed 
+#9 5.562 -- ParaView >= 5.7 found
+#9 5.635 -- ParaView_LIBRARIES: ParaView::PythonCatalyst
+#9 5.635 -- VTK_LIBRARIES: VTK::PythonInterpreter;VTK::ParallelCore;VTK::WrappingPythonCore
+#9 5.641 -- ParaView >= 5.7 setting pkg-config libraries
+#9 5.652 -- Configuring incomplete, errors occurred!
+#9 5.652 See also "/home/docker/installdir/build/damaris/CMakeFiles/CMakeOutput.log".
+#9 ERROR: executor failed running [/bin/bash -c if [ "$repo" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi   && mkdir -p ${INSTALLTMDIR}   && cd ${INSTALLTMDIR}   && echo "Damaris Version: $DAMARIS_VERSION"   && git clone  --depth 1 --branch $DAMARIS_VERSION https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/$repo.git   && mkdir -p ${INSTALLTMDIR}/build/$repo   && cd ${INSTALLTMDIR}/build/$repo   && if [ "$MPI_BINDIR" != "" ] ; then export MPI_BINDIR=$MPI_BINDIR/;  fi   && cmake ../../$repo -DCMAKE_INSTALL_PREFIX:PATH=$INSTALL_PREFIX       -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}       -DCMAKE_CXX_COMPILER=mpicxx       -DCMAKE_C_COMPILER=mpicc       -DCMAKE_Fortran_COMPILER=mpifort       -DENABLE_TESTS=ON       -DENABLE_EXAMPLES=$EXAMPLES_ON_OFF       -DBUILD_SHARED_LIBS=$SHLIBS_ON_OFF       -DENABLE_PYTHON=OFF       -DENABLE_FORTRAN=ON       -DGENERATE_MODEL=$REGEN_ON_OFF       -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi       -DENABLE_CATALYST=ON -DParaView_DIR=${INSTALL_PREFIX}/lib/cmake/paraview-5.10   && make -j${NUMCORES}   && make install   && find ${INSTALL_PREFIX}/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples|"   && cp -r ${INSTALLTMDIR}/build/$repo/test/ ${INSTALL_PREFIX}/examples/test/   && cp  ${INSTALLTMDIR}/build/$repo/CTestTestfile.cmake ${INSTALL_PREFIX}/examples/   && sed -i "s|${INSTALLTMDIR}/build/$repo/|${INSTALL_PREFIX}/examples/|g" ${INSTALL_PREFIX}/examples/test/CTestTestfile.cmake   && rm -fr ${INSTALLTMDIR}/    && chown -R docker:docker /home/docker]: exit code: 1
+------
+ > [builder 2/3] RUN --mount=type=secret,id=thepassword if [ "damaris" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi   && mkdir -p /home/docker/installdir   && cd /home/docker/installdir   && echo "Damaris Version: v1.5.0"   && git clone  --depth 1 --branch v1.5.0 https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/damaris.git   && mkdir -p /home/docker/installdir/build/damaris   && cd /home/docker/installdir/build/damaris   && if [ "$MPI_BINDIR" != "" ] ; then export MPI_BINDIR=$MPI_BINDIR/;  fi   && cmake ../../damaris -DCMAKE_INSTALL_PREFIX:PATH=/home/docker/local       -DCMAKE_BUILD_TYPE=Release       -DCMAKE_CXX_COMPILER=mpicxx       -DCMAKE_C_COMPILER=mpicc       -DCMAKE_Fortran_COMPILER=mpifort       -DENABLE_TESTS=ON       -DENABLE_EXAMPLES=ON       -DBUILD_SHARED_LIBS=ON       -DENABLE_PYTHON=OFF       -DENABLE_FORTRAN=ON       -DGENERATE_MODEL=ON       -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi       -DENABLE_CATALYST=ON -DParaView_DIR=/home/docker/local/lib/cmake/paraview-5.10   && make -j4   && make install   && find /home/docker/local/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>/home/docker/local/examples|"   && cp -r /home/docker/installdir/build/damaris/test/ /home/docker/local/examples/test/   && cp  /home/docker/installdir/build/damaris/CTestTestfile.cmake /home/docker/local/examples/   && sed -i "s|/home/docker/installdir/build/damaris/|/home/docker/local/examples/|g" /home/docker/local/examples/test/CTestTestfile.cmake   && rm -fr /home/docker/installdir/    && chown -R docker:docker /home/docker:
+------
+executor failed running [/bin/bash -c if [ "$repo" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi   && mkdir -p ${INSTALLTMDIR}   && cd ${INSTALLTMDIR}   && echo "Damaris Version: $DAMARIS_VERSION"   && git clone  --depth 1 --branch $DAMARIS_VERSION https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/$repo.git   && mkdir -p ${INSTALLTMDIR}/build/$repo   && cd ${INSTALLTMDIR}/build/$repo   && if [ "$MPI_BINDIR" != "" ] ; then export MPI_BINDIR=$MPI_BINDIR/;  fi   && cmake ../../$repo -DCMAKE_INSTALL_PREFIX:PATH=$INSTALL_PREFIX       -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}       -DCMAKE_CXX_COMPILER=mpicxx       -DCMAKE_C_COMPILER=mpicc       -DCMAKE_Fortran_COMPILER=mpifort       -DENABLE_TESTS=ON       -DENABLE_EXAMPLES=$EXAMPLES_ON_OFF       -DBUILD_SHARED_LIBS=$SHLIBS_ON_OFF       -DENABLE_PYTHON=OFF       -DENABLE_FORTRAN=ON       -DGENERATE_MODEL=$REGEN_ON_OFF       -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi       -DENABLE_CATALYST=ON -DParaView_DIR=${INSTALL_PREFIX}/lib/cmake/paraview-5.10   && make -j${NUMCORES}   && make install   && find ${INSTALL_PREFIX}/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples|"   && cp -r ${INSTALLTMDIR}/build/$repo/test/ ${INSTALL_PREFIX}/examples/test/   && cp  ${INSTALLTMDIR}/build/$repo/CTestTestfile.cmake ${INSTALL_PREFIX}/examples/   && sed -i "s|${INSTALLTMDIR}/build/$repo/|${INSTALL_PREFIX}/examples/|g" ${INSTALL_PREFIX}/examples/test/CTestTestfile.cmake   && rm -fr ${INSTALLTMDIR}/    && chown -R docker:docker /home/docker]: exit code: 1
+#1 [internal] load build definition from Dockerfile.out
+#1 sha256:219a6fc661d6dd07a01542b8b3abe926734cc776e3c8a1bee40571ad66e817bd
+#1 transferring dockerfile: 4.09kB done
+#1 DONE 0.0s
+
+#2 [internal] load .dockerignore
+#2 sha256:1b9ef62df444fca7148cf9a7213459871160dd27ec4cdf591ac52786a67807ac
+#2 transferring context: 2B done
+#2 DONE 0.0s
+
+#3 resolve image config for docker.io/docker/dockerfile:1
+#3 sha256:ac072d521901222eeef550f52282877f196e16b0247844be9ceb1ccc1eac391d
+#3 DONE 0.4s
+
+#4 docker-image://docker.io/docker/dockerfile:1@sha256:42399d4635eddd7a9b8a24be879d2f9a930d0ed040a61324cfdf59ef1357b3b2
+#4 sha256:e7000a2113ce0d8d3e5eb20bd235706bb1408cc39fef67c756c938ffe32b6067
+#4 CACHED
+
+#5 [internal] load .dockerignore
+#5 sha256:bb5c130606ebdfd4cf86a4d9d4baee2a44b8e36b67ca3a90ff63729070294dd0
+#5 DONE 0.0s
+
+#6 [internal] load build definition from Dockerfile.out
+#6 sha256:b7dd8d593da1a2a5849b2da1aaf82642457d42ae6d966c0539bcdbf7c7259533
+#6 DONE 0.0s
+
+#7 [internal] load metadata for registry.gitlab.inria.fr/damaris/damaris-development:debian-10-pv580
+#7 sha256:7c044761ee420648800664846bc92c2ff1bff51c01ada18cbfbf5236390d1b54
+#7 DONE 0.0s
+
+#8 [builder 1/3] FROM registry.gitlab.inria.fr/damaris/damaris-development:debian-10-pv580
+#8 sha256:1ed9651af89bf22a2b730e5dd241e675aa26fc57479a583327dd5c6ddb4894bf
+#8 DONE 0.0s
+
+#9 [builder 2/3] RUN --mount=type=secret,id=thepassword if [ "damaris" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi   && mkdir -p /home/docker/installdir   && cd /home/docker/installdir   && echo "Damaris Version: v1.5.0"   && git clone  --depth 1 --branch v1.5.0 https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/damaris.git   && mkdir -p /home/docker/installdir/build/damaris   && cd /home/docker/installdir/build/damaris   && if [ "$MPI_BINDIR" != "" ] ; then export MPI_BINDIR=$MPI_BINDIR/;  fi   && cmake ../../damaris -DCMAKE_INSTALL_PREFIX:PATH=/home/docker/local       -DCMAKE_BUILD_TYPE=Release       -DCMAKE_CXX_COMPILER=mpicxx       -DCMAKE_C_COMPILER=mpicc       -DCMAKE_Fortran_COMPILER=mpifort       -DENABLE_TESTS=ON       -DENABLE_EXAMPLES=ON       -DBUILD_SHARED_LIBS=ON       -DENABLE_PYTHON=OFF       -DENABLE_FORTRAN=ON       -DGENERATE_MODEL=ON       -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi       -DENABLE_CATALYST=ON -DParaView_DIR=/home/docker/local/lib/cmake/paraview-5.8   && make -j4   && make install   && find /home/docker/local/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>/home/docker/local/examples|"   && cp -r /home/docker/installdir/build/damaris/test/ /home/docker/local/examples/test/   && cp  /home/docker/installdir/build/damaris/CTestTestfile.cmake /home/docker/local/examples/   && sed -i "s|/home/docker/installdir/build/damaris/|/home/docker/local/examples/|g" /home/docker/local/examples/test/CTestTestfile.cmake   && rm -fr /home/docker/installdir/    && chown -R docker:docker /home/docker
+#9 sha256:6c1e1e2b8403899efdfcba02bf214b5bbc86f5dbc6109dd45d885f94cac050d6
+#9 CACHED
+
+#10 [builder 3/3] WORKDIR /home/docker/local/examples
+#10 sha256:92618b19d31a5f82d31520349574be90d8436f90d819bac5e6659f452c0e2ad3
+#10 CACHED
+
+#11 exporting to image
+#11 sha256:e8c613e07b0b7ff33893b694f7759a10d42e180f2b4dc349fb57dc6b71dcab00
+#11 exporting layers done
+#11 writing image sha256:744424aa230d72aab2e9220374540103f0841c938b4f208b3b5da8362f03e2c6 done
+#11 naming to registry.gitlab.inria.fr/damaris/damaris:debian-10-pv580-damaris-v1.5.0 done
+#11 DONE 0.0s
+#1 [internal] load build definition from Dockerfile.out
+#1 sha256:a3fa02cd5a2241ea6f8510ed1725a54e4b5a2e0bbee76dc969c5534c4b08ffa7
+#1 transferring dockerfile: 4.09kB done
+#1 DONE 0.0s
+
+#2 [internal] load .dockerignore
+#2 sha256:6c115d037a60f4e542ba0280121b7bbd7a15af3d15df3ee81fe766002a05c794
+#2 transferring context: 2B done
+#2 DONE 0.0s
+
+#3 resolve image config for docker.io/docker/dockerfile:1
+#3 sha256:ac072d521901222eeef550f52282877f196e16b0247844be9ceb1ccc1eac391d
+#3 DONE 0.5s
+
+#4 docker-image://docker.io/docker/dockerfile:1@sha256:42399d4635eddd7a9b8a24be879d2f9a930d0ed040a61324cfdf59ef1357b3b2
+#4 sha256:e7000a2113ce0d8d3e5eb20bd235706bb1408cc39fef67c756c938ffe32b6067
+#4 CACHED
+
+#6 [internal] load .dockerignore
+#6 sha256:0cfb23a14aa89bea6679abddb8d8d374a59103c7e0e6c9a3a07c687104ff3989
+#6 DONE 0.0s
+
+#5 [internal] load build definition from Dockerfile.out
+#5 sha256:8ffe0486bdb56969a61d2c94126d6b9cc378bfd25d6d875a5bf59923c85dc7b0
+#5 DONE 0.0s
+
+#7 [internal] load metadata for registry.gitlab.inria.fr/damaris/damaris-development:debian-10-pv581
+#7 sha256:07f79e8f3b73f5625170609ebcf3902b2181b54ffd8862554a47a994fb4e48e1
+#7 DONE 0.0s
+
+#8 [builder 1/3] FROM registry.gitlab.inria.fr/damaris/damaris-development:debian-10-pv581
+#8 sha256:3c2f1aff29557fad531e99d4007e144a47f47e5e39b1acc89135e375ac345ab6
+#8 DONE 0.0s
+
+#9 [builder 2/3] RUN --mount=type=secret,id=thepassword if [ "damaris" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi   && mkdir -p /home/docker/installdir   && cd /home/docker/installdir   && echo "Damaris Version: v1.5.0"   && git clone  --depth 1 --branch v1.5.0 https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/damaris.git   && mkdir -p /home/docker/installdir/build/damaris   && cd /home/docker/installdir/build/damaris   && if [ "$MPI_BINDIR" != "" ] ; then export MPI_BINDIR=$MPI_BINDIR/;  fi   && cmake ../../damaris -DCMAKE_INSTALL_PREFIX:PATH=/home/docker/local       -DCMAKE_BUILD_TYPE=Release       -DCMAKE_CXX_COMPILER=mpicxx       -DCMAKE_C_COMPILER=mpicc       -DCMAKE_Fortran_COMPILER=mpifort       -DENABLE_TESTS=ON       -DENABLE_EXAMPLES=ON       -DBUILD_SHARED_LIBS=ON       -DENABLE_PYTHON=OFF       -DENABLE_FORTRAN=ON       -DGENERATE_MODEL=ON       -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi       -DENABLE_CATALYST=ON -DParaView_DIR=/home/docker/local/lib/cmake/paraview-5.8   && make -j4   && make install   && find /home/docker/local/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>/home/docker/local/examples|"   && cp -r /home/docker/installdir/build/damaris/test/ /home/docker/local/examples/test/   && cp  /home/docker/installdir/build/damaris/CTestTestfile.cmake /home/docker/local/examples/   && sed -i "s|/home/docker/installdir/build/damaris/|/home/docker/local/examples/|g" /home/docker/local/examples/test/CTestTestfile.cmake   && rm -fr /home/docker/installdir/    && chown -R docker:docker /home/docker
+#9 sha256:c9a35b7a3bd5afb826d0c6ae938035a4c0cb3cd6e2b4027d90e8abdcc193da35
+#9 CACHED
+
+#10 [builder 3/3] WORKDIR /home/docker/local/examples
+#10 sha256:455afea5a1a3bc220ac62d16d48538bc443dfa30dce8710901fdba8091136612
+#10 CACHED
+
+#11 exporting to image
+#11 sha256:e8c613e07b0b7ff33893b694f7759a10d42e180f2b4dc349fb57dc6b71dcab00
+#11 exporting layers done
+#11 writing image sha256:0f2476cfc6bfb5f7ed63df878fab154a8a73def111164c25ec5f308c87a96689 done
+#11 naming to registry.gitlab.inria.fr/damaris/damaris:debian-10-pv581-damaris-v1.5.0 done
+#11 DONE 0.0s
+#1 [internal] load build definition from Dockerfile.out
+#1 sha256:c0106083e6543c06ec503cc25d3198e25e43cf73110b365d374a8a6bc48d27c4
+#1 transferring dockerfile: 4.09kB done
+#1 DONE 0.0s
+
+#2 [internal] load .dockerignore
+#2 sha256:a3c0c5ba9eecfabe9646443ed31733f00c131e428be632f46a4e48fb36472a60
+#2 transferring context: 2B done
+#2 DONE 0.0s
+
+#3 resolve image config for docker.io/docker/dockerfile:1
+#3 sha256:ac072d521901222eeef550f52282877f196e16b0247844be9ceb1ccc1eac391d
+#3 DONE 0.1s
+
+#4 docker-image://docker.io/docker/dockerfile:1@sha256:42399d4635eddd7a9b8a24be879d2f9a930d0ed040a61324cfdf59ef1357b3b2
+#4 sha256:e7000a2113ce0d8d3e5eb20bd235706bb1408cc39fef67c756c938ffe32b6067
+#4 CACHED
+
+#6 [internal] load .dockerignore
+#6 sha256:9156357b7aea4902757b25cb53284c5c763200da88e669fcbd6db256f8aaf4f0
+#6 DONE 0.0s
+
+#5 [internal] load build definition from Dockerfile.out
+#5 sha256:034be9c1e0b9346bc698aebf6f5e583167480e9ae9e641268660e156e2a11d2b
+#5 DONE 0.0s
+
+#7 [internal] load metadata for registry.gitlab.inria.fr/damaris/damaris-development:debian-10-pv590
+#7 sha256:4d2c64d2af8d20be0e5e4e15de583c15cc287546f27d7ea27ee1566d4fb1701e
+#7 DONE 0.0s
+
+#8 [builder 1/3] FROM registry.gitlab.inria.fr/damaris/damaris-development:debian-10-pv590
+#8 sha256:95ce84fb0a8cc477941aa5a52d61d47409aaeab2c68fb7922a1e9bdf05cd3860
+#8 DONE 0.0s
+
+#9 [builder 2/3] RUN --mount=type=secret,id=thepassword if [ "damaris" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi   && mkdir -p /home/docker/installdir   && cd /home/docker/installdir   && echo "Damaris Version: v1.5.0"   && git clone  --depth 1 --branch v1.5.0 https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/damaris.git   && mkdir -p /home/docker/installdir/build/damaris   && cd /home/docker/installdir/build/damaris   && if [ "$MPI_BINDIR" != "" ] ; then export MPI_BINDIR=$MPI_BINDIR/;  fi   && cmake ../../damaris -DCMAKE_INSTALL_PREFIX:PATH=/home/docker/local       -DCMAKE_BUILD_TYPE=Release       -DCMAKE_CXX_COMPILER=mpicxx       -DCMAKE_C_COMPILER=mpicc       -DCMAKE_Fortran_COMPILER=mpifort       -DENABLE_TESTS=ON       -DENABLE_EXAMPLES=ON       -DBUILD_SHARED_LIBS=ON       -DENABLE_PYTHON=OFF       -DENABLE_FORTRAN=ON       -DGENERATE_MODEL=ON       -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi       -DENABLE_CATALYST=ON -DParaView_DIR=/home/docker/local/lib/cmake/paraview-5.9   && make -j4   && make install   && find /home/docker/local/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>/home/docker/local/examples|"   && cp -r /home/docker/installdir/build/damaris/test/ /home/docker/local/examples/test/   && cp  /home/docker/installdir/build/damaris/CTestTestfile.cmake /home/docker/local/examples/   && sed -i "s|/home/docker/installdir/build/damaris/|/home/docker/local/examples/|g" /home/docker/local/examples/test/CTestTestfile.cmake   && rm -fr /home/docker/installdir/    && chown -R docker:docker /home/docker
+#9 sha256:a1318abd6310ceecb7aad8b5ef7136a54dcf006adf30c6af57293aa2b33cd183
+#9 CACHED
+
+#10 [builder 3/3] WORKDIR /home/docker/local/examples
+#10 sha256:eb51a59c576c7324cd092cc9b606f2552081859b0cbaae161f4f85f9e9c10b61
+#10 CACHED
+
+#11 exporting to image
+#11 sha256:e8c613e07b0b7ff33893b694f7759a10d42e180f2b4dc349fb57dc6b71dcab00
+#11 exporting layers done
+#11 writing image sha256:e9344641beaf1cd7efb3805391b01bf9d8b0dc361939c8ca39b7a150224f9b14 done
+#11 naming to registry.gitlab.inria.fr/damaris/damaris:debian-10-pv590-damaris-v1.5.0 done
+#11 DONE 0.0s
+#1 [internal] load build definition from Dockerfile.out
+#1 sha256:1aa309ee9e5524f96deb3b73b9d610f18f72d47c6d7cf833bbc4128a229fa4a0
+#1 transferring dockerfile: 4.09kB done
+#1 DONE 0.0s
+
+#2 [internal] load .dockerignore
+#2 sha256:c9936a85b9b71b668dfd539dfd3cfc97b4505b84f3850865227037a70e95d344
+#2 transferring context: 2B done
+#2 DONE 0.0s
+
+#3 resolve image config for docker.io/docker/dockerfile:1
+#3 sha256:ac072d521901222eeef550f52282877f196e16b0247844be9ceb1ccc1eac391d
+#3 DONE 0.2s
+
+#4 docker-image://docker.io/docker/dockerfile:1@sha256:42399d4635eddd7a9b8a24be879d2f9a930d0ed040a61324cfdf59ef1357b3b2
+#4 sha256:e7000a2113ce0d8d3e5eb20bd235706bb1408cc39fef67c756c938ffe32b6067
+#4 CACHED
+
+#5 [internal] load .dockerignore
+#5 sha256:0474bae9a084915d3f88cd01d77ca5127c0f2725c852e804b9fc7e5fa6d0257a
+#5 DONE 0.0s
+
+#6 [internal] load build definition from Dockerfile.out
+#6 sha256:348c6e622b868d8a3c63a35460d0f9f284bd71c63dc2c13c989c8648d7fba8e9
+#6 DONE 0.0s
+
+#7 [internal] load metadata for registry.gitlab.inria.fr/damaris/damaris-development:debian-10-pv591
+#7 sha256:17e8a8dbaed5727ef9494fb373c667c8ce30c93517979b8b76c3c5fe91e71371
+#7 DONE 0.0s
+
+#8 [builder 1/3] FROM registry.gitlab.inria.fr/damaris/damaris-development:debian-10-pv591
+#8 sha256:229e041a06cb543343e2708118cdf186cdad378a81175da6c8497f51ee192a9b
+#8 DONE 0.0s
+
+#9 [builder 2/3] RUN --mount=type=secret,id=thepassword if [ "damaris" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi   && mkdir -p /home/docker/installdir   && cd /home/docker/installdir   && echo "Damaris Version: v1.5.0"   && git clone  --depth 1 --branch v1.5.0 https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/damaris.git   && mkdir -p /home/docker/installdir/build/damaris   && cd /home/docker/installdir/build/damaris   && if [ "$MPI_BINDIR" != "" ] ; then export MPI_BINDIR=$MPI_BINDIR/;  fi   && cmake ../../damaris -DCMAKE_INSTALL_PREFIX:PATH=/home/docker/local       -DCMAKE_BUILD_TYPE=Release       -DCMAKE_CXX_COMPILER=mpicxx       -DCMAKE_C_COMPILER=mpicc       -DCMAKE_Fortran_COMPILER=mpifort       -DENABLE_TESTS=ON       -DENABLE_EXAMPLES=ON       -DBUILD_SHARED_LIBS=ON       -DENABLE_PYTHON=OFF       -DENABLE_FORTRAN=ON       -DGENERATE_MODEL=ON       -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi       -DENABLE_CATALYST=ON -DParaView_DIR=/home/docker/local/lib/cmake/paraview-5.9   && make -j4   && make install   && find /home/docker/local/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>/home/docker/local/examples|"   && cp -r /home/docker/installdir/build/damaris/test/ /home/docker/local/examples/test/   && cp  /home/docker/installdir/build/damaris/CTestTestfile.cmake /home/docker/local/examples/   && sed -i "s|/home/docker/installdir/build/damaris/|/home/docker/local/examples/|g" /home/docker/local/examples/test/CTestTestfile.cmake   && rm -fr /home/docker/installdir/    && chown -R docker:docker /home/docker
+#9 sha256:fbaaf93a7a7f8bee27b6a867ed5dc242749440b93800ecc99daf863015ee2e5a
+#9 CACHED
+
+#10 [builder 3/3] WORKDIR /home/docker/local/examples
+#10 sha256:17cc8c53d498e8045599e3516f0ef7252c3c906fbc6c5e98778e4da99f9e6072
+#10 CACHED
+
+#11 exporting to image
+#11 sha256:e8c613e07b0b7ff33893b694f7759a10d42e180f2b4dc349fb57dc6b71dcab00
+#11 exporting layers done
+#11 writing image sha256:c8920711fa8f2940cbcf0a1361e4902f4fe37a56b5b5aed004820659df292176 done
+#11 naming to registry.gitlab.inria.fr/damaris/damaris:debian-10-pv591-damaris-v1.5.0 done
+#11 DONE 0.0s
+#1 [internal] load build definition from Dockerfile.out
+#1 sha256:194e99666e0031932c3326c1b31af966ea58185009782c40edf20ad7d9bab7ab
+#1 transferring dockerfile: 4.09kB done
+#1 DONE 0.0s
+
+#2 [internal] load .dockerignore
+#2 sha256:92aa70039eb93e5b26f8eb3ee4a137f7c6de625662e86d25da00c48241b4fde1
+#2 transferring context: 2B done
+#2 DONE 0.0s
+
+#3 resolve image config for docker.io/docker/dockerfile:1
+#3 sha256:ac072d521901222eeef550f52282877f196e16b0247844be9ceb1ccc1eac391d
+#3 DONE 0.5s
+
+#4 docker-image://docker.io/docker/dockerfile:1@sha256:42399d4635eddd7a9b8a24be879d2f9a930d0ed040a61324cfdf59ef1357b3b2
+#4 sha256:e7000a2113ce0d8d3e5eb20bd235706bb1408cc39fef67c756c938ffe32b6067
+#4 CACHED
+
+#6 [internal] load build definition from Dockerfile.out
+#6 sha256:7932882bd57336e0491730d79253a44df8e48391b414a2789597676514201cb4
+#6 DONE 0.0s
+
+#5 [internal] load .dockerignore
+#5 sha256:01c5e21eb406f098a4a68e3a905882657c7dce1044495557ebefcea28fc6b41b
+#5 DONE 0.0s
+
+#7 [internal] load metadata for registry.gitlab.inria.fr/damaris/damaris-development:debian-11-pv590
+#7 sha256:df38c1a8e619b348427c99bd9519b6a531827423515fd3b1d28af964daa0fd6f
+#7 DONE 0.0s
+
+#8 [builder 1/3] FROM registry.gitlab.inria.fr/damaris/damaris-development:debian-11-pv590
+#8 sha256:1e65bdf32e7c84ad66d8aed7c71b4aa58c270b0764ad1d1bf8704ff4bc92710c
+#8 DONE 0.0s
+
+#9 [builder 2/3] RUN --mount=type=secret,id=thepassword if [ "damaris" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi   && mkdir -p /home/docker/installdir   && cd /home/docker/installdir   && echo "Damaris Version: v1.5.0"   && git clone  --depth 1 --branch v1.5.0 https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/damaris.git   && mkdir -p /home/docker/installdir/build/damaris   && cd /home/docker/installdir/build/damaris   && if [ "$MPI_BINDIR" != "" ] ; then export MPI_BINDIR=$MPI_BINDIR/;  fi   && cmake ../../damaris -DCMAKE_INSTALL_PREFIX:PATH=/home/docker/local       -DCMAKE_BUILD_TYPE=Release       -DCMAKE_CXX_COMPILER=mpicxx       -DCMAKE_C_COMPILER=mpicc       -DCMAKE_Fortran_COMPILER=mpifort       -DENABLE_TESTS=ON       -DENABLE_EXAMPLES=ON       -DBUILD_SHARED_LIBS=ON       -DENABLE_PYTHON=OFF       -DENABLE_FORTRAN=ON       -DGENERATE_MODEL=ON       -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi       -DENABLE_CATALYST=ON -DParaView_DIR=/home/docker/local/lib/cmake/paraview-5.9   && make -j4   && make install   && find /home/docker/local/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>/home/docker/local/examples|"   && cp -r /home/docker/installdir/build/damaris/test/ /home/docker/local/examples/test/   && cp  /home/docker/installdir/build/damaris/CTestTestfile.cmake /home/docker/local/examples/   && sed -i "s|/home/docker/installdir/build/damaris/|/home/docker/local/examples/|g" /home/docker/local/examples/test/CTestTestfile.cmake   && rm -fr /home/docker/installdir/    && chown -R docker:docker /home/docker
+#9 sha256:1079c349a2976b0968cf611707c775d5ff507b0d4adda38a9155221c4a18d513
+#9 CACHED
+
+#10 [builder 3/3] WORKDIR /home/docker/local/examples
+#10 sha256:ed29825417aa74e5168aae9106c0a634ed485f75a28aaec16d21b9c8d7b37407
+#10 CACHED
+
+#11 exporting to image
+#11 sha256:e8c613e07b0b7ff33893b694f7759a10d42e180f2b4dc349fb57dc6b71dcab00
+#11 exporting layers done
+#11 writing image sha256:b779425b642cf999054128ca0cb4ac9b6a33dd98344fa9d955a357fa9d6ab0e0 done
+#11 naming to registry.gitlab.inria.fr/damaris/damaris:debian-11-pv590-damaris-v1.5.0 done
+#11 DONE 0.0s
+#1 [internal] load build definition from Dockerfile.out
+#1 sha256:3467c939a8dc1030e400daa0c4ee412235aecb820194882a1e7f878423347c8a
+#1 transferring dockerfile: 4.09kB done
+#1 DONE 0.0s
+
+#2 [internal] load .dockerignore
+#2 sha256:d8874cae5bcf6b69095c802550feeca9d6b8d31f9bc6ae2332f93e89ce10c480
+#2 transferring context: 2B done
+#2 DONE 0.0s
+
+#3 resolve image config for docker.io/docker/dockerfile:1
+#3 sha256:ac072d521901222eeef550f52282877f196e16b0247844be9ceb1ccc1eac391d
+#3 DONE 0.5s
+
+#4 docker-image://docker.io/docker/dockerfile:1@sha256:42399d4635eddd7a9b8a24be879d2f9a930d0ed040a61324cfdf59ef1357b3b2
+#4 sha256:e7000a2113ce0d8d3e5eb20bd235706bb1408cc39fef67c756c938ffe32b6067
+#4 CACHED
+
+#5 [internal] load .dockerignore
+#5 sha256:175f7dfe2d23b28e1b21f302ef6e488bf2918b4e92bd9cc2fa99edd5923147dc
+#5 DONE 0.0s
+
+#6 [internal] load build definition from Dockerfile.out
+#6 sha256:b32ecc4d8b0a79641b53f9f2b0ffaa15deef8eee7997206cc9a003d1e812e794
+#6 DONE 0.0s
+
+#7 [internal] load metadata for registry.gitlab.inria.fr/damaris/damaris-development:debian-11-pv591
+#7 sha256:5d4f8ea5dcdaea349a767bf0ca69604cf95bf3450dc52a15e97c1d4044bcd8ae
+#7 DONE 0.0s
+
+#8 [builder 1/3] FROM registry.gitlab.inria.fr/damaris/damaris-development:debian-11-pv591
+#8 sha256:16acc679b391ac7034ead3e185bf81a63116938a26bafff21d81d31270e667c4
+#8 DONE 0.0s
+
+#9 [builder 2/3] RUN --mount=type=secret,id=thepassword if [ "damaris" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi   && mkdir -p /home/docker/installdir   && cd /home/docker/installdir   && echo "Damaris Version: v1.5.0"   && git clone  --depth 1 --branch v1.5.0 https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/damaris.git   && mkdir -p /home/docker/installdir/build/damaris   && cd /home/docker/installdir/build/damaris   && if [ "$MPI_BINDIR" != "" ] ; then export MPI_BINDIR=$MPI_BINDIR/;  fi   && cmake ../../damaris -DCMAKE_INSTALL_PREFIX:PATH=/home/docker/local       -DCMAKE_BUILD_TYPE=Release       -DCMAKE_CXX_COMPILER=mpicxx       -DCMAKE_C_COMPILER=mpicc       -DCMAKE_Fortran_COMPILER=mpifort       -DENABLE_TESTS=ON       -DENABLE_EXAMPLES=ON       -DBUILD_SHARED_LIBS=ON       -DENABLE_PYTHON=OFF       -DENABLE_FORTRAN=ON       -DGENERATE_MODEL=ON       -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi       -DENABLE_CATALYST=ON -DParaView_DIR=/home/docker/local/lib/cmake/paraview-5.9   && make -j4   && make install   && find /home/docker/local/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>/home/docker/local/examples|"   && cp -r /home/docker/installdir/build/damaris/test/ /home/docker/local/examples/test/   && cp  /home/docker/installdir/build/damaris/CTestTestfile.cmake /home/docker/local/examples/   && sed -i "s|/home/docker/installdir/build/damaris/|/home/docker/local/examples/|g" /home/docker/local/examples/test/CTestTestfile.cmake   && rm -fr /home/docker/installdir/    && chown -R docker:docker /home/docker
+#9 sha256:98a6896f2c0f388c83e8dd070e707d4ea3be8e034b5a8070a499e974fec724c1
+#9 CACHED
+
+#10 [builder 3/3] WORKDIR /home/docker/local/examples
+#10 sha256:d6576e5ba7c5af650014185b792a765f5df2ba2b49e4175e54acbfe36f922f27
+#10 CACHED
+
+#11 exporting to image
+#11 sha256:e8c613e07b0b7ff33893b694f7759a10d42e180f2b4dc349fb57dc6b71dcab00
+#11 exporting layers done
+#11 writing image sha256:303f79ab2931a957f9aa6b120643e9c0cd76dfd9b415e6f4de0d695b60ba1647 done
+#11 naming to registry.gitlab.inria.fr/damaris/damaris:debian-11-pv591-damaris-v1.5.0 done
+#11 DONE 0.0s
+#1 [internal] load build definition from Dockerfile.out
+#1 sha256:738637c88b803a9ebee4725b5ace590228f88c350dbbb0a9f9a82e7d24849832
+#1 transferring dockerfile: 4.09kB done
+#1 DONE 0.0s
+
+#2 [internal] load .dockerignore
+#2 sha256:fc7f5e7f93343176e6390d37a0b6b23cc31435d424ceced033e7c9b46aa64533
+#2 transferring context: 2B done
+#2 DONE 0.0s
+
+#3 resolve image config for docker.io/docker/dockerfile:1
+#3 sha256:ac072d521901222eeef550f52282877f196e16b0247844be9ceb1ccc1eac391d
+#3 DONE 0.2s
+
+#4 docker-image://docker.io/docker/dockerfile:1@sha256:42399d4635eddd7a9b8a24be879d2f9a930d0ed040a61324cfdf59ef1357b3b2
+#4 sha256:e7000a2113ce0d8d3e5eb20bd235706bb1408cc39fef67c756c938ffe32b6067
+#4 CACHED
+
+#6 [internal] load build definition from Dockerfile.out
+#6 sha256:ed26cb3b2dbf83c39353ee5a82f0acebd9df877d46f36efdf83d7005e6c3234f
+#6 DONE 0.0s
+
+#5 [internal] load .dockerignore
+#5 sha256:839689817c3a138fada46bd565a5e4c772f9c81b5030efb03761361d39d8db2f
+#5 DONE 0.0s
+
+#7 [internal] load metadata for registry.gitlab.inria.fr/damaris/damaris-development:debian-11-pv5100
+#7 sha256:932c9454144a4d4f9dd8f91447e03f8ce7b56780a531533666ddf88fd9d5e2a1
+#7 DONE 0.0s
+
+#8 [builder 1/3] FROM registry.gitlab.inria.fr/damaris/damaris-development:debian-11-pv5100
+#8 sha256:ad7e5e791477482ff2369ea482525890eaf766c729d1c51b3819fd21896fe485
+#8 CACHED
+
+#9 [builder 2/3] RUN --mount=type=secret,id=thepassword if [ "damaris" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi   && mkdir -p /home/docker/installdir   && cd /home/docker/installdir   && echo "Damaris Version: v1.5.0"   && git clone  --depth 1 --branch v1.5.0 https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/damaris.git   && mkdir -p /home/docker/installdir/build/damaris   && cd /home/docker/installdir/build/damaris   && if [ "$MPI_BINDIR" != "" ] ; then export MPI_BINDIR=$MPI_BINDIR/;  fi   && cmake ../../damaris -DCMAKE_INSTALL_PREFIX:PATH=/home/docker/local       -DCMAKE_BUILD_TYPE=Release       -DCMAKE_CXX_COMPILER=mpicxx       -DCMAKE_C_COMPILER=mpicc       -DCMAKE_Fortran_COMPILER=mpifort       -DENABLE_TESTS=ON       -DENABLE_EXAMPLES=ON       -DBUILD_SHARED_LIBS=ON       -DENABLE_PYTHON=OFF       -DENABLE_FORTRAN=ON       -DGENERATE_MODEL=ON       -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi       -DENABLE_CATALYST=ON -DParaView_DIR=/home/docker/local/lib/cmake/paraview-5.10   && make -j4   && make install   && find /home/docker/local/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>/home/docker/local/examples|"   && cp -r /home/docker/installdir/build/damaris/test/ /home/docker/local/examples/test/   && cp  /home/docker/installdir/build/damaris/CTestTestfile.cmake /home/docker/local/examples/   && sed -i "s|/home/docker/installdir/build/damaris/|/home/docker/local/examples/|g" /home/docker/local/examples/test/CTestTestfile.cmake   && rm -fr /home/docker/installdir/    && chown -R docker:docker /home/docker
+#9 sha256:8270e841f67e693c121cacf74796c57465007d9208b317a1a58ddbf3e4faea24
+#9 1.202 Damaris Version: v1.5.0
+#9 1.206 Cloning into 'damaris'...
+#9 1.791 Note: switching to '68206a696ad430aa8426ca370501aa71914fbc87'.
+#9 1.791 
+#9 1.791 You are in 'detached HEAD' state. You can look around, make experimental
+#9 1.791 changes and commit them, and you can discard any commits you make in this
+#9 1.791 state without impacting any branches by switching back to a branch.
+#9 1.791 
+#9 1.791 If you want to create a new branch to retain commits you create, you may
+#9 1.791 do so (now or later) by using -c with the switch command. Example:
+#9 1.791 
+#9 1.791   git switch -c <new-branch-name>
+#9 1.791 
+#9 1.791 Or undo this operation with:
+#9 1.791 
+#9 1.791   git switch -
+#9 1.791 
+#9 1.791 Turn off this advice by setting config variable advice.detachedHead to false
+#9 1.791 
+#9 1.984 -- The C compiler identification is GNU 10.2.1
+#9 2.051 -- The CXX compiler identification is GNU 10.2.1
+#9 2.066 -- Detecting C compiler ABI info
+#9 2.131 -- Detecting C compiler ABI info - done
+#9 2.141 -- Check for working C compiler: /usr/bin/mpicc - skipped
+#9 2.141 -- Detecting C compile features
+#9 2.142 -- Detecting C compile features - done
+#9 2.146 -- Detecting CXX compiler ABI info
+#9 2.223 -- Detecting CXX compiler ABI info - done
+#9 2.233 -- Check for working CXX compiler: /usr/bin/mpicxx - skipped
+#9 2.234 -- Detecting CXX compile features
+#9 2.234 -- Detecting CXX compile features - done
+#9 2.315 -- The Fortran compiler identification is GNU 10.2.1
+#9 2.329 -- Detecting Fortran compiler ABI info
+#9 2.416 -- Detecting Fortran compiler ABI info - done
+#9 2.428 -- Check for working Fortran compiler: /usr/bin/mpifort - skipped
+#9 2.428 -- Checking whether /usr/bin/mpifort supports Fortran 90
+#9 2.520 -- Checking whether /usr/bin/mpifort supports Fortran 90 - yes
+#9 2.523 -- Detecting Fortran/C Interface
+#9 3.724 -- Detecting Fortran/C Interface - Found GLOBAL and MODULE mangling
+#9 3.726 -- Looking for pthread.h
+#9 3.799 -- Looking for pthread.h - found
+#9 3.799 -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+#9 3.870 -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+#9 3.871 -- Found Threads: TRUE  
+#9 3.897 -- Found Boost: /usr/lib/x86_64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found suitable version "1.74.0", minimum required is "1.65.0") found components: thread log log_setup filesystem system date_time 
+#9 3.899 CMake Warning at CMakeLists.txt:95 (message):
+#9 3.899   WARNING Boost BOOST_BIND_GLOBAL_PLACEHOLDERS defined to remove warnings -
+#9 3.899   perhaps check for issue?
+#9 3.899 
+#9 3.899 
+#9 3.900 -- Found XSD: /usr/bin/xsd  
+#9 3.907 -- Found XercesC: /usr/lib/x86_64-linux-gnu/libxerces-c.so (found version "3.2.3") 
+#9 3.935 -- Found HDF5: /usr/lib/x86_64-linux-gnu/hdf5/openmpi/lib/libhdf5.so (found version "1.10.6") found components: C 
+#9 4.002 CMake Error at /home/docker/local/lib/cmake/paraview-5.10/paraview-config.cmake:163 (list):
+#9 4.002   list sub-command REMOVE_ITEM requires two or more arguments.
+#9 4.002 Call Stack (most recent call first):
+#9 4.002   CMakeLists.txt:149 (find_package)
+#9 4.002 
+#9 4.002 
+#9 4.100 -- Found MPI_C: /usr/bin/mpicc (found version "3.1") 
+#9 4.100 -- Found MPI: TRUE (found version "3.1") found components: C 
+#9 4.267 -- Found Python3: /usr/bin/python3.9 (found suitable version "3.9.2", minimum required is "3.9") found components: Interpreter Development.Module Development.Embed 
+#9 4.287 -- ParaView >= 5.7 found
+#9 4.358 -- ParaView_LIBRARIES: ParaView::PythonCatalyst
+#9 4.358 -- VTK_LIBRARIES: VTK::PythonInterpreter;VTK::ParallelCore;VTK::WrappingPythonCore
+#9 4.363 -- ParaView >= 5.7 setting pkg-config libraries
+#9 4.373 -- Configuring incomplete, errors occurred!
+#9 4.373 See also "/home/docker/installdir/build/damaris/CMakeFiles/CMakeOutput.log".
+#9 ERROR: executor failed running [/bin/bash -c if [ "$repo" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi   && mkdir -p ${INSTALLTMDIR}   && cd ${INSTALLTMDIR}   && echo "Damaris Version: $DAMARIS_VERSION"   && git clone  --depth 1 --branch $DAMARIS_VERSION https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/$repo.git   && mkdir -p ${INSTALLTMDIR}/build/$repo   && cd ${INSTALLTMDIR}/build/$repo   && if [ "$MPI_BINDIR" != "" ] ; then export MPI_BINDIR=$MPI_BINDIR/;  fi   && cmake ../../$repo -DCMAKE_INSTALL_PREFIX:PATH=$INSTALL_PREFIX       -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}       -DCMAKE_CXX_COMPILER=mpicxx       -DCMAKE_C_COMPILER=mpicc       -DCMAKE_Fortran_COMPILER=mpifort       -DENABLE_TESTS=ON       -DENABLE_EXAMPLES=$EXAMPLES_ON_OFF       -DBUILD_SHARED_LIBS=$SHLIBS_ON_OFF       -DENABLE_PYTHON=OFF       -DENABLE_FORTRAN=ON       -DGENERATE_MODEL=$REGEN_ON_OFF       -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi       -DENABLE_CATALYST=ON -DParaView_DIR=${INSTALL_PREFIX}/lib/cmake/paraview-5.10   && make -j${NUMCORES}   && make install   && find ${INSTALL_PREFIX}/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples|"   && cp -r ${INSTALLTMDIR}/build/$repo/test/ ${INSTALL_PREFIX}/examples/test/   && cp  ${INSTALLTMDIR}/build/$repo/CTestTestfile.cmake ${INSTALL_PREFIX}/examples/   && sed -i "s|${INSTALLTMDIR}/build/$repo/|${INSTALL_PREFIX}/examples/|g" ${INSTALL_PREFIX}/examples/test/CTestTestfile.cmake   && rm -fr ${INSTALLTMDIR}/    && chown -R docker:docker /home/docker]: exit code: 1
+------
+ > [builder 2/3] RUN --mount=type=secret,id=thepassword if [ "damaris" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi   && mkdir -p /home/docker/installdir   && cd /home/docker/installdir   && echo "Damaris Version: v1.5.0"   && git clone  --depth 1 --branch v1.5.0 https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/damaris.git   && mkdir -p /home/docker/installdir/build/damaris   && cd /home/docker/installdir/build/damaris   && if [ "$MPI_BINDIR" != "" ] ; then export MPI_BINDIR=$MPI_BINDIR/;  fi   && cmake ../../damaris -DCMAKE_INSTALL_PREFIX:PATH=/home/docker/local       -DCMAKE_BUILD_TYPE=Release       -DCMAKE_CXX_COMPILER=mpicxx       -DCMAKE_C_COMPILER=mpicc       -DCMAKE_Fortran_COMPILER=mpifort       -DENABLE_TESTS=ON       -DENABLE_EXAMPLES=ON       -DBUILD_SHARED_LIBS=ON       -DENABLE_PYTHON=OFF       -DENABLE_FORTRAN=ON       -DGENERATE_MODEL=ON       -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi       -DENABLE_CATALYST=ON -DParaView_DIR=/home/docker/local/lib/cmake/paraview-5.10   && make -j4   && make install   && find /home/docker/local/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>/home/docker/local/examples|"   && cp -r /home/docker/installdir/build/damaris/test/ /home/docker/local/examples/test/   && cp  /home/docker/installdir/build/damaris/CTestTestfile.cmake /home/docker/local/examples/   && sed -i "s|/home/docker/installdir/build/damaris/|/home/docker/local/examples/|g" /home/docker/local/examples/test/CTestTestfile.cmake   && rm -fr /home/docker/installdir/    && chown -R docker:docker /home/docker:
+------
+executor failed running [/bin/bash -c if [ "$repo" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi   && mkdir -p ${INSTALLTMDIR}   && cd ${INSTALLTMDIR}   && echo "Damaris Version: $DAMARIS_VERSION"   && git clone  --depth 1 --branch $DAMARIS_VERSION https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/$repo.git   && mkdir -p ${INSTALLTMDIR}/build/$repo   && cd ${INSTALLTMDIR}/build/$repo   && if [ "$MPI_BINDIR" != "" ] ; then export MPI_BINDIR=$MPI_BINDIR/;  fi   && cmake ../../$repo -DCMAKE_INSTALL_PREFIX:PATH=$INSTALL_PREFIX       -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}       -DCMAKE_CXX_COMPILER=mpicxx       -DCMAKE_C_COMPILER=mpicc       -DCMAKE_Fortran_COMPILER=mpifort       -DENABLE_TESTS=ON       -DENABLE_EXAMPLES=$EXAMPLES_ON_OFF       -DBUILD_SHARED_LIBS=$SHLIBS_ON_OFF       -DENABLE_PYTHON=OFF       -DENABLE_FORTRAN=ON       -DGENERATE_MODEL=$REGEN_ON_OFF       -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi       -DENABLE_CATALYST=ON -DParaView_DIR=${INSTALL_PREFIX}/lib/cmake/paraview-5.10   && make -j${NUMCORES}   && make install   && find ${INSTALL_PREFIX}/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples|"   && cp -r ${INSTALLTMDIR}/build/$repo/test/ ${INSTALL_PREFIX}/examples/test/   && cp  ${INSTALLTMDIR}/build/$repo/CTestTestfile.cmake ${INSTALL_PREFIX}/examples/   && sed -i "s|${INSTALLTMDIR}/build/$repo/|${INSTALL_PREFIX}/examples/|g" ${INSTALL_PREFIX}/examples/test/CTestTestfile.cmake   && rm -fr ${INSTALLTMDIR}/    && chown -R docker:docker /home/docker]: exit code: 1
+#1 [internal] load build definition from Dockerfile.out
+#1 sha256:d90a1f253d012452d511a75022ab3b541eced17663e46d9a486c6ef102b8e225
+#1 transferring dockerfile: 4.18kB done
+#1 DONE 0.0s
+
+#2 [internal] load .dockerignore
+#2 sha256:b68d3a635d0397b877bbd7b1f3e813dccd60abba3ee866efc8724aaa868ac5ea
+#2 transferring context: 2B done
+#2 DONE 0.0s
+
+#3 resolve image config for docker.io/docker/dockerfile:1
+#3 sha256:ac072d521901222eeef550f52282877f196e16b0247844be9ceb1ccc1eac391d
+#3 DONE 0.4s
+
+#4 docker-image://docker.io/docker/dockerfile:1@sha256:42399d4635eddd7a9b8a24be879d2f9a930d0ed040a61324cfdf59ef1357b3b2
+#4 sha256:e7000a2113ce0d8d3e5eb20bd235706bb1408cc39fef67c756c938ffe32b6067
+#4 CACHED
+
+#6 [internal] load .dockerignore
+#6 sha256:51a8f951e0d09963b9536d8657f4e919514a25247e49f17925597e60746c69a3
+#6 DONE 0.0s
+
+#5 [internal] load build definition from Dockerfile.out
+#5 sha256:8f4ab6a23647b08c4e9ef527cacdc4aa9cb6d02d5663b4c0d0871732cf04319a
+#5 DONE 0.0s
+
+#7 [internal] load metadata for registry.gitlab.inria.fr/damaris/damaris-development:quay.io-centos-centos-stream8-pv580
+#7 sha256:00424e7b5fa0879f66e24c8a40fcb9244a469a23fcb0839f18cd3c61b0b9191d
+#7 DONE 0.0s
+
+#8 [builder 1/3] FROM registry.gitlab.inria.fr/damaris/damaris-development:quay.io-centos-centos-stream8-pv580
+#8 sha256:24195babd2db17733b30aad1992a64e773687f0c80f6cd913815c3b90d612d5a
+#8 DONE 0.0s
+
+#9 [builder 2/3] RUN --mount=type=secret,id=thepassword if [ "damaris" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi   && mkdir -p /home/docker/installdir   && cd /home/docker/installdir   && echo "Damaris Version: v1.5.0"   && git clone  --depth 1 --branch v1.5.0 https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/damaris.git   && mkdir -p /home/docker/installdir/build/damaris   && cd /home/docker/installdir/build/damaris   && if [ "/usr/lib64/openmpi/bin" != "" ] ; then export MPI_BINDIR=/usr/lib64/openmpi/bin/;  fi   && cmake ../../damaris -DCMAKE_INSTALL_PREFIX:PATH=/home/docker/local       -DCMAKE_BUILD_TYPE=Release       -DCMAKE_CXX_COMPILER=/usr/lib64/openmpi/bin/mpicxx       -DCMAKE_C_COMPILER=/usr/lib64/openmpi/bin/mpicc       -DCMAKE_Fortran_COMPILER=/usr/lib64/openmpi/bin/mpifort       -DENABLE_TESTS=ON       -DENABLE_EXAMPLES=ON       -DBUILD_SHARED_LIBS=ON       -DENABLE_PYTHON=OFF       -DENABLE_FORTRAN=ON       -DGENERATE_MODEL=ON       -DENABLE_HDF5=ON        -DENABLE_CATALYST=ON -DParaView_DIR=/home/docker/local/lib64/cmake/paraview-5.8   && make -j4   && make install   && find /home/docker/local/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>/home/docker/local/examples|"   && cp -r /home/docker/installdir/build/damaris/test/ /home/docker/local/examples/test/   && cp  /home/docker/installdir/build/damaris/CTestTestfile.cmake /home/docker/local/examples/   && sed -i "s|/home/docker/installdir/build/damaris/|/home/docker/local/examples/|g" /home/docker/local/examples/test/CTestTestfile.cmake   && rm -fr /home/docker/installdir/    && chown -R docker:docker /home/docker
+#9 sha256:c295a84dbce4d7bcede43090049fd28490d390a257100bc25581ba621fcbeb03
+#9 CACHED
+
+#10 [builder 3/3] WORKDIR /home/docker/local/examples
+#10 sha256:3388af918d06d4a771beb2e4cc3e6888d7841d6b742b0cd118761f29d346f793
+#10 CACHED
+
+#11 exporting to image
+#11 sha256:e8c613e07b0b7ff33893b694f7759a10d42e180f2b4dc349fb57dc6b71dcab00
+#11 exporting layers done
+#11 writing image sha256:c5faaded16ba8e499414759372832989566537e8ac0f07c9f04bda1e1f7ef34e done
+#11 naming to registry.gitlab.inria.fr/damaris/damaris:quay.io-centos-centos-stream8-pv580-damaris-v1.5.0 done
+#11 DONE 0.0s
+#1 [internal] load build definition from Dockerfile.out
+#1 sha256:3a3efc66803087585d9b296618e784b2fd250d497879059896a97ed86a3021b0
+#1 transferring dockerfile: 4.18kB done
+#1 DONE 0.0s
+
+#2 [internal] load .dockerignore
+#2 sha256:3f9bd1242d4109b7080aa87ff76e3a18467561bfcb7e1942910f1dacbb05b03e
+#2 transferring context: 2B done
+#2 DONE 0.0s
+
+#3 resolve image config for docker.io/docker/dockerfile:1
+#3 sha256:ac072d521901222eeef550f52282877f196e16b0247844be9ceb1ccc1eac391d
+#3 DONE 0.5s
+
+#4 docker-image://docker.io/docker/dockerfile:1@sha256:42399d4635eddd7a9b8a24be879d2f9a930d0ed040a61324cfdf59ef1357b3b2
+#4 sha256:e7000a2113ce0d8d3e5eb20bd235706bb1408cc39fef67c756c938ffe32b6067
+#4 CACHED
+
+#6 [internal] load build definition from Dockerfile.out
+#6 sha256:82b2178135ea232e3ddcb085e54dc1902be9afbe4bd8e72e15429120190ae697
+#6 DONE 0.0s
+
+#5 [internal] load .dockerignore
+#5 sha256:3c0b624761bebf0078b85f4b6cf6686334a673271d3c12c1645a9fde9f682be0
+#5 DONE 0.0s
+
+#7 [internal] load metadata for registry.gitlab.inria.fr/damaris/damaris-development:quay.io-centos-centos-stream8-pv581
+#7 sha256:2013173be822b919feb86b7ed304a8b6e4ca412ae7368e4a40a34e7a63769970
+#7 DONE 0.0s
+
+#8 [builder 1/3] FROM registry.gitlab.inria.fr/damaris/damaris-development:quay.io-centos-centos-stream8-pv581
+#8 sha256:6980cc972450f5c0c81427b607e6da163fd26010e20de38669305d9096fc92ae
+#8 DONE 0.0s
+
+#9 [builder 2/3] RUN --mount=type=secret,id=thepassword if [ "damaris" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi   && mkdir -p /home/docker/installdir   && cd /home/docker/installdir   && echo "Damaris Version: v1.5.0"   && git clone  --depth 1 --branch v1.5.0 https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/damaris.git   && mkdir -p /home/docker/installdir/build/damaris   && cd /home/docker/installdir/build/damaris   && if [ "/usr/lib64/openmpi/bin" != "" ] ; then export MPI_BINDIR=/usr/lib64/openmpi/bin/;  fi   && cmake ../../damaris -DCMAKE_INSTALL_PREFIX:PATH=/home/docker/local       -DCMAKE_BUILD_TYPE=Release       -DCMAKE_CXX_COMPILER=/usr/lib64/openmpi/bin/mpicxx       -DCMAKE_C_COMPILER=/usr/lib64/openmpi/bin/mpicc       -DCMAKE_Fortran_COMPILER=/usr/lib64/openmpi/bin/mpifort       -DENABLE_TESTS=ON       -DENABLE_EXAMPLES=ON       -DBUILD_SHARED_LIBS=ON       -DENABLE_PYTHON=OFF       -DENABLE_FORTRAN=ON       -DGENERATE_MODEL=ON       -DENABLE_HDF5=ON        -DENABLE_CATALYST=ON -DParaView_DIR=/home/docker/local/lib64/cmake/paraview-5.8   && make -j4   && make install   && find /home/docker/local/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>/home/docker/local/examples|"   && cp -r /home/docker/installdir/build/damaris/test/ /home/docker/local/examples/test/   && cp  /home/docker/installdir/build/damaris/CTestTestfile.cmake /home/docker/local/examples/   && sed -i "s|/home/docker/installdir/build/damaris/|/home/docker/local/examples/|g" /home/docker/local/examples/test/CTestTestfile.cmake   && rm -fr /home/docker/installdir/    && chown -R docker:docker /home/docker
+#9 sha256:dd5209aaa5ac71c69923f10e8dfefff61376d69087180705086dc322404867c6
+#9 CACHED
+
+#10 [builder 3/3] WORKDIR /home/docker/local/examples
+#10 sha256:ef7528a787c0fa98e8905bf636c0fc6bc90f909165061dc6ddfe639247ea229f
+#10 CACHED
+
+#11 exporting to image
+#11 sha256:e8c613e07b0b7ff33893b694f7759a10d42e180f2b4dc349fb57dc6b71dcab00
+#11 exporting layers done
+#11 writing image sha256:9ead0537bb190751eb90f3b1c6a49f01d924f76fd522b7f9f6c34d0e8301dade done
+#11 naming to registry.gitlab.inria.fr/damaris/damaris:quay.io-centos-centos-stream8-pv581-damaris-v1.5.0 done
+#11 DONE 0.0s
+#1 [internal] load build definition from Dockerfile.out
+#1 sha256:5a38bae3eecfdcf5dc4528dc406a7723303c566679eb91cbc9c2a20e02e2051c
+#1 transferring dockerfile: 4.18kB done
+#1 DONE 0.0s
+
+#2 [internal] load .dockerignore
+#2 sha256:207638ed2f8953879207ca2e0ab4daafca6a9bc97f4f00bef1efaf240543df48
+#2 transferring context: 2B done
+#2 DONE 0.0s
+
+#3 resolve image config for docker.io/docker/dockerfile:1
+#3 sha256:ac072d521901222eeef550f52282877f196e16b0247844be9ceb1ccc1eac391d
+#3 DONE 0.2s
+
+#4 docker-image://docker.io/docker/dockerfile:1@sha256:42399d4635eddd7a9b8a24be879d2f9a930d0ed040a61324cfdf59ef1357b3b2
+#4 sha256:e7000a2113ce0d8d3e5eb20bd235706bb1408cc39fef67c756c938ffe32b6067
+#4 CACHED
+
+#6 [internal] load build definition from Dockerfile.out
+#6 sha256:59d9cf3a4f770d2b93f5b1d3de35b61c0b18712986301a872f76b2ff9b55e65c
+#6 DONE 0.0s
+
+#5 [internal] load .dockerignore
+#5 sha256:6323915a6175e911a24afcc65f49d75889831a51099f9f438c686d9c462a1265
+#5 DONE 0.0s
+
+#7 [internal] load metadata for registry.gitlab.inria.fr/damaris/damaris-development:quay.io-centos-centos-stream8-pv590
+#7 sha256:6e86655622a09357c82c80ddaf50a7636be4d82b6e6198ccdaf61c1da60f1a9f
+#7 DONE 0.0s
+
+#8 [builder 1/3] FROM registry.gitlab.inria.fr/damaris/damaris-development:quay.io-centos-centos-stream8-pv590
+#8 sha256:49ceaa23d90ca0b9fc624b7a29be11637d583c01bfc9b7e41f77d48344497e63
+#8 DONE 0.0s
+
+#9 [builder 2/3] RUN --mount=type=secret,id=thepassword if [ "damaris" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi   && mkdir -p /home/docker/installdir   && cd /home/docker/installdir   && echo "Damaris Version: v1.5.0"   && git clone  --depth 1 --branch v1.5.0 https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/damaris.git   && mkdir -p /home/docker/installdir/build/damaris   && cd /home/docker/installdir/build/damaris   && if [ "/usr/lib64/openmpi/bin" != "" ] ; then export MPI_BINDIR=/usr/lib64/openmpi/bin/;  fi   && cmake ../../damaris -DCMAKE_INSTALL_PREFIX:PATH=/home/docker/local       -DCMAKE_BUILD_TYPE=Release       -DCMAKE_CXX_COMPILER=/usr/lib64/openmpi/bin/mpicxx       -DCMAKE_C_COMPILER=/usr/lib64/openmpi/bin/mpicc       -DCMAKE_Fortran_COMPILER=/usr/lib64/openmpi/bin/mpifort       -DENABLE_TESTS=ON       -DENABLE_EXAMPLES=ON       -DBUILD_SHARED_LIBS=ON       -DENABLE_PYTHON=OFF       -DENABLE_FORTRAN=ON       -DGENERATE_MODEL=ON       -DENABLE_HDF5=ON        -DENABLE_CATALYST=ON -DParaView_DIR=/home/docker/local/lib64/cmake/paraview-5.9   && make -j4   && make install   && find /home/docker/local/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>/home/docker/local/examples|"   && cp -r /home/docker/installdir/build/damaris/test/ /home/docker/local/examples/test/   && cp  /home/docker/installdir/build/damaris/CTestTestfile.cmake /home/docker/local/examples/   && sed -i "s|/home/docker/installdir/build/damaris/|/home/docker/local/examples/|g" /home/docker/local/examples/test/CTestTestfile.cmake   && rm -fr /home/docker/installdir/    && chown -R docker:docker /home/docker
+#9 sha256:859c39aa4c5309396a04fadc42e17d74ffff344cf422192d399b2e01aa00f904
+#9 CACHED
+
+#10 [builder 3/3] WORKDIR /home/docker/local/examples
+#10 sha256:b609e31b74f29b8b9ec50449119ac92516c9122e9fb67dbc45bb81d84b8c4b39
+#10 CACHED
+
+#11 exporting to image
+#11 sha256:e8c613e07b0b7ff33893b694f7759a10d42e180f2b4dc349fb57dc6b71dcab00
+#11 exporting layers done
+#11 writing image sha256:ae97d8152f1d8fb4bb26327362c7e5953c9f3ed96a64e3079445a3db16c498f7 done
+#11 naming to registry.gitlab.inria.fr/damaris/damaris:quay.io-centos-centos-stream8-pv590-damaris-v1.5.0 done
+#11 DONE 0.0s
+#1 [internal] load build definition from Dockerfile.out
+#1 sha256:6f2760960c2cc6ea4e275b05658e0330213928fd00f224b1b91c38af80e20ba0
+#1 transferring dockerfile: 4.18kB done
+#1 DONE 0.0s
+
+#2 [internal] load .dockerignore
+#2 sha256:3b38d441634d2c16d6ad478e6aede356d5032d8caef8e77b3f941fc6ffdc0a70
+#2 transferring context: 2B done
+#2 DONE 0.0s
+
+#3 resolve image config for docker.io/docker/dockerfile:1
+#3 sha256:ac072d521901222eeef550f52282877f196e16b0247844be9ceb1ccc1eac391d
+#3 DONE 0.1s
+
+#4 docker-image://docker.io/docker/dockerfile:1@sha256:42399d4635eddd7a9b8a24be879d2f9a930d0ed040a61324cfdf59ef1357b3b2
+#4 sha256:e7000a2113ce0d8d3e5eb20bd235706bb1408cc39fef67c756c938ffe32b6067
+#4 CACHED
+
+#5 [internal] load .dockerignore
+#5 sha256:f24ec4a58af22b9b3e6993e68adbf716c3948234eeb9f8de1570b522518080cd
+#5 DONE 0.0s
+
+#6 [internal] load build definition from Dockerfile.out
+#6 sha256:14a8d2cc951ed7f53185c96704759d4facdbab8f14cbe9995264382221b4517a
+#6 DONE 0.0s
+
+#7 [internal] load metadata for registry.gitlab.inria.fr/damaris/damaris-development:quay.io-centos-centos-stream8-pv591
+#7 sha256:04672b16e13e5275c69179c577adcd287b4e3b223582a8ab878c7a9b9b4e69b2
+#7 DONE 0.0s
+
+#8 [builder 1/3] FROM registry.gitlab.inria.fr/damaris/damaris-development:quay.io-centos-centos-stream8-pv591
+#8 sha256:ca2bc1c7c4e45014503342771cd76c3e7f767a2cdd6353e124e3a53a1374bdb1
+#8 DONE 0.0s
+
+#9 [builder 2/3] RUN --mount=type=secret,id=thepassword if [ "damaris" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi   && mkdir -p /home/docker/installdir   && cd /home/docker/installdir   && echo "Damaris Version: v1.5.0"   && git clone  --depth 1 --branch v1.5.0 https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/damaris.git   && mkdir -p /home/docker/installdir/build/damaris   && cd /home/docker/installdir/build/damaris   && if [ "/usr/lib64/openmpi/bin" != "" ] ; then export MPI_BINDIR=/usr/lib64/openmpi/bin/;  fi   && cmake ../../damaris -DCMAKE_INSTALL_PREFIX:PATH=/home/docker/local       -DCMAKE_BUILD_TYPE=Release       -DCMAKE_CXX_COMPILER=/usr/lib64/openmpi/bin/mpicxx       -DCMAKE_C_COMPILER=/usr/lib64/openmpi/bin/mpicc       -DCMAKE_Fortran_COMPILER=/usr/lib64/openmpi/bin/mpifort       -DENABLE_TESTS=ON       -DENABLE_EXAMPLES=ON       -DBUILD_SHARED_LIBS=ON       -DENABLE_PYTHON=OFF       -DENABLE_FORTRAN=ON       -DGENERATE_MODEL=ON       -DENABLE_HDF5=ON        -DENABLE_CATALYST=ON -DParaView_DIR=/home/docker/local/lib64/cmake/paraview-5.9   && make -j4   && make install   && find /home/docker/local/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>/home/docker/local/examples|"   && cp -r /home/docker/installdir/build/damaris/test/ /home/docker/local/examples/test/   && cp  /home/docker/installdir/build/damaris/CTestTestfile.cmake /home/docker/local/examples/   && sed -i "s|/home/docker/installdir/build/damaris/|/home/docker/local/examples/|g" /home/docker/local/examples/test/CTestTestfile.cmake   && rm -fr /home/docker/installdir/    && chown -R docker:docker /home/docker
+#9 sha256:a202d3469e0958fd4c12c42f4eccc487cfd05f10e1bc27a530861be7977d3057
+#9 CACHED
+
+#10 [builder 3/3] WORKDIR /home/docker/local/examples
+#10 sha256:cd539085c786e3f802900cec2d4972b7dc7241b836eaeb90491601614113e347
+#10 CACHED
+
+#11 exporting to image
+#11 sha256:e8c613e07b0b7ff33893b694f7759a10d42e180f2b4dc349fb57dc6b71dcab00
+#11 exporting layers done
+#11 writing image sha256:67f031a6c5b260d5bf55f34a3c1f7b2044725e138bfb6db8bcfd8217a0b90558 done
+#11 naming to registry.gitlab.inria.fr/damaris/damaris:quay.io-centos-centos-stream8-pv591-damaris-v1.5.0 done
+#11 DONE 0.0s
+#1 [internal] load build definition from Dockerfile.out
+#1 sha256:b51bd9fdbbc0bfe9fcef4c33baee2692682b32acab7e942969c1c41178735614
+#1 transferring dockerfile: 4.18kB done
+#1 DONE 0.0s
+
+#2 [internal] load .dockerignore
+#2 sha256:2025c6d98af5cd75a9ec92dfc0b69c408637d98cd6a16c77d06c2840b111b1da
+#2 transferring context: 2B done
+#2 DONE 0.0s
+
+#3 resolve image config for docker.io/docker/dockerfile:1
+#3 sha256:ac072d521901222eeef550f52282877f196e16b0247844be9ceb1ccc1eac391d
+#3 DONE 0.1s
+
+#4 docker-image://docker.io/docker/dockerfile:1@sha256:42399d4635eddd7a9b8a24be879d2f9a930d0ed040a61324cfdf59ef1357b3b2
+#4 sha256:e7000a2113ce0d8d3e5eb20bd235706bb1408cc39fef67c756c938ffe32b6067
+#4 CACHED
+
+#6 [internal] load build definition from Dockerfile.out
+#6 sha256:81752c0508f0035af2dddb4d17b5746c077af4578192b0c63d30a25e67dbf825
+#6 DONE 0.0s
+
+#5 [internal] load .dockerignore
+#5 sha256:2eede9545ca9ab28849ed763873be54cabe9db1272ccb082daa147293613db46
+#5 DONE 0.0s
+
+#7 [internal] load metadata for registry.gitlab.inria.fr/damaris/damaris-development:quay.io-centos-centos-stream8-pv5100
+#7 sha256:8ff65cfab60d51aff214002b025c94b42bde5fa69e361e8d9d3db8e21832d676
+#7 DONE 0.0s
+
+#8 [builder 1/3] FROM registry.gitlab.inria.fr/damaris/damaris-development:quay.io-centos-centos-stream8-pv5100
+#8 sha256:d1031ec449f38d71fb6922499538ee08ed37ef680a3cd7b47d688b285eb48e8d
+#8 DONE 0.0s
+
+#9 [builder 2/3] RUN --mount=type=secret,id=thepassword if [ "damaris" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi   && mkdir -p /home/docker/installdir   && cd /home/docker/installdir   && echo "Damaris Version: v1.5.0"   && git clone  --depth 1 --branch v1.5.0 https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/damaris.git   && mkdir -p /home/docker/installdir/build/damaris   && cd /home/docker/installdir/build/damaris   && if [ "/usr/lib64/openmpi/bin" != "" ] ; then export MPI_BINDIR=/usr/lib64/openmpi/bin/;  fi   && cmake ../../damaris -DCMAKE_INSTALL_PREFIX:PATH=/home/docker/local       -DCMAKE_BUILD_TYPE=Release       -DCMAKE_CXX_COMPILER=/usr/lib64/openmpi/bin/mpicxx       -DCMAKE_C_COMPILER=/usr/lib64/openmpi/bin/mpicc       -DCMAKE_Fortran_COMPILER=/usr/lib64/openmpi/bin/mpifort       -DENABLE_TESTS=ON       -DENABLE_EXAMPLES=ON       -DBUILD_SHARED_LIBS=ON       -DENABLE_PYTHON=OFF       -DENABLE_FORTRAN=ON       -DGENERATE_MODEL=ON       -DENABLE_HDF5=ON        -DENABLE_CATALYST=ON -DParaView_DIR=/home/docker/local/lib64/cmake/paraview-5.10   && make -j4   && make install   && find /home/docker/local/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>/home/docker/local/examples|"   && cp -r /home/docker/installdir/build/damaris/test/ /home/docker/local/examples/test/   && cp  /home/docker/installdir/build/damaris/CTestTestfile.cmake /home/docker/local/examples/   && sed -i "s|/home/docker/installdir/build/damaris/|/home/docker/local/examples/|g" /home/docker/local/examples/test/CTestTestfile.cmake   && rm -fr /home/docker/installdir/    && chown -R docker:docker /home/docker
+#9 sha256:e363b2496337589cfcddcd0087423378b65dce68a2dd616935d3327376652d60
+#9 CACHED
+
+#10 [builder 3/3] WORKDIR /home/docker/local/examples
+#10 sha256:99c8ad2afce8ff0788b483842de2231e53385ee2b279e880df254c37868f31f1
+#10 CACHED
+
+#11 exporting to image
+#11 sha256:e8c613e07b0b7ff33893b694f7759a10d42e180f2b4dc349fb57dc6b71dcab00
+#11 exporting layers done
+#11 writing image sha256:70a95fd72b8874559822c6592e7ea0f3bfe2f04ccd094f38617200fd1e19d517 done
+#11 naming to registry.gitlab.inria.fr/damaris/damaris:quay.io-centos-centos-stream8-pv5100-damaris-v1.5.0 done
+#11 DONE 0.0s
+#1 [internal] load build definition from Dockerfile.out
+#1 sha256:841eba987a58655d8f8136b63245539c79a4571be7b651ca0d3562cc3f1f2106
+#1 transferring dockerfile: 4.10kB done
+#1 DONE 0.0s
+
+#2 [internal] load .dockerignore
+#2 sha256:2fd68c5ff256bb5356fefb2df5f4637da7712aafe9f1d1e3fc0f706098cdb588
+#2 transferring context: 2B done
+#2 DONE 0.0s
+
+#3 resolve image config for docker.io/docker/dockerfile:1
+#3 sha256:ac072d521901222eeef550f52282877f196e16b0247844be9ceb1ccc1eac391d
+#3 DONE 0.5s
+
+#4 docker-image://docker.io/docker/dockerfile:1@sha256:42399d4635eddd7a9b8a24be879d2f9a930d0ed040a61324cfdf59ef1357b3b2
+#4 sha256:e7000a2113ce0d8d3e5eb20bd235706bb1408cc39fef67c756c938ffe32b6067
+#4 CACHED
+
+#6 [internal] load .dockerignore
+#6 sha256:c1d49a400b7e1ea22c88e266659579b3227b0904639ea533a6af1b05d846a1ce
+#6 DONE 0.0s
+
+#5 [internal] load build definition from Dockerfile.out
+#5 sha256:571bf1fced6043bb5e18350f584b228faf3c635992dace3e2c7f658708937931
+#5 DONE 0.0s
+
+#7 [internal] load metadata for registry.gitlab.inria.fr/damaris/damaris-development:archlinux-base-devel-pv5100
+#7 sha256:3f0099c3947b988b2e1715b1dca91b274a5e666b5e1afa93fa89548c543cd1e1
+#7 DONE 0.0s
+
+#8 [builder 1/3] FROM registry.gitlab.inria.fr/damaris/damaris-development:archlinux-base-devel-pv5100
+#8 sha256:3f0616970828c49802f8379ed1153a200e0c025f7c1f6567f0d900ec97e47eaf
+#8 DONE 0.0s
+
+#9 [builder 2/3] RUN --mount=type=secret,id=thepassword if [ "damaris" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi   && mkdir -p /home/docker/installdir   && cd /home/docker/installdir   && echo "Damaris Version: v1.5.0"   && git clone  --depth 1 --branch v1.5.0 https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/damaris.git   && mkdir -p /home/docker/installdir/build/damaris   && cd /home/docker/installdir/build/damaris   && if [ "/usr/bin" != "" ] ; then export MPI_BINDIR=/usr/bin/;  fi   && cmake ../../damaris -DCMAKE_INSTALL_PREFIX:PATH=/home/docker/local       -DCMAKE_BUILD_TYPE=Release       -DCMAKE_CXX_COMPILER=/usr/bin/mpicxx       -DCMAKE_C_COMPILER=/usr/bin/mpicc       -DCMAKE_Fortran_COMPILER=/usr/bin/mpifort       -DENABLE_TESTS=ON       -DENABLE_EXAMPLES=ON       -DBUILD_SHARED_LIBS=ON       -DENABLE_PYTHON=OFF       -DENABLE_FORTRAN=ON       -DGENERATE_MODEL=ON       -DENABLE_HDF5=ON        -DENABLE_CATALYST=ON -DParaView_DIR=/home/docker/local/lib/cmake/paraview-5.10   && make -j4   && make install   && find /home/docker/local/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>/home/docker/local/examples|"   && cp -r /home/docker/installdir/build/damaris/test/ /home/docker/local/examples/test/   && cp  /home/docker/installdir/build/damaris/CTestTestfile.cmake /home/docker/local/examples/   && sed -i "s|/home/docker/installdir/build/damaris/|/home/docker/local/examples/|g" /home/docker/local/examples/test/CTestTestfile.cmake   && rm -fr /home/docker/installdir/    && chown -R docker:docker /home/docker
+#9 sha256:725cab2f2cb489f878a23081e7205d60630c68a59998f0f912c72fc6d0fc5ef3
+#9 CACHED
+
+#10 [builder 3/3] WORKDIR /home/docker/local/examples
+#10 sha256:26da63050050c0b6eaec0f0282b84c343db1d2b3c70546e89a138cd9d3892391
+#10 CACHED
+
+#11 exporting to image
+#11 sha256:e8c613e07b0b7ff33893b694f7759a10d42e180f2b4dc349fb57dc6b71dcab00
+#11 exporting layers done
+#11 writing image sha256:57dd69edb15d430e11b38471ab4b603ede8cba3d9b07ac2ea5fef22c480b1ed6 done
+#11 naming to registry.gitlab.inria.fr/damaris/damaris:archlinux-base-devel-pv5100-damaris-v1.5.0 done
+#11 DONE 0.0s
+#2 [internal] load .dockerignore
+#2 sha256:11515af7f3ef031f75eac01c93958ca309dafffa7c75b8d779c8f3ffae11fc29
+#2 transferring context: 2B 0.4s done
+#2 DONE 0.4s
+
+#1 [internal] load build definition from Dockerfile.out
+#1 sha256:5b0d1c3b01af3458a7c18be588b233dda13d54dd870a7464854cd44e053bb2ad
+#1 transferring dockerfile: 4.27kB 0.4s done
+#1 DONE 0.4s
+
+#3 resolve image config for docker.io/docker/dockerfile:1
+#3 sha256:ac072d521901222eeef550f52282877f196e16b0247844be9ceb1ccc1eac391d
+#3 DONE 0.5s
+
+#4 docker-image://docker.io/docker/dockerfile:1@sha256:42399d4635eddd7a9b8a24be879d2f9a930d0ed040a61324cfdf59ef1357b3b2
+#4 sha256:e7000a2113ce0d8d3e5eb20bd235706bb1408cc39fef67c756c938ffe32b6067
+#4 CACHED
+
+#5 [internal] load build definition from Dockerfile.out
+#5 sha256:ddb019320c901ba88f940cc468bbefe3106ff3708b1d9678c149c4d7d7cace0f
+#5 DONE 0.0s
+
+#6 [internal] load .dockerignore
+#6 sha256:a43b738579d4666a4a91af1d7bfe713f879f76fbff338b592c512f835c4bcd89
+#6 DONE 0.0s
+
+#7 [internal] load metadata for registry.gitlab.inria.fr/damaris/damaris-development:opensuse-leap-15.3-pv580
+#7 sha256:897eb560d3704297b6e5c3ae783ff735701ced6eb1a78730bd6cffa96c395539
+#7 DONE 0.0s
+
+#8 [builder 1/4] FROM registry.gitlab.inria.fr/damaris/damaris-development:opensuse-leap-15.3-pv580
+#8 sha256:6b45579a7c6c941ea140ae93f8571adaf671ac3a8ed5900f752a95d356ce3df1
+#8 DONE 0.0s
+
+#9 [builder 2/4] RUN zypper -n install gcc-fortran libboost*_75_0-devel
+#9 sha256:f0d7585cef2e910fe6ffad3f9b76c68ab726cd7ff30a7b5c2029ca724d7e21c4
+#9 CACHED
+
+#10 [builder 3/4] RUN --mount=type=secret,id=thepassword if [ "damaris" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi   && mkdir -p /home/docker/installdir   && cd /home/docker/installdir   && echo "Damaris Version: v1.5.0"   && git clone  --depth 1 --branch v1.5.0 https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/damaris.git   && mkdir -p /home/docker/installdir/build/damaris   && cd /home/docker/installdir/build/damaris   && if [ "/usr/lib64/openmpi/bin" != "" ] ; then export MPI_BINDIR=/usr/lib64/openmpi/bin/;  fi   && cmake ../../damaris -DCMAKE_INSTALL_PREFIX:PATH=/home/docker/local       -DCMAKE_BUILD_TYPE=Release       -DCMAKE_CXX_COMPILER=/usr/lib64/mpi/gcc/openmpi4/bin/mpicxx       -DCMAKE_C_COMPILER=/usr/lib64/mpi/gcc/openmpi4/bin/mpicc       -DCMAKE_Fortran_COMPILER=/usr/lib64/mpi/gcc/openmpi4/bin/mpifort       -DENABLE_TESTS=ON       -DENABLE_EXAMPLES=ON       -DBUILD_SHARED_LIBS=ON       -DENABLE_PYTHON=OFF       -DENABLE_FORTRAN=ON       -DGENERATE_MODEL=ON       -DENABLE_HDF5=ON        -DENABLE_CATALYST=ON -DParaView_DIR=/home/docker/local/lib64/cmake/paraview-5.8   && make -j4   && make install   && find /home/docker/local/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>/home/docker/local/examples|"   && cp -r /home/docker/installdir/build/damaris/test/ /home/docker/local/examples/test/   && cp  /home/docker/installdir/build/damaris/CTestTestfile.cmake /home/docker/local/examples/   && sed -i "s|/home/docker/installdir/build/damaris/|/home/docker/local/examples/|g" /home/docker/local/examples/test/CTestTestfile.cmake   && rm -fr /home/docker/installdir/    && chown -R docker:docker /home/docker
+#10 sha256:ccea8e4d0cbd9f2c6af832041ef4656b1ea0f2228110580db2fbaf3a85cc4d79
+#10 CACHED
+
+#11 [builder 4/4] WORKDIR /home/docker/local/examples
+#11 sha256:4d1999d1eebca693f1dfe10eb28779e902d5aa3c91f454cd99ccf74855e2806c
+#11 CACHED
+
+#12 exporting to image
+#12 sha256:e8c613e07b0b7ff33893b694f7759a10d42e180f2b4dc349fb57dc6b71dcab00
+#12 exporting layers done
+#12 writing image sha256:bd64c3e354c559fe29011424a436ad9e8dde86b2944639674693b089ce03427a done
+#12 naming to registry.gitlab.inria.fr/damaris/damaris:opensuse-leap-15.3-pv580-damaris-v1.5.0 done
+#12 DONE 0.0s
+#1 [internal] load build definition from Dockerfile.out
+#1 sha256:099611cfc1b62f62761932339ebfd55e8010b2b7996c76df8f1fd74c3693093e
+#1 transferring dockerfile: 4.27kB done
+#1 DONE 0.0s
+
+#2 [internal] load .dockerignore
+#2 sha256:81102a24f543accb919f120c78d670829cc3b5837b09183cdf14220ae9ec1b5f
+#2 transferring context: 2B done
+#2 DONE 0.0s
+
+#3 resolve image config for docker.io/docker/dockerfile:1
+#3 sha256:ac072d521901222eeef550f52282877f196e16b0247844be9ceb1ccc1eac391d
+#3 DONE 0.5s
+
+#4 docker-image://docker.io/docker/dockerfile:1@sha256:42399d4635eddd7a9b8a24be879d2f9a930d0ed040a61324cfdf59ef1357b3b2
+#4 sha256:e7000a2113ce0d8d3e5eb20bd235706bb1408cc39fef67c756c938ffe32b6067
+#4 CACHED
+
+#6 [internal] load build definition from Dockerfile.out
+#6 sha256:d3f5778c2555e64a9ebddf6b6de29b353583ca311c21de7386b491e9850a01ed
+#6 DONE 0.0s
+
+#5 [internal] load .dockerignore
+#5 sha256:f2ab87bf007cc3f80533355aad30909e53bac8ecf0995db469c22fed7a02e94e
+#5 DONE 0.0s
+
+#7 [internal] load metadata for registry.gitlab.inria.fr/damaris/damaris-development:opensuse-leap-15.3-pv581
+#7 sha256:3c017d6473fc28bef0cd6122bb2c8e2855b9fa9d7bf1e4c679b3ed086b506cd1
+#7 DONE 0.0s
+
+#11 [builder 1/4] FROM registry.gitlab.inria.fr/damaris/damaris-development:opensuse-leap-15.3-pv581
+#11 sha256:515f988a1d8886f8f5cc21100ce65596b4eb9a2fd0431c1f6ac29df605459315
+#11 DONE 0.0s
+
+#9 [builder 3/4] RUN --mount=type=secret,id=thepassword if [ "damaris" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi   && mkdir -p /home/docker/installdir   && cd /home/docker/installdir   && echo "Damaris Version: v1.5.0"   && git clone  --depth 1 --branch v1.5.0 https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/damaris.git   && mkdir -p /home/docker/installdir/build/damaris   && cd /home/docker/installdir/build/damaris   && if [ "/usr/lib64/openmpi/bin" != "" ] ; then export MPI_BINDIR=/usr/lib64/openmpi/bin/;  fi   && cmake ../../damaris -DCMAKE_INSTALL_PREFIX:PATH=/home/docker/local       -DCMAKE_BUILD_TYPE=Release       -DCMAKE_CXX_COMPILER=/usr/lib64/mpi/gcc/openmpi4/bin/mpicxx       -DCMAKE_C_COMPILER=/usr/lib64/mpi/gcc/openmpi4/bin/mpicc       -DCMAKE_Fortran_COMPILER=/usr/lib64/mpi/gcc/openmpi4/bin/mpifort       -DENABLE_TESTS=ON       -DENABLE_EXAMPLES=ON       -DBUILD_SHARED_LIBS=ON       -DENABLE_PYTHON=OFF       -DENABLE_FORTRAN=ON       -DGENERATE_MODEL=ON       -DENABLE_HDF5=ON        -DENABLE_CATALYST=ON -DParaView_DIR=/home/docker/local/lib64/cmake/paraview-5.8   && make -j4   && make install   && find /home/docker/local/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>/home/docker/local/examples|"   && cp -r /home/docker/installdir/build/damaris/test/ /home/docker/local/examples/test/   && cp  /home/docker/installdir/build/damaris/CTestTestfile.cmake /home/docker/local/examples/   && sed -i "s|/home/docker/installdir/build/damaris/|/home/docker/local/examples/|g" /home/docker/local/examples/test/CTestTestfile.cmake   && rm -fr /home/docker/installdir/    && chown -R docker:docker /home/docker
+#9 sha256:c855372886ed84d760b5680b481a38585a494e28a30603960c6eebd7d4dd37f0
+#9 CACHED
+
+#8 [builder 2/4] RUN zypper -n install gcc-fortran libboost*_75_0-devel
+#8 sha256:0bd545cfeefee30f406a75d892512eb28279dbf6752dadfa68fa9b0ab2980b36
+#8 CACHED
+
+#10 [builder 4/4] WORKDIR /home/docker/local/examples
+#10 sha256:ceee6c2abcb773e6314301dcad6f6f35f85e14eaf235258cd8d2107c194f1372
+#10 CACHED
+
+#12 exporting to image
+#12 sha256:e8c613e07b0b7ff33893b694f7759a10d42e180f2b4dc349fb57dc6b71dcab00
+#12 exporting layers done
+#12 writing image sha256:161135afaea69232f93c62d465a8292cffd561cc56e3584b612aa7a1baa46448 done
+#12 naming to registry.gitlab.inria.fr/damaris/damaris:opensuse-leap-15.3-pv581-damaris-v1.5.0 done
+#12 DONE 0.0s
+#1 [internal] load build definition from Dockerfile.out
+#1 sha256:fe914569a585a9abdaed2bafdde9b09d342cf9d6ff0bdd19536846e25dbac0fe
+#1 transferring dockerfile: 4.27kB done
+#1 DONE 0.0s
+
+#2 [internal] load .dockerignore
+#2 sha256:83f46835903a6993af06305218009ce89980e74428876ae709e9c77f1dce8d1f
+#2 transferring context: 2B done
+#2 DONE 0.0s
+
+#3 resolve image config for docker.io/docker/dockerfile:1
+#3 sha256:ac072d521901222eeef550f52282877f196e16b0247844be9ceb1ccc1eac391d
+#3 DONE 0.2s
+
+#4 docker-image://docker.io/docker/dockerfile:1@sha256:42399d4635eddd7a9b8a24be879d2f9a930d0ed040a61324cfdf59ef1357b3b2
+#4 sha256:e7000a2113ce0d8d3e5eb20bd235706bb1408cc39fef67c756c938ffe32b6067
+#4 CACHED
+
+#6 [internal] load .dockerignore
+#6 sha256:5d1603533a2eb0c4ad0a5f02312ae1d9045fe7dfb8201aba0eada5e2c68723cb
+#6 DONE 0.0s
+
+#5 [internal] load build definition from Dockerfile.out
+#5 sha256:b7c1225b1b94731a88e351dbe24bb393b3089bf40eca0d2e0b518abff3f40212
+#5 DONE 0.0s
+
+#7 [internal] load metadata for registry.gitlab.inria.fr/damaris/damaris-development:opensuse-leap-15.3-pv590
+#7 sha256:c410016e85a2f7f159a9d88e9c4251a8ea2152420b058009775c37daeba21cc4
+#7 DONE 0.0s
+
+#8 [builder 1/4] FROM registry.gitlab.inria.fr/damaris/damaris-development:opensuse-leap-15.3-pv590
+#8 sha256:57a62be57a5b8a91fbf74217a60210b1b8493c43ea93716bf3e3a2d5dcfb3b1f
+#8 DONE 0.0s
+
+#9 [builder 2/4] RUN zypper -n install gcc-fortran libboost*_75_0-devel
+#9 sha256:0a8058b3da4c211c3b935e56bec7a3de28cb63e769ecf31fbc0e756404454563
+#9 CACHED
+
+#10 [builder 3/4] RUN --mount=type=secret,id=thepassword if [ "damaris" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi   && mkdir -p /home/docker/installdir   && cd /home/docker/installdir   && echo "Damaris Version: v1.5.0"   && git clone  --depth 1 --branch v1.5.0 https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/damaris.git   && mkdir -p /home/docker/installdir/build/damaris   && cd /home/docker/installdir/build/damaris   && if [ "/usr/lib64/openmpi/bin" != "" ] ; then export MPI_BINDIR=/usr/lib64/openmpi/bin/;  fi   && cmake ../../damaris -DCMAKE_INSTALL_PREFIX:PATH=/home/docker/local       -DCMAKE_BUILD_TYPE=Release       -DCMAKE_CXX_COMPILER=/usr/lib64/mpi/gcc/openmpi4/bin/mpicxx       -DCMAKE_C_COMPILER=/usr/lib64/mpi/gcc/openmpi4/bin/mpicc       -DCMAKE_Fortran_COMPILER=/usr/lib64/mpi/gcc/openmpi4/bin/mpifort       -DENABLE_TESTS=ON       -DENABLE_EXAMPLES=ON       -DBUILD_SHARED_LIBS=ON       -DENABLE_PYTHON=OFF       -DENABLE_FORTRAN=ON       -DGENERATE_MODEL=ON       -DENABLE_HDF5=ON        -DENABLE_CATALYST=ON -DParaView_DIR=/home/docker/local/lib64/cmake/paraview-5.9   && make -j4   && make install   && find /home/docker/local/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>/home/docker/local/examples|"   && cp -r /home/docker/installdir/build/damaris/test/ /home/docker/local/examples/test/   && cp  /home/docker/installdir/build/damaris/CTestTestfile.cmake /home/docker/local/examples/   && sed -i "s|/home/docker/installdir/build/damaris/|/home/docker/local/examples/|g" /home/docker/local/examples/test/CTestTestfile.cmake   && rm -fr /home/docker/installdir/    && chown -R docker:docker /home/docker
+#10 sha256:4b1945b68bd2827747823a274c0ed0f134cde56f7a548dc65ed9de682d9cddb4
+#10 CACHED
+
+#11 [builder 4/4] WORKDIR /home/docker/local/examples
+#11 sha256:6c11b8a79615e24cb9587834bbe8d63afef7261a6dda22b50b35d20467dbc0e9
+#11 CACHED
+
+#12 exporting to image
+#12 sha256:e8c613e07b0b7ff33893b694f7759a10d42e180f2b4dc349fb57dc6b71dcab00
+#12 exporting layers done
+#12 writing image sha256:216e77b3b98a070acb9fd449cd6f83e1ffb8f2da0bb2df8b4129c99c262b70e2 0.0s done
+#12 naming to registry.gitlab.inria.fr/damaris/damaris:opensuse-leap-15.3-pv590-damaris-v1.5.0 done
+#12 DONE 0.0s
+#1 [internal] load build definition from Dockerfile.out
+#1 sha256:1985eaf0373a49f5001d5a17aed224f9534d69f6e967cf01c9f1c1e95d72b5c1
+#1 transferring dockerfile: 4.27kB done
+#1 DONE 0.0s
+
+#2 [internal] load .dockerignore
+#2 sha256:1c4bb152078c168d1b69e3811836a6a298071481be1b25ae0fa1caae90012d72
+#2 transferring context: 2B done
+#2 DONE 0.0s
+
+#3 resolve image config for docker.io/docker/dockerfile:1
+#3 sha256:ac072d521901222eeef550f52282877f196e16b0247844be9ceb1ccc1eac391d
+#3 DONE 0.2s
+
+#4 docker-image://docker.io/docker/dockerfile:1@sha256:42399d4635eddd7a9b8a24be879d2f9a930d0ed040a61324cfdf59ef1357b3b2
+#4 sha256:e7000a2113ce0d8d3e5eb20bd235706bb1408cc39fef67c756c938ffe32b6067
+#4 CACHED
+
+#6 [internal] load build definition from Dockerfile.out
+#6 sha256:0d21fe1541616e397e5beda2f8ac923701d091a18aea51db8e47a8593166d236
+#6 DONE 0.0s
+
+#5 [internal] load .dockerignore
+#5 sha256:c3ce8730d4029632001fa9f4fd226d2f1c72151b612e88e4918a0e815330260b
+#5 DONE 0.0s
+
+#7 [internal] load metadata for registry.gitlab.inria.fr/damaris/damaris-development:opensuse-leap-15.3-pv591
+#7 sha256:1dc66416335fe44b4016de326c6f392ac936601cb1742f1141c5035c4ad07d7c
+#7 DONE 0.0s
+
+#8 [builder 1/4] FROM registry.gitlab.inria.fr/damaris/damaris-development:opensuse-leap-15.3-pv591
+#8 sha256:fbaaaf86967773c8dc2bbcbdab900b44b561461201235dfe785304156ddc3eee
+#8 DONE 0.0s
+
+#9 [builder 2/4] RUN zypper -n install gcc-fortran libboost*_75_0-devel
+#9 sha256:a02568e29533e15cf8456d87271ce6fbb7b1fd9152f0c17e4bd3229795ce9f08
+#9 CACHED
+
+#10 [builder 3/4] RUN --mount=type=secret,id=thepassword if [ "damaris" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi   && mkdir -p /home/docker/installdir   && cd /home/docker/installdir   && echo "Damaris Version: v1.5.0"   && git clone  --depth 1 --branch v1.5.0 https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/damaris.git   && mkdir -p /home/docker/installdir/build/damaris   && cd /home/docker/installdir/build/damaris   && if [ "/usr/lib64/openmpi/bin" != "" ] ; then export MPI_BINDIR=/usr/lib64/openmpi/bin/;  fi   && cmake ../../damaris -DCMAKE_INSTALL_PREFIX:PATH=/home/docker/local       -DCMAKE_BUILD_TYPE=Release       -DCMAKE_CXX_COMPILER=/usr/lib64/mpi/gcc/openmpi4/bin/mpicxx       -DCMAKE_C_COMPILER=/usr/lib64/mpi/gcc/openmpi4/bin/mpicc       -DCMAKE_Fortran_COMPILER=/usr/lib64/mpi/gcc/openmpi4/bin/mpifort       -DENABLE_TESTS=ON       -DENABLE_EXAMPLES=ON       -DBUILD_SHARED_LIBS=ON       -DENABLE_PYTHON=OFF       -DENABLE_FORTRAN=ON       -DGENERATE_MODEL=ON       -DENABLE_HDF5=ON        -DENABLE_CATALYST=ON -DParaView_DIR=/home/docker/local/lib64/cmake/paraview-5.9   && make -j4   && make install   && find /home/docker/local/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>/home/docker/local/examples|"   && cp -r /home/docker/installdir/build/damaris/test/ /home/docker/local/examples/test/   && cp  /home/docker/installdir/build/damaris/CTestTestfile.cmake /home/docker/local/examples/   && sed -i "s|/home/docker/installdir/build/damaris/|/home/docker/local/examples/|g" /home/docker/local/examples/test/CTestTestfile.cmake   && rm -fr /home/docker/installdir/    && chown -R docker:docker /home/docker
+#10 sha256:3e8974e602331bd963377fb8d414d80675745a126995114c83688d1d365813de
+#10 CACHED
+
+#11 [builder 4/4] WORKDIR /home/docker/local/examples
+#11 sha256:a730b516ada02153656c7b1a9d62e33a3154542a1848f176333b2b38e5646fc9
+#11 CACHED
+
+#12 exporting to image
+#12 sha256:e8c613e07b0b7ff33893b694f7759a10d42e180f2b4dc349fb57dc6b71dcab00
+#12 exporting layers done
+#12 writing image sha256:46e929c8c1cda2dbf4886df425f91575005d7c04e49189b6dd35abad609f4b28 done
+#12 naming to registry.gitlab.inria.fr/damaris/damaris:opensuse-leap-15.3-pv591-damaris-v1.5.0 done
+#12 DONE 0.0s
+#1 [internal] load build definition from Dockerfile.out
+#1 sha256:ed8941f2d21946e0317d7eef79da2cef631eede9049da9622c8b4deb06129d16
+#1 transferring dockerfile: 4.27kB done
+#1 DONE 0.0s
+
+#2 [internal] load .dockerignore
+#2 sha256:769e6c1f027e7704db5454ab5361ae97f4fe8f406897ce43874e033a203f2ed9
+#2 transferring context: 2B done
+#2 DONE 0.0s
+
+#3 resolve image config for docker.io/docker/dockerfile:1
+#3 sha256:ac072d521901222eeef550f52282877f196e16b0247844be9ceb1ccc1eac391d
+#3 DONE 0.2s
+
+#4 docker-image://docker.io/docker/dockerfile:1@sha256:42399d4635eddd7a9b8a24be879d2f9a930d0ed040a61324cfdf59ef1357b3b2
+#4 sha256:e7000a2113ce0d8d3e5eb20bd235706bb1408cc39fef67c756c938ffe32b6067
+#4 CACHED
+
+#6 [internal] load build definition from Dockerfile.out
+#6 sha256:2469f99445472da673d530e54d784f53818cc351c69e9263eb2f779bb308faab
+#6 DONE 0.0s
+
+#5 [internal] load .dockerignore
+#5 sha256:ab434f3120b7da04d51a34264ab2f8c57bd32cf9a4ed35655687c220ab9f9e8c
+#5 DONE 0.0s
+
+#7 [internal] load metadata for registry.gitlab.inria.fr/damaris/damaris-development:opensuse-leap-15.3-pv5100
+#7 sha256:73e966bcc13a0c1cf51eb5e9a6a5b82b19d14220b89a605588aa2ed5e9c73e9e
+#7 DONE 0.0s
+
+#8 [builder 1/4] FROM registry.gitlab.inria.fr/damaris/damaris-development:opensuse-leap-15.3-pv5100
+#8 sha256:364b70631d79e287361a360f7eda63c1bbdd7e4438133f62dec1e4cd2a7ba25a
+#8 DONE 0.0s
+
+#9 [builder 2/4] RUN zypper -n install gcc-fortran libboost*_75_0-devel
+#9 sha256:f5a51a402dd6e47b08f2a3adfff4ab66def39aeb361921169ce1ba4ed8b1230a
+#9 CACHED
+
+#10 [builder 3/4] RUN --mount=type=secret,id=thepassword if [ "damaris" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi   && mkdir -p /home/docker/installdir   && cd /home/docker/installdir   && echo "Damaris Version: v1.5.0"   && git clone  --depth 1 --branch v1.5.0 https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/damaris.git   && mkdir -p /home/docker/installdir/build/damaris   && cd /home/docker/installdir/build/damaris   && if [ "/usr/lib64/openmpi/bin" != "" ] ; then export MPI_BINDIR=/usr/lib64/openmpi/bin/;  fi   && cmake ../../damaris -DCMAKE_INSTALL_PREFIX:PATH=/home/docker/local       -DCMAKE_BUILD_TYPE=Release       -DCMAKE_CXX_COMPILER=/usr/lib64/mpi/gcc/openmpi4/bin/mpicxx       -DCMAKE_C_COMPILER=/usr/lib64/mpi/gcc/openmpi4/bin/mpicc       -DCMAKE_Fortran_COMPILER=/usr/lib64/mpi/gcc/openmpi4/bin/mpifort       -DENABLE_TESTS=ON       -DENABLE_EXAMPLES=ON       -DBUILD_SHARED_LIBS=ON       -DENABLE_PYTHON=OFF       -DENABLE_FORTRAN=ON       -DGENERATE_MODEL=ON       -DENABLE_HDF5=ON        -DENABLE_CATALYST=ON -DParaView_DIR=/home/docker/local/lib64/cmake/paraview-5.10   && make -j4   && make install   && find /home/docker/local/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>/home/docker/local/examples|"   && cp -r /home/docker/installdir/build/damaris/test/ /home/docker/local/examples/test/   && cp  /home/docker/installdir/build/damaris/CTestTestfile.cmake /home/docker/local/examples/   && sed -i "s|/home/docker/installdir/build/damaris/|/home/docker/local/examples/|g" /home/docker/local/examples/test/CTestTestfile.cmake   && rm -fr /home/docker/installdir/    && chown -R docker:docker /home/docker
+#10 sha256:d76d316f628054acc3afe8438581b78a18491f3e0542920225d20694694177b8
+#10 0.825 Damaris Version: v1.5.0
+#10 0.826 Cloning into 'damaris'...
+#10 1.302 Note: switching to '68206a696ad430aa8426ca370501aa71914fbc87'.
+#10 1.302 
+#10 1.302 You are in 'detached HEAD' state. You can look around, make experimental
+#10 1.302 changes and commit them, and you can discard any commits you make in this
+#10 1.302 state without impacting any branches by switching back to a branch.
+#10 1.302 
+#10 1.302 If you want to create a new branch to retain commits you create, you may
+#10 1.302 do so (now or later) by using -c with the switch command. Example:
+#10 1.302 
+#10 1.302   git switch -c <new-branch-name>
+#10 1.302 
+#10 1.302 Or undo this operation with:
+#10 1.302 
+#10 1.302   git switch -
+#10 1.302 
+#10 1.302 Turn off this advice by setting config variable advice.detachedHead to false
+#10 1.302 
+#10 1.380 -- The C compiler identification is GNU 7.5.0
+#10 1.460 -- The CXX compiler identification is GNU 7.5.0
+#10 1.464 -- Check for working C compiler: /usr/lib64/mpi/gcc/openmpi4/bin/mpicc
+#10 1.529 -- Check for working C compiler: /usr/lib64/mpi/gcc/openmpi4/bin/mpicc - works
+#10 1.530 -- Detecting C compiler ABI info
+#10 1.597 -- Detecting C compiler ABI info - done
+#10 1.605 -- Detecting C compile features
+#10 1.606 -- Detecting C compile features - done
+#10 1.608 -- Check for working CXX compiler: /usr/lib64/mpi/gcc/openmpi4/bin/mpicxx
+#10 1.924 -- Check for working CXX compiler: /usr/lib64/mpi/gcc/openmpi4/bin/mpicxx - works
+#10 1.925 -- Detecting CXX compiler ABI info
+#10 2.042 -- Detecting CXX compiler ABI info - done
+#10 2.052 -- Detecting CXX compile features
+#10 2.053 -- Detecting CXX compile features - done
+#10 2.126 -- The Fortran compiler identification is GNU 7.5.0
+#10 2.135 -- Check for working Fortran compiler: /usr/lib64/mpi/gcc/openmpi4/bin/mpifort
+#10 2.223 -- Check for working Fortran compiler: /usr/lib64/mpi/gcc/openmpi4/bin/mpifort - works
+#10 2.225 -- Detecting Fortran compiler ABI info
+#10 2.314 -- Detecting Fortran compiler ABI info - done
+#10 2.324 -- Checking whether /usr/lib64/mpi/gcc/openmpi4/bin/mpifort supports Fortran 90
+#10 2.416 -- Checking whether /usr/lib64/mpi/gcc/openmpi4/bin/mpifort supports Fortran 90 - yes
+#10 2.417 -- Detecting Fortran/C Interface
+#10 3.916 -- Detecting Fortran/C Interface - Found GLOBAL and MODULE mangling
+#10 3.919 -- Looking for pthread.h
+#10 3.990 -- Looking for pthread.h - found
+#10 3.990 -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+#10 4.061 -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+#10 4.062 -- Found Threads: TRUE  
+#10 4.080 -- Found Boost: /usr/lib64/cmake/Boost-1.75.0/BoostConfig.cmake (found suitable version "1.75.0", minimum required is "1.65.0") found components: thread log log_setup filesystem system date_time 
+#10 4.082 CMake Warning at CMakeLists.txt:95 (message):
+#10 4.082   WARNING Boost BOOST_BIND_GLOBAL_PLACEHOLDERS defined to remove warnings -
+#10 4.082   perhaps check for issue?
+#10 4.082 
+#10 4.082 
+#10 4.083 -- Found XSD: /usr/bin/xsd  
+#10 4.088 -- Found XercesC: /usr/lib64/libxerces-c.so (found version "3.2.3") 
+#10 4.184 -- HDF5: Using hdf5 compiler wrapper to determine C configuration
+#10 4.186 -- Found HDF5: /usr/lib64/mpi/gcc/openmpi4/lib64/libhdf5.so;/usr/lib64/libpthread.so;/usr/lib64/libz.so;/usr/lib64/libdl.so;/usr/lib64/libm.so (found version "1.10.7") found components: C 
+#10 4.248 CMake Error at /home/docker/local/lib64/cmake/paraview-5.10/paraview-config.cmake:163 (list):
+#10 4.248   list sub-command REMOVE_ITEM requires two or more arguments.
+#10 4.248 Call Stack (most recent call first):
+#10 4.248   CMakeLists.txt:149 (find_package)
+#10 4.248 
+#10 4.248 
+#10 4.334 -- Found MPI_C: /usr/lib64/mpi/gcc/openmpi4/bin/mpicc (found version "3.1") 
+#10 4.334 -- Found MPI: TRUE (found version "3.1") found components: C 
+#10 4.580 -- Found Python3: /usr/bin/python3.6 (found suitable version "3.6.15", minimum required is "3.6") found components: Interpreter Development.Module Development.Embed 
+#10 4.583 -- Using previously found TBB::tbb
+#10 4.583 -- Using previously found TBB::tbbmalloc
+#10 4.583 -- Using previously found TBB::tbbmalloc_proxy
+#10 4.599 -- ParaView >= 5.7 found
+#10 4.609 -- Using previously found TBB::tbb
+#10 4.609 -- Using previously found TBB::tbbmalloc
+#10 4.609 -- Using previously found TBB::tbbmalloc_proxy
+#10 4.663 -- Using previously found TBB::tbb
+#10 4.663 -- Using previously found TBB::tbbmalloc
+#10 4.663 -- Using previously found TBB::tbbmalloc_proxy
+#10 4.679 -- ParaView_LIBRARIES: ParaView::PythonCatalyst
+#10 4.679 -- VTK_LIBRARIES: VTK::PythonInterpreter;VTK::ParallelCore;VTK::WrappingPythonCore
+#10 4.683 -- ParaView >= 5.7 setting pkg-config libraries
+#10 4.692 -- Configuring incomplete, errors occurred!
+#10 4.692 See also "/home/docker/installdir/build/damaris/CMakeFiles/CMakeOutput.log".
+#10 ERROR: executor failed running [/bin/bash -c if [ "$repo" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi   && mkdir -p ${INSTALLTMDIR}   && cd ${INSTALLTMDIR}   && echo "Damaris Version: $DAMARIS_VERSION"   && git clone  --depth 1 --branch $DAMARIS_VERSION https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/$repo.git   && mkdir -p ${INSTALLTMDIR}/build/$repo   && cd ${INSTALLTMDIR}/build/$repo   && if [ "$MPI_BINDIR" != "" ] ; then export MPI_BINDIR=$MPI_BINDIR/;  fi   && cmake ../../$repo -DCMAKE_INSTALL_PREFIX:PATH=$INSTALL_PREFIX       -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}       -DCMAKE_CXX_COMPILER=/usr/lib64/mpi/gcc/openmpi4/bin/mpicxx       -DCMAKE_C_COMPILER=/usr/lib64/mpi/gcc/openmpi4/bin/mpicc       -DCMAKE_Fortran_COMPILER=/usr/lib64/mpi/gcc/openmpi4/bin/mpifort       -DENABLE_TESTS=ON       -DENABLE_EXAMPLES=$EXAMPLES_ON_OFF       -DBUILD_SHARED_LIBS=$SHLIBS_ON_OFF       -DENABLE_PYTHON=OFF       -DENABLE_FORTRAN=ON       -DGENERATE_MODEL=$REGEN_ON_OFF       -DENABLE_HDF5=ON        -DENABLE_CATALYST=ON -DParaView_DIR=${INSTALL_PREFIX}/lib64/cmake/paraview-5.10   && make -j${NUMCORES}   && make install   && find ${INSTALL_PREFIX}/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples|"   && cp -r ${INSTALLTMDIR}/build/$repo/test/ ${INSTALL_PREFIX}/examples/test/   && cp  ${INSTALLTMDIR}/build/$repo/CTestTestfile.cmake ${INSTALL_PREFIX}/examples/   && sed -i "s|${INSTALLTMDIR}/build/$repo/|${INSTALL_PREFIX}/examples/|g" ${INSTALL_PREFIX}/examples/test/CTestTestfile.cmake   && rm -fr ${INSTALLTMDIR}/    && chown -R docker:docker /home/docker]: exit code: 1
+------
+ > [builder 3/4] RUN --mount=type=secret,id=thepassword if [ "damaris" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi   && mkdir -p /home/docker/installdir   && cd /home/docker/installdir   && echo "Damaris Version: v1.5.0"   && git clone  --depth 1 --branch v1.5.0 https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/damaris.git   && mkdir -p /home/docker/installdir/build/damaris   && cd /home/docker/installdir/build/damaris   && if [ "/usr/lib64/openmpi/bin" != "" ] ; then export MPI_BINDIR=/usr/lib64/openmpi/bin/;  fi   && cmake ../../damaris -DCMAKE_INSTALL_PREFIX:PATH=/home/docker/local       -DCMAKE_BUILD_TYPE=Release       -DCMAKE_CXX_COMPILER=/usr/lib64/mpi/gcc/openmpi4/bin/mpicxx       -DCMAKE_C_COMPILER=/usr/lib64/mpi/gcc/openmpi4/bin/mpicc       -DCMAKE_Fortran_COMPILER=/usr/lib64/mpi/gcc/openmpi4/bin/mpifort       -DENABLE_TESTS=ON       -DENABLE_EXAMPLES=ON       -DBUILD_SHARED_LIBS=ON       -DENABLE_PYTHON=OFF       -DENABLE_FORTRAN=ON       -DGENERATE_MODEL=ON       -DENABLE_HDF5=ON        -DENABLE_CATALYST=ON -DParaView_DIR=/home/docker/local/lib64/cmake/paraview-5.10   && make -j4   && make install   && find /home/docker/local/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>/home/docker/local/examples|"   && cp -r /home/docker/installdir/build/damaris/test/ /home/docker/local/examples/test/   && cp  /home/docker/installdir/build/damaris/CTestTestfile.cmake /home/docker/local/examples/   && sed -i "s|/home/docker/installdir/build/damaris/|/home/docker/local/examples/|g" /home/docker/local/examples/test/CTestTestfile.cmake   && rm -fr /home/docker/installdir/    && chown -R docker:docker /home/docker:
+------
+executor failed running [/bin/bash -c if [ "$repo" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi   && mkdir -p ${INSTALLTMDIR}   && cd ${INSTALLTMDIR}   && echo "Damaris Version: $DAMARIS_VERSION"   && git clone  --depth 1 --branch $DAMARIS_VERSION https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/$repo.git   && mkdir -p ${INSTALLTMDIR}/build/$repo   && cd ${INSTALLTMDIR}/build/$repo   && if [ "$MPI_BINDIR" != "" ] ; then export MPI_BINDIR=$MPI_BINDIR/;  fi   && cmake ../../$repo -DCMAKE_INSTALL_PREFIX:PATH=$INSTALL_PREFIX       -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}       -DCMAKE_CXX_COMPILER=/usr/lib64/mpi/gcc/openmpi4/bin/mpicxx       -DCMAKE_C_COMPILER=/usr/lib64/mpi/gcc/openmpi4/bin/mpicc       -DCMAKE_Fortran_COMPILER=/usr/lib64/mpi/gcc/openmpi4/bin/mpifort       -DENABLE_TESTS=ON       -DENABLE_EXAMPLES=$EXAMPLES_ON_OFF       -DBUILD_SHARED_LIBS=$SHLIBS_ON_OFF       -DENABLE_PYTHON=OFF       -DENABLE_FORTRAN=ON       -DGENERATE_MODEL=$REGEN_ON_OFF       -DENABLE_HDF5=ON        -DENABLE_CATALYST=ON -DParaView_DIR=${INSTALL_PREFIX}/lib64/cmake/paraview-5.10   && make -j${NUMCORES}   && make install   && find ${INSTALL_PREFIX}/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples|"   && cp -r ${INSTALLTMDIR}/build/$repo/test/ ${INSTALL_PREFIX}/examples/test/   && cp  ${INSTALLTMDIR}/build/$repo/CTestTestfile.cmake ${INSTALL_PREFIX}/examples/   && sed -i "s|${INSTALLTMDIR}/build/$repo/|${INSTALL_PREFIX}/examples/|g" ${INSTALL_PREFIX}/examples/test/CTestTestfile.cmake   && rm -fr ${INSTALLTMDIR}/    && chown -R docker:docker /home/docker]: exit code: 1

@@ -83,7 +83,8 @@
 # The gitlab.inria.fr/Damaris/damaris repo should build without the secret setup.
 # 
 # To build the damaris repo (no password needed):
-# sudo TAG=v1.5.0 DOCKER_BUILDKIT=1 docker build -t \
+# export TAG=v1.5.0 
+# sudo DOCKER_BUILDKIT=1 docker build -t \
 #            registry.gitlab.inria.fr/damaris:${TAG} \
 #            --build-arg INPUT_damaris_ver=${TAG} \
 #            --build-arg INPUT_repo=damaris \
@@ -93,6 +94,7 @@
 # password being setup for gitlab-read-repo user (within gitlab CI) in the 
 # MY_CI_READ_REPO_PWD variable:
 # see the .gitlab-ci.yml file, but it follows this pattern:
+#  export TAG=v1.5.0 
 #  sudo DOCKER_BUILDKIT=1 docker build -t \
 #          registry.gitlab.inria.fr/damaris-development:${TAG} \
 #          --secret id=thepassword,src=$MY_CI_READ_REPO_PWD \
@@ -128,7 +130,7 @@ ARG INPUT_repo
 ########################################
 ## Stage 1 of build
 ########################################
-FROM centos:8 AS builder
+FROM quay.io/centos/centos:stream8 AS builder
 SHELL ["/bin/bash", "-c"]
 
 
