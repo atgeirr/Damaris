@@ -62,7 +62,7 @@ docker-build:
     # - docker push "$CI_REGISTRY_IMAGE${tag}-centos8-p${PVSHORT}"
     # - sudo chmod +x ./build_damaris_on_paraview_base_images.sh
     # - apt -y install bash
-    - . build_damaris_on_paraview_base_images.sh  $CI_PROJECT_NAME  $CI_COMMIT_BRANCH  $MY_CI_READ_REPO_PWD > build_damaris_on_paraview_base_images.err
+    - /bin/bash -c build_damaris_on_paraview_base_images.sh  $CI_PROJECT_NAME  $CI_COMMIT_BRANCH  $MY_CI_READ_REPO_PWD > build_damaris_on_paraview_base_images.err
   # Run this job in a branch where a Dockerfile exists
   timeout: 5h 00m
 #  rules:
