@@ -47,6 +47,7 @@ docker-build:
       fi
     - pwd
     - cd build/docker/damaris
+    - ls -l
     # - docker image prune -f
     # - docker container prune -f
     # - docker builder prune -f
