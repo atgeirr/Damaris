@@ -2,7 +2,7 @@
 
 # Author: Josh Bowden, Inria
 # Date: 4/2/2022
-# Usage:   ./build_damaris_on_paraview_base_images.sh  DAMARIS_REPO  DAMARIS_VER  
+# Usage:   ./build_damaris_on_paraview_base_images.sh  DAMARIS_REPO  DAMARIS_VER   MY_CI_READ_REPO_PWD
 #               DAMARIS_VER   is the tag or a branch to build
 #               DAMARIS_REPO  is the repo to clone (damaris or damaris-development)
 #
@@ -38,6 +38,13 @@ if [[ "$2" != "" ]] ; then
 else
   export DAMARIS_VER=v1.5.0
 fi
+
+if [[ "$3" != "" ]] ; then
+  export MY_CI_READ_REPO_PWD=$3
+else
+  export MY_CI_READ_REPO_PWD=""
+fi
+
 
 
 PV_VER_ARRAY=(v5.8.0 v5.8.1 v5.9.0 v5.9.1 v5.10.0)
@@ -114,6 +121,7 @@ do
                 # echo "Building: $DOCKER_IMAGE_OUTPUTNAME:${BASEIMAGETAG}"
                DOCKER_BUILDKIT=1 docker build -t \
                   ${DOCKER_IMAGE_OUTPUTNAME}:${BASEIMAGETAG}-damaris-${DAMARIS_VER} \
+                  --secret id=thepassword,src=$MY_CI_READ_REPO_PWD \
                    --build-arg INPUT_damaris_ver=${DAMARIS_VER} \
                    --build-arg INPUT_repo=${DAMARIS_REPO} \
                   -f ./Dockerfile.out . 
@@ -125,6 +133,7 @@ do
                echo "ERROR: ${DOCKER_IMAGE_OUTPUTNAME}:${BASEIMAGETAG}-damaris-${DAMARIS_VER} could not be built"
               # echo ""
             fi
+            rm ./Dockerfile.out
          else
            echo "INFO: The base image ${DOCKER_IMAGE_BASENAME}:${BASEIMAGETAG} does not exist "
         fi

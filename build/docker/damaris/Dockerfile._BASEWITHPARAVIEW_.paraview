@@ -1,24 +1,14 @@
 # syntax=docker/dockerfile:1
-## Usage of this file (standalone or automated via gitlab CI): 
-# The gitlab.inria.fr/Damaris/damaris repo should build without the secret setup.
-# 
-# To build the damaris repo (no password needed):
-# export TAG=v1.5.0
-# export PV_VER=v5.9.0
-# export PVSHORT=${PV_VERSION//./}
-# sudo  DOCKER_BUILDKIT=1 docker build -t \
-#            registry.gitlab.inria.fr/damaris/damaris:${TAG}-deb11-p${PVSHORT) \
-#            --build-arg INPUT_damaris_ver=${TAG} \
-#            --build-arg INPUT_repo=damaris \
-#                -f ./Dockerfile.debian.paraview58 .
-# 
-# mpirun -np 4 singularity exec ubuntu20_paraview58  /usr/local/damaris/examples/paraview/image /usr/local/damaris/examples/paraview/image.xml
+#
+# This builds Damaris using the base images that must be pre-built 
+# from dockerfiles in  build/docker/bases
+# This file is templated and needs to have the following template strings replaced using sed:
+#   _BASEWITHPARAVIEW_  _DISTLIB_  _HDF_PATH_  _MPI_BIN_PATH_  _PV_SHORT_DOT_  _INSTALL_GFORT_
+# This will be carried out by script ./build_damaris_on_paraview_base_images.sh
 
-# This is a global arg that can be used in all stages of the build
-# ARG INPUT_repo
 
 ########################################
-## Stage 1 of build
+## Build Damaris from source with Paraview support
 ########################################
 FROM _BASEWITHPARAVIEW_ AS builder
 SHELL ["/bin/bash", "-c"]
