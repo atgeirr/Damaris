@@ -37,7 +37,7 @@ fi
 if [[ "$3" != "" ]] ; then
   export EXECMD=$3
 else
-  export EXECMD=ctest
+  export EXECMD="ctest -Q"
 fi
 
 
@@ -47,8 +47,8 @@ DOCKERFILE_ARRAY=(ubuntu20 ubuntu21 debian10 debian11 centos8 archlinux opensuse
 
 
 # To test a subset of the containers specify smaller arrays
-PV_VER_ARRAY=( v5.9.1)
-DOCKERFILE_ARRAY=(ubuntu20)
+# PV_VER_ARRAY=( v5.9.1)
+# DOCKERFILE_ARRAY=(ubuntu20)
 
 
 # This function gets a simplified version of the basename used in a Dockerfile
@@ -69,20 +69,65 @@ get_tag_name () {
 }
 
 
+#######################################################
+## Setting up the markdown table
+#######################################################
+
+MAX=1
+LEN_ARRAY=()
+# Get the length of each row header string and find the max of them all
+for DOCKERFILE in ${DOCKERFILE_ARRAY[@]};
+do
+    BASE_IMAGE_SHORT=$(get_tag_name "../bases/Dockerfile.${DOCKERFILE}.paraview")
+    CURRENT_NUM=${#BASE_IMAGE_SHORT}  # string length
+    if [[ "$CURRENT_NUM" -gt "$MAX" ]]; then
+       MAX="$CURRENT_NUM"
+    fi
+    LEN_ARRAY+=($CURRENT_NUM)
+done
+
+echo "GRAPH: Repository: $DAMARIS_REPO  branch:$DAMARIS_VER  "
+echo "GRAPH: Command Tested: $EXECMD  "
+TABLE_HEAD="GRAPH: |   "
+TABLE_BASE="GRAPH: |---"
+# Make the lines all matching length
+for STEP in $(seq 1 $MAX);  do
+    TABLE_HEAD+=" ";
+    TABLE_BASE+="-";
+done  
+# Add the columns for each Paraview install
+for PV_VERSION in ${PV_VER_ARRAY[@]};
+do
+  TABLE_HEAD+="| $PV_VERSION "
+  TABLE_BASE+="|--------"
+done
+echo "$TABLE_HEAD|"
+echo "$TABLE_BASE|"
+
+#######################################################
+##  Loop through docker images and run tests
+#######################################################
+
 # docker login registry.gitlab.inria.fr
 DOCKER_IMAGE_BASENAME=registry.gitlab.inria.fr/damaris/$DAMARIS_REPO
 # DOCKER_IMAGE_OUTPUTNAME=registry.gitlab.inria.fr/damaris/$DAMARIS_REPO
 i=0
 for DOCKERFILE in ${DOCKERFILE_ARRAY[@]};
 do
-
+    LEN=${LEN_ARRAY[$i]}
     BASE_IMAGE_SHORT=$(get_tag_name "../bases/Dockerfile.${DOCKERFILE}.paraview")
    
+    TABLE_ROW="GRAPH: | $BASE_IMAGE_SHORT "
+    # Make the GRAPH: lines all matching length
+    for STEP in $(seq $LEN $MAX);  do
+        TABLE_ROW+=" ";
+    done    
+
     # echo "DOCKERFILE=$BASE_IMAGE_SHORT  " 
     if [[ "$BASE_IMAGE_SHORT" != "" ]] ; then        
         for PV_VERSION in ${PV_VER_ARRAY[@]};
         do
-          echo ""
+          # echo ""
           PVSHORT=${PV_VERSION//./}
           PV_SHORT_DOT=${PV_VERSION:1:-2}
           BASEIMAGETAG=$(echo $BASE_IMAGE_SHORT-p${PVSHORT}${DAMARIS_VER})
@@ -97,18 +142,30 @@ do
               # Run the command within the Docker image:
               docker run  --rm -v /dev/shm:/dev/shm -p 22222:22222 -it \
                   ${DOCKER_IMAGE_BASENAME}:${BASEIMAGETAG} ${EXECMD}
-                  
             if [[ $? -eq 0 ]] ; then
-               echo "INFO: docker run ... ${DOCKER_IMAGE_BASENAME}:${BASEIMAGETAG} ${EXECMD} Completeded successfully"
+               # docker push "$DOCKER_IMAGE_OUTPUTNAME:${BASEIMAGETAG}-damaris-${DAMARIS_VER}"
+               # echo "INFO: ${DOCKER_IMAGE_OUTPUTNAME}:${BASEIMAGETAG}-damaris-${DAMARIS_VER} $EXECMD Completeded successfully"
+               TABLE_ROW+="|  pass  "
+               # echo ""
             else 
-                echo "ERROR: docker run ... ${DOCKER_IMAGE_BASENAME}:${BASEIMAGETAG} ${EXECMD} Failed"
+               # echo "ERROR: ${DOCKER_IMAGE_OUTPUTNAME}:${BASEIMAGETAG}-damaris-${DAMARIS_VER} $EXECMD failed"
+               TABLE_ROW+="|  fail   "
+              # echo ""
             fi
+            # rm ./Dockerfile.out
          else
-           echo "INFO: The base image ${DOCKER_IMAGE_BASENAME}:${BASEIMAGETAG} does not exist "
-         fi
+           # echo "INFO: The base image ${DOCKER_IMAGE_BASENAME}:${BASEIMAGETAG} does not exist "
+           TABLE_ROW+="|   pf   "
+        fi
         done
     else
       echo "ERROR: Dockerfile.${DOCKERFILE}.paraview does not exist - check the names given in DOCKERFILE_ARRAY"
     fi
+    echo "$TABLE_ROW|"
     i=$((i+1))
 done
+echo "GRAPH: Legend:  "
+echo "GRAPH: pass  : command completed successfully  "
+echo "GRAPH: fail  : command failed  "
+echo "GRAPH: pf : paraview base not built  "
+echo "GRAPH:   "
