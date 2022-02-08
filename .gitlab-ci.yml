@@ -62,7 +62,8 @@ docker-build:
     # - docker push "$CI_REGISTRY_IMAGE${tag}-centos8-p${PVSHORT}"
     # - sudo chmod +x ./build_damaris_on_paraview_base_images.sh
     # - apt -y install bash  
-    - apk add --no-cache bash curl
+    - apk add --no-cache bash 
+    - apk add --no-cache curl
     - ./build_damaris_on_paraview_base_images.sh  $CI_PROJECT_NAME  $CI_COMMIT_BRANCH  $MY_CI_READ_REPO_PWD | tee build_damaris_on_paraview_base_images.graph
     - cat build_damaris_on_paraview_base_images.graph | grep "^GRAPH:" | sed "s|GRAPH:||g" > build_damaris_on_paraview_base_images.md
     - DATA=$(cat build_damaris_on_paraview_base_images.md)
