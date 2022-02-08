@@ -81,34 +81,33 @@ get_tag_name () {
   echo $BASE_IMAGE_SHORT
 }
 
+
+#######################################################
+## Setting up the markdown table
+#######################################################
+
 MAX=1
 LEN_ARRAY=()
+# Get the length of each row header string and find the max of them all
 for DOCKERFILE in ${DOCKERFILE_ARRAY[@]};
 do
     BASE_IMAGE_SHORT=$(get_tag_name "../bases/Dockerfile.${DOCKERFILE}.paraview")
     CURRENT_NUM=${#BASE_IMAGE_SHORT}  # string length
-    if [[ "$CURRENT_NUM" > "$MAX" ]]; then
+    if [[ "$CURRENT_NUM" -gt "$MAX" ]]; then
        MAX="$CURRENT_NUM"
     fi
     LEN_ARRAY+=($CURRENT_NUM)
-    echo "GRAPH: $BASE_IMAGE_SHORT $CURRENT_NUM"
 done
-echo "GRAPH: MAX: $MAX  "
-
 
 echo "GRAPH: Repository: $DAMARIS_REPO  branch:$DAMARIS_VER"
-TABLE_HEAD="GRAPH: |  "
-TABLE_BASE="GRAPH: |--"
-
-for DOCKERFILE in ${DOCKERFILE_ARRAY[@]};
-do
-    LEN=${LEN_ARRAY[$i]}
-    # Make the GRAPH: lines all matching length
-    for STEP in {1..$MAX};  do
-        TABLE_HEAD+=" "
-        TABLE_BASE+="-"
-    done  
-done
+TABLE_HEAD="GRAPH: |   "
+TABLE_BASE="GRAPH: |---"
+# Make the lines all matching length
+for STEP in $(seq 1 $MAX);  do
+    TABLE_HEAD+=" ";
+    TABLE_BASE+="-";
+done  
+# Add the columns for each Paraview install
 for PV_VERSION in ${PV_VER_ARRAY[@]};
 do
   TABLE_HEAD+="| $PV_VERSION "
@@ -118,6 +117,9 @@ echo "$TABLE_HEAD|"
 echo "$TABLE_BASE|"
 
 
+#######################################################
+##  Loop through docker images and build damaris
+#######################################################
 
 # docker login registry.gitlab.inria.fr
 DOCKER_IMAGE_BASENAME=registry.gitlab.inria.fr/damaris/damaris-development
@@ -137,7 +139,7 @@ do
     TABLE_ROW="GRAPH: | $BASE_IMAGE_SHORT "
     
     # Make the GRAPH: lines all matching length
-    for STEP in {$LEN..$MAX};  do
+    for STEP in $(seq $LEN $MAX);  do
         TABLE_ROW+=" ";
     done    
     
@@ -164,16 +166,16 @@ do
                 sed -i "s|_PV_SHORT_DOT_|${PV_SHORT_DOT}|g" Dockerfile.out
                 sed -i "s|_INSTALL_GFORT_|${GFORT}|g" Dockerfile.out
                 # echo "Building: $DOCKER_IMAGE_OUTPUTNAME:${BASEIMAGETAG}"
-               DOCKER_BUILDKIT=1 docker build -t \
-                  ${DOCKER_IMAGE_OUTPUTNAME}:${BASEIMAGETAG}-damaris-${DAMARIS_VER} \
-                  --secret id=thepassword,src=$MY_CI_READ_REPO_PWD \
-                   --build-arg INPUT_damaris_ver=${DAMARIS_VER} \
-                   --build-arg INPUT_repo=${DAMARIS_REPO} \
-                  -f ./Dockerfile.out . 
+               # DOCKER_BUILDKIT=1 docker build -t \
+              #    ${DOCKER_IMAGE_OUTPUTNAME}:${BASEIMAGETAG}-damaris-${DAMARIS_VER} \
+              #    --secret id=thepassword,src=$MY_CI_READ_REPO_PWD \
+               #    --build-arg INPUT_damaris_ver=${DAMARIS_VER} \
+              #     --build-arg INPUT_repo=${DAMARIS_REPO} \
+              #    -f ./Dockerfile.out . 
             if [[ $? -eq 0 ]] ; then
                docker push "$DOCKER_IMAGE_OUTPUTNAME:${BASEIMAGETAG}-damaris-${DAMARIS_VER}"
                echo "INFO: ${DOCKER_IMAGE_OUTPUTNAME}:${BASEIMAGETAG}-damaris-${DAMARIS_VER}  built"
-               TABLE_ROW+="|   +    "
+               TABLE_ROW+="|   d    "
                # echo ""
             else 
                echo "ERROR: ${DOCKER_IMAGE_OUTPUTNAME}:${BASEIMAGETAG}-damaris-${DAMARIS_VER} could not be built"
@@ -183,7 +185,7 @@ do
             rm ./Dockerfile.out
          else
            echo "INFO: The base image ${DOCKER_IMAGE_BASENAME}:${BASEIMAGETAG} does not exist "
-           TABLE_ROW+="|   -    "
+           TABLE_ROW+="|   pf   "
         fi
         done
     else
@@ -192,6 +194,7 @@ do
     echo "$TABLE_ROW|"
     i=$((i+1))
 done
-echo "GRAPH: + : damaris built "
-echo "GRAPH: x : damaris not built"
-echo "GRAPH: - : paraview base not built"
+echo "GRAPH: Legend:  "
+echo "GRAPH: d  : damaris built  "
+echo "GRAPH: x  : damaris not built  "
+echo "GRAPH: pf : paraview base not built  "
