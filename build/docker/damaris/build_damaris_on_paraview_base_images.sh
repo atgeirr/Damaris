@@ -81,6 +81,17 @@ get_tag_name () {
   echo $BASE_IMAGE_SHORT
 }
 
+echo "GRAPH: $DAMARIS_REPO $DAMARIS_VER"
+TABLE_HEAD="GRAPH: "
+TABLE_BASE="GRAPH: "
+for PV_VERSION in ${PV_VER_ARRAY[@]};
+do
+  TABLE_HEAD+="| $PV_VERSION "
+  TABLE_BASE+="|---------"
+done
+echo "$TABLE_HEAD|"
+echo "$TABLE_BASE|"
+
 
 # docker login registry.gitlab.inria.fr
 DOCKER_IMAGE_BASENAME=registry.gitlab.inria.fr/damaris/damaris-development
@@ -96,6 +107,8 @@ do
     HDF_PATH=${HDF_PATH_ARRAY[${WHICH_HDFPATH}]}
     MPI_BIN_PATH=${MPI_BIN_PATH_ARRAY[$i]}
     GFORT=${GFORT_ARRAY[$i]}
+    
+    TABLE_ROW="GRAPH: | $DOCKERFILE |"
     # echo "DOCKERFILE=$DOCKERFILE    LIB64 = $LIB64  WHICH_HDFPATH=$WHICH_HDFPATH  HDF_PATH=$HDF_PATH  " 
     if [[ "$BASE_IMAGE_SHORT" != "" ]] ; then
         for PV_VERSION in ${PV_VER_ARRAY[@]};
@@ -128,18 +141,25 @@ do
             if [[ $? -eq 0 ]] ; then
                docker push "$DOCKER_IMAGE_OUTPUTNAME:${BASEIMAGETAG}-damaris-${DAMARIS_VER}"
                echo "INFO: ${DOCKER_IMAGE_OUTPUTNAME}:${BASEIMAGETAG}-damaris-${DAMARIS_VER}  built"
+               TABLE_ROW+="|   +    "
                # echo ""
             else 
                echo "ERROR: ${DOCKER_IMAGE_OUTPUTNAME}:${BASEIMAGETAG}-damaris-${DAMARIS_VER} could not be built"
+               TABLE_ROW+="|   x    "
               # echo ""
             fi
             rm ./Dockerfile.out
          else
            echo "INFO: The base image ${DOCKER_IMAGE_BASENAME}:${BASEIMAGETAG} does not exist "
+           TABLE_ROW+="|   -    "
         fi
         done
     else
       echo "ERROR: Dockerfile.${DOCKERFILE}.paraview does not exist - check the names given in DOCKERFILE_ARRAY"
     fi
+    echo "$TABLE_ROW|"
     i=$((i+1))
 done
+echo "GRAPH: + : damaris built "
+echo "GRAPH: x : damaris not built"
+echo "GRAPH: - : paraview base not built"
