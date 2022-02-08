@@ -81,16 +81,39 @@ get_tag_name () {
   echo $BASE_IMAGE_SHORT
 }
 
+MAX=1
+LEN_ARRAY=()
+for DOCKERFILE in ${DOCKERFILE_ARRAY[@]};
+do
+    BASE_IMAGE_SHORT=$(get_tag_name "../bases/Dockerfile.${DOCKERFILE}.paraview")
+    CURRENT_NUM=${#BASE_IMAGE_SHORT}  # string length
+    if [[ "$CURRENT_NUM" > "$MAX" ]]; then
+       MAX="$CURRENT_NUM"
+    fi
+    LEN_ARRAY+=($CURRENT_NUM)
+done
+
 echo "GRAPH: Repository: $DAMARIS_REPO  branch:$DAMARIS_VER"
-TABLE_HEAD="GRAPH: |               "
-TABLE_BASE="GRAPH: |---------------"
+TABLE_HEAD="GRAPH: |  "
+TABLE_BASE="GRAPH: |--"
+
+for DOCKERFILE in ${DOCKERFILE_ARRAY[@]};
+do
+    LEN=${LEN_ARRAY[$i]}
+    # Make the GRAPH: lines all matching length
+    for STEP in {1..$MAX};  do
+        TABLE_HEAD+=" "
+        TABLE_BASE+="-"
+    done  
+done
 for PV_VERSION in ${PV_VER_ARRAY[@]};
 do
   TABLE_HEAD+="| $PV_VERSION "
-  TABLE_BASE+="|---------"
+  TABLE_BASE+="|--------"
 done
 echo "$TABLE_HEAD|"
 echo "$TABLE_BASE|"
+
 
 
 # docker login registry.gitlab.inria.fr
@@ -107,8 +130,13 @@ do
     HDF_PATH=${HDF_PATH_ARRAY[${WHICH_HDFPATH}]}
     MPI_BIN_PATH=${MPI_BIN_PATH_ARRAY[$i]}
     GFORT=${GFORT_ARRAY[$i]}
+    LEN=${LEN_ARRAY[$i]}
+    TABLE_ROW="GRAPH: | $BASE_IMAGE_SHORT "
     
-    TABLE_ROW="GRAPH: | $BASE_IMAGE_SHORT  "
+    # Make the GRAPH: lines all matching length
+    for STEP in {$LEN..$MAX};  do
+        TABLE_ROW+=" ";
+    done    
     
     # echo "DOCKERFILE=$DOCKERFILE    LIB64 = $LIB64  WHICH_HDFPATH=$WHICH_HDFPATH  HDF_PATH=$HDF_PATH  " 
     if [[ "$BASE_IMAGE_SHORT" != "" ]] ; then
