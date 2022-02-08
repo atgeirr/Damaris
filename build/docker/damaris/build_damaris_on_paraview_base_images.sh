@@ -81,9 +81,9 @@ get_tag_name () {
   echo $BASE_IMAGE_SHORT
 }
 
-echo "GRAPH: $DAMARIS_REPO $DAMARIS_VER"
-TABLE_HEAD="GRAPH: "
-TABLE_BASE="GRAPH: "
+echo "GRAPH: Repository: $DAMARIS_REPO  branch:$DAMARIS_VER"
+TABLE_HEAD="GRAPH: |               "
+TABLE_BASE="GRAPH: |---------------"
 for PV_VERSION in ${PV_VER_ARRAY[@]};
 do
   TABLE_HEAD+="| $PV_VERSION "
@@ -108,7 +108,8 @@ do
     MPI_BIN_PATH=${MPI_BIN_PATH_ARRAY[$i]}
     GFORT=${GFORT_ARRAY[$i]}
     
-    TABLE_ROW="GRAPH: | $DOCKERFILE |"
+    TABLE_ROW="GRAPH: | $BASE_IMAGE_SHORT  "
+    
     # echo "DOCKERFILE=$DOCKERFILE    LIB64 = $LIB64  WHICH_HDFPATH=$WHICH_HDFPATH  HDF_PATH=$HDF_PATH  " 
     if [[ "$BASE_IMAGE_SHORT" != "" ]] ; then
         for PV_VERSION in ${PV_VER_ARRAY[@]};
