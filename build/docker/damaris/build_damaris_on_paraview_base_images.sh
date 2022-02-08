@@ -91,7 +91,10 @@ do
        MAX="$CURRENT_NUM"
     fi
     LEN_ARRAY+=($CURRENT_NUM)
+    echo "GRAPH: $BASE_IMAGE_SHORT $CURRENT_NUM"
 done
+echo "GRAPH: MAX: $MAX  "
+
 
 echo "GRAPH: Repository: $DAMARIS_REPO  branch:$DAMARIS_VER"
 TABLE_HEAD="GRAPH: |  "
