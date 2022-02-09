@@ -61,7 +61,7 @@ docker-build:
     # - DOCKER_BUILDKIT=1 docker build --no-cache --pull -t "${CI_REGISTRY_IMAGE}${tag}-centos8-p${PVSHORT}" --secret id=thepassword,src=$MY_CI_READ_REPO_PWD --build-arg INPUT_damaris_ver=$CI_COMMIT_BRANCH --build-arg INPUT_repo=$CI_PROJECT_NAME  --build-arg INPUT_pv_ver=${PV_VERSION} -f ./Dockerfile.centos8.paraview .
     # - docker push "$CI_REGISTRY_IMAGE${tag}-centos8-p${PVSHORT}"
     # - sudo chmod +x ./build_damaris_on_paraview_base_images.sh
-    # - apt -y install bash  
+    # - apt -y install bash 
     - apk add --no-cache bash 
     - ./build_damaris_on_paraview_base_images.sh  $CI_PROJECT_NAME  $CI_COMMIT_BRANCH  $MY_CI_READ_REPO_PWD | tee build_damaris_on_paraview_base_images.graph
     - ./test_damaris_images.sh   $CI_PROJECT_NAME  -damaris-$CI_COMMIT_BRANCH  "ctest -VV" | tee -a build_damaris_on_paraview_base_images.graph

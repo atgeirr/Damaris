@@ -69,6 +69,10 @@ get_tag_name () {
 }
 
 
+# docker login registry.gitlab.inria.fr
+DOCKER_IMAGE_BASENAME=registry.gitlab.inria.fr/damaris/$DAMARIS_REPO
+# DOCKER_IMAGE_OUTPUTNAME=registry.gitlab.inria.fr/damaris/$DAMARIS_REPO
+
 #######################################################
 ## Setting up the markdown table
 #######################################################
@@ -86,8 +90,9 @@ do
     LEN_ARRAY+=($CURRENT_NUM)
 done
 
-echo "GRAPH: Repository: $DAMARIS_REPO  branch:$DAMARIS_VER  "
-echo "GRAPH: Command Tested: $EXECMD  "
+
+echo "GRAPH: Docker image base : $DOCKER_IMAGE_BASENAME<O.S.><ParaView>$DAMARIS_VER  "
+echo "GRAPH: Command Tested    : $EXECMD  "
 TABLE_HEAD="GRAPH: |   "
 TABLE_BASE="GRAPH: |---"
 # Make the lines all matching length
@@ -108,9 +113,7 @@ echo "$TABLE_BASE|"
 ##  Loop through docker images and run tests
 #######################################################
 
-# docker login registry.gitlab.inria.fr
-DOCKER_IMAGE_BASENAME=registry.gitlab.inria.fr/damaris/$DAMARIS_REPO
-# DOCKER_IMAGE_OUTPUTNAME=registry.gitlab.inria.fr/damaris/$DAMARIS_REPO
+
 i=0
 for DOCKERFILE in ${DOCKERFILE_ARRAY[@]};
 do
@@ -140,7 +143,7 @@ do
               # The base container exists in the repository                  
               # echo "Building: $DOCKER_IMAGE_OUTPUTNAME:${BASEIMAGETAG}"
               # Run the command within the Docker image:
-              docker run  --rm -v /dev/shm:/dev/shm -p 22222:22222 -it \
+              docker run  --rm -v /dev/shm:/dev/shm -p 22222:22222 \
                   ${DOCKER_IMAGE_BASENAME}:${BASEIMAGETAG} ${EXECMD}
             if [[ $? -eq 0 ]] ; then
                # docker push "$DOCKER_IMAGE_OUTPUTNAME:${BASEIMAGETAG}-damaris-${DAMARIS_VER}"
@@ -149,13 +152,13 @@ do
                # echo ""
             else 
                # echo "ERROR: ${DOCKER_IMAGE_OUTPUTNAME}:${BASEIMAGETAG}-damaris-${DAMARIS_VER} $EXECMD failed"
-               TABLE_ROW+="|  fail   "
+               TABLE_ROW+="|  fail  "
               # echo ""
             fi
             # rm ./Dockerfile.out
          else
            # echo "INFO: The base image ${DOCKER_IMAGE_BASENAME}:${BASEIMAGETAG} does not exist "
-           TABLE_ROW+="|   pf   "
+           TABLE_ROW+="|  nbc  "
         fi
         done
     else
@@ -167,5 +170,5 @@ done
 echo "GRAPH: Legend:  "
 echo "GRAPH: pass  : command completed successfully  "
 echo "GRAPH: fail  : command failed  "
-echo "GRAPH: pf : paraview base not built  "
+echo "GRAPH: nbc   : damaris base not built  "
 echo "GRAPH:   "
