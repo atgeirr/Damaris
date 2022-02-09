@@ -64,7 +64,7 @@ docker-build:
     # - apt -y install bash  
     - apk add --no-cache bash 
     - ./build_damaris_on_paraview_base_images.sh  $CI_PROJECT_NAME  $CI_COMMIT_BRANCH  $MY_CI_READ_REPO_PWD | tee build_damaris_on_paraview_base_images.graph
-    - ./test_damaris_images.sh   $CI_PROJECT_NAME  $CI_COMMIT_BRANCH  "ctest -VV" | tee -a build_damaris_on_paraview_base_images.graph
+    - ./test_damaris_images.sh   $CI_PROJECT_NAME  -damaris-$CI_COMMIT_BRANCH  "ctest -VV" | tee -a build_damaris_on_paraview_base_images.graph
     - cat build_damaris_on_paraview_base_images.graph | grep "^GRAPH:" | sed "s|GRAPH:||g" > build_damaris_on_paraview_base_images.md
     
     # - apk add --no-cache curl
@@ -72,6 +72,7 @@ docker-build:
     # - curl  -X GET  --header "PRIVATE-TOKEN:  $CI_JOB_TOKEN"  "https://gitlab.inria.fr/api/v4/projects/Damaris%2Fdamaris-development/wikis/Build-success-table"
     # - curl  --request PUT --data "format=markdown&content=$DATA&title=Build-success-table"  --header "PRIVATE-TOKEN:  $CI_JOB_TOKEN"  "https://gitlab.inria.fr/api/v4/projects/Damaris%2Fdamaris-development/wikis/Build-success-table"
     - rm build_damaris_on_paraview_base_images.graph    
+    - cat build_damaris_on_paraview_base_images.md
   # Run this job in a branch where a Dockerfile exists
   timeout: 5h 00m
 #  rules:
