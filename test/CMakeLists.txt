@@ -2,6 +2,8 @@ configure_file(test.xml test.xml COPYONLY)
 
 set(CMAKE_C_STANDARD 99)
 
+
+
 add_executable(TestDataSpace TestDataSpace.cpp)
 target_link_libraries(TestDataSpace ${DEP_LIBRARIES} ${CPPUNIT_LIBRARIES})
 
@@ -32,7 +34,15 @@ target_link_libraries(TestAction damaris ${DEP_LIBRARIES} ${CPPUNIT_LIBRARIES})
 add_executable(TestEventLogger TestEventLogger.cpp)
 target_link_libraries(TestEventLogger damaris ${DEP_LIBRARIES} ${CPPUNIT_LIBRARIES})
 
+add_executable(TestModifyModel TestModifyModel.cpp)
+target_link_libraries(TestModifyModel damaris ${DEP_LIBRARIES} ${CPPUNIT_LIBRARIES})
 
+add_executable(TestModifyModelParallel TestModifyModelParallel.cpp)
+target_link_libraries(TestModifyModelParallel damaris ${DEP_LIBRARIES} ${CPPUNIT_LIBRARIES})
+
+
+add_test(NAME "TestModifyModelParallel"     COMMAND mpirun --hostfile ${CMAKE_BINARY_DIR}/test/my-hostfile -np 4 ${CMAKE_BINARY_DIR}/test/TestModifyModelParallel)  # TestModifyModelParallel test assumes -np 4 
+add_test(NAME "TestModify"          COMMAND ${CMAKE_BINARY_DIR}/test/TestModifyModel)
 add_test(NAME "TestDataSpace"       COMMAND ${CMAKE_BINARY_DIR}/test/TestDataSpace)
 add_test(NAME "TestVariableManager" COMMAND ${CMAKE_BINARY_DIR}/test/TestVariableManager)
 add_test(NAME "TestLayoutManager"   COMMAND ${CMAKE_BINARY_DIR}/test/TestLayoutManager)
@@ -43,3 +53,4 @@ add_test(NAME "TestVariable"        COMMAND mpirun --hostfile ${CMAKE_BINARY_DIR
 add_test(NAME "TestActionManager"   COMMAND mpirun --hostfile ${CMAKE_BINARY_DIR}/test/my-hostfile -np 1 ${CMAKE_BINARY_DIR}/test/TestActionManager)
 add_test(NAME "TestAction"          COMMAND mpirun --hostfile ${CMAKE_BINARY_DIR}/test/my-hostfile -np 3 ${CMAKE_BINARY_DIR}/test/TestAction)
 add_test(NAME "TestEventLogger"     COMMAND ${CMAKE_BINARY_DIR}/test/TestEventLogger)
+

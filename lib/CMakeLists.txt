@@ -40,6 +40,7 @@ set(DAMARIS_SRC
 	${DAMARIS_SOURCE_DIR}/src/comm/MPI2Reactor.cpp
 	${DAMARIS_SOURCE_DIR}/src/buffer/SharedMemorySegment.cpp
 	${DAMARIS_SOURCE_DIR}/src/model/BcastXML.cpp
+	${DAMARIS_SOURCE_DIR}/src/model/ModifyModel.cpp
 	${DAMARIS_SOURCE_DIR}/src/log/EventLogger.cpp
 	${DAMARIS_SOURCE_DIR}/src/storage/StorageManager.cpp
 	${DAMARIS_SOURCE_DIR}/src/storage/NullStore.cpp

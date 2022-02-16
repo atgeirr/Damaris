@@ -124,6 +124,10 @@ private:
 	}
 
 public:
+    
+    static bool Init( void * configXMLSim,
+            MPI_Comm world);
+    
     /**
      * Initializes the environment given a model and a communicator.
      * The configuration file must exist (Abort if the file does not exist).

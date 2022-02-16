@@ -75,6 +75,7 @@ std::shared_ptr<Simulation> BcastXML(const MPI_Comm& comm, const std::string& ur
 				xml_schema::flags::dont_validate);
 	} catch(xml_schema::exception &e) {
 		ERROR(e.what());
+        ERROR("The XML input was :\n" << content << "\n");
 		exit(-1);
 	}
 	
@@ -93,6 +94,7 @@ std::shared_ptr<Simulation> LoadXML(const std::string& uri)
 		xmlfile.close();
 	} catch(xml_schema::exception &e) {
 		ERROR(e.what());
+        ERROR("The XML file was : " << uri << "\n");
 		exit(-1);
 	}
 	return std::shared_ptr<Simulation>(std::move(model));
