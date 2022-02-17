@@ -18,6 +18,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <map>
 
 #include "damaris/model/Model.hpp"
 
@@ -29,13 +30,15 @@ namespace model {
  * configuration file and then modify then XML model that is created so that 
  * the Damaris configuration can spcified prorammatically.
  */
-    class ModifyModel {
+class ModifyModel {
+          
     private:
         std::string config_xml_ ; /*!< A string of XML that (will) conform to the Damaris XSD model. */
         std::unique_ptr<Simulation> simModel_ ; /*!< The Damaris XML model that will be created rom the config_xml_ string */
         bool converted_ ;          /*!< is true if the string XML value has been converted to the std::unique_ptr<Simulation> value */
-        
+                     
     public:
+
         /**
         * Constructor (Default). Initializes config_xml_ string to a basic XML string based that contains
         * REGEX substrings to replace (good for testing)
@@ -55,19 +58,41 @@ namespace model {
         *
         * \param[in] input_xml : A string of XML that needs to (after any preprocessing) conform to the Damaris XSD model.
         */
-        void SetXMLstring(std::string& input_xml) ;
+        void SetXMLstring(std::string& input_xml) ;       
+        /**
+        * Repalces keys in the XML string with  values found in the std::map
+        * 
+        * \param[in] find_and_replace : std::map of string,string pairs where the key (->first) is the string to
+        *                                find and the value (->second) is the string with which to replace) 
+        */
+        void RepalceWithRegEx( std::map<std::string,std::string> find_and_replace ) ;
+        
+        /**
+         * Returns the currrent XML based Damaris configuration string
+         */
+        std::string & GetConfigString( void ) ;
+        
+        /**
+         * Save the current XML string to a file
+         * 
+         *  * \param[in] filename :  The filename to save the config_xml_XML string to 
+         */
+        void SaveXMLStringToFile(std::string filename ) ;
+    
+        
+    protected:
         
         /**
         *  Uses ModifyModel::config_xml_ string to initialize the the Damaris XML *Simulation* model. 
-        *  Only call this method after any required preprocessing has been done.
+        *  Only call this method after any required preprocessing has been done to the XML string.
         *
-        * \param[in] input_xml : A string of XML that (will) conform to the Damaris XSD model.
         */
         void SetSimulationModel( void ) ;
         
         
         /**
-        *  Returns the *Simulation* model as a shared_ptr<>
+        *  Returns the *Simulation* model as a shared_ptr<>. This class will then not contain a Simulation object, 
+        *  so SetSimulationModel() will nedd to be called again to generate one.
         *  Only call this method after any required preprocessing has been done.
         * 
         * \param[in] ignore_converted_ : if true then returns the  simModel_ object before it has been initialized by the XML text. This is experimental.
@@ -82,28 +107,14 @@ namespace model {
         */
         void * PassModelAsVoidPtr( void ) ;
         
+        
         /**
-        * Repalces keys in the XML string with  values found in the std::map
-        * 
-        * \param[in] find_and_replace : std::map of string,string pairs where the key (->first) is the string to
-        *                                find and the value (->second) is the string with which to replace) 
+        * Allows access to the  the Damaris XML *Simulation* model so it can be modified using the XSD geenrated API
+        * N.B. Used for testing, not used in Damaris public API
         */
-        void RepalceWithRegEx( std::map<std::string,std::string> find_and_replace ) ;
+        Simulation * GetModel( void ) ;
         
-        /**
-         * Returns the currrent XML based Damaris configuration string
-         */
-        std::string & getConfigString( void ) ;
-        
-        /**
-         * Save the current XML string to a file
-         * 
-         *  * \param[in] filename :  The filename to save the config_xml_XML string to 
-         */
-        void SaveXMLStringToFile(std::string filename ) ;
-    
-        
-    };  // end of  class ModifyModel
+};  // end of  class ModifyModel
     
 }
 }

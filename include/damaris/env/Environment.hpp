@@ -125,15 +125,27 @@ private:
 
 public:
     
+    /**
+     * Initializes the environment given a pre-initialized XML model and a communicator.
+     * This is only used in testing of of the ModifyModel class that alows pre-processing of
+     * an XML file and creation of the model::Simulation object. The methods have been declared
+     * protected so that users are discouraged from using them.
+     * This function will initialize all Managers. Environment::Finalize() should be called when 
+     * finished
+     *
+     * \param[in] confiFile : void pointer that points to a model::Simulation object
+     * \param[in] global : global MPI communicator.
+     */
     static bool Init( void * configXMLSim,
             MPI_Comm world);
     
     /**
-     * Initializes the environment given a model and a communicator.
+     * Initializes the environment given an XML version of a model and a communicator.
      * The configuration file must exist (Abort if the file does not exist).
      * The hardware configuration (number of cores in each node) must
      * match the configuration file (Abort otherwise).
-     * This function will initialize all Managers.
+     * This function will initialize all Managers. Environment::Finalize() should be called when 
+     * finished.
      *
      * \param[in] confiFile : name of the XML file to read.
      * \param[in] global : global MPI communicator.

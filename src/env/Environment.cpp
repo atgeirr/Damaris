@@ -63,78 +63,6 @@ bool				Environment::_sharedStructuresOwner_;
 
 
 
-bool Environment::Init( void * configXMLSim,
-            MPI_Comm world) {
-
-    if(_initialized_) return false;
-
-    _baseModel_ = std::shared_ptr<model::Simulation>( static_cast<model::Simulation *>( configXMLSim )) ;
-      
-    int size, rank;
-    MPI_Comm_size(world,&size);
-    MPI_Comm_rank(world,&rank);
-
-    // _baseModel_ = model::BcastXML(world,configFile);
-    _globalComm_ = world;
-    _lastIteration_ = 0;
-    _initialized_ = true;
-
-    /* Compute the magic number of the simulation */
-    time_t mgnbr;
-    time(&mgnbr);
-    MPI_Bcast(&mgnbr,sizeof(time_t),MPI_BYTE,0,_globalComm_);
-    std::ostringstream oss;
-    oss << mgnbr;
-    _magicNumber_ = oss.str();
-
-    /* Create a new communicator gathering processes of the same node */
-    int node_id = Hardware::GetNodeID();
-    MPI_Comm_split(_globalComm_,node_id,rank,&_nodeComm_);
-
-    /* Create a global communicator with ordered ranks */
-    MPI_Comm orderedComm;
-    MPI_Comm_split(_globalComm_,0,node_id,&orderedComm);
-    _globalComm_ = orderedComm;
-    MPI_Comm_rank(_globalComm_,&_globalProcessID_);
-
-    /* Get the size of the node */
-    MPI_Comm_size(_nodeComm_,&_coresPerNode_);
-
-    // Get the number of the nodes
-    _numberOfNodes_ = size/_coresPerNode_;
-
-    if (_baseModel_->log().present()) {
-        /* Initialize the logger single instance */
-        std::string file_name = _baseModel_->log().get().FileName();
-        int rotation_size = _baseModel_->log().get().RotationSize();
-        std::string log_format = _baseModel_->log().get().LogFormat();
-        LogLevelType::value log_level = _baseModel_->log().get().LogLevel();
-
-        _eventLogger_ = EventLogger::New();
-        _eventLogger_->Init(rank, file_name, rotation_size, log_format, log_level);
-        _eventLogger_->Log("EventLogger initiated successfully\n" , EventLogger::Info);
-    }
-
-    bool retbool ;
-    /* If there are dedicated nodes */
-    if(_baseModel_->architecture().dedicated().nodes() > 0) {
-        /* There are dedicated nodes */
-        retbool = InitDedicatedNodes();
-    } else if(_baseModel_->architecture().dedicated().cores() > 0) {
-        retbool =  InitDedicatedCores(_globalComm_);
-    } else {
-        retbool =  InitStandalone(_globalComm_);
-    }
-
-    // Set LogLevel to Debug to get the string output to the log file
-    if (GetModel()->log().present()) {
-        if (GetModel()->log().get().LogLevel() < 2) SetEnvString() ;
-    }
-
-    return (retbool) ;
-}
-
-
 
 bool Environment::Init(const std::string& configFile,
 			MPI_Comm world) {
@@ -205,6 +133,80 @@ bool Environment::Init(const std::string& configFile,
 	return (retbool) ;
 }
 
+
+
+/* This method is not used in the public Damaris API functions. Currently here for testing of ModifyModel class
+ */
+bool Environment::Init( void * configXMLSim,
+            MPI_Comm world) {
+
+    if(_initialized_) return false;
+
+    _baseModel_ = std::shared_ptr<model::Simulation>( static_cast<model::Simulation *>( configXMLSim )) ;
+      
+    int size, rank;
+    MPI_Comm_size(world,&size);
+    MPI_Comm_rank(world,&rank);
+
+    // _baseModel_ = model::BcastXML(world,configFile);
+    _globalComm_ = world;
+    _lastIteration_ = 0;
+    _initialized_ = true;
+
+    /* Compute the magic number of the simulation */
+    time_t mgnbr;
+    time(&mgnbr);
+    MPI_Bcast(&mgnbr,sizeof(time_t),MPI_BYTE,0,_globalComm_);
+    std::ostringstream oss;
+    oss << mgnbr;
+    _magicNumber_ = oss.str();
+
+    /* Create a new communicator gathering processes of the same node */
+    int node_id = Hardware::GetNodeID();
+    MPI_Comm_split(_globalComm_,node_id,rank,&_nodeComm_);
+
+    /* Create a global communicator with ordered ranks */
+    MPI_Comm orderedComm;
+    MPI_Comm_split(_globalComm_,0,node_id,&orderedComm);
+    _globalComm_ = orderedComm;
+    MPI_Comm_rank(_globalComm_,&_globalProcessID_);
+
+    /* Get the size of the node */
+    MPI_Comm_size(_nodeComm_,&_coresPerNode_);
+
+    // Get the number of the nodes
+    _numberOfNodes_ = size/_coresPerNode_;
+
+    if (_baseModel_->log().present()) {
+        /* Initialize the logger single instance */
+        std::string file_name = _baseModel_->log().get().FileName();
+        int rotation_size = _baseModel_->log().get().RotationSize();
+        std::string log_format = _baseModel_->log().get().LogFormat();
+        LogLevelType::value log_level = _baseModel_->log().get().LogLevel();
+
+        _eventLogger_ = EventLogger::New();
+        _eventLogger_->Init(rank, file_name, rotation_size, log_format, log_level);
+        _eventLogger_->Log("EventLogger initiated successfully\n" , EventLogger::Info);
+    }
+
+    bool retbool ;
+    /* If there are dedicated nodes */
+    if(_baseModel_->architecture().dedicated().nodes() > 0) {
+        /* There are dedicated nodes */
+        retbool = InitDedicatedNodes();
+    } else if(_baseModel_->architecture().dedicated().cores() > 0) {
+        retbool =  InitDedicatedCores(_globalComm_);
+    } else {
+        retbool =  InitStandalone(_globalComm_);
+    }
+
+    // Set LogLevel to Debug to get the string output to the log file
+    if (GetModel()->log().present()) {
+        if (GetModel()->log().get().LogLevel() < 2) SetEnvString() ;
+    }
+
+    return (retbool) ;
+}
 
 
 

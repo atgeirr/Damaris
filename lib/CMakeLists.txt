@@ -126,7 +126,8 @@ target_include_directories(damaris PUBLIC $<INSTALL_INTERFACE:include>)
 target_include_directories(damaris BEFORE PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>)
 target_include_directories(damaris PUBLIC ${Boost_INCLUDE_DIRS}
-		${XSD_INCLUDE_DIR} ${XercesC_INCLUDE_DIRS})
+                                            ${XercesC_INCLUDE_DIRS})
+# ${XSD_INCLUDE_DIR}  have been removed from above
 if(ENABLE_VISIT)
 	target_include_directories(damaris PUBLIC ${VisIt_INCLUDE_DIRS})
 endif(ENABLE_VISIT)

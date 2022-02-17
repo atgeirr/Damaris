@@ -11,16 +11,23 @@
 #include "damaris/action/ActionManager.hpp"
 #include "damaris/env/Environment.hpp"
 
-extern "C" void my_function(const char* name, int32_t source, int32_t /*iteration*/,
-		const char* args)
-{
-	CPPUNIT_ASSERT(std::string(name) == "test_event");
-	CPPUNIT_ASSERT(source == 1);
-	std::cout << "hello world !" << std::endl;
-}
 
 namespace damaris {
 
+/* I am adding the derived class so I can get access to the protected methods that have been hidden
+ * so that they are not used in any final user code (for now)
+ */
+namespace model {
+class ModifyModelDerived : public ModifyModel {
+    public:  
+        using ModifyModel::ModifyModel;
+        using ModifyModel::SetSimulationModel;
+        using ModifyModel::ReturnSimulationModel;
+        using ModifyModel::PassModelAsVoidPtr;
+        using ModifyModel::GetModel;
+         
+} ;
+}
 
 class TestModifyModel : public CppUnit::TestFixture {
 	
@@ -70,8 +77,8 @@ _MYSTORE_OR_EMPTY_REGEX_
 outputdir
 MyStore
 )V0G0N";
-		damaris::model::ModifyModel myMod = damaris::model::ModifyModel(input_xml);
-        // std::cout << "Input string: " << std::endl  << myMod.getConfigString()  << std::endl ;
+		damaris::model::ModifyModelDerived myMod = damaris::model::ModifyModelDerived(input_xml);
+        // std::cout << "Input string: " << std::endl  << myMod.GetConfigString()  << std::endl ;
         std::map<std::string,std::string> find_replace_map = {
         {"_SHMEM_BUFFER_BYTES_REGEX_","67108864"},
         {"_DC_REGEX_","2"},
@@ -82,14 +89,12 @@ MyStore
         myMod.RepalceWithRegEx(find_replace_map);
         
         CPPUNIT_ASSERT_EQUAL_MESSAGE("Comparing REGEXed string with expected",
-              expected, myMod.getConfigString() ) ;
-
-        
+              expected,
+ myMod.GetConfigString() ) ;
 	}
 	
 	void CallCreateModifyModelandSimulation() {
-		damaris::model::ModifyModel myMod = damaris::model::ModifyModel(); // this creator is pre-defined with a Simulation XML string
-        // std::cout << "Input string: " << std::endl  << myMod.getConfigString()  << std::endl ;
+		damaris::model::ModifyModelDerived myMod = damaris::model::ModifyModelDerived(); // this creator is pre-defined with a Simulation XML string
         std::map<std::string,std::string> find_replace_map = {
         {"_SHMEM_BUFFER_BYTES_REGEX_","67108864"},
         {"_DC_REGEX_","1"},
@@ -98,21 +103,20 @@ MyStore
         {"_MYSTORE_OR_EMPTY_REGEX_","MyStore"},
         };
         myMod.RepalceWithRegEx(find_replace_map);
-        // if (rank == 0) std::cout << "Rank 0: Output XML string: " << std::endl  << myMod.getConfigString()  << std::endl ;
         myMod.SetSimulationModel() ;   
         
         std::shared_ptr<model::Simulation> mdl = myMod.ReturnSimulationModel() ;
         //std::shared_ptr<model::Simulation>  mdl = model::LoadXML("simulation.xml");
         unsigned long int buffer_size = static_cast<unsigned long>(mdl->architecture().buffer().size()) ;
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Comparing REGEXed mdl->architecture().buffer().size()", 67108864ul, buffer_size ) ;
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Comparing REGEXed mdl->architecture().buffer().size()", 67108864ul, buffer_size
+ ) ;
        
-		initialized = false;
-                
+		initialized = false; 
 	}
 	
 	void CallCreateModifyModelandSimulationViaVoid() {
-		damaris::model::ModifyModel myMod = damaris::model::ModifyModel();  // this creator is pre-defined with a Simulation XML string
-        // std::cout << "Input string: " << std::endl  << myMod.getConfigString()  << std::endl ;
+		damaris::model::ModifyModelDerived myMod = damaris::model::ModifyModelDerived();  // this creator is pre-defined with a Simulation XML string
+        std::cout << "Input string: " << std::endl  << myMod.GetConfigString()  << std::endl ;
         std::map<std::string,std::string> find_replace_map = {
         {"_SHMEM_BUFFER_BYTES_REGEX_","67108864"},
         {"_DC_REGEX_","1"},
@@ -121,18 +125,16 @@ MyStore
         {"_MYSTORE_OR_EMPTY_REGEX_","MyStore"},
         };
         myMod.RepalceWithRegEx(find_replace_map);
-        // if (rank == 0) std::cout << "Rank 0: Output XML string: " << std::endl  << myMod.getConfigString()  << std::endl ;
         myMod.SetSimulationModel() ;   
         
-        // std::shared_ptr<model::Simulation> mdl = myMod.ReturnSimulationModel() ;
-        
-        std::shared_ptr<model::Simulation> mdl  = std::shared_ptr<model::Simulation>( static_cast<model::Simulation *>( myMod.PassModelAsVoidPtr() )) ; // ToDo: this needs to be fixed
+        // casting the returned void * back to a shared_ptr<Simulation>
+        std::shared_ptr<model::Simulation> mdl  = std::shared_ptr<model::Simulation>( static_cast<model::Simulation *>( myMod.PassModelAsVoidPtr() )) ; 
 
         unsigned long int buffer_size = static_cast<unsigned long>(mdl->architecture().buffer().size()) ;
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Comparing REGEXed mdl->architecture().buffer().size()", 67108864ul, buffer_size ) ;
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Comparing REGEXed mdl->architecture().buffer().size()", 67108864ul, buffer_size
+ ) ;
        
 		initialized = false;
-                
 	}
 	
 };

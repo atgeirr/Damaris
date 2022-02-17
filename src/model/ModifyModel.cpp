@@ -29,13 +29,13 @@ namespace model {
                 
 void ModifyModel::SetXMLstring(std::string& input_xml) {
     config_xml_ = input_xml;
-} ;
+} 
    
    
    
    
 
-ModifyModel::ModifyModel() {
+ModifyModel::ModifyModel( void ) {
     converted_ = false ;
     config_xml_ =  R"V0G0N(<?xml version="1.0"?>
 <simulation name="opm-flow" language="c" 
@@ -74,7 +74,7 @@ ModifyModel::ModifyModel() {
 
 </simulation>
 )V0G0N";
-} ;
+} 
 
 
 ModifyModel::ModifyModel(std::string& input_xml) {
@@ -83,6 +83,12 @@ ModifyModel::ModifyModel(std::string& input_xml) {
     
 }
 
+/*  Do not include thie destructor
+ModifyModel::~ModifyModel( void ) ;
+{
+    
+}
+*/
 
 void ModifyModel::SetSimulationModel() {
     
@@ -135,7 +141,7 @@ void ModifyModel::RepalceWithRegEx( std::map<std::string,std::string> find_and_r
     config_xml_ = config_xml_cpy ;
 } 
 
-std::string & ModifyModel::getConfigString( void )
+std::string & ModifyModel::GetConfigString( void )
 {
     return (this->config_xml_) ;
 }
@@ -155,10 +161,16 @@ std::shared_ptr<Simulation>  ModifyModel::ReturnSimulationModel( bool ignore_con
 
 void ModifyModel::SaveXMLStringToFile(std::string filename ) {
   std::ofstream out(filename.c_str());
-  out <<  this->getConfigString() ;
+  out <<  this->GetConfigString() ;
   out.close();
 }
-        
+
+
+Simulation * ModifyModel::GetModel( void ) {
+    
+    return (simModel_.get()) ;
+    
+}
 //std::shared_ptr<Simulation> ModifyModel::ReturnSharedModelPtr( void ) {
 //    
 //}
