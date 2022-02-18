@@ -131,7 +131,26 @@ void Server::Run() {
 void Server::EndOfIterationCallback(int tag, int source,
     const void* buf, int count) 
 {
-    Environment::Log("Server::EndOfIterationCallback method started.", EventLogger::Info);
+    static double t_fin = 0.0 ;
+    double t_start,  t_server_run, t_server_free ;
+    
+    int iteration = Environment::GetLastIteration()-1;
+    t_start = MPI_Wtime();
+    
+    int server_pid = Environment::GetEntityProcessID() ;
+    
+    if (t_fin == 0.0) {
+        t_server_free = 0.0 ;     
+        Environment::Log("Server::EndOfIterationCallback method started.)", EventLogger::Info);
+        Environment::Log("N.B. Server free-time (t_server_free) is the time in seconds that the server core had free (= time at exit of routine - time the successive iteration starts)", EventLogger::Info);
+        Environment::Log("N.B. Server run-time (t_server_run) is the time in seconds that the server core took to process I/O routines (= time at exit of routine - time at start of routine)", EventLogger::Info);
+        Environment::Log("TIME: server_pid, iteration , t_server_run, t_server_free", EventLogger::Info);
+    } else {
+        t_server_free =  t_start - t_fin ;
+        Environment::Log("Server::EndOfIterationCallback method started.", EventLogger::Info);
+    }
+     
+    
     // sync finished for this iteration, starts listening
     // to clients again
     std::map<int,std::shared_ptr<Channel> >::iterator ch;
@@ -145,7 +164,7 @@ void Server::EndOfIterationCallback(int tag, int source,
                 BIND(&Server::OnHeader,this,_1,_2,_3,_4));
     }
 
-    int iteration = Environment::GetLastIteration()-1;
+   
 
 #ifdef HAVE_VISIT_ENABLED
     if(Environment::GetModel()->visit().present()) {
@@ -172,13 +191,18 @@ void Server::EndOfIterationCallback(int tag, int source,
 #ifdef HAVE_PYTHON_ENABLED
     ScriptManager::RunScripts(iteration);
 #endif
-
+    
+    t_fin = MPI_Wtime();
+    t_server_run = t_fin - t_start;
     Environment::Log("Server::EndOfIterationCallback method finished.", EventLogger::Info);
+    Environment::Log("TIME:  " + std::to_string(server_pid) + ", "  + std::to_string(iteration) + ", " +std::to_string(t_server_run)+ ", " +std::to_string(t_server_free), EventLogger::Info);
     if (Environment::GetModel()->log().present()) {
         if (Environment::GetModel()->log().get().Flush()) {
             Environment::FlushLog();
         }
     }
+    
+    
 
 }
 
