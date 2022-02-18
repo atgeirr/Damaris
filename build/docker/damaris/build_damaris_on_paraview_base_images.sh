@@ -166,7 +166,7 @@ do
                 sed -i "s|_PV_SHORT_DOT_|${PV_SHORT_DOT}|g" Dockerfile.out
                 sed -i "s|_INSTALL_GFORT_|${GFORT}|g" Dockerfile.out
                 # echo "Building: $DOCKER_IMAGE_OUTPUTNAME:${BASEIMAGETAG}"
-                DOCKER_BUILDKIT=1 docker build -t \
+                DOCKER_BUILDKIT=1 docker build --no-cache -t \
                   ${DOCKER_IMAGE_OUTPUTNAME}:${BASEIMAGETAG}-damaris-${DAMARIS_VER} \
                   --secret id=thepassword,src=$MY_CI_READ_REPO_PWD \
                    --build-arg INPUT_damaris_ver=${DAMARIS_VER} \
