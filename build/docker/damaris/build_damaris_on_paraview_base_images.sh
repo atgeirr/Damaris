@@ -81,6 +81,14 @@ get_tag_name () {
   echo $BASE_IMAGE_SHORT
 }
 
+#######################################################
+## Remove password tag from template on public damaris
+#######################################################
+# As the password is only needed for the private Damaris repo, we will erase it from the public Damaris repo testing 
+if [[ "$DAMARIS_REPO"=="damaris" ]] ; then
+  sed -i "s|^RUN --mount=type=secret.*||g" Dockerfile._BASEWITHPARAVIEW_.paraview
+  sed -i "s|  && mkdir -p \${INSTALLTMDIR} \\\|RUN mkdir -p \${INSTALLTMDIR} \\\|g" Dockerfile._BASEWITHPARAVIEW_.paraview
+fi
 
 #######################################################
 ## Setting up the markdown table
