@@ -29,7 +29,7 @@ docker-build:
     - eval $(ssh-agent -s)
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
-    - echo -e "$MY_CI_SSH_KEY_VAR" | base64 -d |  ssh-add -
+    # This fails for public site:- echo -e "$MY_CI_SSH_KEY_VAR" | base64 -d |  ssh-add -
     - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config 
     # Instead of "StrictHostKeyChecking no" you could try the following:
     # - ssh-keyscan example.com >> ~/.ssh/known_hosts
