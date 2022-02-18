@@ -193,7 +193,7 @@ be done on a system where you do have admin/sudo rights. You then need to copy t
 where you only have normal user rights and you will then be able to run the container.
 
 ### Build Singularity container from a Singularity definition file 
-There are Singularity definition files in the ```build/singularity``` directory that are based on Ubuntu (apt-get)
+There are Singularity definition files in the build/singularity directory that are based on Ubuntu (apt-get)
 or Centos 8 (Yum / dnf) that can be used to build containers with Damaris installed. Similar to the Dockerfiles,
 both use the pre-built Damaris prerequisite libraries (Boost,XSD and xerces-c), OpenMPI, HDF5 and CppUnit of thoses distributions. 
 
