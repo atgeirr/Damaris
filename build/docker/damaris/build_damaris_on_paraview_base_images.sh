@@ -85,10 +85,10 @@ get_tag_name () {
 ## Remove password tag from template on public damaris
 #######################################################
 # As the password is only needed for the private Damaris repo, we will erase it from the public Damaris repo testing 
-if [[ "$DAMARIS_REPO"=="damaris" ]] ; then
-  sed -i "s|^RUN --mount=type=secret.*||g" Dockerfile._BASEWITHPARAVIEW_.paraview
-  sed -i "s|  && mkdir -p \${INSTALLTMDIR} \\\|RUN mkdir -p \${INSTALLTMDIR} \\\|g" Dockerfile._BASEWITHPARAVIEW_.paraview
-fi
+# if [[ "$DAMARIS_REPO" == "damaris" ]] ; then
+#   sed -i "s|^RUN --mount=type=secret.*||g" Dockerfile._BASEWITHPARAVIEW_.paraview
+#   sed -i "s|  && mkdir -p \${INSTALLTMDIR} \\\|RUN mkdir -p \${INSTALLTMDIR} \\\|g" Dockerfile._BASEWITHPARAVIEW_.paraview
+# fi
 
 #######################################################
 ## Setting up the markdown table
@@ -174,12 +174,21 @@ do
                 sed -i "s|_PV_SHORT_DOT_|${PV_SHORT_DOT}|g" Dockerfile.out
                 sed -i "s|_INSTALL_GFORT_|${GFORT}|g" Dockerfile.out
                 # echo "Building: $DOCKER_IMAGE_OUTPUTNAME:${BASEIMAGETAG}"
+                if [[ "$DAMARIS_REPO" == "damaris" ]] ; then
                 DOCKER_BUILDKIT=1 docker build --no-cache -t \
+                  ${DOCKER_IMAGE_OUTPUTNAME}:${BASEIMAGETAG}-damaris-${DAMARIS_VER} \
+                   --build-arg INPUT_damaris_ver=${DAMARIS_VER} \
+                   --build-arg INPUT_repo=${DAMARIS_REPO} \
+                  -f ./Dockerfile.out . 
+                else
+                  DOCKER_BUILDKIT=1 docker build --no-cache -t \
                   ${DOCKER_IMAGE_OUTPUTNAME}:${BASEIMAGETAG}-damaris-${DAMARIS_VER} \
                   --secret id=thepassword,src=$MY_CI_READ_REPO_PWD \
                    --build-arg INPUT_damaris_ver=${DAMARIS_VER} \
                    --build-arg INPUT_repo=${DAMARIS_REPO} \
                   -f ./Dockerfile.out . 
+                  
+                fi
             if [[ $? -eq 0 ]] ; then
                docker push "$DOCKER_IMAGE_OUTPUTNAME:${BASEIMAGETAG}-damaris-${DAMARIS_VER}"
                echo "INFO: ${DOCKER_IMAGE_OUTPUTNAME}:${BASEIMAGETAG}-damaris-${DAMARIS_VER}  built"
