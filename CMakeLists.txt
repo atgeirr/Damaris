@@ -4,14 +4,14 @@ cmake_minimum_required (VERSION 3.12) # Required because of policy CMP0074
 # Starting project definition
 #----------------------------------------------------------------------------#
 
-project(DAMARIS VERSION 1.5.0)
+project(DAMARIS VERSION 1.6.0)
 
 
 #
 # library version set here (e.g. for shared libs).
 #
 # set(DAMARIS_VERSION_MAJOR 1)
-# set(DAMARIS_VERSION_MINOR 5)
+# set(DAMARIS_VERSION_MINOR 6)
 # set(DAMARIS_VERSION_PATCH 0)
 
 # set(DAMARIS_VERSION "${DAMARIS_VERSION_MAJOR}.${DAMARIS_VERSION_MINOR}.${DAMARIS_VERSION_PATCH}")
@@ -39,6 +39,8 @@ option(ENABLE_FORTRAN  "Build Fortran support. Requires CMAKE_Fortran_COMPILER t
 option(ENABLE_VISIT    "Build VisIt support. May requires VisIt_ROOT to be set." OFF)
 option(ENABLE_CATALYST "Build Catalyst support. May requires ParaView_DIR to be set." OFF)
 option(ENABLE_HDF5     "Build with HDF5 support. May requires HDF5_ROOT to be set." OFF)
+option(ENABLE_PYTHON   "Build with Python+ NumPy scripting capabilties." OFF)
+option(ENABLE_DOCS     "Configure DOxygen documentation build feature." OFF)
 option(GENERATE_MODEL  "Regenerates the XSD model instead of using existing ones." OFF)
 
 #----------------------------------------------------------------------------#
@@ -143,6 +145,29 @@ if(ENABLE_HDF5)
 endif(ENABLE_HDF5)
 
 #----------------------------------------------------------------------------#
+# Set everything related to Python
+#----------------------------------------------------------------------------#
+if(ENABLE_PYTHON)
+  execute_process(
+  COMMAND python -c "import numpy; print numpy.get_include()"
+  OUTPUT_VARIABLE NUMPY_INCLUDE_PATH
+  ERROR_QUIET
+  )
+  find_package(Boost COMPONENTS python REQUIRED)
+  find_package(Boost COMPONENTS numpy REQUIRED)
+  find_package(PythonInterp 3 )
+  find_package( PythonLibs 3 REQUIRED )
+  set(HAVE_PYTHON_ENABLED 1)
+  list(APPEND DEP_LIBRARIES  ${PYTHON_LIBRARIES} ${Boost_LIBRARIES} )
+#   include_directories(
+#  ${PYTHON_INCLUDE_DIRS}
+#  ${Boost_INCLUDE_DIRS}
+#  ${NUMPY_INCLUDE_PATH}
+#  )
+endif(ENABLE_PYTHON)
+
+
+#----------------------------------------------------------------------------#
 # Set everything related to ParaView
 #----------------------------------------------------------------------------#
 if(ENABLE_CATALYST)
@@ -153,12 +178,14 @@ if(ENABLE_CATALYST)
     find_package(ParaView 4.2 REQUIRED COMPONENTS vtkPVPythonCatalyst vtkParallelMPI vtkUtilitiesPythonInitializer) 
     include("${PARAVIEW_USE_FILE}")
     set(HAVE_PARAVIEW_ENABLED 1)
+    set(PARAVIEW_VERSION ${ParaView_VERSION})
     set(PARAVIEW_LIBRARIES "vtkUtilitiesPythonInitializer" "vtkPVPythonCatalyst" "vtkParallelMPI")
     message(STATUS "ParaView_LIBRARIES: ${ParaView_LIBRARIES}")
     message(STATUS "VTK_LIBRARIES: ${VTK_LIBRARIES}")
   else()
     message(STATUS "ParaView >= 5.7 found")
     set(HAVE_PARAVIEW_ENABLED 1)
+    set(PARAVIEW_VERSION ${ParaView_VERSION})
     find_package(ParaView 4.2 REQUIRED COMPONENTS PythonCatalyst ) 
     set(PARAVIEW_LIBRARIES ParaView::PythonCatalyst VTK::mpi)
     message(STATUS "ParaView_LIBRARIES: ${ParaView_LIBRARIES}")
@@ -207,3 +234,7 @@ endif(ENABLE_EXAMPLES)
 if(ENABLE_TESTS)
   add_subdirectory (test)
 endif(ENABLE_TESTS)
+
+if(ENABLE_DOCS)
+  add_subdirectory (docs)
+endif(ENABLE_DOCS)

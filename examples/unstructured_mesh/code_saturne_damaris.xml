@@ -3,6 +3,7 @@
         <architecture>
                 <domains count="1" />
                 <dedicated cores="1" nodes="0" />
+                <placement />                
                 <buffer name="damaris-buffer" size="150000000" />
                 <queue  name="damaris-queue"  size="100" />
         </architecture>
@@ -37,7 +38,7 @@
                <variable name="section_sizes"         layout="mesh_n_sections"    type="scalar" visualizable="false"  time-varying="false"  comment="The number of elements in each section- soe equiv to the number of field values per section" />
                <variable name="section_connectivity"  layout="connectivity_size"  type="scalar" visualizable="false"  time-varying="false"  comment="n_connectivity += section->n_elements * vtk_type_stride ;"/>
                
-               <mesh name="fluid_domain_umesh" type="unstructured" topology="3" comment="These arrays can be ragged, i.e. each rank could have a different number of sections and each section can have a diiferent number of verticies etc" >
+               <mesh name="fluid_domain_umesh" type="unstructured" topology="3" comment="These arrays can be ragged, i.e. each rank could have a different number of sections and each section can have a different number of verticies etc" >
                   <coord                name="umesh_vars/unstructured_mesh_xyz"  unit="m"    />
                   <vertex_global_id     name="umesh_vars/unstructured_gid"       offset="-1" />
                   <section_types        name="umesh_vars/section_types"                      />

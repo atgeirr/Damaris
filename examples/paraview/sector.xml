@@ -3,6 +3,7 @@
         <architecture>
                 <domains count="1" />
                 <dedicated cores="2" nodes="0" />
+                <placement />                
                 <buffer name="damaris-buffer" size="150000000" />
                 <queue  name="damaris-queue" size="100" />
         </architecture>
@@ -10,13 +11,13 @@
                 <parameter name="WIDTH"  type="int" value="100" />
                 <parameter name="HEIGHT" type="int" value="100" />
                 <parameter name="DEPTH"  type="int" value="100" />
-                <parameter name="size"	 type="int" value="2"  />
+                <parameter name="size"     type="int" value="2"  />
 
                 <layout name="cells"  type="double" dimensions="WIDTH,HEIGHT,DEPTH/size"
-				        global="WIDTH,HEIGHT,DEPTH" ghosts="0:0,0:0,0:0" />
+                        global="WIDTH,HEIGHT,DEPTH" ghosts="0:0,0:0,0:0" />
 
                 <layout name="cmesh"  type="float"  dimensions="WIDTH+1,HEIGHT+1,DEPTH/size+1"
-				                global="WIDTH+1,HEIGHT+1,DEPTH+1" ghosts="0:0,0:0,0:0" />
+                                global="WIDTH+1,HEIGHT+1,DEPTH+1" ghosts="0:0,0:0,0:0" />
 
                 <mesh name="mesh" type="curvilinear" topology="3">
                         <coord name="coord/x" label="x"/>

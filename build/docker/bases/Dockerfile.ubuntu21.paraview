@@ -1,0 +1,118 @@
+# syntax=docker/dockerfile:1
+## Usage of this file (standalone or automated via gitlab CI): 
+# The gitlab.inria.fr/Damaris/damaris repo should build without the secret setup.
+# 
+# To build the damaris repo (no password needed):
+# export TAG=v1.5.0
+# export PV_VERSION=v5.9.0
+# export PVSHORT=$(echo $PV_VERSION | sed 's|\.||g')
+# sudo  DOCKER_BUILDKIT=1 docker build -t \
+#            registry.gitlab.inria.fr/damaris/damaris:${TAG}-ubu20-p${PVSHORT} \
+#            --build-arg INPUT_pv_ver=${PV_VERSION} \
+#                -f ./Dockerfile.ubuntu20.paraview .
+# 
+# mpirun -np 4 singularity exec ubuntu20_paraview58  /usr/local/damaris/examples/paraview/image /usr/local/damaris/examples/paraview/image.xml
+
+########################################
+## Stage 1 of build
+########################################
+FROM ubuntu:21.10 AS builder
+SHELL ["/bin/bash", "-c"]
+
+USER root
+
+RUN useradd docker \
+	&& mkdir /home/docker \
+	&& chown docker:docker /home/docker \
+	&& addgroup docker staff
+    
+    
+ENV INSTALLTMDIR=/home/docker/installdir
+ENV CMAKE_BUILD_TYPE=Release
+ENV NUMCORES=4
+ENV INSTALL_PREFIX=/home/docker/local
+ENV PATH=${INSTALL_PREFIX}/bin:${PATH}
+ENV LD_LIBRARY_PATH=${INSTALL_PREFIX}/lib:${LD_LIBRARY_PATH}
+
+# ENV PYTHON_INCLUDE_DIR=/usr/include/python3.8
+ENV GL_INSTALL_PATH=/usr/lib/x86_64-linux-gnu
+ENV GL_HEADER_PATH=/usr
+
+  
+RUN apt-get update -y \
+  && echo "debconf debconf/frontend select Noninteractive" | debconf-set-selections \
+  && apt-get install -y --no-install-recommends \ 
+	software-properties-common \
+    apt-utils \
+    build-essential \
+    gfortran \
+    pkg-config \
+    git-core \
+    cmake \
+    wget unzip nano \
+	libhdf5-openmpi-dev \
+    libboost-all-dev \
+	libpython3-dev  \
+	libxerces-c-dev  \
+	xsdcxx \
+    libcppunit-dev \
+	hdf5-tools \
+    cmake \
+  && apt-get clean \
+  && ln -s /usr/bin/xsdcxx /usr/bin/xsd 
+  
+RUN echo "debconf debconf/frontend select Noninteractive" | debconf-set-selections \
+  && apt-get -y  --no-install-recommends install  \
+    libosmesa6-dev \
+    mesa-common-dev \
+    mesa-utils \
+    freeglut3-dev \
+    python3-numpy \
+    ninja-build \
+    libtbb-dev \
+  && apt-get clean 
+ 
+USER docker
+
+###### Install ParaView - 
+# N.B. The version installed here must match exactly the version of Paraview used to connect to the simulation via Catalyst
+# -DPARAVIEW_BUILD_EDITION=CATALYST_RENDERING includes more (for rendering screen shots), but may not be needed
+# see https://www.kitware.com/paraview-catalyst-editions-what-are-they/ for some more details
+RUN   mkdir -p ${INSTALLTMDIR} \
+  &&   cd ${INSTALLTMDIR} \
+  &&   git clone  https://gitlab.kitware.com/paraview/paraview.git \
+  &&   cd ${INSTALLTMDIR}/paraview   \
+  &&   git fetch --all 
+
+ARG INPUT_pv_ver=v5.8.0
+ENV PV_VERSION=$INPUT_pv_ver
+  
+RUN   cd ${INSTALLTMDIR}/paraview   \
+  &&   git checkout ${PV_VERSION}  \
+  &&   git submodule update --init --recursive \
+  &&   mkdir -p ${INSTALLTMDIR}/build/pv \
+  &&   cd ${INSTALLTMDIR}/build/pv   \
+  &&   cmake -GNinja ../../paraview -DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX} \
+       -DBUILD_TESTING=OFF \
+       -DVTK_SMP_IMPLEMENTATION_TYPE=TBB \
+       -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} \
+       -DPARAVIEW_BUILD_EDITION=CATALYST \
+       -DPARAVIEW_INSTALL_DEVELOPMENT_FILES=ON \
+       -DPARAVIEW_USE_PYTHON=ON \
+       -DPARAVIEW_BUILD_SHARED_LIBS=ON \
+       -DPARAVIEW_USE_MPI=ON \
+       -DPARAVIEW_USE_QT=OFF \
+       -DVTK_USE_X=OFF \
+       -DVTK_OPENGL_HAS_OSMESA=ON \
+       -DPARAVIEW_USE_FORTRAN=OFF \
+       -DOSMESA_INCLUDE_DIR=$GL_HEADER_PATH/include \
+       -DOSMESA_LIBRARY=$GL_INSTALL_PATH/libOSMesa.so 
+       
+RUN   cd ${INSTALLTMDIR}/build/pv  \
+  && ninja -j${NUMCORES} \
+  && ninja install \
+  && rm -fr ${INSTALLTMDIR}
+  
+ 
+ 
+CMD ["/bin/bash"]

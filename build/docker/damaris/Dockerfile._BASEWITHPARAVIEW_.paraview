@@ -1,0 +1,75 @@
+# syntax=docker/dockerfile:1
+#
+# This builds Damaris using the base images that must be pre-built 
+# from dockerfiles in  build/docker/bases
+# This file is templated and needs to have the following template strings replaced using sed:
+#   _BASEWITHPARAVIEW_  _DISTLIB_  _HDF_PATH_  _MPI_BIN_PATH_  _PV_SHORT_DOT_  _INSTALL_GFORT_
+# This will be carried out by script ./build_damaris_on_paraview_base_images.sh
+
+
+########################################
+## Build Damaris from source with Paraview support
+########################################
+FROM _BASEWITHPARAVIEW_ AS builder
+SHELL ["/bin/bash", "-c"]
+
+USER root
+# These should also be supplied on the command line as --build-arg 
+# ENV ENABLE_PYTHON=
+# Regenerate the xml model in C using XSD
+ENV REGEN_ON_OFF=ON
+ENV SHLIBS_ON_OFF=ON
+# Build examples
+ENV EXAMPLES_ON_OFF=ON
+
+# N.B INPUT_damaris_ver to be provided on the docker build -t registry.gitlab.inria.fr/damaris-development:${TAG}  --build-arg INPUT_damaris_ver=v1.5.0 --build-arg INPUT_repo="damaris-development" -f Dockerfile.ubuntu20 .
+ARG INPUT_damaris_ver
+ARG INPUT_repo
+# ARG INPUT_repo  # making this a global arge and defining before stage 1
+ENV DAMARIS_VERSION=$INPUT_damaris_ver
+ENV repo=$INPUT_repo
+
+# ENV MPI_BINDIR=${MPI_BINDIR}
+ENV PATH=_MPI_BIN_PATH_:${PATH}
+ENV LD_LIBRARY_PATH=_MPI_BIN_PATH_../_DISTLIB_:${LD_LIBRARY_PATH}
+
+_INSTALL_GFORT_
+
+# may need this:  -DParaView_DIR=$CATALYSTDIR
+# The first line deals with different access rights to damaris-development (private) and damaris (public) repository
+RUN --mount=type=secret,id=thepassword if [ "$repo" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi \
+  && mkdir -p ${INSTALLTMDIR} \
+  && cd ${INSTALLTMDIR} \
+  && echo "Damaris Version: $DAMARIS_VERSION" \
+  && git clone  --depth 1 --branch $DAMARIS_VERSION https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/$repo.git \
+  && mkdir -p ${INSTALLTMDIR}/build/$repo \
+  && cd ${INSTALLTMDIR}/build/$repo \
+  && cmake ../../$repo -DCMAKE_INSTALL_PREFIX:PATH=$INSTALL_PREFIX \
+      -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} \
+      -DCMAKE_CXX_COMPILER=_MPI_BIN_PATH_mpicxx \
+      -DCMAKE_C_COMPILER=_MPI_BIN_PATH_mpicc \
+      -DCMAKE_Fortran_COMPILER=_MPI_BIN_PATH_mpifort \
+      -DENABLE_TESTS=ON \
+      -DENABLE_EXAMPLES=$EXAMPLES_ON_OFF \
+      -DBUILD_SHARED_LIBS=$SHLIBS_ON_OFF \
+      -DENABLE_PYTHON=OFF \
+      -DENABLE_FORTRAN=ON \
+      -DGENERATE_MODEL=$REGEN_ON_OFF \
+      -DENABLE_HDF5=ON _HDF_PATH_ \
+      -DENABLE_CATALYST=ON -DParaView_DIR=${INSTALL_PREFIX}/_DISTLIB_/cmake/paraview-_PV_SHORT_DOT_ \
+  && make -j${NUMCORES} \
+  && make install \
+  && find ${INSTALL_PREFIX}/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples|" \
+  && cp -r ${INSTALLTMDIR}/build/$repo/test/ ${INSTALL_PREFIX}/examples/test/ \
+  && cp  ${INSTALLTMDIR}/build/$repo/CTestTestfile.cmake ${INSTALL_PREFIX}/examples/ \
+  && sed -i "s|${INSTALLTMDIR}/build/$repo/|${INSTALL_PREFIX}/examples/|g" ${INSTALL_PREFIX}/examples/test/CTestTestfile.cmake \
+  && rm -fr ${INSTALLTMDIR}/  \
+  && chown -R docker:docker /home/docker
+
+USER docker
+# ENV PYTHONPATH=/usr/local/lib/python3.8/site-packages/_paraview.zip:/usr/local/lib/python3.8/site-packages/_vtk.zip:/usr/local/lib/python3.8/site-packages:/usr/lib/python38.zip:/usr/lib/python3.8:/usr/lib/python3.8/lib-dynload:/usr/local/lib/python3.8/dist-packages:/usr/lib/python3/dist-packages
+# ENV LD_LIBRARY_PATH=_MPI_BIN_PATH_../_DISTLIB_:${LD_LIBRARY_PATH}
+
+WORKDIR ${INSTALL_PREFIX}/examples
+ 
+CMD ["/bin/bash"]

@@ -28,7 +28,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #cmakedefine HAVE_VISIT_ENABLED
 #cmakedefine HAVE_HDF5_ENABLED
 #cmakedefine HAVE_PARAVIEW_ENABLED
-
+#cmakedefine PARAVIEW_VERSION @PARAVIEW_VERSION@
+#cmakedefine HAVE_PYTHON_ENABLED
 
 #ifdef __cplusplus
 extern "C" {

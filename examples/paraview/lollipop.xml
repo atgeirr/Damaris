@@ -2,63 +2,64 @@
 <simulation name="image" language="c" xmlns="http://damaris.gforge.inria.fr/damaris/model">
         <architecture>
                 <domains count="1" />
-				<dedicated cores="2" nodes="0" />
+                <dedicated cores="2" nodes="0" />
+                <placement />                
                 <buffer name="damaris-buffer" size="150000000" />
                 <queue  name="damaris-queue" size="100" />
         </architecture>
         <data>
-		        <parameter name="CANDY_WIDTH"  type="int" value="100" />
-				<parameter name="CANDY_HEIGHT" type="int" value="100" />
-				<parameter name="CANDY_DEPTH"  type="int" value="20" />
+                <parameter name="CANDY_WIDTH"  type="int" value="100" />
+                <parameter name="CANDY_HEIGHT" type="int" value="100" />
+                <parameter name="CANDY_DEPTH"  type="int" value="20" />
 
                 <parameter name="HANDLE_WIDTH"  type="int" value="100" />
-				<parameter name="HANDLE_HEIGHT" type="int" value="20" />
-				<parameter name="HANDLE_DEPTH"  type="int" value="20" />
+                <parameter name="HANDLE_HEIGHT" type="int" value="20" />
+                <parameter name="HANDLE_DEPTH"  type="int" value="20" />
 
-                <parameter name="size"	 type="int" value="2"  />
+                <parameter name="size"     type="int" value="2"  />
 
                 <layout name="candy_layout"  type="double" dimensions="CANDY_WIDTH,CANDY_HEIGHT,CANDY_DEPTH/size"
-				    global="CANDY_WIDTH,CANDY_HEIGHT,CANDY_DEPTH" />
-				<layout name="candy_mesh_layout"  type="float"  dimensions="CANDY_WIDTH+1,CANDY_HEIGHT+1,CANDY_DEPTH/size+1"
-				    global="CANDY_WIDTH+1,CANDY_HEIGHT+1,CANDY_DEPTH+1" />
+                    global="CANDY_WIDTH,CANDY_HEIGHT,CANDY_DEPTH" />
+                <layout name="candy_mesh_layout"  type="float"  dimensions="CANDY_WIDTH+1,CANDY_HEIGHT+1,CANDY_DEPTH/size+1"
+                    global="CANDY_WIDTH+1,CANDY_HEIGHT+1,CANDY_DEPTH+1" />
 
 
                 <layout name="handle_layout"  type="double" dimensions="HANDLE_WIDTH,HANDLE_HEIGHT,HANDLE_DEPTH/size"
-				    global="HANDLE_WIDTH,HANDLE_HEIGHT,HANDLE_DEPTH" />
-				<layout name="handle_mesh_layout_x"  type="float"  dimensions="HANDLE_WIDTH+1" global="HANDLE_WIDTH+1" />
-				<layout name="handle_mesh_layout_y"  type="float"  dimensions="HANDLE_HEIGHT+1" global="HANDLE_HEIGHT+1" />
-				<layout name="handle_mesh_layout_z"  type="float"  dimensions="HANDLE_DEPTH/size+1" global="HANDLE_DEPTH+1" />
+                    global="HANDLE_WIDTH,HANDLE_HEIGHT,HANDLE_DEPTH" />
+                <layout name="handle_mesh_layout_x"  type="float"  dimensions="HANDLE_WIDTH+1" global="HANDLE_WIDTH+1" />
+                <layout name="handle_mesh_layout_y"  type="float"  dimensions="HANDLE_HEIGHT+1" global="HANDLE_HEIGHT+1" />
+                <layout name="handle_mesh_layout_z"  type="float"  dimensions="HANDLE_DEPTH/size+1" global="HANDLE_DEPTH+1" />
 
                 <mesh name="candy_mesh" type="curvilinear" topology="3">
-				        <coord name="coord/candy_x" label="x"/>
-						<coord name="coord/candy_y" label="y"/>
-						<coord name="coord/candy_z" label="z"/>
+                        <coord name="coord/candy_x" label="x"/>
+                        <coord name="coord/candy_y" label="y"/>
+                        <coord name="coord/candy_z" label="z"/>
                 </mesh>
 
                 <mesh name="handle_mesh" type="rectilinear" topology="3">
-				    <coord name="coord/handle_x" label="x"/>
-					<coord name="coord/handle_y" label="y"/>
-					<coord name="coord/handle_z" label="z"/>
-				</mesh>
+                    <coord name="coord/handle_x" label="x"/>
+                    <coord name="coord/handle_y" label="y"/>
+                    <coord name="coord/handle_z" label="z"/>
+                </mesh>
 
                 <group name="coord">
-				        <variable name="candy_x" layout="candy_mesh_layout" visualizable="false" time-varying="false"  />
-						<variable name="candy_y" layout="candy_mesh_layout" visualizable="false" time-varying="false"  />
-						<variable name="candy_z" layout="candy_mesh_layout" visualizable="false" time-varying="false"  />
+                        <variable name="candy_x" layout="candy_mesh_layout" visualizable="false" time-varying="false"  />
+                        <variable name="candy_y" layout="candy_mesh_layout" visualizable="false" time-varying="false"  />
+                        <variable name="candy_z" layout="candy_mesh_layout" visualizable="false" time-varying="false"  />
 
                         <variable name="handle_x" layout="handle_mesh_layout_x" visualizable="false" time-varying="false"  />
-						<variable name="handle_y" layout="handle_mesh_layout_y" visualizable="false" time-varying="false"  />
-						<variable name="handle_z" layout="handle_mesh_layout_z" visualizable="false" time-varying="false"  />
+                        <variable name="handle_y" layout="handle_mesh_layout_y" visualizable="false" time-varying="false"  />
+                        <variable name="handle_z" layout="handle_mesh_layout_z" visualizable="false" time-varying="false"  />
                 </group>
 
                 <variable name="candy" type="scalar" layout="candy_layout" mesh="candy_mesh" centering="zonal" />
-				<variable name="handle" type="scalar" layout="handle_layout" mesh="handle_mesh" centering="zonal" />
+                <variable name="handle" type="scalar" layout="handle_layout" mesh="handle_mesh" centering="zonal" />
 
         </data>
         <actions>
         </actions>
         <paraview>
-		    <script>/usr/local/examples/paraview/lollipop.py</script>
+            <script>/usr/local/examples/paraview/lollipop.py</script>
         </paraview>
         <log FileName="log/damaris" RotationSize="5" LogFormat="[%TimeStamp%]: %Message%" LogLevel="info" Flush="false" />
 </simulation>

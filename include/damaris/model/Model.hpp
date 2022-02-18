@@ -31,8 +31,8 @@
 // in the accompanying FLOSSE file.
 //
 
-#ifndef CXX_HOME_JBOWDEN_PV_BUILD_DAMARIS_DEVELOPMENT_SRC_MODEL_MODEL_HPP
-#define CXX_HOME_JBOWDEN_PV_BUILD_DAMARIS_DEVELOPMENT_SRC_MODEL_MODEL_HPP
+#ifndef CXX_HOME_JBOWDEN_OPMBUILD_DAMARIS_DEVELOPMENT_SRC_MODEL_MODEL_HPP
+#define CXX_HOME_JBOWDEN_OPMBUILD_DAMARIS_DEVELOPMENT_SRC_MODEL_MODEL_HPP
 
 #ifndef XSD_CXX11
 #define XSD_CXX11
@@ -235,6 +235,7 @@ namespace damaris
     class KeyVal;
     class Dedicated;
     class Domains;
+    class Placement;
     class ShmType;
     class Buffer;
     class Queue;
@@ -263,8 +264,8 @@ namespace damaris
     class Exception;
     class VisitParam;
     class ParaViewParam;
-    class PythonParam;
     class Actions;
+    class Scripts;
     class StoreType;
     class Store;
     class Storage;
@@ -620,6 +621,139 @@ namespace damaris
       ::xsd::cxx::tree::one< count_type > count_;
     };
 
+    class Placement: public ::xml_schema::type
+    {
+      public:
+      // mask
+      //
+      typedef ::xml_schema::string mask_type;
+      typedef ::xsd::cxx::tree::traits< mask_type, char > mask_traits;
+
+      const mask_type&
+      mask () const;
+
+      mask_type&
+      mask ();
+
+      void
+      mask (const mask_type& x);
+
+      void
+      mask (::std::unique_ptr< mask_type > p);
+
+      static const mask_type&
+      mask_default_value ();
+
+      // start
+      //
+      typedef ::xml_schema::int_ start_type;
+      typedef ::xsd::cxx::tree::traits< start_type, char > start_traits;
+
+      const start_type&
+      start () const;
+
+      start_type&
+      start ();
+
+      void
+      start (const start_type& x);
+
+      static start_type
+      start_default_value ();
+
+      // step
+      //
+      typedef ::xml_schema::unsigned_int step_type;
+      typedef ::xsd::cxx::tree::traits< step_type, char > step_traits;
+
+      const step_type&
+      step () const;
+
+      step_type&
+      step ();
+
+      void
+      step (const step_type& x);
+
+      static step_type
+      step_default_value ();
+
+      // blocksize
+      //
+      typedef ::xml_schema::unsigned_int blocksize_type;
+      typedef ::xsd::cxx::tree::traits< blocksize_type, char > blocksize_traits;
+
+      const blocksize_type&
+      blocksize () const;
+
+      blocksize_type&
+      blocksize ();
+
+      void
+      blocksize (const blocksize_type& x);
+
+      static blocksize_type
+      blocksize_default_value ();
+
+      // comment
+      //
+      typedef ::xml_schema::string comment_type;
+      typedef ::xsd::cxx::tree::optional< comment_type > comment_optional;
+      typedef ::xsd::cxx::tree::traits< comment_type, char > comment_traits;
+
+      const comment_optional&
+      comment () const;
+
+      comment_optional&
+      comment ();
+
+      void
+      comment (const comment_type& x);
+
+      void
+      comment (const comment_optional& x);
+
+      void
+      comment (::std::unique_ptr< comment_type > p);
+
+      // Constructors.
+      //
+      Placement ();
+
+      Placement (const ::xercesc::DOMElement& e,
+                 ::xml_schema::flags f = 0,
+                 ::xml_schema::container* c = 0);
+
+      Placement (const Placement& x,
+                 ::xml_schema::flags f = 0,
+                 ::xml_schema::container* c = 0);
+
+      virtual Placement*
+      _clone (::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0) const;
+
+      Placement&
+      operator= (const Placement& x);
+
+      virtual 
+      ~Placement ();
+
+      // Implementation.
+      //
+      protected:
+      void
+      parse (::xsd::cxx::xml::dom::parser< char >&,
+             ::xml_schema::flags);
+
+      protected:
+      ::xsd::cxx::tree::one< mask_type > mask_;
+      static const mask_type mask_default_value_;
+      ::xsd::cxx::tree::one< start_type > start_;
+      ::xsd::cxx::tree::one< step_type > step_;
+      ::xsd::cxx::tree::one< blocksize_type > blocksize_;
+      comment_optional comment_;
+    };
+
     class ShmType: public ::xml_schema::string
     {
       public:
@@ -909,6 +1043,23 @@ namespace damaris
       void
       dedicated (::std::unique_ptr< dedicated_type > p);
 
+      // placement
+      //
+      typedef ::damaris::model::Placement placement_type;
+      typedef ::xsd::cxx::tree::traits< placement_type, char > placement_traits;
+
+      const placement_type&
+      placement () const;
+
+      placement_type&
+      placement ();
+
+      void
+      placement (const placement_type& x);
+
+      void
+      placement (::std::unique_ptr< placement_type > p);
+
       // buffer
       //
       typedef ::damaris::model::Buffer buffer_type;
@@ -968,11 +1119,13 @@ namespace damaris
       //
       Architecture (const domains_type&,
                     const dedicated_type&,
+                    const placement_type&,
                     const buffer_type&,
                     const queue_type&);
 
       Architecture (::std::unique_ptr< domains_type >,
                     ::std::unique_ptr< dedicated_type >,
+                    ::std::unique_ptr< placement_type >,
                     ::std::unique_ptr< buffer_type >,
                     ::std::unique_ptr< queue_type >);
 
@@ -1004,6 +1157,7 @@ namespace damaris
       protected:
       ::xsd::cxx::tree::one< domains_type > domains_;
       ::xsd::cxx::tree::one< dedicated_type > dedicated_;
+      ::xsd::cxx::tree::one< placement_type > placement_;
       ::xsd::cxx::tree::one< buffer_type > buffer_;
       ::xsd::cxx::tree::one< queue_type > queue_;
       name_optional name_;
@@ -1018,7 +1172,8 @@ namespace damaris
         fortran,
         c,
         cpp,
-        python
+        python,
+        r
       };
 
       Language (value v);
@@ -1064,8 +1219,8 @@ namespace damaris
       _xsd_Language_convert () const;
 
       public:
-      static const char* const _xsd_Language_literals_[5];
-      static const value _xsd_Language_indexes_[5];
+      static const char* const _xsd_Language_literals_[6];
+      static const value _xsd_Language_indexes_[6];
     };
 
     class Type: public ::xml_schema::string
@@ -1671,6 +1826,26 @@ namespace damaris
       static const store_type&
       store_default_value ();
 
+      // script
+      //
+      typedef ::xml_schema::string script_type;
+      typedef ::xsd::cxx::tree::traits< script_type, char > script_traits;
+
+      const script_type&
+      script () const;
+
+      script_type&
+      script ();
+
+      void
+      script (const script_type& x);
+
+      void
+      script (::std::unique_ptr< script_type > p);
+
+      static const script_type&
+      script_default_value ();
+
       // comment
       //
       typedef ::xml_schema::string comment_type;
@@ -1751,6 +1926,8 @@ namespace damaris
       ::xsd::cxx::tree::one< time_varying_type > time_varying_;
       ::xsd::cxx::tree::one< store_type > store_;
       static const store_type store_default_value_;
+      ::xsd::cxx::tree::one< script_type > script_;
+      static const script_type script_default_value_;
       comment_optional comment_;
     };
 
@@ -3394,6 +3571,23 @@ namespace damaris
       static external_type
       external_default_value ();
 
+      // frequency
+      //
+      typedef ::xml_schema::unsigned_int frequency_type;
+      typedef ::xsd::cxx::tree::traits< frequency_type, char > frequency_traits;
+
+      const frequency_type&
+      frequency () const;
+
+      frequency_type&
+      frequency ();
+
+      void
+      frequency (const frequency_type& x);
+
+      static frequency_type
+      frequency_default_value ();
+
       // Constructors.
       //
       Script (const name_type&,
@@ -3434,6 +3628,7 @@ namespace damaris
       ::xsd::cxx::tree::one< scope_type > scope_;
       static const scope_type scope_default_value_;
       ::xsd::cxx::tree::one< external_type > external_;
+      ::xsd::cxx::tree::one< frequency_type > frequency_;
     };
 
     class Exception: public ::xml_schema::type
@@ -3719,78 +3914,6 @@ namespace damaris
       ::xsd::cxx::tree::one< end_iteration_type > end_iteration_;
     };
 
-    class PythonParam: public ::xml_schema::type
-    {
-      public:
-      // path
-      //
-      typedef ::xml_schema::string path_type;
-      typedef ::xsd::cxx::tree::traits< path_type, char > path_traits;
-
-      const path_type&
-      path () const;
-
-      path_type&
-      path ();
-
-      void
-      path (const path_type& x);
-
-      void
-      path (::std::unique_ptr< path_type > p);
-
-      // home
-      //
-      typedef ::xml_schema::string home_type;
-      typedef ::xsd::cxx::tree::traits< home_type, char > home_traits;
-
-      const home_type&
-      home () const;
-
-      home_type&
-      home ();
-
-      void
-      home (const home_type& x);
-
-      void
-      home (::std::unique_ptr< home_type > p);
-
-      // Constructors.
-      //
-      PythonParam (const path_type&,
-                   const home_type&);
-
-      PythonParam (const ::xercesc::DOMElement& e,
-                   ::xml_schema::flags f = 0,
-                   ::xml_schema::container* c = 0);
-
-      PythonParam (const PythonParam& x,
-                   ::xml_schema::flags f = 0,
-                   ::xml_schema::container* c = 0);
-
-      virtual PythonParam*
-      _clone (::xml_schema::flags f = 0,
-              ::xml_schema::container* c = 0) const;
-
-      PythonParam&
-      operator= (const PythonParam& x);
-
-      virtual 
-      ~PythonParam ();
-
-      // Implementation.
-      //
-      protected:
-      void
-      parse (::xsd::cxx::xml::dom::parser< char >&,
-             ::xml_schema::flags);
-
-      protected:
-      ::xsd::cxx::tree::one< path_type > path_;
-      ::xsd::cxx::tree::one< home_type > home_;
-    };
-
     class Actions: public ::xml_schema::type
     {
       public:
@@ -3810,23 +3933,6 @@ namespace damaris
 
       void
       event (const event_sequence& s);
-
-      // script
-      //
-      typedef ::damaris::model::Script script_type;
-      typedef ::xsd::cxx::tree::sequence< script_type > script_sequence;
-      typedef script_sequence::iterator script_iterator;
-      typedef script_sequence::const_iterator script_const_iterator;
-      typedef ::xsd::cxx::tree::traits< script_type, char > script_traits;
-
-      const script_sequence&
-      script () const;
-
-      script_sequence&
-      script ();
-
-      void
-      script (const script_sequence& s);
 
       // error
       //
@@ -3876,8 +3982,60 @@ namespace damaris
 
       protected:
       event_sequence event_;
-      script_sequence script_;
       error_sequence error_;
+    };
+
+    class Scripts: public ::xml_schema::type
+    {
+      public:
+      // pyscript
+      //
+      typedef ::damaris::model::Script pyscript_type;
+      typedef ::xsd::cxx::tree::sequence< pyscript_type > pyscript_sequence;
+      typedef pyscript_sequence::iterator pyscript_iterator;
+      typedef pyscript_sequence::const_iterator pyscript_const_iterator;
+      typedef ::xsd::cxx::tree::traits< pyscript_type, char > pyscript_traits;
+
+      const pyscript_sequence&
+      pyscript () const;
+
+      pyscript_sequence&
+      pyscript ();
+
+      void
+      pyscript (const pyscript_sequence& s);
+
+      // Constructors.
+      //
+      Scripts ();
+
+      Scripts (const ::xercesc::DOMElement& e,
+               ::xml_schema::flags f = 0,
+               ::xml_schema::container* c = 0);
+
+      Scripts (const Scripts& x,
+               ::xml_schema::flags f = 0,
+               ::xml_schema::container* c = 0);
+
+      virtual Scripts*
+      _clone (::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0) const;
+
+      Scripts&
+      operator= (const Scripts& x);
+
+      virtual 
+      ~Scripts ();
+
+      // Implementation.
+      //
+      protected:
+      void
+      parse (::xsd::cxx::xml::dom::parser< char >&,
+             ::xml_schema::flags);
+
+      protected:
+      pyscript_sequence pyscript_;
     };
 
     class StoreType: public ::xml_schema::string
@@ -4346,40 +4504,44 @@ namespace damaris
       // actions
       //
       typedef ::damaris::model::Actions actions_type;
+      typedef ::xsd::cxx::tree::optional< actions_type > actions_optional;
       typedef ::xsd::cxx::tree::traits< actions_type, char > actions_traits;
 
-      const actions_type&
+      const actions_optional&
       actions () const;
 
-      actions_type&
+      actions_optional&
       actions ();
 
       void
       actions (const actions_type& x);
 
       void
+      actions (const actions_optional& x);
+
+      void
       actions (::std::unique_ptr< actions_type > p);
 
-      // python
+      // scripts
       //
-      typedef ::damaris::model::PythonParam python_type;
-      typedef ::xsd::cxx::tree::optional< python_type > python_optional;
-      typedef ::xsd::cxx::tree::traits< python_type, char > python_traits;
+      typedef ::damaris::model::Scripts scripts_type;
+      typedef ::xsd::cxx::tree::optional< scripts_type > scripts_optional;
+      typedef ::xsd::cxx::tree::traits< scripts_type, char > scripts_traits;
 
-      const python_optional&
-      python () const;
+      const scripts_optional&
+      scripts () const;
 
-      python_optional&
-      python ();
-
-      void
-      python (const python_type& x);
+      scripts_optional&
+      scripts ();
 
       void
-      python (const python_optional& x);
+      scripts (const scripts_type& x);
 
       void
-      python (::std::unique_ptr< python_type > p);
+      scripts (const scripts_optional& x);
+
+      void
+      scripts (::std::unique_ptr< scripts_type > p);
 
       // visit
       //
@@ -4485,12 +4647,10 @@ namespace damaris
       //
       Simulation (const architecture_type&,
                   const data_type&,
-                  const actions_type&,
                   const name_type&);
 
       Simulation (::std::unique_ptr< architecture_type >,
                   ::std::unique_ptr< data_type >,
-                  ::std::unique_ptr< actions_type >,
                   const name_type&);
 
       Simulation (const ::xercesc::DOMElement& e,
@@ -4522,8 +4682,8 @@ namespace damaris
       ::xsd::cxx::tree::one< architecture_type > architecture_;
       ::xsd::cxx::tree::one< data_type > data_;
       storage_optional storage_;
-      ::xsd::cxx::tree::one< actions_type > actions_;
-      python_optional python_;
+      actions_optional actions_;
+      scripts_optional scripts_;
       visit_optional visit_;
       paraview_optional paraview_;
       log_optional log_;
@@ -4646,4 +4806,4 @@ namespace damaris
 //
 // End epilogue.
 
-#endif // CXX_HOME_JBOWDEN_PV_BUILD_DAMARIS_DEVELOPMENT_SRC_MODEL_MODEL_HPP
+#endif // CXX_HOME_JBOWDEN_OPMBUILD_DAMARIS_DEVELOPMENT_SRC_MODEL_MODEL_HPP

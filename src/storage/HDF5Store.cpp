@@ -260,7 +260,7 @@ namespace damaris {
 
                 // Obtain the block size
                 // HDF5 uses C storage conventions, assuming that the last listed
-				// dimension is the fastest-changing dimension and the first-listed
+                // dimension is the fastest-changing dimension and the first-listed
                 // dimension is the slowest changing.
                 // So here we are assuming that Damaris has stored the fastest moving dimension
                 // in the 1st ([0]) position of the lower_bounds_ and upper_bounds_ arrays

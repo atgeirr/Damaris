@@ -15,6 +15,7 @@ set(DAMARIS_SRC
 	${DAMARIS_SOURCE_DIR}/src/client/RemoteClient.cpp
 	${DAMARIS_SOURCE_DIR}/src/server/Server.cpp
 	${DAMARIS_SOURCE_DIR}/src/action/ActionManager.cpp
+	${DAMARIS_SOURCE_DIR}/src/action/ScriptManager.cpp
 	${DAMARIS_SOURCE_DIR}/src/action/Action.cpp
 	${DAMARIS_SOURCE_DIR}/src/action/DynamicAction.cpp
 	${DAMARIS_SOURCE_DIR}/src/data/Variable.cpp
@@ -23,7 +24,7 @@ set(DAMARIS_SRC
 	${DAMARIS_SOURCE_DIR}/src/data/ParameterManager.cpp
 	${DAMARIS_SOURCE_DIR}/src/data/Mesh.cpp
 	${DAMARIS_SOURCE_DIR}/src/data/MeshManager.cpp
-    ${DAMARIS_SOURCE_DIR}/src/data/StructuredMesh.cpp
+	${DAMARIS_SOURCE_DIR}/src/data/StructuredMesh.cpp
 	${DAMARIS_SOURCE_DIR}/src/data/RectilinearMesh.cpp
 	${DAMARIS_SOURCE_DIR}/src/data/CurvilinearMesh.cpp
 	${DAMARIS_SOURCE_DIR}/src/data/PointMesh.cpp
@@ -39,6 +40,7 @@ set(DAMARIS_SRC
 	${DAMARIS_SOURCE_DIR}/src/comm/MPI2Reactor.cpp
 	${DAMARIS_SOURCE_DIR}/src/buffer/SharedMemorySegment.cpp
 	${DAMARIS_SOURCE_DIR}/src/model/BcastXML.cpp
+	${DAMARIS_SOURCE_DIR}/src/model/ModifyModel.cpp
 	${DAMARIS_SOURCE_DIR}/src/log/EventLogger.cpp
 	${DAMARIS_SOURCE_DIR}/src/storage/StorageManager.cpp
 	${DAMARIS_SOURCE_DIR}/src/storage/NullStore.cpp
@@ -64,6 +66,10 @@ endif(ENABLE_CATALYST)
 if(ENABLE_FORTRAN)
   set(DAMARIS_FORTRAN_MODULE ${DAMARIS_SOURCE_DIR}/src/main/Damaris.F90)
 endif(ENABLE_FORTRAN)
+
+if(ENABLE_PYTHON)
+	set(DAMARIS_PYTHONACTION_SRC ${DAMARIS_SOURCE_DIR}/src/scripts/PyAction.cpp) 
+endif(ENABLE_PYTHON)
 
 # add the Dependency on XSD-generated files
 set_source_files_properties(
@@ -109,7 +115,8 @@ add_library(damaris 	${DAMARIS_SRC}
 			${DAMARIS_VISIT_SRC}
 			${DAMARIS_HDF5_SRC} 
 			${DAMARIS_PARAVIEW_SRC}
-			${DAMARIS_FORTRAN_MODULE})
+			${DAMARIS_FORTRAN_MODULE}
+			${DAMARIS_PYTHONACTION_SRC})
 
 include_directories(${CMAKE_BINARY_DIR}/include/damaris
 		${CMAKE_BINARY_DIR}/include)
@@ -119,7 +126,8 @@ target_include_directories(damaris PUBLIC $<INSTALL_INTERFACE:include>)
 target_include_directories(damaris BEFORE PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>)
 target_include_directories(damaris PUBLIC ${Boost_INCLUDE_DIRS}
-		${XSD_INCLUDE_DIR} ${XercesC_INCLUDE_DIRS})
+                                            ${XercesC_INCLUDE_DIRS})
+# ${XSD_INCLUDE_DIR}  have been removed from above
 if(ENABLE_VISIT)
 	target_include_directories(damaris PUBLIC ${VisIt_INCLUDE_DIRS})
 endif(ENABLE_VISIT)
@@ -130,6 +138,12 @@ if(ENABLE_CATALYST)
 	target_include_directories(damaris PUBLIC ${PARAVIEW_INCLUDE_DIRS})
 	target_include_directories(damaris PUBLIC ${ParaView_INCLUDE_DIRS})
 endif(ENABLE_CATALYST)
+
+
+if(ENABLE_PYTHON)
+  target_include_directories(damaris PUBLIC  ${PYTHON_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${NUMPY_INCLUDE_PATH})
+endif(ENABLE_PYTHON)
+
 
 # for shared libs, establish the lib version
 set_target_properties(damaris
@@ -344,6 +358,12 @@ if(ENABLE_EXAMPLES)
 	if(ENABLE_FORTRAN)
 	  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/fortran/cube" DESTINATION examples/fortran)
 	endif(ENABLE_FORTRAN)
+	if(ENABLE_PYTHON)
+	  install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/python/3dmesh_py" DESTINATION examples/python)
+	endif(ENABLE_PYTHON)
 	install(FILES "${CMAKE_BINARY_DIR}/examples/plugin/libgc.so" DESTINATION examples/plugin)
+	install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/Example" DESTINATION examples)
+    install(FILES "${CMAKE_BINARY_DIR}/examples/libexample.so" DESTINATION examples)
+    install(FILES "${DAMARIS_SOURCE_DIR}/examples/example.xml" DESTINATION examples)
 endif(ENABLE_EXAMPLES)
 

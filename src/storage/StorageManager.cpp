@@ -29,50 +29,50 @@ namespace damaris {
 
 void StorageManager::Init(const model::Storage& mdl)
 {
-	model::Storage::store_const_iterator s(mdl.store().begin());
-	for(; s != mdl.store().end(); s++) {
-		switch(s->type()) {
-		case model::StoreType::null :
-			Create<NullStore>(*s); break;
-		case model::StoreType::HDF5 :
+    model::Storage::store_const_iterator s(mdl.store().begin());
+    for(; s != mdl.store().end(); s++) {
+        switch(s->type()) {
+        case model::StoreType::null :
+            Create<NullStore>(*s); break;
+        case model::StoreType::HDF5 :
 #ifdef HAVE_HDF5_ENABLED
-			Create<HDF5Store>(*s); break;
+            Create<HDF5Store>(*s); break;
 #else
-			CFGERROR("Requesting the creation of HDF5 store \""
-			<< s->name() << "\" but HDF5 is not enabled");
+            CFGERROR("Requesting the creation of HDF5 store \""
+            << s->name() << "\" but HDF5 is not enabled");
 #endif
-		default: break;
-		}
-	}
-	
-	VariableManager::iterator v = VariableManager::Begin();
-	for(; v != VariableManager::End(); v++) {
-		const model::Variable& mdl = (*v)->GetModel();
-		if(mdl.store() == "#") continue;
-		
-		std::vector<std::string> stores;
-		boost::split(stores, mdl.store(), boost::is_any_of(",; "));
-		
-		std::vector<std::string>::iterator s = stores.begin();
-		for(; s != stores.end(); s++) {
-			std::shared_ptr<Store> st = Search(*s);
-			if(st) {
-				st->AddVariable(*v);
-			} else {
-				CFGERROR("Unknown store \""
-				<< *s << "\" for variable \"" 
-				<< (*v)->GetName() << "\"");
-			}
-		}
-	}
+        default: break;
+        }
+    }
+    
+    VariableManager::iterator v = VariableManager::Begin();
+    for(; v != VariableManager::End(); v++) {
+        const model::Variable& mdl = (*v)->GetModel();
+        if(mdl.store() == "#") continue;
+        
+        std::vector<std::string> stores;
+        boost::split(stores, mdl.store(), boost::is_any_of(",; "));
+        
+        std::vector<std::string>::iterator s = stores.begin();
+        for(; s != stores.end(); s++) {
+            std::shared_ptr<Store> st = Search(*s);
+            if(st) {
+                st->AddVariable(*v);
+            } else {
+                CFGERROR("Unknown store \""
+                << *s << "\" for variable \"" 
+                << (*v)->GetName() << "\"");
+            }
+        }
+    }
 }
 
 void StorageManager::Update(int32_t iteration)
 {
-	iterator s = Begin();
-	for(; s != End(); s++) {
-		(*s)->Output(iteration);
-	}
+    iterator s = Begin();
+    for(; s != End(); s++) {
+        (*s)->Output(iteration);
+    }
 }
 
 }

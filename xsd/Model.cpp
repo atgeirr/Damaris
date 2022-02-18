@@ -250,6 +250,142 @@ namespace damaris
     }
 
 
+    // Placement
+    // 
+
+    const Placement::mask_type& Placement::
+    mask () const
+    {
+      return this->mask_.get ();
+    }
+
+    Placement::mask_type& Placement::
+    mask ()
+    {
+      return this->mask_.get ();
+    }
+
+    void Placement::
+    mask (const mask_type& x)
+    {
+      this->mask_.set (x);
+    }
+
+    void Placement::
+    mask (::std::unique_ptr< mask_type > x)
+    {
+      this->mask_.set (std::move (x));
+    }
+
+    const Placement::mask_type& Placement::
+    mask_default_value ()
+    {
+      return mask_default_value_;
+    }
+
+    const Placement::start_type& Placement::
+    start () const
+    {
+      return this->start_.get ();
+    }
+
+    Placement::start_type& Placement::
+    start ()
+    {
+      return this->start_.get ();
+    }
+
+    void Placement::
+    start (const start_type& x)
+    {
+      this->start_.set (x);
+    }
+
+    Placement::start_type Placement::
+    start_default_value ()
+    {
+      return start_type (0);
+    }
+
+    const Placement::step_type& Placement::
+    step () const
+    {
+      return this->step_.get ();
+    }
+
+    Placement::step_type& Placement::
+    step ()
+    {
+      return this->step_.get ();
+    }
+
+    void Placement::
+    step (const step_type& x)
+    {
+      this->step_.set (x);
+    }
+
+    Placement::step_type Placement::
+    step_default_value ()
+    {
+      return step_type (0U);
+    }
+
+    const Placement::blocksize_type& Placement::
+    blocksize () const
+    {
+      return this->blocksize_.get ();
+    }
+
+    Placement::blocksize_type& Placement::
+    blocksize ()
+    {
+      return this->blocksize_.get ();
+    }
+
+    void Placement::
+    blocksize (const blocksize_type& x)
+    {
+      this->blocksize_.set (x);
+    }
+
+    Placement::blocksize_type Placement::
+    blocksize_default_value ()
+    {
+      return blocksize_type (0U);
+    }
+
+    const Placement::comment_optional& Placement::
+    comment () const
+    {
+      return this->comment_;
+    }
+
+    Placement::comment_optional& Placement::
+    comment ()
+    {
+      return this->comment_;
+    }
+
+    void Placement::
+    comment (const comment_type& x)
+    {
+      this->comment_.set (x);
+    }
+
+    void Placement::
+    comment (const comment_optional& x)
+    {
+      this->comment_ = x;
+    }
+
+    void Placement::
+    comment (::std::unique_ptr< comment_type > x)
+    {
+      this->comment_.set (std::move (x));
+    }
+
+
     // ShmType
     // 
 
@@ -514,6 +650,30 @@ namespace damaris
     dedicated (::std::unique_ptr< dedicated_type > x)
     {
       this->dedicated_.set (std::move (x));
+    }
+
+    const Architecture::placement_type& Architecture::
+    placement () const
+    {
+      return this->placement_.get ();
+    }
+
+    Architecture::placement_type& Architecture::
+    placement ()
+    {
+      return this->placement_.get ();
+    }
+
+    void Architecture::
+    placement (const placement_type& x)
+    {
+      this->placement_.set (x);
+    }
+
+    void Architecture::
+    placement (::std::unique_ptr< placement_type > x)
+    {
+      this->placement_.set (std::move (x));
     }
 
     const Architecture::buffer_type& Architecture::
@@ -1290,6 +1450,36 @@ namespace damaris
     store_default_value ()
     {
       return store_default_value_;
+    }
+
+    const Variable::script_type& Variable::
+    script () const
+    {
+      return this->script_.get ();
+    }
+
+    Variable::script_type& Variable::
+    script ()
+    {
+      return this->script_.get ();
+    }
+
+    void Variable::
+    script (const script_type& x)
+    {
+      this->script_.set (x);
+    }
+
+    void Variable::
+    script (::std::unique_ptr< script_type > x)
+    {
+      this->script_.set (std::move (x));
+    }
+
+    const Variable::script_type& Variable::
+    script_default_value ()
+    {
+      return script_default_value_;
     }
 
     const Variable::comment_optional& Variable::
@@ -2861,6 +3051,30 @@ namespace damaris
       return external_type (false);
     }
 
+    const Script::frequency_type& Script::
+    frequency () const
+    {
+      return this->frequency_.get ();
+    }
+
+    Script::frequency_type& Script::
+    frequency ()
+    {
+      return this->frequency_.get ();
+    }
+
+    void Script::
+    frequency (const frequency_type& x)
+    {
+      this->frequency_.set (x);
+    }
+
+    Script::frequency_type Script::
+    frequency_default_value ()
+    {
+      return frequency_type (1U);
+    }
+
 
     // Exception
     // 
@@ -3108,58 +3322,6 @@ namespace damaris
     }
 
 
-    // PythonParam
-    // 
-
-    const PythonParam::path_type& PythonParam::
-    path () const
-    {
-      return this->path_.get ();
-    }
-
-    PythonParam::path_type& PythonParam::
-    path ()
-    {
-      return this->path_.get ();
-    }
-
-    void PythonParam::
-    path (const path_type& x)
-    {
-      this->path_.set (x);
-    }
-
-    void PythonParam::
-    path (::std::unique_ptr< path_type > x)
-    {
-      this->path_.set (std::move (x));
-    }
-
-    const PythonParam::home_type& PythonParam::
-    home () const
-    {
-      return this->home_.get ();
-    }
-
-    PythonParam::home_type& PythonParam::
-    home ()
-    {
-      return this->home_.get ();
-    }
-
-    void PythonParam::
-    home (const home_type& x)
-    {
-      this->home_.set (x);
-    }
-
-    void PythonParam::
-    home (::std::unique_ptr< home_type > x)
-    {
-      this->home_.set (std::move (x));
-    }
-
-
     // Actions
     // 
 
@@ -3181,24 +3343,6 @@ namespace damaris
       this->event_ = s;
     }
 
-    const Actions::script_sequence& Actions::
-    script () const
-    {
-      return this->script_;
-    }
-
-    Actions::script_sequence& Actions::
-    script ()
-    {
-      return this->script_;
-    }
-
-    void Actions::
-    script (const script_sequence& s)
-    {
-      this->script_ = s;
-    }
-
     const Actions::error_sequence& Actions::
     error () const
     {
@@ -3215,6 +3359,28 @@ namespace damaris
     error (const error_sequence& s)
     {
       this->error_ = s;
+    }
+
+
+    // Scripts
+    // 
+
+    const Scripts::pyscript_sequence& Scripts::
+    pyscript () const
+    {
+      return this->pyscript_;
+    }
+
+    Scripts::pyscript_sequence& Scripts::
+    pyscript ()
+    {
+      return this->pyscript_;
+    }
+
+    void Scripts::
+    pyscript (const pyscript_sequence& s)
+    {
+      this->pyscript_ = s;
     }
 
 
@@ -3629,16 +3795,16 @@ namespace damaris
       this->storage_.set (std::move (x));
     }
 
-    const Simulation::actions_type& Simulation::
+    const Simulation::actions_optional& Simulation::
     actions () const
     {
-      return this->actions_.get ();
+      return this->actions_;
     }
 
-    Simulation::actions_type& Simulation::
+    Simulation::actions_optional& Simulation::
     actions ()
     {
-      return this->actions_.get ();
+      return this->actions_;
     }
 
     void Simulation::
@@ -3648,39 +3814,45 @@ namespace damaris
     }
 
     void Simulation::
+    actions (const actions_optional& x)
+    {
+      this->actions_ = x;
+    }
+
+    void Simulation::
     actions (::std::unique_ptr< actions_type > x)
     {
       this->actions_.set (std::move (x));
     }
 
-    const Simulation::python_optional& Simulation::
-    python () const
+    const Simulation::scripts_optional& Simulation::
+    scripts () const
     {
-      return this->python_;
+      return this->scripts_;
     }
 
-    Simulation::python_optional& Simulation::
-    python ()
+    Simulation::scripts_optional& Simulation::
+    scripts ()
     {
-      return this->python_;
-    }
-
-    void Simulation::
-    python (const python_type& x)
-    {
-      this->python_.set (x);
+      return this->scripts_;
     }
 
     void Simulation::
-    python (const python_optional& x)
+    scripts (const scripts_type& x)
     {
-      this->python_ = x;
+      this->scripts_.set (x);
     }
 
     void Simulation::
-    python (::std::unique_ptr< python_type > x)
+    scripts (const scripts_optional& x)
     {
-      this->python_.set (std::move (x));
+      this->scripts_ = x;
+    }
+
+    void Simulation::
+    scripts (::std::unique_ptr< scripts_type > x)
+    {
+      this->scripts_.set (std::move (x));
     }
 
     const Simulation::visit_optional& Simulation::
@@ -4329,6 +4501,144 @@ namespace damaris
     {
     }
 
+    // Placement
+    //
+
+    const Placement::mask_type Placement::mask_default_value_ (
+      "");
+
+    Placement::
+    Placement ()
+    : ::xml_schema::type (),
+      mask_ (mask_default_value (), this),
+      start_ (start_default_value (), this),
+      step_ (step_default_value (), this),
+      blocksize_ (blocksize_default_value (), this),
+      comment_ (this)
+    {
+    }
+
+    Placement::
+    Placement (const Placement& x,
+               ::xml_schema::flags f,
+               ::xml_schema::container* c)
+    : ::xml_schema::type (x, f, c),
+      mask_ (x.mask_, f, this),
+      start_ (x.start_, f, this),
+      step_ (x.step_, f, this),
+      blocksize_ (x.blocksize_, f, this),
+      comment_ (x.comment_, f, this)
+    {
+    }
+
+    Placement::
+    Placement (const ::xercesc::DOMElement& e,
+               ::xml_schema::flags f,
+               ::xml_schema::container* c)
+    : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+      mask_ (this),
+      start_ (this),
+      step_ (this),
+      blocksize_ (this),
+      comment_ (this)
+    {
+      if ((f & ::xml_schema::flags::base) == 0)
+      {
+        ::xsd::cxx::xml::dom::parser< char > p (e, false, false, true);
+        this->parse (p, f);
+      }
+    }
+
+    void Placement::
+    parse (::xsd::cxx::xml::dom::parser< char >& p,
+           ::xml_schema::flags f)
+    {
+      while (p.more_attributes ())
+      {
+        const ::xercesc::DOMAttr& i (p.next_attribute ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        if (n.name () == "mask" && n.namespace_ ().empty ())
+        {
+          this->mask_.set (mask_traits::create (i, f, this));
+          continue;
+        }
+
+        if (n.name () == "start" && n.namespace_ ().empty ())
+        {
+          this->start_.set (start_traits::create (i, f, this));
+          continue;
+        }
+
+        if (n.name () == "step" && n.namespace_ ().empty ())
+        {
+          this->step_.set (step_traits::create (i, f, this));
+          continue;
+        }
+
+        if (n.name () == "blocksize" && n.namespace_ ().empty ())
+        {
+          this->blocksize_.set (blocksize_traits::create (i, f, this));
+          continue;
+        }
+
+        if (n.name () == "comment" && n.namespace_ ().empty ())
+        {
+          this->comment_.set (comment_traits::create (i, f, this));
+          continue;
+        }
+      }
+
+      if (!mask_.present ())
+      {
+        this->mask_.set (mask_default_value ());
+      }
+
+      if (!start_.present ())
+      {
+        this->start_.set (start_default_value ());
+      }
+
+      if (!step_.present ())
+      {
+        this->step_.set (step_default_value ());
+      }
+
+      if (!blocksize_.present ())
+      {
+        this->blocksize_.set (blocksize_default_value ());
+      }
+    }
+
+    Placement* Placement::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class Placement (*this, f, c);
+    }
+
+    Placement& Placement::
+    operator= (const Placement& x)
+    {
+      if (this != &x)
+      {
+        static_cast< ::xml_schema::type& > (*this) = x;
+        this->mask_ = x.mask_;
+        this->start_ = x.start_;
+        this->step_ = x.step_;
+        this->blocksize_ = x.blocksize_;
+        this->comment_ = x.comment_;
+      }
+
+      return *this;
+    }
+
+    Placement::
+    ~Placement ()
+    {
+    }
+
     // ShmType
     //
 
@@ -4653,11 +4963,13 @@ namespace damaris
     Architecture::
     Architecture (const domains_type& domains,
                   const dedicated_type& dedicated,
+                  const placement_type& placement,
                   const buffer_type& buffer,
                   const queue_type& queue)
     : ::xml_schema::type (),
       domains_ (domains, this),
       dedicated_ (dedicated, this),
+      placement_ (placement, this),
       buffer_ (buffer, this),
       queue_ (queue, this),
       name_ (this)
@@ -4667,11 +4979,13 @@ namespace damaris
     Architecture::
     Architecture (::std::unique_ptr< domains_type > domains,
                   ::std::unique_ptr< dedicated_type > dedicated,
+                  ::std::unique_ptr< placement_type > placement,
                   ::std::unique_ptr< buffer_type > buffer,
                   ::std::unique_ptr< queue_type > queue)
     : ::xml_schema::type (),
       domains_ (std::move (domains), this),
       dedicated_ (std::move (dedicated), this),
+      placement_ (std::move (placement), this),
       buffer_ (std::move (buffer), this),
       queue_ (std::move (queue), this),
       name_ (this)
@@ -4685,6 +4999,7 @@ namespace damaris
     : ::xml_schema::type (x, f, c),
       domains_ (x.domains_, f, this),
       dedicated_ (x.dedicated_, f, this),
+      placement_ (x.placement_, f, this),
       buffer_ (x.buffer_, f, this),
       queue_ (x.queue_, f, this),
       name_ (x.name_, f, this)
@@ -4698,6 +5013,7 @@ namespace damaris
     : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
       domains_ (this),
       dedicated_ (this),
+      placement_ (this),
       buffer_ (this),
       queue_ (this),
       name_ (this)
@@ -4747,6 +5063,20 @@ namespace damaris
           }
         }
 
+        // placement
+        //
+        if (n.name () == "placement" && n.namespace_ () == "http://damaris.gforge.inria.fr/damaris/model")
+        {
+          ::std::unique_ptr< placement_type > r (
+            placement_traits::create (i, f, this));
+
+          if (!placement_.present ())
+          {
+            this->placement_.set (::std::move (r));
+            continue;
+          }
+        }
+
         // buffer
         //
         if (n.name () == "buffer" && n.namespace_ () == "http://damaris.gforge.inria.fr/damaris/model")
@@ -4789,6 +5119,13 @@ namespace damaris
       {
         throw ::xsd::cxx::tree::expected_element< char > (
           "dedicated",
+          "http://damaris.gforge.inria.fr/damaris/model");
+      }
+
+      if (!placement_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_element< char > (
+          "placement",
           "http://damaris.gforge.inria.fr/damaris/model");
       }
 
@@ -4835,6 +5172,7 @@ namespace damaris
         static_cast< ::xml_schema::type& > (*this) = x;
         this->domains_ = x.domains_;
         this->dedicated_ = x.dedicated_;
+        this->placement_ = x.placement_;
         this->buffer_ = x.buffer_;
         this->queue_ = x.queue_;
         this->name_ = x.name_;
@@ -4892,11 +5230,11 @@ namespace damaris
       ::xsd::cxx::tree::enum_comparator< char > c (_xsd_Language_literals_);
       const value* i (::std::lower_bound (
                         _xsd_Language_indexes_,
-                        _xsd_Language_indexes_ + 5,
+                        _xsd_Language_indexes_ + 6,
                         *this,
                         c));
 
-      if (i == _xsd_Language_indexes_ + 5 || _xsd_Language_literals_[*i] != *this)
+      if (i == _xsd_Language_indexes_ + 6 || _xsd_Language_literals_[*i] != *this)
       {
         throw ::xsd::cxx::tree::unexpected_enumerator < char > (*this);
       }
@@ -4905,22 +5243,24 @@ namespace damaris
     }
 
     const char* const Language::
-    _xsd_Language_literals_[5] =
+    _xsd_Language_literals_[6] =
     {
       "unknown",
       "fortran",
       "c",
       "cpp",
-      "python"
+      "python",
+      "r"
     };
 
     const Language::value Language::
-    _xsd_Language_indexes_[5] =
+    _xsd_Language_indexes_[6] =
     {
       ::damaris::model::Language::c,
       ::damaris::model::Language::cpp,
       ::damaris::model::Language::fortran,
       ::damaris::model::Language::python,
+      ::damaris::model::Language::r,
       ::damaris::model::Language::unknown
     };
 
@@ -5436,6 +5776,9 @@ namespace damaris
     const Variable::store_type Variable::store_default_value_ (
       "#");
 
+    const Variable::script_type Variable::script_default_value_ (
+      "#");
+
     Variable::
     Variable (const name_type& name,
               const layout_type& layout)
@@ -5451,6 +5794,7 @@ namespace damaris
       visualizable_ (visualizable_default_value (), this),
       time_varying_ (time_varying_default_value (), this),
       store_ (store_default_value (), this),
+      script_ (script_default_value (), this),
       comment_ (this)
     {
     }
@@ -5471,6 +5815,7 @@ namespace damaris
       visualizable_ (visualizable_default_value (), this),
       time_varying_ (time_varying_default_value (), this),
       store_ (store_default_value (), this),
+      script_ (script_default_value (), this),
       comment_ (this)
     {
     }
@@ -5491,6 +5836,7 @@ namespace damaris
       visualizable_ (visualizable_default_value (), this),
       time_varying_ (time_varying_default_value (), this),
       store_ (store_default_value (), this),
+      script_ (script_default_value (), this),
       comment_ (this)
     {
     }
@@ -5511,6 +5857,7 @@ namespace damaris
       visualizable_ (visualizable_default_value (), this),
       time_varying_ (time_varying_default_value (), this),
       store_ (store_default_value (), this),
+      script_ (script_default_value (), this),
       comment_ (this)
     {
     }
@@ -5531,6 +5878,7 @@ namespace damaris
       visualizable_ (x.visualizable_, f, this),
       time_varying_ (x.time_varying_, f, this),
       store_ (x.store_, f, this),
+      script_ (x.script_, f, this),
       comment_ (x.comment_, f, this)
     {
     }
@@ -5551,6 +5899,7 @@ namespace damaris
       visualizable_ (this),
       time_varying_ (this),
       store_ (this),
+      script_ (this),
       comment_ (this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
@@ -5636,6 +5985,12 @@ namespace damaris
           continue;
         }
 
+        if (n.name () == "script" && n.namespace_ ().empty ())
+        {
+          this->script_.set (script_traits::create (i, f, this));
+          continue;
+        }
+
         if (n.name () == "comment" && n.namespace_ ().empty ())
         {
           this->comment_.set (comment_traits::create (i, f, this));
@@ -5701,6 +6056,11 @@ namespace damaris
       {
         this->store_.set (store_default_value ());
       }
+
+      if (!script_.present ())
+      {
+        this->script_.set (script_default_value ());
+      }
     }
 
     Variable* Variable::
@@ -5727,6 +6087,7 @@ namespace damaris
         this->visualizable_ = x.visualizable_;
         this->time_varying_ = x.time_varying_;
         this->store_ = x.store_;
+        this->script_ = x.script_;
         this->comment_ = x.comment_;
       }
 
@@ -7526,7 +7887,8 @@ namespace damaris
       execution_ (execution_default_value (), this),
       language_ (language, this),
       scope_ (scope_default_value (), this),
-      external_ (external_default_value (), this)
+      external_ (external_default_value (), this),
+      frequency_ (frequency_default_value (), this)
     {
     }
 
@@ -7540,7 +7902,8 @@ namespace damaris
       execution_ (x.execution_, f, this),
       language_ (x.language_, f, this),
       scope_ (x.scope_, f, this),
-      external_ (x.external_, f, this)
+      external_ (x.external_, f, this),
+      frequency_ (x.frequency_, f, this)
     {
     }
 
@@ -7554,7 +7917,8 @@ namespace damaris
       execution_ (this),
       language_ (this),
       scope_ (this),
-      external_ (this)
+      external_ (this),
+      frequency_ (this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
       {
@@ -7608,6 +7972,12 @@ namespace damaris
           this->external_.set (external_traits::create (i, f, this));
           continue;
         }
+
+        if (n.name () == "frequency" && n.namespace_ ().empty ())
+        {
+          this->frequency_.set (frequency_traits::create (i, f, this));
+          continue;
+        }
       }
 
       if (!name_.present ())
@@ -7645,6 +8015,11 @@ namespace damaris
       {
         this->external_.set (external_default_value ());
       }
+
+      if (!frequency_.present ())
+      {
+        this->frequency_.set (frequency_default_value ());
+      }
     }
 
     Script* Script::
@@ -7666,6 +8041,7 @@ namespace damaris
         this->language_ = x.language_;
         this->scope_ = x.scope_;
         this->external_ = x.external_;
+        this->frequency_ = x.frequency_;
       }
 
       return *this;
@@ -8020,124 +8396,6 @@ namespace damaris
     {
     }
 
-    // PythonParam
-    //
-
-    PythonParam::
-    PythonParam (const path_type& path,
-                 const home_type& home)
-    : ::xml_schema::type (),
-      path_ (path, this),
-      home_ (home, this)
-    {
-    }
-
-    PythonParam::
-    PythonParam (const PythonParam& x,
-                 ::xml_schema::flags f,
-                 ::xml_schema::container* c)
-    : ::xml_schema::type (x, f, c),
-      path_ (x.path_, f, this),
-      home_ (x.home_, f, this)
-    {
-    }
-
-    PythonParam::
-    PythonParam (const ::xercesc::DOMElement& e,
-                 ::xml_schema::flags f,
-                 ::xml_schema::container* c)
-    : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
-      path_ (this),
-      home_ (this)
-    {
-      if ((f & ::xml_schema::flags::base) == 0)
-      {
-        ::xsd::cxx::xml::dom::parser< char > p (e, true, false, false);
-        this->parse (p, f);
-      }
-    }
-
-    void PythonParam::
-    parse (::xsd::cxx::xml::dom::parser< char >& p,
-           ::xml_schema::flags f)
-    {
-      for (; p.more_content (); p.next_content (false))
-      {
-        const ::xercesc::DOMElement& i (p.cur_element ());
-        const ::xsd::cxx::xml::qualified_name< char > n (
-          ::xsd::cxx::xml::dom::name< char > (i));
-
-        // path
-        //
-        if (n.name () == "path" && n.namespace_ () == "http://damaris.gforge.inria.fr/damaris/model")
-        {
-          ::std::unique_ptr< path_type > r (
-            path_traits::create (i, f, this));
-
-          if (!path_.present ())
-          {
-            this->path_.set (::std::move (r));
-            continue;
-          }
-        }
-
-        // home
-        //
-        if (n.name () == "home" && n.namespace_ () == "http://damaris.gforge.inria.fr/damaris/model")
-        {
-          ::std::unique_ptr< home_type > r (
-            home_traits::create (i, f, this));
-
-          if (!home_.present ())
-          {
-            this->home_.set (::std::move (r));
-            continue;
-          }
-        }
-
-        break;
-      }
-
-      if (!path_.present ())
-      {
-        throw ::xsd::cxx::tree::expected_element< char > (
-          "path",
-          "http://damaris.gforge.inria.fr/damaris/model");
-      }
-
-      if (!home_.present ())
-      {
-        throw ::xsd::cxx::tree::expected_element< char > (
-          "home",
-          "http://damaris.gforge.inria.fr/damaris/model");
-      }
-    }
-
-    PythonParam* PythonParam::
-    _clone (::xml_schema::flags f,
-            ::xml_schema::container* c) const
-    {
-      return new class PythonParam (*this, f, c);
-    }
-
-    PythonParam& PythonParam::
-    operator= (const PythonParam& x)
-    {
-      if (this != &x)
-      {
-        static_cast< ::xml_schema::type& > (*this) = x;
-        this->path_ = x.path_;
-        this->home_ = x.home_;
-      }
-
-      return *this;
-    }
-
-    PythonParam::
-    ~PythonParam ()
-    {
-    }
-
     // Actions
     //
 
@@ -8145,7 +8403,6 @@ namespace damaris
     Actions ()
     : ::xml_schema::type (),
       event_ (this),
-      script_ (this),
       error_ (this)
     {
     }
@@ -8156,7 +8413,6 @@ namespace damaris
              ::xml_schema::container* c)
     : ::xml_schema::type (x, f, c),
       event_ (x.event_, f, this),
-      script_ (x.script_, f, this),
       error_ (x.error_, f, this)
     {
     }
@@ -8167,7 +8423,6 @@ namespace damaris
              ::xml_schema::container* c)
     : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
       event_ (this),
-      script_ (this),
       error_ (this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
@@ -8195,17 +8450,6 @@ namespace damaris
             event_traits::create (i, f, this));
 
           this->event_.push_back (::std::move (r));
-          continue;
-        }
-
-        // script
-        //
-        if (n.name () == "script" && n.namespace_ () == "http://damaris.gforge.inria.fr/damaris/model")
-        {
-          ::std::unique_ptr< script_type > r (
-            script_traits::create (i, f, this));
-
-          this->script_.push_back (::std::move (r));
           continue;
         }
 
@@ -8238,7 +8482,6 @@ namespace damaris
       {
         static_cast< ::xml_schema::type& > (*this) = x;
         this->event_ = x.event_;
-        this->script_ = x.script_;
         this->error_ = x.error_;
       }
 
@@ -8247,6 +8490,88 @@ namespace damaris
 
     Actions::
     ~Actions ()
+    {
+    }
+
+    // Scripts
+    //
+
+    Scripts::
+    Scripts ()
+    : ::xml_schema::type (),
+      pyscript_ (this)
+    {
+    }
+
+    Scripts::
+    Scripts (const Scripts& x,
+             ::xml_schema::flags f,
+             ::xml_schema::container* c)
+    : ::xml_schema::type (x, f, c),
+      pyscript_ (x.pyscript_, f, this)
+    {
+    }
+
+    Scripts::
+    Scripts (const ::xercesc::DOMElement& e,
+             ::xml_schema::flags f,
+             ::xml_schema::container* c)
+    : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+      pyscript_ (this)
+    {
+      if ((f & ::xml_schema::flags::base) == 0)
+      {
+        ::xsd::cxx::xml::dom::parser< char > p (e, true, false, false);
+        this->parse (p, f);
+      }
+    }
+
+    void Scripts::
+    parse (::xsd::cxx::xml::dom::parser< char >& p,
+           ::xml_schema::flags f)
+    {
+      for (; p.more_content (); p.next_content (false))
+      {
+        const ::xercesc::DOMElement& i (p.cur_element ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        // pyscript
+        //
+        if (n.name () == "pyscript" && n.namespace_ () == "http://damaris.gforge.inria.fr/damaris/model")
+        {
+          ::std::unique_ptr< pyscript_type > r (
+            pyscript_traits::create (i, f, this));
+
+          this->pyscript_.push_back (::std::move (r));
+          continue;
+        }
+
+        break;
+      }
+    }
+
+    Scripts* Scripts::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class Scripts (*this, f, c);
+    }
+
+    Scripts& Scripts::
+    operator= (const Scripts& x)
+    {
+      if (this != &x)
+      {
+        static_cast< ::xml_schema::type& > (*this) = x;
+        this->pyscript_ = x.pyscript_;
+      }
+
+      return *this;
+    }
+
+    Scripts::
+    ~Scripts ()
     {
     }
 
@@ -8779,14 +9104,13 @@ namespace damaris
     Simulation::
     Simulation (const architecture_type& architecture,
                 const data_type& data,
-                const actions_type& actions,
                 const name_type& name)
     : ::xml_schema::type (),
       architecture_ (architecture, this),
       data_ (data, this),
       storage_ (this),
-      actions_ (actions, this),
-      python_ (this),
+      actions_ (this),
+      scripts_ (this),
       visit_ (this),
       paraview_ (this),
       log_ (this),
@@ -8798,14 +9122,13 @@ namespace damaris
     Simulation::
     Simulation (::std::unique_ptr< architecture_type > architecture,
                 ::std::unique_ptr< data_type > data,
-                ::std::unique_ptr< actions_type > actions,
                 const name_type& name)
     : ::xml_schema::type (),
       architecture_ (std::move (architecture), this),
       data_ (std::move (data), this),
       storage_ (this),
-      actions_ (std::move (actions), this),
-      python_ (this),
+      actions_ (this),
+      scripts_ (this),
       visit_ (this),
       paraview_ (this),
       log_ (this),
@@ -8823,7 +9146,7 @@ namespace damaris
       data_ (x.data_, f, this),
       storage_ (x.storage_, f, this),
       actions_ (x.actions_, f, this),
-      python_ (x.python_, f, this),
+      scripts_ (x.scripts_, f, this),
       visit_ (x.visit_, f, this),
       paraview_ (x.paraview_, f, this),
       log_ (x.log_, f, this),
@@ -8841,7 +9164,7 @@ namespace damaris
       data_ (this),
       storage_ (this),
       actions_ (this),
-      python_ (this),
+      scripts_ (this),
       visit_ (this),
       paraview_ (this),
       log_ (this),
@@ -8914,23 +9237,23 @@ namespace damaris
           ::std::unique_ptr< actions_type > r (
             actions_traits::create (i, f, this));
 
-          if (!actions_.present ())
+          if (!this->actions_)
           {
             this->actions_.set (::std::move (r));
             continue;
           }
         }
 
-        // python
+        // scripts
         //
-        if (n.name () == "python" && n.namespace_ () == "http://damaris.gforge.inria.fr/damaris/model")
+        if (n.name () == "scripts" && n.namespace_ () == "http://damaris.gforge.inria.fr/damaris/model")
         {
-          ::std::unique_ptr< python_type > r (
-            python_traits::create (i, f, this));
+          ::std::unique_ptr< scripts_type > r (
+            scripts_traits::create (i, f, this));
 
-          if (!this->python_)
+          if (!this->scripts_)
           {
-            this->python_.set (::std::move (r));
+            this->scripts_.set (::std::move (r));
             continue;
           }
         }
@@ -8994,13 +9317,6 @@ namespace damaris
           "http://damaris.gforge.inria.fr/damaris/model");
       }
 
-      if (!actions_.present ())
-      {
-        throw ::xsd::cxx::tree::expected_element< char > (
-          "actions",
-          "http://damaris.gforge.inria.fr/damaris/model");
-      }
-
       while (p.more_attributes ())
       {
         const ::xercesc::DOMAttr& i (p.next_attribute ());
@@ -9050,7 +9366,7 @@ namespace damaris
         this->data_ = x.data_;
         this->storage_ = x.storage_;
         this->actions_ = x.actions_;
-        this->python_ = x.python_;
+        this->scripts_ = x.scripts_;
         this->visit_ = x.visit_;
         this->paraview_ = x.paraview_;
         this->log_ = x.log_;

@@ -172,10 +172,10 @@ if (( $v5BOOST == 1 )); then
  echo -e "--- COMPILING & INSTALLING BOOST ---------------------------------------------------------------\n"
  # Installing boost
  cd $tempdir
- wget --no-check-certificate http://sourceforge.net/projects/boost/files/boost/1.67.0/boost_1_67_0.tar.gz
- tar -xzf boost_1_67_0.tar.gz
- cd boost_1_67_0
- ./bootstrap.sh --prefix=$install_path --with-libraries=thread,log,date_time,program_options,filesystem,system
+ wget --no-check-certificate http://sourceforge.net/projects/boost/files/boost/1.78.0/boost_1_78_0.tar.gz
+ tar -xzf boost_1_78_0.tar.gz
+ cd boost_1_78_0
+ ./bootstrap.sh --prefix=$install_path --with-libraries=thread,log,date_time,program_options,filesystem,system,python,numpy
  # ./b2 threading=multi,single # seem like both of these together is not supported
  ./b2 threading=multi
  ./b2 install

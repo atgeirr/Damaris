@@ -1,0 +1,279 @@
+# syntax=docker/dockerfile:1
+
+##################
+# Author: Josh Bowden
+# Company: Inria
+# Date: 13/01/2022
+#
+# This Dockerfile file is automatically built by gitlab on push to the 
+# damaris-development repository. It works in concert with the .gitlab-ci.yml 
+# file and a required gitlab-runner process that is currently running somewhere.
+#
+##################
+#
+# ## Create and Configure a Gitlab Runner
+# To start a gitlab-runner, you need sudo/admin access to a machine that has
+# docker installed and can start a runner (in daemon mode) like this:
+# 
+# sudo docker run -d --name gitlab-runner-g5k-vm --restart always \
+#  -v /var/run/docker.sock:/var/run/docker.sok \
+#  -v /srv/gitlab-runner/config:/etc/gitlab-runner  \
+#  gitlab/gitlab-runner:latest 
+#
+# You then need to register the runner, then stop and edit the config.toml and 
+# then restart and configure the gitlab CI Settings for the runner.
+# To register the runner, make sure you have:
+# 1/ The gitlab-runner registration URL: https://gitlab.inria.fr/
+# 2/ The token obtained from:
+#  gitlab -> Settings -> CI/CD -> Runners ->Specific runners
+# 3/ A description for the runner - 
+#    I reuse the docker container name: gitlab-runner-g5k-vm
+# 4/ Other tags : docker,ostype,grid500,inria-ci
+# 5/ An image to use to run docker-in-docker: alpine:latest
+# 
+# Now, register the runner:
+# >sudo docker run --rm -it -v /srv/gitlab-runner/config:/etc/gitlab-runner \
+#                              gitlab/gitlab-runner register [--non-interactive ...]
+# >sudo docker stop gitlab-runner-g5k-vm
+# >sudo docker rm gitlab-runner-g5k-vm
+# Now, edit the file : /srv/gitlab-runner/config/config.toml
+# And then restart the runner
+# > sudo docker run -d --name gitlab-runner-g5k-vm --restart always \
+#  -v /var/run/docker.sock:/var/run/docker.sok \
+#  -v /srv/gitlab-runner/config:/etc/gitlab-runner  \
+#  gitlab/gitlab-runner:latest 
+#
+# Contents of the file : /srv/gitlab-runner/config/config.toml
+#  concurrent = 1
+#  check_interval = 0
+# [session_server]
+#  session_timeout = 1800
+# [[runers]]
+#  name = "docker-on-ubu21-vm"
+#  url = "https://gitlab.inria.fr"
+#  token = "9ZWpjGZpxY5BCco3ChCV"  # This is obtained from gitlab Settings->CI/CD->Runners
+#  executor = "docker"
+#  [runners.custom_build_dir]
+#  [runners.cache]
+#    Insecure = false
+#  [runners.docker]
+#    tls_verify = false
+#   image = "alpine:latest"
+#    privileged = true            # Check this is true
+#    disable_entrypoint_overwrite = false
+#    oom_kill_disable = false
+#    disable_cache = false
+#    volumes = ["/var/run/docker.sock:/var/run/docker.sock", "/cache"]  # the sock has to be passed through
+#    shm_size = 0
+#   cache_dir = "/cache"
+#
+## To monitor and restart the gitlab-runner daemon on a system:
+# sudo docker logs gitlab-runner-g5k-vm
+# sudo docker stop gitlab-runner-g5k-vm
+# sudo docker rm gitlab-runner-g5k-vm
+#
+# Now the runner is registered it will show up in the list of runners as seen in:
+#  Setting -> Ci/CD -> Runners -> Specific Runners
+# IMPORTANT: You will need to edit the runner information (the pencil icon) and check "Run untagged jobs" 
+# so that the runner picks up CI jobs.
+# 
+##################
+#
+## Usage of this file (standalone or automated via gitlab CI): 
+# The gitlab.inria.fr/Damaris/damaris repo should build without the secret setup.
+# 
+# To build the damaris repo (no password needed):
+# sudo TAG=v1.5.0 DOCKER_BUILDKIT=1 docker build -t \
+#            registry.gitlab.inria.fr/damaris/damaris:${TAG} \
+#            --build-arg INPUT_damaris_ver=${TAG} \
+#            --build-arg INPUT_repo=damaris \
+#                -f ./Dockerfile.ubuntu20
+#
+# The damaris-development repo will build from the gitlab CI setup due to the 
+# password being setup for gitlab-read-repo user (within gitlab CI) in the 
+# MY_CI_READ_REPO_PWD variable:
+# see the .gitlab-ci.yml file, but it follows this pattern:
+#  sudo DOCKER_BUILDKIT=1 docker build -t \
+#          registry.gitlab.inria.fr/damaris/damaris-development:${TAG} \
+#          --secret id=thepassword,src=$MY_CI_READ_REPO_PWD \
+#              --build-arg INPUT_damaris_ver=${TAG} \
+#              --build-arg INPUT_repo=damaris-development \
+#                  -f ./Dockerfile.ubuntu20 .
+#
+# N.B. MY_CI_READ_REPO_PWD is the filename that contains the token for user 'gitlab-read-repo' 
+# User 'gitlab-read-repo' is created in the 
+# Settings -> Access tokens page
+# and MY_CI_READ_REPO_PWD is a gitlab CI 'file' variable that contains a gitlab token
+# just created and the variable is created in the 
+# Settings -> CI/CD -> Variables page
+#
+###################
+#
+## To test the created docker image:
+# 1/ Log in to the gitlab repository 
+# N.B. You may need a ~/.docker/config.json file configured with an access token
+# > docker login registry.gitlab.inria.fr
+# 
+# 2/ Use docker run as it does not leave the container running on exit and run Damaris tests:
+#
+# > docker run --rm -it registry.gitlab.inria.fr/damaris-development:<branch> /bin/bash
+# <container prompt> ctest
+#
+######################################################################################
+
+
+# This is a global arg that can be used in all stages of the build
+ARG INPUT_repo
+
+########################################
+## Stage 1 of build
+########################################
+FROM ubuntu:20.04 AS builder
+SHELL ["/bin/bash", "-c"]
+
+RUN useradd docker \
+	&& mkdir /home/docker \
+	&& chown docker:docker /home/docker \
+	&& addgroup docker staff
+
+
+ENV INSTALLTMDIR=/home/docker/installdir
+
+## Install build tools and dependencies for Damaris
+RUN apt-get update -y \
+  && apt clean \
+  && echo "debconf debconf/frontend select Noninteractive" | debconf-set-selections \
+  && apt-get install -y --no-install-recommends \ 
+	software-properties-common \
+    apt-utils \
+    build-essential \
+    gfortran \
+    pkg-config \
+    git-core \
+    cmake \
+    wget unzip nano \
+	libpython3-dev libboost-python-dev libboost-numpy-dev \
+	libboost-dev \
+	libboost-regex-dev \
+	libboost-date-time-dev \
+	libboost-log-dev \
+	libboost-system-dev \
+	libboost-filesystem-dev \
+	libboost-thread-dev \
+	libhdf5-openmpi-dev \
+	libxerces-c-dev  \
+	xsdcxx \
+    libcppunit-dev \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/* \
+  && ln -s /usr/bin/xsdcxx /usr/bin/xsd 
+  
+   
+# RUN apt-get install -y --no-install-recommends \ 
+#  	libpython3-dev \
+#   libpython3-dev libboost-python-dev libboost-numpy-dev \
+  
+# RUN --mount=type=secret,id=thepassword  ls -l /run/secrets/thepassword
+# USER docker
+
+# N.B INPUT_damaris_ver to be provided on the docker build -t registry.gitlab.inria.fr/damaris-development:${TAG}  --build-arg INPUT_damaris_ver=v1.5.0 --build-arg INPUT_repo="damaris-development" -f Dockerfile.ubuntu20 .
+ARG INPUT_damaris_ver
+ARG INPUT_repo
+# ARG INPUT_repo  # making this a global arge and defining before stage 1
+ENV DAMARIS_VERSION=$INPUT_damaris_ver
+ENV repo=$INPUT_repo
+
+# These should also be supplied on the command line as --build-arg 
+# ENV ENABLE_PYTHON=
+
+
+# Regenerate the xml model in C using XSD
+ENV REGEN_ON_OFF=ON
+ENV SHLIBS_ON_OFF=OFF
+# Build examples
+ENV EXAMPLES_ON_OFF=ON
+
+ENV INSTALL_PREFIX=/home/docker/local
+ENV NUMCORES=1
+
+# The first line deals with different access rights to damaris-development (private) and damaris (public) repository
+RUN --mount=type=secret,id=thepassword if [ "$repo" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi \
+  && mkdir -p ${INSTALLTMDIR} \
+  && cd ${INSTALLTMDIR} \
+  && echo "Damaris Version: $DAMARIS_VERSION" \
+  && git clone  --depth 1 --branch $DAMARIS_VERSION https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/$repo.git \
+  && mkdir -p ${INSTALLTMDIR}/build/$repo \
+  && cd ${INSTALLTMDIR}/build/$repo \
+  && cmake ../../$repo -DCMAKE_INSTALL_PREFIX:PATH=$INSTALL_PREFIX \
+      -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
+      -DCMAKE_CXX_COMPILER=mpicxx \
+      -DCMAKE_C_COMPILER=mpicc \
+      -DENABLE_TESTS=ON \
+      -DENABLE_EXAMPLES=$EXAMPLES_ON_OFF \
+      -DBUILD_SHARED_LIBS=$SHLIBS_ON_OFF \
+      -DENABLE_PYTHON=OFF \
+      -DENABLE_CATALYST=OFF \
+      -DGENERATE_MODEL=$REGEN_ON_OFF \
+      -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi \
+  && make -j${NUMCORES} \
+  && make install 
+  
+ # && echo "localhost" > ${INSTALLTMDIR}/build/$repo/test/my-hostfile 
+  
+RUN find ${INSTALL_PREFIX}/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples|"
+# RUN chown -R docker:docker /home/docker 
+
+
+########################################
+## Stage 2 of build
+########################################
+FROM ubuntu:20.04 AS testing  
+
+RUN useradd docker \
+	&& mkdir /home/docker \
+	&& chown docker:docker /home/docker \
+	&& addgroup docker staff
+
+# INPUT_repo is a global argument
+ARG INPUT_repo
+ENV repo=$INPUT_repo
+ENV INSTALLTMDIR=/home/docker/installdir
+
+RUN apt-get update -y \
+  && echo "debconf debconf/frontend select Noninteractive" | debconf-set-selections \
+  && apt-get install -y --no-install-recommends \ 
+	software-properties-common \
+    cmake \
+    wget unzip nano \
+	libhdf5-openmpi-dev \
+	libboost-regex-dev \
+	libboost-date-time-dev \
+	libboost-log-dev \
+	libboost-system-dev \
+	libboost-filesystem-dev \
+	libboost-thread-dev \
+	libhdf5-openmpi-dev \
+	libxerces-c-dev  \
+	xsdcxx \
+    libcppunit-dev \
+	hdf5-tools \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
+  
+  
+# RUN apt-get install -y --no-install-recommends \ 
+#  	libpython3-dev \
+#   libpython3-dev libboost-python-dev libboost-numpy-dev \
+
+COPY --from=builder /home/docker/local/ /home/docker/local/
+COPY --from=builder ${INSTALLTMDIR}/build/$repo/test/ /home/docker/local/examples/test/
+COPY --from=builder ${INSTALLTMDIR}/build/$repo/CTestTestfile.cmake /home/docker/local/examples/
+
+RUN sed -i "s|${INSTALLTMDIR}/build/$repo/|/home/docker/local/examples/|g" /home/docker/local/examples/test/CTestTestfile.cmake
+
+RUN chown -R docker:docker /home/docker
+USER docker
+
+WORKDIR /home/docker/local/examples
+ 
+CMD ["/bin/bash"]

@@ -21,20 +21,20 @@ namespace damaris {
 
 void Action::operator()( int32_t sourceID, int32_t iteration, const char* args)
 {
-	Call(sourceID,iteration,args);
+    Call(sourceID,iteration,args);
 }
 
 #ifdef HAVE_VISIT_ENABLED
 bool Action::ExposeVisItMetaData(visit_handle h)
 {
-	visit_handle cmd = VISIT_INVALID_HANDLE;
-	if(not IsExternallyVisible()) return false;
-	if(VisIt_CommandMetaData_alloc(&cmd) == VISIT_OKAY) {
-		VisIt_CommandMetaData_setName(cmd, GetName().c_str());
-		VisIt_SimulationMetaData_addGenericCommand(h, cmd);
-		return true;
-	}
-	return false;
+    visit_handle cmd = VISIT_INVALID_HANDLE;
+    if(not IsExternallyVisible()) return false;
+    if(VisIt_CommandMetaData_alloc(&cmd) == VISIT_OKAY) {
+        VisIt_CommandMetaData_setName(cmd, GetName().c_str());
+        VisIt_SimulationMetaData_addGenericCommand(h, cmd);
+        return true;
+    }
+    return false;
 }
 #endif
 

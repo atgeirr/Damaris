@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<simulation name="life" language="c" 
+	xmlns="http://damaris.gforge.inria.fr/damaris/model">
+	<architecture>
+		<domains count="1"/>
+		<dedicated cores="8" nodes="0" />
+        <placement start="1" step="4" blocksize="2" mask="" comment="0110011001100110" />
+		<buffer name="buffer" size="67108864" />
+		<queue  name="queue" size="100" />
+	</architecture>
+	<data>
+		<parameter name="NROW" type="int" value="96" />
+		<parameter name="NCOL" type="int" value="96" />
+		<parameter name="size" type="int" value="2" />
+
+		<layout name="rmeshX" type="float" dimensions="1+NCOL" />
+		<layout name="rmeshY" type="float" dimensions="1+NROW/size" />
+
+		<layout name="cells" type="int" dimensions="NCOL,NROW/size" />
+
+		<mesh name="mesh2d" type="rectilinear" topology="2">
+			<coord name="coordinates/x2d" unit="cm" label="Width"/>
+			<coord name="coordinates/y2d" unit="cm" label="Height"/>
+		</mesh>
+
+		<group name="coordinates">
+			<variable name="x2d" layout="rmeshX" 
+				visualizable="false" />
+			<variable name="y2d" layout="rmeshY" 
+				visualizable="false" />
+		</group>
+	
+		<group name="life">
+			<variable name="cells" type="scalar" layout="cells" 
+				mesh="mesh2d" centering="zonal" />
+		</group>
+	</data>
+	<storage>
+	</storage>
+	<actions>
+		<event name="test_event" action="my_function" scope="core" />
+	</actions>
+</simulation>

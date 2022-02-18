@@ -1,0 +1,276 @@
+# syntax=docker/dockerfile:1
+## Usage of this file (standalone or automated via gitlab CI): 
+# The gitlab.inria.fr/Damaris/damaris repo should build without the secret setup.
+# 
+# To build the damaris repo (no password needed):
+# export TAG=v1.5.0
+# export PV_VER=v5.9.0
+# export PVSHORT=${PV_VERSION//./}
+# sudo  DOCKER_BUILDKIT=1 docker build -t \
+#            registry.gitlab.inria.fr/damaris/damaris:${TAG}-deb11-p${PVSHORT) \
+#            --build-arg INPUT_damaris_ver=${TAG} \
+#            --build-arg INPUT_repo=damaris \
+#            --build-arg INPUT_pv_ver=${PV_VER} \
+#                -f ./Dockerfile.debian.paraview58 .
+# 
+# mpirun -np 4 singularity exec ubuntu20_paraview58  /usr/local/damaris/examples/paraview/image /usr/local/damaris/examples/paraview/image.xml
+
+# This is a global arg that can be used in all stages of the build
+ARG INPUT_repo
+
+########################################
+## Stage 1 of build
+########################################
+FROM ubuntu:21.10 AS builder
+SHELL ["/bin/bash", "-c"]
+
+USER root
+
+RUN useradd docker \
+	&& mkdir /home/docker \
+	&& chown docker:docker /home/docker \
+	&& addgroup docker staff
+    
+    
+ENV INSTALLTMDIR=/home/docker/installdir
+ENV CMAKE_BUILD_TYPE=Release
+ENV NUMCORES=4
+ENV INSTALL_PREFIX=/home/docker/local
+ENV PATH=${INSTALL_PREFIX}/bin:${PATH}
+ENV LD_LIBRARY_PATH=${INSTALL_PREFIX}/lib:${LD_LIBRARY_PATH}
+
+# ENV PYTHON_INCLUDE_DIR=/usr/include/python3.8
+ENV GL_INSTALL_PATH=/usr/lib/x86_64-linux-gnu
+ENV GL_HEADER_PATH=/usr
+
+# RUN apt-get update -y \
+  # && add-apt-repository ppa:deadsnakes/ppa \
+  # && apt-get -y install python3.10 python3.10-dev \
+  # && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1 \
+  # &&  update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 2 \
+  # && echo "1" | update-alternatives --config python3 
+ 
+ 
+RUN apt-get update -y \
+  && echo "debconf debconf/frontend select Noninteractive" | debconf-set-selections \
+  && apt-get install -y --no-install-recommends \ 
+	software-properties-common \
+    apt-utils \
+    build-essential \
+    gfortran \
+    pkg-config \
+    git-core \
+    cmake \
+    wget unzip nano \
+	libhdf5-openmpi-dev \
+    libpython3-dev \
+    python3-numpy \
+    libboost-all-dev \
+	libxerces-c-dev  \
+	xsdcxx \
+    libcppunit-dev \
+	hdf5-tools \
+    cmake \
+  && apt-get clean \
+  && ln -s /usr/bin/xsdcxx /usr/bin/xsd 
+  
+RUN echo "debconf debconf/frontend select Noninteractive" | debconf-set-selections \
+  && apt-get -y  --no-install-recommends install  \
+    libosmesa6-dev \
+    mesa-common-dev \
+    mesa-utils \
+    freeglut3-dev \
+    ninja-build \
+    libtbb-dev \
+  && apt-get clean 
+
+
+
+###### Install ParaView - 
+# N.B. The version installed here must match exactly the version of Paraview used to connect to the simulation via Catalyst
+# -DPARAVIEW_BUILD_EDITION=CATALYST_RENDERING includes more (for rendering screen shots), but may not be needed
+# see https://www.kitware.com/paraview-catalyst-editions-what-are-they/ for some more details
+RUN   mkdir -p ${INSTALLTMDIR} \
+  &&   cd ${INSTALLTMDIR} \
+  &&   git clone  https://gitlab.kitware.com/paraview/paraview.git \
+  &&   cd ${INSTALLTMDIR}/paraview   \
+  &&   git fetch --all 
+
+ARG INPUT_pv_ver=v5.8.0
+ENV PV_VERSION=$INPUT_pv_ver
+  
+RUN   cd ${INSTALLTMDIR}/paraview   \
+  &&   git checkout ${PV_VERSION}  \
+  &&   git submodule update --init --recursive \
+  &&   mkdir -p ${INSTALLTMDIR}/build/pv \
+  &&   cd ${INSTALLTMDIR}/build/pv   \
+  &&   cmake -GNinja ../../paraview -DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX} \
+       -DBUILD_TESTING=OFF \
+       -DVTK_SMP_IMPLEMENTATION_TYPE=TBB \
+       -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} \
+       -DPARAVIEW_BUILD_EDITION=CATALYST \
+       -DPARAVIEW_INSTALL_DEVELOPMENT_FILES=ON \
+       -DPARAVIEW_USE_PYTHON=ON \
+       -DPARAVIEW_BUILD_SHARED_LIBS=ON \
+       -DPARAVIEW_USE_MPI=ON \
+       -DPARAVIEW_USE_QT=OFF \
+       -DVTK_USE_X=OFF \
+       -DVTK_OPENGL_HAS_OSMESA=ON \
+       -DPARAVIEW_USE_FORTRAN=OFF \
+       -DOSMESA_INCLUDE_DIR=$GL_HEADER_PATH/include \
+       -DOSMESA_LIBRARY=$GL_INSTALL_PATH/libOSMesa.so 
+       
+RUN   cd ${INSTALLTMDIR}/build/pv  \
+  && ninja -j${NUMCORES} \
+  && ninja install 
+
+
+
+# These should also be supplied on the command line as --build-arg 
+# ENV ENABLE_PYTHON=
+# Regenerate the xml model in C using XSD
+ENV REGEN_ON_OFF=ON
+ENV SHLIBS_ON_OFF=ON
+# Build examples
+ENV EXAMPLES_ON_OFF=ON
+
+# N.B INPUT_damaris_ver to be provided on the docker build -t registry.gitlab.inria.fr/damaris-development:${TAG}  --build-arg INPUT_damaris_ver=v1.5.0 --build-arg INPUT_repo="damaris-development" -f Dockerfile.ubuntu20 .
+ARG INPUT_damaris_ver
+ARG INPUT_repo
+# ARG INPUT_repo  # making this a global arge and defining before stage 1
+ENV DAMARIS_VERSION=$INPUT_damaris_ver
+ENV repo=$INPUT_repo
+
+
+
+# may need this:  -DParaView_DIR=$CATALYSTDIR
+# The first line deals with different access rights to damaris-development (private) and damaris (public) repository
+RUN --mount=type=secret,id=thepassword if [ "$repo" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi \
+  && export PV_VERSION_SHORT=${PV_VERSION:1:-2} \
+  && mkdir -p ${INSTALLTMDIR} \
+  && cd ${INSTALLTMDIR} \
+  && echo "Damaris Version: $DAMARIS_VERSION" \
+  && git clone  --depth 1 --branch $DAMARIS_VERSION https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/$repo.git \
+  && mkdir -p ${INSTALLTMDIR}/build/$repo \
+  && cd ${INSTALLTMDIR}/build/$repo \
+  && cmake ../../$repo -DCMAKE_INSTALL_PREFIX:PATH=$INSTALL_PREFIX \
+      -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} \
+      -DCMAKE_CXX_COMPILER=mpicxx \
+      -DCMAKE_C_COMPILER=mpicc \
+      -DENABLE_TESTS=ON \
+      -DENABLE_EXAMPLES=$EXAMPLES_ON_OFF \
+      -DBUILD_SHARED_LIBS=$SHLIBS_ON_OFF \
+      -DENABLE_PYTHON=OFF \
+      -DGENERATE_MODEL=$REGEN_ON_OFF \
+      -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi \
+      -DENABLE_CATALYST=ON -DParaView_DIR=${INSTALL_PREFIX}/lib/cmake/paraview-${PV_VERSION_SHORT} \
+  && make -j${NUMCORES} \
+  && make install 
+  
+ # && echo "localhost" > ${INSTALLTMDIR}/build/$repo/test/my-hostfile 
+  
+RUN find ${INSTALL_PREFIX}/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples|"
+# RUN chown -R docker:docker /home/docker 
+
+# COPY --from=builder ${INSTALL_PREFIX}/ ${INSTALL_PREFIX}/
+RUN  cp -r ${INSTALLTMDIR}/build/$repo/test/ ${INSTALL_PREFIX}/examples/test/ \
+ && cp  ${INSTALLTMDIR}/build/$repo/CTestTestfile.cmake ${INSTALL_PREFIX}/examples/ \
+ && sed -i "s|${INSTALLTMDIR}/build/$repo/|${INSTALL_PREFIX}/examples/|g" ${INSTALL_PREFIX}/examples/test/CTestTestfile.cmake
+ 
+RUN rm -fr ${INSTALLTMDIR}/
+
+RUN chown -R docker:docker /home/docker
+
+USER docker
+ENV PATH=/usr/local/bin:${PATH}
+ENV LD_LIBRARY_PATH=/usr/local/bin:${LD_LIBRARY_PATH}
+ENV PYTHONPATH=/usr/local/lib/python3.8/site-packages/_paraview.zip:/usr/local/lib/python3.8/site-packages/_vtk.zip:/usr/local/lib/python3.8/site-packages:/usr/lib/python38.zip:/usr/lib/python3.8:/usr/lib/python3.8/lib-dynload:/usr/local/lib/python3.8/dist-packages:/usr/lib/python3/dist-packages
+
+
+WORKDIR ${INSTALL_PREFIX}/examples
+
+
+########################################
+## Stage 2 of build
+########################################
+# FROM ubuntu:21.10 AS testing  
+
+# USER root
+# RUN useradd docker \
+	# && mkdir /home/docker \
+	# && chown docker:docker /home/docker \
+	# && addgroup docker staff
+
+
+# # INPUT_repo is a global argument
+# ARG INPUT_repo
+# ENV repo=$INPUT_repo
+# ENV INSTALLTMDIR=/home/docker/installdir
+
+# RUN apt-get update -y \
+  # && echo "debconf debconf/frontend select Noninteractive" | debconf-set-selections \
+  # && apt-get install -y --no-install-recommends \ 
+	# software-properties-common \
+    # wget unzip nano \
+	# libhdf5-openmpi-dev \
+    # libboost-all-dev \
+	# libpython3-dev  \
+	# libxerces-c-dev  \
+	# xsdcxx \
+    # libcppunit-dev \
+	# hdf5-tools \
+    # cmake \
+  # && apt-get clean \
+  # && ln -s /usr/bin/xsdcxx /usr/bin/xsd 
+  
+# RUN echo "debconf debconf/frontend select Noninteractive" | debconf-set-selections \
+  # && apt-get -y  --no-install-recommends install libosmesa6 \
+    # mesa-utils \
+    # python3 \
+    # python3-numpy \
+    # libtbb-dev \
+  # && apt-get clean 
+  
+  
+# # RUN apt-get install -y --no-install-recommends \ 
+# #  	libpython3-dev \
+# #   libpython3-dev libboost-python-dev libboost-numpy-dev \
+
+# # ENV CMAKE_VERSION=3.20
+# # ENV CMAKE_VERSION_FULL=${CMAKE_VERSION}.1
+# ###### Install CMake - from binary (fast)
+# # RUN mkdir -p ${INSTALLTMDIR}
+# # COPY --from=builder ${INSTALLTMDIR}/cmake-${CMAKE_VERSION_FULL}-linux-x86_64/bin /usr/local \
+# # COPY --from=builder ${INSTALLTMDIR}/cmake-${CMAKE_VERSION_FULL}-linux-x86_64/share/cmake-${CMAKE_VERSION} /usr/local/share
+    
+# # COPY --from=builder ${INSTALLTMDIR}/-xzf boost_1_78_0.tar.gz ${INSTALLTMDIR}/-xzf boost_1_78_0.tar.gz \
+# # &&  cd boost_1_78_0  \
+# # && ./bootstrap.sh --prefix=$install_path --with-libraries=thread,log,date_time,program_options,filesystem,system,python \
+# # &&  ./b2 threading=multi \
+# # &&  ./b2 install 
+
+# ENV INSTALL_PREFIX=/home/docker/local
+# ENV PATH=${INSTALL_PREFIX}/bin:${PATH}
+# ENV LD_LIBRARY_PATH=${INSTALL_PREFIX}/lib:${LD_LIBRARY_PATH}
+
+# # ENV PATH=/usr/local/bin:${PATH}
+# # ENV LD_LIBRARY_PATH=/usr/local/bin:${LD_LIBRARY_PATH}
+
+# # This first copy gets the paraview installation
+# # COPY --from=builder /usr/local/ /usr/local/   
+# COPY --from=builder ${INSTALL_PREFIX}/ ${INSTALL_PREFIX}/
+# COPY --from=builder ${INSTALLTMDIR}/build/$repo/test/ ${INSTALL_PREFIX}/examples/test/
+# COPY --from=builder ${INSTALLTMDIR}/build/$repo/CTestTestfile.cmake ${INSTALL_PREFIX}/examples/
+
+# RUN sed -i "s|${INSTALLTMDIR}/build/$repo/|${INSTALL_PREFIX}/examples/|g" ${INSTALL_PREFIX}/examples/test/CTestTestfile.cmake
+
+
+# RUN chown -R docker:docker /home/docker
+
+# USER docker
+# ENV PATH=/usr/local/bin:${PATH}
+# ENV LD_LIBRARY_PATH=/usr/local/bin:${LD_LIBRARY_PATH}
+
+# WORKDIR ${INSTALL_PREFIX}/examples
+ 
+CMD ["/bin/bash"]

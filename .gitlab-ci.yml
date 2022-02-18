@@ -1,0 +1,98 @@
+# To contribute improvements to CI/CD templates, please follow the Development guide at:
+# https://docs.gitlab.com/ee/development/cicd/templates.html
+# This specific template is located at:
+# https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Docker.gitlab-ci.yml
+
+# Build a Docker image with CI/CD and push to the GitLab registry.
+# Docker-in-Docker documentation: https://docs.gitlab.com/ee/ci/docker/using_docker_build.html
+#
+# This template uses one generic job with conditional builds
+# for the default branch and all other (MR) branches.
+
+# N.B. to use the CI_REGISTRY_USER and CI_REGISTRY_PASSWORD variables we must have an access token
+# created under the name of "gitlab-deploy-token" with access rights to the gitlab docker registry
+# and then gitlab can use the registry for this runner.
+
+docker-build:
+  # Use the official docker image.
+  image: docker:latest
+  stage: build
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    
+    # This code section is needed to get access to a specific machine (MY_CI_REMOTETEST_HOST) which 
+    # is on Grid5000. The gitlab-runner needs to be running on a machine in grid5000.fr or connected 
+    # to it via VPN.
+    - 'command -v ssh-agent >/dev/null || ( apk --update add openssh-client )'
+    - eval $(ssh-agent -s)
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - echo -e "$MY_CI_SSH_KEY_VAR" | base64 -d |  ssh-add -
+    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config 
+    # Instead of "StrictHostKeyChecking no" you could try the following:
+    # - ssh-keyscan example.com >> ~/.ssh/known_hosts
+     
+  # Default branch leaves tag empty (= latest tag)
+  # All other branches are tagged with the escaped branch name (commit ref slug)
+  script:
+    - |
+      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
+        tag=""
+        echo "Running on default branch '$CI_DEFAULT_BRANCH': tag = ':latest'"
+      else
+        tag=":$CI_COMMIT_REF_SLUG"
+        echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
+      fi
+    - pwd
+    - cd build/docker/damaris
+    - ls -l
+    # - docker image prune -f
+    # - docker container prune -f
+    # - docker builder prune -f
+    # - ssh jbowden@"$MY_CI_REMOTETEST_HOST"  'bash -s' < ../../test/run_on_remote.sh
+    # Build Ubuntu 20.04 version
+    # - export PV_VERSION=v5.8.0
+    # - export PVSHORT=${PV_VERSION//./}
+    # - DOCKER_BUILDKIT=1 docker build --no-cache --pull -t "${CI_REGISTRY_IMAGE}${tag}-ubu20-p${PVSHORT}" --secret id=thepassword,src=$MY_CI_READ_REPO_PWD --build-arg INPUT_damaris_ver=$CI_COMMIT_BRANCH --build-arg INPUT_repo=$CI_PROJECT_NAME --build-arg INPUT_pv_ver=${PV_VERSION} -f ./Dockerfile.ubuntu20.paraview .
+    # - docker push "$CI_REGISTRY_IMAGE${tag}-ubu20-p${PVSHORT}"
+    # Build CentOS8  version
+    # - DOCKER_BUILDKIT=1 docker build --no-cache --pull -t "${CI_REGISTRY_IMAGE}${tag}-centos8-p${PVSHORT}" --secret id=thepassword,src=$MY_CI_READ_REPO_PWD --build-arg INPUT_damaris_ver=$CI_COMMIT_BRANCH --build-arg INPUT_repo=$CI_PROJECT_NAME  --build-arg INPUT_pv_ver=${PV_VERSION} -f ./Dockerfile.centos8.paraview .
+    # - docker push "$CI_REGISTRY_IMAGE${tag}-centos8-p${PVSHORT}"
+    # - sudo chmod +x ./build_damaris_on_paraview_base_images.sh
+    # - apt -y install bash 
+    - apk add --no-cache bash 
+    - ./build_damaris_on_paraview_base_images.sh  $CI_PROJECT_NAME  $CI_COMMIT_BRANCH  $MY_CI_READ_REPO_PWD | tee build_damaris_on_paraview_base_images.graph
+    - ./test_damaris_images.sh   $CI_PROJECT_NAME  -damaris-$CI_COMMIT_BRANCH  "ctest -VV" | tee -a build_damaris_on_paraview_base_images.graph
+    - cat build_damaris_on_paraview_base_images.graph | grep "^GRAPH:" | sed "s|GRAPH:||g" > build_damaris_on_paraview_base_images.md
+    
+    # - apk add --no-cache curl
+    # - DATA=$(cat build_damaris_on_paraview_base_images.md)
+    # - curl  -X GET  --header "PRIVATE-TOKEN:  $CI_JOB_TOKEN"  "https://gitlab.inria.fr/api/v4/projects/Damaris%2Fdamaris-development/wikis/Build-success-table"
+    # - curl  --request PUT --data "format=markdown&content=$DATA&title=Build-success-table"  --header "PRIVATE-TOKEN:  $CI_JOB_TOKEN"  "https://gitlab.inria.fr/api/v4/projects/Damaris%2Fdamaris-development/wikis/Build-success-table"
+    - rm build_damaris_on_paraview_base_images.graph    
+    - cat build_damaris_on_paraview_base_images.md
+  # Run this job in a branch where a Dockerfile exists
+  timeout: 5h 00m
+#  rules:
+#    - if:
+#      exists:
+#        - build/docker/damaris/build_damaris_on_paraview_base_images.sh
+  only:
+    changes:
+      - .gitlab-ci.yml
+      - src/**/*
+      - include/**/*
+      - examples/**/*
+      - test/*
+      - build/docker/bases/*
+      - build/docker/damaris/*
+  artifacts:
+    when: always
+    name: table-of-successfull-builds-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG
+    paths: 
+      - build/docker/damaris/build_damaris_on_paraview_base_images.md
+  #  reports:
+  #    junit: report.xml
+
