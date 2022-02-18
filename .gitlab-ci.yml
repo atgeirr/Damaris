@@ -12,7 +12,7 @@
 # N.B. to use the CI_REGISTRY_USER and CI_REGISTRY_PASSWORD variables we must have an access token
 # created under the name of "gitlab-deploy-token" with access rights to the gitlab docker registry
 # and then gitlab can use the registry for this runner.
-
+ 
 docker-build:
   # Use the official docker image.
   image: docker:latest
