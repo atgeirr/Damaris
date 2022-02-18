@@ -82,9 +82,9 @@ docker-build:
   only:
     changes:
       - .gitlab-ci.yml
-      - src/*
-      - include/*
-      - examples/*
+      - src/**/*
+      - include/**/*
+      - examples/**/*
       - test/*
       - build/docker/bases/*
       - build/docker/damaris/*
