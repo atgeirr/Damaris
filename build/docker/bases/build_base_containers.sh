@@ -3,7 +3,7 @@
 # Author:  Josh Bowden, Inria
 # Date  :  4/2/2022
 # Usage :  sudo ./build_base_containers.sh  2> ./build_base.err
-#          Requires sudo if docker commands need suro privlages
+#          Requires sudo if docker commands need sudo privlages
 #          Script will try to build docker images from all files of form Dockerfile.${DOCKERFILE_ARRAY[]}.paraview 
 #          and then push them to the repository under name: DOCKER_IMAGE_BASENAME
 #          The user should log in to the docker registry first.
@@ -20,7 +20,7 @@ DOCKER_IMAGE_BASENAME=registry.gitlab.inria.fr/damaris/damaris-development
 # e.g. If the line is : FROM <base-name:tag/tag-base>
 #      it will return : base-name-tag-tag-base
 # N.B. It only removes 2 forward slashes, any more will be included.
-# N.B. It must match the same function in ../bases/build_base_containers.sh
+# N.B. It must match the same function in ../damaris/build_damaris_on_paraview_base_images.sh
 get_tag_name () {
   PATH_AND_DOCKERFILENAME=$1 
   BASE_IMAGE=$(cat ${PATH_AND_DOCKERFILENAME} | grep ^[[:space:]]*FROM | head -n 1 |  awk -F ' ' '{print $2}')

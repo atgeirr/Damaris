@@ -32,47 +32,58 @@ class ModifyModelDerived : public ModifyModel {
 
 
 class TestModifyModelParallel : public CppUnit::TestFixture {
-	
+    
 private:
-	static bool initialized;
+    static bool initialized;
     int rank, size;
 public:
-	TestModifyModelParallel() {
+    TestModifyModelParallel() {
         MPI_Comm_size(MPI_COMM_WORLD,&size);
-		MPI_Comm_rank(MPI_COMM_WORLD,&rank);
-		/*if(not initialized) {
-			Environment::Init("test.xml",MPI_COMM_WORLD);
-			initialized = true;
-		}*/
-	}
+        MPI_Comm_rank(MPI_COMM_WORLD,&rank);
+        /*if(not initialized) {
+            Environment::Init("test.xml",MPI_COMM_WORLD);
+            initialized = true;
+        }*/
+    }
 
-	virtual ~TestModifyModelParallel() {
-		//Environment::Finalize();
-		//initialized = false;
-	}
+    virtual ~TestModifyModelParallel() {
+        //Environment::Finalize();
+        //initialized = false;
+    }
 
-	static CppUnit::Test* GetTestSuite() {
-		CppUnit::TestSuite *suiteOfTests = 
-			new CppUnit::TestSuite("ModifyModel");
-		
-    
+    static CppUnit::Test* GetTestSuite() {
+        CppUnit::TestSuite *suiteOfTests =  new CppUnit::TestSuite("ModifyModel");
+        
+     
+        suiteOfTests->addTest(new CppUnit::TestCaller<TestModifyModelParallel>(
+                "Creates a ModifyModel class and preprocess using REGEX, then returns the model::simulation via the \
+void * release from the unique_ptr<Simulation> ",
+                &TestModifyModelParallel::CallCreateModifyModelandEnvViaVoid));
         
         suiteOfTests->addTest(new CppUnit::TestCaller<TestModifyModelParallel>(
-				"Creates a ModifyModel class and preprocess using REGEX, then returns the model::simulation via the void * release from the unique_ptr<Simulation> ",
-				&TestModifyModelParallel::CallCreateModifyModelandEnvViaVoid));
+                "Creates a ModifyModel class and preprocess using REGEX, then uses/modifies model::simulation directly \
+from the unique_ptr<Simulation> before initializing the Environment object and testing",
+                &TestModifyModelParallel::CallCreateModifyModelandEnvViaVoidModBySimObject));
         
         suiteOfTests->addTest(new CppUnit::TestCaller<TestModifyModelParallel>(
-				"Creates a ModifyModel class and preprocess using REGEX, then uses/modifies model::simulation directly from the unique_ptr<Simulation> before initializing the Environment object and testing",
-				&TestModifyModelParallel::CallCreateModifyModelandEnvViaVoidModBySimObject));
-		
-		return suiteOfTests;
-	}
+                "Reads the test.xml file and reates a Simulation model and then tests the XML has some valad values  \
+e.g. servers per node == 1 and rank 3 is the dedicated core",
+                &TestModifyModelParallel::CallReadXMLFromFileAndMakeModel));
+        
+         suiteOfTests->addTest(new CppUnit::TestCaller<TestModifyModelParallel>(
+                "Reads the test.xml file and reates a Simulation model and then tests the XML has some valad values  \
+e.g. servers per node == 1 and rank 3 is the dedicated core",
+                &TestModifyModelParallel::CallReadXMLFromFileNotExist));
+        
+        
+        return suiteOfTests;
+    }
 
 protected:
-	
-	
-	void CallCreateModifyModelandEnvViaVoid() {
-		damaris::model::ModifyModelDerived myMod = damaris::model::ModifyModelDerived();  // this creator is pre-defined with a Simulation XML string
+    
+    
+    void CallCreateModifyModelandEnvViaVoid() {
+        damaris::model::ModifyModelDerived myMod = damaris::model::ModifyModelDerived();  // this creator is pre-defined with a Simulation XML string
         // std::cout << "Input string: " << std::endl  << myMod.GetConfigString()  << std::endl ;
         std::map<std::string,std::string> find_replace_map = {
         {"_SHMEM_BUFFER_BYTES_REGEX_","67108864"},
@@ -93,11 +104,11 @@ protected:
         }
        
         Environment::Finalize();
-		initialized = false;     
-	}
-	
-	void CallCreateModifyModelandEnvViaVoidModBySimObject() {
-		damaris::model::ModifyModelDerived myMod = damaris::model::ModifyModelDerived();  // this creator is pre-defined with a Simulation XML string
+        initialized = false;     
+    }
+    
+    void CallCreateModifyModelandEnvViaVoidModBySimObject() {
+        damaris::model::ModifyModelDerived myMod = damaris::model::ModifyModelDerived();  // this creator is pre-defined with a Simulation XML string
         // std::cout << "Input string: " << std::endl  << myMod.GetConfigString()  << std::endl ;
         std::map<std::string,std::string> find_replace_map = {
         {"_SHMEM_BUFFER_BYTES_REGEX_","67108864"},
@@ -111,8 +122,8 @@ protected:
         
         // Now we have the Simulation object we can modify it via the C++ API
         // if (rank == 0) std::cout << "Rank 0: myMod.GetModel()->architecture().buffer().size(): " << std::endl  << myMod.GetModel()->architecture().buffer().size() << std::endl ;
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Comparing REGEXed myMod.GetModel()->architecture().buffer().size()", 67108864ul, static_cast<unsigned long>(myMod.GetModel()->architecture().buffer().size() )
- ) ;
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Comparing REGEXed myMod.GetModel()->architecture().buffer().size()", 67108864ul, 
+                                                  static_cast<unsigned long>(myMod.GetModel()->architecture().buffer().size() )) ;
         
         // Now modify the number of dedicated cores
         myMod.GetModel()->architecture().dedicated().cores( 2u )  ;
@@ -129,10 +140,41 @@ protected:
         }
        
         Environment::Finalize();
-		initialized = false;    
-	}
-	
-	
+        initialized = false;    
+    }
+    
+    
+     void CallReadXMLFromFileAndMakeModel() {
+        damaris::model::ModifyModelDerived myMod = damaris::model::ModifyModelDerived();  // this creator is pre-defined with a Simulation XML string
+        
+        myMod.ReadAndBroadcastXMLFromFile(MPI_COMM_WORLD, "test.xml");
+        
+        
+        myMod.SetSimulationModel() ;   
+        
+        Environment::Init(myMod.PassModelAsVoidPtr() ,MPI_COMM_WORLD);
+
+        //unsigned long int buffer_size = static_cast<unsigned long>(mdl->architecture().buffer().size()) ;
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Comparing (from file test.xml) Environment::ServersPerNode ", 1, Environment::ServersPerNode() ) ;
+        if (rank == 3) {
+            CPPUNIT_ASSERT_EQUAL_MESSAGE("Comparing (from file test.xml) Environment::IsDedicatedCore() assuming: mpirun -np 4 and rank == 3 ", true, Environment::IsDedicatedCore() ) ;
+        }
+       
+        Environment::Finalize();
+        initialized = false;     
+    }
+    
+     void CallReadXMLFromFileNotExist() {
+        damaris::model::ModifyModelDerived myMod = damaris::model::ModifyModelDerived();  // this creator is pre-defined with a Simulation XML string
+        
+        bool retbool = myMod.ReadAndBroadcastXMLFromFile(MPI_COMM_WORLD, "test_foo.xml");
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Comparing (from file test_foo.xml) return value of ReadAndBroadcastXMLFromFile after trying to read file that does not exist", false, retbool ) ;
+      
+    }
+    
+    
+    
+    
 };
 
 bool TestModifyModelParallel::initialized = false;

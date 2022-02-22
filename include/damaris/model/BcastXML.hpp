@@ -30,7 +30,7 @@ namespace model {
  * its content to other processes that will all parse it and return a model.
  *
  * \param[in] comm : MPI communicator gather all processes 
-	that need to load the XML file.
+    that need to load the XML file.
  * \param[in] uri : path of the XML file.
  */
 std::shared_ptr<Simulation> BcastXML(const MPI_Comm& comm, const std::string& uri);

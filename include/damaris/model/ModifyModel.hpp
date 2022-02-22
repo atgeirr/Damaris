@@ -20,6 +20,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <fstream>
 #include <map>
 
+#include <mpi.h>
+
 #include "damaris/model/Model.hpp"
 
 namespace damaris {
@@ -78,6 +80,17 @@ class ModifyModel {
          *  * \param[in] filename :  The filename to save the config_xml_XML string to 
          */
         void SaveXMLStringToFile(std::string filename ) ;
+        
+        
+        /**
+         * Loads an XML file in the rank 0 of the given MPI communicator, broadcast
+         * its content to other processes that will copy it to the config_xml_ string.
+         *
+         * \param[in] comm : MPI communicator gather all processess that need to 
+         *                   load the XML file.
+         * \param[in] uri  : Path and filename of the XML file.
+        */
+        bool ReadAndBroadcastXMLFromFile(const MPI_Comm& comm, const std::string& uri) ;
     
         
     protected:

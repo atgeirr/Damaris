@@ -100,28 +100,28 @@ private:
     static bool ReturnTrueIfClientFromPlacement(int rankInNode); 
 
     /**
-   	* Writes out string of values describing the environment of current process to std::string _environment_print_string_
-   	* Format: | GetSimulationName | GetDefaultLanguage | IsServer | IsClient | IsDedicatedNode | CoresPerNode | ServersPerNode | NumberOfNodes | ClientsPerNode | GetGlobalProcessID | GetEntityProcessID |
-   	* The value will be printed to Damaris log files currently when LogLevel is <= debug, as set in config xml file
-   	*/
-	static void SetEnvString(  ){
-		std::ostringstream buf1("Process Environment: ", std::ios_base::in);
-		std::ostringstream buf2("Process Environment: ", std::ios_base::in);
-		buf1 << "| GetSimulationName " ; buf2 << " | " << Environment::GetSimulationName();
-		buf1 << "| GetDefaultLanguage " ; buf2 << " | " << Environment::GetDefaultLanguage();
-		buf1 << "| IsServer " ; buf2 << " | " << Environment::IsServer();
-		buf1 << "| IsClient " ; buf2 << " | " << Environment::IsClient();
-		buf1 << "| IsDedicatedNode " ; buf2 << " | " << Environment::IsDedicatedNode();
-		buf1 << "| CoresPerNode " ; buf2 << " | " << Environment::CoresPerNode();
-		buf1 << "| ServersPerNode " ; buf2 << " | " << Environment::ServersPerNode();
-		buf1 << "| NumberOfNodes " ; buf2 << " | " << Environment::NumberOfNodes();
-		buf1 << "| ClientsPerNode " ; buf2 << " | " << Environment::ClientsPerNode();
-		buf1 << "| GetGlobalProcessID " ; buf2 << " | " << Environment::GetGlobalProcessID();
-		buf1 << "| GetEntityProcessID " ; buf2 << " | " << Environment::GetEntityProcessID();
-		buf1 << "|  " ; buf2 << " | " ;
-		// assign to the member string
-		_environment_print_string_ = buf1.str() + "\n" + buf2.str();
-	}
+       * Writes out string of values describing the environment of current process to std::string _environment_print_string_
+       * Format: | GetSimulationName | GetDefaultLanguage | IsServer | IsClient | IsDedicatedNode | CoresPerNode | ServersPerNode | NumberOfNodes | ClientsPerNode | GetGlobalProcessID | GetEntityProcessID |
+       * The value will be printed to Damaris log files currently when LogLevel is <= debug, as set in config xml file
+       */
+    static void SetEnvString(  ){
+        std::ostringstream buf1("Process Environment: ", std::ios_base::in);
+        std::ostringstream buf2("Process Environment: ", std::ios_base::in);
+        buf1 << "| GetSimulationName " ; buf2 << " | " << Environment::GetSimulationName();
+        buf1 << "| GetDefaultLanguage " ; buf2 << " | " << Environment::GetDefaultLanguage();
+        buf1 << "| IsServer " ; buf2 << " | " << Environment::IsServer();
+        buf1 << "| IsClient " ; buf2 << " | " << Environment::IsClient();
+        buf1 << "| IsDedicatedNode " ; buf2 << " | " << Environment::IsDedicatedNode();
+        buf1 << "| CoresPerNode " ; buf2 << " | " << Environment::CoresPerNode();
+        buf1 << "| ServersPerNode " ; buf2 << " | " << Environment::ServersPerNode();
+        buf1 << "| NumberOfNodes " ; buf2 << " | " << Environment::NumberOfNodes();
+        buf1 << "| ClientsPerNode " ; buf2 << " | " << Environment::ClientsPerNode();
+        buf1 << "| GetGlobalProcessID " ; buf2 << " | " << Environment::GetGlobalProcessID();
+        buf1 << "| GetEntityProcessID " ; buf2 << " | " << Environment::GetEntityProcessID();
+        buf1 << "|  " ; buf2 << " | " ;
+        // assign to the member string
+        _environment_print_string_ = buf1.str() + "\n" + buf2.str();
+    }
 
 public:
     
@@ -294,11 +294,11 @@ public:
 
 
     /**
-	 * Returns pointer to the string that describes the environment.
-	 * Only used when LogLevel is set to Debug or lower
-	 */
+     * Returns pointer to the string that describes the environment.
+     * Only used when LogLevel is set to Debug or lower
+     */
     static const char * GetEnvString( void ){
-    	return (_environment_print_string_.c_str() );
+        return (_environment_print_string_.c_str() );
     }
 
 
@@ -431,14 +431,14 @@ public:
     }
 
     /**
-	* Logs Events.
-	*/
-	static void FlushLog() {
-		if (!_eventLogger_)
-			return;
+    * Logs Events.
+    */
+    static void FlushLog() {
+        if (!_eventLogger_)
+            return;
 
-		_eventLogger_->Flush();
-	}
+        _eventLogger_->Flush();
+    }
 };
 
 }

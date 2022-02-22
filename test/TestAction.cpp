@@ -6,10 +6,10 @@
 using namespace std;
 
 int main(int argc, char** argv) {
-	MPI_Init(&argc,&argv);
-	CppUnit::TextUi::TestRunner runner;
-	runner.addTest(damaris::TestAction::GetTestSuite());
-	bool failed = runner.run();
-	MPI_Finalize();
-	return !failed;
+    MPI_Init(&argc,&argv);
+    CppUnit::TextUi::TestRunner runner;
+    runner.addTest(damaris::TestAction::GetTestSuite());
+    bool failed = runner.run();
+    MPI_Finalize();
+    return !failed;
 }

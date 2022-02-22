@@ -51,7 +51,7 @@ SHELL ["/bin/bash", "-c"]
 
 
 RUN useradd -m --create-home -s /bin/bash docker \
-	&& groupadd staff \
+    && groupadd staff \
     && groupadd docker \
     && usermod -a -G staff docker \
     && mkdir -p  /home/docker \
@@ -126,7 +126,6 @@ RUN zypper --non-interactive install libOSMesa-devel \
 RUN zypper --non-interactive install python3-devel  
 
 USER docker
-
  
 RUN   mkdir -p ${INSTALLTMDIR} \
   &&   cd ${INSTALLTMDIR} \

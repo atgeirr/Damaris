@@ -20,7 +20,7 @@ project(DAMARIS VERSION 1.6.0)
 # Set the location of CMake Modules
 #----------------------------------------------------------------------------#
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} 
-		"${DAMARIS_SOURCE_DIR}/cmake/Modules/")
+        "${DAMARIS_SOURCE_DIR}/cmake/Modules/")
 
 
 #----------------------------------------------------------------------------#
@@ -59,8 +59,8 @@ if(ENABLE_FORTRAN)
     enable_language(Fortran)
     include(FortranCInterface)
     FortranCInterface_HEADER(${DAMARIS_SOURCE_DIR}/include/DamarisFCMangle.h
-		    MACRO_NAMESPACE "FC_FUNC_"
-		    SYMBOL_NAMESPACE "FC_SYM_")
+            MACRO_NAMESPACE "FC_FUNC_"
+            SYMBOL_NAMESPACE "FC_SYM_")
     add_definitions(-D__ENABLE_FORTRAN)
   else(CMAKE_Fortran_COMPILER)
     message(FATAL "Fortran support requested but no Fortran compiler was found.")
@@ -218,8 +218,8 @@ endfunction()
 # Configure Damaris
 #----------------------------------------------------------------------------#
 CONFIGURE_FILE(${DAMARIS_SOURCE_DIR}/include/Damaris.h.in 
-	       ${CMAKE_BINARY_DIR}/include/Damaris.h)
-	       
+           ${CMAKE_BINARY_DIR}/include/Damaris.h)
+           
 
 #----------------------------------------------------------------------------#
 # Add the proper subdirectories
