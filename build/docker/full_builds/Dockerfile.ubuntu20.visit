@@ -40,7 +40,6 @@ ENV LD_LIBRARY_PATH=${INSTALL_PREFIX}/lib:${INSTALL_PREFIX}/lib64:$LD_LIBRARY_PA
 
 
 
-
 # ENV PV_VERSION=5.8.0
 # ENV PYTHON_INCLUDE_DIR=/usr/include/python3.8
 # ENV GL_INSTALL_PATH=/usr/lib/x86_64-linux-gnu
@@ -79,29 +78,115 @@ RUN apt-get update -y \
   
 
 
+RUN  apt-get install -y hostname patch python3 python3-dev
+
+
 USER docker
-ARG INPUT_visit=3.2.1
-ENV VISIT_VERSION=$INPUT_visit
-ENV VISIT_VER_UNDERSCORE=$(echo $VISIT_VERSION  | tr '.' '_')
+
+# Define INPUT_visit_ver with a default
+ARG INPUT_visit_ver
+ENV VISIT_VERSION=3.2.1
+# ENV VISIT_VER_UNDERSCORE=${VISIT_VERSION//./_}
+ENV VISIT_VER_UNDERSCORE=3_2_1
 # This is for building from source: ./build_visit2_13_2 --server-components-only --mesa --system-cmake --parallel --prefix $INSTALL_PREFIX/visit
-RUN mkdir -p ${INSTALLTMDIR} \
+RUN VISIT_VER_UNDERSCORE=${VISIT_VERSION//./_} \
+    && mkdir -p ${INSTALLTMDIR} \
     && cd ${INSTALLTMDIR} \
     && mkdir ./third_party \
     && wget  https://github.com/visit-dav/visit/releases/download/v${VISIT_VERSION}/build_visit${VISIT_VER_UNDERSCORE} \
+    && chmod +x build_visit${VISIT_VER_UNDERSCORE} \
     && export PAR_COMPILER=$(which mpicc) \
     && export PAR_COMPILER_CXX=$(which mpicxx) \
     && export PAR_INCLUDE="\"$(mpicc  --showme:compile)\"" \
     && export PAR_LIBS="\"$(mpicc  --showme:link)\""  \
-    && ./build_visit${VISIT_VER_UNDERSCORE} --server-components-only --osmesa --llvm --system-python --system-cmake --parallel --download-only --prefix $INSTALL_PREFIX/visit
+    && ./build_visit${VISIT_VER_UNDERSCORE} --server-components-only --mesagl  --llvm  --system-python --system-cmake --parallel --download-only --prefix $INSTALL_PREFIX/visit
 
-RUN  cd ${INSTALLTMDIR} \
+# --download-only --skip-opengl-context-check --conduit  --no-thirdparty  --stdout  --build-mode $CMAKE_BUILD_TYPE  --mesagl --llvm   --skip-opengl-context-check --no-thirdparty
+
+USER root
+RUN apt-get install -y x11proto-gl-dev  hostname patch autoconf automake libtool
+
+RUN apt-get -y build-dep mesa
+# RUN apt-get install -y libx11-dev libxkbfile-dev libxext-dev
+RUN ln -s /usr/bin/python3 /usr/bin/python
+
+RUN echo 'docker' | passwd --stdin root
+USER docker
+
+RUN VISIT_VER_UNDERSCORE=${VISIT_VERSION//./_} \
+    && cd ${INSTALLTMDIR} \
     && export PAR_COMPILER=$(which mpicc) \
     && export PAR_COMPILER_CXX=$(which mpicxx) \
     && export PAR_INCLUDE="\"$(mpicc  --showme:compile)\"" \
     && export PAR_LIBS="\"$(mpicc  --showme:link)\""  \
-    && ./build_visit${VISIT_VER_UNDERSCORE} --server-components-only --osmesa --llvm --system-python --system-cmake --parallel --prefix $INSTALL_PREFIX/visit
-  
-  
+    && ./build_visit${VISIT_VER_UNDERSCORE} --server-components-only --stdout --mesagl --llvm --makeflags -j${NUMCORES} --system-python --system-cmake --cxxflag "-Wno-class-memaccess -Wno-cast-function-type" --parallel --prefix $INSTALL_PREFIX/visit
+
+
+
+# These should also be supplied on the command line as --build-arg
+# ENV ENABLE_PYTHON=
+# Regenerate the xml model in C using XSD
+ENV REGEN_ON_OFF=ON
+ENV SHLIBS_ON_OFF=ON
+# Build examples
+ENV EXAMPLES_ON_OFF=ON
+
+# N.B INPUT_damaris_ver to be provided on the docker build -t registry.gitlab.inria.fr/damaris-development:${TAG}  --build-arg INPUT_damaris_ver=v1.5.0 --build-arg INPUT_repo="damaris-development" -f Dockerfile.ubuntu20 .
+ARG INPUT_damaris_ver
+ARG INPUT_repo
+# ARG INPUT_repo  # making this a global arge and defining before stage 1
+ENV DAMARIS_VERSION=$INPUT_damaris_ver
+ENV repo=$INPUT_repo
+
+cat build_visit3_2_1 | sed 's|vopts="${vopts} -DPYTHON_EXTRA_LIBS:STRING=${VTK_PY_LIBS}"|vopts="${vopts} -DPYTHON_EXTRA_LIBS:STRING=\\\"${VTK_PY_LIBS}\\\""|g' > build_visit3_2_1_patched
+
+
+# may need this:  -DParaView_DIR=$CATALYSTDIR
+# The first line deals with different access rights to damaris-development (private) and damaris (public) repository
+RUN --mount=type=secret,id=thepassword if [ "$repo" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi \
+  && export PV_VERSION_SHORT=${PV_VERSION:1:-2} \
+  && mkdir -p ${INSTALLTMDIR} \
+  && cd ${INSTALLTMDIR} \
+  && echo "Damaris Version: $DAMARIS_VERSION" \
+  && git clone  --depth 1 --branch $DAMARIS_VERSION https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/$repo.git \
+  && mkdir -p ${INSTALLTMDIR}/build/$repo \
+  && cd ${INSTALLTMDIR}/build/$repo \
+  && cmake ../../$repo -DCMAKE_INSTALL_PREFIX:PATH=$INSTALL_PREFIX \
+      -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} \
+      -DCMAKE_CXX_COMPILER=mpicxx \
+      -DCMAKE_C_COMPILER=mpicc \
+      -DENABLE_TESTS=ON \
+      -DENABLE_EXAMPLES=$EXAMPLES_ON_OFF \
+      -DBUILD_SHARED_LIBS=$SHLIBS_ON_OFF \
+      -DENABLE_PYTHON=OFF \
+      -DGENERATE_MODEL=$REGEN_ON_OFF \
+      -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi \
+      -DENABLE_VISIT=ON  -DVisIt_ROOT=${INSTALL_PREFIX} \
+      -DENABLE_CATALYST=OFF -DParaView_DIR=${INSTALL_PREFIX}/lib/cmake/paraview-${PV_VERSION_SHORT} \
+  && make -j${NUMCORES} \
+  && make install
+
+ # && echo "localhost" > ${INSTALLTMDIR}/build/$repo/test/my-hostfile
+
+RUN find ${INSTALL_PREFIX}/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples|"
+# RUN chown -R docker:docker /home/docker
+
+# COPY --from=builder ${INSTALL_PREFIX}/ ${INSTALL_PREFIX}/
+RUN  cp -r ${INSTALLTMDIR}/build/$repo/test/ ${INSTALL_PREFIX}/examples/test/ \
+ && cp  ${INSTALLTMDIR}/build/$repo/CTestTestfile.cmake ${INSTALL_PREFIX}/examples/ \
+ && sed -i "s|${INSTALLTMDIR}/build/$repo/|${INSTALL_PREFIX}/examples/|g" ${INSTALL_PREFIX}/examples/test/CTestTestfile.cmake
+
+RUN rm -fr ${INSTALLTMDIR}/
+
+RUN chown -R docker:docker /home/docker
+
+USER docker
+ENV PATH=/usr/local/bin:${PATH}
+ENV LD_LIBRARY_PATH=/usr/local/bin:${LD_LIBRARY_PATH}
+ENV PYTHONPATH=/usr/local/lib/python3.8/site-packages/_paraview.zip:/usr/local/lib/python3.8/site-packages/_vtk.zip:/usr/local/lib/python3.8/site-packages:/usr/lib/python38.zip:/usr/lib/python3.8:/usr/lib/python3.8/lib-dynload:/usr/local/lib/python3.8/dist-packages:/usr/lib/python3/dist-packages
+
+
+WORKDIR ${INSTALL_PREFIX}/examples
 
 
 WORKDIR /home/docker/local/examples

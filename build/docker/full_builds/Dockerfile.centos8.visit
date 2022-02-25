@@ -1,0 +1,239 @@
+# syntax=docker/dockerfile:1
+
+##################
+# Author: Josh Bowden
+# Company: Inria
+# Date: 25/01/2022
+#
+# This Dockerfile file can be built by gitlab on push to the 
+# damaris-development repository. It works in concert with the .gitlab-ci.yml 
+# file and a required gitlab-runner process that is currently running somewhere.
+#
+##################
+##################
+#
+## Usage of this file (standalone or automated via gitlab CI): 
+# The gitlab.inria.fr/Damaris/damaris repo should build without the secret setup.
+# 
+# To build the damaris repo (no password needed):
+# export TAG=v1.5.0
+# export VISIT_VER=3.2.1
+# sudo  DOCKER_BUILDKIT=1 docker build -t \
+#            registry.gitlab.inria.fr/damaris/damaris:${TAG}-centos8-visit${VISIT_VER} \
+#            --build-arg INPUT_damaris_ver=${TAG} \
+#            --build-arg INPUT_repo=damaris \
+#            --build-arg INPUT_visit_ver=${VISIT_VER} \
+#                -f ./Dockerfile.centos8.visit .
+#
+#
+###################
+#
+## To test the created docker image:
+# 1/ Log in to the gitlab repository 
+# N.B. You may need a ~/.docker/config.json file configured with an access token
+# > docker login registry.gitlab.inria.fr
+# 
+# 2/ Use docker run as it does not leave the container running on exit and run Damaris tests:
+#    Map the shared memory filesystem and the Paraview Catalyst port
+#
+# > docker run --rm -v /dev/shm:/dev/shm -p 22222:22222 -it registry.gitlab.inria.fr/damaris/damaris:<branch>-<OS>-visit<VisIt version> /bin/bash
+# <container prompt> ctest
+#
+# > sudo docker run --rm -v /dev/shm:/dev/shm -p 22222:22222 -it registry.gitlab.inria.fr/damaris/damaris:v1.5.0-centos8-visit3.2.1 /bin/bash
+# > cd /home/docker/local/examples/storage/
+# > mpirun -np 4 ./3dmesh 3dmesh.xml
+######################################################################################
+
+
+# global args can be used in all stages of the build
+
+########################################
+## Stage 1 of build
+########################################
+FROM quay.io/centos/centos:stream8 AS builder
+SHELL ["/bin/bash", "-c"]
+
+
+
+RUN useradd docker \
+	&& chown docker:docker /home/docker \
+	&& groupadd staff \
+    && usermod -a -G staff docker
+
+ENV INSTALL_PREFIX=/home/docker/local
+ENV MPI_BINDIR=/usr/lib64/openmpi/bin 
+ENV PATH=$INSTALL_PREFIX/bin:${MPI_BINDIR}:$PATH  
+ENV LD_LIBRARY_PATH=$INSTALL_PREFIX/lib:$INSTALL_PREFIX/lib64:$MPI_LIBDIR:$LD_LIBRARY_PATH
+ENV PATH=${INSTALL_PREFIX}/bin:${PATH}
+ENV LD_LIBRARY_PATH=${INSTALL_PREFIX}/lib:${INSTALL_PREFIX}/lib64:${LD_LIBRARY_PATH}
+
+
+# N.B. MPI_BINDIR=/usr/lib64/openmpi/bin has to be on the PATH
+ENV MPICXX_PATH=$MPI_BINDIR/mpicxx
+ENV MPICC_PATH=$MPI_BINDIR/mpicc
+ENV MPIFORT_PATH=$MPI_BINDIR/mpifort
+
+ENV INSTALLTMDIR=/home/docker/installdir
+ENV CMAKE_BUILD_TYPE=Release
+ENV NUMCORES=4
+
+ENV GL_INSTALL_PATH=/usr/lib64
+ENV GL_HEADER_PATH=/usr/include
+
+
+
+## Good to look at: https://centos.pkgs.org/
+
+## Install build tools and dependencies for Damaris
+RUN dnf -y install dnf-plugins-core \
+   && dnf config-manager --set-enabled powertools \
+   &&  dnf makecache --refresh \
+   &&  dnf update -y \
+   &&  dnf install -y epel-release \
+   &&  dnf install -y xerces-c-devel \
+   &&  dnf install -y xsd \
+   &&  dnf -y --enablerepo=powertools install cppunit-devel \
+   &&  dnf -y install redhat-rpm-config \
+   &&  dnf -y install hdf5-openmpi-devel \
+   hdf5-openmpi-static \
+   boost-devel \
+   git \
+   gcc-gfortran \
+   gcc-c++ \
+   openssl-devel \
+   libcurl-devel \
+   xz-devel \
+   nano \
+   wget \
+   cmake \
+   && cp /usr/bin/xsdcxx /usr/bin/xsd
+
+## For Paraview
+RUN dnf install -y --enablerepo=powertools mesa-libOSMesa-devel \
+  freeglut-devel \
+  ninja-build \
+  tbb-devel
+
+RUN  dnf -y --enablerepo=powertools install python3 python3-devel platform-python-devel boost-python3-devel
+# RUN  dnf -y install libSM-devel libICE-devel libXext-devel
+
+RUN dnf install -y xz
+
+
+RUN  dnf install -y xorg-x11-proto-devel  hostname patch autoconf automake libtool
+RUN dnf builddep -y mesa
+# RUN  dnf install -y libX11-devel libxkbfile-devel libglvnd libXext-devel
+RUN ln -s /usr/bin/python3 /usr/bin/python
+RUN echo 'docker' | passwd --stdin root
+
+USER docker
+
+RUN llvm-config --version
+
+
+# Define INPUT_visit_ver with a default
+ARG INPUT_visit_ver
+ENV VISIT_VERSION=3.2.1
+# ENV VISIT_VER_UNDERSCORE=${VISIT_VERSION//./_}
+ENV VISIT_VER_UNDERSCORE=3_2_1
+# This is for building from source: ./build_visit2_13_2 --server-components-only --mesa --system-cmake --parallel --prefix $INSTALL_PREFIX/visit
+RUN VISIT_VER_UNDERSCORE=${VISIT_VERSION//./_} \
+    && mkdir -p ${INSTALLTMDIR} \
+    && cd ${INSTALLTMDIR} \
+    && mkdir ./third_party \
+    && wget  https://github.com/visit-dav/visit/releases/download/v${VISIT_VERSION}/build_visit${VISIT_VER_UNDERSCORE} \
+    && chmod +x build_visit${VISIT_VER_UNDERSCORE} \
+    && export PAR_COMPILER=mpicc \
+    && export PAR_COMPILER_CXX=mpicxx \
+    && ./build_visit${VISIT_VER_UNDERSCORE}  --thirdparty-path /home/docker/local --mesagl  --llvm --server-components-only  --cc mpicc --cxx mpicxx --cflags "-I/home/docker/local/include" --cxxflags "-I/home/docker/local/include"  --system-python --system-cmake --parallel --download-only --prefix $INSTALL_PREFIX/visit
+
+
+
+##################
+#   && ./build_visit${VISIT_VER_UNDERSCORE}  --thirdparty-path /home/docker/local  --mesagl  --server-components-only --cc mpicc --cxx mpicxx --cflags "-I/home/docker/local/include" --cxxflags "-I/home/docker/local/include"  --llvm  --system-python --system-cmake --parallel --download-only --prefix $INSTALL_PREFIX/visit
+#   && export PAR_INCLUDE="\"$(mpicc  --showme:compile)\""
+#   && export PAR_LIBS="\"$(mpicc  --showme:link)\""
+####################
+
+
+
+# --download-only --skip-opengl-context-check --conduit  --no-thirdparty  --stdout  --build-mode $CMAKE_BUILD_TYPE  --mesagl --llvm   --skip-opengl-context-check --no-thirdparty
+
+RUN cd ${INSTALLTMDIR} \
+    && cat build_visit${VISIT_VER_UNDERSCORE} | sed 's|vopts="${vopts} -DPYTHON_EXTRA_LIBS:STRING=${VTK_PY_LIBS}"|vopts="${vopts} -DPYTHON_EXTRA_LIBS:STRING=\\\"${VTK_PY_LIBS}\\\""|g' > build_visit${VISIT_VER_UNDERSCORE}_patched \
+    && chmod +x build_visit${VISIT_VER_UNDERSCORE}_patched
+
+
+# --cflags "-I/home/docker/local/include" --cxxflags "-I/home/docker/local/include"
+
+
+RUN VISIT_VER_UNDERSCORE=${VISIT_VERSION//./_} \
+    && cd ${INSTALLTMDIR} \
+    && export PAR_COMPILER=mpicc \
+    && export PAR_COMPILER_CXX=mpicxx \
+    && yes yes | ./build_visit${VISIT_VER_UNDERSCORE}_patched --no-visit --thirdparty-path /home/docker/local --mesagl --llvm --server-components-only --stdout  --cc mpicc --cxx mpicxx  --cflags "-I/home/docker/local/include" --cxxflags "-I/home/docker/local/include"  --makeflags -j${NUMCORES} --system-python --system-cmake --cxxflag "-Wno-class-memaccess -Wno-cast-function-type" --parallel --prefix $INSTALL_PREFIX/visit
+
+RUN VISIT_VER_UNDERSCORE=${VISIT_VERSION//./_} \
+    && cd ${INSTALLTMDIR} \
+    && export PAR_COMPILER=mpicc \
+    && export PAR_COMPILER_CXX=mpicxx \
+    && yes yes | ./build_visit${VISIT_VER_UNDERSCORE}_patched --thirdparty-path /home/docker/local --mesagl --llvm --server-components-only --stdout  --cc mpicc --cxx mpicxx  --cflags "-I/home/docker/local/include" --cxxflags "-I/home/docker/local/include"  --makeflags -j${NUMCORES} --system-python --system-cmake --cxxflag "-Wno-class-memaccess -Wno-cast-function-type" --parallel --prefix $INSTALL_PREFIX/visit  || echo "We will try again"
+
+
+RUN rm -fr ${INSTALLTMDIR}/visit${VISIT_VERSION}/build \
+  && mkdir ${INSTALLTMDIR}/visit${VISIT_VERSION}/build \
+  && cd ${INSTALLTMDIR}/visit${VISIT_VERSION}/build \
+  && /usr/bin/cmake -DVISIT_CONFIG_SITE:FILEPATH=/home/docker/installdir/buildkitsandbox.cmake -DVISIT_INSTALL_THIRD_PARTY:BOOL=ON -DVISIT_PARALLEL:BOOL=ON -DCMAKE_BUILD_TYPE:STRING=Release -DVISIT_C_COMPILER:FILEPATH=mpicc -DVISIT_CXX_COMPILER:FILEPATH=mpicxx -DVISIT_C_FLAGS:STRING=" -m64 -fPIC -I/home/docker/local/include" -DVISIT_CXX_FLAGS:STRING=" -m64 -fPIC -I/home/docker/local/include -Wno-class-memaccess -Wno-cast-function-type" -DCMAKE_INSTALL_PREFIX:PATH=/home/docker/local/visit -DCPACK_INSTALL_PREFIX:PATH=/home/docker/local/visit -DCPACK_PACKAGING_INSTALL_PREFIX:PATH=/home/docker/local/visit -DVISIT_SERVER_COMPONENTS_ONLY:BOOL=ON ../src  \
+  && make -j${NUMCORES} \
+  && make install
+
+
+ENV REGEN_ON_OFF=ON
+ENV SHLIBS_ON_OFF=ON
+# Build examples
+ENV EXAMPLES_ON_OFF=ON
+
+
+# N.B INPUT_damaris_ver to be provided on the docker build -t registry.gitlab.inria.fr/damaris-development:${TAG}  --build-arg INPUT_damaris_ver=v1.5.0 --build-arg INPUT_repo="damaris-development" -f Dockerfile.ubuntu20 .
+ARG INPUT_damaris_ver
+ARG INPUT_repo
+# ARG INPUT_repo  # making this a global arge and defining before stage 1
+ENV DAMARIS_VERSION=$INPUT_damaris_ver
+ENV repo=$INPUT_repo
+
+
+# may need this:  -DParaView_DIR=$CATALYSTDIR
+# The first line deals with different access rights to damaris-development (private) and damaris (public) repository
+RUN --mount=type=secret,id=thepassword if [ "$repo" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi \
+  && export PV_VERSION_SHORT=${PV_VERSION:1:-2} \
+  && mkdir -p ${INSTALLTMDIR} \
+  && cd ${INSTALLTMDIR} \
+  && echo "Damaris Version: $DAMARIS_VERSION" \
+  && git clone  --depth 1 --branch $DAMARIS_VERSION https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/$repo.git \
+  && mkdir -p ${INSTALLTMDIR}/build/$repo \
+  && cd ${INSTALLTMDIR}/build/$repo \
+  && cmake ../../$repo -DCMAKE_INSTALL_PREFIX:PATH=$INSTALL_PREFIX \
+      -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} \
+      -DCMAKE_CXX_COMPILER=mpicxx \
+      -DCMAKE_C_COMPILER=mpicc \
+      -DENABLE_TESTS=ON \
+      -DENABLE_EXAMPLES=$EXAMPLES_ON_OFF \
+      -DBUILD_SHARED_LIBS=$SHLIBS_ON_OFF \
+      -DENABLE_PYTHON=OFF \
+      -DGENERATE_MODEL=$REGEN_ON_OFF \
+      -DENABLE_HDF5=ON \
+      -DENABLE_VISIT=ON -DVisIt_ROOT=${INSTALL_PREFIX}/visit/${VISIT_VERSION}/linux-x86_64/libsim/V2 \
+      -DENABLE_CATALYST=OFF -DParaView_DIR=${INSTALL_PREFIX}/lib/cmake/paraview-${PV_VERSION_SHORT} \
+  && make -j${NUMCORES} \
+  && make install
+
+
+RUN find ${INSTALL_PREFIX}/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples|"
+
+RUN  cp -r ${INSTALLTMDIR}/build/$repo/test/ ${INSTALL_PREFIX}/examples/test/ \
+ && cp  ${INSTALLTMDIR}/build/$repo/CTestTestfile.cmake ${INSTALL_PREFIX}/examples/ \
+ && sed -i "s|${INSTALLTMDIR}/build/$repo/|${INSTALL_PREFIX}/examples/|g" ${INSTALL_PREFIX}/examples/test/CTestTestfile.cmake
+
+
+ 
+CMD ["/bin/bash"]

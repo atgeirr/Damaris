@@ -87,7 +87,7 @@
 SCRIPTDIR=/home/jbowden/C_S/damaris_build
 # Where the source code for Damaris is
 REPODIR=/home/jbowden/C_S/damaris-development
-# The build directory that will be created by the SCRIPTDIR directory
+# The build directory that will be created by the SCRIPTDIR script (this script)
 BUILDDIR=damaris-build-sharedlib-examples-dbg4
 # The installation directory
 INSTALL_PREFIX=/opt/damaris/shared_dbg
@@ -122,6 +122,7 @@ BOOST_HASH=4qfvorx
 CPPUNIT_HASH=jywsrhy
 # Paraview has dependent libs OpenMPI HDF5 and Python
 # They should *not be overridden* by other versions using: spack load <other version>
+# So, we go to some effort working out which ones Paraview is using below
 PARAVIEW_HASH=y64gtko
 # e6s2at7
 
