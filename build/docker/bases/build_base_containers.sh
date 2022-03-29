@@ -10,6 +10,7 @@
 #            > docker login registry.gitlab.inria.fr
 
 PV_VER_ARRAY=(v5.7.0 v5.8.0 v5.8.1 v5.9.0 v5.9.1 v5.10.0)
+VISIT_VER_ARRAY=( 3.2.1 )
 DOCKERFILE_ARRAY=(ubuntu20 ubuntu21 debian10 debian11 centos8 archlinux opensuse)
 
 # docker login registry.gitlab.inria.fr
@@ -31,6 +32,7 @@ get_tag_name () {
   echo $BASE_IMAGE_SHORT
 }
 
+echo "Build Paraview Base Images"
 for DOCKERFILE in ${DOCKERFILE_ARRAY[@]};
 do
     BASE_IMAGE_SHORT=$(get_tag_name "./Dockerfile.${DOCKERFILE}.paraview")
@@ -40,16 +42,17 @@ do
           echo ""
           PVSHORT=${PV_VERSION//./}
           TAG=$(echo $BASE_IMAGE_SHORT-p${PVSHORT})
-          # echo $DOCKER_IMAGE_BASENAME:${TAG} 
+          # echo $DOCKER_IMAGE_BASENAME:${TAG}
           BUILD_IMAGE=$(sudo docker manifest inspect $DOCKER_IMAGE_BASENAME:${TAG} 2> /dev/null ; echo $?)
           if [[ "$BUILD_IMAGE" == "1" ]] ; then
-            # echo "Building: $DOCKER_IMAGE_BASENAME:${TAG}"
-               DOCKER_BUILDKIT=1 docker build -q -t \
-                  ${DOCKER_IMAGE_BASENAME}:${TAG} \
-                  --build-arg INPUT_pv_ver=${PV_VERSION} \
-                  -f ./Dockerfile.$DOCKERFILE.paraview . 
+             echo "Building: $DOCKER_IMAGE_BASENAME:${TAG}"
+            #   DOCKER_BUILDKIT=1 docker build -q -t \
+            #      ${DOCKER_IMAGE_BASENAME}:${TAG} \
+            #      --build-arg INPUT_pv_ver=${PV_VERSION} \
+            #      -f ./Dockerfile.$DOCKERFILE.paraview .
             if [[ $? -eq 0 ]] ; then
-               docker push "$DOCKER_IMAGE_BASENAME:${TAG}"
+               echo "Pushing $DOCKER_IMAGE_BASENAME:${TAG}"
+               # docker push "$DOCKER_IMAGE_BASENAME:${TAG}"
             else 
                echo "ERROR: Dockerfile.${DOCKERFILE}.paraview PV_VERSION=$PV_VERSION could not be built"
             fi
@@ -61,3 +64,39 @@ do
       echo "ERROR: Dockerfile.${DOCKERFILE}.paraview does not exist - check the names given in DOCKERFILE_ARRAY"
     fi
 done
+
+
+echo "Build  Visit base images"
+for DOCKERFILE in ${DOCKERFILE_ARRAY[@]};
+do
+    BASE_IMAGE_SHORT=$(get_tag_name "./Dockerfile.${DOCKERFILE}.visit")
+    if [[ "$BASE_IMAGE_SHORT" != "" ]] ; then
+        for VISIT_VERSION in ${VISIT_VER_ARRAY[@]};
+        do
+          echo ""
+          VISITSHORT=${VISIT_VERSION//./}
+          TAG=$(echo $BASE_IMAGE_SHORT-visit${VISITSHORT})
+          # echo $DOCKER_IMAGE_BASENAME:${TAG}
+          BUILD_IMAGE=$(sudo docker manifest inspect $DOCKER_IMAGE_BASENAME:${TAG} 2> /dev/null ; echo $?)
+          if [[ "$BUILD_IMAGE" == "1" ]] ; then
+              echo "Building: $DOCKER_IMAGE_BASENAME:${TAG}"
+              # DOCKER_BUILDKIT=1 docker build -q -t \
+              #    ${DOCKER_IMAGE_BASENAME}:${TAG} \
+              #    --build-arg INPUT_pv_ver=${VISIT_VERSION} \
+              #    -f ./Dockerfile.$DOCKERFILE.visit .
+            if [[ $? -eq 0 ]] ; then
+               echo "Pushing $DOCKER_IMAGE_BASENAME:${TAG}"
+               # docker push "$DOCKER_IMAGE_BASENAME:${TAG}"
+            else
+               echo "ERROR: Dockerfile.${DOCKERFILE}.visit VISIT_VERSION=$VISIT_VERSION could not be built"
+            fi
+         else
+           echo "INFO: the image $DOCKER_IMAGE_BASENAME:${TAG} already exists"
+         fi
+        done
+    else
+      echo "ERROR: Dockerfile.${DOCKERFILE}.visit does not exist - check the names given in DOCKERFILE_ARRAY"
+    fi
+done
+
+

@@ -65,19 +65,6 @@ RUN useradd -m --create-home -s /bin/bash docker \
 	&& groupadd staff \
     && usermod -a -G staff docker
 
-ENV INSTALL_PREFIX=/home/docker/local
-# ENV MPI_BINDIR=/usr/bin 
-# ENV PATH=$INSTALL_PREFIX/bin:${MPI_BINDIR}:$PATH  
-ENV PATH=${INSTALL_PREFIX}/bin:${PATH}
-ENV LD_LIBRARY_PATH=${INSTALL_PREFIX}/lib:${INSTALL_PREFIX}/lib64:${LD_LIBRARY_PATH}
-
-ENV INSTALLTMDIR=/home/docker/installdir
-ENV CMAKE_BUILD_TYPE=Release
-ENV NUMCORES=4
-
-
-ENV GL_INSTALL_PATH=/usr/lib
-ENV GL_HEADER_PATH=/usr/include
 
 
 ## Good to look at: https://centos.pkgs.org/
@@ -121,6 +108,21 @@ RUN yes | pacman -Syu python python-mpi4py python-numpy
 
 USER docker
 
+
+ENV INSTALL_PREFIX=/home/docker/local
+# ENV MPI_BINDIR=/usr/bin
+# ENV PATH=$INSTALL_PREFIX/bin:${MPI_BINDIR}:$PATH
+ENV PATH=${INSTALL_PREFIX}/bin:${PATH}
+ENV LD_LIBRARY_PATH=${INSTALL_PREFIX}/lib:${INSTALL_PREFIX}/lib64:${LD_LIBRARY_PATH}
+
+ENV INSTALLTMDIR=/home/docker/installdir
+ENV CMAKE_BUILD_TYPE=Release
+ENV NUMCORES=4
+
+
+ENV GL_INSTALL_PATH=/usr/lib
+ENV GL_HEADER_PATH=/usr/include
+
 ENV MPI_BINDIR=/usr/bin 
 ENV PATH=$INSTALL_PREFIX/bin:${MPI_BINDIR}:$PATH  
 # N.B. MPI_BINDIR=/usr/lib64/openmpi/bin has to be on the PATH
@@ -139,6 +141,9 @@ RUN   mkdir -p ${INSTALLTMDIR} \
 
 ARG INPUT_pv_ver=v5.8.0
 ENV PV_VERSION=$INPUT_pv_ver
+
+
+
   
 RUN   cd ${INSTALLTMDIR}/paraview   \
   &&   git checkout ${PV_VERSION}  \

@@ -1,35 +1,31 @@
 # syntax=docker/dockerfile:1
-
 ## Usage of this file (standalone or automated via gitlab CI): 
 # The gitlab.inria.fr/Damaris/damaris repo should build without the secret setup.
 # 
 # To build the damaris repo (no password needed):
 # export TAG=v1.5.0
-# export VISIT_VER=3.2.1
-# sudo  DOCKER_BUILDKIT=1 docker build --progress=plain  -t \
-#            registry.gitlab.inria.fr/damaris/damaris:${TAG}-centos8-visit${VISIT_VER} \
-#            --build-arg INPUT_damaris_ver=${TAG} \
-#            --build-arg INPUT_repo=damaris \
-#            --build-arg INPUT_visit_ver=${VISIT_VER} \
-#                -f ./Dockerfile.centos8.visit .
-
-
-# This is a global arg that can be used in all stages of the build
-ARG INPUT_repo
+# export PV_VER=v5.9.0
+# export PVSHORT=${PV_VERSION//./}
+# sudo  DOCKER_BUILDKIT=1 docker build -t \
+#            registry.gitlab.inria.fr/damaris/damaris:${TAG}-deb11-p${PVSHORT) \
+#            --build-arg INPUT_pv_ver=${PV_VER} \
+#                -f ./Dockerfile.debian.paraview58 .
+# 
+# mpirun -np 4 singularity exec ubuntu20_paraview58  /usr/local/damaris/examples/paraview/image /usr/local/damaris/examples/paraview/image.xml
 
 ########################################
 ## Stage 1 of build
 ########################################
-FROM ubuntu:20.04 AS builder
+FROM debian:10 AS builder
 SHELL ["/bin/bash", "-c"]
 
 USER root
 
 RUN useradd docker \
-    && mkdir /home/docker \
-    && chown docker:docker /home/docker \
-    && addgroup docker staff
-    
+	&& mkdir /home/docker \
+	&& chown docker:docker /home/docker \
+	&& addgroup docker staff
+
 # RUN yes docker | passwd --stdin root
 RUN echo 'root:docker' | chpasswd
 
@@ -74,6 +70,11 @@ RUN apt-get update -y \
 
 
 
+
+
+
+
+
 ENV INSTALL_PREFIX=/home/docker/local
 ENV PATH=${INSTALL_PREFIX}/bin:${PATH}
 ENV LD_LIBRARY_PATH=${INSTALL_PREFIX}/lib:${INSTALL_PREFIX}/lib64:${LD_LIBRARY_PATH}
@@ -82,7 +83,6 @@ ENV INSTALLTMDIR=/home/docker/installdir
 ENV CMAKE_BUILD_TYPE=Release
 ENV NUMCORES=4
 
-# N.B. MPI_ROOT=/usr/lib64/openmpi/bin has to be on the PATH
 ENV MPI_ROOT=/usr
 ENV MPICXX=$MPI_ROOT/bin/mpicxx
 ENV MPICC=$MPI_ROOT/bin/mpicc
@@ -150,68 +150,6 @@ RUN rm -fr ${INSTALLTMDIR}/visit${VISIT_VERSION}/build \
   && /usr/bin/cmake -DVISIT_CONFIG_SITE:FILEPATH=/home/docker/installdir/buildkitsandbox.cmake -DVISIT_INSTALL_THIRD_PARTY:BOOL=ON -DVISIT_PARALLEL:BOOL=ON -DCMAKE_BUILD_TYPE:STRING=Release -DVISIT_C_COMPILER:FILEPATH=mpicc -DVISIT_CXX_COMPILER:FILEPATH=${MPICXX}  -DVISIT_C_FLAGS:STRING=" -m64 -fPIC -I${INSTALL_PREFIX}/include" -DVISIT_CXX_FLAGS:STRING=" -m64 -fPIC -I${INSTALL_PREFIX}/include -Wno-class-memaccess -Wno-cast-function-type" -DCMAKE_INSTALL_PREFIX:PATH=${INSTALL_PREFIX}/visit -DCPACK_INSTALL_PREFIX:PATH=${INSTALL_PREFIX}/visit -DCPACK_PACKAGING_INSTALL_PREFIX:PATH=${INSTALL_PREFIX}/visit -DVISIT_SERVER_COMPONENTS_ONLY:BOOL=ON ../src  \
   && make -j${NUMCORES} \
   && make install
-
-
-ENV REGEN_ON_OFF=ON
-ENV SHLIBS_ON_OFF=ON
-# Build examples
-ENV EXAMPLES_ON_OFF=ON
-
-
-# N.B INPUT_damaris_ver to be provided on the docker build -t registry.gitlab.inria.fr/damaris-development:${TAG}  --build-arg INPUT_damaris_ver=v1.5.0 --build-arg INPUT_repo="damaris-development" -f Dockerfile.ubuntu20 .
-ARG INPUT_damaris_ver
-ARG INPUT_repo
-# ARG INPUT_repo  # making this a global arge and defining before stage 1
-ENV DAMARIS_VERSION=$INPUT_damaris_ver
-ENV repo=$INPUT_repo
-
-
-# may need this:  -DParaView_DIR=$CATALYSTDIR
-# The first line deals with different access rights to damaris-development (private) and damaris (public) repository
-RUN --mount=type=secret,id=thepassword if [ "$repo" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi \
-  && export PV_VERSION_SHORT=${PV_VERSION:1:-2} \
-  && mkdir -p ${INSTALLTMDIR} \
-  && cd ${INSTALLTMDIR} \
-  && echo "Damaris Version: $DAMARIS_VERSION" \
-  && git clone  --depth 1 --branch $DAMARIS_VERSION https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/$repo.git \
-  && mkdir -p ${INSTALLTMDIR}/build/$repo \
-  && cd ${INSTALLTMDIR}/build/$repo \
-  && cmake ../../$repo -DCMAKE_INSTALL_PREFIX:PATH=$INSTALL_PREFIX \
-      -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} \
-      -DCMAKE_CXX_COMPILER=${MPICXX}  \
-      -DCMAKE_C_COMPILER=${MPICC} \
-      -DCMAKE_Fortran_COMPILER=${MPIFORT} \
-      -DENABLE_FORTRAN=ON \
-      -DENABLE_TESTS=ON \
-      -DENABLE_EXAMPLES=$EXAMPLES_ON_OFF \
-      -DBUILD_SHARED_LIBS=$SHLIBS_ON_OFF \
-      -DENABLE_PYTHON=OFF \
-      -DGENERATE_MODEL=$REGEN_ON_OFF \
-      -DENABLE_HDF5=ON \
-      -DENABLE_VISIT=ON -DVisIt_ROOT=${INSTALL_PREFIX}/visit/${VISIT_VERSION}/linux-x86_64/libsim/V2 \
-      -DENABLE_CATALYST=OFF -DParaView_DIR=${INSTALL_PREFIX}/lib/cmake/paraview-${PV_VERSION_SHORT} \
-  && make -j${NUMCORES} \
-  && make install
-
-
-RUN find ${INSTALL_PREFIX}/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples|"
-
-RUN  cp -r ${INSTALLTMDIR}/build/$repo/test/ ${INSTALL_PREFIX}/examples/test/ \
- && cp  ${INSTALLTMDIR}/build/$repo/CTestTestfile.cmake ${INSTALL_PREFIX}/examples/ \
- && sed -i "s|${INSTALLTMDIR}/build/$repo/|${INSTALL_PREFIX}/examples/|g" ${INSTALL_PREFIX}/examples/test/CTestTestfile.cmake
-
-
-RUN rm -fr ${INSTALLTMDIR}/
-
-RUN chown -R docker:docker /home/docker
-
-USER docker
-ENV PATH=/usr/local/bin:${PATH}
-ENV LD_LIBRARY_PATH=/usr/local/bin:${LD_LIBRARY_PATH}
-ENV PYTHONPATH=/usr/local/lib/python3.8/site-packages/_paraview.zip:/usr/local/lib/python3.8/site-packages/_vtk.zip:/usr/local/lib/python3.8/site-packages:/usr/lib/python38.zip:/usr/lib/python3.8:/usr/lib/python3.8/lib-dynload:/usr/local/lib/python3.8/dist-packages:/usr/lib/python3/dist-packages
-
-
-WORKDIR ${INSTALL_PREFIX}/examples
 
 
 CMD ["/bin/bash"]

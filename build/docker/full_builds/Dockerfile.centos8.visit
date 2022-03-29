@@ -16,9 +16,9 @@
 # The gitlab.inria.fr/Damaris/damaris repo should build without the secret setup.
 # 
 # To build the damaris repo (no password needed):
-# export TAG=v1.5.0
+# export TAG=v1.6.0
 # export VISIT_VER=3.2.1
-# sudo  DOCKER_BUILDKIT=1 docker build -t \
+# sudo  DOCKER_BUILDKIT=1 docker build --progress=plain -t \
 #            registry.gitlab.inria.fr/damaris/damaris:${TAG}-centos8-visit${VISIT_VER} \
 #            --build-arg INPUT_damaris_ver=${TAG} \
 #            --build-arg INPUT_repo=damaris \
@@ -60,27 +60,6 @@ RUN useradd docker \
 	&& groupadd staff \
     && usermod -a -G staff docker
 
-ENV INSTALL_PREFIX=/home/docker/local
-ENV MPI_BINDIR=/usr/lib64/openmpi/bin 
-ENV PATH=$INSTALL_PREFIX/bin:${MPI_BINDIR}:$PATH  
-ENV LD_LIBRARY_PATH=$INSTALL_PREFIX/lib:$INSTALL_PREFIX/lib64:$MPI_LIBDIR:$LD_LIBRARY_PATH
-ENV PATH=${INSTALL_PREFIX}/bin:${PATH}
-ENV LD_LIBRARY_PATH=${INSTALL_PREFIX}/lib:${INSTALL_PREFIX}/lib64:${LD_LIBRARY_PATH}
-
-
-# N.B. MPI_BINDIR=/usr/lib64/openmpi/bin has to be on the PATH
-ENV MPICXX_PATH=$MPI_BINDIR/mpicxx
-ENV MPICC_PATH=$MPI_BINDIR/mpicc
-ENV MPIFORT_PATH=$MPI_BINDIR/mpifort
-
-ENV INSTALLTMDIR=/home/docker/installdir
-ENV CMAKE_BUILD_TYPE=Release
-ENV NUMCORES=4
-
-ENV GL_INSTALL_PATH=/usr/lib64
-ENV GL_HEADER_PATH=/usr/include
-
-
 
 ## Good to look at: https://centos.pkgs.org/
 
@@ -109,22 +88,48 @@ RUN dnf -y install dnf-plugins-core \
    && cp /usr/bin/xsdcxx /usr/bin/xsd
 
 ## For Paraview
-RUN dnf install -y --enablerepo=powertools mesa-libOSMesa-devel \
-  freeglut-devel \
-  ninja-build \
-  tbb-devel
+# RUN dnf install -y --enablerepo=powertools mesa-libOSMesa-devel \
+#  freeglut-devel \
+#  ninja-build \
+#  tbb-devel
 
 RUN  dnf -y --enablerepo=powertools install python3 python3-devel platform-python-devel boost-python3-devel
 # RUN  dnf -y install libSM-devel libICE-devel libXext-devel
 
-RUN dnf install -y xz
 
-
-RUN  dnf install -y xorg-x11-proto-devel  hostname patch autoconf automake libtool
+RUN  dnf install -y xz xorg-x11-proto-devel  hostname patch autoconf automake libtool
 RUN dnf builddep -y mesa
 # RUN  dnf install -y libX11-devel libxkbfile-devel libglvnd libXext-devel
 RUN ln -s /usr/bin/python3 /usr/bin/python
 RUN echo 'docker' | passwd --stdin root
+
+
+
+
+ENV INSTALL_PREFIX=/home/docker/local
+ENV MPI_ROOT=/usr/lib64/openmpi
+ENV MPI_BINDIR=$MPI_ROOT/bin
+ENV PATH=$INSTALL_PREFIX/bin:${MPI_BINDIR}:$PATH
+ENV LD_LIBRARY_PATH=$INSTALL_PREFIX/lib:$INSTALL_PREFIX/lib64:$MPI_ROOT/lib:$MPI_ROOT/lib64:$LD_LIBRARY_PATH
+ENV PATH=${INSTALL_PREFIX}/bin:${PATH}
+ENV LD_LIBRARY_PATH=${INSTALL_PREFIX}/lib:${INSTALL_PREFIX}/lib64:${LD_LIBRARY_PATH}
+
+ENV INSTALLTMDIR=/home/docker/installdir
+ENV CMAKE_BUILD_TYPE=Release
+ENV NUMCORES=4
+
+ENV GL_INSTALL_PATH=/usr/lib64
+ENV GL_HEADER_PATH=/usr/include
+
+
+# N.B. MPI_BINDIR=/usr/lib64/openmpi/bin has to be on the PATH
+ENV MPICXX=$MPI_BINDIR/mpicxx
+ENV MPICC=$MPI_BINDIR/mpicc
+ENV MPIFORT=$MPI_BINDIR/mpifort
+
+ENV GCC=/usr/bin/gcc
+ENV GPP=/usr/bin/g++
+
 
 USER docker
 
@@ -143,19 +148,9 @@ RUN VISIT_VER_UNDERSCORE=${VISIT_VERSION//./_} \
     && mkdir ./third_party \
     && wget  https://github.com/visit-dav/visit/releases/download/v${VISIT_VERSION}/build_visit${VISIT_VER_UNDERSCORE} \
     && chmod +x build_visit${VISIT_VER_UNDERSCORE} \
-    && export PAR_COMPILER=mpicc \
-    && export PAR_COMPILER_CXX=mpicxx \
-    && ./build_visit${VISIT_VER_UNDERSCORE}  --thirdparty-path /home/docker/local --mesagl  --llvm --server-components-only  --cc mpicc --cxx mpicxx --cflags "-I/home/docker/local/include" --cxxflags "-I/home/docker/local/include"  --system-python --system-cmake --parallel --download-only --prefix $INSTALL_PREFIX/visit
-
-
-
-##################
-#   && ./build_visit${VISIT_VER_UNDERSCORE}  --thirdparty-path /home/docker/local  --mesagl  --server-components-only --cc mpicc --cxx mpicxx --cflags "-I/home/docker/local/include" --cxxflags "-I/home/docker/local/include"  --llvm  --system-python --system-cmake --parallel --download-only --prefix $INSTALL_PREFIX/visit
-#   && export PAR_INCLUDE="\"$(mpicc  --showme:compile)\""
-#   && export PAR_LIBS="\"$(mpicc  --showme:link)\""
-####################
-
-
+    && export PAR_COMPILER=${MPICC} \
+    && export PAR_COMPILER_CXX=${MPICXX} \
+    && ./build_visit${VISIT_VER_UNDERSCORE}  --thirdparty-path $INSTALL_PREFIX --mesagl  --llvm --server-components-only  --cc ${GCC}  --cxx ${GPP}  --cflags "-I$INSTALL_PREFIX/include" --cxxflags "-I$INSTALL_PREFIX/include"  --system-python --system-cmake --parallel --download-only --prefix $INSTALL_PREFIX/visit
 
 # --download-only --skip-opengl-context-check --conduit  --no-thirdparty  --stdout  --build-mode $CMAKE_BUILD_TYPE  --mesagl --llvm   --skip-opengl-context-check --no-thirdparty
 
@@ -164,26 +159,24 @@ RUN cd ${INSTALLTMDIR} \
     && chmod +x build_visit${VISIT_VER_UNDERSCORE}_patched
 
 
-# --cflags "-I/home/docker/local/include" --cxxflags "-I/home/docker/local/include"
-
 
 RUN VISIT_VER_UNDERSCORE=${VISIT_VERSION//./_} \
     && cd ${INSTALLTMDIR} \
-    && export PAR_COMPILER=mpicc \
-    && export PAR_COMPILER_CXX=mpicxx \
-    && yes yes | ./build_visit${VISIT_VER_UNDERSCORE}_patched --no-visit --thirdparty-path /home/docker/local --mesagl --llvm --server-components-only --stdout  --cc mpicc --cxx mpicxx  --cflags "-I/home/docker/local/include" --cxxflags "-I/home/docker/local/include"  --makeflags -j${NUMCORES} --system-python --system-cmake --cxxflag "-Wno-class-memaccess -Wno-cast-function-type" --parallel --prefix $INSTALL_PREFIX/visit
+    && export PAR_COMPILER=${MPICC}  \
+    && export PAR_COMPILER_CXX=${MPICXX}  \
+    && yes yes | ./build_visit${VISIT_VER_UNDERSCORE}_patched --no-visit --thirdparty-path $INSTALL_PREFIX --mesagl --llvm --server-components-only --stdout  --cc ${GCC}  --cxx ${GPP}   --cflags "-I$INSTALL_PREFIX/include" --cxxflags "-I$INSTALL_PREFIX/include"  --makeflags -j${NUMCORES} --system-python --system-cmake --cxxflag "-Wno-class-memaccess -Wno-cast-function-type" --parallel --prefix $INSTALL_PREFIX/visit
 
 RUN VISIT_VER_UNDERSCORE=${VISIT_VERSION//./_} \
     && cd ${INSTALLTMDIR} \
-    && export PAR_COMPILER=mpicc \
-    && export PAR_COMPILER_CXX=mpicxx \
-    && yes yes | ./build_visit${VISIT_VER_UNDERSCORE}_patched --thirdparty-path /home/docker/local --mesagl --llvm --server-components-only --stdout  --cc mpicc --cxx mpicxx  --cflags "-I/home/docker/local/include" --cxxflags "-I/home/docker/local/include"  --makeflags -j${NUMCORES} --system-python --system-cmake --cxxflag "-Wno-class-memaccess -Wno-cast-function-type" --parallel --prefix $INSTALL_PREFIX/visit  || echo "We will try again"
+    && export PAR_COMPILER=${MPICC}  \
+    && export PAR_COMPILER_CXX=${MPICXX}  \
+    && yes yes | ./build_visit${VISIT_VER_UNDERSCORE}_patched --thirdparty-path $INSTALL_PREFIX --mesagl --llvm --server-components-only --stdout  --cc ${GCC}  --cxx ${GPP}   --cflags "-I$INSTALL_PREFIX/include" --cxxflags "-I$INSTALL_PREFIX/include"  --makeflags -j${NUMCORES} --system-python --system-cmake --cxxflag "-Wno-class-memaccess -Wno-cast-function-type" --parallel --prefix $INSTALL_PREFIX/visit  || echo "We will try again"
 
 
 RUN rm -fr ${INSTALLTMDIR}/visit${VISIT_VERSION}/build \
   && mkdir ${INSTALLTMDIR}/visit${VISIT_VERSION}/build \
   && cd ${INSTALLTMDIR}/visit${VISIT_VERSION}/build \
-  && /usr/bin/cmake -DVISIT_CONFIG_SITE:FILEPATH=/home/docker/installdir/buildkitsandbox.cmake -DVISIT_INSTALL_THIRD_PARTY:BOOL=ON -DVISIT_PARALLEL:BOOL=ON -DCMAKE_BUILD_TYPE:STRING=Release -DVISIT_C_COMPILER:FILEPATH=mpicc -DVISIT_CXX_COMPILER:FILEPATH=mpicxx -DVISIT_C_FLAGS:STRING=" -m64 -fPIC -I/home/docker/local/include" -DVISIT_CXX_FLAGS:STRING=" -m64 -fPIC -I/home/docker/local/include -Wno-class-memaccess -Wno-cast-function-type" -DCMAKE_INSTALL_PREFIX:PATH=/home/docker/local/visit -DCPACK_INSTALL_PREFIX:PATH=/home/docker/local/visit -DCPACK_PACKAGING_INSTALL_PREFIX:PATH=/home/docker/local/visit -DVISIT_SERVER_COMPONENTS_ONLY:BOOL=ON ../src  \
+  && /usr/bin/cmake -DVISIT_CONFIG_SITE:FILEPATH=${INSTALLTMDIR}/buildkitsandbox.cmake -DVISIT_INSTALL_THIRD_PARTY:BOOL=ON -DVISIT_PARALLEL:BOOL=ON -DCMAKE_BUILD_TYPE:STRING=Release -DVISIT_C_COMPILER:FILEPATH=${MPICC} -DVISIT_CXX_COMPILER:FILEPATH=${MPICXX}  -DVISIT_C_FLAGS:STRING=" -m64 -fPIC -I$INSTALL_PREFIX/include" -DVISIT_CXX_FLAGS:STRING=" -m64 -fPIC -I$INSTALL_PREFIX/include -Wno-class-memaccess -Wno-cast-function-type" -DCMAKE_INSTALL_PREFIX:PATH=$INSTALL_PREFIX/visit -DCPACK_INSTALL_PREFIX:PATH=$INSTALL_PREFIX/visit -DCPACK_PACKAGING_INSTALL_PREFIX:PATH=$INSTALL_PREFIX/visit -DVISIT_SERVER_COMPONENTS_ONLY:BOOL=ON ../src  \
   && make -j${NUMCORES} \
   && make install
 
@@ -214,8 +207,10 @@ RUN --mount=type=secret,id=thepassword if [ "$repo" == "damaris-development" ] ;
   && cd ${INSTALLTMDIR}/build/$repo \
   && cmake ../../$repo -DCMAKE_INSTALL_PREFIX:PATH=$INSTALL_PREFIX \
       -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} \
-      -DCMAKE_CXX_COMPILER=mpicxx \
-      -DCMAKE_C_COMPILER=mpicc \
+      -DCMAKE_CXX_COMPILER=${MPICXX}  \
+      -DCMAKE_C_COMPILER=${MPICC} \
+      -DCMAKE_Fortran_COMPILER=${MPIFORT} \
+      -DENABLE_FORTRAN=ON \
       -DENABLE_TESTS=ON \
       -DENABLE_EXAMPLES=$EXAMPLES_ON_OFF \
       -DBUILD_SHARED_LIBS=$SHLIBS_ON_OFF \

@@ -1,4 +1,4 @@
-# Copyright 2013-2020 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2022 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -15,7 +15,7 @@ class Damaris(CMakePackage):
     git      = "https://gitlab.inria.fr/Damaris/damaris.git"
     maintainers = ['jcbowden']
 
-    # version('master', branch='master')
+    version('master', branch='master')
     version('1.6.0',  tag='v1.6.0')
     version('1.5.0',  tag='v1.5.0')
     version('1.3.3',  tag='v1.3.3')
@@ -66,20 +66,16 @@ class Damaris(CMakePackage):
             args.extend(['-DENABLE_CATALYST:BOOL=ON'])
             args.extend(['-DParaView_ROOT:PATH=%s'
                          % self.spec['catalyst'].prefix])
-        
+
         if (self.spec.variants['examples'].value):
             args.extend(['-DENABLE_EXAMPLES:BOOL=ON'])
 
-
-        # Only available in version 1.6.0: 
         if (self.spec.variants['docs'].value):
             args.extend(['-DENABLE_DOCS:BOOL=ON'])
-            
-        # Only available in version 1.6.0:  
+
         if (self.spec.variants['python'].value):
             args.extend(['-DENABLE_PYTHON:BOOL=ON'])
-            
-            
+
         if (self.spec.variants['visit'].value):
             args.extend(['-DENABLE_VISIT:BOOL=ON'])
             args.extend(['-DVisIt_ROOT:PATH=%s' % self.spec['visit'].prefix])

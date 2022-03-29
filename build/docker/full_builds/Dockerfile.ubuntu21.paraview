@@ -28,43 +28,11 @@ RUN useradd docker \
 	&& chown docker:docker /home/docker \
 	&& addgroup docker staff
     
-    
-ENV INSTALLTMDIR=/home/docker/installdir
-ENV CMAKE_BUILD_TYPE=Release
-ENV NUMCORES=4
-ENV INSTALL_PREFIX=/home/docker/local
-ENV PATH=${INSTALL_PREFIX}/bin:${PATH}
-ENV LD_LIBRARY_PATH=${INSTALL_PREFIX}/lib:${LD_LIBRARY_PATH}
 
-ENV PV_VERSION=5.9.1
-# ENV PYTHON_INCLUDE_DIR=/usr/include/python3.8
-ENV GL_INSTALL_PATH=/usr/lib/x86_64-linux-gnu
-ENV GL_HEADER_PATH=/usr
-
-# These should also be supplied on the command line as --build-arg 
-# ENV ENABLE_PYTHON=
-# Regenerate the xml model in C using XSD
-ENV REGEN_ON_OFF=ON
-ENV SHLIBS_ON_OFF=ON
-# Build examples
-ENV EXAMPLES_ON_OFF=ON
-
-# N.B INPUT_damaris_ver to be provided on the docker build -t registry.gitlab.inria.fr/damaris-development:${TAG}  --build-arg INPUT_damaris_ver=v1.5.0 --build-arg INPUT_repo="damaris-development" -f Dockerfile.ubuntu20 .
-ARG INPUT_damaris_ver
-ARG INPUT_repo
-# ARG INPUT_repo  # making this a global arge and defining before stage 1
-ENV DAMARIS_VERSION=$INPUT_damaris_ver
-ENV repo=$INPUT_repo
-
-
-  
 RUN apt-get update -y \
   && echo "debconf debconf/frontend select Noninteractive" | debconf-set-selections \
-  && apt-get install -y --no-install-recommends \ 
-	software-properties-common \
+  && apt-get install -y --no-install-recommends \
     apt-utils \
-    build-essential \
-    gfortran \
     pkg-config \
     git-core \
     cmake \
@@ -76,10 +44,21 @@ RUN apt-get update -y \
 	xsdcxx \
     libcppunit-dev \
 	hdf5-tools \
-    cmake \
   && apt-get clean \
-  && ln -s /usr/bin/xsdcxx /usr/bin/xsd 
-  
+  && ln -s /usr/bin/xsdcxx /usr/bin/xsd \
+
+
+RUN apt-get update -y \
+  && apt-get install -y --no-install-recommends \
+	software-properties-common \
+    apt-utils \
+    build-essential \
+    gfortran \
+  && apt-get clean
+
+
+
+# Extras for Paraview install
 RUN echo "debconf debconf/frontend select Noninteractive" | debconf-set-selections \
   && apt-get -y  --no-install-recommends install  \
     libosmesa6-dev \
@@ -89,37 +68,34 @@ RUN echo "debconf debconf/frontend select Noninteractive" | debconf-set-selectio
     python3-numpy \
     ninja-build \
     libtbb-dev \
-  && apt-get clean 
-   
-#     libgl1-mesa-dev \
-#    libglu1-mesa-dev \
-
-# RUN --mount=type=secret,id=thepassword  ls -l /run/secrets/thepassword
-# USER docker
-
-# ENV CMAKE_VERSION=3.20
-# ENV CMAKE_VERSION_FULL=${CMAKE_VERSION}.1
-###### Install CMake - from binary (fast)
-# RUN wget https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION_FULL}/cmake-${CMAKE_VERSION_FULL}-linux-x86_64.tar.gz \
-# RUN mkdir -p ${INSTALLTMDIR}
-# COPY cmake-${CMAKE_VERSION_FULL}-linux-x86_64.tar.gz ${INSTALLTMDIR}/cmake-${CMAKE_VERSION_FULL}-linux-x86_64.tar.gz 
-# RUN  cd ${INSTALLTMDIR} && pwd && tar -xf ${INSTALLTMDIR}/cmake-${CMAKE_VERSION_FULL}-linux-x86_64.tar.gz \
-#  && cp -r ${INSTALLTMDIR}/cmake-${CMAKE_VERSION_FULL}-linux-x86_64/bin /usr \
-#  && cp -r ${INSTALLTMDIR}/cmake-${CMAKE_VERSION_FULL}-linux-x86_64/share/cmake-${CMAKE_VERSION} /usr/local/share
-    
+  && apt-get clean
 
 
-# COPY boost_1_78_0.tar.gz ${INSTALLTMDIR}/boost_1_78_0.tar.gz
-# RUN  cd ${INSTALLTMDIR} && test -f boost_1_78_0.tar.gz  ||  wget --no-check-certificate http://sourceforge.net/projects/boost/files/boost/1.78.0/boost_1_78_0.tar.gz
-# RUN  cd ${INSTALLTMDIR} \
-#  && tar -xzf boost_1_78_0.tar.gz \
-#  &&  cd boost_1_78_0  \
-#  && ./bootstrap.sh --prefix=/usr/local/ --with-libraries=thread,log,date_time,program_options,filesystem,system,python \
-#  &&  ./b2 threading=multi \
-#  &&  ./b2 install 
 
-# ssh-keyscan -H gitlab.kitware.com >> ~/.ssh/known_hosts
-# git clone --depth 1 --branch v${PV_VERSION} git@gitlab.kitware.com:paraview/paraview.git
+RUN ln -s /usr/bin/python3 /usr/bin/python  || echo "python already linked to python3"
+# RUN yes docker | passwd --stdin root
+RUN echo 'root:docker' | chpasswd
+
+
+ENV INSTALL_PREFIX=/home/docker/local
+ENV PATH=${INSTALL_PREFIX}/bin:${PATH}
+ENV LD_LIBRARY_PATH=${INSTALL_PREFIX}/lib:${INSTALL_PREFIX}/lib64:${LD_LIBRARY_PATH}
+
+ENV INSTALLTMDIR=/home/docker/installdir
+ENV CMAKE_BUILD_TYPE=Release
+ENV NUMCORES=4
+
+ENV GL_INSTALL_PATH=/usr/lib/x86_64-linux-gnu
+ENV GL_HEADER_PATH=/usr
+
+# N.B. MPI_ROOT=/usr/lib64/openmpi/bin has to be on the PATH
+ENV MPI_ROOT=/usr
+ENV MPICXX=$MPI_ROOT/bin/mpicxx
+ENV MPICC=$MPI_ROOT/bin/mpicc
+ENV MPIFORT=$MPI_ROOT/bin/mpifort
+
+ENV GCC=/usr/bin/gcc
+ENV GPP=/usr/bin/g++
 
 ###### Install ParaView - 
 # N.B. The version installed here must match exactly the version of Paraview used to connect to the simulation via Catalyst
@@ -127,8 +103,15 @@ RUN echo "debconf debconf/frontend select Noninteractive" | debconf-set-selectio
 # see https://www.kitware.com/paraview-catalyst-editions-what-are-they/ for some more details
 RUN   mkdir -p ${INSTALLTMDIR} \
   &&   cd ${INSTALLTMDIR} \
-  &&   git clone --depth 1 --branch v${PV_VERSION} https://gitlab.kitware.com/paraview/paraview.git \
-  &&   cd paraview \
+  &&   git clone  https://gitlab.kitware.com/paraview/paraview.git \
+  &&   cd ${INSTALLTMDIR}/paraview   \
+  &&   git fetch --all
+
+ARG INPUT_pv_ver=v5.8.0
+ENV PV_VERSION=$INPUT_pv_ver
+
+RUN   cd ${INSTALLTMDIR}/paraview   \
+  &&   git checkout ${PV_VERSION}  \
   &&   git submodule update --init --recursive \
   &&   mkdir -p ${INSTALLTMDIR}/build/pv \
   &&   cd ${INSTALLTMDIR}/build/pv   \
@@ -146,10 +129,31 @@ RUN   mkdir -p ${INSTALLTMDIR} \
        -DVTK_OPENGL_HAS_OSMESA=ON \
        -DPARAVIEW_USE_FORTRAN=OFF \
        -DOSMESA_INCLUDE_DIR=$GL_HEADER_PATH/include \
-       -DOSMESA_LIBRARY=$GL_INSTALL_PATH/libOSMesa.so \
+       -DOSMESA_LIBRARY=$GL_INSTALL_PATH/libOSMesa.so
+
+RUN   cd ${INSTALLTMDIR}/build/pv  \
   && ninja -j${NUMCORES} \
-  && ninja install 
-    
+  && ninja install \
+  && rm -fr ${INSTALLTMDIR}
+
+
+
+###### Install Damaris
+#
+# These should also be supplied on the command line as --build-arg
+# ENV ENABLE_PYTHON=
+# Regenerate the xml model in C using XSD
+ENV REGEN_ON_OFF=ON
+ENV SHLIBS_ON_OFF=ON
+# Build examples
+ENV EXAMPLES_ON_OFF=ON
+
+# N.B INPUT_damaris_ver to be provided on the docker build -t registry.gitlab.inria.fr/damaris-development:${TAG}  --build-arg INPUT_damaris_ver=v1.5.0 --build-arg INPUT_repo="damaris-development" -f Dockerfile.ubuntu20 .
+ARG INPUT_damaris_ver
+ARG INPUT_repo
+# ARG INPUT_repo  # making this a global arge and defining before stage 1
+ENV DAMARIS_VERSION=$INPUT_damaris_ver
+ENV repo=$INPUT_repo
 
 
 # may need this:  -DParaView_DIR=$CATALYSTDIR
@@ -163,8 +167,10 @@ RUN --mount=type=secret,id=thepassword if [ "$repo" == "damaris-development" ] ;
   && cd ${INSTALLTMDIR}/build/$repo \
   && cmake ../../$repo -DCMAKE_INSTALL_PREFIX:PATH=$INSTALL_PREFIX \
       -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} \
-      -DCMAKE_CXX_COMPILER=mpicxx \
-      -DCMAKE_C_COMPILER=mpicc \
+      -DCMAKE_CXX_COMPILER=${MPICXX}  \
+      -DCMAKE_C_COMPILER=${MPICC}  \
+      -DCMAKE_Fortran_COMPILER=${MPIFORT} \
+      -DENABLE_FORTRAN=ON \
       -DENABLE_TESTS=ON \
       -DENABLE_EXAMPLES=$EXAMPLES_ON_OFF \
       -DBUILD_SHARED_LIBS=$SHLIBS_ON_OFF \
