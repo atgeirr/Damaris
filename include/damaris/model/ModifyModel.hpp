@@ -122,7 +122,7 @@ class ModifyModel {
         
         
         /**
-        * Allows access to the  the Damaris XML *Simulation* model so it can be modified using the XSD geenrated API
+        * Allows access to the  the Damaris XML *Simulation* model so it can be modified using the XSD genrated API
         * N.B. Used for testing, not used in Damaris public API
         */
         Simulation * GetModel( void ) ;

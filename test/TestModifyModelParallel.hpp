@@ -66,13 +66,13 @@ from the unique_ptr<Simulation> before initializing the Environment object and t
                 &TestModifyModelParallel::CallCreateModifyModelandEnvViaVoidModBySimObject));
         
         suiteOfTests->addTest(new CppUnit::TestCaller<TestModifyModelParallel>(
-                "Reads the test.xml file and reates a Simulation model and then tests the XML has some valad values  \
+                "Reads the test.xml file and creates a Simulation model and then tests the XML has some valad values  \
 e.g. servers per node == 1 and rank 3 is the dedicated core",
                 &TestModifyModelParallel::CallReadXMLFromFileAndMakeModel));
         
          suiteOfTests->addTest(new CppUnit::TestCaller<TestModifyModelParallel>(
-                "Reads the test.xml file and reates a Simulation model and then tests the XML has some valad values  \
-e.g. servers per node == 1 and rank 3 is the dedicated core",
+                "Reads the test.xml file and creates a Simulation model and then tests the XML has some valad values  \
+e.g. servers per node == 2 and rank 2 and 3 are the dedicated core",
                 &TestModifyModelParallel::CallReadXMLFromFileNotExist));
         
         
@@ -83,19 +83,29 @@ protected:
     
     
     void CallCreateModifyModelandEnvViaVoid() {
-        damaris::model::ModifyModelDerived myMod = damaris::model::ModifyModelDerived();  // this creator is pre-defined with a Simulation XML string
+        // This creator is pre-defined with a Simulation XML string, 
+        // however needs RepalceWithRegEx() to be valid
+        damaris::model::ModifyModelDerived myMod = damaris::model::ModifyModelDerived();  
         // std::cout << "Input string: " << std::endl  << myMod.GetConfigString()  << std::endl ;
         std::map<std::string,std::string> find_replace_map = {
         {"_SHMEM_BUFFER_BYTES_REGEX_","67108864"},
         {"_DC_REGEX_","1"},
         {"_DN_REGEX_","0"},
-        {"_PATH_REGEX_","outputdir"},
-        {"_MYSTORE_OR_EMPTY_REGEX_","MyStore"},
+        {"_PATH_REGEX_","outputdir/outputsubdir"},
+        {"_MYSTORE_OR_EMPTY_REGEX_",""},
         };
         myMod.RepalceWithRegEx(find_replace_map);
+        
+        // Print the regex'ed string
+        // Check for outputdir/outputsubdir containing correct forward slash
+        if (rank == 0) std::cout << myMod.GetConfigString() << std::endl ;
+        
+        
         myMod.SetSimulationModel() ;   
         
         Environment::Init(myMod.PassModelAsVoidPtr() ,MPI_COMM_WORLD);
+        
+        
 
         //unsigned long int buffer_size = static_cast<unsigned long>(mdl->architecture().buffer().size()) ;
         CPPUNIT_ASSERT_EQUAL_MESSAGE("Comparing Environment::ServersPerNode ", 1, Environment::ServersPerNode() ) ;
@@ -108,14 +118,16 @@ protected:
     }
     
     void CallCreateModifyModelandEnvViaVoidModBySimObject() {
-        damaris::model::ModifyModelDerived myMod = damaris::model::ModifyModelDerived();  // this creator is pre-defined with a Simulation XML string
+        // This creator is pre-defined with a Simulation XML string, 
+        // however needs RepalceWithRegEx() to be valid
+        damaris::model::ModifyModelDerived myMod = damaris::model::ModifyModelDerived();  
         // std::cout << "Input string: " << std::endl  << myMod.GetConfigString()  << std::endl ;
         std::map<std::string,std::string> find_replace_map = {
         {"_SHMEM_BUFFER_BYTES_REGEX_","67108864"},
         {"_DC_REGEX_","1"},
         {"_DN_REGEX_","0"},
         {"_PATH_REGEX_","outputdir"},
-        {"_MYSTORE_OR_EMPTY_REGEX_","MyStore"},
+        {"_MYSTORE_OR_EMPTY_REGEX_",""},
         };
         myMod.RepalceWithRegEx(find_replace_map);
         myMod.SetSimulationModel() ;   
@@ -145,7 +157,9 @@ protected:
     
     
      void CallReadXMLFromFileAndMakeModel() {
-        damaris::model::ModifyModelDerived myMod = damaris::model::ModifyModelDerived();  // this creator is pre-defined with a Simulation XML string
+         // This creator is pre-defined with a Simulation XML string, 
+        // however needs RepalceWithRegEx() to be valid
+        damaris::model::ModifyModelDerived myMod = damaris::model::ModifyModelDerived();  
         
         myMod.ReadAndBroadcastXMLFromFile(MPI_COMM_WORLD, "test.xml");
         
@@ -165,7 +179,9 @@ protected:
     }
     
      void CallReadXMLFromFileNotExist() {
-        damaris::model::ModifyModelDerived myMod = damaris::model::ModifyModelDerived();  // this creator is pre-defined with a Simulation XML string
+         // This creator is pre-defined with a Simulation XML string, 
+        // however needs RepalceWithRegEx() to be valid
+        damaris::model::ModifyModelDerived myMod = damaris::model::ModifyModelDerived();  
         
         bool retbool = myMod.ReadAndBroadcastXMLFromFile(MPI_COMM_WORLD, "test_foo.xml");
         CPPUNIT_ASSERT_EQUAL_MESSAGE("Comparing (from file test_foo.xml) return value of ReadAndBroadcastXMLFromFile after trying to read file that does not exist", false, retbool ) ;
