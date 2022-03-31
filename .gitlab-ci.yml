@@ -21,7 +21,7 @@ docker-build:
     - docker:dind
   before_script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-    
+    - docker system prune -f
     # This code section is needed to get access to a specific machine (MY_CI_REMOTETEST_HOST) which 
     # is on Grid5000. The gitlab-runner needs to be running on a machine in grid5000.fr or connected 
     # to it via VPN.
@@ -64,7 +64,7 @@ docker-build:
     # - apt -y install bash 
     - apk add --no-cache bash 
     - ./build_damaris_on_paraview_base_images.sh  $CI_PROJECT_NAME  $CI_COMMIT_BRANCH  $MY_CI_READ_REPO_PWD | tee build_damaris_on_paraview_base_images.graph
-    - ./test_damaris_images.sh   $CI_PROJECT_NAME  -damaris-$CI_COMMIT_BRANCH  "ctest -VV" | tee -a build_damaris_on_paraview_base_images.graph
+    - ./test_damaris_images.sh   $CI_PROJECT_NAME  -damaris-$CI_COMMIT_BRANCH  "ctest --output-on-failure" | tee -a build_damaris_on_paraview_base_images.graph
     - cat build_damaris_on_paraview_base_images.graph | grep "^GRAPH:" | sed "s|GRAPH:||g" > build_damaris_on_paraview_base_images.md
     
     # - apk add --no-cache curl

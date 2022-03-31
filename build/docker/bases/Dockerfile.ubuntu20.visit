@@ -111,9 +111,14 @@ COPY --chown=docker:docker *.tgz ${INSTALLTMDIR}/
 COPY --chown=docker:docker build_visit* ${INSTALLTMDIR}/
 
 
-# cp build_visit${VISIT_VER_UNDERSCORE} build_visit${VISIT_VER_UNDERSCORE}.cpy
-# The following is needed to fix how the build_visit script finds Python on Ubuntu 20
-# sed -i 's|error "python library was not found, cannot configure python"|PYTHON_LIBRARY=$(pkg-config --libs python3-embed);  PYTHON_LIBRARY="lib${PYTHON_LIBRARY:2}.so" ; if [ ! -e "${PYTHON_LIBRARY_DIR}/${PYTHON_LIBRARY}" ] ; then  error "python library was not found, cannot configure python" ; fi|g' ./build_visit${VISIT_VER_UNDERSCORE}.cpy
+# N.B. Could set: --arch "" as it would remove the "linux-x86_64_gcc-X.Y"
+ENV VISIT_PYTHON3=${INSTALL_PREFIX}/python/3.7.7/linux-x86_64_gcc-9.4
+ENV PATH=${VISIT_PYTHON3}/bin:${PATH}
+ENV LD_LIBRARY_PATH=${VISIT_PYTHON3}/lib:${VISIT_PYTHON3}/lib64:${LD_LIBRARY_PATH}
+
+ENV PAR_COMPILER=${MPICC}
+ENV PAR_COMPILER_CXX=${MPICXX}
+ENV HOSTNAME_DOCKER=buildkitsandbox
 
 # Define INPUT_visit_ver with a default
 ARG INPUT_visit_ver
@@ -121,44 +126,35 @@ ENV VISIT_VERSION=$INPUT_visit_ver
 
 
 # This only modifies the visit_build script
+# The following is needed to fix how the build_visit script finds Python on Ubuntu 20
 RUN export VISIT_VER_UNDERSCORE=${VISIT_VERSION//./_} \
     && cd ${INSTALLTMDIR} \
     && mkdir ./third_party \
     && chmod +x build_visit${VISIT_VER_UNDERSCORE} \
     && sed -i 's|error "python library was not found, cannot configure python"|PYTHON_LIBRARY=$(pkg-config --libs python3-embed);  PYTHON_LIBRARY="lib${PYTHON_LIBRARY:2}.so" ; if [ ! -e "${PYTHON_LIBRARY_DIR}/${PYTHON_LIBRARY}" ] ; then  error "python library was not found, cannot configure python" ; fi|g' ./build_visit${VISIT_VER_UNDERSCORE} \
-    && sed -i 's|vopts="${vopts} -DPYTHON_EXTRA_LIBS:STRING=${VTK_PY_LIBS}"|vopts="${vopts} -DPYTHON_EXTRA_LIBS:STRING=\\\"${VTK_PY_LIBS}\\\""|g' ./build_visit${VISIT_VER_UNDERSCORE} 
+    && sed -i 's|vopts="${vopts} -DPYTHON_EXTRA_LIBS:STRING=${VTK_PY_LIBS}"|vopts="${vopts} -DPYTHON_EXTRA_LIBS:STRING=\\\"${VTK_PY_LIBS}\\\""|g' ./build_visit${VISIT_VER_UNDERSCORE} \
+    && yes yes | ./build_visit${VISIT_VER_UNDERSCORE}  --thirdparty-path ${INSTALL_PREFIX} --mesagl --llvm --server-components-only --stdout  --cc ${GCC}  --cxx ${GPP}  --cflags "-I${INSTALL_PREFIX}/include" --cxxflags "-I${INSTALL_PREFIX}/include"  --makeflags -j${NUMCORES} --system-cmake --cxxflag "-Wno-class-memaccess -Wno-cast-function-type" --parallel --prefix $INSTALL_PREFIX/visit  \
+    || echo "We will try again 1" \
+    && ln -s ${VISIT_PYTHON3}/bin/python3 ${VISIT_PYTHON3}/bin/python \
+    && yes yes | ./build_visit${VISIT_VER_UNDERSCORE} --thirdparty-path ${INSTALL_PREFIX} --mesagl --llvm --server-components-only --stdout  --cc ${GCC}  --cxx ${GPP}  --cflags "-I${INSTALL_PREFIX}/include" --cxxflags "-I${INSTALL_PREFIX}/include"  --makeflags -j${NUMCORES} --system-cmake --cxxflag "-Wno-class-memaccess -Wno-cast-function-type" --parallel --prefix $INSTALL_PREFIX/visit  \
+    || echo "We will try again 2" \
+    && rm -fr ${INSTALLTMDIR}/visit${VISIT_VERSION}/build \
+    && mkdir -p ${INSTALLTMDIR}/visit${VISIT_VERSION}/build \
+    && cd ${INSTALLTMDIR}/visit${VISIT_VERSION}/build \
+    && sed -i "s|VISIT_OPTION_DEFAULT(VISIT_C_COMPILER ${GCC}|VISIT_OPTION_DEFAULT(VISIT_C_COMPILER ${MPICC}|g" ${INSTALLTMDIR}/$HOSTNAME_DOCKER.cmake \
+    && sed -i "s|VISIT_OPTION_DEFAULT(VISIT_CXX_COMPILER ${GPP}|VISIT_OPTION_DEFAULT(VISIT_CXX_COMPILER ${MPICXX}|g" ${INSTALLTMDIR}/$HOSTNAME_DOCKER.cmake \
+    && /usr/bin/cmake -DVISIT_CONFIG_SITE:FILEPATH=/home/docker/installdir/buildkitsandbox.cmake -DVISIT_INSTALL_THIRD_PARTY:BOOL=ON -DVISIT_PARALLEL:BOOL=ON -DCMAKE_BUILD_TYPE:STRING=Release -DVISIT_C_COMPILER:FILEPATH=${MPICC} -DVISIT_CXX_COMPILER:FILEPATH=${MPICXX}  -DVISIT_C_FLAGS:STRING=" -m64 -fPIC -I${INSTALL_PREFIX}/include" -DVISIT_CXX_FLAGS:STRING=" -m64 -fPIC -I${INSTALL_PREFIX}/include -Wno-class-memaccess -Wno-cast-function-type" -DCMAKE_INSTALL_PREFIX:PATH=${INSTALL_PREFIX}/visit -DCPACK_INSTALL_PREFIX:PATH=${INSTALL_PREFIX}/visit -DCPACK_PACKAGING_INSTALL_PREFIX:PATH=${INSTALL_PREFIX}/visit -DVISIT_SERVER_COMPONENTS_ONLY:BOOL=ON ../src  \
+    && make -j${NUMCORES} \
+    && touch ./resources/help/en_US/manual \
+    && make install \
+    || echo "We will try again 3" \
+    && rm -fr ${INSTALLTMDIR} 
+    
+ENV PATH=${INSTALL_PREFIX}/visit/bin:${PATH}
 
+RUN visit -env -engine > ~/tmp.txt \
+   && sed -i 's|^|export |g' ~/tmp.txt \
+   && sed -i 's|^export LD_LIBRARY_PATH.*|&$LD_LIBRARY_PATH|' ~/tmp.txt  \
+   && cat ~/tmp.txt >> ~/.bashrc
 
-
-RUN VISIT_VER_UNDERSCORE=${VISIT_VERSION//./_} \
-    && cd ${INSTALLTMDIR} \
-    && export PAR_COMPILER=${MPICC} \
-    && export PAR_COMPILER_CXX=${MPICXX}  \
-    && yes yes | ./build_visit${VISIT_VER_UNDERSCORE}  --thirdparty-path ${INSTALL_PREFIX} --mesagl --llvm --server-components-only --stdout  --cc ${GCC}  --cxx ${GPP}  --cflags "-I${INSTALL_PREFIX}/include" --cxxflags "-I${INSTALL_PREFIX}/include"  --makeflags -j${NUMCORES} --system-cmake --cxxflag "-Wno-class-memaccess -Wno-cast-function-type" --parallel --prefix $INSTALL_PREFIX/visit  || echo "We will try again 1"
-
-
-# N.B. Could set: --arch "" as it would remove the "linux-x86_64_gcc-X.Y"
-################## N.B. The GCC version is hard coded #####################
-ENV VISIT_PYTHON3=${INSTALL_PREFIX}/python/3.7.7/linux-x86_64_gcc-9.4
-RUN ln -s ${VISIT_PYTHON3}/bin/python3 ${VISIT_PYTHON3}/bin/python
-ENV PATH=${VISIT_PYTHON3}/bin:${PATH}
-ENV LD_LIBRARY_PATH=${VISIT_PYTHON3}/lib:${VISIT_PYTHON3}/lib64:${LD_LIBRARY_PATH}
-
-RUN VISIT_VER_UNDERSCORE=${VISIT_VERSION//./_} \
-    && cd ${INSTALLTMDIR} \
-    && export PAR_COMPILER=${MPICC} \
-    && export PAR_COMPILER_CXX=${MPICXX}  \
-    && yes yes | ./build_visit${VISIT_VER_UNDERSCORE} --system-python --thirdparty-path ${INSTALL_PREFIX} --mesagl --llvm --server-components-only --stdout  --cc ${GCC}  --cxx ${GPP}  --cflags "-I${INSTALL_PREFIX}/include" --cxxflags "-I${INSTALL_PREFIX}/include"  --makeflags -j${NUMCORES} --system-cmake --cxxflag "-Wno-class-memaccess -Wno-cast-function-type" --parallel --prefix $INSTALL_PREFIX/visit  || echo "We will try again 2"
- 
-ENV HOSTNAME_DOCKER=buildkitsandbox
-
-RUN rm -fr ${INSTALLTMDIR}/visit${VISIT_VERSION}/build \
-  && mkdir -p ${INSTALLTMDIR}/visit${VISIT_VERSION}/build \
-  && cd ${INSTALLTMDIR}/visit${VISIT_VERSION}/build \
-  && sed -i "s|VISIT_OPTION_DEFAULT(VISIT_C_COMPILER ${GCC}|VISIT_OPTION_DEFAULT(VISIT_C_COMPILER ${MPICC}|g" ${INSTALLTMDIR}/$HOSTNAME_DOCKER.cmake \
-  && sed -i "s|VISIT_OPTION_DEFAULT(VISIT_CXX_COMPILER ${GPP}|VISIT_OPTION_DEFAULT(VISIT_CXX_COMPILER ${MPICXX}|g" ${INSTALLTMDIR}/$HOSTNAME_DOCKER.cmake \
-  && /usr/bin/cmake -DVISIT_CONFIG_SITE:FILEPATH=/home/docker/installdir/buildkitsandbox.cmake -DVISIT_INSTALL_THIRD_PARTY:BOOL=ON -DVISIT_PARALLEL:BOOL=ON -DCMAKE_BUILD_TYPE:STRING=Release -DVISIT_C_COMPILER:FILEPATH=${MPICC} -DVISIT_CXX_COMPILER:FILEPATH=${MPICXX}  -DVISIT_C_FLAGS:STRING=" -m64 -fPIC -I${INSTALL_PREFIX}/include" -DVISIT_CXX_FLAGS:STRING=" -m64 -fPIC -I${INSTALL_PREFIX}/include -Wno-class-memaccess -Wno-cast-function-type" -DCMAKE_INSTALL_PREFIX:PATH=${INSTALL_PREFIX}/visit -DCPACK_INSTALL_PREFIX:PATH=${INSTALL_PREFIX}/visit -DCPACK_PACKAGING_INSTALL_PREFIX:PATH=${INSTALL_PREFIX}/visit -DVISIT_SERVER_COMPONENTS_ONLY:BOOL=ON ../src  \
-  && make -j${NUMCORES} \
-  && make install || echo "We will try again 3"
- 
 CMD ["/bin/bash"]
