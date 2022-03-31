@@ -45,11 +45,10 @@ RUN apt-get update -y \
     libcppunit-dev \
 	hdf5-tools \
   && apt-get clean \
-  && ln -s /usr/bin/xsdcxx /usr/bin/xsd \
+  && ln -s /usr/bin/xsdcxx /usr/bin/xsd
 
 
-RUN apt-get update -y \
-  && apt-get install -y --no-install-recommends \
+RUN  apt-get install -y --no-install-recommends \
 	software-properties-common \
     build-essential \
     gfortran \
@@ -58,8 +57,7 @@ RUN apt-get update -y \
 
 
 # Extras for Paraview install
-RUN echo "debconf debconf/frontend select Noninteractive" | debconf-set-selections \
-  && apt-get -y  --no-install-recommends install  \
+RUN apt-get install -y  --no-install-recommends  \
     libosmesa6-dev \
     mesa-common-dev \
     mesa-utils \
@@ -93,6 +91,7 @@ ENV MPICXX=$MPI_ROOT/bin/mpicxx
 ENV MPICC=$MPI_ROOT/bin/mpicc
 ENV MPIFORT=$MPI_ROOT/bin/mpifort
 
+USER docker
 
 ###### Install ParaView -
 # N.B. The version installed here must match exactly the version of Paraview used to connect to the simulation via Catalyst

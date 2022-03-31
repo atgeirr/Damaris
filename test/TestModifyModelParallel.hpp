@@ -92,7 +92,7 @@ protected:
         {"_DC_REGEX_","1"},
         {"_DN_REGEX_","0"},
         {"_PATH_REGEX_","outputdir/outputsubdir"},
-        {"_MYSTORE_OR_EMPTY_REGEX_",""},
+        {"_MYSTORE_OR_EMPTY_REGEX_",""},  // "store="MyStore"
         };
         myMod.RepalceWithRegEx(find_replace_map);
         
@@ -161,9 +161,10 @@ protected:
         // however needs RepalceWithRegEx() to be valid
         damaris::model::ModifyModelDerived myMod = damaris::model::ModifyModelDerived();  
         
-        myMod.ReadAndBroadcastXMLFromFile(MPI_COMM_WORLD, "test.xml");
         
+        myMod.ReadAndBroadcastXMLFromFile(MPI_COMM_WORLD, "test_modify.xml");
         
+        // test_modify.xml should be able to be loaded by damaris without HDF, Paraview or Visit support
         myMod.SetSimulationModel() ;   
         
         Environment::Init(myMod.PassModelAsVoidPtr() ,MPI_COMM_WORLD);

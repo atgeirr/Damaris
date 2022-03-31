@@ -10,6 +10,10 @@ Makefile
 cmake_install.cmake 
 install_manifest.txt 
 CMakeLists.txt.user
+build/docker/bases/*.tar.gz
+build/docker/bases/*.tar.xz
+build/docker/bases/*.tgz
+build/docker/bases/build_visit*
 Testing/
 CTestTestfile.cmake
 lib/CTestTestfile.cmake
@@ -66,6 +70,8 @@ test/TestLayoutManager
 test/TestReactor
 test/TestVariable
 test/TestVariableManager
+test/TestModifyModel
+test/TestModifyModelParallel
 examples/visit/blocks.xml
 examples/visit/curve.xml
 examples/visit/mandelbulb.xml

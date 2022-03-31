@@ -16,14 +16,14 @@
 # The gitlab.inria.fr/Damaris/damaris repo should build without the secret setup.
 # 
 # To build the damaris repo (no password needed):
-# export TAG=v1.5.0
-# export PV_VER=v5.9.0
-# export PVSHORT=${PV_VERSION//./})
-# sudo  DOCKER_BUILDKIT=1 docker build -t \
-#            registry.gitlab.inria.fr/damaris/damaris:${TAG}-centos8-p${PVSHORT} \
-#            --build-arg INPUT_pv_ver=${PV_VER} \
-#                -f ./Dockerfile.centos8.paraview .
-#
+# export TAG=v1.6.0
+# export VISIT_VER=3.2.1
+# sudo  DOCKER_BUILDKIT=1 docker build --progress=plain -t \
+#            registry.gitlab.inria.fr/damaris/damaris:${TAG}-centos8-visit${VISIT_VER} \
+#            --build-arg INPUT_damaris_ver=${TAG} \
+#            --build-arg INPUT_repo=damaris \
+#            --build-arg INPUT_visit_ver=${VISIT_VER} \
+#                -f ./Dockerfile.centos8.visit .
 #
 ###################
 #
@@ -113,47 +113,43 @@ ENV GPP=/usr/bin/g++
 
 USER docker
 
-# RUN llvm-config --version
+
+COPY --chown=docker:docker *.tar.gz ${INSTALLTMDIR}/
+COPY --chown=docker:docker *.tar.xz ${INSTALLTMDIR}/
+COPY --chown=docker:docker *.tgz ${INSTALLTMDIR}/
+COPY --chown=docker:docker build_visit* ${INSTALLTMDIR}/
+
 
 
 # Define INPUT_visit_ver with a default
 ARG INPUT_visit_ver
-ENV VISIT_VERSION=3.2.1
+ENV VISIT_VERSION=$INPUT_visit_ver
 
 ENV VISIT_VER_UNDERSCORE=3_2_1
 # This is for building from source: ./build_visit2_13_2 --server-components-only --mesa --system-cmake --parallel --prefix $INSTALL_PREFIX/visit
 RUN VISIT_VER_UNDERSCORE=${VISIT_VERSION//./_} \
-    && mkdir -p ${INSTALLTMDIR} \
     && cd ${INSTALLTMDIR} \
     && mkdir ./third_party \
-    && wget  https://github.com/visit-dav/visit/releases/download/v${VISIT_VERSION}/build_visit${VISIT_VER_UNDERSCORE} \
     && chmod +x build_visit${VISIT_VER_UNDERSCORE} \
-    && export PAR_COMPILER=${MPICC} \
-    && export PAR_COMPILER_CXX=${MPICXX} \
-    && ./build_visit${VISIT_VER_UNDERSCORE}  --thirdparty-path $INSTALL_PREFIX --mesagl  --llvm --server-components-only  --cc ${GCC}  --cxx ${GPP} --cflags "-I$INSTALL_PREFIX/include" --cxxflags "-I$INSTALL_PREFIX/include"  --system-python --system-cmake --parallel --download-only --prefix $INSTALL_PREFIX/visit
-
-# --download-only --skip-opengl-context-check --conduit  --no-thirdparty  --stdout  --build-mode $CMAKE_BUILD_TYPE  --mesagl --llvm   --skip-opengl-context-check --no-thirdparty
-
-RUN cd ${INSTALLTMDIR} \
-    && cat build_visit${VISIT_VER_UNDERSCORE} | sed 's|vopts="${vopts} -DPYTHON_EXTRA_LIBS:STRING=${VTK_PY_LIBS}"|vopts="${vopts} -DPYTHON_EXTRA_LIBS:STRING=\\\"${VTK_PY_LIBS}\\\""|g' > build_visit${VISIT_VER_UNDERSCORE}_patched \
-    && chmod +x build_visit${VISIT_VER_UNDERSCORE}_patched
+    && sed -i 's|error "python library was not found, cannot configure python"|PYTHON_LIBRARY=$(pkg-config --libs python3-embed);  PYTHON_LIBRARY="lib${PYTHON_LIBRARY:2}.so" ; if [ ! -e "${PYTHON_LIBRARY_DIR}/${PYTHON_LIBRARY}" ] ; then  error "python library was not found, cannot configure python" ; fi|g' ./build_visit${VISIT_VER_UNDERSCORE} \
+    && sed -i 's|vopts="${vopts} -DPYTHON_EXTRA_LIBS:STRING=${VTK_PY_LIBS}"|vopts="${vopts} -DPYTHON_EXTRA_LIBS:STRING=\\\"${VTK_PY_LIBS}\\\""|g' ./build_visit${VISIT_VER_UNDERSCORE} 
 
 
 RUN VISIT_VER_UNDERSCORE=${VISIT_VERSION//./_} \
     && cd ${INSTALLTMDIR} \
     && export PAR_COMPILER=${MPICC} \
     && export PAR_COMPILER_CXX=${MPICXX}  \
-    && yes yes | ./build_visit${VISIT_VER_UNDERSCORE}_patched --no-visit --thirdparty-path $INSTALL_PREFIX --mesagl --llvm --server-components-only --stdout  --cc ${GCC}   --cxx ${GPP}   --cflags "-I$INSTALL_PREFIX/include" --cxxflags "-I$INSTALL_PREFIX/include"  --makeflags -j${NUMCORES} --system-python --system-cmake --cxxflag "-Wno-class-memaccess -Wno-cast-function-type" --parallel --prefix $INSTALL_PREFIX/visit
+    && yes yes | ./build_visit${VISIT_VER_UNDERSCORE} --no-visit --thirdparty-path $INSTALL_PREFIX --mesagl --llvm --server-components-only --stdout  --cc ${GCC}   --cxx ${GPP}   --cflags "-I$INSTALL_PREFIX/include" --cxxflags "-I$INSTALL_PREFIX/include"  --makeflags -j${NUMCORES}  --system-cmake --cxxflag "-Wno-class-memaccess -Wno-cast-function-type" --parallel --prefix $INSTALL_PREFIX/visit
 
 RUN VISIT_VER_UNDERSCORE=${VISIT_VERSION//./_} \
     && cd ${INSTALLTMDIR} \
     && export PAR_COMPILER=${MPICC} \
     && export PAR_COMPILER_CXX=${MPICXX}  \
-    && yes yes | ./build_visit${VISIT_VER_UNDERSCORE}_patched --thirdparty-path $INSTALL_PREFIX --mesagl --llvm --server-components-only --stdout  --cc ${GCC}   --cxx ${GPP}   --cflags "-I$INSTALL_PREFIX/include" --cxxflags "-I$INSTALL_PREFIX/include"  --makeflags -j${NUMCORES} --system-python --system-cmake --cxxflag "-Wno-class-memaccess -Wno-cast-function-type" --parallel --prefix $INSTALL_PREFIX/visit  || echo "We will try again"
+    && yes yes | ./build_visit${VISIT_VER_UNDERSCORE} --thirdparty-path $INSTALL_PREFIX --mesagl --llvm --server-components-only --stdout  --cc ${GCC}   --cxx ${GPP}   --cflags "-I$INSTALL_PREFIX/include" --cxxflags "-I$INSTALL_PREFIX/include"  --makeflags -j${NUMCORES}  --system-cmake --cxxflag "-Wno-class-memaccess -Wno-cast-function-type" --parallel --prefix $INSTALL_PREFIX/visit  || echo "We will try again"
 
 
 RUN rm -fr ${INSTALLTMDIR}/visit${VISIT_VERSION}/build \
-  && mkdir ${INSTALLTMDIR}/visit${VISIT_VERSION}/build \
+  && mkdir -p ${INSTALLTMDIR}/visit${VISIT_VERSION}/build \
   && cd ${INSTALLTMDIR}/visit${VISIT_VERSION}/build \
   && /usr/bin/cmake -DVISIT_CONFIG_SITE:FILEPATH=${INSTALLTMDIR}/buildkitsandbox.cmake -DVISIT_INSTALL_THIRD_PARTY:BOOL=ON -DVISIT_PARALLEL:BOOL=ON -DCMAKE_BUILD_TYPE:STRING=Release -DVISIT_C_COMPILER:FILEPATH=${MPICC} -DVISIT_CXX_COMPILER:FILEPATH=${MPICXX}  -DVISIT_C_FLAGS:STRING=" -m64 -fPIC -I$INSTALL_PREFIX/include" -DVISIT_CXX_FLAGS:STRING=" -m64 -fPIC -I$INSTALL_PREFIX/include -Wno-class-memaccess -Wno-cast-function-type" -DCMAKE_INSTALL_PREFIX:PATH=$INSTALL_PREFIX/visit -DCPACK_INSTALL_PREFIX:PATH=$INSTALL_PREFIX/visit -DCPACK_PACKAGING_INSTALL_PREFIX:PATH=$INSTALL_PREFIX/visit -DVISIT_SERVER_COMPONENTS_ONLY:BOOL=ON ../src  \
   && make -j${NUMCORES} \

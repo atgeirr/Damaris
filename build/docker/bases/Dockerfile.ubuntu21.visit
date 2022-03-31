@@ -45,11 +45,10 @@ RUN apt-get update -y \
     libcppunit-dev \
 	hdf5-tools \
   && apt-get clean \
-  && ln -s /usr/bin/xsdcxx /usr/bin/xsd \
+  && ln -s /usr/bin/xsdcxx /usr/bin/xsd
 
 
-RUN apt-get update -y \
-  && apt-get install -y --no-install-recommends \
+RUN apt-get install -y --no-install-recommends \
 	software-properties-common \
     build-essential \
     gfortran \
@@ -57,8 +56,8 @@ RUN apt-get update -y \
 
 
 # Extras for visit install
-RUN apt-get update -y \
-  && hostname patch \
+RUN apt-get install -y  --no-install-recommends \
+    hostname patch \
     x11proto-dev   \
     xz-utils libtool m4 automake \
     libx11-dev xorg-dev  libx11-xcb-dev libxcb-dri2-0-dev  \
@@ -94,25 +93,30 @@ ENV MPIFORT=$MPI_ROOT/bin/mpifort
 ENV GCC=/usr/bin/gcc
 ENV GPP=/usr/bin/g++
 
+USER docker
+
+
+COPY --chown=docker:docker *.tar.gz ${INSTALLTMDIR}/
+COPY --chown=docker:docker *.tar.xz ${INSTALLTMDIR}/
+COPY --chown=docker:docker *.tgz ${INSTALLTMDIR}/
+COPY --chown=docker:docker build_visit* ${INSTALLTMDIR}/
+
+
+
 ###### Install Visit
 # Define INPUT_visit_ver with a default
 ARG INPUT_visit_ver
 ENV VISIT_VERSION=$INPUT_visit_ver
-# ENV VISIT_VER_UNDERSCORE=${VISIT_VERSION//./_}
-# ENV VISIT_VER_UNDERSCORE=3_2_1
+
+
 # This is for building from source: ./build_visit2_13_2 --server-components-only --mesa --system-cmake --parallel --prefix $INSTALL_PREFIX/visit
 RUN VISIT_VER_UNDERSCORE=${VISIT_VERSION//./_} \
-    && mkdir -p ${INSTALLTMDIR} \
     && cd ${INSTALLTMDIR} \
     && mkdir ./third_party \
-    && wget  https://github.com/visit-dav/visit/releases/download/v${VISIT_VERSION}/build_visit${VISIT_VER_UNDERSCORE} \
     && chmod +x build_visit${VISIT_VER_UNDERSCORE} \
-    && export PAR_COMPILER=${MPICC} \
-    && export PAR_COMPILER_CXX=${MPICXX} \
     && sed -i 's|error "python library was not found, cannot configure python"|PYTHON_LIBRARY=$(pkg-config --libs python3-embed);  PYTHON_LIBRARY="lib${PYTHON_LIBRARY:2}.so" ; if [ ! -e "${PYTHON_LIBRARY_DIR}/${PYTHON_LIBRARY}" ] ; then  error "python library was not found, cannot configure python" ; fi|g' ./build_visit${VISIT_VER_UNDERSCORE} \
-    && sed -i 's|vopts="${vopts} -DPYTHON_EXTRA_LIBS:STRING=${VTK_PY_LIBS}"|vopts="${vopts} -DPYTHON_EXTRA_LIBS:STRING=\\\"${VTK_PY_LIBS}\\\""|g' ./build_visit${VISIT_VER_UNDERSCORE} \
-    && yes yes | ./build_visit${VISIT_VER_UNDERSCORE}  --download-only  --thirdparty-path /home/docker/local --mesagl  --llvm --server-components-only  --cc ${GCC} --cxx ${GPP}  --cflags "-I/home/docker/local/include" --cxxflags "-I/home/docker/local/include"  --system-cmake --parallel --prefix $INSTALL_PREFIX/visit
-# --system-python
+    && sed -i 's|vopts="${vopts} -DPYTHON_EXTRA_LIBS:STRING=${VTK_PY_LIBS}"|vopts="${vopts} -DPYTHON_EXTRA_LIBS:STRING=\\\"${VTK_PY_LIBS}\\\""|g' ./build_visit${VISIT_VER_UNDERSCORE} 
+
 
 
 RUN VISIT_VER_UNDERSCORE=${VISIT_VERSION//./_} \

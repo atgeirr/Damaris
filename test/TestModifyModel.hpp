@@ -100,7 +100,7 @@ MyStore
         {"_DC_REGEX_","1"},
         {"_DN_REGEX_","0"},
         {"_PATH_REGEX_","outputdir"},
-        {"_MYSTORE_OR_EMPTY_REGEX_","MyStore"},
+        {"_MYSTORE_OR_EMPTY_REGEX_",""},
         };
         myMod.RepalceWithRegEx(find_replace_map);
         myMod.SetSimulationModel() ;   
@@ -122,7 +122,7 @@ MyStore
         {"_DC_REGEX_","1"},
         {"_DN_REGEX_","0"},
         {"_PATH_REGEX_","outputdir"},
-        {"_MYSTORE_OR_EMPTY_REGEX_","MyStore"},
+        {"_MYSTORE_OR_EMPTY_REGEX_",""},
         };
         myMod.RepalceWithRegEx(find_replace_map);
         myMod.SetSimulationModel() ;   

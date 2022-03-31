@@ -45,11 +45,10 @@ RUN apt-get update -y \
     libcppunit-dev \
 	hdf5-tools \
   && apt-get clean \
-  && ln -s /usr/bin/xsdcxx /usr/bin/xsd \
+  && ln -s /usr/bin/xsdcxx /usr/bin/xsd
 
 
-RUN apt-get update -y \
-  && apt-get install -y --no-install-recommends \
+RUN apt-get install -y --no-install-recommends \
 	software-properties-common \
     build-essential \
     gfortran \
@@ -58,8 +57,8 @@ RUN apt-get update -y \
 
 
 # Extras for visit install
-RUN apt-get update -y \
-  && hostname patch \
+RUN apt-get install -y --no-install-recommends \
+    hostname patch \
     x11proto-dev   \
     xz-utils libtool m4 automake \
     libx11-dev xorg-dev  libx11-xcb-dev libxcb-dri2-0-dev  \
@@ -91,10 +90,16 @@ ENV MPIFORT=$MPI_ROOT/bin/mpifort
 ENV GCC=/usr/bin/gcc
 ENV GPP=/usr/bin/g++
 
-USER root
 
 
 USER docker
+
+
+COPY --chown=docker:docker *.tar.gz ${INSTALLTMDIR}/
+COPY --chown=docker:docker *.tar.xz ${INSTALLTMDIR}/
+COPY --chown=docker:docker *.tgz ${INSTALLTMDIR}/
+COPY --chown=docker:docker build_visit* ${INSTALLTMDIR}/
+
 
 
 # cp build_visit${VISIT_VER_UNDERSCORE} build_visit${VISIT_VER_UNDERSCORE}.cpy
@@ -103,49 +108,34 @@ USER docker
 
 # Define INPUT_visit_ver with a default
 ARG INPUT_visit_ver
-ENV VISIT_VERSION=3.2.1
-# ENV VISIT_VER_UNDERSCORE=${VISIT_VERSION//./_}
-ENV VISIT_VER_UNDERSCORE=3_2_1
+ENV VISIT_VERSION=$INPUT_visit_ver
+
 # This is for building from source: ./build_visit2_13_2 --server-components-only --mesa --system-cmake --parallel --prefix $INSTALL_PREFIX/visit
 RUN VISIT_VER_UNDERSCORE=${VISIT_VERSION//./_} \
-    && mkdir -p ${INSTALLTMDIR} \
     && cd ${INSTALLTMDIR} \
     && mkdir ./third_party \
-    && wget  https://github.com/visit-dav/visit/releases/download/v${VISIT_VERSION}/build_visit${VISIT_VER_UNDERSCORE} \
     && chmod +x build_visit${VISIT_VER_UNDERSCORE} \
-    && export PAR_COMPILER=${MPICC} \
-    && export PAR_COMPILER_CXX=${MPICXX} \
     && sed -i 's|error "python library was not found, cannot configure python"|PYTHON_LIBRARY=$(pkg-config --libs python3-embed);  PYTHON_LIBRARY="lib${PYTHON_LIBRARY:2}.so" ; if [ ! -e "${PYTHON_LIBRARY_DIR}/${PYTHON_LIBRARY}" ] ; then  error "python library was not found, cannot configure python" ; fi|g' ./build_visit${VISIT_VER_UNDERSCORE} \
-    && sed -i 's|vopts="${vopts} -DPYTHON_EXTRA_LIBS:STRING=${VTK_PY_LIBS}"|vopts="${vopts} -DPYTHON_EXTRA_LIBS:STRING=\\\"${VTK_PY_LIBS}\\\""|g' ./build_visit${VISIT_VER_UNDERSCORE} \
-    && yes yes | ./build_visit${VISIT_VER_UNDERSCORE}  --download-only --system-python --thirdparty-path ${INSTALL_PREFIX} --mesagl  --llvm --server-components-only  --cc ${GCC} --cxx ${GPP}  --cflags "-I${INSTALL_PREFIX}/include" --cxxflags "-I${INSTALL_PREFIX}/include"  --system-cmake --parallel --prefix $INSTALL_PREFIX/visit
-# --system-python
-
-# RUN cd ${INSTALLTMDIR} \
-#     && cat build_visit${VISIT_VER_UNDERSCORE} |  > build_visit${VISIT_VER_UNDERSCORE}_patched \
-#    && chmod +x build_visit${VISIT_VER_UNDERSCORE}_patched
-
-
-# --cflags "-I/home/docker/local/include" --cxxflags "-I/home/docker/local/include"
+    && sed -i 's|vopts="${vopts} -DPYTHON_EXTRA_LIBS:STRING=${VTK_PY_LIBS}"|vopts="${vopts} -DPYTHON_EXTRA_LIBS:STRING=\\\"${VTK_PY_LIBS}\\\""|g' ./build_visit${VISIT_VER_UNDERSCORE} 
 
 
 RUN VISIT_VER_UNDERSCORE=${VISIT_VERSION//./_} \
     && cd ${INSTALLTMDIR} \
     && export PAR_COMPILER=${MPICC} \
     && export PAR_COMPILER_CXX=${MPICXX}  \
-    && yes yes | ./build_visit${VISIT_VER_UNDERSCORE} --no-visit --system-python --thirdparty-path ${INSTALL_PREFIX} --mesagl --llvm --server-components-only --stdout  --cc ${GCC}  --cxx ${GPP}  --cflags "-I${INSTALL_PREFIX}/include" --cxxflags "-I${INSTALL_PREFIX}/include"  --makeflags -j${NUMCORES} --system-cmake --cxxflag "-Wno-class-memaccess -Wno-cast-function-type" --parallel --prefix $INSTALL_PREFIX/visit
+    && yes yes | ./build_visit${VISIT_VER_UNDERSCORE} --no-visit  --thirdparty-path ${INSTALL_PREFIX} --mesagl --llvm --server-components-only --stdout  --cc ${GCC}  --cxx ${GPP}  --cflags "-I${INSTALL_PREFIX}/include" --cxxflags "-I${INSTALL_PREFIX}/include"  --makeflags -j${NUMCORES} --system-cmake --cxxflag "-Wno-class-memaccess -Wno-cast-function-type" --parallel --prefix $INSTALL_PREFIX/visit
 
-    # --system-python  /usr/lib/x86_64-linux-gnu
 
 
 RUN VISIT_VER_UNDERSCORE=${VISIT_VERSION//./_} \
     && cd ${INSTALLTMDIR} \
     && export PAR_COMPILER=${MPICC} \
     && export PAR_COMPILER_CXX=${MPICXX}  \
-    && yes yes | ./build_visit${VISIT_VER_UNDERSCORE} --system-python --thirdparty-path ${INSTALL_PREFIX} --mesagl --llvm --server-components-only --stdout  --cc ${GCC}  --cxx ${GPP}  --cflags "-I${INSTALL_PREFIX}/include" --cxxflags "-I${INSTALL_PREFIX}/include"  --makeflags -j${NUMCORES} --system-cmake --cxxflag "-Wno-class-memaccess -Wno-cast-function-type" --parallel --prefix $INSTALL_PREFIX/visit  || echo "We will try again"
+    && yes yes | ./build_visit${VISIT_VER_UNDERSCORE} --thirdparty-path ${INSTALL_PREFIX} --mesagl --llvm --server-components-only --stdout  --cc ${GCC}  --cxx ${GPP}  --cflags "-I${INSTALL_PREFIX}/include" --cxxflags "-I${INSTALL_PREFIX}/include"  --makeflags -j${NUMCORES} --system-cmake --cxxflag "-Wno-class-memaccess -Wno-cast-function-type" --parallel --prefix $INSTALL_PREFIX/visit  || echo "We will try again"
 #
 
 RUN rm -fr ${INSTALLTMDIR}/visit${VISIT_VERSION}/build \
-  && mkdir ${INSTALLTMDIR}/visit${VISIT_VERSION}/build \
+  && mkdir -p ${INSTALLTMDIR}/visit${VISIT_VERSION}/build \
   && cd ${INSTALLTMDIR}/visit${VISIT_VERSION}/build \
   && /usr/bin/cmake -DVISIT_CONFIG_SITE:FILEPATH=/home/docker/installdir/buildkitsandbox.cmake -DVISIT_INSTALL_THIRD_PARTY:BOOL=ON -DVISIT_PARALLEL:BOOL=ON -DCMAKE_BUILD_TYPE:STRING=Release -DVISIT_C_COMPILER:FILEPATH=mpicc -DVISIT_CXX_COMPILER:FILEPATH=${MPICXX}  -DVISIT_C_FLAGS:STRING=" -m64 -fPIC -I${INSTALL_PREFIX}/include" -DVISIT_CXX_FLAGS:STRING=" -m64 -fPIC -I${INSTALL_PREFIX}/include -Wno-class-memaccess -Wno-cast-function-type" -DCMAKE_INSTALL_PREFIX:PATH=${INSTALL_PREFIX}/visit -DCPACK_INSTALL_PREFIX:PATH=${INSTALL_PREFIX}/visit -DCPACK_PACKAGING_INSTALL_PREFIX:PATH=${INSTALL_PREFIX}/visit -DVISIT_SERVER_COMPONENTS_ONLY:BOOL=ON ../src  \
   && make -j${NUMCORES} \

@@ -12,13 +12,14 @@
 # The gitlab.inria.fr/Damaris/damaris repo should build without the secret setup.
 # 
 # To build the damaris repo (no password needed):
-# export TAG=v1.5.0
-# export PV_VERSION=v5.9.1
-# export PVSHORT=${PV_VERSION//./}
-# sudo  DOCKER_BUILDKIT=1 docker build -t \
-#            registry.gitlab.inria.fr/damaris/damaris:${TAG}-archlinux-p${PVSHORT} \
-#            --build-arg INPUT_pv_ver=${PV_VERSION} \
-#                -f ./Dockerfile.archlinux.paraview
+# export TAG=v1.6.0
+# export VISIT_VER=3.2.1
+# sudo  DOCKER_BUILDKIT=1 docker build --progress=plain -t \
+#            registry.gitlab.inria.fr/damaris/damaris:${TAG}-archlinux-visit${VISIT_VER} \
+#            --build-arg INPUT_damaris_ver=${TAG} \
+#            --build-arg INPUT_repo=damaris \
+#            --build-arg INPUT_visit_ver=${VISIT_VER} \
+#                -f ./Dockerfile.archlinux.visit .
 #
 #
 # N.B. MY_CI_READ_REPO_PWD is the filename that contains the token for user 'gitlab-read-repo' 
@@ -129,22 +130,26 @@ ENV MPIFORT=$MPI_BINDIR/mpifort
 ENV GCC=/usr/bin/gcc
 ENV GPP=/usr/bin/g++
 
+USER docker
+
+
+COPY --chown=docker:docker *.tar.gz ${INSTALLTMDIR}/
+COPY --chown=docker:docker *.tar.xz ${INSTALLTMDIR}/
+COPY --chown=docker:docker *.tgz ${INSTALLTMDIR}/
+COPY --chown=docker:docker build_visit* ${INSTALLTMDIR}/
+
 
 
 ARG INPUT_visit_ver
 ENV VISIT_VERSION=$INPUT_visit_ver
 
+
 RUN VISIT_VER_UNDERSCORE=${VISIT_VERSION//./_} \
-    && mkdir -p ${INSTALLTMDIR} \
     && cd ${INSTALLTMDIR} \
     && mkdir ./third_party \
-    && wget  https://github.com/visit-dav/visit/releases/download/v${VISIT_VERSION}/build_visit${VISIT_VER_UNDERSCORE} \
     && chmod +x build_visit${VISIT_VER_UNDERSCORE} \
-    && export PAR_COMPILER=${MPICC} \
-    && export PAR_COMPILER_CXX=${MPICXX}  \
     && sed -i 's|error "python library was not found, cannot configure python"|PYTHON_LIBRARY=$(pkg-config --libs python3-embed);  PYTHON_LIBRARY="lib${PYTHON_LIBRARY:2}.so" ; if [ ! -e "${PYTHON_LIBRARY_DIR}/${PYTHON_LIBRARY}" ] ; then  error "python library was not found, cannot configure python" ; fi|g' ./build_visit${VISIT_VER_UNDERSCORE} \
-    && sed -i 's|vopts="${vopts} -DPYTHON_EXTRA_LIBS:STRING=${VTK_PY_LIBS}"|vopts="${vopts} -DPYTHON_EXTRA_LIBS:STRING=\\\"${VTK_PY_LIBS}\\\""|g' ./build_visit${VISIT_VER_UNDERSCORE} \
-    && yes yes | ./build_visit${VISIT_VER_UNDERSCORE}  --download-only  --thirdparty-path ${INSTALL_PREFIX} --mesagl  --llvm --server-components-only  --cc ${GCC} --cxx ${GPP} --cflags "-I${INSTALL_PREFIX}/include" --cxxflags "-I${INSTALL_PREFIX}/include"  --system-cmake --parallel --prefix $INSTALL_PREFIX/visit
+    && sed -i 's|vopts="${vopts} -DPYTHON_EXTRA_LIBS:STRING=${VTK_PY_LIBS}"|vopts="${vopts} -DPYTHON_EXTRA_LIBS:STRING=\\\"${VTK_PY_LIBS}\\\""|g' ./build_visit${VISIT_VER_UNDERSCORE} 
 
 
 # N.B. cxxflag "-fpermissive" needed due to issue in VTK with Python3.7 and passing  char* when const char * is expected.
@@ -156,7 +161,7 @@ RUN VISIT_VER_UNDERSCORE=${VISIT_VERSION//./_} \
     && export PAR_COMPILER_CXX=${MPICXX} \
     && yes yes | ./build_visit${VISIT_VER_UNDERSCORE} --no-visit  --thirdparty-path ${INSTALL_PREFIX} --mesagl --llvm --server-components-only --stdout  --cc ${GCC} --cxx ${GPP}  --cflags "-I${INSTALL_PREFIX}/include -fcommon" --cxxflag "-Wno-class-memaccess -Wno-cast-function-type -fpermissive -fcommon"  --makeflags -j${NUMCORES} --system-cmake --parallel --prefix $INSTALL_PREFIX/visit \
     || echo "We will try again 1"
-# --no-visit
+
 
 # gcc --version | grep gcc | awk { print $3 }
 ENV VISIT_PYTHON3=${INSTALL_PREFIX}/python/3.7.7/linux-x86_64_gcc-11.2
@@ -164,10 +169,6 @@ RUN ln -s ${VISIT_PYTHON3}/bin/python3 ${VISIT_PYTHON3}/bin/python
 ENV PATH=${VISIT_PYTHON3}/bin:${PATH}
 ENV LD_LIBRARY_PATH=${VISIT_PYTHON3}/lib:${VISIT_PYTHON3}/lib64:${LD_LIBRARY_PATH}
 
-
-# USER root
-# RUN yes | pacman -Syu haskell-hostname
-# USER docker
 
 
 # Now finish dependencies and then try to configure VisIt, and fail due to -fPic or some other flag

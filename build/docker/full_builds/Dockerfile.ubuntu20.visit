@@ -91,8 +91,6 @@ ENV MPIFORT=$MPI_ROOT/bin/mpifort
 ENV GCC=/usr/bin/gcc
 ENV GPP=/usr/bin/g++
 
-USER root
-
 
 USER docker
 
@@ -103,9 +101,8 @@ USER docker
 
 # Define INPUT_visit_ver with a default
 ARG INPUT_visit_ver
-ENV VISIT_VERSION=3.2.1
-# ENV VISIT_VER_UNDERSCORE=${VISIT_VERSION//./_}
-ENV VISIT_VER_UNDERSCORE=3_2_1
+ENV VISIT_VERSION=$INPUT_visit_ver
+
 # This is for building from source: ./build_visit2_13_2 --server-components-only --mesa --system-cmake --parallel --prefix $INSTALL_PREFIX/visit
 RUN VISIT_VER_UNDERSCORE=${VISIT_VERSION//./_} \
     && mkdir -p ${INSTALLTMDIR} \

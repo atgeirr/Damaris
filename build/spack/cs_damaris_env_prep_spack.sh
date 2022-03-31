@@ -1,8 +1,8 @@
 #!/bin/bash
 # Author: Josh Bowden, INRIA
 # Description:
-# This script configures Damaris via camke, using pre-installed libraries that were installed via Spack.
-# It is specific to installing Damaris with in-situ vizulisation support with Catalyst using a Spack 
+# This script configures Damaris via cmake, using pre-installed libraries that were installed via Spack.
+# It is specific to installing Damaris with in-situ visulization support with Catalyst using a Spack 
 # installed Paraview library.
 #
 # Before running this script, please make sure that C/C++/Fortran compilers are installed on the target machine.

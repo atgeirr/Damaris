@@ -326,7 +326,8 @@ endif(CMAKE_Fortran_COMPILER)
 
 
 if(ENABLE_TESTS)
-  install(FILES "${DAMARIS_SOURCE_DIR}/test/my-hostfile" DESTINATION  ${PROJECT_BINARY_DIR}/test)
+# This will be done in directory test/CMakeLists.txt
+#  install(FILES "${DAMARIS_SOURCE_DIR}/test/my-hostfile" DESTINATION  ${PROJECT_BINARY_DIR}/test)
 endif(ENABLE_TESTS)
 
 
