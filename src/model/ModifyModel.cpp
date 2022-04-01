@@ -89,8 +89,26 @@ ModifyModel::~ModifyModel( void ) ;
     
 }
 */
+bool ModifyModel::TestSimulationModel( bool verbose ) 
+{
+    std::istringstream stream(config_xml_);
+    std::unique_ptr<Simulation> simModel_local ;
+    try {
+        // The creator returns a std::unique_ptr<Simulation>
+        simModel_local = model::simulation(stream,
+                xml_schema::flags::dont_validate);
+    } catch(xml_schema::exception &e) {
+        if (verbose == true) {
+            ERROR(e.what());
+            ERROR("ERROR: ModifyModel::SetSimulationModel(): The XML input was :\n" << config_xml_);
+        }
+        return false ;
+    }
+    return true ;
+    
+}
 
-void ModifyModel::SetSimulationModel() {
+bool ModifyModel::SetSimulationModel() {
     
     std::istringstream stream(config_xml_);
     
@@ -101,9 +119,12 @@ void ModifyModel::SetSimulationModel() {
     } catch(xml_schema::exception &e) {
         ERROR(e.what());
         ERROR("ERROR: ModifyModel::SetSimulationModel(): The XML input was :\n" << config_xml_);
-        exit(-1);
+        // exit(-1);
+        this->converted_ = false ;
+        return false ;
     }
     this->converted_ = true ;
+    return true ;
 }
     
         

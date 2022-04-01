@@ -36,7 +36,7 @@ class ModifyModel {
           
     private:
         std::string config_xml_ ; /*!< A string of XML that (will) conform to the Damaris XSD model. */
-        std::unique_ptr<Simulation> simModel_ ; /*!< The Damaris XML model that will be created rom the config_xml_ string */
+        std::unique_ptr<Simulation> simModel_ ; /*!< The Damaris XML model that will be created from the config_xml_ string */
         bool converted_ ;          /*!< is true if the string XML value has been converted to the std::unique_ptr<Simulation> value */
                      
     public:
@@ -91,6 +91,15 @@ class ModifyModel {
          * \param[in] uri  : Path and filename of the XML file.
         */
         bool ReadAndBroadcastXMLFromFile(const MPI_Comm& comm, const std::string& uri) ;
+        
+        /**
+        *  Uses ModifyModel::config_xml_ string to initialize the the Damaris XML *Simulation* model. 
+        *  which is a test if it is valid XML..
+        *
+        * \param[in] verbose : If verbose == true, then on failure to convert the string representation
+        *                      to the model then print the xml string 
+        */
+        bool TestSimulationModel( bool verbose ) ;
     
         
     protected:
@@ -100,7 +109,7 @@ class ModifyModel {
         *  Only call this method after any required preprocessing has been done to the XML string.
         *
         */
-        void SetSimulationModel( void ) ;
+        bool SetSimulationModel( void ) ;
         
         
         /**
