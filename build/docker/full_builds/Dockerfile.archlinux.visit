@@ -1,0 +1,349 @@
+# syntax=docker/dockerfile:1
+
+##################
+# Author: Josh Bowden
+# Company: Inria
+# Date: 28/03/2022
+#
+# 
+##################
+#
+## Usage of this file (standalone or automated via gitlab CI): 
+# The gitlab.inria.fr/Damaris/damaris repo should build without the secret setup.
+# 
+# To build the damaris repo (no password needed):
+# export TAG=v1.6.0
+# export VISIT_VER=3.2.1
+# sudo  DOCKER_BUILDKIT=1 docker build --progress=plain  -t \
+#             registry.gitlab.inria.fr/damaris/damaris:${TAG}-archlinux-visit${VISIT_VER} \
+#            --build-arg INPUT_damaris_ver=${TAG} \
+#            --build-arg INPUT_repo=damaris \
+#            --build-arg INPUT_visit_ver=${VISIT_VER} \
+#                -f ./Dockerfile.archlinux.visit .
+#
+#
+# N.B. MY_CI_READ_REPO_PWD is the filename that contains the token for user 'gitlab-read-repo' 
+# User 'gitlab-read-repo' is created in the 
+# Settings -> Access tokens page
+# and MY_CI_READ_REPO_PWD is a gitlab CI 'file' variable that contains a gitlab token
+# just created and the variable is created in the 
+# Settings -> CI/CD -> Variables page
+#
+###################
+#
+## To test the created docker image:
+# 1/ Log in to the gitlab repository 
+# N.B. You may need a ~/.docker/config.json file configured with an access token
+# > docker login registry.gitlab.inria.fr
+# 
+# 2/ Use docker run as it does not leave the container running on exit and run Damaris tests:
+#
+# > sudo docker run --rm -u "docker:staff" -v /dev/shm:/dev/shm -it registry.gitlab.inria.fr/damaris/damaris:${TAG}-archlinux-visit${VISIT_VER} /bin/bash
+# <container prompt> ctest
+# <container prompt> cd /home/docker/local/examples/storage/
+# <container prompt> mpirun -np 4 ./3dmesh 3dmesh.xml
+######################################################################################
+
+
+# This is a global arg that can be used in all stages of the build
+ARG INPUT_repo
+
+########################################
+## Stage 1 of build
+########################################
+FROM archlinux:base-devel AS builder
+SHELL ["/bin/bash", "-c"]
+
+
+
+RUN useradd -m --create-home -s /bin/bash docker \
+	&& chown docker:docker /home/docker \
+	&& groupadd staff \
+    && usermod -a -G staff docker
+
+RUN echo 'root:docker' | chpasswd
+#RUN yes docker | passwd --stdin root
+
+# For freeglut
+# RUN echo "[extra]" >> /etc/pacman.conf \
+#     && echo "Include = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf
+
+# Archlinux: https://archlinux.org/packages/community/x86_64/
+# Dependencies for Damaris
+RUN  yes | pacman -Syu xerces-c \
+    xsd \
+    cppunit \
+    hdf5-openmpi \
+    boost \
+    boost-libs \
+    git \
+    openssl \
+    curl \
+    xz \
+    nano \
+    wget \
+    cmake \
+    python \
+    python-mpi4py \
+    python-numpy \
+  && cp /usr/bin/xsdcxx /usr/bin/xsd \
+  && yes | pacman -Scc
+
+
+# Compile-time dependencies
+# freeglut-devel is just for OpenGL headers,
+# that should be found in the mesa install of Visit,
+# but are not.
+RUN yes | pacman -Syu   gcc gcc-fortran  \
+       libtool m4 automake   \
+       freeglut \
+  && yes | pacman -Scc
+
+
+RUN yes | pacman -Syu  libx11 libffi xcb-util-xrm patch xz unzip  libxext expat libxt \
+  && yes | pacman -Scc
+
+
+
+USER docker
+
+
+ENV INSTALL_PREFIX=/home/docker/local
+# ENV MPI_BINDIR=/usr/bin
+# ENV PATH=$INSTALL_PREFIX/bin:${MPI_BINDIR}:$PATH
+ENV PATH=${INSTALL_PREFIX}/bin:${PATH}
+ENV LD_LIBRARY_PATH=${INSTALL_PREFIX}/lib:${INSTALL_PREFIX}/lib64:${LD_LIBRARY_PATH}
+
+ENV INSTALLTMDIR=/home/docker/installdir
+ENV CMAKE_BUILD_TYPE=Release
+ENV NUMCORES=4
+
+
+ENV GL_INSTALL_PATH=/usr/lib
+ENV GL_HEADER_PATH=/usr/include
+
+ENV MPI_BINDIR=/usr/bin 
+ENV PATH=$INSTALL_PREFIX/bin:${MPI_BINDIR}:$PATH  
+# N.B. MPI_BINDIR=/usr/lib64/openmpi/bin has to be on the PATH
+ENV MPICXX=$MPI_BINDIR/mpicxx
+ENV MPICC=$MPI_BINDIR/mpicc
+ENV MPIFORT=$MPI_BINDIR/mpifort
+
+ENV GCC=/usr/bin/gcc
+ENV GPP=/usr/bin/g++
+
+
+
+ARG INPUT_visit_ver
+ENV VISIT_VERSION=$INPUT_visit_ver
+
+RUN VISIT_VER_UNDERSCORE=${VISIT_VERSION//./_} \
+    && mkdir -p ${INSTALLTMDIR} \
+    && cd ${INSTALLTMDIR} \
+    && mkdir ./third_party \
+    && wget  https://github.com/visit-dav/visit/releases/download/v${VISIT_VERSION}/build_visit${VISIT_VER_UNDERSCORE} \
+    && chmod +x build_visit${VISIT_VER_UNDERSCORE} \
+    && export PAR_COMPILER=${MPICC} \
+    && export PAR_COMPILER_CXX=${MPICXX}  \
+    && sed -i 's|error "python library was not found, cannot configure python"|PYTHON_LIBRARY=$(pkg-config --libs python3-embed);  PYTHON_LIBRARY="lib${PYTHON_LIBRARY:2}.so" ; if [ ! -e "${PYTHON_LIBRARY_DIR}/${PYTHON_LIBRARY}" ] ; then  error "python library was not found, cannot configure python" ; fi|g' ./build_visit${VISIT_VER_UNDERSCORE} \
+    && sed -i 's|vopts="${vopts} -DPYTHON_EXTRA_LIBS:STRING=${VTK_PY_LIBS}"|vopts="${vopts} -DPYTHON_EXTRA_LIBS:STRING=\\\"${VTK_PY_LIBS}\\\""|g' ./build_visit${VISIT_VER_UNDERSCORE} \
+    && yes yes | ./build_visit${VISIT_VER_UNDERSCORE}  --download-only  --thirdparty-path ${INSTALL_PREFIX} --mesagl  --llvm --server-components-only  --cc ${GCC} --cxx ${GPP} --cflags "-I${INSTALL_PREFIX}/include" --cxxflags "-I${INSTALL_PREFIX}/include"  --system-cmake --parallel --prefix $INSTALL_PREFIX/visit
+
+
+# N.B. cxxflag "-fpermissive" needed due to issue in VTK with Python3.7 and passing  char* when const char * is expected.
+# No Visit, just dependencies
+# This fails during VTK build as python is only available as python3
+RUN VISIT_VER_UNDERSCORE=${VISIT_VERSION//./_} \
+    && cd ${INSTALLTMDIR} \
+    && export PAR_COMPILER=${MPICC} \
+    && export PAR_COMPILER_CXX=${MPICXX} \
+    && yes yes | ./build_visit${VISIT_VER_UNDERSCORE} --no-visit  --thirdparty-path ${INSTALL_PREFIX} --mesagl --llvm --server-components-only --stdout  --cc ${GCC} --cxx ${GPP}  --cflags "-I${INSTALL_PREFIX}/include -fcommon" --cxxflag "-Wno-class-memaccess -Wno-cast-function-type -fpermissive -fcommon"  --makeflags -j${NUMCORES} --system-cmake --parallel --prefix $INSTALL_PREFIX/visit \
+    || echo "We will try again 1"
+# --no-visit
+
+# gcc --version | grep gcc | awk { print $3 }
+ENV VISIT_PYTHON3=${INSTALL_PREFIX}/python/3.7.7/linux-x86_64_gcc-11.2
+RUN ln -s ${VISIT_PYTHON3}/bin/python3 ${VISIT_PYTHON3}/bin/python
+ENV PATH=${VISIT_PYTHON3}/bin:${PATH}
+ENV LD_LIBRARY_PATH=${VISIT_PYTHON3}/lib:${VISIT_PYTHON3}/lib64:${LD_LIBRARY_PATH}
+
+
+# USER root
+# RUN yes | pacman -Syu haskell-hostname
+# USER docker
+
+
+# Now finish dependencies and then try to configure VisIt, and fail due to -fPic or some other flag
+# Mesa failed on gcc >= 10 due to change in default linking, need to add -fcommon
+RUN VISIT_VER_UNDERSCORE=${VISIT_VERSION//./_} \
+    && cd ${INSTALLTMDIR} \
+    && export PAR_COMPILER=${MPICC} \
+    && export PAR_COMPILER_CXX=${MPICXX} \
+    && yes yes | ./build_visit${VISIT_VER_UNDERSCORE} --thirdparty-path ${INSTALL_PREFIX} --mesagl --llvm --server-components-only --stdout  --cc ${GCC} --cxx ${GPP}  --cflags "-I${INSTALL_PREFIX}/include -fcommon" --cxxflags "-Wno-class-memaccess -Wno-cast-function-type -fcommon"  --system-cmake --parallel --makeflags -j${NUMCORES}  --prefix $INSTALL_PREFIX/visit \
+    || echo "We will try again 2c"
+
+ENV HOSTNAME_DOCKER=
+# ENV HOSTNAME_DOCKER=buildkitsandbox
+
+RUN rm -fr ${INSTALLTMDIR}/visit${VISIT_VERSION}/build \
+  && mkdir -p ${INSTALLTMDIR}/visit${VISIT_VERSION}/build \
+  && cd ${INSTALLTMDIR}/visit${VISIT_VERSION}/build \
+  && sed -i "s|VISIT_OPTION_DEFAULT(VISIT_C_COMPILER ${GCC}|VISIT_OPTION_DEFAULT(VISIT_C_COMPILER ${MPICC}|g" ${INSTALLTMDIR}/$HOSTNAME_DOCKER.cmake \
+  && sed -i "s|VISIT_OPTION_DEFAULT(VISIT_CXX_COMPILER ${GPP}|VISIT_OPTION_DEFAULT(VISIT_CXX_COMPILER ${MPICXX}|g" ${INSTALLTMDIR}/$HOSTNAME_DOCKER.cmake \
+  && /usr/bin/cmake -DVISIT_CONFIG_SITE:FILEPATH=${INSTALLTMDIR}/$HOSTNAME_DOCKER.cmake -DVISIT_INSTALL_THIRD_PARTY:BOOL=ON -DVISIT_PARALLEL:BOOL=ON -DCMAKE_BUILD_TYPE:STRING=Release -DVISIT_C_COMPILER:FILEPATH=${MPICC} -DVISIT_CXX_COMPILER:FILEPATH=${MPICXX} -DVISIT_C_FLAGS:STRING=" -m64 -fPIC -I${INSTALL_PREFIX}/mesagl/17.3.9/linux-x86_64_gcc-11.2/include" -DVISIT_CXX_FLAGS:STRING=" -m64 -fPIC -I${INSTALL_PREFIX}/mesagl/17.3.9/linux-x86_64_gcc-11.2/include -Wno-class-memaccess -Wno-cast-function-type" -DCMAKE_INSTALL_PREFIX:PATH=${INSTALL_PREFIX}/visit -DCPACK_INSTALL_PREFIX:PATH=${INSTALL_PREFIX}/visit -DCPACK_PACKAGING_INSTALL_PREFIX:PATH=${INSTALL_PREFIX}/visit -DVISIT_SERVER_COMPONENTS_ONLY:BOOL=ON ../src  \
+  && make -j${NUMCORES} \
+  && touch ./resources/help/en_US/manual \
+  && make install
+
+
+
+# These should also be supplied on the command line as --build-arg
+# ENV ENABLE_PYTHON=
+# Regenerate the xml model in C using XSD
+ENV REGEN_ON_OFF=ON
+ENV SHLIBS_ON_OFF=ON
+# Build examples
+ENV EXAMPLES_ON_OFF=ON
+
+# N.B INPUT_damaris_ver to be provided on the docker build -t registry.gitlab.inria.fr/damaris-development:${TAG}  --build-arg INPUT_damaris_ver=v1.5.0 --build-arg INPUT_repo="damaris-development" -f Dockerfile.ubuntu20 .
+ARG INPUT_damaris_ver
+ARG INPUT_repo
+# ARG INPUT_repo  # making this a global arge and defining before stage 1
+ENV DAMARIS_VERSION=$INPUT_damaris_ver
+ENV repo=$INPUT_repo
+
+####################################
+## Build Damaris
+####################################
+
+# The first line deals with different access rights to damaris-development (private) and damaris (public) repository
+RUN --mount=type=secret,id=thepassword if [ "$repo" == "damaris-development" ] ; then export GITLABUSERNAME="gitlab-read-repo:$(cat /run/secrets/thepassword)@";  fi \
+  && export PV_VERSION_SHORT=${PV_VERSION:1:-2} \
+  && mkdir -p ${INSTALLTMDIR} \
+  && cd ${INSTALLTMDIR} \
+  && echo "Damaris Version: $DAMARIS_VERSION" \
+  && git clone  --depth 1 --branch $DAMARIS_VERSION https://${GITLABUSERNAME}gitlab.inria.fr/Damaris/$repo.git \
+  && mkdir -p ${INSTALLTMDIR}/build/$repo \
+  && cd ${INSTALLTMDIR}/build/$repo \
+  && cmake ../../$repo -DCMAKE_INSTALL_PREFIX:PATH=$INSTALL_PREFIX \
+      -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
+      -DCMAKE_CXX_COMPILER=${MPICXX} \
+      -DCMAKE_C_COMPILER=${MPICC} \
+      -DCMAKE_Fortran_COMPILER=${MPIFORT} \
+      -DENABLE_TESTS=ON \
+      -DENABLE_EXAMPLES=$EXAMPLES_ON_OFF \
+      -DBUILD_SHARED_LIBS=$SHLIBS_ON_OFF \
+      -DENABLE_PYTHON=OFF \
+      -DENABLE_FORTRAN=ON \
+      -DGENERATE_MODEL=$REGEN_ON_OFF \
+      -DENABLE_HDF5=ON -DHDF5_ROOT=${HDF5_ROOT} \
+      -DENABLE_VISIT=ON -DVisIt_ROOT=${INSTALL_PREFIX}/visit/${VISIT_VERSION}/linux-x86_64/libsim/V2 \
+      -DENABLE_CATALYST=OFF \
+  && make -j${NUMCORES} \
+  && make install
+
+RUN find ${INSTALL_PREFIX}/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples|"
+
+# COPY --from=builder ${INSTALL_PREFIX}/ ${INSTALL_PREFIX}/
+RUN  cp -r ${INSTALLTMDIR}/build/$repo/test/ ${INSTALL_PREFIX}/examples/test/ \
+ && cp  ${INSTALLTMDIR}/build/$repo/CTestTestfile.cmake ${INSTALL_PREFIX}/examples/ \
+ && sed -i "s|${INSTALLTMDIR}/build/$repo/|${INSTALL_PREFIX}/examples/|g" ${INSTALL_PREFIX}/examples/test/CTestTestfile.cmake
+
+
+
+########################################
+## Stage 2 of build
+########################################
+FROM archlinux:base-devel AS final
+SHELL ["/bin/bash", "-c"]
+
+RUN useradd -m --create-home -s /bin/bash docker \
+	&& chown docker:docker /home/docker \
+	&& groupadd staff \
+    && usermod -a -G staff docker
+
+RUN echo 'root:docker' | chpasswd
+#RUN yes docker | passwd --stdin root
+
+
+# For freeglut
+# RUN echo "[extra]" >> /etc/pacman.conf \
+#     && echo "Include = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf
+
+# Archlinux: https://archlinux.org/packages/community/x86_64/
+# Dependencies for Damaris
+RUN  yes | pacman -Syu xerces-c \
+    xsd \
+    cppunit \
+    hdf5-openmpi \
+    boost \
+    boost-libs \
+    git \
+    openssl \
+    curl \
+    xz \
+    nano \
+    wget \
+    cmake \
+    python \
+    python-mpi4py \
+    python-numpy \
+  && cp /usr/bin/xsdcxx /usr/bin/xsd \
+  && yes | pacman -Scc
+
+
+# Compile-time dependencies
+# freeglut-devel is just for OpenGL headers,
+# that should be found in the mesa install of Visit,
+# but are not.
+#RUN yes | pacman -Syu   gcc gcc-fortran  \
+#       libtool m4 automake   \
+#       freeglut \
+#  && yes | pacman -Scc
+
+RUN yes | pacman -Syu  gcc-fortran \
+  && yes | pacman -Scc
+
+# RUN yes | pacman -Syu  libx11 libffi xcb-util-xrm patch xz unzip  libxext expat libxt \
+#  && yes | pacman -Scc
+
+
+
+USER docker
+
+
+ENV INSTALL_PREFIX=/home/docker/local
+# ENV MPI_BINDIR=/usr/bin
+# ENV PATH=$INSTALL_PREFIX/bin:${MPI_BINDIR}:$PATH
+ENV PATH=${INSTALL_PREFIX}/bin:${PATH}
+# Special VisIt paths
+ENV PATH=$INSTALL_PREFIX/visit/bin:$PATH
+
+ENV LD_LIBRARY_PATH=${INSTALL_PREFIX}/lib:${INSTALL_PREFIX}/lib64:${LD_LIBRARY_PATH}
+
+ENV INSTALLTMDIR=/home/docker/installdir
+ENV CMAKE_BUILD_TYPE=Release
+ENV NUMCORES=4
+
+ENV GL_INSTALL_PATH=/usr/lib
+ENV GL_HEADER_PATH=/usr/include
+
+
+ENV MPI_ROOT=/usr
+ENV PATH=$INSTALL_PREFIX/bin:${MPI_BINDIR}:$PATH
+# N.B. MPI_BINDIR=/usr/lib64/openmpi/bin has to be on the PATH
+ENV MPI_BINDIR=$MPI_ROOT/bin
+ENV MPICXX=$MPI_BINDIR/mpicxx
+ENV MPICC=$MPI_BINDIR/mpicc
+ENV MPIFORT=$MPI_BINDIR/mpifort
+COPY --from=builder ${INSTALL_PREFIX}/ ${INSTALL_PREFIX}/
+USER docker
+WORKDIR ${INSTALL_PREFIX}/examples
+
+RUN visit -env -engine > ~/tmp.txt \
+   && sed -i 's|^|export |g' ~/tmp.txt \
+   && sed -i 's|^export LD_LIBRARY_PATH.*|&$LD_LIBRARY_PATH|' ~/tmp.txt  \
+   && cat ~/tmp.txt >> ~/.bashrc
+
+ 
+CMD ["/bin/bash"]

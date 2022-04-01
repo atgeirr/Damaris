@@ -326,7 +326,8 @@ endif(CMAKE_Fortran_COMPILER)
 
 
 if(ENABLE_TESTS)
-  install(FILES "${DAMARIS_SOURCE_DIR}/test/my-hostfile" DESTINATION  ${PROJECT_BINARY_DIR}/test)
+# This will be done in directory test/CMakeLists.txt
+#  install(FILES "${DAMARIS_SOURCE_DIR}/test/my-hostfile" DESTINATION  ${PROJECT_BINARY_DIR}/test)
 endif(ENABLE_TESTS)
 
 
@@ -355,6 +356,12 @@ if(ENABLE_EXAMPLES)
       install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/mesh" DESTINATION examples/visit)
       install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/point" DESTINATION examples/visit)
       install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/var" DESTINATION examples/visit)
+      install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/curve.xml" DESTINATION examples/visit)
+      install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/life.xml" DESTINATION examples/visit)
+      install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/blocks.xml" DESTINATION examples/visit)
+      install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/mesh.xml" DESTINATION examples/visit)
+      install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/point.xml" DESTINATION examples/visit)
+      install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/var.xml" DESTINATION examples/visit)
     endif(ENABLE_VISIT)
     if(ENABLE_FORTRAN)
       install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/fortran/cube" DESTINATION examples/fortran)

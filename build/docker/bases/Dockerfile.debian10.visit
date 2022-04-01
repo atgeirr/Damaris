@@ -1,0 +1,145 @@
+# syntax=docker/dockerfile:1
+## Usage of this file (standalone or automated via gitlab CI): 
+# The gitlab.inria.fr/Damaris/damaris repo should build without the secret setup.
+# 
+# To build the damaris repo (no password needed):
+# export TAG=v1.5.0
+# export PV_VER=v5.9.0
+# export PVSHORT=${PV_VERSION//./}
+# sudo  DOCKER_BUILDKIT=1 docker build -t \
+#            registry.gitlab.inria.fr/damaris/damaris:${TAG}-deb11-p${PVSHORT) \
+#            --build-arg INPUT_pv_ver=${PV_VER} \
+#                -f ./Dockerfile.debian.paraview58 .
+# 
+# mpirun -np 4 singularity exec ubuntu20_paraview58  /usr/local/damaris/examples/paraview/image /usr/local/damaris/examples/paraview/image.xml
+
+########################################
+## Stage 1 of build
+########################################
+FROM debian:10 AS builder
+SHELL ["/bin/bash", "-c"]
+
+USER root
+
+RUN useradd docker \
+	&& mkdir /home/docker \
+	&& chown docker:docker /home/docker \
+	&& addgroup docker staff
+
+# RUN yes docker | passwd --stdin root
+RUN echo 'root:docker' | chpasswd
+
+RUN apt-get update -y \
+  && echo "debconf debconf/frontend select Noninteractive" | debconf-set-selections \
+  && apt-get install -y --no-install-recommends \
+    apt-utils \
+    pkg-config \
+    git-core \
+    cmake \
+    wget unzip nano \
+	libhdf5-openmpi-dev \
+    libboost-all-dev \
+	libpython3-dev  \
+	libxerces-c-dev  \
+	xsdcxx \
+    libcppunit-dev \
+	hdf5-tools \
+  && apt-get clean \
+  && ln -s /usr/bin/xsdcxx /usr/bin/xsd
+
+
+RUN apt-get install -y --no-install-recommends \
+	software-properties-common \
+    build-essential \
+    gfortran \
+  && apt-get clean
+
+
+
+# Extras for visit install
+RUN apt-get install -y --no-install-recommends \
+    hostname patch \
+    x11proto-dev   \
+    xz-utils libtool m4 automake \
+    libx11-dev xorg-dev  libx11-xcb-dev libxcb-dri2-0-dev  \
+    libxcb-xfixes0-dev \
+    libffi-dev \
+  && apt-get clean
+
+
+
+
+
+
+
+
+
+ENV INSTALL_PREFIX=/home/docker/local
+ENV PATH=${INSTALL_PREFIX}/bin:${PATH}
+ENV LD_LIBRARY_PATH=${INSTALL_PREFIX}/lib:${INSTALL_PREFIX}/lib64:${LD_LIBRARY_PATH}
+
+ENV INSTALLTMDIR=/home/docker/installdir
+ENV CMAKE_BUILD_TYPE=Release
+ENV NUMCORES=4
+
+ENV MPI_ROOT=/usr
+ENV MPICXX=$MPI_ROOT/bin/mpicxx
+ENV MPICC=$MPI_ROOT/bin/mpicc
+ENV MPIFORT=$MPI_ROOT/bin/mpifort
+
+ENV GCC=/usr/bin/gcc
+ENV GPP=/usr/bin/g++
+
+
+
+USER docker
+
+
+COPY --chown=docker:docker *.tar.gz ${INSTALLTMDIR}/
+COPY --chown=docker:docker *.tar.xz ${INSTALLTMDIR}/
+COPY --chown=docker:docker *.tgz ${INSTALLTMDIR}/
+COPY --chown=docker:docker build_visit* ${INSTALLTMDIR}/
+
+
+
+# cp build_visit${VISIT_VER_UNDERSCORE} build_visit${VISIT_VER_UNDERSCORE}.cpy
+# The following is eeded to fix how the build_visit script finds Python on Ubuntu 20
+# sed -i 's|error "python library was not found, cannot configure python"|PYTHON_LIBRARY=$(pkg-config --libs python3-embed);  PYTHON_LIBRARY="lib${PYTHON_LIBRARY:2}.so" ; if [ ! -e "${PYTHON_LIBRARY_DIR}/${PYTHON_LIBRARY}" ] ; then  error "python library was not found, cannot configure python" ; fi|g' ./build_visit${VISIT_VER_UNDERSCORE}.cpy
+
+# Define INPUT_visit_ver with a default
+ARG INPUT_visit_ver
+ENV VISIT_VERSION=$INPUT_visit_ver
+
+# This is for building from source: ./build_visit2_13_2 --server-components-only --mesa --system-cmake --parallel --prefix $INSTALL_PREFIX/visit
+RUN VISIT_VER_UNDERSCORE=${VISIT_VERSION//./_} \
+    && cd ${INSTALLTMDIR} \
+    && mkdir ./third_party \
+    && chmod +x build_visit${VISIT_VER_UNDERSCORE} \
+    && sed -i 's|error "python library was not found, cannot configure python"|PYTHON_LIBRARY=$(pkg-config --libs python3-embed);  PYTHON_LIBRARY="lib${PYTHON_LIBRARY:2}.so" ; if [ ! -e "${PYTHON_LIBRARY_DIR}/${PYTHON_LIBRARY}" ] ; then  error "python library was not found, cannot configure python" ; fi|g' ./build_visit${VISIT_VER_UNDERSCORE} \
+    && sed -i 's|vopts="${vopts} -DPYTHON_EXTRA_LIBS:STRING=${VTK_PY_LIBS}"|vopts="${vopts} -DPYTHON_EXTRA_LIBS:STRING=\\\"${VTK_PY_LIBS}\\\""|g' ./build_visit${VISIT_VER_UNDERSCORE} 
+
+
+RUN VISIT_VER_UNDERSCORE=${VISIT_VERSION//./_} \
+    && cd ${INSTALLTMDIR} \
+    && export PAR_COMPILER=${MPICC} \
+    && export PAR_COMPILER_CXX=${MPICXX}  \
+    && yes yes | ./build_visit${VISIT_VER_UNDERSCORE} --no-visit  --thirdparty-path ${INSTALL_PREFIX} --mesagl --llvm --server-components-only --stdout  --cc ${GCC}  --cxx ${GPP}  --cflags "-I${INSTALL_PREFIX}/include" --cxxflags "-I${INSTALL_PREFIX}/include"  --makeflags -j${NUMCORES} --system-cmake --cxxflag "-Wno-class-memaccess -Wno-cast-function-type" --parallel --prefix $INSTALL_PREFIX/visit
+
+
+
+RUN VISIT_VER_UNDERSCORE=${VISIT_VERSION//./_} \
+    && cd ${INSTALLTMDIR} \
+    && export PAR_COMPILER=${MPICC} \
+    && export PAR_COMPILER_CXX=${MPICXX}  \
+    && yes yes | ./build_visit${VISIT_VER_UNDERSCORE} --thirdparty-path ${INSTALL_PREFIX} --mesagl --llvm --server-components-only --stdout  --cc ${GCC}  --cxx ${GPP}  --cflags "-I${INSTALL_PREFIX}/include" --cxxflags "-I${INSTALL_PREFIX}/include"  --makeflags -j${NUMCORES} --system-cmake --cxxflag "-Wno-class-memaccess -Wno-cast-function-type" --parallel --prefix $INSTALL_PREFIX/visit  || echo "We will try again"
+#
+
+RUN rm -fr ${INSTALLTMDIR}/visit${VISIT_VERSION}/build \
+  && mkdir -p ${INSTALLTMDIR}/visit${VISIT_VERSION}/build \
+  && cd ${INSTALLTMDIR}/visit${VISIT_VERSION}/build \
+  && /usr/bin/cmake -DVISIT_CONFIG_SITE:FILEPATH=/home/docker/installdir/buildkitsandbox.cmake -DVISIT_INSTALL_THIRD_PARTY:BOOL=ON -DVISIT_PARALLEL:BOOL=ON -DCMAKE_BUILD_TYPE:STRING=Release -DVISIT_C_COMPILER:FILEPATH=mpicc -DVISIT_CXX_COMPILER:FILEPATH=${MPICXX}  -DVISIT_C_FLAGS:STRING=" -m64 -fPIC -I${INSTALL_PREFIX}/include" -DVISIT_CXX_FLAGS:STRING=" -m64 -fPIC -I${INSTALL_PREFIX}/include -Wno-class-memaccess -Wno-cast-function-type" -DCMAKE_INSTALL_PREFIX:PATH=${INSTALL_PREFIX}/visit -DCPACK_INSTALL_PREFIX:PATH=${INSTALL_PREFIX}/visit -DCPACK_PACKAGING_INSTALL_PREFIX:PATH=${INSTALL_PREFIX}/visit -DVISIT_SERVER_COMPONENTS_ONLY:BOOL=ON ../src  \
+  && make -j${NUMCORES} \
+  && make install
+
+
+CMD ["/bin/bash"]

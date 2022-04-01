@@ -19,9 +19,11 @@ int main(int argc, char** argv)
    if(argc < 2)
    {
       fprintf(stderr,"Usage: %s <3dmesh_py.xml> [-v] [-r] [-s X]\n",argv[0]);
-      fprintf(stderr,"-v      Verbose mode, prints arrays\n");
-      fprintf(stderr,"-r      Array values set as rank of process\n");
-      fprintf(stderr,"-s      X is integer value for time to sleep between iterations\n");
+      fprintf(stderr,"-v  <X>    X = 0 default, do not print arrays\n");
+      fprintf(stderr,"-v  <X>    X = 1 Verbose mode, prints arrays\n");
+      fprintf(stderr,"           X = 2 Verbose mode, prints summation of arrays\n");
+      fprintf(stderr,"-r         Array values set as rank of process\n");
+      fprintf(stderr,"-s  <Y>    Y is integer value for time to sleep between iterations\n");
       exit(0);
    }
 
@@ -35,8 +37,10 @@ int main(int argc, char** argv)
   int time = 1 ;
   while (current_arg < argc ) 
   {
-    if (strcmp(argv[current_arg],"-v") == 0)
-      verbose = 1 ;
+    if (strcmp(argv[current_arg],"-v") == 0) {
+        current_arg++;
+        verbose = atoi(argv[current_arg]);
+    }
     else if (strcmp(argv[current_arg],"-r") == 0)
       rank_only = 1 ;
     else if (strcmp(argv[current_arg],"-s") == 0) {
@@ -116,7 +120,7 @@ int main(int argc, char** argv)
          position_cube[2] = 0;
       }
       
-      // allocate the data array
+      // allocate the local data array
       int cube[local_depth][local_height][local_width];
       
       // set the appropriate position for the current rank
@@ -139,7 +143,7 @@ int main(int argc, char** argv)
                  }  
                }
             }            
-         } else { // print values to screen
+         } else  if (verbose == 1) { // print values to screen
             int current_rank = 0 ;
             int sending_rank = 0 ;
              // serialize the print statements
@@ -160,6 +164,34 @@ int main(int argc, char** argv)
                     }
                     printf("\n");
                   }
+                  fflush(stdin); 
+                  sending_rank = current_rank ;
+                  current_rank++ ;
+               } // end of serialized section
+               MPI_Bcast(&current_rank,1, MPI_INT,sending_rank, comm);
+               sending_rank = current_rank ;
+            } // end of in-order loop over ranks
+         } else  if (verbose == 2) { // print summation values to screen
+            int current_rank = 0 ;
+            int sending_rank = 0 ;
+            int sumdata = 0 ;
+             // serialize the print statements
+             while ( current_rank < size)
+             {
+               printf("\n"); 
+               if (rank == current_rank) { // start of serialized section
+                  sequence = 0;
+
+                  for ( d = 0; d < local_depth; d++){
+                    for ( h = 0; h < local_height; h++){
+                     for ( w = 0; w < local_width; w++) {
+                        cube[d][h][w] = (int) sequence + rank;
+                        sumdata += cube[d][h][w] ;
+                        if (rank_only==0) sequence++;
+                     }
+                    }
+                  }
+                  printf("Rank %d SUm = %8d\t", current_rank, sumdata );
                   fflush(stdin); 
                   sending_rank = current_rank ;
                   current_rank++ ;

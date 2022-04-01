@@ -24,7 +24,7 @@
       <layout name="cells_whd_wf"  type="int" dimensions="WIDTH/size,HEIGHT,DEPTH"
             global="WIDTH,HEIGHT,DEPTH" ghosts="0:0,0:0,0:0" />
 
-        <variable name="cube" type="scalar" layout="cells_whd_wf" mesh="mesh" centering="nodal" />
+        <variable name="cube" type="scalar" layout="cells_whd_dl" mesh="mesh" centering="nodal" />
     </data>
     <actions>
     </actions>

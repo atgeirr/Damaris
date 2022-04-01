@@ -54,7 +54,7 @@ ModifyModel::ModifyModel( void ) {
      <parameter name="n"     type="int" value="1" />
      
      <layout   name="zonal_layout_usmesh"             type="double" dimensions="n_elements_local"   global="n_elements_total"   comment="For the field data e.g. Pressure"  />
-     <variable name="PRESSURE"    layout="zonal_layout_usmesh"     type="scalar"  visualizable="false"     unit="Pa"   centering="zonal"  store="_MYSTORE_OR_EMPTY_REGEX_" /> 
+     <variable name="PRESSURE"    layout="zonal_layout_usmesh"     type="scalar"  visualizable="false"     unit="Pa"   centering="zonal" _MYSTORE_OR_EMPTY_REGEX_ /> 
      
     </data>
     

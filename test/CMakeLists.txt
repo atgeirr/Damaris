@@ -1,4 +1,7 @@
 configure_file(test.xml test.xml COPYONLY)
+configure_file(test_modify.xml test_modify.xml COPYONLY)
+configure_file(my-hostfile my-hostfile COPYONLY)
+# install(FILES "${DAMARIS_SOURCE_DIR}/test/my-hostfile" DESTINATION  ${PROJECT_BINARY_DIR}/test)
 
 set(CMAKE_C_STANDARD 99)
 
