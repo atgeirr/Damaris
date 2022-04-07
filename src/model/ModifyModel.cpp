@@ -59,11 +59,6 @@ ModifyModel::ModifyModel( void ) {
     </data>
     
      <storage>
-      <store name="MyStore" type="HDF5">
-         <option key="FileMode">Collective</option>
-         <option key="XDMFMode">NoIteration</option>
-         <option key="FilesPath">_PATH_REGEX_</option>
-      </store>
       </storage>
       
       

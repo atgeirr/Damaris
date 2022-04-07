@@ -1,4 +1,4 @@
-The **offical documentation** for Damaris is available here: https://project.inria.fr/damaris/documentation/ 
+The **official documentation** for Damaris is available here: https://project.inria.fr/damaris/documentation/ 
   
 The tests are created when the project is configured by CMake using ENABLE_TESTS flag. This will require the cppunit library to be avialable on the system.
   

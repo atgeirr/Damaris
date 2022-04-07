@@ -1,49 +1,42 @@
 # syntax=docker/dockerfile:1
-
 ##################
-# Author: Josh Bowden
-# Company: Inria
-# Date: 25/01/2022
-#
-# This Dockerfile file can be built by gitlab on push to the 
-# damaris-development repository. It works in concert with the .gitlab-ci.yml 
-# file and a required gitlab-runner process that is currently running somewhere.
-#
-##################
-##################
-#
 ## Usage of this file (standalone or automated via gitlab CI): 
-# The gitlab.inria.fr/Damaris/damaris repo should build without the secret setup.
+#
+# This is a base image definition on which to build Damaris
 # 
-# To build the damaris repo (no password needed):
-# export TAG=v1.5.0
-# export PV_VERSION=v5.9.1
-# export PVSHORT=${PV_VERSION//./}
-# sudo  DOCKER_BUILDKIT=1 docker build -t \
-#            registry.gitlab.inria.fr/damaris/damaris:${TAG}-opensuse-p${PVSHORT} \
-#            --build-arg INPUT_pv_ver=${PV_VERSION} \
-#                -f ./Dockerfile.opensuse.paraview .
+# Visit builds use a multi-stage build so as to get some information 
+# about the compiler and architecture being used
+# 
+#   ## Build stage 1
+#   DOCKER_IMAGE_BASENAME=registry.gitlab.inria.fr/damaris/damaris-development
+#   DOCKERFILE=opensuse
+#   DOCKER_BUILDKIT=1 docker build --progress=plain\
+#     --target base_builder   \
+#     -t  ${DOCKER_IMAGE_BASENAME}:${TAG} \
+#     --build-arg INPUT_visit_ver=${VISIT_VERSION} \
+#     -f ./Dockerfile.$DOCKERFILE.visit .
 #
-#
+#   docker run --rm -it ${DOCKER_IMAGE_BASENAME}:${TAG} cat /home/docker/vist_arch.txt > ./vist_arch.txt
+#   VISTARCH=$(cat ./vist_arch.txt)
+#   echo "VISTARCH: $VISTARCH"
+
+#  ## Build stage 2
+#  DOCKER_BUILDKIT=1 docker build --progress=plain \
+#     --target visit_builder   \
+#     -t  ${DOCKER_IMAGE_BASENAME}:${TAG} \
+#     --build-arg INPUT_visit_ver=${VISIT_VERSION} \
+#     --build-arg  INPUT_os_arch_compiler_ver=$VISTARCH \
+#     -f ./Dockerfile.$DOCKERFILE.visit .
+# 
 ###################
-#
-## To test the created docker image:
-# 1/ Log in to the gitlab repository 
-# N.B. You may need a ~/.docker/config.json file configured with an access token
-# > docker login registry.gitlab.inria.fr
-# 
-# 2/ Use docker run as it does not leave the container running on exit and run Damaris tests:
-#    Map the shared memory filesystem and the Paraview Catalyst port
-#
-# > sudo docker run --rm -v /dev/shm:/dev/shm -p 22222:22222 -it registry.gitlab.inria.fr/damaris/damaris:v1.5.0-opensuse-pv5100 /bin/bash
-# > cd /home/docker/local/examples/storage/
-# > mpirun -np 4 ./3dmesh 3dmesh.xml
-######################################################################################
+
+# This is a global arg that can be used in all stages of the build
+ARG INPUT_visit_ver
 
 ########################################
 ## Stage 1 of build
 ########################################
-FROM opensuse/leap:15.3 AS builder
+FROM opensuse/leap:15.3 AS base_builder
 SHELL ["/bin/bash", "-c"]
 
 
@@ -133,56 +126,87 @@ COPY --chown=docker:docker build_visit* ${INSTALLTMDIR}/
 
 
 
+ARG INPUT_visit_ver
+ENV VISIT_VERSION=$INPUT_visit_ver
+
+
+RUN cd /home/docker \
+  && export VISIT_VER_UNDERSCORE=${VISIT_VERSION//./_} \
+  && env -i /bin/bash \
+  && source ${INSTALLTMDIR}/build_visit${VISIT_VER_UNDERSCORE}_to_source \
+  && initialize_build_visit \
+  && echo $VISITARCHTMP > vist_arch.txt 
+
+# Now we need to copy vist_arch.txt  from the container and use its contents as
+# an arg to stage 2 "INPUT_os_arch_compiler_ver"
+  
+
+
+####################################
+## Second stage of build - Build Visit
+####################################
+FROM base_builder AS visit_builder
+SHELL ["/bin/bash", "-c"]
+ 
+
+# GCCVERSION=$(g++ -v 2>&1 | grep "gcc version" | awk '{ print $3 }' | sed 's|\.[^.]*$||')
+ARG INPUT_os_arch_compiler_ver
+ENV VISIT_ARCH=$INPUT_os_arch_compiler_ver
+
+# N.B. Could set: --arch "" as it would remove the "linux-x86_64_gcc-X.Y"
+ENV VISIT_PYTHON3=${INSTALL_PREFIX}/python/3.7.7/${VISIT_ARCH}
+ENV PATH=${VISIT_PYTHON3}/bin:${PATH}
+ENV LD_LIBRARY_PATH=${VISIT_PYTHON3}/lib:${VISIT_PYTHON3}/lib64:${LD_LIBRARY_PATH}
+
+ENV PAR_COMPILER=${MPICC}
+ENV PAR_COMPILER_CXX=${MPICXX}
+ENV HOSTNAME_DOCKER=buildkitsandbox
+
 # Define INPUT_visit_ver with a default
 ARG INPUT_visit_ver
 ENV VISIT_VERSION=$INPUT_visit_ver
 
 
-RUN VISIT_VER_UNDERSCORE=${VISIT_VERSION//./_} \
+
+# This is a multi-stage RUN command that is required as the build_vist script is not so robust.
+# The initial sed is needed to fix how the build_visit script finds Python on Ubuntu 20
+# The first "We will try again 1" is needed as Mesa does not find Python (this may be related to the initial sed commands above?)
+# The second "We will try again 2" is needed as the build_visit script does not run cmake correctly - seems to have issues with quotations of multiple value arguments.
+# The final sed commands swap the gcc versions for the mpicc versions in the cmake config file (even though PAR_COMPILER is set correctly)
+# N.B. Flags can be added to ./build_visit${VISIT_VER_UNDERSCORE} to minimise warnings from LLVM:
+# --cflags "-Wno-class-memaccess -Wno-cast-function-type -fcommon" --cxxflags "-Wno-class-memaccess -Wno-cast-function-type -fcommon"
+# And -fcommon is needed for ggc >= 10 for Mesa compilation.
+RUN export VISIT_VER_UNDERSCORE=${VISIT_VERSION//./_} \
     && cd ${INSTALLTMDIR} \
     && mkdir ./third_party \
     && chmod +x build_visit${VISIT_VER_UNDERSCORE} \
     && sed -i 's|error "python library was not found, cannot configure python"|PYTHON_LIBRARY=$(pkg-config --libs python3-embed);  PYTHON_LIBRARY="lib${PYTHON_LIBRARY:2}.so" ; if [ ! -e "${PYTHON_LIBRARY_DIR}/${PYTHON_LIBRARY}" ] ; then  error "python library was not found, cannot configure python" ; fi|g' ./build_visit${VISIT_VER_UNDERSCORE} \
-    && sed -i 's|vopts="${vopts} -DPYTHON_EXTRA_LIBS:STRING=${VTK_PY_LIBS}"|vopts="${vopts} -DPYTHON_EXTRA_LIBS:STRING=\\\"${VTK_PY_LIBS}\\\""|g' ./build_visit${VISIT_VER_UNDERSCORE} 
-
-
-# N.B. cxxflag "-fpermissive" needed due to issue in VTK with Python3.7 and passing  char* when const char * is expected.
-# No Visit, just dependencies
-# This fails during VTK build as python is only available as python3
-RUN VISIT_VER_UNDERSCORE=${VISIT_VERSION//./_} \
+    && sed -i 's|vopts="${vopts} -DPYTHON_EXTRA_LIBS:STRING=${VTK_PY_LIBS}"|vopts="${vopts} -DPYTHON_EXTRA_LIBS:STRING=\\\"${VTK_PY_LIBS}\\\""|g' ./build_visit${VISIT_VER_UNDERSCORE} \
+    && yes yes | ./build_visit${VISIT_VER_UNDERSCORE}  --thirdparty-path ${INSTALL_PREFIX} --mesagl --llvm --server-components-only --stdout  --cc ${GCC}  --cxx ${GPP}   --makeflags -j${NUMCORES} --system-cmake --parallel  --prefix $INSTALL_PREFIX/visit  \
+    || echo "We will try again 1" \
+    && cd ${VISIT_PYTHON3}/bin \
+    && ln -s python3 python \
     && cd ${INSTALLTMDIR} \
-    && export PAR_COMPILER=${MPICC} \
-    && export PAR_COMPILER_CXX=${MPICXX} \
-    && yes yes | ./build_visit${VISIT_VER_UNDERSCORE} --no-visit  --thirdparty-path ${INSTALL_PREFIX} --mesagl --llvm --server-components-only --stdout  --cc ${GCC} --cxx ${GPP} --cflags "-I${INSTALL_PREFIX}/include" --cxxflag "-Wno-class-memaccess -Wno-cast-function-type -fpermissive"  --makeflags -j${NUMCORES} --system-cmake --parallel --prefix $INSTALL_PREFIX/visit \
-    || echo "We will try again 1"
+    && yes yes | ./build_visit${VISIT_VER_UNDERSCORE} --thirdparty-path ${INSTALL_PREFIX} --mesagl --llvm --server-components-only --stdout  --cc ${GCC}  --cxx ${GPP}  --makeflags -j${NUMCORES} --system-cmake --parallel  --prefix $INSTALL_PREFIX/visit  \
+    || echo "We will try again 2" \
+    && rm -fr ${INSTALLTMDIR}/visit${VISIT_VERSION}/build \
+    && mkdir -p ${INSTALLTMDIR}/visit${VISIT_VERSION}/build \
+    && cd ${INSTALLTMDIR}/visit${VISIT_VERSION}/build \
+    && sed -i "s|VISIT_OPTION_DEFAULT(VISIT_C_COMPILER ${GCC}|VISIT_OPTION_DEFAULT(VISIT_C_COMPILER ${MPICC}|g" ${INSTALLTMDIR}/$HOSTNAME_DOCKER.cmake \
+    && sed -i "s|VISIT_OPTION_DEFAULT(VISIT_CXX_COMPILER ${GPP}|VISIT_OPTION_DEFAULT(VISIT_CXX_COMPILER ${MPICXX}|g" ${INSTALLTMDIR}/$HOSTNAME_DOCKER.cmake \
+    && /usr/bin/cmake -DVISIT_CONFIG_SITE:FILEPATH=/home/docker/installdir/buildkitsandbox.cmake -DVISIT_INSTALL_THIRD_PARTY:BOOL=ON -DVISIT_PARALLEL:BOOL=ON -DCMAKE_BUILD_TYPE:STRING=Release -DVISIT_C_COMPILER:FILEPATH=${MPICC} -DVISIT_CXX_COMPILER:FILEPATH=${MPICXX}  -DVISIT_C_FLAGS:STRING=" -m64 -fPIC -I${INSTALL_PREFIX}/include" -DVISIT_CXX_FLAGS:STRING=" -m64 -fPIC -I${INSTALL_PREFIX}/include " -DCMAKE_INSTALL_PREFIX:PATH=${INSTALL_PREFIX}/visit -DCPACK_INSTALL_PREFIX:PATH=${INSTALL_PREFIX}/visit -DCPACK_PACKAGING_INSTALL_PREFIX:PATH=${INSTALL_PREFIX}/visit -DVISIT_SERVER_COMPONENTS_ONLY:BOOL=ON ../src  \
+    && make -j${NUMCORES} \
+    && touch ./resources/help/en_US/manual \
+    && make install \
+    || echo "We will try again 3" \
+    && rm -fr ${INSTALLTMDIR} 
+    
+ENV PATH=${INSTALL_PREFIX}/visit/bin:${PATH}
 
-
-################## N.B. The GCC version is hard codes #####################
-ENV VISIT_PYTHON3=${INSTALL_PREFIX}/python/3.7.7/linux-x86_64_gcc-7.5
-RUN ln -s ${VISIT_PYTHON3}/bin/python3 ${VISIT_PYTHON3}/bin/python
-ENV PATH=${VISIT_PYTHON3}/bin:${PATH}
-ENV LD_LIBRARY_PATH=${VISIT_PYTHON3}/lib:${VISIT_PYTHON3}/lib64:${LD_LIBRARY_PATH}
-
-# Now finish dependencies and thentry to configure VisIt, and fail due to -fPic or some other flag
-RUN VISIT_VER_UNDERSCORE=${VISIT_VERSION//./_} \
-    && cd ${INSTALLTMDIR} \
-    && export PAR_COMPILER=${MPICC} \
-    && export PAR_COMPILER_CXX=${MPICXX} \
-    && yes yes | ./build_visit${VISIT_VER_UNDERSCORE} --thirdparty-path ${INSTALL_PREFIX} --mesagl --llvm --server-components-only --stdout  --cc ${GCC} --cxx ${GPP}  --cflags "-I${INSTALL_PREFIX}/include" --cxxflags "-Wno-class-memaccess -Wno-cast-function-type "  --system-cmake --parallel --makeflags -j${NUMCORES}  --prefix $INSTALL_PREFIX/visit \
-    || echo "We will try again 2b"
-
-ENV HOSTNAME_DOCKER=buildkitsandbox
-
-# buildkitsandbox.cmake
-RUN rm -fr ${INSTALLTMDIR}/visit${VISIT_VERSION}/build \
-  && mkdir -p ${INSTALLTMDIR}/visit${VISIT_VERSION}/build \
-  && cd ${INSTALLTMDIR}/visit${VISIT_VERSION}/build \
-  && sed -i "s|VISIT_OPTION_DEFAULT(VISIT_C_COMPILER ${GCC}|VISIT_OPTION_DEFAULT(VISIT_C_COMPILER ${MPICC}|g" ${INSTALLTMDIR}/$HOSTNAME_DOCKER.cmake \
-  && sed -i "s|VISIT_OPTION_DEFAULT(VISIT_CXX_COMPILER ${GPP}|VISIT_OPTION_DEFAULT(VISIT_CXX_COMPILER ${MPICXX}|g" ${INSTALLTMDIR}/$HOSTNAME_DOCKER.cmake \
-  && /usr/bin/cmake -DVISIT_CONFIG_SITE:FILEPATH=${INSTALLTMDIR}/$HOSTNAME_DOCKER.cmake -DVISIT_INSTALL_THIRD_PARTY:BOOL=ON -DVISIT_PARALLEL:BOOL=ON -DCMAKE_BUILD_TYPE:STRING=Release -DVISIT_C_COMPILER:FILEPATH=${MPICC_PATH} -DVISIT_CXX_COMPILER:FILEPATH=${MPICXX_PATH} -DVISIT_C_FLAGS:STRING=" -m64 -fPIC -I${INSTALL_PREFIX}/mesagl/17.3.9/linux-x86_64_gcc-7.5/include" -DVISIT_CXX_FLAGS:STRING=" -m64 -fPIC -I${INSTALL_PREFIX}/mesagl/17.3.9/linux-x86_64_gcc-7.5/include -Wno-class-memaccess -Wno-cast-function-type" -DCMAKE_INSTALL_PREFIX:PATH=${INSTALL_PREFIX}/visit -DCPACK_INSTALL_PREFIX:PATH=${INSTALL_PREFIX}/visit -DCPACK_PACKAGING_INSTALL_PREFIX:PATH=${INSTALL_PREFIX}/visit -DVISIT_SERVER_COMPONENTS_ONLY:BOOL=ON ../src  \
-  && make -j${NUMCORES} \
-  && touch ./resources/help/en_US/manual \
-  && make install
+RUN visit -env -engine > ~/tmp.txt \
+   && sed -i 's|^|export |g' ~/tmp.txt \
+   && sed -i 's|^export LD_LIBRARY_PATH.*|&$LD_LIBRARY_PATH|' ~/tmp.txt  \
+   && cat ~/tmp.txt >> ~/.bashrc
 
  
 CMD ["/bin/bash"]

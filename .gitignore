@@ -14,6 +14,8 @@ build/docker/bases/*.tar.gz
 build/docker/bases/*.tar.xz
 build/docker/bases/*.tgz
 build/docker/bases/build_visit*
+build/docker/bases/*.log
+build/docker/bases/*.txt
 Testing/
 CTestTestfile.cmake
 lib/CTestTestfile.cmake

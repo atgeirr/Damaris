@@ -25,9 +25,13 @@ ENV SHLIBS_ON_OFF=ON
 # Build examples
 ENV EXAMPLES_ON_OFF=ON
 
+# Set this incase it changes in the base images
+ENV VISIT_PYTHON_VERSION=3.7
+
 # N.B INPUT_damaris_ver to be provided on the docker build -t registry.gitlab.inria.fr/damaris-development:${TAG}  --build-arg INPUT_damaris_ver=v1.5.0 --build-arg INPUT_repo="damaris-development" -f Dockerfile.ubuntu20 .
 ARG INPUT_damaris_ver
 ARG INPUT_repo
+
 # ARG INPUT_repo  # making this a global arge and defining before stage 1
 ENV DAMARIS_VERSION=$INPUT_damaris_ver
 ENV repo=$INPUT_repo
@@ -38,14 +42,15 @@ ENV LD_LIBRARY_PATH=_MPI_BIN_PATH_../_DISTLIB_:${LD_LIBRARY_PATH}
 
 
 
-
-RUN if [[ "$INSTALLTMDIR" == "" ] ;   then echo "ERROR: VAR DOES NOT EXIST IN BASE IMAGE: INSTALLTMDIR" ;   exit 1; fi
-RUN if [[ "$INSTALL_PREFIX" == "" ] ; then echo "ERROR: VAR DOES NOT EXIST IN BASE IMAGE: INSTALL_PREFIX" ; exit 1; fi
-RUN if [[ "$VISIT_VERSION" == "" ] ;  then echo "ERROR: VAR DOES NOT EXIST IN BASE IMAGE: VISIT_VERSION" ;  exit 1; fi
-RUN if [[ "$MPICXX" == "" ] ;         then echo "ERROR: VAR DOES NOT EXIST IN BASE IMAGE: MPICXX" ;         exit 1; fi
-RUN if [[ "$MPICC" == "" ] ;          then echo "ERROR: VAR DOES NOT EXIST IN BASE IMAGE: MPICC" ;          exit 1; fi
-RUN if [[ "$MPIFORT" == "" ] ;        then echo "ERROR: VAR DOES NOT EXIST IN BASE IMAGE: MPIFORT" ;        exit 1; fi
-
+RUN if [[ "$INSTALLTMDIR" == "" ] ;   then echo "ERROR: VAR DOES NOT EXIST IN BASE IMAGE: INSTALLTMDIR" ;   exit 1; fi  \
+ && if [[ "$INSTALL_PREFIX" == "" ] ; then echo "ERROR: VAR DOES NOT EXIST IN BASE IMAGE: INSTALL_PREFIX" ; exit 1; fi  \
+ && if [[ "$VISIT_VERSION" == "" ] ;  then echo "ERROR: VAR DOES NOT EXIST IN BASE IMAGE: VISIT_VERSION" ;  exit 1; fi  \
+ && if [[ "$MPICXX" == "" ] ;         then echo "ERROR: VAR DOES NOT EXIST IN BASE IMAGE: MPICXX" ;         exit 1; fi  \
+ && if [[ "$MPICC" == "" ] ;          then echo "ERROR: VAR DOES NOT EXIST IN BASE IMAGE: MPICC" ;          exit 1; fi  \
+ && if [[ "$MPIFORT" == "" ] ;        then echo "ERROR: VAR DOES NOT EXIST IN BASE IMAGE: MPIFORT" ;        exit 1; fi  \
+ && if [[ "$VISIT_PYTHON3" == "" ] ;  then echo "ERROR: VAR DOES NOT EXIST IN BASE IMAGE: VISIT_PYTHON3" ;  exit 1; fi  
+ 
+ 
 _INSTALL_GFORT_
 
 # may need this:  -DParaView_DIR=$CATALYSTDIR
@@ -81,7 +86,7 @@ RUN --mount=type=secret,id=thepassword if [ "$repo" == "damaris-development" ] ;
   && chown -R docker:docker /home/docker
 
 USER docker
-# ENV PYTHONPATH=/usr/local/lib/python3.8/site-packages/_paraview.zip:/usr/local/lib/python3.8/site-packages/_vtk.zip:/usr/local/lib/python3.8/site-packages:/usr/lib/python38.zip:/usr/lib/python3.8:/usr/lib/python3.8/lib-dynload:/usr/local/lib/python3.8/dist-packages:/usr/lib/python3/dist-packages
+ENV PYTHONPATH=$VISIT_PYTHON3/lib/python$VISIT_PYTHON_VERSION/:VISIT_PYTHON3/lib/python$VISIT_PYTHON_VERSION/site-packages:$VISIT_PYTHON3/lib/python$VISIT_PYTHON_VERSION/lib-dynload:$PYTHONPATH
 # ENV LD_LIBRARY_PATH=_MPI_BIN_PATH_../_DISTLIB_:${LD_LIBRARY_PATH}
 
 WORKDIR ${INSTALL_PREFIX}/examples
