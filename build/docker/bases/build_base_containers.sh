@@ -5,7 +5,7 @@
 # Usage :  First ensure you are logged in to the registry:
 #          >sudo docker login registry.gitlab.inria.fr
 #          Then run the script:
-#          >sudo ./build_base_containers.sh  2> ./build_base.err
+#          >sudo ./build_base_containers.sh  2>&1  ./build_base.log
 #           or, to force rebuild of all base containers
 #          >sudo ./build_base_containers.sh --force 2>&1 | tee ./build_base.log
 # 

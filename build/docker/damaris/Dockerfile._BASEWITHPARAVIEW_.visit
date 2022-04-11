@@ -3,7 +3,10 @@
 # This builds Damaris using the base images that must be pre-built 
 # from dockerfiles in  build/docker/bases
 # This file is templated and needs to have the following template strings replaced using sed:
-#   _BASEWITHPARAVIEW_  _DISTLIB_  _HDF_PATH_  _MPI_BIN_PATH_    _INSTALL_GFORT_
+#   _BASEWITHPARAVIEW_    _HDF_PATH_    _INSTALL_GFORT_
+# Not used: _MPI_BIN_PATH_ and _DISTLIB_ 
+#
+#
 # This will be carried out by script ./build_damaris_on_visit_base_images.sh
 #
 # N.B. This script assumes the following variables are defined in the base image:
@@ -37,8 +40,8 @@ ENV DAMARIS_VERSION=$INPUT_damaris_ver
 ENV repo=$INPUT_repo
 
 # ENV MPI_BINDIR=${MPI_BINDIR}
-ENV PATH=_MPI_BIN_PATH_:${PATH}
-ENV LD_LIBRARY_PATH=_MPI_BIN_PATH_../_DISTLIB_:${LD_LIBRARY_PATH}
+# ENV PATH=_MPI_BIN_PATH_:${PATH}
+# ENV LD_LIBRARY_PATH=_MPI_BIN_PATH_../_DISTLIB_:${LD_LIBRARY_PATH}
 
 
 

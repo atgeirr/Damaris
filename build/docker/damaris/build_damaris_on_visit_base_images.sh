@@ -16,12 +16,13 @@
 #         A set of built base images in registry.gitlab.inria.fr/damaris/damaris-development that
 #         correspond to the Dockerfiles (Dockerfile.${DOCKERFILE}.visit)
 #         A file: Docker._BASEWITHPARAVIEW_.visit that has template strings to replace using sed:
-#           _BASEWITHPARAVIEW_  _DISTLIB_  _HDF_PATH_  _MPI_BIN_PATH_  _PV_SHORT_DOT_  _INSTALL_GFORT_
+#           _BASEWITHPARAVIEW_  _HDF_PATH_    _INSTALL_GFORT_
+#         not used: _MPI_BIN_PATH_ , _DISTLIB_ ,  _PV_SHORT_DOT_
 #
 # Outputs: 
 #        Docker images built from the base images that are stored in :
 #           registry.gitlab.inria.fr/damaris/$DAMARIS_REPO:${BASEIMAGETAG}-damaris 
-#        where BASEIMAGETAG == $(echo $BASE_IMAGE_SHORT-p${PVSHORT})
+#        where BASEIMAGETAG == $(echo $BASE_IMAGE_SHORT-visit${VISITSHORT})
 #        and BASE_IMAGE_SHORT is derived from the FROM tag in the base Dockerfiles 
 #        (i.e. derived from  ../bases/Dockerfile.${DOCKERFILE}.visit using function get_tag_name() below)
 #       /bin/bash -c
@@ -134,7 +135,7 @@ do
     LIB64=${LIBNAME_ARRAY[$i]}
     WHICH_HDFPATH=${HDF_PATH_INDEX[$i]}
     HDF_PATH=${HDF_PATH_ARRAY[${WHICH_HDFPATH}]}
-    MPI_BIN_PATH=${MPI_BIN_PATH_ARRAY[$i]}
+#    MPI_BIN_PATH=${MPI_BIN_PATH_ARRAY[$i]}
     GFORT=${GFORT_ARRAY[$i]}
     LEN=${LEN_ARRAY[$i]}
     TABLE_ROW="GRAPH: | $BASE_IMAGE_SHORT "
@@ -149,9 +150,9 @@ do
         for VISIT_VERSION in ${VISIT_VER_ARRAY[@]};
         do
           echo ""
-          PVSHORT=${VISIT_VERSION//./}
-          PV_SHORT_DOT=${VISIT_VERSION:1:-2}
-          BASEIMAGETAG=$(echo $BASE_IMAGE_SHORT-p${PVSHORT})
+          VISITSHORT=${VISIT_VERSION//./}
+          # PV_SHORT_DOT=${VISIT_VERSION:1:-2}
+          BASEIMAGETAG=$(echo $BASE_IMAGE_SHORT-visit${VISITSHORT})
 
           # Check if the image exists in the repository
           TMPVAR=$(docker manifest inspect $DOCKER_IMAGE_BASENAME:${BASEIMAGETAG} 2> /dev/null) 
@@ -161,7 +162,7 @@ do
               # The base container exists in the repository   
                 cp Dockerfile._BASEWITHPARAVIEW_.visit  Dockerfile.out
                 sed -i "s|_BASEWITHPARAVIEW_|${DOCKER_IMAGE_BASENAME}:${BASEIMAGETAG}|g" Dockerfile.out
-                sed -i "s|_DISTLIB_|${LIB64}|g" Dockerfile.out
+                # sed -i "s|_DISTLIB_|${LIB64}|g" Dockerfile.out
                 sed -i "s|_HDF_PATH_|${HDF_PATH}|g" Dockerfile.out
                 # sed -i "s|_MPI_BIN_PATH_|${MPI_BIN_PATH}|g" Dockerfile.out
                 sed -i "s|_INSTALL_GFORT_|${GFORT}|g" Dockerfile.out
