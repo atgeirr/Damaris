@@ -7,7 +7,7 @@
 #          Then run the script:
 #          >sudo ./build_base_containers.sh  2>&1  ./build_base.log
 #           or, to force rebuild of all base containers
-#          >sudo ./build_base_containers.sh --force 2>&1 | tee ./build_base.log
+#          >sudo ./build_base_containers.sh --force 2>&1 ./build_base.log
 # 
 #          Requires sudo if docker commands need sudo privlages
 #          Script will try to build docker images from all files of form Dockerfile.${DOCKERFILE_ARRAY[]}.paraview 
@@ -91,11 +91,11 @@ do
   if [[ ! -f build_visit${VISIT_VER_UNDERSCORE} ]] ; then
     wget  https://github.com/visit-dav/visit/releases/download/v${VISIT_VERSION}/build_visit${VISIT_VER_UNDERSCORE}
     chmod +x build_visit${VISIT_VER_UNDERSCORE}
-    # create a version that does not call the functions (i.e.e remove last 3 lines)
+    # create a version that does not call the functions (i.e. remove last 3 lines)
     # We will use this to call  initialize_build_visit() that sets VISITARCHTMP, 
     # which is needed to be passed as an argument (INPUT_os_arch_compiler_ver), so 
-    # that we can set the path to the Python version that visit_build creates for 
-    # the mesa configure part of the build.
+    # that we can set the path to the Python version that visit_build creates so  
+    # the mesa configure part of the build does not break.
     cat build_visit${VISIT_VER_UNDERSCORE} | head -n -3 > build_visit${VISIT_VER_UNDERSCORE}_to_source 
     # Download the visit zip files to be copied into the containers
     ./build_visit${VISIT_VER_UNDERSCORE}  --download-only  --thirdparty-path ${INSTALL_PREFIX} --mesagl  --llvm --server-components-only  --system-cmake --parallel
