@@ -40,6 +40,44 @@ get_tag_name () {
 
 echo ""
 echo ""
+echo "Build Python Base Images (no-hdf5)"
+for DOCKERFILE in ${DOCKERFILE_ARRAY[@]};
+do
+    BASE_IMAGE_SHORT=$(get_tag_name "./Dockerfile.${DOCKERFILE}.python")
+    if [[ "$BASE_IMAGE_SHORT" != "" ]] ; then
+          echo ""          
+          TAG=$(echo $BASE_IMAGE_SHORT-python)
+          # echo $DOCKER_IMAGE_BASENAME:${TAG}
+          if [[ "$1" == "--force" ]] ; then
+            BUILD_IMAGE=1
+          else
+            BUILD_IMAGE=$(sudo docker manifest inspect $DOCKER_IMAGE_BASENAME:${TAG} 2> /dev/null ; echo $?)
+          fi
+          if [[ "$BUILD_IMAGE" == "1" ]] ; then
+             echo "Building: $DOCKER_IMAGE_BASENAME:${TAG}"
+               DOCKER_BUILDKIT=1 docker build --progress=plain -t \
+                  ${DOCKER_IMAGE_BASENAME}:${TAG} \
+                  --build-arg INPUT_pv_ver=${PV_VERSION} \
+                  -f ./Dockerfile.$DOCKERFILE.python .
+            if [[ $? -eq 0 ]] ; then
+               echo "Pushing $DOCKER_IMAGE_BASENAME:${TAG}"
+               docker push "$DOCKER_IMAGE_BASENAME:${TAG}"
+            else 
+               echo "ERROR: Dockerfile.${DOCKERFILE}.python could not be built"
+            fi
+         else
+           echo "INFO: the image $DOCKER_IMAGE_BASENAME:${TAG} already exists"
+         fi
+    else
+      echo "ERROR: Dockerfile.${DOCKERFILE}.python does not exist - check the names given in DOCKERFILE_ARRAY"
+    fi
+done
+
+exit 1
+
+
+echo ""
+echo ""
 echo "Build Paraview Base Images"
 for DOCKERFILE in ${DOCKERFILE_ARRAY[@]};
 do
@@ -77,7 +115,7 @@ do
     fi
 done
 
-exit 1
+
 
 echo ""
 echo ""

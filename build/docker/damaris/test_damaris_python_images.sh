@@ -31,7 +31,7 @@ if [[ "$2" == "-" ]] ; then
 elif [[ "$2" != "" ]] ; then
   export DAMARIS_VER="$2"
 else
-  export DAMARIS_VER=v1.5.0
+  export DAMARIS_VER="-damaris-v1.5.0"
 fi
 
 if [[ "$3" != "" ]] ; then
@@ -42,7 +42,7 @@ fi
 
 
 # Set up arrays of Paraview versions and base images:
-PYTHON_VER_ARRAY=( python )
+PYTHON_VER_ARRAY=( python nodeps)
 DOCKERFILE_ARRAY=(ubuntu20 ubuntu21 debian10 debian11 centos8 archlinux opensuse)
 
 
@@ -130,8 +130,14 @@ do
     if [[ "$BASE_IMAGE_SHORT" != "" ]] ; then        
         for PYTHON_VERSION in ${PYTHON_VER_ARRAY[@]};
         do
+          
           # echo ""
-          BASEIMAGETAG=$(echo $BASE_IMAGE_SHORT-python${DAMARIS_VER})
+          BASEIMAGETAG=$(echo $BASE_IMAGE_SHORT-python)
+          if [[ "$PYTHON_VERSION" == "nodeps" ]] ; then 
+            BASEIMAGETAG+="-py-off${DAMARIS_VER}"
+          else
+            BASEIMAGETAG+="-py-on${DAMARIS_VER}"
+          fi
           # echo "BASEIMAGETAG= $DOCKER_IMAGE_BASENAME:$BASEIMAGETAG  ${EXECMD}"
           # Check if the image exists in the repository
           TMPVAR=$(docker manifest inspect $DOCKER_IMAGE_BASENAME:${BASEIMAGETAG} 2> /dev/null) 
