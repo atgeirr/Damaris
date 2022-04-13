@@ -31,7 +31,7 @@ if [[ "$2" == "-" ]] ; then
 elif [[ "$2" != "" ]] ; then
   export DAMARIS_VER="$2"
 else
-  export DAMARIS_VER="-damaris-v1.5.0"
+  export DAMARIS_VER="v1.5.0"
 fi
 
 if [[ "$3" != "" ]] ; then
@@ -134,16 +134,16 @@ do
           # echo ""
           BASEIMAGETAG=$(echo $BASE_IMAGE_SHORT-python)
           if [[ "$PYTHON_VERSION" == "nodeps" ]] ; then 
-            BASEIMAGETAG+="-py-off${DAMARIS_VER}"
+            BASEIMAGETAG+="-py-off-damaris-${DAMARIS_VER}"
           else
-            BASEIMAGETAG+="-py-on${DAMARIS_VER}"
+            BASEIMAGETAG+="-py-on-damaris-${DAMARIS_VER}"
           fi
           # echo "BASEIMAGETAG= $DOCKER_IMAGE_BASENAME:$BASEIMAGETAG  ${EXECMD}"
           # Check if the image exists in the repository
           TMPVAR=$(docker manifest inspect $DOCKER_IMAGE_BASENAME:${BASEIMAGETAG} 2> /dev/null) 
           BUILD_IMAGE=$(echo $?)
           #  echo "BUILD_IMAGE= $BUILD_IMAGE"
-          if [[ "$BUILD_IMAGE" == "0" ]] ; then
+          if [[ "$BUILD_IMAGE" == "0" ]] ; then 
               # The base container exists in the repository                  
               # echo "Building: $DOCKER_IMAGE_OUTPUTNAME:${BASEIMAGETAG}"
               # Run the command within the Docker image:

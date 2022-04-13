@@ -132,7 +132,7 @@ do
         do
           # echo ""
           VISITSHORT=${VISIT_VERSION//./}
-          BASEIMAGETAG=$(echo $BASE_IMAGE_SHORT-visit${VISITSHORT}${DAMARIS_VER})
+          BASEIMAGETAG=$(echo $BASE_IMAGE_SHORT-visit${VISITSHORT}-damaris-${DAMARIS_VER})
           # echo "BASEIMAGETAG= $DOCKER_IMAGE_BASENAME:$BASEIMAGETAG  ${EXECMD}"
           # Check if the image exists in the repository
           TMPVAR=$(docker manifest inspect $DOCKER_IMAGE_BASENAME:${BASEIMAGETAG} 2> /dev/null) 

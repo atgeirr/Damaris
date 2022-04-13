@@ -48,19 +48,24 @@ docker-build:
     - cd build/docker/damaris
     - apk add --no-cache bash 
     ## build and test Paraview base image builds
-    - ./build_damaris_on_paraview_base_images.sh  $CI_PROJECT_NAME  $CI_COMMIT_BRANCH  $MY_CI_READ_REPO_PWD | tee build_damaris_on_paraview_base_images.graph
-    - ./test_damaris_paraview_images.sh   $CI_PROJECT_NAME  -damaris-$CI_COMMIT_BRANCH  "ctest --output-on-failure" | tee -a build_damaris_on_paraview_base_images.graph
-    - cat build_damaris_on_paraview_base_images.graph | grep "^GRAPH:" | sed "s|GRAPH:||g" > build_damaris_on_paraview_base_images.md
-    ## build and test VisIt base image builds
-    - ./build_damaris_on_visit_base_images.sh  $CI_PROJECT_NAME  $CI_COMMIT_BRANCH  $MY_CI_READ_REPO_PWD | tee build_damaris_on_visit_base_images.graph
-    - ./test_damaris_visit_images.sh   $CI_PROJECT_NAME  -damaris-$CI_COMMIT_BRANCH  "ctest --output-on-failure" | tee -a build_damaris_on_visit_base_images.graph
-    - cat build_damaris_on_visit_base_images.graph | grep "^GRAPH:" | sed "s|GRAPH:||g" > build_damaris_on_visit_base_images.md
+    # - ./build_damaris_on_paraview_base_images.sh  $CI_PROJECT_NAME  $CI_COMMIT_BRANCH  $MY_CI_READ_REPO_PWD | tee build_damaris_on_paraview_base_images.graph
+    # - ./test_damaris_paraview_images.sh   $CI_PROJECT_NAME  $CI_COMMIT_BRANCH  "ctest --output-on-failure" | tee -a build_damaris_on_paraview_base_images.graph
+    # - cat build_damaris_on_paraview_base_images.graph | grep "^GRAPH:" | sed "s|GRAPH:||g" > build_damaris_on_paraview_base_images.md
     
-    - docker rmi $(docker images | grep visit | awk '{ print $3 }')
-    - docker system prune -f
+    # - docker rmi $(docker images | grep pv5 | awk '{ print $3 }')
+    # - docker system prune -f
+    
+    # ## build and test VisIt base image builds
+    # - ./build_damaris_on_visit_base_images.sh  $CI_PROJECT_NAME  $CI_COMMIT_BRANCH  $MY_CI_READ_REPO_PWD | tee build_damaris_on_visit_base_images.graph
+    # - ./test_damaris_visit_images.sh   $CI_PROJECT_NAME  $CI_COMMIT_BRANCH  "ctest --output-on-failure" | tee -a build_damaris_on_visit_base_images.graph
+    # - cat build_damaris_on_visit_base_images.graph | grep "^GRAPH:" | sed "s|GRAPH:||g" > build_damaris_on_visit_base_images.md
+    
+    # - docker rmi $(docker images | grep visit | awk '{ print $3 }')
+    # - docker system prune -f
+    
     ## build and test Python and No dependencies version (no HDF5) base image builds
     - ./build_damaris_on_python_base_images.sh  $CI_PROJECT_NAME  $CI_COMMIT_BRANCH  $MY_CI_READ_REPO_PWD | tee build_damaris_on_python_base_images.graph
-    - ./test_damaris_python_images.sh   $CI_PROJECT_NAME  -damaris-$CI_COMMIT_BRANCH  "ctest --output-on-failure" | tee -a build_damaris_on_python_base_images.graph
+    - ./test_damaris_python_images.sh   $CI_PROJECT_NAME  $CI_COMMIT_BRANCH  "ctest --output-on-failure" | tee -a build_damaris_on_python_base_images.graph
     - cat build_damaris_on_python_base_images.graph | grep "^GRAPH:" | sed "s|GRAPH:||g" > build_damaris_on_python_base_images.md
     
     ## The following command could be used to run ReFrame tests (once developed)
