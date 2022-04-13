@@ -134,7 +134,7 @@ do
     # WHICH_HDFPATH=${HDF_PATH_INDEX[$i]}
     # HDF_PATH=${HDF_PATH_ARRAY[${WHICH_HDFPATH}]}
     # MPI_BIN_PATH=${MPI_BIN_PATH_ARRAY[$i]}
-    GFORT=${GFORT_ARRAY[$i]}
+    # GFORT=${GFORT_ARRAY[$i]}
     LEN=${LEN_ARRAY[$i]}
     TABLE_ROW="GRAPH: | $BASE_IMAGE_SHORT "
     
@@ -160,7 +160,7 @@ do
               # The base container exists in the repository   
                 cp Dockerfile._BASEWITHPARAVIEW_.python  Dockerfile.out            
                 sed -i "s|_BASEWITHPARAVIEW_|${DOCKER_IMAGE_BASENAME}:${BASEIMAGETAG}|g" Dockerfile.out
-                
+                # Now chage the name ofthe base container
                 if [[ "$PYTHON_VERSION" == "nodeps" ]] ; then 
                   PY_ON_OR_OFF=OFF
                   BASEIMAGETAG+="-py-off"
