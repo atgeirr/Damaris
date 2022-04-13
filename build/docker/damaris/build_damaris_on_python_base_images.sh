@@ -156,6 +156,11 @@ do
 
           #  echo "BUILD_IMAGE= $BUILD_IMAGE"
           if [[ "$BUILD_IMAGE" == "0" ]] ; then
+                
+              # The base container exists in the repository   
+                cp Dockerfile._BASEWITHPARAVIEW_.python  Dockerfile.out            
+                sed -i "s|_BASEWITHPARAVIEW_|${DOCKER_IMAGE_BASENAME}:${BASEIMAGETAG}|g" Dockerfile.out
+                
                 if [[ "$PYTHON_VERSION" == "nodeps" ]] ; then 
                   PY_ON_OR_OFF=OFF
                   BASEIMAGETAG+="-py-off"
@@ -163,9 +168,7 @@ do
                   PY_ON_OR_OFF=ON
                   BASEIMAGETAG+="-py-on"
                 fi
-              # The base container exists in the repository   
-                cp Dockerfile._BASEWITHPARAVIEW_.python  Dockerfile.out            
-                sed -i "s|_BASEWITHPARAVIEW_|${DOCKER_IMAGE_BASENAME}:${BASEIMAGETAG}|g" Dockerfile.out
+                
                 sed -i "s|_INSTALL_GFORT_|${GFORT}|g" Dockerfile.out
                 sed -i "s|_PYTHON_ON_OR_OFF_|${PY_ON_OR_OFF}|g" Dockerfile.out
                 # echo "Building: $DOCKER_IMAGE_OUTPUTNAME:${BASEIMAGETAG}"
