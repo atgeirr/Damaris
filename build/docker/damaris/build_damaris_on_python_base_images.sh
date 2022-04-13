@@ -150,19 +150,19 @@ do
           echo ""
           BASEIMAGETAG=$(echo $BASE_IMAGE_SHORT-python)
           
-          if [[ "$PYTHON_VERSION" == "nodeps" ]] ; then 
-            PY_ON_OR_OFF=OFF
-            BASEIMAGETAG+="-py-off"
-          else
-            PY_ON_OR_OFF=ON
-            BASEIMAGETAG+="-py-on"
-          fi
-
           # Check if the base image exists in the repository
           TMPVAR=$(docker manifest inspect $DOCKER_IMAGE_BASENAME:${BASEIMAGETAG} 2> /dev/null) 
           BUILD_IMAGE=$(echo $?)
+
           #  echo "BUILD_IMAGE= $BUILD_IMAGE"
           if [[ "$BUILD_IMAGE" == "0" ]] ; then
+                if [[ "$PYTHON_VERSION" == "nodeps" ]] ; then 
+                  PY_ON_OR_OFF=OFF
+                  BASEIMAGETAG+="-py-off"
+                else
+                  PY_ON_OR_OFF=ON
+                  BASEIMAGETAG+="-py-on"
+                fi
               # The base container exists in the repository   
                 cp Dockerfile._BASEWITHPARAVIEW_.python  Dockerfile.out            
                 sed -i "s|_BASEWITHPARAVIEW_|${DOCKER_IMAGE_BASENAME}:${BASEIMAGETAG}|g" Dockerfile.out
@@ -195,10 +195,10 @@ do
               # echo ""
             fi
             rm ./Dockerfile.out
-         else
-           echo "INFO: The base image ${DOCKER_IMAGE_BASENAME}:${BASEIMAGETAG} does not exist "
-           TABLE_ROW+="|   pf   "
-        fi
+          else
+            echo "INFO: The base image ${DOCKER_IMAGE_BASENAME}:${BASEIMAGETAG} does not exist "
+            TABLE_ROW+="|   pf   "
+          fi
         done
     else
       echo "ERROR: Dockerfile.${DOCKERFILE}.python does not exist - check the names given in DOCKERFILE_ARRAY"
