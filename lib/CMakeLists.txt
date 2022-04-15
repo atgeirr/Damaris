@@ -320,9 +320,11 @@ install(FILES "${CMAKE_BINARY_DIR}/include/Damaris.h" DESTINATION include)
 install(FILES "${CMAKE_BINARY_DIR}/include/damaris/model/Model.hpp" DESTINATION include/damaris/model)
 install(DIRECTORY "${DAMARIS_SOURCE_DIR}/include/damaris" DESTINATION include)
 
+if(ENABLE_FORTRAN)
 if(CMAKE_Fortran_COMPILER)
   install(FILES "${CMAKE_BINARY_DIR}/lib/damaris.mod" DESTINATION include)
 endif(CMAKE_Fortran_COMPILER)
+endif(ENABLE_FORTRAN)
 
 
 if(ENABLE_TESTS)

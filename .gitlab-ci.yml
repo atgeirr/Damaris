@@ -48,20 +48,20 @@ docker-build:
     - cd build/docker/damaris
     - apk add --no-cache bash 
     ## build and test Paraview base image builds
-    # - ./build_damaris_on_paraview_base_images.sh  $CI_PROJECT_NAME  $CI_COMMIT_BRANCH  $MY_CI_READ_REPO_PWD | tee build_damaris_on_paraview_base_images.graph
-    # - ./test_damaris_paraview_images.sh   $CI_PROJECT_NAME  $CI_COMMIT_BRANCH  "ctest --output-on-failure" | tee -a build_damaris_on_paraview_base_images.graph
-    # - cat build_damaris_on_paraview_base_images.graph | grep "^GRAPH:" | sed "s|GRAPH:||g" > build_damaris_on_paraview_base_images.md
+    - ./build_damaris_on_paraview_base_images.sh  $CI_PROJECT_NAME  $CI_COMMIT_BRANCH  $MY_CI_READ_REPO_PWD | tee build_damaris_on_paraview_base_images.graph
+    - ./test_damaris_paraview_images.sh   $CI_PROJECT_NAME  $CI_COMMIT_BRANCH  "ctest --output-on-failure" | tee -a build_damaris_on_paraview_base_images.graph
+    - cat build_damaris_on_paraview_base_images.graph | grep "^GRAPH:" | sed "s|GRAPH:||g" > build_damaris_on_paraview_base_images.md
     
-    # - docker rmi $(docker images | grep pv5 | awk '{ print $3 }')
-    # - docker system prune -f
+    - docker rmi $(docker images | grep pv5 | awk '{ print $3 }')
+    - docker system prune -f
     
     # ## build and test VisIt base image builds
-    # - ./build_damaris_on_visit_base_images.sh  $CI_PROJECT_NAME  $CI_COMMIT_BRANCH  $MY_CI_READ_REPO_PWD | tee build_damaris_on_visit_base_images.graph
-    # - ./test_damaris_visit_images.sh   $CI_PROJECT_NAME  $CI_COMMIT_BRANCH  "ctest --output-on-failure" | tee -a build_damaris_on_visit_base_images.graph
-    # - cat build_damaris_on_visit_base_images.graph | grep "^GRAPH:" | sed "s|GRAPH:||g" > build_damaris_on_visit_base_images.md
+    - ./build_damaris_on_visit_base_images.sh  $CI_PROJECT_NAME  $CI_COMMIT_BRANCH  $MY_CI_READ_REPO_PWD | tee build_damaris_on_visit_base_images.graph
+    - ./test_damaris_visit_images.sh   $CI_PROJECT_NAME  $CI_COMMIT_BRANCH  "ctest --output-on-failure" | tee -a build_damaris_on_visit_base_images.graph
+    - cat build_damaris_on_visit_base_images.graph | grep "^GRAPH:" | sed "s|GRAPH:||g" > build_damaris_on_visit_base_images.md
     
-    # - docker rmi $(docker images | grep visit | awk '{ print $3 }')
-    # - docker system prune -f
+    - docker rmi $(docker images | grep visit | awk '{ print $3 }')
+    - docker system prune -f
     
     ## build and test Python and No dependencies version (no HDF5) base image builds
     - ./build_damaris_on_python_base_images.sh  $CI_PROJECT_NAME  $CI_COMMIT_BRANCH  $MY_CI_READ_REPO_PWD | tee build_damaris_on_python_base_images.graph
@@ -78,8 +78,8 @@ docker-build:
     # - curl  --request PUT --data "format=markdown&content=$DATA&title=Build-success-table"  --header "PRIVATE-TOKEN:  $CI_JOB_TOKEN"  "https://gitlab.inria.fr/api/v4/projects/Damaris%2Fdamaris-development/wikis/Build-success-table"
     
     # - rm *.graph 
-    # - cat build_damaris_on_paraview_base_images.md
-    # - cat build_damaris_on_visit_base_images.md
+    - cat build_damaris_on_paraview_base_images.md
+    - cat build_damaris_on_visit_base_images.md
     - cat build_damaris_on_python_base_images.md
   # Run this job in a branch where a Dockerfile exists
   timeout: 5h 00m
@@ -100,8 +100,8 @@ docker-build:
     when: always
     name: table-of-successfull-builds-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG
     paths: 
-      # - build/docker/damaris/build_damaris_on_paraview_base_images.md
-      # - build/docker/damaris/build_damaris_on_visit_base_images.md
+      - build/docker/damaris/build_damaris_on_paraview_base_images.md
+      - build/docker/damaris/build_damaris_on_visit_base_images.md
       - build/docker/damaris/build_damaris_on_python_base_images.md
   #  reports:
   #    junit: report.xml

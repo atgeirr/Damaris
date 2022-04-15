@@ -113,7 +113,7 @@ bool Block::FillVisItDataHandle(visit_handle hdl)
 			VisIt_VariableData_setDataD(hdl, 
 				VISIT_OWNER_SIM, 1, nb_items, 
 				(double*)ds.GetData());
-		} else if(t == model::Type::char_ or model::Type::character) {
+		} else if(t == model::Type::char_ or t == model::Type::character) {
 			VisIt_VariableData_setDataC(hdl, 
 				VISIT_OWNER_SIM, 1, nb_items, 
 				(char*)ds.GetData());
