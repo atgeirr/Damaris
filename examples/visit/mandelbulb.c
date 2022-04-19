@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <math.h>
 #include <mpi.h>
 #include "Damaris.h"
@@ -136,6 +137,7 @@ int main(int argc, char** argv)
 			if(rank == 0) {
 				printf("Iteration %d done in %f seconds\n",i,(t2-t1));
 			}
+            sleep(5);
 		}
 
 		damaris_stop();
