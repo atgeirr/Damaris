@@ -48,7 +48,7 @@ docker-build:
     - 
       if [[ -f CI_ON_OFF ]] ; then
         DOCI=$(cat CI_ON_OFF)
-        echo "INFO: The contents of CI_ON_OFF is $DOCI"
+        echo "INFO The contents of CI_ON_OFF is $DOCI"
       fi
       if [[ "DOCI" != "OFF" ]] ; then
       
@@ -90,7 +90,7 @@ docker-build:
         cat build_damaris_on_python_base_images.md
       else
         echo ""
-        echo "WARNING: file CI_ON_OFF has CI builds set to OFF. Set file contents to ON to run Gitlab-CI"
+        echo "WARNING file CI_ON_OFF has CI builds set to OFF. Set file contents to ON to run Gitlab-CI"
         echo ""
         touch build_damaris_on_paraview_base_images.md
         touch build_damaris_on_visit_base_images.md
