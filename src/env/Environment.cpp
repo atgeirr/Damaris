@@ -126,8 +126,8 @@ bool Environment::Init(const std::string& configFile,
     
     
 #ifdef HAVE_PYTHON_ENABLED        
- //       Py_Initialize();
- //       np::initialize();
+    Py_Initialize();
+    np::initialize();
 #endif
         
     /* If there are dedicated nodes */
@@ -326,10 +326,6 @@ bool Environment::InitDedicatedCores(MPI_Comm global)
         _client_->Connect();
     } else {
         _isDedicatedCore_ = true;
-#ifdef HAVE_PYTHON_ENABLED        
-        Py_Initialize();
-        np::initialize();
-#endif
         if(bufEnabled) {
             if(rankInNode == _clientsPerNode_) { // first server on node only
                 CreateSharedStructures();
