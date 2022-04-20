@@ -50,7 +50,7 @@ docker-build:
         DOCI=$(cat CI_ON_OFF)
         echo "INFO The contents of CI_ON_OFF is $DOCI"
       fi
-      if [[ "DOCI" != "OFF" ]] ; then
+      if [[ "$DOCI" != "OFF" ]] ; then
       
         cd build/docker/damaris
         apk add --no-cache bash 
@@ -62,7 +62,7 @@ docker-build:
         docker rmi $(docker images | grep pv5 | awk '{ print $3 }')
         docker system prune -f
     
-        # ## build and test VisIt base image builds
+        ## build and test VisIt base image builds
         ./build_damaris_on_visit_base_images.sh  $CI_PROJECT_NAME  $CI_COMMIT_BRANCH  $MY_CI_READ_REPO_PWD | tee build_damaris_on_visit_base_images.graph
         ./test_damaris_visit_images.sh   $CI_PROJECT_NAME  $CI_COMMIT_BRANCH  "ctest --output-on-failure" | tee -a build_damaris_on_visit_base_images.graph
         cat build_damaris_on_visit_base_images.graph | grep "^GRAPH:" | sed "s|GRAPH:||g" > build_damaris_on_visit_base_images.md
@@ -78,7 +78,7 @@ docker-build:
         ## The following command could be used to run ReFrame tests (once developed)
         # - ssh jbowden@"$MY_CI_REMOTETEST_HOST"  'bash -s' < ../../test/run_on_remote.sh
     
-        ## Pusing data directly to Wiki (does not work)
+        ## Pushing data directly to Wiki (does not work)
         # - apk add --no-cache curl
         # - DATA=$(cat build_damaris_on_paraview_base_images.md)
         # - curl  -X GET  --header "PRIVATE-TOKEN:  $CI_JOB_TOKEN"  "https://gitlab.inria.fr/api/v4/projects/Damaris%2Fdamaris-development/wikis/Build-success-table"
