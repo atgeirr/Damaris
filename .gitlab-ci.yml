@@ -92,9 +92,10 @@ docker-build:
         echo ""
         echo "WARNING file CI_ON_OFF has CI builds set to OFF. Set file contents to ON to run Gitlab-CI"
         echo ""
-        touch build_damaris_on_paraview_base_images.md
-        touch build_damaris_on_visit_base_images.md
-        touch build_damaris_on_python_base_images.md
+        cd build/docker/damaris
+        echo "file CI_ON_OFF has CI builds set to OFF." > build_damaris_on_paraview_base_images.md
+        echo "file CI_ON_OFF has CI builds set to OFF." > build_damaris_on_visit_base_images.md
+        echo "file CI_ON_OFF has CI builds set to OFF." > build_damaris_on_python_base_images.md
       fi
   # Run this job in a branch where a Dockerfile exists
   timeout: 5h 00m
@@ -115,9 +116,7 @@ docker-build:
     when: always
     name: table-of-successfull-builds-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG
     paths: 
-      - build/docker/damaris/build_damaris_on_paraview_base_images.md
-      - build/docker/damaris/build_damaris_on_visit_base_images.md
-      - build/docker/damaris/build_damaris_on_python_base_images.md
+      - build/docker/damaris/*.md
   #  reports:
   #    junit: report.xml
 

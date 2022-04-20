@@ -26,6 +26,13 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <VisItDataInterface_V2.h>
 #endif
 
+#ifdef HAVE_PYTHON_ENABLED
+#include <boost/python.hpp>
+#include <boost/python/numpy.hpp>
+#include <boost/python/dict.hpp>
+namespace np = boost::python::numpy;
+#endif
+
 #include "damaris/util/Pointers.hpp"
 //#include "damaris/util/TypeWrapper.hpp"
 #include "damaris/util/ForwardDcl.hpp"
@@ -55,7 +62,12 @@ class Action {
     /**
      * Constructor. 
      */
-    Action(const std::string& n) : name_(n) {}
+    Action(const std::string& n) : name_(n) {
+#ifdef HAVE_PYTHON_ENABLED        
+        Py_Initialize();
+        np::initialize();
+#endif
+    }
             
     /**
      * Destructor.

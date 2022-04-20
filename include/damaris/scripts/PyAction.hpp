@@ -107,8 +107,9 @@ class PyAction : public Action, public Configurable<model::Script> {
         file_     = mdl.file() ;
         frequency_= mdl.frequency() ;
         
-        Py_Initialize();
-        np::initialize();
+       // The initialisation is being done in the parent class Action.hpp
+       // Py_Initialize();
+       // np::initialize();
   
         /**
         * import the __main__ module and obtain the globals dict
