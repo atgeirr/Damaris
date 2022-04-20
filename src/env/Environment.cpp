@@ -33,6 +33,14 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "client/StandaloneClient.hpp"
 #include "client/RemoteClient.hpp"
 
+
+#ifdef HAVE_PYTHON_ENABLED
+#include <boost/python.hpp>
+#include <boost/python/numpy.hpp>
+#include <boost/python/dict.hpp>
+namespace np = boost::python::numpy;
+#endif
+
 using namespace damaris::model;
 
 namespace damaris {
@@ -115,6 +123,13 @@ bool Environment::Init(const std::string& configFile,
     }
 
     bool retbool ;
+    
+    
+#ifdef HAVE_PYTHON_ENABLED        
+ //       Py_Initialize();
+ //       np::initialize();
+#endif
+        
     /* If there are dedicated nodes */
     if(_baseModel_->architecture().dedicated().nodes() > 0) {
         /* There are dedicated nodes */
@@ -311,6 +326,10 @@ bool Environment::InitDedicatedCores(MPI_Comm global)
         _client_->Connect();
     } else {
         _isDedicatedCore_ = true;
+#ifdef HAVE_PYTHON_ENABLED        
+        Py_Initialize();
+        np::initialize();
+#endif
         if(bufEnabled) {
             if(rankInNode == _clientsPerNode_) { // first server on node only
                 CreateSharedStructures();
