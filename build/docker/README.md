@@ -1,9 +1,10 @@
 # Docker files for building Damaris
 
-These files will build the Damaris library, it's unit tests and examples within a docker container.
-The Docker files (Dockerfile.ubuntu20 and Dockerfile.centos8) are currently used by the Gitlab CI system,
-so should remain in this directory (build/docker) and not be modified without careful testing.
-They currently compile the HDF5 compatible  version. The Python capable version should also be implemented sometime.
+The Docker files in the directories ```bases``` and ```damaris``` are currently used by the Gitlab CI system,
+so should remain in the respective directories and not be modified without careful testing.
+  
+The dockerfiles in the ```full_builds``` directory can be used to create stand-alone docker images containing Damaris.
+There are versions that build Paraview or Visit within the container on a range of base image Linux distributions.
 
 ### To build the damaris repo (no password needed):
 ```bash
@@ -37,9 +38,10 @@ sudo docker run --rm -it registry.gitlab.inria.fr/damaris/damaris:<branch> /bin/
 <container prompt> ctest
  
 # run and example:
+<container prompt> cd /home/docker/local/examples
 <container prompt> mpirun -np 4  /home/docker/local/examples/storage/3dmesh /home/docker/local/examples/storage/3dmesh.xml [-v] [-r]
  
-# Should find HDF5 output
+## After running, we should find HDF5 output
 <container prompt> ls *.h5
 <container prompt> h5dump *.h5
 ```
