@@ -193,8 +193,9 @@ void Server::EndOfIterationCallback(int tag, int source,
     ActionManager::RunActions(iteration);
     
 #ifdef HAVE_PYTHON_ENABLED
+    // N.B. ActionManager::RunActions(iteration); will run the same code as ScriptManager::RunScripts(iteration)
     //std::cout <<"INFO: Server.cpp HAVE_PYTHON_ENABLED is defined" << std::endl ;
-    ScriptManager::RunScripts(iteration);
+    // ScriptManager::RunScripts(iteration);
 #else
    // std::cout <<"INFO: Server.cpp HAVE_PYTHON_ENABLED is NOT defined" << std::endl ;
 #endif
