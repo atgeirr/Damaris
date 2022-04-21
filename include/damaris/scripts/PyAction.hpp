@@ -17,7 +17,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __DAMARIS_PYACTION_H
 #define __DAMARIS_PYACTION_H
 
-#ifdef HAVE_PYTHON_ENABLED
+//#ifdef HAVE_PYTHON_ENABLED
 
 
 #include "damaris/action/ScriptAction.hpp"
@@ -71,23 +71,24 @@ class PyAction : public Action, public Configurable<model::Script> {
     /**
     * The dictionary that holds the Python environment
     */
-    bp::dict locals;
+    bp::dict locals_;
     /**
     * The dictionary that wil store the created numpy arrays that 
     * wrap the Damaris data. The dictionary will be added to the Python 
     * local dictionary and be named DamarisData['varname_is_key_<type>_<iteration>']
     */
-    bp::dict damarisData;
+    bp::dict damarisData_;
     
     /**
     * used to hold the __main__ module and obtain the globals dict
     */
-    bp::object main;
+    bp::object main_;
     
     /**
     * used to hold the globals dict which is obtained from the __main__ module
     */
-    bp::object globals;
+    bp::object globals_;
+    
     
     /**
     * String of Python code used to remove datasets from Pyhton environment when the 
@@ -107,7 +108,7 @@ class PyAction : public Action, public Configurable<model::Script> {
         file_     = mdl.file() ;
         frequency_= mdl.frequency() ;
         
-       // The initialisation is being done in the parent class Action.hpp
+       // The initialisation is being done in Environment::Init
        // Py_Initialize();
        // np::initialize();
   
@@ -115,8 +116,8 @@ class PyAction : public Action, public Configurable<model::Script> {
         * import the __main__ module and obtain the globals dict
         * assign to the bp::object 
         */
-        main     = bp::import("__main__");
-        globals  = main.attr("__dict__");
+        main_     = bp::import("__main__");
+        globals_  = main_.attr("__dict__");
       
         /**
         * String of Python code used to remove datasets from Pyhton environment when the 
@@ -126,6 +127,8 @@ class PyAction : public Action, public Configurable<model::Script> {
                                         "  del DamarisData['REPLACE']   \n"
                                         "except KeyError as err:             \n"
                                         "  print('Damaris Server: KeyError could not delete key: ', err) \n" ;; 
+                                    
+        locals_["DamarisData"] = damarisData_ ;
 
     }
     
@@ -162,7 +165,7 @@ class PyAction : public Action, public Configurable<model::Script> {
     * Uses boost::Numpy data types to convert a Damaris variable 
     * (as given in the XML model) to a numpy data type.
     */
-    bool PassDataToPython(int iteration );
+    bool PassDataToPython(int iteration ); 
 
 
     /**
@@ -175,27 +178,34 @@ class PyAction : public Action, public Configurable<model::Script> {
     /**
      * \see damaris::Action::operator()
      */
-     void Call(int32_t sourceID, int32_t iteration,
-                const char* args = NULL) override {} ;
+    virtual  void Call(int32_t sourceID, int32_t iteration,
+                const char* args = NULL) {
+        
+        if (iteration % frequency_ == 0){
+            PassDataToPython( iteration ); 
+        }
+        
+    }
+
 
     /**
      * Tells if the action can be called from outside the simulation.
      */
-      bool IsExternallyVisible() const final  { 
+     virtual  bool IsExternallyVisible() const final  { 
         return GetModel().external(); 
     }
 
     /**
      * \see Action::GetExecLocation
      */
-     model::Exec GetExecLocation() const final   {
+   virtual   model::Exec GetExecLocation() const final   {
         return GetModel().execution();
     }
 
     /**
      * \see Action::GetScope
      */
-     model::Scope GetScope() const final {
+   virtual   model::Scope GetScope() const final {
         return GetModel().scope();
     }
 
@@ -216,5 +226,5 @@ class PyAction : public Action, public Configurable<model::Script> {
 
 }
 
-#endif  // HAVE_PYTHON_ENABLED
+//#endif  // HAVE_PYTHON_ENABLED
 #endif

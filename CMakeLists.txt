@@ -156,7 +156,7 @@ if(ENABLE_PYTHON)
   find_package(Boost COMPONENTS numpy REQUIRED)
   find_package(PythonInterp 3 )
   find_package( PythonLibs 3 REQUIRED )
-  set(HAVE_PYTHON_ENABLED 1)
+  set(HAVE_PYTHON_ENABLED 1) 
   list(APPEND DEP_LIBRARIES  ${PYTHON_LIBRARIES} ${Boost_LIBRARIES} )
 #   include_directories(
 #  ${PYTHON_INCLUDE_DIRS}

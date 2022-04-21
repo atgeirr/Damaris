@@ -68,6 +68,7 @@ if(ENABLE_FORTRAN)
 endif(ENABLE_FORTRAN)
 
 if(ENABLE_PYTHON)
+    # set(HAVE_PYTHON_ENABLED 1) 
     set(DAMARIS_PYTHONACTION_SRC ${DAMARIS_SOURCE_DIR}/src/scripts/PyAction.cpp) 
 endif(ENABLE_PYTHON)
 
@@ -112,11 +113,12 @@ else()
 endif()
 
 add_library(damaris     ${DAMARIS_SRC}
+            ${DAMARIS_PYTHONACTION_SRC}
             ${DAMARIS_VISIT_SRC}
             ${DAMARIS_HDF5_SRC} 
             ${DAMARIS_PARAVIEW_SRC}
             ${DAMARIS_FORTRAN_MODULE}
-            ${DAMARIS_PYTHONACTION_SRC})
+            )
 
 include_directories(${CMAKE_BINARY_DIR}/include/damaris
         ${CMAKE_BINARY_DIR}/include)

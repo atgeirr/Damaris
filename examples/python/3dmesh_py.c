@@ -57,7 +57,8 @@ int main(int argc, char** argv)
    int is_client;
    int err = damaris_start(&is_client);
 
-   if((err == DAMARIS_OK || err == DAMARIS_NO_SERVER) && is_client) {
+   // if((err == DAMARIS_OK || err == DAMARIS_NO_SERVER) && is_client) {
+   if(err == DAMARIS_OK && is_client) {
 
       MPI_Comm comm;
       damaris_client_comm_get(&comm);

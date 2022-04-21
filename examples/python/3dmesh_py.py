@@ -5,7 +5,8 @@ np.set_printoptions(threshold=np.inf)
 
 def main(DamarisDict):
     try:
-        print('')
+        pass
+        # print('')
         # if 'np_3d_int_1' in DamarisDict:
             # Assignment to data will fail as in C++ code numpy array was created as 
             # read only using  np::from_data(static_cast<const int *>( )
@@ -22,9 +23,9 @@ def main(DamarisDict):
             # del DamarisDict['np_3d_int_2']
         
         # if DamarisDict['iteration'] == 3 :
-        print('Hi from iteration ', DamarisDict['iteration'] )
-        keys = list(DamarisDict.keys())
-        print(keys)
+        # print('Hi from iteration ', DamarisDict['iteration'] )
+        # keys = list(DamarisDict.keys())
+        # print(keys)
         # del DamarisDict['np_3d_int_1']
         
     except KeyError as err: 
@@ -37,8 +38,9 @@ def main(DamarisDict):
         print('Damaris data not assigned!: ', err)
     # finally: is always called.    
     finally:
-        print('Finally called for iteration: ', DamarisDict['iteration'])
-        print('')
+        pass
+        #print('Finally called for iteration: ', DamarisDict['iteration'])
+        #print('')
 
 
 if __name__ == '__main__':

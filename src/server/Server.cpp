@@ -35,6 +35,10 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "paraview/ParaViewAdaptor.hpp"
 #endif
 
+#ifdef HAVE_PYTHON_ENABLED
+// #include "scripts/.hpp"
+#endif
+
 enum {
     BCAST_EVENT,
     VISIT_CONNECTED,
@@ -189,7 +193,10 @@ void Server::EndOfIterationCallback(int tag, int source,
     ActionManager::RunActions(iteration);
     
 #ifdef HAVE_PYTHON_ENABLED
+    //std::cout <<"INFO: Server.cpp HAVE_PYTHON_ENABLED is defined" << std::endl ;
     ScriptManager::RunScripts(iteration);
+#else
+   // std::cout <<"INFO: Server.cpp HAVE_PYTHON_ENABLED is NOT defined" << std::endl ;
 #endif
     
     t_fin = MPI_Wtime();

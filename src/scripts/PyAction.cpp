@@ -14,26 +14,26 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ***************************************************************************/
-#ifdef HAVE_PYTHON_ENABLED
+// #ifdef HAVE_PYTHON_ENABLED
 
 
 #include <sstream>
 #include "util/Debug.hpp"
-#include "damaris/scripts/PyAction.hpp"
+#include "scripts/PyAction.hpp"
 
 
-namespace damaris {
-    template <typename T>
-    struct StaticCast
-    {
-        template <typename U>
-        T operator()(const U& rhs)
-        {
-            return static_cast<const T>(rhs);
-        }
-    };
-}
-    
+// namespace damaris {
+//     template <typename T>
+//     struct StaticCast
+//     {
+//         template <typename U>
+//         T operator()(const U& rhs)
+//         {
+//             return static_cast<const T>(rhs);
+//         }
+//     };
+// }
+//     
 // #include "damaris_data.hpp"
 
 
@@ -61,13 +61,13 @@ namespace damaris {
     
     
     
-    void PyAction::Call(int32_t sourceID, int32_t iteration, const char* args){
-        
-        if (iteration % frequency_ == 0){
-            PassDataToPython( iteration );
-        }
-        
-    }
+//     void PyAction::Call(int32_t sourceID, int32_t iteration, const char* args) {
+//         
+//         if (iteration % frequency_ == 0){
+//             PassDataToPython( iteration ); 
+//         }
+//         
+//     }
 
     
     np::dtype PyAction::GetNumPyType(model::Type mdlType) {
@@ -183,8 +183,8 @@ namespace damaris {
         // np::dtype dt ;  //= np::dtype::get_builtin<int>()
         
         // std::vector<std::weak_ptr<Variable> >::const_iterator w;
-        // w = GetVariables().begin();
-        
+        // w = GetVariab[les().begin();
+        damarisData_["iteration"] = iteration ;
         // for each variable ... (unlike HDF5 storage, which can have a <variable ... store="" /> attribute 
         VariableManager::iterator v = VariableManager::Begin();
         for(; v != VariableManager::End(); v++) {
@@ -219,6 +219,8 @@ namespace damaris {
             v->get()->GetBlocksByIteration(iteration, begin, end);
             std::string varName;
 
+            std::cout <<"INFO: PyAction::PassDataToPython() (*v)->GetName() = " << (*v)->GetName() << std::endl << std::flush ; 
+            
             for (BlocksByIteration::iterator bid = begin; bid != end; bid++) {
                 std::shared_ptr<Block> b = *bid;
 
@@ -267,15 +269,17 @@ namespace damaris {
                 void *np_ptr = b->GetDataSpace().GetData();
 
                 // Writing data
-                damarisData["iteration"] = iteration ;  // This is the current iteration
+                damarisData_["iteration"] = iteration ;  // This is the current iteration
                 
                  np::ndarray mul_data_ex = np::from_data( static_cast<const int *>( np_ptr ), GetNumPyType(v->get()->GetLayout()->GetType()) ,
                                             bp::make_tuple(localDims[0],localDims[1],localDims[2]),
                                             bp::make_tuple(sizeof(int)*localDims[2]*localDims[1],sizeof(int)*localDims[2],sizeof(int)),
                                              own_local);
                 std::string numpy_name =  varName + "_" + std::to_string(iteration) ;
-                damarisData[numpy_name]  = mul_data_ex ;
- 
+                damarisData_[numpy_name]  = mul_data_ex ;
+                
+                std::cout <<"INFO: PyAction::PassDataToPython() numpy_name = " << numpy_name << std::endl << std::flush ; 
+    
 
                 delete [] blockDim;
             } // for of block iteration
@@ -283,7 +287,9 @@ namespace damaris {
             delete [] globalDims;
             delete [] localDims;
         } // for of variable iteration
-
+         
+        bp::object res = bp::exec_file(this->file_.c_str(), this->globals_, this->locals_) ;
+        
         return true;
     }
 
@@ -434,5 +440,5 @@ namespace damaris {
     */
 }
 
-#endif // HAVE_PYTHON_ENABLED
+// #endif // HAVE_PYTHON_ENABLED
 
