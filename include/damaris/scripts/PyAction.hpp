@@ -22,6 +22,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "damaris/action/ScriptAction.hpp"
 #include "data/VariableManager.hpp"
+// #include "damaris/data/Variable.hpp"
 
 #include <iostream>
 #include <string>

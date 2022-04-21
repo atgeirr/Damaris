@@ -182,23 +182,26 @@ namespace damaris {
         bp::object own_local = bp::object() ;
         // np::dtype dt ;  //= np::dtype::get_builtin<int>()
         
-        // std::vector<std::weak_ptr<Variable> >::const_iterator w;
-        // w = GetVariab[les().begin();
+        //std::vector<std::weak_ptr<Variable> >::const_iterator w;
+        //w = GetVariables().begin();
+        
         damarisData_["iteration"] = iteration ;
         // for each variable ... (unlike HDF5 storage, which can have a <variable ... store="" /> attribute 
-        VariableManager::iterator v = VariableManager::Begin();
-        for(; v != VariableManager::End(); v++) {
+        VariableManager::iterator w = VariableManager::Begin();
+        for(; w != VariableManager::End(); w++) {
         
-        // for (; w != GetVariables().end(); w++) {
-            // std::shared_ptr<Variable> v = w->lock();
+         //for (; w != GetVariables().end(); w++) {
+            std::shared_ptr<Variable> v = (*w) ; // ->lock();
 
             // non TimeVarying variables only are written in the first iteration.
-            if ((not v->get()->IsTimeVarying()) && (iteration > 0))
+            //if ((not v->get()->IsTimeVarying()) && (iteration > 0))
+            if ((not v->IsTimeVarying()) && (iteration > 0))
                 continue;
 
             // Getting the dimensions of the variable
             int varDimention;
-            varDimention = v->get()->GetLayout()->GetDimensions();
+            // varDimention = v->get()->GetLayout()->GetDimensions();
+            varDimention = v->GetLayout()->GetDimensions();
 
             // Create a array for dimensions
             int *globalDims;
@@ -216,10 +219,11 @@ namespace damaris {
 
             BlocksByIteration::iterator begin;
             BlocksByIteration::iterator end;
-            v->get()->GetBlocksByIteration(iteration, begin, end);
+            // (*v)->get()->GetBlocksByIteration(iteration, begin, end);
+            v->GetBlocksByIteration(iteration, begin, end);
             std::string varName;
 
-            std::cout <<"INFO: PyAction::PassDataToPython() (*v)->GetName() = " << (*v)->GetName() << std::endl << std::flush ; 
+            std::cout <<"INFO: PyAction::PassDataToPython() (*v)->GetName() = " << v->GetName() << std::endl << std::flush ; 
             
             for (BlocksByIteration::iterator bid = begin; bid != end; bid++) {
                 std::shared_ptr<Block> b = *bid;
@@ -260,7 +264,7 @@ namespace damaris {
                 // <type> as C named data type
                 // <X> is the variable source rank
                 // <Y> is the block number for the rank
-                varName = GetVariableFullName((*v) , &b);
+                varName = GetVariableFullName(v , &b);
 
                 // Update ghost zones
                 // UpdateGhostZones(v , memSpace , blockDim);
@@ -271,7 +275,7 @@ namespace damaris {
                 // Writing data
                 damarisData_["iteration"] = iteration ;  // This is the current iteration
                 
-                 np::ndarray mul_data_ex = np::from_data( static_cast<const int *>( np_ptr ), GetNumPyType(v->get()->GetLayout()->GetType()) ,
+                 np::ndarray mul_data_ex = np::from_data( static_cast<const int *>( np_ptr ), GetNumPyType(v->GetLayout()->GetType()) ,
                                             bp::make_tuple(localDims[0],localDims[1],localDims[2]),
                                             bp::make_tuple(sizeof(int)*localDims[2]*localDims[1],sizeof(int)*localDims[2],sizeof(int)),
                                              own_local);
