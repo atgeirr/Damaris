@@ -194,7 +194,7 @@ namespace damaris {
         for(; w != VariableManager::End(); w++) {
         
          //for (; w != GetVariables().end(); w++) {
-            std::shared_ptr<Variable> v = (*w) ; // ->lock();
+            std::shared_ptr<Variable> v = (*w) ; // ->lock()) ; // ->lock();
 
             // non TimeVarying variables only are written in the first iteration.
             //if ((not v->get()->IsTimeVarying()) && (iteration > 0))
@@ -222,7 +222,7 @@ namespace damaris {
 
            
             // (*v)->get()->GetBlocksByIteration(iteration, begin, end);
-            v->GetBlocksByIteration(iteration+1, begin, end);
+            v->GetBlocksByIteration(iteration, begin, end);
             std::string varName;
 
             std::cout <<"INFO: PyAction::PassDataToPython() (*v)->GetName() = " << v->GetName() << std::endl << std::flush ; 
