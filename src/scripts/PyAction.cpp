@@ -222,7 +222,7 @@ namespace damaris {
 
            
             // (*v)->get()->GetBlocksByIteration(iteration, begin, end);
-            v->GetBlocksByIteration(iteration, begin, end);
+            v->GetBlocksByIteration(iteration+1, begin, end);
             std::string varName;
 
             std::cout <<"INFO: PyAction::PassDataToPython() (*v)->GetName() = " << v->GetName() << std::endl << std::flush ; 
