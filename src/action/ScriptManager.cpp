@@ -50,27 +50,34 @@ void ScriptManager::Init(const model::Scripts& mdl_script)
 // was RunActions(
 bool ScriptManager::RunScripts(const int iteration)
 {
-    
+    /*
     iterator s = Begin();
     for(; s != End(); s++) {
         (*s)->Call(iteration, iteration);
     }
+    */
     
-    /*
     // loop through actions looking for the script() actions
     auto actnItr = Begin();
     for(; actnItr != End(); actnItr++) {
-        std::shared_ptr<Action> action = *actnItr;
+        
+       // if ( dynamic_cast<PyAction*>(*actnItr) != nullptr ) {
+        if ( std::dynamic_pointer_cast<PyAction>(*actnItr) != nullptr ) {
+            std::shared_ptr<Action> action = *actnItr;
+            action->Call(iteration, iteration) ;            
+        }
+        
        // action->CoProcess(iteration) ;
-        const model::Actions& actn_mdl = GetModel(); 
+       /* const model::Actions& actn_mdl = GetModel(); 
        if (actn_mdl.language().present() ) {
            
            std::string file_ = Actions.get().file() ;
            std::cout << "RunActions has found a script which has a file field named: " << file_ << std::endl ;
        }
+       */
     }
-    */
+    
     return true ;
-} // end of RunActions
+} // end of RunScripts
 
 }  // end damaris namespace
