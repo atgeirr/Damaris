@@ -184,10 +184,13 @@ namespace damaris {
         
         //std::vector<std::weak_ptr<Variable> >::const_iterator w;
         //w = GetVariables().begin();
-        
+        BlocksByIteration::iterator begin;
+        BlocksByIteration::iterator end;
+            
         damarisData_["iteration"] = iteration ;
         // for each variable ... (unlike HDF5 storage, which can have a <variable ... store="" /> attribute 
         VariableManager::iterator w = VariableManager::Begin();
+        // std::vector<std::weak_ptr<Variable> >::const_iterator w = GetVariables().begin();
         for(; w != VariableManager::End(); w++) {
         
          //for (; w != GetVariables().end(); w++) {
@@ -217,8 +220,7 @@ namespace damaris {
             // if (not GetNumPyType(v->GetLayout()->GetType(), dt)) 
             //    ERROR("in PyAction::PassDataToPython(): Unknown variable type " << v->GetLayout()->GetType());
 
-            BlocksByIteration::iterator begin;
-            BlocksByIteration::iterator end;
+           
             // (*v)->get()->GetBlocksByIteration(iteration, begin, end);
             v->GetBlocksByIteration(iteration, begin, end);
             std::string varName;
