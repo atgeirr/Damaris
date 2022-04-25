@@ -95,7 +95,9 @@ class PyAction : public Action, public Configurable<model::Script> {
     * String of Python code used to remove datasets from Pyhton environment when the 
     * Damris data they use  is invalidated/deleted
     */
-    std::string regex_string_with_python_code; 
+    std::string regex_string_with_python_code_; 
+    
+    std::regex e_  ;
     
   protected:
     /**
@@ -124,10 +126,12 @@ class PyAction : public Action, public Configurable<model::Script> {
         * String of Python code used to remove datasets from Pyhton environment when the 
         * Damris data they use  is invalidated/deleted
         */
-        regex_string_with_python_code = "try :               \n"
-                                        "  del DamarisData['REPLACE']   \n"
-                                        "except KeyError as err:             \n"
-                                        "  print('Damaris Server: KeyError could not delete key: ', err) \n" ;; 
+        regex_string_with_python_code_ = "try :               \n"
+                                         "  del DamarisData['REPLACE']   \n"
+                                         "except KeyError as err:             \n"
+                                         "  print('Damaris Server: KeyError could not delete key: ', err) \n" ;
+                                         
+        e_ = "\\b(REPLACE)([^ ]*)" ;
                                     
         locals_["DamarisData"] = damarisData_ ;
 

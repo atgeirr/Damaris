@@ -155,13 +155,14 @@ namespace damaris {
     std::string PyAction::GetVariableFullName(std::shared_ptr<Variable> v , std::shared_ptr<Block> *b){
         std::stringstream varName;
         std::string baseName;
+        std::string typestr ;
         int numDomains;
 
         baseName = Environment::GetSimulationName();
         numDomains = Environment::NumDomainsPerClient();
-        std::string typestr ;
-        // (b == NULL) means that there is no access to block data, i.e. in file-per-core mode or future modes.
+    
         
+        typestr = GetTypeString(v->GetLayout()->GetType()) ; // return type string is prefixed by "_"
         
         if (numDomains == 1){
             varName << v->GetName() << typestr << "_P" << (*b)->GetSource(); // e.g. varName_P2
@@ -228,7 +229,7 @@ namespace damaris {
             v->GetBlocksByIteration(iteration, begin, end);
             std::string varName;
 
-            std::cout <<"INFO: PyAction::PassDataToPython() (*v)->GetName() = " << v->GetName() << std::endl << std::flush ; 
+            std::cout <<"INFO: " << iteration << " PyAction::PassDataToPython() (*v)->GetName() = " << v->GetName() << std::endl << std::flush ; 
             
             for (BlocksByIteration::iterator bid = begin; bid != end; bid++) {
                 std::shared_ptr<Block> b = *bid;
@@ -278,27 +279,55 @@ namespace damaris {
                 void *np_ptr = b->GetDataSpace().GetData();
 
                 // Writing data
-                damarisData_["iteration"] = iteration ;  // This is the current iteration
-                
+                // ************** Push the NumPy data through to Python
                  np::ndarray mul_data_ex = np::from_data( static_cast<const int *>( np_ptr ), GetNumPyType(v->GetLayout()->GetType()) ,
                                             bp::make_tuple(localDims[0],localDims[1],localDims[2]),
                                             bp::make_tuple(sizeof(int)*localDims[2]*localDims[1],sizeof(int)*localDims[2],sizeof(int)),
-                                             own_local);
+                                            own_local);
                 std::string numpy_name =  varName + "_" + std::to_string(iteration) ;
                 damarisData_[numpy_name]  = mul_data_ex ;
                 
-                std::cout <<"INFO: PyAction::PassDataToPython() numpy_name = " << numpy_name << std::endl << std::flush ; 
+                std::cout <<"INFO: " << iteration << " PyAction::PassDataToPython() numpy_name: " << numpy_name << std::endl << std::flush ; 
     
 
                 delete [] blockDim;
-            } // for of block iteration
+            } // for each block of the variable
  
             delete [] globalDims;
             delete [] localDims;
-        } // for of variable iteration
+        } // for each variable of the iteration (that is specified with script="..." ))
          
+         
+        std::cout <<"INFO: " << iteration << " PyAction::PassDataToPython() Running Script: " << this->file_.c_str() << std::endl << std::flush ; 
+        // **************  Now run the script on the exposed data 
         bp::object res = bp::exec_file(this->file_.c_str(), this->globals_, this->locals_) ;
         
+        
+        
+        // ************** Now remove the data, as the block data will be deleted from shared memory
+        w = GetVariables().begin();
+        // for selected variables ... (like HDF5 storage, we can can have a <variable ... script="MyScript" /> attribute 
+        for (; w != GetVariables().end(); w++) {
+            std::shared_ptr<Variable> v = w->lock();
+            v->GetBlocksByIteration(iteration, begin, end);
+            std::string varName;
+            
+            for (BlocksByIteration::iterator bid = begin; bid != end; bid++) {
+                std::shared_ptr<Block> b = *bid;
+                varName = GetVariableFullName(v , &b);
+                std::string numpy_name =  varName + "_" + std::to_string(iteration) ;
+                std::cout <<"INFO: " << iteration << " PyAction::PassDataToPython() deleting: " << numpy_name << std::endl << std::flush ;
+                
+                varName +=  "$2" ;
+                std::string string_with_python_code = std::regex_replace (regex_string_with_python_code_,this->e_,numpy_name.c_str());
+                // bp::object result = bp::exec(string_with_python_code.c_str(), this->globals_, this->locals_);                
+            }                        
+        }
+            
+          
+        
+        
+        // if all good then return true
         return true;
     }
 
