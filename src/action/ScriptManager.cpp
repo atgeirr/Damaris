@@ -41,7 +41,29 @@ void ScriptManager::Init(const model::Scripts& mdl_script)
             Create<PyAction>(*s,"#error");
         }
     }
+    
 #endif  // HAVE_PYTHON_ENABLED
+
+    VariableManager::iterator v = VariableManager::Begin();
+    for(; v != VariableManager::End(); v++) {
+        const model::Variable& mdl = (*v)->GetModel();
+        if(mdl.store() == "#") continue;
+        
+        std::vector<std::string> scripts;
+        boost::split(scripts, mdl.script(), boost::is_any_of(",; "));
+        
+        std::vector<std::string>::iterator s = scripts.begin();
+        for(; s != scripts.end(); s++) {
+            std::shared_ptr<Action> st = Search(*s); // Search is inherited from Manager
+            if(st) {
+                st->AddVariable(*v);
+            } else {
+                CFGERROR("Unknown script \""
+                << *s << "\" for variable \"" 
+                << (*v)->GetName() << "\"");
+            }
+        }
+    }
     
   // mdl_= mdl ;
 }

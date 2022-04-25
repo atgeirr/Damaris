@@ -50,6 +50,8 @@ class Action {
     std::string name_; /*!< Name of the action. */
     int id_;       /*!< ID given to the action when set in
                 the ActionsManager. */
+                
+    std::vector<std::weak_ptr<Variable> > vars_; /*!< List of variables that will be accessible with this action/script */
 
     protected:
         
@@ -79,6 +81,27 @@ class Action {
      * Gets the name of the action.
      */
     const std::string& GetName() const { return name_; }    
+    
+    /**
+     * This function is called on all variables that will be accessible
+     * to the actions/scripts i.e. variables that have script="MyNamedScript" attribute
+     * and MyNamedScript matches a script in the list of <scripts> ... </scripts> will be
+     * added to vars_ vector by the ScriptManager class and their data will be exposed
+     * to the script. 
+     * ToDo: In the future we may want add a switch to allow all variables to be exposed.
+     */
+    void AddVariable(const std::shared_ptr<Variable>& v) {
+        vars_.push_back(v);
+    }
+
+    /**
+     * Returns a reference to the list of variables that have been reqested to be exposed
+     * to the scripts/actions.
+     */
+     const std::vector< std::weak_ptr<Variable> >& GetVariables() const {
+        return vars_;
+    }
+
 
     /**
      * Operator overloaded to simplify the call to an action.

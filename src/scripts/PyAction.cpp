@@ -189,13 +189,16 @@ namespace damaris {
             
         damarisData_["iteration"] = iteration ;
         // for each variable ... (unlike HDF5 storage, which can have a <variable ... store="" /> attribute 
-        VariableManager::iterator w = VariableManager::Begin();
-        // std::vector<std::weak_ptr<Variable> >::const_iterator w = GetVariables().begin();
-        for(; w != VariableManager::End(); w++) {
+        // VariableManager::iterator w = VariableManager::Begin();
         
-         //for (; w != GetVariables().end(); w++) {
-            std::shared_ptr<Variable> v = (*w) ; // ->lock()) ; // ->lock();
-
+        std::vector<std::weak_ptr<Variable> >::const_iterator w = GetVariables().begin();
+        //for(; w != VariableManager::End(); w++) {
+            // std::shared_ptr<Variable> v = (*w) ; // ->lock()) ; // ->lock();
+        
+        // for selected variables ... (like HDF5 storage, we can can have a <variable ... script="MyScript" /> attribute 
+        for (; w != GetVariables().end(); w++) {
+            
+            std::shared_ptr<Variable> v = w->lock();
             // non TimeVarying variables only are written in the first iteration.
             //if ((not v->get()->IsTimeVarying()) && (iteration > 0))
             if ((not v->IsTimeVarying()) && (iteration > 0))

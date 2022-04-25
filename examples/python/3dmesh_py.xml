@@ -24,12 +24,12 @@
       <layout name="cells_whd_wf"  type="int" dimensions="WIDTH/size,HEIGHT,DEPTH"
             global="WIDTH,HEIGHT,DEPTH" ghosts="0:0,0:0,0:0" />
 
-        <variable name="cube" type="scalar" layout="cells_whd_wf" mesh="mesh" centering="nodal" />
+        <variable name="cube" type="scalar" layout="cells_whd_wf" mesh="mesh" centering="nodal" script="MyPyAction" />
     </data>
     <actions>
     </actions>
     <scripts>
-        <pyscript name="pyaction" file="3dmesh_py.py" language="python" frequency="1" />
+        <pyscript name="MyPyAction" file="3dmesh_py.py" language="python" frequency="1" />
     </scripts>
 
     <log FileName="log/3dmesh" RotationSize="5" LogFormat="[%TimeStamp%]: %Message%" LogLevel="info" Flush="false" />
