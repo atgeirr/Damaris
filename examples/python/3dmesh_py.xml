@@ -21,8 +21,11 @@
       <layout name="cells_whd_hm"  type="int" dimensions="WIDTH,HEIGHT/size,DEPTH"
             global="WIDTH,HEIGHT,DEPTH" ghosts="0:0,0:0,0:0" />
       
-      <layout name="cells_whd_wf"  type="int" dimensions="WIDTH/size,HEIGHT,DEPTH"
+      <layout name="cells_whd_wf_original"  type="int" dimensions="WIDTH/size,HEIGHT,DEPTH"
             global="WIDTH,HEIGHT,DEPTH" ghosts="0:0,0:0,0:0" />
+      
+      <layout name="cells_whd_wf"  type="int" dimensions="DEPTH/size,HEIGHT,WIDTH"
+            global="DEPTH,HEIGHT,WIDTH" ghosts="0:0,0:0,0:0" />
 
         <variable name="cube" type="scalar" layout="cells_whd_wf" mesh="mesh" centering="nodal" script="MyPyAction" />
     </data>

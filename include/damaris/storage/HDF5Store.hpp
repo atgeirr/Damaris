@@ -26,7 +26,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace damaris {
 
-/**
+/** 
  * HDF5Store.hpp is a Store that writes HDF5 files, either file per process, 
  * or collective writes as single HDF5 file. Data to write is specified in
  * the Damaris XML file by specifying the name in the  <variable ... store="MyStore", />

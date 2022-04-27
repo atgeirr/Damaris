@@ -47,7 +47,7 @@ void ScriptManager::Init(const model::Scripts& mdl_script)
     VariableManager::iterator v = VariableManager::Begin();
     for(; v != VariableManager::End(); v++) {
         const model::Variable& mdl = (*v)->GetModel();
-        if(mdl.store() == "#") continue;
+        if(mdl.script() == "#") continue;
         
         std::vector<std::string> scripts;
         boost::split(scripts, mdl.script(), boost::is_any_of(",; "));

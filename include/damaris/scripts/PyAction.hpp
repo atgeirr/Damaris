@@ -137,8 +137,10 @@ class PyAction : public Action, public Configurable<model::Script> {
 
     }
     
-
-    
+ 
+    std::string extractException() ;
+     
+     
     /**
     * Uses boost::Numpy data types to convert a Damaris variable 
     * (as given in the XML model) to a numpy data type.

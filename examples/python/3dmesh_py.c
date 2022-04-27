@@ -7,7 +7,7 @@
 #include <mpi.h>
 #include "Damaris.h"
 
-#define MAX_CYCLES 5
+#define MAX_CYCLES 3
 
 int WIDTH;
 int HEIGHT;
@@ -78,6 +78,7 @@ int main(int argc, char** argv)
       
       int64_t position_cube[3];
       int local_width, local_height, local_depth  ;
+      int rank_start = 0 ;
 
       if (whd_layout == 0) {
          if (size > DEPTH) {
@@ -92,6 +93,8 @@ int main(int argc, char** argv)
          position_cube[0] = 0;
          position_cube[1] = 0;
          position_cube[2] = rank*local_depth;
+         
+         rank_start = rank * local_width * local_height ;
 
       } else  if (whd_layout == 1) {
          if (size > HEIGHT) {
@@ -106,19 +109,29 @@ int main(int argc, char** argv)
          position_cube[0] = 0;
          position_cube[1] = rank*local_height;
          position_cube[2] = 0;
+         
+         rank_start = rank * local_width * local_depth ;
+         
       } else  if (whd_layout == 2) {
          if (size > WIDTH) {
              printf("ERROR: MPI process count (size=%2d) is greater than the blocked index (WIDTH=%2d)\t", size, WIDTH  );
              exit(-1);
          }
           // used with: <layout name="cells_whd_wf" type="int" dimensions="WIDTH/size,HEIGHT,DEPTH" global="WIDTH,HEIGHT,DEPTH" />
-         local_width      = WIDTH/size;
+         local_width      = WIDTH ; // WIDTH/size;
          local_height     = HEIGHT;
-         local_depth      = DEPTH;
+         local_depth      = DEPTH/size;
          
-         position_cube[0] = rank*local_width;
+         /*position_cube[0] = rank*local_width;
          position_cube[1] = 0;
          position_cube[2] = 0;
+         */
+         position_cube[0] = rank*local_depth;
+         position_cube[1] = 0;
+         position_cube[2] = 0;
+         
+         rank_start = rank * local_width * local_height ;
+         
       }
       
       // allocate the local data array
@@ -132,14 +145,14 @@ int main(int argc, char** argv)
       for( i=0; i < MAX_CYCLES; i++) {
          double t1 = MPI_Wtime();         
          int sequence ;
+         sequence =  i ;  // this is the start of the sequence for this iteration
          if (verbose == 0) { // default - do not print values to screen
-            sequence = 0;
 
              for ( d = 0; d < local_depth; d++){
                for ( h = 0; h < local_height; h++){
                  for ( w = 0; w < local_width; w++) {
 
-                    cube[d][h][w] = (int) sequence + rank;
+                    cube[d][h][w] = (int) sequence + rank_start;
                     if (rank_only==0) sequence++;
                  }  
                }
@@ -152,12 +165,11 @@ int main(int argc, char** argv)
              {
                printf("\n"); 
                if (rank == current_rank) { // start of serialized section
-                  sequence = 0;
 
                   for ( d = 0; d < local_depth; d++){
                     for ( h = 0; h < local_height; h++){
                      for ( w = 0; w < local_width; w++) {
-                        cube[d][h][w] = (int) sequence + rank;
+                        cube[d][h][w] = (int) sequence + rank_start;
                         printf("%2d\t", cube[d][h][w] );
                         if (rank_only==0) sequence++;
                      }
@@ -172,7 +184,7 @@ int main(int argc, char** argv)
                MPI_Bcast(&current_rank,1, MPI_INT,sending_rank, comm);
                sending_rank = current_rank ;
             } // end of in-order loop over ranks
-         } else  if (verbose == 2) { // print summation values to screen
+         } else  if (verbose == 2) { // print sumation values to screen
             int current_rank = 0 ;
             int sending_rank = 0 ;
             int sumdata = 0 ;
@@ -180,19 +192,18 @@ int main(int argc, char** argv)
              while ( current_rank < size)
              {
                printf("\n"); 
-               if (rank == current_rank) { // start of serialized section
-                  sequence = 0;
+               if (rank == current_rank) { // start of serialized section                
 
                   for ( d = 0; d < local_depth; d++){
                     for ( h = 0; h < local_height; h++){
                      for ( w = 0; w < local_width; w++) {
-                        cube[d][h][w] = (int) sequence + rank;
+                        cube[d][h][w] = (int) sequence + rank_start ;
                         sumdata += cube[d][h][w] ;
                         if (rank_only==0) sequence++;
                      }
                     }
                   }
-                  printf("Rank %d SUm = %8d\t", current_rank, sumdata );
+                  printf("Iteration %d Rank %d Sum = %8d\t", i, current_rank, sumdata );
                   fflush(stdin); 
                   sending_rank = current_rank ;
                   current_rank++ ;
@@ -214,6 +225,7 @@ int main(int argc, char** argv)
 
          if(rank == 0) {
             printf("Iteration %d done in %f seconds\n",i,(t2-t1));
+            fflush(stdin); 
          }
       }
 

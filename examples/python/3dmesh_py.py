@@ -5,7 +5,7 @@ np.set_printoptions(threshold=np.inf)
 
 def main(DamarisDict):
     try:
-        pass
+        # pass
         # print('')
         # if 'np_3d_int_1' in DamarisDict:
             # Assignment to data will fail as in C++ code numpy array was created as 
@@ -22,10 +22,16 @@ def main(DamarisDict):
             # print(DamarisDict['np_3d_int_2'])
             # del DamarisDict['np_3d_int_2']
         
-        # if DamarisDict['iteration'] == 3 :
+        if DamarisDict['iteration'] == 0 :
         # print('Hi from iteration ', DamarisDict['iteration'] )
         # keys = list(DamarisDict.keys())
         # print(keys)
+            print(DamarisDict['cube_int_P0_0'].shape)
+            print(DamarisDict['cube_int_P0_0'])
+            print(DamarisDict['cube_int_P1_0'])
+            print(DamarisDict['cube_int_P2_0'])
+            print(DamarisDict['cube_int_P3_0'])
+
         # del DamarisDict['np_3d_int_1']
         
     except KeyError as err: 
