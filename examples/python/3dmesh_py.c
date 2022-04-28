@@ -136,10 +136,11 @@ int main(int argc, char** argv)
       
       // allocate the local data array
       int cube[local_depth][local_height][local_width];
+      float cube_f[local_depth][local_height][local_width];
       
       // set the appropriate position for the current rank
-      damaris_set_position("cube",position_cube);
-
+      damaris_set_position("cube_i",position_cube);
+      damaris_set_position("cube_f",position_cube);
 
       int i, d, h, w ;
       for( i=0; i < MAX_CYCLES; i++) {
@@ -153,6 +154,7 @@ int main(int argc, char** argv)
                  for ( w = 0; w < local_width; w++) {
 
                     cube[d][h][w] = (int) sequence + rank_start;
+                    cube_f[d][h][w] = (float) sequence + rank_start +0.5f;
                     if (rank_only==0) sequence++;
                  }  
                }
@@ -170,6 +172,7 @@ int main(int argc, char** argv)
                     for ( h = 0; h < local_height; h++){
                      for ( w = 0; w < local_width; w++) {
                         cube[d][h][w] = (int) sequence + rank_start;
+                        cube_f[d][h][w] = (float) sequence + rank_start +0.5f;
                         printf("%2d\t", cube[d][h][w] );
                         if (rank_only==0) sequence++;
                      }
@@ -198,6 +201,7 @@ int main(int argc, char** argv)
                     for ( h = 0; h < local_height; h++){
                      for ( w = 0; w < local_width; w++) {
                         cube[d][h][w] = (int) sequence + rank_start ;
+                        cube_f[d][h][w] = (float) sequence + rank_start +0.5f;
                         sumdata += cube[d][h][w] ;
                         if (rank_only==0) sequence++;
                      }
@@ -215,7 +219,8 @@ int main(int argc, char** argv)
          
          
 
-         damaris_write("cube" , cube);
+         damaris_write("cube_i" , cube);
+         damaris_write("cube_f" , cube_f);
          damaris_end_iteration();
          MPI_Barrier(comm);
          

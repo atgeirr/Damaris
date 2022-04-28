@@ -173,7 +173,12 @@ class PyAction : public Action, public Configurable<model::Script> {
     * (as given in the XML model) to a numpy data type.
     */
     bool PassDataToPython(int iteration ); 
-
+    
+    //void ReturnNpNdarray(int blockDimension, int * localDims, model::Type mdlType, np::ndarray& retarray) ;
+    
+  //  template  <typename T>
+   // void ReturnNpNdarrayTyped<T>(int blockDimension, int * localDims, np::ndarray& retarray)
+     
 
     /**
      * Destructor.
@@ -228,9 +233,84 @@ class PyAction : public Action, public Configurable<model::Script> {
     
     }
 
+    
+
+   np::ndarray   ReturnNpNdarray(int blockDimension, int * localDims, void *np_ptr, model::Type mdlType) {
+         //;
+         
+        if (mdlType.compare("int") == 0) {
+            int mytype= 0 ;
+           return ( ReturnNpNdarrayTyped<int>( blockDimension, localDims, np_ptr, mdlType, mytype));
+        } else if (mdlType.compare("float") == 0) {
+            float mytype= 0 ;
+            return ( ReturnNpNdarrayTyped<float>(blockDimension, localDims, np_ptr, mdlType, mytype));
+        } else if (mdlType.compare("real") == 0) {
+            float mytype= 0 ;
+            return ( ReturnNpNdarrayTyped<float>(blockDimension, localDims, np_ptr, mdlType, mytype));
+        } else if (mdlType.compare("integer") == 0) {
+            int mytype= 0 ;
+            return ( ReturnNpNdarrayTyped<int>(blockDimension, localDims, np_ptr, mdlType,  mytype));
+        } else if (mdlType.compare("double") == 0) {
+            double mytype= 0 ;
+            return ( ReturnNpNdarrayTyped<double>(blockDimension, localDims, np_ptr, mdlType,mytype));
+        } else if (mdlType.compare("long") == 0) {
+            long mytype= 0 ;
+           return (  ReturnNpNdarrayTyped<long int>(blockDimension, localDims, np_ptr, mdlType,  mytype));
+        } else if (mdlType.compare("short") == 0) {
+            short mytype= 0 ;
+            return ( ReturnNpNdarrayTyped<short>(blockDimension, localDims, np_ptr, mdlType,  mytype));
+        } else if (mdlType.compare("char") == 0) {
+            char mytype= 0 ;
+            return ( ReturnNpNdarrayTyped<char>(blockDimension, localDims, np_ptr, mdlType, mytype));
+        } else if (mdlType.compare("character") == 0) {
+            char mytype= 0 ;
+             return (ReturnNpNdarrayTyped<char>(blockDimension, localDims, np_ptr, mdlType,  mytype));
+        } else {
+             std::cerr << "ERROR: PyAction::ReturnNpNdarray(): no matching type supported found" ;
+        }
+        //return ( np::ndarray mul_data_ex ) ;
+    }
+
+    
+   template <typename T>
+     np::ndarray   ReturnNpNdarrayTyped(int blockDimension, int * localDims, void *np_ptr, model::Type mdlType,   T mytype) {
+        bp::object own_local = bp::object() ;
+        // np::ndarray   retarray ;
+        if (blockDimension == 1) {
+            return( np::from_data( static_cast<const T *>( np_ptr ), GetNumPyType(mdlType) ,
+                                bp::make_tuple(localDims[0]),
+                                bp::make_tuple(sizeof(T)),
+                                own_local));
+        } else if (blockDimension == 2 ) {
+            return(  np::from_data( static_cast<const T *>( np_ptr ), GetNumPyType(mdlType) ,
+                                bp::make_tuple(localDims[0],localDims[1]),
+                                bp::make_tuple(sizeof(T)*localDims[2],sizeof(T)),
+                                own_local));
+        } else if (blockDimension == 3 ) {
+            return(  np::from_data( static_cast<const T *>( np_ptr ), GetNumPyType(mdlType) ,
+                                bp::make_tuple(localDims[0],localDims[1],localDims[2]),
+                                bp::make_tuple(sizeof(T)*localDims[2]*localDims[1],sizeof(T)*localDims[2],sizeof(T)),
+                                own_local));
+        } else if (blockDimension == 4 ) {
+           return(  np::from_data( static_cast<const T *>( np_ptr ), GetNumPyType(mdlType) ,
+                                bp::make_tuple(localDims[0],localDims[1],localDims[2],localDims[3]),
+                                bp::make_tuple(sizeof(T)*localDims[3]*localDims[2]*localDims[1],sizeof(T)*localDims[2]*localDims[1],sizeof(T)*localDims[2],sizeof(T)),
+                                own_local));
+        } else if (blockDimension == 5 ) {
+            return(  np::from_data( static_cast<const T *>( np_ptr ), GetNumPyType(mdlType) ,
+                                bp::make_tuple(localDims[0],localDims[1],localDims[2],localDims[3],localDims[4]),
+                                bp::make_tuple(sizeof(T)*localDims[4]*localDims[3]*localDims[2]*localDims[1],sizeof(T)*localDims[3]*localDims[2]*localDims[1],sizeof(T)*localDims[2]*localDims[1],sizeof(T)*localDims[2],sizeof(T)),
+                                own_local));
+        } else if (blockDimension >= 6 ) {
+            std::cerr << "ERROR: PyAction::ReturnNpNdarrayTyped(): Damaris Python integration currently can parse a maximum of 5 dimensional NumPy array.\n"<< "The array given has dimensions of : " << blockDimension << std::endl << std::flush ; 
+        }
+        //return ( np::ndarray mul_data_ex ) ;
+    }
+
 
 };
 
+     
 }
 
 //#endif  // HAVE_PYTHON_ENABLED

@@ -124,34 +124,9 @@ namespace damaris {
         return retstr;
     }
     
-    /*
-    bool PyAction::StaticConstCast(void * serv_ptr) {
-        if (mdlType.compare("int") == 0) {
-            return StaticCast<int>();
-        } else if (mdlType.compare("float") == 0) {
-            dt = np::dtype::get_builtin<float>();
-        } else if (mdlType.compare("real") == 0) {
-            dt = np::dtype::get_builtin<float>();
-        } else if (mdlType.compare("integer") == 0) {
-            dt = np::dtype::get_builtin<int>();
-        } else if (mdlType.compare("double") == 0) {
-            dt = np::dtype::get_builtin<double>();
-        } else if (mdlType.compare("long") == 0) {
-            dt = np::dtype::get_builtin<long int>();
-        } else if (mdlType.compare("short") == 0) {
-            dt = np::dtype::get_builtin<short>();;
-        } else if (mdlType.compare("char") == 0) {
-            dt = np::dtype::get_builtin<char>();
-        } else if (mdlType.compare("character") == 0) {
-            dt = np::dtype::get_builtin<char>();
-        } else {
-            return false;
-        }
-        return true;
-    }
-    */
     
-    
+
+           
     
     std::string PyAction::GetVariableFullName(std::shared_ptr<Variable> v , std::shared_ptr<Block> *b){
         std::stringstream varName;
@@ -173,6 +148,7 @@ namespace damaris {
 
         return  varName.str();
     }
+    
     
     // from wiki.python.org/moin/boost.python/EmbeddingPython
     std::string PyAction::extractException() 
@@ -197,11 +173,12 @@ namespace damaris {
         }
     }
     
+  
     
     bool PyAction::PassDataToPython(int iteration )
     {
         
-        bp::object own_local = bp::object() ;
+        // bp::object own_local = bp::object() ;
         // np::dtype dt ;  //= np::dtype::get_builtin<int>()
         
         //std::vector<std::weak_ptr<Variable> >::const_iterator w;
@@ -241,19 +218,15 @@ namespace damaris {
             if (localDims == NULL) {
                 ERROR("in PyAction::PassDataToPython(): Failed to allocate memory for localDims arrays!");
             }
-
-            // Getting the equivalent boost  Variable Type
-            // if (not GetNumPyType(v->GetLayout()->GetType(), dt)) 
-            //    ERROR("in PyAction::PassDataToPython(): Unknown variable type " << v->GetLayout()->GetType());
-
-           
+ 
             // (*v)->get()->GetBlocksByIteration(iteration, begin, end);
             v->GetBlocksByIteration(iteration, begin, end);
             std::string varName;
 
             //std::cout <<"INFO: " << iteration << " PyAction::PassDataToPython() (*v)->GetName() = " << v->GetName() << std::endl << std::flush ; 
            
-                       
+            bp::list block_list ;
+            bp::list blockid_list ;
             for (BlocksByIteration::iterator bid = begin; bid != end; bid++) {
                 std::shared_ptr<Block> b = *bid;
 
@@ -272,68 +245,47 @@ namespace damaris {
                 // Numpy uses C storage conventions, assuming that the last listed
                 // dimension is the fastest-changing dimension and the first-listed
                 // dimension is the slowest changing.
-                std::string logString_localDims("PyAction::PassDataToPython() numpy array ") ; 
+                std::string logString_localDims("PyAction::PassDataToPython() numpy array dims ") ; 
                 logString_localDims += numpy_name ;
                 for (int i = 0 ; i < blockDimension ; i++) {
                     localDims[i] = b->GetEndIndex(i) - b->GetStartIndex(i) + 1;
                     logString_localDims += "[" + std::to_string(localDims[i]) + "]" ;
                 }
                 
-            
+                block_list.append(b->GetSource() ) ;
+                if (Environment::NumDomainsPerClient() > 1 ) {
+                    blockid_list.append(b->GetID());
+                 }
                 // globalDims are not currently used (may be needed for VDS support?)
                 //for (int i = 0; i < varDimention; i++) {
                 //    globalDims[i] = b->GetGlobalExtent(i) ;
                 //}
 
-                // Update ghost zones
-                // UpdateGhostZones(v , memSpace , blockDim);
-
-                // Getting the data
+                // Get pointer to the block data
                 void *np_ptr = b->GetDataSpace().GetData();
-
-                // Wrapping data as NumPy array
-                // ************** Push the NumPy data through to Python
-                /*np::ndarray mul_data_ex = np::from_data( static_cast<const int *>( np_ptr ), GetNumPyType(v->GetLayout()->GetType()) ,
-                                            bp::make_tuple(localDims[0],localDims[1],localDims[2]),
-                                            bp::make_tuple(sizeof(int)*localDims[2]*localDims[1],sizeof(int)*localDims[2],sizeof(int)),
-                                            own_local);*/
-                
                 
                 try {
-                    np::ndarray mul_data_ex = np::from_data( static_cast<const int *>( np_ptr ), GetNumPyType(v->GetLayout()->GetType()) ,
-                                            bp::make_tuple(localDims[0],localDims[1],localDims[2]),
-                                            bp::make_tuple(sizeof(int)*localDims[2]*localDims[1],sizeof(int)*localDims[2],sizeof(int)),
-                                            own_local);
-                  /*  std::vector<int> vect = {localDims[0],localDims[1],localDims[2]};
-                    bp::object get_iter = bp::iterator<std::vector<int> >();
-                    bp::object iter = get_iter(vect);
-                    bp::tuple tup(iter);
-                    np::ndarray mul_data_ex = np::from_data( static_cast<const int *>( np_ptr ), GetNumPyType(v->GetLayout()->GetType()) ,
-                                            tup,
-                                            bp::make_tuple(sizeof(int)*localDims[2]*localDims[1],sizeof(int)*localDims[2],sizeof(int)),
-                                            own_local);
-                                            
-                                            */
-                /*np::ndarray mul_data_ex = np::from_data( static_cast<const int *>( np_ptr ), GetNumPyType(v->GetLayout()->GetType()) ,
-                                            std::tuple<int>(localDims[0],localDims[1],localDims[2]),
-                                            std::tuple<int>(sizeof(int)*localDims[2]*localDims[1],sizeof(int)*localDims[2],sizeof(int)),
-                                            own_local);*/
-                    damarisData_[numpy_name]  = mul_data_ex ;
+                   // Wrapping data as NumPy array
+                   // ************** Push the NumPy data through to Python 
+                   np::ndarray mul_data_ex = ReturnNpNdarray(blockDimension, localDims, np_ptr, v->GetLayout()->GetType()) ;
+                
+                   // Store reference to NumPy array in Python dictionary
+                   damarisData_[numpy_name]  = mul_data_ex ;
                 }
                 catch( bp::error_already_set ) {
-                    //std::string std::string logString_from_data ; 
-                    // logString_from_data = std::string("ERORR: PyAction::PassDataToPython() np::from_data() ") + this->extractException() ;
-                    std::cerr << this->extractException() << std::endl << std::flush ;   
+                    std::string logString_from_data ; 
+                    logString_from_data = std::string("ERORR: PyAction::PassDataToPython() np::from_data() /n ") ;
+                    logString_from_data += this->extractException() ;
+                    Environment::Log(logString_from_data , EventLogger::Debug);
+                    std::cerr << logString_from_data << std::endl << std::flush ;   
                 }
-                // Store reference to NumPy array in Python dictionary
-                
-                
-                std::cout <<"INFO: " << iteration << " PyAction::PassDataToPython() numpy_name: " << numpy_name << std::endl << std::flush ; 
+                              
+                // std::cout <<"INFO: " << iteration << " PyAction::PassDataToPython() numpy_name: " << numpy_name << std::endl << std::flush ; 
     
                 Environment::Log(logString_localDims , EventLogger::Debug);
-               // delete [] blockDim;
             } // for each block of the variable
- 
+            damarisData_["block_source"]  =  block_list ;
+            damarisData_["block_domains"] =  blockid_list ;
             //delete [] globalDims;
             delete [] localDims;
         } // for each variable of the iteration (that is specified with script="..." ))
@@ -347,11 +299,11 @@ namespace damaris {
             bp::object res = bp::exec_file(this->file_.c_str(), this->globals_, this->locals_) ;
         } 
         catch( bp::error_already_set ) {
-            //std::string std::string logString_exec_file("ERORR: PyAction::PassDataToPython() bp::exec_file() ") ; 
-            //logString_exec_file += this->extractException() ;
-            // std::cerr << logString_exec_file << std::endl << std::flush ; 
-            // Environment::Log(logString_exec_file.c_str() , EventLogger::Debug);
-            std::cerr << this->extractException() << std::endl << std::flush ; 
+            std::string logString_exec_file("ERORR: PyAction::PassDataToPython() bp::exec_file() /n") ; 
+            logString_exec_file += this->extractException() ;
+            std::cerr << logString_exec_file << std::endl << std::flush ; 
+            Environment::Log(logString_exec_file , EventLogger::Debug);
+            std::cerr << logString_exec_file << std::endl << std::flush ; 
            // return bp::object();            
         }
         
@@ -375,13 +327,13 @@ namespace damaris {
                 std::string string_with_python_code = std::regex_replace (regex_string_with_python_code_,this->e_,numpy_name.c_str());
                 
                 try {
-                    // bp::object result = bp::exec(string_with_python_code.c_str(), this->globals_, this->locals_);  
+                    bp::object result = bp::exec(string_with_python_code.c_str(), this->globals_, this->locals_);  
                 }  catch( bp::error_already_set ) {
-                    //std::string std::string logString_del_array("ERORR: PyAction::PassDataToPython() bp::exec() " ) ;
-                    //logString_del_array += this->extractException() ;
-                    //std::cerr  << logString_del_array << std::endl << std::flush ; 
-                    std::cerr << this->extractException() << std::endl << std::flush ; 
-                    //Environment::Log(logString_del_array , EventLogger::Debug);
+                    std::string logString_del_array("ERORR: PyAction::PassDataToPython() bp::exec() " ) ;
+                    logString_del_array += this->extractException() ;
+                    std::cerr  << logString_del_array << std::endl << std::flush ; 
+                    //std::cerr << this->extractException() << std::endl << std::flush ; 
+                    Environment::Log(logString_del_array , EventLogger::Debug);
                     // return bp::object(); 
                 }
             }                        
