@@ -194,7 +194,7 @@ int main(int argc, char** argv)
              // serialize the print statements
              while ( current_rank < size)
              {
-               printf("\n"); 
+               // printf("\n"); 
                if (rank == current_rank) { // start of serialized section                
 
                   for ( d = 0; d < local_depth; d++){
@@ -207,7 +207,7 @@ int main(int argc, char** argv)
                      }
                     }
                   }
-                  printf("Iteration %d Rank %d Sum = %8d\t", i, current_rank, sumdata );
+                  printf("Iteration %d Rank %d Sum = %8d\n", i, current_rank, sumdata );
                   fflush(stdin); 
                   sending_rank = current_rank ;
                   current_rank++ ;
