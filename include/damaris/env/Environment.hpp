@@ -68,7 +68,7 @@ private:
                                           processes of the same kind. */
 
     static int   _clientsPerNode_;  /*!< number of clients per node. */
-    static int   _coresPerNode_;    /*!< number of cores per node. */
+    static int   _coresPerNode_;    /*!< number of cores (mpi processes) per node. */
     static int   _serversPerNode_;  /*! number of servers per node*/  // orc:
     static int   _numberOfNodes_;   /*!< number of nodes in the simulation. */
 
@@ -263,7 +263,7 @@ public:
     }
 
     /**
-     * Get the number of cores per node.
+     * Get the number of cores (mpi processes) per node.
      */
     static int CoresPerNode() {
         if(not _initialized_) return -1;

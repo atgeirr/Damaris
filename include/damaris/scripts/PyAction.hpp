@@ -28,6 +28,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 #include <regex>
 #include <iterator>
+#include <stdexcept>
 
 #include <boost/python.hpp>
 #include <boost/python/numpy.hpp>
@@ -67,6 +68,7 @@ class PyAction : public Action, public Configurable<model::Script> {
     //std::string name_ ;  We get this from inheriting from Action
     std::string language_ ;
     std::string file_ ;
+    std::string scheduler_file_ ;  //< The Dask scheduler file to read in and start dask-workers with
     unsigned int frequency_ ;
     
     /**
@@ -97,6 +99,35 @@ class PyAction : public Action, public Configurable<model::Script> {
     */
     std::string regex_string_with_python_code_; 
     
+    /**
+    * String for checking all workers are available. 
+    * We need to replace:
+    *    REPLACE with scheduler_file_
+    *  and 
+    *    NWORKERS by the expected number of workers (== Damaris server cores)
+    */
+    std::string regex_string_dask_worker_available_ ;
+    int dask_scheduler_exists_ ;
+    std::string dask_worker_name_ ;
+    std::string nthreads_str_ ;  // default = "", openmp == use OMP_NUM_THREADS, "X" where x is an integer
+    int nthreads_ ;  // the number of threads to launch per dask worker
+    
+    /**
+    * String of Python code used to shutdown the Dask scheduler and all workers 
+    * that corresponds to the scheduler_file_
+    * 
+    */
+    std::string regex_string_shutdown_dask_; 
+    
+    /**
+    * String of Python code used to shutdown the Dask workers *by name*
+    * that corresponds to the current scheduler_file_. THe name given means
+    * the workers that were launched by the current Damaris simulation are
+    * shut down only.
+    * 
+    */
+    std::string regex_string_shutdown_dask_workers_ ;
+    
     std::regex e_  ;
     
   protected:
@@ -107,9 +138,40 @@ class PyAction : public Action, public Configurable<model::Script> {
         : Action(mdl.name()), Configurable<model::Script>(mdl)
     { 
         // name_     = mdl.name() ;
-        language_ = mdl.language() ;
-        file_     = mdl.file() ;
-        frequency_= mdl.frequency() ;
+        language_       = mdl.language() ;
+        file_           = mdl.file() ;
+        frequency_      = mdl.frequency() ;
+        scheduler_file_ = mdl.scheduler_file();
+        nthreads_str_   = mdl.nthreads() ;
+        std::transform(nthreads_str_.begin(),nthreads_str_.end(), nthreads_str_.begin(), 
+                       [](unsigned char c){ return std::tolower(c); } );
+         // 1 if file exists, 0 otherwise
+        dask_scheduler_exists_ = DaskSchedulerFileExists(Environment::GetEntityComm(), scheduler_file_) ;
+        dask_worker_name_ =  Environment::GetSimulationName() + "_" + Environment::GetMagicNumber() + "_" + std::to_string(Environment::GetEntityProcessID()) ;
+        
+        
+        // Mess around trying to convert a string to a nthread integer
+        if (nthreads_str_== std::string("")){
+            nthreads_ = 1 ;
+        } else if (nthreads_str_ == std::string("openmp")) {
+#ifdef _OPENMP
+          #pragma omp parallel
+          nthreads_ = omp_get_num_threads() ;
+#else
+          nthreads_ = 1 ;
+#endif
+        } else {
+            try {
+              std::string::size_type sz; 
+              nthreads_ = std::stoi (nthreads_str_,&sz);
+            }
+            catch (const std::invalid_argument& ia) {
+	           std::cerr << "Invalid argument: " << ia.what() << '\n';
+	           nthreads_ = 1 ;
+            }       
+        }
+        
+        
         
        // The initialisation is being done in Environment::Init
        // Py_Initialize();
@@ -134,11 +196,53 @@ class PyAction : public Action, public Configurable<model::Script> {
         e_ = "\\b(REPLACE)([^ ]*)" ;
                                     
         locals_["DamarisData"] = damarisData_ ;
+        
+        /**
+         * String for waiting until all workers are available. 
+         * We need to replace:
+         *    REPLACE with scheduler_file_
+         *  and 
+         *    NWORKERS by the expected number of workers (== number of Damaris server cores)
+         */
+        regex_string_dask_worker_available_ = "from dask.distributed import Client\n"
+                                              "client = Client(scheduler_file='REPLACE')\n"
+                                              "while ((client.status == 'running'') and (len(client.scheduler_info()['workers']) < NWORKERS)):\n"
+                                              "  sleep(1.0)\n" ;
+        
+        regex_string_shutdown_dask_ = "from dask.distributed import Client\n"
+                                "cient = Client(scheduler_file='REPLACE')\n"
+                                "cient.shutdown()\n" ;
+                                
+        regex_string_shutdown_dask_workers_ = "from dask.distributed import Client\n"
+                                "cient = Client(scheduler_file='REPLACE')\n"
+                                "workers = client.scheduler_info()['workers']\n"
+                                "shutdown_worker_list = list()\n"
+                                "for worker in workers :\n"
+                                "   if worker['id'] == 'IDNAME' :\n"
+                                "   shutdown_worker_list.append(worker)\n"                                        
+                                "client.retire_workers(shutdown_worker_list)\n"
+                                              
+        // Lunch the dask worker. One per didcated core
+        if ((Environment::IsServer() == true) && (dask_scheduler_exists_ == 1)){
+            int server_rank ;
+            MPI_Comm_rank(Environment::GetEntityComm(), &server_rank) ;
+            std::cout <<"INFO: Starting Dask Worker, server rank : " << server_rank << std::endl ;
+            this->LaunchDaskWorker() ;
+        }
 
     }
     
  
     std::string extractException() ;
+    
+    
+    /**
+     * 
+     * Tests for file on rank 0 of the given communicator and broacasts result to other processes.
+     * 
+     * Returns 1 if the dask-scheduler file exists, 0 otherwise. 
+     */
+    int  DaskSchedulerFileExists(const MPI_Comm& comm, std::string filename) ;
      
      
     /**
@@ -174,11 +278,14 @@ class PyAction : public Action, public Configurable<model::Script> {
     */
     bool PassDataToPython(int iteration ); 
     
-    //void ReturnNpNdarray(int blockDimension, int * localDims, model::Type mdlType, np::ndarray& retarray) ;
-    
-  //  template  <typename T>
-   // void ReturnNpNdarrayTyped<T>(int blockDimension, int * localDims, np::ndarray& retarray)
-     
+
+    /**
+    * Executes a dask-worker in a sub-shell, specifying the dask-scheduler configuration file that is 
+    * set in the Dmaaris XML <pyscript ... scheduler-file=""> tag and 
+    * 
+    * Returns the return value from the std::system command
+    */ 
+    int  LaunchDaskWorker() ;
 
     /**
      * Destructor.

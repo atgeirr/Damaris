@@ -335,6 +335,8 @@
         <xs:attribute name="scope"     type="mdl:Scope"  use="optional" default="core"/>
         <xs:attribute name="external"  type="xs:boolean" use="optional" default="false"/>
         <xs:attribute name="frequency" type="xs:unsignedInt" use="optional" default="1" />
+        <xs:attribute name="scheduler-file" type="xs:string" use="optional" default="" />
+        <xs:attribute name="nthreads" type="xs:string" use="optional" default="" />
     </xs:complexType>
 
     <!-- Exception node -->

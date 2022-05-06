@@ -3075,6 +3075,66 @@ namespace damaris
       return frequency_type (1U);
     }
 
+    const Script::scheduler_file_type& Script::
+    scheduler_file () const
+    {
+      return this->scheduler_file_.get ();
+    }
+
+    Script::scheduler_file_type& Script::
+    scheduler_file ()
+    {
+      return this->scheduler_file_.get ();
+    }
+
+    void Script::
+    scheduler_file (const scheduler_file_type& x)
+    {
+      this->scheduler_file_.set (x);
+    }
+
+    void Script::
+    scheduler_file (::std::unique_ptr< scheduler_file_type > x)
+    {
+      this->scheduler_file_.set (std::move (x));
+    }
+
+    const Script::scheduler_file_type& Script::
+    scheduler_file_default_value ()
+    {
+      return scheduler_file_default_value_;
+    }
+
+    const Script::nthreads_type& Script::
+    nthreads () const
+    {
+      return this->nthreads_.get ();
+    }
+
+    Script::nthreads_type& Script::
+    nthreads ()
+    {
+      return this->nthreads_.get ();
+    }
+
+    void Script::
+    nthreads (const nthreads_type& x)
+    {
+      this->nthreads_.set (x);
+    }
+
+    void Script::
+    nthreads (::std::unique_ptr< nthreads_type > x)
+    {
+      this->nthreads_.set (std::move (x));
+    }
+
+    const Script::nthreads_type& Script::
+    nthreads_default_value ()
+    {
+      return nthreads_default_value_;
+    }
+
 
     // Exception
     // 
@@ -7877,6 +7937,12 @@ namespace damaris
     const Script::scope_type Script::scope_default_value_ (
       "core");
 
+    const Script::scheduler_file_type Script::scheduler_file_default_value_ (
+      "");
+
+    const Script::nthreads_type Script::nthreads_default_value_ (
+      "");
+
     Script::
     Script (const name_type& name,
             const file_type& file,
@@ -7888,7 +7954,9 @@ namespace damaris
       language_ (language, this),
       scope_ (scope_default_value (), this),
       external_ (external_default_value (), this),
-      frequency_ (frequency_default_value (), this)
+      frequency_ (frequency_default_value (), this),
+      scheduler_file_ (scheduler_file_default_value (), this),
+      nthreads_ (nthreads_default_value (), this)
     {
     }
 
@@ -7903,7 +7971,9 @@ namespace damaris
       language_ (x.language_, f, this),
       scope_ (x.scope_, f, this),
       external_ (x.external_, f, this),
-      frequency_ (x.frequency_, f, this)
+      frequency_ (x.frequency_, f, this),
+      scheduler_file_ (x.scheduler_file_, f, this),
+      nthreads_ (x.nthreads_, f, this)
     {
     }
 
@@ -7918,7 +7988,9 @@ namespace damaris
       language_ (this),
       scope_ (this),
       external_ (this),
-      frequency_ (this)
+      frequency_ (this),
+      scheduler_file_ (this),
+      nthreads_ (this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
       {
@@ -7978,6 +8050,18 @@ namespace damaris
           this->frequency_.set (frequency_traits::create (i, f, this));
           continue;
         }
+
+        if (n.name () == "scheduler-file" && n.namespace_ ().empty ())
+        {
+          this->scheduler_file_.set (scheduler_file_traits::create (i, f, this));
+          continue;
+        }
+
+        if (n.name () == "nthreads" && n.namespace_ ().empty ())
+        {
+          this->nthreads_.set (nthreads_traits::create (i, f, this));
+          continue;
+        }
       }
 
       if (!name_.present ())
@@ -8020,6 +8104,16 @@ namespace damaris
       {
         this->frequency_.set (frequency_default_value ());
       }
+
+      if (!scheduler_file_.present ())
+      {
+        this->scheduler_file_.set (scheduler_file_default_value ());
+      }
+
+      if (!nthreads_.present ())
+      {
+        this->nthreads_.set (nthreads_default_value ());
+      }
     }
 
     Script* Script::
@@ -8042,6 +8136,8 @@ namespace damaris
         this->scope_ = x.scope_;
         this->external_ = x.external_;
         this->frequency_ = x.frequency_;
+        this->scheduler_file_ = x.scheduler_file_;
+        this->nthreads_ = x.nthreads_;
       }
 
       return *this;

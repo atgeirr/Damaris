@@ -3588,6 +3588,46 @@ namespace damaris
       static frequency_type
       frequency_default_value ();
 
+      // scheduler-file
+      //
+      typedef ::xml_schema::string scheduler_file_type;
+      typedef ::xsd::cxx::tree::traits< scheduler_file_type, char > scheduler_file_traits;
+
+      const scheduler_file_type&
+      scheduler_file () const;
+
+      scheduler_file_type&
+      scheduler_file ();
+
+      void
+      scheduler_file (const scheduler_file_type& x);
+
+      void
+      scheduler_file (::std::unique_ptr< scheduler_file_type > p);
+
+      static const scheduler_file_type&
+      scheduler_file_default_value ();
+
+      // nthreads
+      //
+      typedef ::xml_schema::string nthreads_type;
+      typedef ::xsd::cxx::tree::traits< nthreads_type, char > nthreads_traits;
+
+      const nthreads_type&
+      nthreads () const;
+
+      nthreads_type&
+      nthreads ();
+
+      void
+      nthreads (const nthreads_type& x);
+
+      void
+      nthreads (::std::unique_ptr< nthreads_type > p);
+
+      static const nthreads_type&
+      nthreads_default_value ();
+
       // Constructors.
       //
       Script (const name_type&,
@@ -3629,6 +3669,10 @@ namespace damaris
       static const scope_type scope_default_value_;
       ::xsd::cxx::tree::one< external_type > external_;
       ::xsd::cxx::tree::one< frequency_type > frequency_;
+      ::xsd::cxx::tree::one< scheduler_file_type > scheduler_file_;
+      static const scheduler_file_type scheduler_file_default_value_;
+      ::xsd::cxx::tree::one< nthreads_type > nthreads_;
+      static const nthreads_type nthreads_default_value_;
     };
 
     class Exception: public ::xml_schema::type

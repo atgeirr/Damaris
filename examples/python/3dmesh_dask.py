@@ -3,7 +3,6 @@
 import numpy as np
 np.set_printoptions(threshold=np.inf)
 
-
 # DD (AKA Damaris Data) is a dictionary that has been filled by the 
 # Damaris server process with NumPy arraysthat point to the data variables 
 # that is exposed in the simulation. The Damaris source file that implements 
@@ -31,7 +30,6 @@ np.set_printoptions(threshold=np.inf)
 #      the distributed workers.
 #      Also, this file is read by each Damaris server process on each iteration that is 
 #      specified by the frequency="" XML sttribute.
-
 def main(DD):
     # from mpi4py import MPI
     try:
@@ -39,10 +37,12 @@ def main(DD):
         # comm = MPI.COMM_WORLD
         # rank = comm.Get_rank()
         keys = list(DD.keys())
-        # if each block has multiple domains then DD['block_domains'] will not be empty
+        # block_domains may not be present.
+        # this depends on use of 'domains' in XML file and damaris_write_block() API
         if 'block_domains' in keys:
             block_domains = len( DD['block_domains'])  
             print('The number of domains for variables: ', str(block_domains))
+        # block_list should always exist
         block_list = DD['block_source']
         it_str = str(DD['iteration'])
         # if DD['iteration'] == 0 : 
@@ -50,8 +50,6 @@ def main(DD):
         for block in block_list :
             block_key = block_key_base + str(block) + '_' +it_str 
             if block_key in DD:
-                # print('block_key', block_key)
-                # print(DD[block_key].shape)
                 print("Iteration ",it_str, " Block key ", str(block_key), " Sum =   ", DD[block_key].sum())
             else :
                 print ('The key was not found in the DD dictionary! ', block_key)

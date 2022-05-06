@@ -19,6 +19,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <sstream>
 #include <tuple>
+#include <cstdlib>  // for std::system()
+#include <fstream> 
 #include "util/Debug.hpp"
 #include "scripts/PyAction.hpp"
 
@@ -173,16 +175,57 @@ namespace damaris {
         }
     }
     
+    
+    
+    int  PyAction::LaunchDaskWorker() 
+    {
+        std::string launch_worker("dask-worker --scheduler-file ") ;
+        std::cout << std::flush ;
+        // launch_worker += scheduler_file_ + " --name " + dask_worker_name_ +  std::string(" &") ;
+        launch_worker += scheduler_file_ + " --name " + dask_worker_name_ +    std::string(" --nthreads ") + std::to_string(nthreads_) + std::string("  &") ;
+        std::cout <<"INFO: Starting Dask Worker, calling : " << launch_worker << std::endl ;
+        Environment::Log(launch_worker , EventLogger::Debug);
+        int ret = std::system(launch_worker.c_str()) ;
+        return (ret) ;
+    }
+    
+    
+    int  PyAction::DaskSchedulerFileExists(const MPI_Comm& comm, std::string filename) 
+    {
+        int rank;
+        MPI_Comm_rank(comm,&rank);
+        std::string dask_file_exists("Scheduler file ") ;
+        dask_file_exists += filename ;
+        int retint = 0 ;
+        if (rank == 0) {
+            std::ifstream daskschedfile;
+            daskschedfile.open(filename.c_str()); 
+            if(! daskschedfile.fail()) {
+                daskschedfile.close();
+                retint = 1 ;
+            }
+            MPI_Bcast(&retint,1,MPI_INT,0,comm);
+        } else {
+            
+             MPI_Bcast(&retint,1,MPI_INT,0,comm);  // recieve the value from rank 0
+        }
+        
+        if (retint == 1) {
+            dask_file_exists += " Exists. Damaris server cores will launch dask-workers." ;
+        } else {
+            dask_file_exists += " Does not exist. Check <pyscript> tag for scheduler-file value, or next time launch a dask-scheduler with --schedule-file " + filename ; 
+        }
+        
+        Environment::Log(dask_file_exists , EventLogger::Debug);
+        
+        return (retint ) ;
+    }
+
   
     
     bool PyAction::PassDataToPython(int iteration )
     {
         
-        // bp::object own_local = bp::object() ;
-        // np::dtype dt ;  //= np::dtype::get_builtin<int>()
-        
-        //std::vector<std::weak_ptr<Variable> >::const_iterator w;
-        //w = GetVariables().begin();
         BlocksByIteration::iterator begin;
         BlocksByIteration::iterator end;
             
@@ -192,7 +235,7 @@ namespace damaris {
         
         std::vector<std::weak_ptr<Variable> >::const_iterator w = GetVariables().begin();
         //for(; w != VariableManager::End(); w++) {
-            // std::shared_ptr<Variable> v = (*w) ; // ->lock()) ; // ->lock();
+        //  std::shared_ptr<Variable> v = (*w) ; // ->lock()) ; // ->lock();
         
         // for selected variables ... (like HDF5 storage, we can can have a <variable ... script="MyScript" /> attribute 
         for (; w != GetVariables().end(); w++) {
@@ -225,6 +268,7 @@ namespace damaris {
 
             //std::cout <<"INFO: " << iteration << " PyAction::PassDataToPython() (*v)->GetName() = " << v->GetName() << std::endl << std::flush ; 
            
+            // Define Python lists for some usefull metadata to be pushed to Python
             bp::list block_list ;
             bp::list blockid_list ;
             for (BlocksByIteration::iterator bid = begin; bid != end; bid++) {
