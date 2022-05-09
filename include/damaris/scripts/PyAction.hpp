@@ -169,9 +169,7 @@ class PyAction : public Action, public Configurable<model::Script> {
 	           std::cerr << "Invalid argument: " << ia.what() << '\n';
 	           nthreads_ = 1 ;
             }       
-        }
-        
-        
+       }
         
        // The initialisation is being done in Environment::Init
        // Py_Initialize();
@@ -210,17 +208,39 @@ class PyAction : public Action, public Configurable<model::Script> {
                                               "  sleep(1.0)\n" ;
         
         regex_string_shutdown_dask_ = "from dask.distributed import Client\n"
-                                "cient = Client(scheduler_file='REPLACE')\n"
-                                "cient.shutdown()\n" ;
-                                
+                                "client = Client(scheduler_file='REPLACE')\n"
+                                "client.shutdown()\n" ;
+             
+        /**
+         * String for removing workers from the worker pool. Workers is a dict of dicts, 
+         * the first index of which is the protocol + ip address:port of the worker.
+         * 
+         * We need to replace:
+         *    REPLACE with scheduler_file_
+         *  and 
+         *    IDNAME by the expected name of the worker (dask_worker_name_)
+         * 
+         * N.B. The simulation will not end if there are workers that were launched 
+         *      by it still running. This will not shut down the scheduler.
+         */                         
         regex_string_shutdown_dask_workers_ = "from dask.distributed import Client\n"
-                                "cient = Client(scheduler_file='REPLACE')\n"
+                                "client = Client(scheduler_file='REPLACE')\n"
                                 "workers = client.scheduler_info()['workers']\n"
-                                "shutdown_worker_list = list()\n"
+                                "shutdown_worker_dict = dict()\n"
                                 "for worker in workers :\n"
-                                "   if worker['id'] == 'IDNAME' :\n"
-                                "   shutdown_worker_list.append(worker)\n"                                        
-                                "client.retire_workers(shutdown_worker_list)\n"
+                                "   if worker[1]['id'] == 'IDNAME' :\n"
+                                "       shutdown_worker_dict[worker[0]] = worker[1]\n"                                        
+                                "client.retire_workers(shutdown_worker_dict)\n" ;
+                                 
+        std::string REPLACE_STR =  scheduler_file_ + "$2" ;
+        regex_string_shutdown_dask_workers_ = std::regex_replace(regex_string_shutdown_dask_workers_,this->e_,REPLACE_STR.c_str());
+        REPLACE_STR =  dask_worker_name_  + "$2" ;
+        std::regex id_rgex ; 
+        id_rgex = "\\b(IDNAME)([^ ]*)" ;
+        regex_string_shutdown_dask_workers_ = std::regex_replace(regex_string_shutdown_dask_workers_,id_rgex,REPLACE_STR.c_str());
+        
+        // std::cout <<"INFO: regex_string_shutdown_dask_workers_ :\n" << regex_string_shutdown_dask_workers_ << std::endl ;
+                
                                               
         // Lunch the dask worker. One per didcated core
         if ((Environment::IsServer() == true) && (dask_scheduler_exists_ == 1)){
@@ -231,8 +251,9 @@ class PyAction : public Action, public Configurable<model::Script> {
         }
 
     }
-    
- 
+       
+        
+        
     std::string extractException() ;
     
     
@@ -290,7 +311,22 @@ class PyAction : public Action, public Configurable<model::Script> {
     /**
      * Destructor.
      */
-    ~PyAction() {}
+    ~PyAction() 
+    {
+        std::cout <<"INFO: ~PyAction : In the destructor \n"  << std::endl ;
+        if ((Environment::IsServer() == true) && (dask_scheduler_exists_ == 1))
+        {  
+            try {
+                std::cout <<"INFO: ~PyAction : About to call bp::exec()  \n"  << std::endl ;
+                bp::object result = bp::exec(regex_string_shutdown_dask_workers_.c_str(), this->globals_, this->locals_);  
+            }  catch( bp::error_already_set &e) {
+                std::string logString_del_daskworker("ERORR: PyAction::~PyAction() bp::exec() " ) ;
+                logString_del_daskworker += this->extractException() ;
+                std::cerr  << logString_del_daskworker << std::endl << std::flush ; 
+                Environment::Log(logString_del_daskworker , EventLogger::Debug);
+            }
+        }       
+    }
 
     public:    
     

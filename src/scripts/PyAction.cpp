@@ -213,7 +213,7 @@ namespace damaris {
         if (retint == 1) {
             dask_file_exists += " Exists. Damaris server cores will launch dask-workers." ;
         } else {
-            dask_file_exists += " Does not exist. Check <pyscript> tag for scheduler-file value, or next time launch a dask-scheduler with --schedule-file " + filename ; 
+            dask_file_exists += " Does not exist. Check Damaris XML file <pyscript> tag for scheduler-file value, or next time launch a dask-scheduler with --schedule-file " + filename ; 
         }
         
         Environment::Log(dask_file_exists , EventLogger::Debug);
@@ -316,7 +316,7 @@ namespace damaris {
                    // Store reference to NumPy array in Python dictionary
                    damarisData_[numpy_name]  = mul_data_ex ;
                 }
-                catch( bp::error_already_set ) {
+                catch( bp::error_already_set &e) {
                     std::string logString_from_data ; 
                     logString_from_data = std::string("ERORR: PyAction::PassDataToPython() np::from_data() /n ") ;
                     logString_from_data += this->extractException() ;
@@ -342,7 +342,7 @@ namespace damaris {
         try {
             bp::object res = bp::exec_file(this->file_.c_str(), this->globals_, this->locals_) ;
         } 
-        catch( bp::error_already_set ) {
+        catch( bp::error_already_set &e) {
             std::string logString_exec_file("ERORR: PyAction::PassDataToPython() bp::exec_file() /n") ; 
             logString_exec_file += this->extractException() ;
             std::cerr << logString_exec_file << std::endl << std::flush ; 
@@ -352,7 +352,7 @@ namespace damaris {
         }
         
         
-        // ************** Now remove the data, as the block data will be deleted from shared memory
+        // ************** Now remove the data, as the block data will be deleted from shared memory (well, maybe only the references to it)
         w = GetVariables().begin();
         // for selected variables ... (like HDF5 storage, we can can have a <variable ... script="MyScript" /> attribute 
         for (; w != GetVariables().end(); w++) {
@@ -372,13 +372,11 @@ namespace damaris {
                 
                 try {
                     bp::object result = bp::exec(string_with_python_code.c_str(), this->globals_, this->locals_);  
-                }  catch( bp::error_already_set ) {
+                }  catch( bp::error_already_set &e) {
                     std::string logString_del_array("ERORR: PyAction::PassDataToPython() bp::exec() " ) ;
                     logString_del_array += this->extractException() ;
                     std::cerr  << logString_del_array << std::endl << std::flush ; 
-                    //std::cerr << this->extractException() << std::endl << std::flush ; 
                     Environment::Log(logString_del_array , EventLogger::Debug);
-                    // return bp::object(); 
                 }
             }                        
         }

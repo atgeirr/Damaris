@@ -7,23 +7,30 @@
 #include <mpi.h>
 #include "Damaris.h"
 
-#define MAX_CYCLES 3
+//#define MAX_CYCLES 3
+
+void print_usage(char* exename) {
+   
+      fprintf(stderr,"Usage: %s <3dmesh_py.xml> [-v] [-r] [-s X]\n",exename);
+      fprintf(stderr,"-v  <X>    X = 0 default, do not print arrays\n");
+      fprintf(stderr,"           X = 1 Verbose mode, prints arrays\n");
+      fprintf(stderr,"           X = 2 Verbose mode, prints summation of arrays\n");
+      fprintf(stderr,"-r         Array values set as rank of process\n");
+      fprintf(stderr,"-s  <Y>    Y is integer time to sleep in sconds between iterations\n");
+      fprintf(stderr,"-i  <I>    I is the number of iterations of simulation to run\n");
+}
 
 int WIDTH;
 int HEIGHT;
 int DEPTH;
+int MAX_CYCLES ;
 
 
 int main(int argc, char** argv)
 {
    if(argc < 2)
    {
-      fprintf(stderr,"Usage: %s <3dmesh_py.xml> [-v] [-r] [-s X]\n",argv[0]);
-      fprintf(stderr,"-v  <X>    X = 0 default, do not print arrays\n");
-      fprintf(stderr,"-v  <X>    X = 1 Verbose mode, prints arrays\n");
-      fprintf(stderr,"           X = 2 Verbose mode, prints summation of arrays\n");
-      fprintf(stderr,"-r         Array values set as rank of process\n");
-      fprintf(stderr,"-s  <Y>    Y is integer value for time to sleep between iterations\n");
+      print_usage(argv[0]) ;
       exit(0);
    }
 
@@ -35,6 +42,7 @@ int main(int argc, char** argv)
   int rank_only = 0;
   int current_arg = 2 ;  
   int time = 1 ;
+  MAX_CYCLES = 5;  // default number of iterations to run
   while (current_arg < argc ) 
   {
     if (strcmp(argv[current_arg],"-v") == 0) {
@@ -46,7 +54,14 @@ int main(int argc, char** argv)
     else if (strcmp(argv[current_arg],"-s") == 0) {
         current_arg++;
         time = atoi(argv[current_arg]);
+    } else if (strcmp(argv[current_arg],"-i") == 0) {
+        current_arg++;
+        MAX_CYCLES = atoi(argv[current_arg]);
+    } else if (strcmp(argv[current_arg],"-h") == 0) {
+        print_usage(argv[0]) ;
+        exit(0);
     }
+    
       current_arg++;
   }
 
