@@ -3628,6 +3628,26 @@ namespace damaris
       static const nthreads_type&
       nthreads_default_value ();
 
+      // keep-workers
+      //
+      typedef ::xml_schema::string keep_workers_type;
+      typedef ::xsd::cxx::tree::traits< keep_workers_type, char > keep_workers_traits;
+
+      const keep_workers_type&
+      keep_workers () const;
+
+      keep_workers_type&
+      keep_workers ();
+
+      void
+      keep_workers (const keep_workers_type& x);
+
+      void
+      keep_workers (::std::unique_ptr< keep_workers_type > p);
+
+      static const keep_workers_type&
+      keep_workers_default_value ();
+
       // Constructors.
       //
       Script (const name_type&,
@@ -3673,6 +3693,8 @@ namespace damaris
       static const scheduler_file_type scheduler_file_default_value_;
       ::xsd::cxx::tree::one< nthreads_type > nthreads_;
       static const nthreads_type nthreads_default_value_;
+      ::xsd::cxx::tree::one< keep_workers_type > keep_workers_;
+      static const keep_workers_type keep_workers_default_value_;
     };
 
     class Exception: public ::xml_schema::type

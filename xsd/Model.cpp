@@ -3135,6 +3135,36 @@ namespace damaris
       return nthreads_default_value_;
     }
 
+    const Script::keep_workers_type& Script::
+    keep_workers () const
+    {
+      return this->keep_workers_.get ();
+    }
+
+    Script::keep_workers_type& Script::
+    keep_workers ()
+    {
+      return this->keep_workers_.get ();
+    }
+
+    void Script::
+    keep_workers (const keep_workers_type& x)
+    {
+      this->keep_workers_.set (x);
+    }
+
+    void Script::
+    keep_workers (::std::unique_ptr< keep_workers_type > x)
+    {
+      this->keep_workers_.set (std::move (x));
+    }
+
+    const Script::keep_workers_type& Script::
+    keep_workers_default_value ()
+    {
+      return keep_workers_default_value_;
+    }
+
 
     // Exception
     // 
@@ -7943,6 +7973,9 @@ namespace damaris
     const Script::nthreads_type Script::nthreads_default_value_ (
       "");
 
+    const Script::keep_workers_type Script::keep_workers_default_value_ (
+      "no");
+
     Script::
     Script (const name_type& name,
             const file_type& file,
@@ -7956,7 +7989,8 @@ namespace damaris
       external_ (external_default_value (), this),
       frequency_ (frequency_default_value (), this),
       scheduler_file_ (scheduler_file_default_value (), this),
-      nthreads_ (nthreads_default_value (), this)
+      nthreads_ (nthreads_default_value (), this),
+      keep_workers_ (keep_workers_default_value (), this)
     {
     }
 
@@ -7973,7 +8007,8 @@ namespace damaris
       external_ (x.external_, f, this),
       frequency_ (x.frequency_, f, this),
       scheduler_file_ (x.scheduler_file_, f, this),
-      nthreads_ (x.nthreads_, f, this)
+      nthreads_ (x.nthreads_, f, this),
+      keep_workers_ (x.keep_workers_, f, this)
     {
     }
 
@@ -7990,7 +8025,8 @@ namespace damaris
       external_ (this),
       frequency_ (this),
       scheduler_file_ (this),
-      nthreads_ (this)
+      nthreads_ (this),
+      keep_workers_ (this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
       {
@@ -8062,6 +8098,12 @@ namespace damaris
           this->nthreads_.set (nthreads_traits::create (i, f, this));
           continue;
         }
+
+        if (n.name () == "keep-workers" && n.namespace_ ().empty ())
+        {
+          this->keep_workers_.set (keep_workers_traits::create (i, f, this));
+          continue;
+        }
       }
 
       if (!name_.present ())
@@ -8114,6 +8156,11 @@ namespace damaris
       {
         this->nthreads_.set (nthreads_default_value ());
       }
+
+      if (!keep_workers_.present ())
+      {
+        this->keep_workers_.set (keep_workers_default_value ());
+      }
     }
 
     Script* Script::
@@ -8138,6 +8185,7 @@ namespace damaris
         this->frequency_ = x.frequency_;
         this->scheduler_file_ = x.scheduler_file_;
         this->nthreads_ = x.nthreads_;
+        this->keep_workers_ = x.keep_workers_;
       }
 
       return *this;

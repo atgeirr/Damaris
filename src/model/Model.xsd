@@ -337,6 +337,7 @@
         <xs:attribute name="frequency" type="xs:unsignedInt" use="optional" default="1" />
         <xs:attribute name="scheduler-file" type="xs:string" use="optional" default="" />
         <xs:attribute name="nthreads" type="xs:string" use="optional" default="" />
+        <xs:attribute name="keep-workers" type="xs:string" use="optional" default="no" />
     </xs:complexType>
 
     <!-- Exception node -->

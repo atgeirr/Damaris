@@ -156,6 +156,9 @@ int main(int argc, char** argv)
       // set the appropriate position for the current rank
       damaris_set_position("cube_i",position_cube);
       damaris_set_position("cube_f",position_cube);
+      
+      // do not do this here as we will not get an updated value (if time-varying="true" )
+      // damaris_write("last_iter" , &MAX_CYCLES);
 
       int i, d, h, w ;
       for( i=0; i < MAX_CYCLES; i++) {
@@ -236,10 +239,13 @@ int main(int argc, char** argv)
 
          damaris_write("cube_i" , cube);
          damaris_write("cube_f" , cube_f);
+         damaris_write("last_iter" , &MAX_CYCLES);
+         sleep(time);
+         
          damaris_end_iteration();
          MPI_Barrier(comm);
          
-         sleep(time);
+         // sleep(time);
 
          double t2 = MPI_Wtime();
 

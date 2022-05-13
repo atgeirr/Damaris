@@ -151,6 +151,13 @@ namespace damaris {
         return  varName.str();
     }
     
+
+    void PyAction::CatchPrintAndLogPyException(std::string MessageStr ) {
+                    MessageStr += this->extractException() ;
+                    std::cerr  << MessageStr << std::endl << std::flush ; 
+                    Environment::Log(MessageStr , EventLogger::Debug);
+    }
+    
     
     // from wiki.python.org/moin/boost.python/EmbeddingPython
     std::string PyAction::extractException() 
@@ -182,7 +189,7 @@ namespace damaris {
         std::string launch_worker("dask-worker --scheduler-file ") ;
         std::cout << std::flush ;
         // launch_worker += scheduler_file_ + " --name " + dask_worker_name_ +  std::string(" &") ;
-        launch_worker += scheduler_file_ + " --name " + dask_worker_name_ +    std::string(" --nthreads ") + std::to_string(nthreads_) + std::string("  &") ;
+        launch_worker += scheduler_file_ + " --name " + dask_worker_name_ +    std::string(" --nthreads ") + std::to_string(dask_nthreads_) + std::string("  &") ;
         std::cout <<"INFO: Starting Dask Worker, calling : " << launch_worker << std::endl ;
         Environment::Log(launch_worker , EventLogger::Debug);
         int ret = std::system(launch_worker.c_str()) ;
@@ -190,20 +197,41 @@ namespace damaris {
     }
     
     
+
+    
     int  PyAction::DaskSchedulerFileExists(const MPI_Comm& comm, std::string filename) 
     {
         int rank;
         MPI_Comm_rank(comm,&rank);
-        std::string dask_file_exists("Scheduler file ") ;
+        std::string dask_file_exists("INFO: Scheduler file ") ;
         dask_file_exists += filename ;
         int retint = 0 ;
         if (rank == 0) {
             std::ifstream daskschedfile;
             daskschedfile.open(filename.c_str()); 
             if(! daskschedfile.fail()) {
+                std::cout  << "INFO: scheduler file found : " << filename << std::endl << std::flush ;
                 daskschedfile.close();
                 retint = 1 ;
             }
+            // Now test to see if it is a valid Dask scheduler
+            if (retint == 1) {
+                try {
+                   std::string test_scheduler_str("INFO: PyAction::DaskSchedulerFileExists(): Calling bp::exec() on the following code to test that scheduler works : ") ;
+                   // std::cout  << test_scheduler_str  << filename << std::endl << std::flush ;
+                   Environment::Log(test_scheduler_str , EventLogger::Debug);
+                   Environment::Log(regex_check_scheduler_exists_ , EventLogger::Debug);
+                   bp::object result = bp::exec(regex_check_scheduler_exists_.c_str(), this->globals_, this->locals_);  
+                }  
+                catch( bp::error_already_set &e) 
+                {
+                    
+                    CatchPrintAndLogPyException("ERROR: PyAction::DaskSchedulerFileExists() bp::exec() Test attaching to Dask Scheduler. " ) ;                    
+                    retint = 0 ;
+                }
+                
+            }
+            
             MPI_Bcast(&retint,1,MPI_INT,0,comm);
         } else {
             
@@ -211,9 +239,9 @@ namespace damaris {
         }
         
         if (retint == 1) {
-            dask_file_exists += " Exists. Damaris server cores will launch dask-workers." ;
+            dask_file_exists += " Exists and is a valid scheduler file. Damaris server cores will launch dask-workers." ;
         } else {
-            dask_file_exists += " Does not exist. Check Damaris XML file <pyscript> tag for scheduler-file value, or next time launch a dask-scheduler with --schedule-file " + filename ; 
+            dask_file_exists += " Does not exist or is not a valid scheduler file. Check Damaris XML file <pyscript> tag for scheduler-file value, or when you launch a dask-scheduler use: --schedule-file " + filename ; 
         }
         
         Environment::Log(dask_file_exists , EventLogger::Debug);
@@ -269,8 +297,8 @@ namespace damaris {
             //std::cout <<"INFO: " << iteration << " PyAction::PassDataToPython() (*v)->GetName() = " << v->GetName() << std::endl << std::flush ; 
            
             // Define Python lists for some usefull metadata to be pushed to Python
-            bp::list block_list ;
-            bp::list blockid_list ;
+            bp::list block_list ;   // each client produces a seperate 'block' of a variable
+            bp::list blockid_list ; // Variables can also have multiple 'domains', which translates to multiple blocks and is data written in multiple chuncks on a single damaris interation
             for (BlocksByIteration::iterator bid = begin; bid != end; bid++) {
                 std::shared_ptr<Block> b = *bid;
 
@@ -317,11 +345,7 @@ namespace damaris {
                    damarisData_[numpy_name]  = mul_data_ex ;
                 }
                 catch( bp::error_already_set &e) {
-                    std::string logString_from_data ; 
-                    logString_from_data = std::string("ERORR: PyAction::PassDataToPython() np::from_data() /n ") ;
-                    logString_from_data += this->extractException() ;
-                    Environment::Log(logString_from_data , EventLogger::Debug);
-                    std::cerr << logString_from_data << std::endl << std::flush ;   
+                    CatchPrintAndLogPyException("ERROR: PyAction::PassDataToPython() np::from_data() /n ") ;                      
                 }
                               
                 // std::cout <<"INFO: " << iteration << " PyAction::PassDataToPython() numpy_name: " << numpy_name << std::endl << std::flush ; 
@@ -343,12 +367,7 @@ namespace damaris {
             bp::object res = bp::exec_file(this->file_.c_str(), this->globals_, this->locals_) ;
         } 
         catch( bp::error_already_set &e) {
-            std::string logString_exec_file("ERORR: PyAction::PassDataToPython() bp::exec_file() /n") ; 
-            logString_exec_file += this->extractException() ;
-            std::cerr << logString_exec_file << std::endl << std::flush ; 
-            Environment::Log(logString_exec_file , EventLogger::Debug);
-            std::cerr << logString_exec_file << std::endl << std::flush ; 
-           // return bp::object();            
+            CatchPrintAndLogPyException("ERROR: PyAction::PassDataToPython() bp::exec_file() /n") ;           
         }
         
         
@@ -366,17 +385,13 @@ namespace damaris {
                 std::string numpy_name =  varName + "_" + std::to_string(iteration) ;
                 
                 // std::cout <<"INFO: " << iteration << " PyAction::PassDataToPython() deleting: " << numpy_name << std::endl << std::flush ;
-                
                 numpy_name +=  "$2" ;
                 std::string string_with_python_code = std::regex_replace (regex_string_with_python_code_,this->e_,numpy_name.c_str());
                 
                 try {
                     bp::object result = bp::exec(string_with_python_code.c_str(), this->globals_, this->locals_);  
                 }  catch( bp::error_already_set &e) {
-                    std::string logString_del_array("ERORR: PyAction::PassDataToPython() bp::exec() " ) ;
-                    logString_del_array += this->extractException() ;
-                    std::cerr  << logString_del_array << std::endl << std::flush ; 
-                    Environment::Log(logString_del_array , EventLogger::Debug);
+                    CatchPrintAndLogPyException("ERROR: PyAction::PassDataToPython() bp::exec() " ) ;
                 }
             }                        
         }

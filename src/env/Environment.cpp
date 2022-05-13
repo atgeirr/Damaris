@@ -422,7 +422,7 @@ bool Environment::InitDedicatedNodes()
         _server_ = Server::New(_entityComm_);
         std::shared_ptr<Reactor> reactor = _server_->GetReactor();
         //debugging:
-                //std::cout << "Node id is " << Hardware::GetNodeID() << "rank for the server is" << rank << std::endl  ;
+        //std::cout << "Node id is " << Hardware::GetNodeID() << "rank for the server is" << rank << std::endl  ;
         //orc:server to client mapping
         for(int k=0; k < ratio; k++) {
             int cID = (rank * ratio) + k + (dn * _coresPerNode_ );
@@ -532,7 +532,8 @@ bool Environment::InitManagers()
     if (_baseModel_->actions().present()) {
         ActionManager::Init(_baseModel_->actions().get());
     }
-    if (_baseModel_->scripts().present()) {
+    if ((_isDedicatedCore_ || _isDedicatedNode_ || (_serversPerNode_ == 0))
+       && (_baseModel_->scripts().present())) {
         ScriptManager::Init(_baseModel_->scripts().get());
     }
     if((_isDedicatedCore_ || _isDedicatedNode_ || (_serversPerNode_ == 0))
@@ -550,6 +551,12 @@ bool Environment::Finalize()
     VariableManager::DeleteAll();
     LayoutManager::DeleteAll();
     ParameterManager::DeleteAll();
+    /*if (_baseModel_->actions().present()) {
+        ActionManager::DeleteAll();
+    }*/
+    if (_baseModel_->scripts().present()) {
+        ScriptManager::DeleteAll();  // inherited from Manager class
+    }
     
     if(_defaultBuffer_ && _sharedStructuresOwner_) {
         SharedMemorySegment::Remove(

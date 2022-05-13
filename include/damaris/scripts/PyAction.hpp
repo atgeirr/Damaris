@@ -67,8 +67,7 @@ class PyAction : public Action, public Configurable<model::Script> {
     // Data obtained from the XML model file
     //std::string name_ ;  We get this from inheriting from Action
     std::string language_ ;
-    std::string file_ ;
-    std::string scheduler_file_ ;  //< The Dask scheduler file to read in and start dask-workers with
+    std::string file_ ;    
     unsigned int frequency_ ;
     
     /**
@@ -107,11 +106,13 @@ class PyAction : public Action, public Configurable<model::Script> {
     *    NWORKERS by the expected number of workers (== Damaris server cores)
     */
     std::string regex_string_dask_worker_available_ ;
-    int dask_scheduler_exists_ ;
-    std::string dask_worker_name_ ;
-    std::string nthreads_str_ ;  // default = "", openmp == use OMP_NUM_THREADS, "X" where x is an integer
-    int nthreads_ ;  // the number of threads to launch per dask worker
-    
+    std::string regex_check_scheduler_exists_ ;
+    std::string scheduler_file_ ;  //< The Dask scheduler file to read in and start dask-workers with
+    int         dask_scheduler_exists_ ;
+    std::string dask_worker_name_ ;    
+    int         dask_nthreads_ ;      // the number of threads to launch per dask worker
+    bool        dask_keep_workers_ ;  // if true, then do not destroy the dask workers (simulation will not return until they are destroyed)
+     
     /**
     * String of Python code used to shutdown the Dask scheduler and all workers 
     * that corresponds to the scheduler_file_
@@ -132,49 +133,26 @@ class PyAction : public Action, public Configurable<model::Script> {
     
   protected:
     /**
-     * Constructor. Initailizes Python and boost::numpy
+     * Constructor. Initailizes Python and boost::numpy only in the Server cores/nodes
      */
     PyAction(const model::Script& mdl)
         : Action(mdl.name()), Configurable<model::Script>(mdl)
-    { 
-        // name_     = mdl.name() ;
-        language_       = mdl.language() ;
-        file_           = mdl.file() ;
-        frequency_      = mdl.frequency() ;
-        scheduler_file_ = mdl.scheduler_file();
-        nthreads_str_   = mdl.nthreads() ;
-        std::transform(nthreads_str_.begin(),nthreads_str_.end(), nthreads_str_.begin(), 
-                       [](unsigned char c){ return std::tolower(c); } );
-         // 1 if file exists, 0 otherwise
-        dask_scheduler_exists_ = DaskSchedulerFileExists(Environment::GetEntityComm(), scheduler_file_) ;
-        dask_worker_name_ =  Environment::GetSimulationName() + "_" + Environment::GetMagicNumber() + "_" + std::to_string(Environment::GetEntityProcessID()) ;
+    {
+        std::string dask_nthreads_str ;      // default = "", openmp == use OMP_NUM_THREADS, "X" where x is an integer
+        std::string dask_keep_workers_str ;  // default = "no"
         
+        language_             = mdl.language() ;
+        file_                 = mdl.file() ;
+        frequency_            = mdl.frequency() ;
+        scheduler_file_       = mdl.scheduler_file();
+        dask_nthreads_str     = mdl.nthreads() ;
+        dask_keep_workers_str = mdl.keep_workers() ;
         
-        // Mess around trying to convert a string to a nthread integer
-        if (nthreads_str_== std::string("")){
-            nthreads_ = 1 ;
-        } else if (nthreads_str_ == std::string("openmp")) {
-#ifdef _OPENMP
-          #pragma omp parallel
-          nthreads_ = omp_get_num_threads() ;
-#else
-          nthreads_ = 1 ;
-#endif
-        } else {
-            try {
-              std::string::size_type sz; 
-              nthreads_ = std::stoi (nthreads_str_,&sz);
-            }
-            catch (const std::invalid_argument& ia) {
-	           std::cerr << "Invalid argument: " << ia.what() << '\n';
-	           nthreads_ = 1 ;
-            }       
-       }
-        
-       // The initialisation is being done in Environment::Init
-       // Py_Initialize();
-       // np::initialize();
-  
+       /** This initialisation is being done in Environment::Init
+       * Py_Initialize();
+       * np::initialize();
+       */
+    
         /**
         * import the __main__ module and obtain the globals dict
         * assign to the bp::object 
@@ -182,18 +160,103 @@ class PyAction : public Action, public Configurable<model::Script> {
         main_     = bp::import("__main__");
         globals_  = main_.attr("__dict__");
       
-        /**
-        * String of Python code used to remove datasets from Pyhton environment when the 
-        * Damris data they use  is invalidated/deleted
+         /**
+        * String of Python code used to test if scheduler is accessible
+        * N.B. known exceptions from this code
+        * "OSError:"
+        * "ValueError:"
         */
-        regex_string_with_python_code_ = "try :               \n"
-                                         "  del DamarisData['REPLACE']   \n"
-                                         "except KeyError as err:             \n"
-                                         "  print('Damaris Server: KeyError could not delete key: ', err) \n" ;
+      /*  regex_check_scheduler_exists_ = "from dask.distributed import Client\n"
+                                        "def inc(x: int) -> int:\n"
+                                        "  return x + 1\n"
+                                        "client = Client('REPLACE', timeout='2s')\n" 
+                                        "a = client.submit(inc, 2)\n"
+                                        "client.gather(a)\n" ;
+                                        "client.close()\n" ;*/ 
+        regex_check_scheduler_exists_ = "from dask.distributed import Client\n"
+                                        "client = Client(scheduler_file='REPLACE', timeout='10s')\n" 
+                                        "client.close()\n" ;                                
+       // "except OSError:\n";
+       // "async def f():\n"
+       // "async def f():\n"     
+        e_ = "\\b(REPLACE)([^ ]*)" ;                                
+        std::string REPLACE_STR =  scheduler_file_ + "$2" ;
+        regex_check_scheduler_exists_ = std::regex_replace(regex_check_scheduler_exists_,this->e_,REPLACE_STR.c_str());
+ 
+        /** 
+        * 1 if scheduler file exists, 
+        * 0 otherwise. Only tests if the scheduler file exists, 
+        * not that the Scheduler is accessible via Python.
+        */
+        dask_scheduler_exists_ = DaskSchedulerFileExists(Environment::GetEntityComm(), scheduler_file_) ;
+        dask_worker_name_      =  Environment::GetSimulationName() + "_" + Environment::GetMagicNumber() + "_" + std::to_string(Environment::GetEntityProcessID()) ;
+        
+        
+        // Mess around trying to convert a string to a nthread integer
+        std::transform(dask_nthreads_str.begin(),dask_nthreads_str.end(), dask_nthreads_str.begin(), 
+                       [](unsigned char c){ return std::tolower(c); } );        
+        if (dask_nthreads_str== std::string("")){
+            dask_nthreads_ = 1 ;
+        } else if (dask_nthreads_str == std::string("openmp")) {
+#ifdef _OPENMP
+          #pragma omp parallel
+          dask_nthreads_ = omp_get_num_threads() ;
+#else
+          dask_nthreads_ = 1 ;
+#endif
+        } else {
+            // Convert string to integer
+            try {
+              std::string::size_type sz; 
+              dask_nthreads_ = std::stoi (dask_nthreads_str,&sz);
+            }
+            catch (const std::invalid_argument& ia) {
+	           std::cerr << "PyAction:PyAction() Invalid argument: " << ia.what() << '\n';
+	           dask_nthreads_ = 1 ;
+            }       
+       }
+       
+       // set string to lower case
+       std::transform(dask_keep_workers_str.begin(),dask_keep_workers_str.end(), dask_keep_workers_str.begin(), 
+                       [](unsigned char c){ return std::tolower(c); } );
+       
+       /** dask_keep_workers_ is tested for in ~PyAction destructor. If true then workers are not destroyed
+       *  and the simulation will not be able to shutdown. This allows a user to continuie to use the Dask
+       *  setup to query and process data interactively, if need be.
+       */
+       if (dask_keep_workers_str == std::string("no"))
+       {
+            dask_keep_workers_ = false ;
+       } else {
+            dask_keep_workers_ = true ;
+       }
+        
+
+       
+        
                                          
-        e_ = "\\b(REPLACE)([^ ]*)" ;
+       
                                     
         locals_["DamarisData"] = damarisData_ ;
+        
+        // Add some usefull Dask information
+        damarisData_["dask_scheduler_exists"]   = dask_scheduler_exists_ ;
+        damarisData_["dask_scheduler_file"]     = scheduler_file_ ;
+        damarisData_["dask_workers_name"]       = this->dask_worker_name_ ;
+        // N.B. this will **not be correct** for Dedicated Node mode
+        damarisData_["dask_nworkers"]           = Environment::ServersPerNode() ; // _serversPerNode_  ;
+        damarisData_["dask_threads_per_worker"] = this->dask_nthreads_ ;
+         
+        // These are the Damaris Environment properties
+        damarisData_["is_dedicated_node"] = Environment::IsDedicatedNode() ; // _isDedicatedNode_
+        damarisData_["is_dedicated_core"] = Environment::IsDedicatedCore() ; // _isDedicatedCore_
+        damarisData_["servers_per_node"]  = Environment::ServersPerNode() ; 
+        damarisData_["clients_per_node"]  = Environment::ClientsPerNode() ;
+        damarisData_["ranks_per_node"]    = Environment::CoresPerNode() ;
+        damarisData_["cores_per_node"]    = Environment::CoresPerNode() ;
+        damarisData_["number_of_nodes"]   = Environment::NumberOfNodes() ;
+        damarisData_["simulation_name"]   = Environment::GetSimulationName() ;
+        damarisData_["simulation_magic_number"]  = Environment::GetMagicNumber() ;  // this is a reference to a string. I hope that is fine.
         
         /**
          * String for waiting until all workers are available. 
@@ -208,9 +271,21 @@ class PyAction : public Action, public Configurable<model::Script> {
                                               "  sleep(1.0)\n" ;
         
         regex_string_shutdown_dask_ = "from dask.distributed import Client\n"
-                                "client = Client(scheduler_file='REPLACE')\n"
-                                "client.shutdown()\n" ;
-             
+                                      "client =  Client(scheduler_file='REPLACE')\n"
+                                      "client.shutdown()\n" ;
+         
+        /**
+        * String of Python code used to remove datasets from Pyhton environment when the 
+        * Damris data they use  is invalidated/deleted
+        */
+        regex_string_with_python_code_ = "try :               \n"
+                                         "  del DamarisData['REPLACE']   \n"
+                                         "except KeyError as err:             \n"
+                                         "  print('Damaris Server: KeyError could not delete key: ', err) \n" ;
+                                         
+       
+        
+         
         /**
          * String for removing workers from the worker pool. Workers is a dict of dicts, 
          * the first index of which is the protocol + ip address:port of the worker.
@@ -223,16 +298,20 @@ class PyAction : public Action, public Configurable<model::Script> {
          * N.B. The simulation will not end if there are workers that were launched 
          *      by it still running. This will not shut down the scheduler.
          */                         
-        regex_string_shutdown_dask_workers_ = "from dask.distributed import Client\n"
-                                "client = Client(scheduler_file='REPLACE')\n"
-                                "workers = client.scheduler_info()['workers']\n"
-                                "shutdown_worker_dict = dict()\n"
-                                "for worker in workers :\n"
-                                "   if worker[1]['id'] == 'IDNAME' :\n"
-                                "       shutdown_worker_dict[worker[0]] = worker[1]\n"                                        
-                                "client.retire_workers(shutdown_worker_dict)\n" ;
+        regex_string_shutdown_dask_workers_="from dask.distributed import Client\n"
+                                            "client = Client(scheduler_file='REPLACE')\n"
+                                            "workers = client.scheduler_info()['workers']\n"
+                                            "shutdown_worker_dict = dict()\n"
+                                            "id_name_list = ['IDNAME']\n"
+                                            "for worker in workers.items() :\n"
+                                            "  if worker[1]['id'] in id_name_list:\n"
+                                            "    shutdown_worker_dict[worker[0]] = worker[1]\n" 
+                                            "client.retire_workers(shutdown_worker_dict)\n" ; 
+                                            //"\tif worker[1]['id'] == 'IDNAME' :\n"
+                                            //"\t\tshutdown_worker_dict[worker[0]] = worker[1]\n"                                        
+                                            //"client.retire_workers(shutdown_worker_dict)\n" ;
                                  
-        std::string REPLACE_STR =  scheduler_file_ + "$2" ;
+        REPLACE_STR =  scheduler_file_ + "$2" ;
         regex_string_shutdown_dask_workers_ = std::regex_replace(regex_string_shutdown_dask_workers_,this->e_,REPLACE_STR.c_str());
         REPLACE_STR =  dask_worker_name_  + "$2" ;
         std::regex id_rgex ; 
@@ -243,17 +322,24 @@ class PyAction : public Action, public Configurable<model::Script> {
                 
                                               
         // Lunch the dask worker. One per didcated core
+        // The test for IsServer() may not be required as this class is only creaed by Server cores/nodes
         if ((Environment::IsServer() == true) && (dask_scheduler_exists_ == 1)){
             int server_rank ;
             MPI_Comm_rank(Environment::GetEntityComm(), &server_rank) ;
-            std::cout <<"INFO: Starting Dask Worker, server rank : " << server_rank << std::endl ;
+            std::cout <<"INFO: PyAction::PyAction() Starting Dask Worker, server rank : " << server_rank << std::endl ;
             this->LaunchDaskWorker() ;
         }
 
     }
        
-        
-        
+    /**
+     *  Tidy up exception catching code in catch {} blocks. Prints to std::cerr and Environment::Log()
+     */
+    void CatchPrintAndLogPyException(std::string MessageStr ) ;    
+    
+    /**
+     *  Very special Python API code to get an excption from Python and print it in C++
+     */   
     std::string extractException() ;
     
     
@@ -313,19 +399,22 @@ class PyAction : public Action, public Configurable<model::Script> {
      */
     ~PyAction() 
     {
-        std::cout <<"INFO: ~PyAction : In the destructor \n"  << std::endl ;
-        if ((Environment::IsServer() == true) && (dask_scheduler_exists_ == 1))
-        {  
-            try {
-                std::cout <<"INFO: ~PyAction : About to call bp::exec()  \n"  << std::endl ;
-                bp::object result = bp::exec(regex_string_shutdown_dask_workers_.c_str(), this->globals_, this->locals_);  
-            }  catch( bp::error_already_set &e) {
-                std::string logString_del_daskworker("ERORR: PyAction::~PyAction() bp::exec() " ) ;
-                logString_del_daskworker += this->extractException() ;
-                std::cerr  << logString_del_daskworker << std::endl << std::flush ; 
-                Environment::Log(logString_del_daskworker , EventLogger::Debug);
-            }
-        }       
+        if ((dask_keep_workers_ == false) && (dask_scheduler_exists_ == 1)) 
+        {
+            // This test for IsServer() may not be required as this class is only creaed by Server cores/nodes
+            if (Environment::IsServer() == true)
+            {  
+                try 
+                {                    
+                    Environment::Log("Calling: PyAction::~PyAction() bp::exec() to shut down Dask workers" , EventLogger::Debug);
+                    bp::object result = bp::exec(regex_string_shutdown_dask_workers_.c_str(), this->globals_, this->locals_);  
+                }  catch( bp::error_already_set &e) {
+                    CatchPrintAndLogPyException("ERORR: PyAction::~PyAction() bp::exec() " ) ;                
+                }
+            }       
+        } else {
+            Environment::Log("Calling: PyAction::~PyAction() Not removing Dask workers" , EventLogger::Debug);
+        }
     }
 
     public:    
