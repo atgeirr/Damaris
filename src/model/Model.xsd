@@ -291,7 +291,7 @@
             <xs:element name="layout"    type="mdl:Layout"/>
             <xs:element name="variable"  type="mdl:Variable"/>
             <xs:element name="group"     type="mdl:Group"/>
-            <xs:element name="mesh"         type="mdl:Mesh"/>
+            <xs:element name="mesh"      type="mdl:Mesh"/>
             <xs:element name="curve" type="mdl:Curve"/>
         </xs:choice>
         </xs:sequence>
@@ -324,6 +324,7 @@
         <xs:attribute name="library"   type="xs:string"  use="optional" default=""/>
         <xs:attribute name="scope"     type="mdl:Scope"  use="optional" default="core"/>
         <xs:attribute name="external"  type="xs:boolean" use="optional" default="false"/>
+        <xs:attribute name="comment"  type="xs:string" use="optional"/>
     </xs:complexType>
 
     <!-- PyScript node -->
@@ -337,7 +338,9 @@
         <xs:attribute name="frequency" type="xs:unsignedInt" use="optional" default="1" />
         <xs:attribute name="scheduler-file" type="xs:string" use="optional" default="" />
         <xs:attribute name="nthreads" type="xs:string" use="optional" default="" />
+        <xs:attribute name="timeout" type="xs:string" use="optional" default="2" />
         <xs:attribute name="keep-workers" type="xs:string" use="optional" default="no" />
+        <xs:attribute name="comment"  type="xs:string" use="optional"/>
     </xs:complexType>
 
     <!-- Exception node -->
@@ -366,6 +369,7 @@
       <xs:attribute name="update-frequency" type="xs:unsignedInt" use="optional" default="1"/>
       <xs:attribute name="realtime-timestep" type="xs:double" use="optional" default="0.1"/>
       <xs:attribute name="end-iteration" type="xs:unsignedInt" use="optional" default="0"/>
+      <xs:attribute name="comment"  type="xs:string" use="optional"/>
    </xs:complexType>
 
     <!-- Parameters related to Python

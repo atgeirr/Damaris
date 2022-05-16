@@ -108,6 +108,7 @@ class PyAction : public Action, public Configurable<model::Script> {
     std::string regex_string_dask_worker_available_ ;
     std::string regex_check_scheduler_exists_ ;
     std::string scheduler_file_ ;  //< The Dask scheduler file to read in and start dask-workers with
+    std::string dask_timeout_ ;
     int         dask_scheduler_exists_ ;
     std::string dask_worker_name_ ;    
     int         dask_nthreads_ ;      // the number of threads to launch per dask worker
@@ -145,6 +146,7 @@ class PyAction : public Action, public Configurable<model::Script> {
         file_                 = mdl.file() ;
         frequency_            = mdl.frequency() ;
         scheduler_file_       = mdl.scheduler_file();
+        dask_timeout_         = mdl.timeout() ;
         dask_nthreads_str     = mdl.nthreads() ;
         dask_keep_workers_str = mdl.keep_workers() ;
         
@@ -162,27 +164,32 @@ class PyAction : public Action, public Configurable<model::Script> {
       
          /**
         * String of Python code used to test if scheduler is accessible
-        * N.B. known exceptions from this code
-        * "OSError:"
-        * "ValueError:"
+        * If the Client cannot be created then possibly the scheduler is not available
         */
-      /*  regex_check_scheduler_exists_ = "from dask.distributed import Client\n"
-                                        "def inc(x: int) -> int:\n"
-                                        "  return x + 1\n"
-                                        "client = Client('REPLACE', timeout='2s')\n" 
-                                        "a = client.submit(inc, 2)\n"
-                                        "client.gather(a)\n" ;
-                                        "client.close()\n" ;*/ 
         regex_check_scheduler_exists_ = "from dask.distributed import Client\n"
-                                        "client = Client(scheduler_file='REPLACE', timeout='10s')\n" 
+                                        "client = Client(scheduler_file='REPLACE', timeout='TIMEOUTs')\n" 
                                         "client.close()\n" ;                                
-       // "except OSError:\n";
-       // "async def f():\n"
-       // "async def f():\n"     
-        e_ = "\\b(REPLACE)([^ ]*)" ;                                
+        /**
+         * regex replace the scheduler_file string and then the timeout
+        */                              
+        e_ = "\\b(REPLACE)([^ ]*)" ;                 
         std::string REPLACE_STR =  scheduler_file_ + "$2" ;
         regex_check_scheduler_exists_ = std::regex_replace(regex_check_scheduler_exists_,this->e_,REPLACE_STR.c_str());
- 
+        
+        // test that the timeout string is a valid integer (default in Model.xsd is "2")
+        try {
+            std::string::size_type sz; 
+            int tmp_int = std::stoi (dask_timeout_,&sz);
+            Environment::Log("PyAction:PyAction() The Dask timeout for client connection was set to "+dask_timeout_+" seconds" , EventLogger::Debug);
+        }
+        catch (const std::invalid_argument& ia) {
+            std::cerr << "PyAction:PyAction() Invalid argument: " << ia.what() << '\n';
+            dask_timeout_ = std::string("2");
+        }   
+        e_ = "\\b(TIMEOUT)([^ ]*)" ;                                
+        REPLACE_STR =  dask_timeout_ + "$2" ;
+        regex_check_scheduler_exists_ = std::regex_replace(regex_check_scheduler_exists_,this->e_,REPLACE_STR.c_str());
+        
         /** 
         * 1 if scheduler file exists, 
         * 0 otherwise. Only tests if the scheduler file exists, 
@@ -230,32 +237,29 @@ class PyAction : public Action, public Configurable<model::Script> {
        } else {
             dask_keep_workers_ = true ;
        }
-        
-
+                                          
        
-        
-                                         
-       
-                                    
+        // This dictionary is placed in the Python interpreter and contains data that
+        // can be accessed through the script
         locals_["DamarisData"] = damarisData_ ;
         
         // Add some usefull Dask information
-        damarisData_["dask_scheduler_exists"]   = dask_scheduler_exists_ ;
-        damarisData_["dask_scheduler_file"]     = scheduler_file_ ;
-        damarisData_["dask_workers_name"]       = this->dask_worker_name_ ;
+        damarisData_["dask_scheduler_exists"]    = dask_scheduler_exists_ ;
+        damarisData_["dask_scheduler_file"]      = scheduler_file_ ;
+        damarisData_["dask_workers_name"]        = this->dask_worker_name_ ;
         // N.B. this will **not be correct** for Dedicated Node mode
-        damarisData_["dask_nworkers"]           = Environment::ServersPerNode() ; // _serversPerNode_  ;
-        damarisData_["dask_threads_per_worker"] = this->dask_nthreads_ ;
+        damarisData_["dask_nworkers"]            = Environment::ServersPerNode() ; // _serversPerNode_  ;
+        damarisData_["dask_threads_per_worker"]  = this->dask_nthreads_ ;
          
         // These are the Damaris Environment properties
-        damarisData_["is_dedicated_node"] = Environment::IsDedicatedNode() ; // _isDedicatedNode_
-        damarisData_["is_dedicated_core"] = Environment::IsDedicatedCore() ; // _isDedicatedCore_
-        damarisData_["servers_per_node"]  = Environment::ServersPerNode() ; 
-        damarisData_["clients_per_node"]  = Environment::ClientsPerNode() ;
-        damarisData_["ranks_per_node"]    = Environment::CoresPerNode() ;
-        damarisData_["cores_per_node"]    = Environment::CoresPerNode() ;
-        damarisData_["number_of_nodes"]   = Environment::NumberOfNodes() ;
-        damarisData_["simulation_name"]   = Environment::GetSimulationName() ;
+        damarisData_["is_dedicated_node"]        = Environment::IsDedicatedNode() ; // _isDedicatedNode_
+        damarisData_["is_dedicated_core"]        = Environment::IsDedicatedCore() ; // _isDedicatedCore_
+        damarisData_["servers_per_node"]         = Environment::ServersPerNode() ; 
+        damarisData_["clients_per_node"]         = Environment::ClientsPerNode() ;
+        damarisData_["ranks_per_node"]           = Environment::CoresPerNode() ;
+        damarisData_["cores_per_node"]           = Environment::CoresPerNode() ;
+        damarisData_["number_of_nodes"]          = Environment::NumberOfNodes() ;
+        damarisData_["simulation_name"]          = Environment::GetSimulationName() ;
         damarisData_["simulation_magic_number"]  = Environment::GetMagicNumber() ;  // this is a reference to a string. I hope that is fine.
         
         /**
@@ -270,13 +274,13 @@ class PyAction : public Action, public Configurable<model::Script> {
                                               "while ((client.status == 'running'') and (len(client.scheduler_info()['workers']) < NWORKERS)):\n"
                                               "  sleep(1.0)\n" ;
         
-        regex_string_shutdown_dask_ = "from dask.distributed import Client\n"
+        /*regex_string_shutdown_dask_ = "from dask.distributed import Client\n"
                                       "client =  Client(scheduler_file='REPLACE')\n"
-                                      "client.shutdown()\n" ;
+                                      "client.shutdown()\n" ;*/
          
         /**
-        * String of Python code used to remove datasets from Pyhton environment when the 
-        * Damris data they use  is invalidated/deleted
+        * String of Python code used to remove datasets from Python environment when the 
+        * Damaris data they use  is invalidated/deleted
         */
         regex_string_with_python_code_ = "try :               \n"
                                          "  del DamarisData['REPLACE']   \n"
@@ -307,10 +311,8 @@ class PyAction : public Action, public Configurable<model::Script> {
                                             "  if worker[1]['id'] in id_name_list:\n"
                                             "    shutdown_worker_dict[worker[0]] = worker[1]\n" 
                                             "client.retire_workers(shutdown_worker_dict)\n" ; 
-                                            //"\tif worker[1]['id'] == 'IDNAME' :\n"
-                                            //"\t\tshutdown_worker_dict[worker[0]] = worker[1]\n"                                        
-                                            //"client.retire_workers(shutdown_worker_dict)\n" ;
-                                 
+
+        e_ = "\\b(REPLACE)([^ ]*)" ;                          
         REPLACE_STR =  scheduler_file_ + "$2" ;
         regex_string_shutdown_dask_workers_ = std::regex_replace(regex_string_shutdown_dask_workers_,this->e_,REPLACE_STR.c_str());
         REPLACE_STR =  dask_worker_name_  + "$2" ;

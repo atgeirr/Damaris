@@ -372,6 +372,7 @@ namespace damaris {
         
         
         // ************** Now remove the data, as the block data will be deleted from shared memory (well, maybe only the references to it)
+        e_ = "\\b(REPLACE)([^ ]*)" ;  // Set the regex as we use it in the constructor for various substitutions
         w = GetVariables().begin();
         // for selected variables ... (like HDF5 storage, we can can have a <variable ... script="MyScript" /> attribute 
         for (; w != GetVariables().end(); w++) {
@@ -386,6 +387,7 @@ namespace damaris {
                 
                 // std::cout <<"INFO: " << iteration << " PyAction::PassDataToPython() deleting: " << numpy_name << std::endl << std::flush ;
                 numpy_name +=  "$2" ;
+               
                 std::string string_with_python_code = std::regex_replace (regex_string_with_python_code_,this->e_,numpy_name.c_str());
                 
                 try {
