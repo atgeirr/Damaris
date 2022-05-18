@@ -75,13 +75,14 @@
     <xs:complexType name="Architecture">
         <xs:all>
         <!--    <xs:element name="cores"  type="mdl:DeprecatedCores" /> -->
-            <xs:element name="domains" type="mdl:Domains" />
+            <xs:element name="domains"   type="mdl:Domains" />
             <xs:element name="dedicated" type="mdl:Dedicated"/>
-            <xs:element name="placement" type="mdl:Placement"/>
-            <xs:element name="buffer" type="mdl:Buffer" />
-            <xs:element name="queue"  type="mdl:Queue" />
+            <xs:element name="buffer"    type="mdl:Buffer" />
+            <xs:element name="placement" type="mdl:Placement" />            
+            <xs:element name="queue"     type="mdl:Queue"     />
         </xs:all>
         <xs:attribute name="name" type="xs:string" use="optional"/>
+        <xs:attribute name="comment"   type="xs:string"  use="optional"  />
     </xs:complexType>
 
     <!-- Languages -->

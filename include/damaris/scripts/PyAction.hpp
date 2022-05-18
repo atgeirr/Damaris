@@ -243,25 +243,38 @@ class PyAction : public Action, public Configurable<model::Script> {
         // can be accessed through the script
         locals_["DamarisData"] = damarisData_ ;
         
-        // Add some usefull Dask information
-        damarisData_["dask_scheduler_exists"]    = dask_scheduler_exists_ ;
-        damarisData_["dask_scheduler_file"]      = scheduler_file_ ;
-        damarisData_["dask_workers_name"]        = this->dask_worker_name_ ;
-        // N.B. this will **not be correct** for Dedicated Node mode
-        damarisData_["dask_nworkers"]            = Environment::ServersPerNode() ; // _serversPerNode_  ;
-        damarisData_["dask_threads_per_worker"]  = this->dask_nthreads_ ;
-         
-        // These are the Damaris Environment properties
-        damarisData_["is_dedicated_node"]        = Environment::IsDedicatedNode() ; // _isDedicatedNode_
-        damarisData_["is_dedicated_core"]        = Environment::IsDedicatedCore() ; // _isDedicatedCore_
-        damarisData_["servers_per_node"]         = Environment::ServersPerNode() ; 
-        damarisData_["clients_per_node"]         = Environment::ClientsPerNode() ;
-        damarisData_["ranks_per_node"]           = Environment::CoresPerNode() ;
-        damarisData_["cores_per_node"]           = Environment::CoresPerNode() ;
-        damarisData_["number_of_nodes"]          = Environment::NumberOfNodes() ;
-        damarisData_["simulation_name"]          = Environment::GetSimulationName() ;
-        damarisData_["simulation_magic_number"]  = Environment::GetMagicNumber() ;  // this is a reference to a string. I hope that is fine.
         
+        // Define Python lists for some usefull metadata to be pushed to Python
+        bp::dict dask_dict ;
+        bp::dict damaris_dict ;    
+        
+        // Add some usefull Dask information
+        if (this->dask_scheduler_exists_ == 1 ) {
+            dask_dict["dask_scheduler_file"]     = this->scheduler_file_ ;
+        } else {
+            dask_dict["dask_scheduler_file"]     = std::string("") ;
+        }
+        
+        dask_dict["dask_workers_name"]           = this->dask_worker_name_ ;
+        // N.B. this will **not be correct** for Dedicated Node mode
+        dask_dict["dask_nworkers"]               = Environment::ServersPerNode() ; // _serversPerNode_  ;
+        dask_dict["dask_threads_per_worker"]     = this->dask_nthreads_ ; 
+        
+        // Add usefull Damaris properties. These are the Damaris Environment properties
+        damaris_dict["is_dedicated_node"]        = Environment::IsDedicatedNode() ; // _isDedicatedNode_
+        damaris_dict["is_dedicated_core"]        = Environment::IsDedicatedCore() ; // _isDedicatedCore_
+        damaris_dict["servers_per_node"]         = Environment::ServersPerNode() ; 
+        damaris_dict["clients_per_node"]         = Environment::ClientsPerNode() ;
+        damaris_dict["ranks_per_node"]           = Environment::CoresPerNode() ;
+        damaris_dict["cores_per_node"]           = Environment::CoresPerNode() ;
+        damaris_dict["number_of_nodes"]          = Environment::NumberOfNodes() ;
+        damaris_dict["simulation_name"]          = Environment::GetSimulationName() ;
+        damaris_dict["simulation_magic_number"]  = Environment::GetMagicNumber() ;  // this is a reference to a string. I hope that is fine.
+        
+        // These are the two 'static' dictionaries
+        // There will be another dictionary containing iteration data
+        damarisData_["dask_env"]              =  dask_dict ;
+        damarisData_["damaris_env"]           =  damaris_dict ;
         /**
          * String for waiting until all workers are available. 
          * We need to replace:
@@ -282,12 +295,21 @@ class PyAction : public Action, public Configurable<model::Script> {
         * String of Python code used to remove datasets from Python environment when the 
         * Damaris data they use  is invalidated/deleted
         */
-        regex_string_with_python_code_ = "try :               \n"
+       /* regex_string_with_python_code_ = "try :               \n"
                                          "  del DamarisData['REPLACE']   \n"
                                          "except KeyError as err:             \n"
                                          "  print('Damaris Server: KeyError could not delete key: ', err) \n" ;
-                                         
-       
+        */
+       /**
+        * String of Python code used to remove datasets from Python environment when the 
+        * Damaris data they use  is invalidated/deleted at the end of an iteration
+        */
+        regex_string_with_python_code_ = "import gc\n"
+                                         "try :\n"
+                                         "  del DamarisData['iteration_data']\n"
+                                         "  gc.collect()\n"
+                                         "except KeyError as err:\n"
+                                         "  print('Damaris Server: KeyError could not delete key: ', err)\n" ;
         
          
         /**

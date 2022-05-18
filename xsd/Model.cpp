@@ -652,30 +652,6 @@ namespace damaris
       this->dedicated_.set (std::move (x));
     }
 
-    const Architecture::placement_type& Architecture::
-    placement () const
-    {
-      return this->placement_.get ();
-    }
-
-    Architecture::placement_type& Architecture::
-    placement ()
-    {
-      return this->placement_.get ();
-    }
-
-    void Architecture::
-    placement (const placement_type& x)
-    {
-      this->placement_.set (x);
-    }
-
-    void Architecture::
-    placement (::std::unique_ptr< placement_type > x)
-    {
-      this->placement_.set (std::move (x));
-    }
-
     const Architecture::buffer_type& Architecture::
     buffer () const
     {
@@ -698,6 +674,30 @@ namespace damaris
     buffer (::std::unique_ptr< buffer_type > x)
     {
       this->buffer_.set (std::move (x));
+    }
+
+    const Architecture::placement_type& Architecture::
+    placement () const
+    {
+      return this->placement_.get ();
+    }
+
+    Architecture::placement_type& Architecture::
+    placement ()
+    {
+      return this->placement_.get ();
+    }
+
+    void Architecture::
+    placement (const placement_type& x)
+    {
+      this->placement_.set (x);
+    }
+
+    void Architecture::
+    placement (::std::unique_ptr< placement_type > x)
+    {
+      this->placement_.set (std::move (x));
     }
 
     const Architecture::queue_type& Architecture::
@@ -752,6 +752,36 @@ namespace damaris
     name (::std::unique_ptr< name_type > x)
     {
       this->name_.set (std::move (x));
+    }
+
+    const Architecture::comment_optional& Architecture::
+    comment () const
+    {
+      return this->comment_;
+    }
+
+    Architecture::comment_optional& Architecture::
+    comment ()
+    {
+      return this->comment_;
+    }
+
+    void Architecture::
+    comment (const comment_type& x)
+    {
+      this->comment_.set (x);
+    }
+
+    void Architecture::
+    comment (const comment_optional& x)
+    {
+      this->comment_ = x;
+    }
+
+    void Architecture::
+    comment (::std::unique_ptr< comment_type > x)
+    {
+      this->comment_.set (std::move (x));
     }
 
 
@@ -5173,32 +5203,34 @@ namespace damaris
     Architecture::
     Architecture (const domains_type& domains,
                   const dedicated_type& dedicated,
-                  const placement_type& placement,
                   const buffer_type& buffer,
+                  const placement_type& placement,
                   const queue_type& queue)
     : ::xml_schema::type (),
       domains_ (domains, this),
       dedicated_ (dedicated, this),
-      placement_ (placement, this),
       buffer_ (buffer, this),
+      placement_ (placement, this),
       queue_ (queue, this),
-      name_ (this)
+      name_ (this),
+      comment_ (this)
     {
     }
 
     Architecture::
     Architecture (::std::unique_ptr< domains_type > domains,
                   ::std::unique_ptr< dedicated_type > dedicated,
-                  ::std::unique_ptr< placement_type > placement,
                   ::std::unique_ptr< buffer_type > buffer,
+                  ::std::unique_ptr< placement_type > placement,
                   ::std::unique_ptr< queue_type > queue)
     : ::xml_schema::type (),
       domains_ (std::move (domains), this),
       dedicated_ (std::move (dedicated), this),
-      placement_ (std::move (placement), this),
       buffer_ (std::move (buffer), this),
+      placement_ (std::move (placement), this),
       queue_ (std::move (queue), this),
-      name_ (this)
+      name_ (this),
+      comment_ (this)
     {
     }
 
@@ -5209,10 +5241,11 @@ namespace damaris
     : ::xml_schema::type (x, f, c),
       domains_ (x.domains_, f, this),
       dedicated_ (x.dedicated_, f, this),
-      placement_ (x.placement_, f, this),
       buffer_ (x.buffer_, f, this),
+      placement_ (x.placement_, f, this),
       queue_ (x.queue_, f, this),
-      name_ (x.name_, f, this)
+      name_ (x.name_, f, this),
+      comment_ (x.comment_, f, this)
     {
     }
 
@@ -5223,10 +5256,11 @@ namespace damaris
     : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
       domains_ (this),
       dedicated_ (this),
-      placement_ (this),
       buffer_ (this),
+      placement_ (this),
       queue_ (this),
-      name_ (this)
+      name_ (this),
+      comment_ (this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
       {
@@ -5273,20 +5307,6 @@ namespace damaris
           }
         }
 
-        // placement
-        //
-        if (n.name () == "placement" && n.namespace_ () == "http://damaris.gforge.inria.fr/damaris/model")
-        {
-          ::std::unique_ptr< placement_type > r (
-            placement_traits::create (i, f, this));
-
-          if (!placement_.present ())
-          {
-            this->placement_.set (::std::move (r));
-            continue;
-          }
-        }
-
         // buffer
         //
         if (n.name () == "buffer" && n.namespace_ () == "http://damaris.gforge.inria.fr/damaris/model")
@@ -5297,6 +5317,20 @@ namespace damaris
           if (!buffer_.present ())
           {
             this->buffer_.set (::std::move (r));
+            continue;
+          }
+        }
+
+        // placement
+        //
+        if (n.name () == "placement" && n.namespace_ () == "http://damaris.gforge.inria.fr/damaris/model")
+        {
+          ::std::unique_ptr< placement_type > r (
+            placement_traits::create (i, f, this));
+
+          if (!placement_.present ())
+          {
+            this->placement_.set (::std::move (r));
             continue;
           }
         }
@@ -5332,17 +5366,17 @@ namespace damaris
           "http://damaris.gforge.inria.fr/damaris/model");
       }
 
-      if (!placement_.present ())
-      {
-        throw ::xsd::cxx::tree::expected_element< char > (
-          "placement",
-          "http://damaris.gforge.inria.fr/damaris/model");
-      }
-
       if (!buffer_.present ())
       {
         throw ::xsd::cxx::tree::expected_element< char > (
           "buffer",
+          "http://damaris.gforge.inria.fr/damaris/model");
+      }
+
+      if (!placement_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_element< char > (
+          "placement",
           "http://damaris.gforge.inria.fr/damaris/model");
       }
 
@@ -5364,6 +5398,12 @@ namespace damaris
           this->name_.set (name_traits::create (i, f, this));
           continue;
         }
+
+        if (n.name () == "comment" && n.namespace_ ().empty ())
+        {
+          this->comment_.set (comment_traits::create (i, f, this));
+          continue;
+        }
       }
     }
 
@@ -5382,10 +5422,11 @@ namespace damaris
         static_cast< ::xml_schema::type& > (*this) = x;
         this->domains_ = x.domains_;
         this->dedicated_ = x.dedicated_;
-        this->placement_ = x.placement_;
         this->buffer_ = x.buffer_;
+        this->placement_ = x.placement_;
         this->queue_ = x.queue_;
         this->name_ = x.name_;
+        this->comment_ = x.comment_;
       }
 
       return *this;

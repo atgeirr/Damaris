@@ -416,52 +416,45 @@ namespace damaris {
                  if (numBlocks == 0) {
                      // Obtain the FilesSpace size (has to match the memory space dimensions)
 
+                    std::string varName = GetVariableFullName(v);
+                    logString_global += varName ;
                     
                     for (int i = 0; i < varDimention; i++) {
                         globalDim[i] = b->GetGlobalExtent(i);
                         logString_global += "[" + std::to_string(globalDim[i]) + "]" ;
                     }
                    
-                   /* i_backwards = varDimention - 1 ;
-                    for (int i = 0 ; i < varDimention ; i++) {
-                         globalDim[i_backwards] = b->GetGlobalExtent(i);
-                         i_backwards-- ;
-                    }*/
-                    
                     
                     // Create dataspace.
                     if ((fileSpace = H5Screate_simple(varDimention, globalDim , NULL)) < 0)
                         ERROR("HDF5: file space creation failed !");
 
-                    std::string varName = GetVariableFullName(v);
+                    
+                    // Create the dataset
                     if ((dsetId = H5Dcreate( fileId, varName.c_str(), dtypeId, fileSpace,
                              lcplId, H5P_DEFAULT, H5P_DEFAULT)) < 0)
                         ERROR("HDF5: Failed to create dataset ... " << varName.c_str());
 
                     H5Sclose(fileSpace);
+                } else {
+                    std::string varName = GetVariableFullName(v);
+                    logString_global += varName ;
                 }
                 
                 
                 
                  // Obtain the starting indices and the size of the hyperslab
-                 /*
-                  * i_backwards = varDimention - 1 ;
-                 for(int i = 0; i < varDimention; i++) {
-                     memOffset[i_backwards] = b->GetStartIndex(i);
-                     memDim[i_backwards]   = b->GetEndIndex(i) - b->GetStartIndex(i) + 1;
-                     i_backwards--;
-                 } */
                 std::string logString_offset("HDF5Store::OutputCollective() memOffset") ;
-                std::string logString_dim("HDF5Store::OutputCollective() memDim") ;
+                   std::string logString_dim("HDF5Store::OutputCollective()    memDim") ;
                 for(int i = 0; i < varDimention; i++) {
-                     memOffset[i] = b->GetStartIndex(i);
-                     memDim[i]   = b->GetEndIndex(i) - b->GetStartIndex(i) + 1;
+                     memOffset[i]  = b->GetStartIndex(i);
+                     memDim[i]     = b->GetEndIndex(i) - b->GetStartIndex(i) + 1;
                      logString_offset += "[" + std::to_string(memOffset[i]) + "]" ;
                      logString_dim    += "[" + std::to_string(memDim[i]) + "]" ;                     
                  }
 
                  
-                 // create memory data space
+                 // Create memory data space
                  memSpace = H5Screate_simple(varDimention, memDim , NULL);
 
                  // Update ghost zones (N.B. untested)
@@ -485,9 +478,10 @@ namespace damaris {
                  H5Sclose(memSpace);
                  H5Pclose(plistId);
                  
-                 Environment::Log(logString_global , EventLogger::Debug);
-                 Environment::Log(logString_offset , EventLogger::Debug);
+                 Environment::Log(logString_global , EventLogger::Debug); // only updated when the counter numBlocks==0
                  Environment::Log(logString_dim ,    EventLogger::Debug);
+                 Environment::Log(logString_offset , EventLogger::Debug);
+                 
             } // for the blocks loop
             delete [] memOffset;
             delete [] memDim;

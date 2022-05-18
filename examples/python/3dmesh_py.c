@@ -67,7 +67,7 @@ int main(int argc, char** argv)
 
   
 
-   int size, rank, whd_layout;
+   int size_client, rank_client, whd_layout;
 
    int is_client;
    int err = damaris_start(&is_client);
@@ -83,69 +83,66 @@ int main(int argc, char** argv)
       damaris_parameter_get("DEPTH" , &DEPTH , sizeof(int));
       damaris_parameter_get("whd_layout" , &whd_layout , sizeof(int));
 
-      MPI_Comm_rank(comm , &rank);
-      MPI_Comm_size(comm , &size);
+      MPI_Comm_rank(comm , &rank_client);
+      MPI_Comm_size(comm , &size_client);
       
       fprintf(stdout,"Input paramaters found: v=%d r=%d (0 is not found)\n",verbose, rank_only);
 
       // Dynamically update the size used in the Damaris layout configuration
-      damaris_parameter_set("size" , &size , sizeof(int));
+      damaris_parameter_set("size" , &size_client , sizeof(int));
       
       int64_t position_cube[3];
       int local_width, local_height, local_depth  ;
       int rank_start = 0 ;
 
       if (whd_layout == 0) {
-         if (size > DEPTH) {
-             printf("ERROR: MPI process count (size=%2d) is greater than the blocked index (DEPTH=%2d)\t", size, DEPTH  );
+         if (size_client > DEPTH) {
+             printf("ERROR: MPI process count (size=%2d) is greater than the blocked index (DEPTH=%2d)\t", size_client, DEPTH  );
              exit(-1);
          }
          // used with: <layout name="cells_whd_dl" type="int" dimensions="WIDTH,HEIGHT,DEPTH/size" global="WIDTH,HEIGHT,DEPTH" />
          local_width      = WIDTH;
          local_height     = HEIGHT;
-         local_depth      = DEPTH/size;
+         local_depth      = DEPTH/size_client;
 
          position_cube[0] = 0;
          position_cube[1] = 0;
-         position_cube[2] = rank*local_depth;
+         position_cube[2] = rank_client*local_depth;
          
-         rank_start = rank * local_width * local_height ;
+         rank_start = rank_client * local_width * local_height ;
 
       } else  if (whd_layout == 1) {
-         if (size > HEIGHT) {
-             printf("ERROR: MPI process count (size=%2d) is greater than the blocked index (HEIGHT=%2d)\t", size, HEIGHT  );
+         if (size_client > HEIGHT) {
+             printf("ERROR: MPI process count (size=%2d) is greater than the blocked index (HEIGHT=%2d)\t", size_client, HEIGHT  );
              exit(-1);
          }
           // used with: <layout name="cells_whd_hm" type="int" dimensions="WIDTH,HEIGHT/size,DEPTH" global="WIDTH,HEIGHT,DEPTH" />
          local_width      = WIDTH;
-         local_height     = HEIGHT/size;
+         local_height     = HEIGHT/size_client;
          local_depth      = DEPTH;
          
          position_cube[0] = 0;
-         position_cube[1] = rank*local_height;
+         position_cube[1] = rank_client*local_height;
          position_cube[2] = 0;
          
-         rank_start = rank * local_width * local_depth ;
+         rank_start = rank_client * local_width * local_depth ;
          
       } else  if (whd_layout == 2) {
-         if (size > WIDTH) {
-             printf("ERROR: MPI process count (size=%2d) is greater than the blocked index (WIDTH=%2d)\t", size, WIDTH  );
+         if (size_client > WIDTH) {
+             printf("ERROR: MPI process count (size=%2d) is greater than the blocked index (WIDTH=%2d)\t", size_client, WIDTH  );
              exit(-1);
          }
           // used with: <layout name="cells_whd_wf" type="int" dimensions="WIDTH/size,HEIGHT,DEPTH" global="WIDTH,HEIGHT,DEPTH" />
          local_width      = WIDTH ; // WIDTH/size;
          local_height     = HEIGHT;
-         local_depth      = DEPTH/size;
+         local_depth      = DEPTH/size_client;
          
-         /*position_cube[0] = rank*local_width;
-         position_cube[1] = 0;
-         position_cube[2] = 0;
-         */
-         position_cube[0] = rank*local_depth;
+
+         position_cube[0] = rank_client*local_depth;
          position_cube[1] = 0;
          position_cube[2] = 0;
          
-         rank_start = rank * local_width * local_height ;
+         rank_start = rank_client * local_width * local_height ;
          
       }
       
@@ -181,10 +178,10 @@ int main(int argc, char** argv)
             int current_rank = 0 ;
             int sending_rank = 0 ;
              // serialize the print statements
-             while ( current_rank < size)
+             while ( current_rank < size_client)
              {
                printf("\n"); 
-               if (rank == current_rank) { // start of serialized section
+               if (rank_client == current_rank) { // start of serialized section
 
                   for ( d = 0; d < local_depth; d++){
                     for ( h = 0; h < local_height; h++){
@@ -210,10 +207,10 @@ int main(int argc, char** argv)
             int sending_rank = 0 ;
             int sumdata = 0 ;
              // serialize the print statements
-             while ( current_rank < size)
+             while ( current_rank < size_client)
              {
                // printf("\n"); 
-               if (rank == current_rank) { // start of serialized section                
+               if (rank_client == current_rank) { // start of serialized section                
 
                   for ( d = 0; d < local_depth; d++){
                     for ( h = 0; h < local_height; h++){
@@ -249,7 +246,7 @@ int main(int argc, char** argv)
 
          double t2 = MPI_Wtime();
 
-         if(rank == 0) {
+         if(rank_client == 0) {
             printf("Iteration %d done in %f seconds\n",i,(t2-t1));
             fflush(stdin); 
          }

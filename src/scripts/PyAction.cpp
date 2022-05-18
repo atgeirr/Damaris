@@ -253,11 +253,14 @@ namespace damaris {
     
     bool PyAction::PassDataToPython(int iteration )
     {
-        
+        std::stringstream varName ;
         BlocksByIteration::iterator begin;
         BlocksByIteration::iterator end;
-            
-        damarisData_["iteration"] = iteration ;
+        
+        // Each variable will be added to this dictionary (by variable name)
+        // and will contain meta-data about multiple blocks
+        bp::dict iteration_dict ;
+        iteration_dict["iteration"] = iteration ;
         // for each variable ... (unlike HDF5 storage, which can have a <variable ... store="" /> attribute 
         // VariableManager::iterator w = VariableManager::Begin();
         
@@ -266,10 +269,15 @@ namespace damaris {
         //  std::shared_ptr<Variable> v = (*w) ; // ->lock()) ; // ->lock();
         
         // for selected variables ... (like HDF5 storage, we can can have a <variable ... script="MyScript" /> attribute 
+        
         for (; w != GetVariables().end(); w++) {
-            
+            // A (sub) dictionary for each variable
+
+            // damaris_variable_dict will be accessible by the Damaris variable name from the iteration_dict 
+            // which is equivalent to the DD['iteration_data'] dictionary if access via Python
+            bp::dict damaris_variable_dict ;  
             std::shared_ptr<Variable> v = w->lock();
-            // non TimeVarying variables only are written in the first iteration.
+            // non TimeVarying variables only are written in the first iteration. 
             //if ((not v->get()->IsTimeVarying()) && (iteration > 0))
             if ((not v->IsTimeVarying()) && (iteration > 0))
                 continue;
@@ -282,53 +290,54 @@ namespace damaris {
             // Create a array for dimensions
             // int *globalDims;
             int *localDims;
+            int *localOffset; // equivalent to memOffset aray in HDF5Store
             // globalDims = new (std::nothrow) int[varDimention];
             localDims = new (std::nothrow)  int[varDimention];
+            localOffset = new (std::nothrow) int[varDimention]; 
+            //memDim = new (std::nothrow) hsize_t[varDimention];
 
             // (globalDims == NULL) || 
             if (localDims == NULL) {
                 ERROR("in PyAction::PassDataToPython(): Failed to allocate memory for localDims arrays!");
             }
+            if (localOffset == NULL) {
+                ERROR("in PyAction::PassDataToPython(): Failed to allocate memory for localOffset arrays!");
+            }
  
-            // (*v)->get()->GetBlocksByIteration(iteration, begin, end);
             v->GetBlocksByIteration(iteration, begin, end);
-            std::string varName;
 
-            //std::cout <<"INFO: " << iteration << " PyAction::PassDataToPython() (*v)->GetName() = " << v->GetName() << std::endl << std::flush ; 
-           
             // Define Python lists for some usefull metadata to be pushed to Python
             bp::list block_list ;   // each client produces a seperate 'block' of a variable
-            bp::list blockid_list ; // Variables can also have multiple 'domains', which translates to multiple blocks and is data written in multiple chuncks on a single damaris interation
+            bp::list blockid_list ; // Variables can also have multiple 'domains', which translates to multiple blocks and 
+                                    // is data written in multiple chunks on a single damaris interation
+            bp::dict variable_data ;  // the numpy arrays
             for (BlocksByIteration::iterator bid = begin; bid != end; bid++) {
                 std::shared_ptr<Block> b = *bid;
 
-                // Obtain block array dimension
+                // Obtain block array number of dimension
                 int blockDimension = b->GetDimensions();
-                
-                                 
-                // Create Dataset name for this block- includes the data type string: _<type>_P<X>[_B<Y>]
-                // <type> as C named data type
-                // <X> is the variable source rank
-                // <Y> is the block number for the rank
-                varName = GetVariableFullName(v , &b);
-                std::string numpy_name =  varName + "_" + std::to_string(iteration) ;
-
+                varName << "P" << b->GetSource() << "_B" << b->GetID();
+            
                 // Obtain the block size
                 // Numpy uses C storage conventions, assuming that the last listed
                 // dimension is the fastest-changing dimension and the first-listed
                 // dimension is the slowest changing.
-                std::string logString_localDims("PyAction::PassDataToPython() numpy array dims ") ; 
-                logString_localDims += numpy_name ;
+                std::string logString_localDims   ("PyAction::PassDataToPython() numpy array dims    ['iteration_data']['") ;
+                std::string logString_localOffsets("PyAction::PassDataToPython() numpy array offsets ['iteration_data']['") ; 
+                logString_localDims    += v->GetName() + "']['numpy_data']" + "[ " + varName "]" ;
+                logString_localOffsets += v->GetName() + "']['numpy_data']" + "[ " + varName "]" ;
                 for (int i = 0 ; i < blockDimension ; i++) {
-                    localDims[i] = b->GetEndIndex(i) - b->GetStartIndex(i) + 1;
-                    logString_localDims += "[" + std::to_string(localDims[i]) + "]" ;
+                    localOffset[i] = b->GetStartIndex(i);
+                    localDims[i]   = b->GetEndIndex(i) - b->GetStartIndex(i) + 1;
+                    logString_localDims    += "[" + std::to_string(localDims[i]) + "]" ;
+                    logString_localOffsets += "[" + std::to_string(localOffset[i]) + "]" ;
                 }
                 
                 block_list.append(b->GetSource() ) ;
-                if (Environment::NumDomainsPerClient() > 1 ) {
-                    blockid_list.append(b->GetID());
-                 }
-                // globalDims are not currently used (may be needed for VDS support?)
+                //if (Environment::NumDomainsPerClient() > 1 ) {
+                blockid_list.append(b->GetID());  // always add the blockid
+                // }
+                //// globalDims are not currently used (may be needed for VDS support?)
                 //for (int i = 0; i < varDimention; i++) {
                 //    globalDims[i] = b->GetGlobalExtent(i) ;
                 //}
@@ -342,37 +351,51 @@ namespace damaris {
                    np::ndarray mul_data_ex = ReturnNpNdarray(blockDimension, localDims, np_ptr, v->GetLayout()->GetType()) ;
                 
                    // Store reference to NumPy array in Python dictionary
-                   damarisData_[numpy_name]  = mul_data_ex ;
+                   variable_data[varName.str()]  = mul_data_ex ;
                 }
                 catch( bp::error_already_set &e) {
-                    CatchPrintAndLogPyException("ERROR: PyAction::PassDataToPython() np::from_data() /n ") ;                      
+                    CatchPrintAndLogPyException("ERROR: PyAction::PassDataToPython() np::from_data() Error wrapping Damaris data as NumPy array /n ") ;                      
                 }
-                              
-                // std::cout <<"INFO: " << iteration << " PyAction::PassDataToPython() numpy_name: " << numpy_name << std::endl << std::flush ; 
-    
+                varName.str("") ; // reset the name string
                 Environment::Log(logString_localDims , EventLogger::Debug);
+                Environment::Log(logString_localOffsets , EventLogger::Debug);
             } // for each block of the variable
-            damarisData_["block_source"]  =  block_list ;
-            damarisData_["block_domains"] =  blockid_list ;
+            damaris_variable_dict["numpy_data"]    =  variable_data ; 
+            damaris_variable_dict["block_source"]  =  block_list    ;
+            damaris_variable_dict["block_domains"] =  blockid_list  ;
+            // std::sring typestr = 
+            damaris_variable_dict["type_string"]   =  GetTypeString(v->GetLayout()->GetType()) ; // return type string is prefixed by "_"
+            
+            // For this variable, add all the meta-data and numpy array blocks to the iteration dictionary
+            iteration_dict[v->GetName()]           = damaris_variable_dict ;
+           
             //delete [] globalDims;
             delete [] localDims;
         } // for each variable of the iteration (that is specified with script="..." ))
          
-         
+        damarisData_["iteration_data"]           = iteration_dict ;
         std::string logString_Script ;
         logString_Script = std::to_string(iteration) +" PyAction::PassDataToPython() Running Script: " +  this->file_  ;
         Environment::Log(logString_Script , EventLogger::Debug);
-        // **************  Now run the script on the exposed data 
+        // **************  Now run the external Python script that has access to the exposed data
         try {
             bp::object res = bp::exec_file(this->file_.c_str(), this->globals_, this->locals_) ;
         } 
         catch( bp::error_already_set &e) {
-            CatchPrintAndLogPyException("ERROR: PyAction::PassDataToPython() bp::exec_file() /n") ;           
+            CatchPrintAndLogPyException("ERROR: PyAction::PassDataToPython() bp::exec_file() Error Running Python Script /n") ;           
+        }
+        
+        // ************** Now remove the iteration data, as the block data will be deleted from shared memory (TBC)
+        try {
+              bp::object result = bp::exec(regex_string_with_python_code_.c_str(), this->globals_, this->locals_);  
+        }  catch( bp::error_already_set &e) {
+              CatchPrintAndLogPyException("ERROR: PyAction::PassDataToPython() bp::exec() Deleting Iteration Data " ) ;
         }
         
         
         // ************** Now remove the data, as the block data will be deleted from shared memory (well, maybe only the references to it)
-        e_ = "\\b(REPLACE)([^ ]*)" ;  // Set the regex as we use it in the constructor for various substitutions
+        /*
+         * e_ = "\\b(REPLACE)([^ ]*)" ;  // Set the regex as we use it in the constructor for various substitutions
         w = GetVariables().begin();
         // for selected variables ... (like HDF5 storage, we can can have a <variable ... script="MyScript" /> attribute 
         for (; w != GetVariables().end(); w++) {
@@ -397,6 +420,7 @@ namespace damaris {
                 }
             }                        
         }
+        */
             
           
         

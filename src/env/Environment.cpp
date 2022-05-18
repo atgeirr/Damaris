@@ -233,21 +233,23 @@ bool Environment::ReturnTrueIfClientFromPlacement(int rankInNode)
     int start ;
     unsigned int step, blocksize ;
     std::string mask;
-    
+
+
+    // Obtain details form XML model
     // Check if XML placement element exists
-    //if (GetModel()->architecture().placement().present())
-    //{
-        // Obtain details form XML model
-        start     = GetModel()->architecture().placement().start() ;
-        step      = GetModel()->architecture().placement().step() ;
-        blocksize = GetModel()->architecture().placement().blocksize() ;
-        mask      = (std::string) GetModel()->architecture().placement().mask() ;
+    //if (GetModel()->architecture().placement().present()) // This is redundant as it has to be present
+    
+    start     = GetModel()->architecture().placement().start() ;
+    step      = GetModel()->architecture().placement().step() ;
+    blocksize = GetModel()->architecture().placement().blocksize() ;
+    mask      = (std::string) GetModel()->architecture().placement().mask() ;
+    
+    mask.erase(std::remove_if(mask.begin(), mask.end(), ::isspace), mask.end());
+    
+    if (mask.empty()) {
         
-        mask.erase(std::remove_if(mask.begin(), mask.end(), ::isspace), mask.end());
-        
-        if (mask.empty()) {
-            
-        }
+    }
+
         
    // } else {
    //     retbool = (rankInNode >= _clientsPerNode_) ? 0 : 1;

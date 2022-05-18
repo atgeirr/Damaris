@@ -1043,23 +1043,6 @@ namespace damaris
       void
       dedicated (::std::unique_ptr< dedicated_type > p);
 
-      // placement
-      //
-      typedef ::damaris::model::Placement placement_type;
-      typedef ::xsd::cxx::tree::traits< placement_type, char > placement_traits;
-
-      const placement_type&
-      placement () const;
-
-      placement_type&
-      placement ();
-
-      void
-      placement (const placement_type& x);
-
-      void
-      placement (::std::unique_ptr< placement_type > p);
-
       // buffer
       //
       typedef ::damaris::model::Buffer buffer_type;
@@ -1076,6 +1059,23 @@ namespace damaris
 
       void
       buffer (::std::unique_ptr< buffer_type > p);
+
+      // placement
+      //
+      typedef ::damaris::model::Placement placement_type;
+      typedef ::xsd::cxx::tree::traits< placement_type, char > placement_traits;
+
+      const placement_type&
+      placement () const;
+
+      placement_type&
+      placement ();
+
+      void
+      placement (const placement_type& x);
+
+      void
+      placement (::std::unique_ptr< placement_type > p);
 
       // queue
       //
@@ -1115,18 +1115,39 @@ namespace damaris
       void
       name (::std::unique_ptr< name_type > p);
 
+      // comment
+      //
+      typedef ::xml_schema::string comment_type;
+      typedef ::xsd::cxx::tree::optional< comment_type > comment_optional;
+      typedef ::xsd::cxx::tree::traits< comment_type, char > comment_traits;
+
+      const comment_optional&
+      comment () const;
+
+      comment_optional&
+      comment ();
+
+      void
+      comment (const comment_type& x);
+
+      void
+      comment (const comment_optional& x);
+
+      void
+      comment (::std::unique_ptr< comment_type > p);
+
       // Constructors.
       //
       Architecture (const domains_type&,
                     const dedicated_type&,
-                    const placement_type&,
                     const buffer_type&,
+                    const placement_type&,
                     const queue_type&);
 
       Architecture (::std::unique_ptr< domains_type >,
                     ::std::unique_ptr< dedicated_type >,
-                    ::std::unique_ptr< placement_type >,
                     ::std::unique_ptr< buffer_type >,
+                    ::std::unique_ptr< placement_type >,
                     ::std::unique_ptr< queue_type >);
 
       Architecture (const ::xercesc::DOMElement& e,
@@ -1157,10 +1178,11 @@ namespace damaris
       protected:
       ::xsd::cxx::tree::one< domains_type > domains_;
       ::xsd::cxx::tree::one< dedicated_type > dedicated_;
-      ::xsd::cxx::tree::one< placement_type > placement_;
       ::xsd::cxx::tree::one< buffer_type > buffer_;
+      ::xsd::cxx::tree::one< placement_type > placement_;
       ::xsd::cxx::tree::one< queue_type > queue_;
       name_optional name_;
+      comment_optional comment_;
     };
 
     class Language: public ::xml_schema::string
