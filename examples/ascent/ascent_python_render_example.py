@@ -101,9 +101,26 @@ mesh_data["fields/alternating/association"] = "element"; # or "vertex"
 mesh_data["fields/alternating/topology"] = "topo";
 mesh_data["fields/alternating/values"].set_external(field_nparray);
 
+#/ print the mesh we created
+ print(mesh_data.to_yaml())
+
 """
+# create container node
+ mesh = conduit.Node()
+# generate simple explicit poly-based 3d 'basic' mesh
+# conduit::blueprint::mesh::examples::basic("polyhedra", 3, 3, 3, mesh);
+conduit.blueprint.mesh.examples.basic("polyhedra", 3, 3, 3, mesh)
+# or
+# mesh =  conduit.blueprint.mesh.examples.basic("polyhedra", 3, 3, 3, mesh)
+# print out results
+mesh.print();
+
 // coordinate system data
 mesh_data["coordsets/coords/type"] = "explicit";
+m_x = np.array([-10.0, 0.0, 10.0, -10.0, 0.0, 10.0, -10.0, 0.0, 10.0, -10.0, 0.0, 10.0, -10.0, 0.0, 10.0, -10.0, 0.0, 10.0, -10.0, 0.0, 10.0, -10.0, 0.0, 10.0, -10.0, 0.0, 10.0])
+m_y = np.array([-10.0, -10.0, -10.0, 0.0, 0.0, 0.0, 10.0, 10.0, 10.0, -10.0, -10.0, -10.0, 0.0, 0.0, 0.0, 10.0, 10.0, 10.0, -10.0, -10.0, -10.0, 0.0, 0.0, 0.0, 10.0, 10.0, 10.0])
+m_z = np.array([-10.0, -10.0, -10.0, -10.0, -10.0, -10.0, -10.0, -10.0, -10.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0])
+topologies: 
 mesh_data["coordsets/coords/x"].set_external(m_x);
 mesh_data["coordsets/coords/y"].set_external(m_y);
 mesh_data["coordsets/coords/z"].set_external(m_z);
@@ -112,13 +129,21 @@ mesh_data["coordsets/coords/z"].set_external(m_z);
 mesh_data["topologies/mesh/type"] = "unstructured";
 mesh_data["topologies/mesh/coordset"] = "coords";
 mesh_data["topologies/mesh/elements/shape"] = "hexs";
-mesh_data["topologies/mesh/elements/connectivity"].set_external(m_nodelist);
+connectivity = np.array( [0, 1, 4, 3, 9, 10, 13, 12, 1, 2, 5, 4, 10, 11, 14, 13, 3, 4, 7, 6, 12, 13, 16, 15, 4, 5, 8, 7, 13, 14, 17, 16, 9, 10, 13, 12, 18, 19, 22, 21, 10, 11, 14, 13, 19, 20, 23, 22, 12, 13, 16, 15, 21, 22, 25, 24, 13, 14, 17, 16, 22, 23, 26, 25], np.type='uint8')
+mesh_data["topologies/mesh/elements/connectivity"].set_external(connectivity, 8);
 
 // one or more scalar fields
-mesh_data["fields/p/type"]        = "scalar";
-mesh_data["fields/p/topology"]    = "mesh";
-mesh_data["fields/p/association"] = "element";
-mesh_data["fields/p/values"].set_external(m_p);
+// create a field named var1
+mesh_data["fields/var1/association"] = "element";
+mesh_data["fields/var1/topology"] = "mesh";
+mesh_data["fields/var1/values"].set_external(var1_vals, 2);
+
+// create a field named var2
+mesh_data["fields/var2/association"] = "element";
+mesh_data["fields/var2/topology"] = "mesh";
+mesh_data["fields/var2/values"].set_external(var2_vals, 2);
+
+print(mesh_data.to_yaml())
 """
 
 

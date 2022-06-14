@@ -34,6 +34,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/python/numpy.hpp>
 #include <boost/python/dict.hpp>
 
+
 namespace bp = boost::python;
 namespace np = boost::python::numpy;
 
@@ -239,8 +240,9 @@ class PyAction : public Action, public Configurable<model::Script> {
        }
                                           
        
-        // This dictionary is placed in the Python interpreter and contains data that
-        // can be accessed through the script
+        /** This dictionary is placed in the Python interpreter and contains data that
+        *   can be accessed through the script specified in the Dmaris XML <pyscript> tag
+        */
         locals_["DamarisData"] = damarisData_ ;
         
         

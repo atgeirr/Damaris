@@ -45,29 +45,30 @@ using namespace damaris::model;
 
 namespace damaris {
 
-bool                Environment::_initialized_;
-std::shared_ptr<model::Simulation>     Environment::_baseModel_;
+bool                 Environment::_initialized_;
 MPI_Comm             Environment::_entityComm_;
 MPI_Comm             Environment::_globalComm_;
 MPI_Comm             Environment::_nodeComm_;
-std::list<int>             Environment::_knownClients_;
-int                 Environment::_lastIteration_;
-bool                 Environment::_isClient_     = false;
-bool                Environment::_isDedicatedCore_     = false;
-bool                Environment::_isDedicatedNode_     = false;
-int                 Environment::_globalProcessID_;
-int                Environment::_entityProcessID_;
-int                Environment::_clientsPerNode_;
-int                Environment::_coresPerNode_;
-int                 Environment::_serversPerNode_;
+std::list<int>       Environment::_knownClients_;
+int                  Environment::_lastIteration_;
+bool                 Environment::_isClient_         = false;
+bool                 Environment::_isDedicatedCore_  = false;
+bool                 Environment::_isDedicatedNode_  = false;
+int                  Environment::_globalProcessID_;
+int                  Environment::_entityProcessID_;
+int                  Environment::_clientsPerNode_;
+int                  Environment::_coresPerNode_;
+int                  Environment::_serversPerNode_;
 int                  Environment::_numberOfNodes_;
-std::string             Environment::_magicNumber_;
-std::string             Environment::_environment_print_string_;
-std::shared_ptr<Buffer>         Environment::_defaultBuffer_;
-std::shared_ptr<Client>        Environment::_client_;
-std::shared_ptr<Server>        Environment::_server_;
-std::shared_ptr<EventLogger> Environment::_eventLogger_;
-bool                Environment::_sharedStructuresOwner_;
+std::string          Environment::_magicNumber_;
+std::string          Environment::_environment_print_string_;
+bool                 Environment::_sharedStructuresOwner_;
+std::shared_ptr<model::Simulation>     Environment::_baseModel_;
+std::shared_ptr<Buffer>                Environment::_defaultBuffer_;
+std::shared_ptr<Client>                Environment::_client_;
+std::shared_ptr<Server>                Environment::_server_;
+std::shared_ptr<EventLogger>           Environment::_eventLogger_;
+
 
 
 

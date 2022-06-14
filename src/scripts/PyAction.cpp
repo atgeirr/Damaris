@@ -235,7 +235,7 @@ namespace damaris {
             MPI_Bcast(&retint,1,MPI_INT,0,comm);
         } else {
             
-             MPI_Bcast(&retint,1,MPI_INT,0,comm);  // recieve the value from rank 0
+            MPI_Bcast(&retint,1,MPI_INT,0,comm);  // recieve the value from rank 0
         }
         
         if (retint == 1) {
@@ -310,7 +310,7 @@ namespace damaris {
             bp::list block_list ;   // each client produces a seperate 'block' of a variable
             bp::list blockid_list ; // Variables can also have multiple 'domains', which translates to multiple blocks and 
                                     // is data written in multiple chunks on a single damaris interation
-            bp::dict variable_data ;  // the numpy arrays
+            bp::dict variable_data ;  // the numpy arrays - one for each block + domain
             for (BlocksByIteration::iterator bid = begin; bid != end; bid++) {
                 std::shared_ptr<Block> b = *bid;
 
@@ -324,8 +324,8 @@ namespace damaris {
                 // dimension is the slowest changing.
                 std::string logString_localDims   ("PyAction::PassDataToPython() numpy array dims    ['iteration_data']['") ;
                 std::string logString_localOffsets("PyAction::PassDataToPython() numpy array offsets ['iteration_data']['") ; 
-                logString_localDims    += v->GetName() + "']['numpy_data']" + "[ " + varName "]" ;
-                logString_localOffsets += v->GetName() + "']['numpy_data']" + "[ " + varName "]" ;
+                logString_localDims    += v->GetName() + "']['numpy_data']" + "[ " + varName.str() + "]" ;
+                logString_localOffsets += v->GetName() + "']['numpy_data']" + "[ " + varName.str() + "]" ;
                 for (int i = 0 ; i < blockDimension ; i++) {
                     localOffset[i] = b->GetStartIndex(i);
                     localDims[i]   = b->GetEndIndex(i) - b->GetStartIndex(i) + 1;
@@ -337,7 +337,7 @@ namespace damaris {
                 //if (Environment::NumDomainsPerClient() > 1 ) {
                 blockid_list.append(b->GetID());  // always add the blockid
                 // }
-                //// globalDims are not currently used (may be needed for VDS support?)
+                //// globalDims are not currently used
                 //for (int i = 0; i < varDimention; i++) {
                 //    globalDims[i] = b->GetGlobalExtent(i) ;
                 //}
@@ -353,8 +353,8 @@ namespace damaris {
                    // Store reference to NumPy array in Python dictionary
                    variable_data[varName.str()]  = mul_data_ex ;
                 }
-                catch( bp::error_already_set &e) {
-                    CatchPrintAndLogPyException("ERROR: PyAction::PassDataToPython() np::from_data() Error wrapping Damaris data as NumPy array /n ") ;                      
+                catch( bp::error_already_set &e) {
+                   CatchPrintAndLogPyException("ERROR: PyAction::PassDataToPython() np::from_data() Error wrapping Damaris data as NumPy array /n ") ;                      
                 }
                 varName.str("") ; // reset the name string
                 Environment::Log(logString_localDims , EventLogger::Debug);
@@ -369,7 +369,7 @@ namespace damaris {
             // For this variable, add all the meta-data and numpy array blocks to the iteration dictionary
             iteration_dict[v->GetName()]           = damaris_variable_dict ;
            
-            //delete [] globalDims;
+            delete [] localOffset;
             delete [] localDims;
         } // for each variable of the iteration (that is specified with script="..." ))
          
@@ -381,14 +381,14 @@ namespace damaris {
         try {
             bp::object res = bp::exec_file(this->file_.c_str(), this->globals_, this->locals_) ;
         } 
-        catch( bp::error_already_set &e) {
+        catch( bp::error_already_set &e) {
             CatchPrintAndLogPyException("ERROR: PyAction::PassDataToPython() bp::exec_file() Error Running Python Script /n") ;           
         }
         
         // ************** Now remove the iteration data, as the block data will be deleted from shared memory (TBC)
         try {
               bp::object result = bp::exec(regex_string_with_python_code_.c_str(), this->globals_, this->locals_);  
-        }  catch( bp::error_already_set &e) {
+        }  catch( bp::error_already_set &e) {
               CatchPrintAndLogPyException("ERROR: PyAction::PassDataToPython() bp::exec() Deleting Iteration Data " ) ;
         }
         

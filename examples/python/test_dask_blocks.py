@@ -24,18 +24,22 @@
 # 
 # cmake -Dcatalyst_DIR=/usr/local/lib/cmake/catalyst-2.0  sim-dir
 #
+
+#
+# ## These are for Ascent and Conduit
+# export PYTHONPATH=/home/jbowden/local/python-modules:$PYTHONPATH
+# 
+#  mpirun -np 4 --oversubscribe ./test_dask_blocks.py
+#
+# ## This is for ParaView (not needed if we use pvbatch or pvpython)
+# export PYTHONPATH=/home/jbowden/local/lib/python3.8/site-packages:$PYTHONPATH
+# This is for using Paraview (not need if using Ascent)
 #
 # export CATALYST_IMPLEMENTATION_PATHS="<paraview-install-dir>/lib/catalyst" 
 # export CATALYST_IMPLEMENTATION_NAME=paraview
-#
-# # these are for Ascent and Conduit
-# export PYTHONPATH=/home/jbowden/local/python-modules:$PYTHONPATH
-# 
-# This is for ParaView (not needed if we use pvbatch or pvpython
-# export PYTHONPATH=/home/jbowden/local/lib/python3.8/site-packages:$PYTHONPATH
 # mpirun -np 4 --oversubscribe pvbatch --sym --mpi ./test_dask_blocks.py
-
-
+# 
+# 
 from mpi4py import MPI
 import dask.array as da
 import time
@@ -54,24 +58,16 @@ import argparse
 
 #----------------------------------------------------------------
 # parse command line arguments
-parser = argparse.ArgumentParser(\
-    description="Wavelet MiniApp for Catalyst testing")
-parser.add_argument("-t", "--timesteps", type=int,
-    help="number of timesteps to run the miniapp for (default: 100)", default=100)
-parser.add_argument("--size",  type=int,
-    help="number of samples in each coordinate direction (default: 101)", default=101)
-parser.add_argument("-s", "--script", type=str, action="append",
-    help="path(s) to the Catalyst script(s) to use for in situ processing. Can be a "
-    ".py file or a Python package zip or directory",
-    required=False)
-parser.add_argument("--script-version", type=int,
-    help="choose Catalyst analysis script version explicitly, otherwise it "
+parser = argparse.ArgumentParser(description="Wavelet MiniApp for Catalyst testing")
+parser.add_argument("-t", "--timesteps", type=int, help="number of timesteps to run the miniapp for (default: 100)", default=100)
+parser.add_argument("--size",  type=int, help="number of samples in each coordinate direction (default: 101)", default=101)
+parser.add_argument("-s", "--script", type=str, action="append", help="path(s) to the Catalyst script(s) to use for in situ processing. Can be a "
+    ".py file or a Python package zip or directory", required=False)
+parser.add_argument("--script-version", type=int,  help="choose Catalyst analysis script version explicitly, otherwise it "
     "will be determined automatically. When specifying multiple scripts, this "
     "setting applies to all scripts.", default=0)
-parser.add_argument("-d", "--delay", type=float,
-    help="delay (in seconds) between timesteps (default: 0.0)", default=0.0)
-parser.add_argument("-c", "--channel", type=str,
-    help="Catalyst channel name (default: input)", default="input")
+parser.add_argument("-d", "--delay", type=float, help="delay (in seconds) between timesteps (default: 0.0)", default=0.0)
+parser.add_argument("-c", "--channel", type=str, help="Catalyst channel name (default: input)", default="input")
 
 
  
@@ -122,11 +118,12 @@ def returnDaskBlockLayout(myblocks_sorted):
     
 
 class SubBlock:
-  def __init__(self, blocknum, dims_tpl, offset_tpl, total_blocks):
+  def __init__(self, blocknum, dims_tpl, offset_tpl, total_blocks,np_sctn):
     self.blocknum = blocknum
     self.dims_tpl = dims_tpl
     self.offset_tpl = offset_tpl
     self.total_blocks = total_blocks
+    self.np_sctn = np_sctn
     #print(self.offset_tpl)
   def __repr__(self):
     return repr((self.offset_tpl))
@@ -177,16 +174,18 @@ def makeSortedBlocks( ranges, bloc_tup ):
     
     
 def makeSortedBlocksWithData( ranges, bloc_tup, split_type, rank, size ):
+    
     # Multiply the length of each range to get the total number of iterations
+    # e.g. [0,2,4,8],[0,1,2,3,4,5,6,7],[0,1,2]  == 4 x 7 x 3
     total_blocs = reduce(mul,([len(v) for v in ranges]))
     blocknum_lst_rnd = random.sample(range(0,total_blocs),total_blocs) # no repeat values
     # print((blocknum_lst_rnd))
     myblocks = []
 
-    # convert ('block', '', '', '') to integer tuple
-    
-    bloc_dim_step   = [int(len(v)> 0) * (size) for v in split_type] 
-    bloc_dim_lower  = tuple([int(len(v)> 0) * (rank * size) for v in split_type])
+    # convert split_type  to integer tuple
+    # e.g. split_type (1 ,0, 0, 0)
+    bloc_dim_step   = [int(v > 0) * (size) for v in split_type] 
+    bloc_dim_lower  = tuple([int(v > 0) * (rank * size) for v in split_type])
     bloc_dim_upper  = tuple(map(lambda i, j: i + j, bloc_dim_lower, bloc_dim_step))
     # print((bloc_dim_step))
     
@@ -194,7 +193,8 @@ def makeSortedBlocksWithData( ranges, bloc_tup, split_type, rank, size ):
     # print(rank, 'bloc_dim_lower: ',bloc_dim_lower)
     # print(rank, 'bloc_dim_upper: ',bloc_dim_upper)
     
-    # This is equivalent to a nested for loop of the ranges in ranges
+    # This is equivalent to a nested for loop of the ranges in the 'ranges' object
+    creation = 0
     for args in itertools.product(*ranges):
         # if rank == 1: print(rank, ' args ', args)
         blocknum = blocknum_lst_rnd.pop()  # goes backwards through list and removes the last item.
@@ -205,12 +205,18 @@ def makeSortedBlocksWithData( ranges, bloc_tup, split_type, rank, size ):
             args_zeroed[i] = 0
         args_zeroed = tuple(args_zeroed)  
         
-        if (args_zeroed) >= (bloc_dim_lower) and (args_zeroed)  < (bloc_dim_upper) : 
-            #print(rank, ' args_zeroed: ',args_zeroed)
-            # print(rank, ' args:        ',args, '  size: ', bloc_tup)
-            np_sctn = np.ones(bloc_tup)
-        myblocks.append(SubBlock(blocknum, bloc_tup, args, total_blocs))
-
+       
+        # if (args_zeroed) >= (bloc_dim_lower) and (args_zeroed)  < (bloc_dim_upper) : 
+        #    #print(rank, ' args_zeroed: ',args_zeroed)
+        #    print('rank: ', rank, ' making block:        ',blocknum, '  size: ', bloc_tup)
+        if creation % size == rank:
+            np_sctn = np.ones(bloc_tup) * rank    
+        else:
+            np_sctn = None
+            
+        myblocks.append(SubBlock(blocknum, bloc_tup, args, total_blocs, np_sctn))
+        creation += 1
+        
     return myblocks, total_blocs
     
     
@@ -219,38 +225,44 @@ def makeSortedBlocksWithData( ranges, bloc_tup, split_type, rank, size ):
 # The following could be used to re-order the randomized tuple data
 # myblocks_sorted= sorted(myblocks_unsorted, key=attrgetter('offset_tpl'), reverse=False)
 
-
-
  
 def main(args) :
     try:
-        from paraview.catalyst import bridge
-        from paraview import print_info, print_warning
-        bridge.initialize()
-        
+        # from paraview.catalyst import bridge
+        # from paraview import print_info, print_warning
+        # bridge.initialize()
+        np.random.seed(seed=42)
         comm = MPI.COMM_WORLD
         rank = comm.Get_rank()
         size = comm.Get_size()
         
-        # MPI decomposition
-        split_type = ('', '', 'block', '')  # block or spread are the options
-        
-     
+        # This code is generic for any rank of
+        # arrays to be tested
+        # We build the dimensions here.
         # Domain size:
-        domain_V = 16
+        # domain_V = 16
         domain_W = 16
-        domain_H = 9  # block this into 3
-        domain_D = 16 # block this into 4
+        domain_H = 16  # block this into 3
+        # domain_D = 16 # block this into 4
 
         # Block sub-domain sizes:
-        bloc_V   = 16
-        bloc_W   = 16  // 4
-        bloc_H   = 9   // 1
-        bloc_D   = 16  // 4 
+        # bloc_V   = domain_V  // 1
+        bloc_W   = domain_W  // 4
+        bloc_H   = domain_H  // 4
+        # bloc_D   = domain_D  // 4 
 
-        bloc_tup        = (bloc_D, bloc_H, bloc_W, bloc_V)
-        domain_tup      = (domain_D, domain_H, domain_W, domain_V)
+        # bloc_tup        = (bloc_D, bloc_H, bloc_W, bloc_V)
+        # domain_tup      = (domain_D, domain_H, domain_W, domain_V)        
+        # bloc_tup        = (bloc_D, bloc_H, bloc_W)
+        # domain_tup      = (domain_D, domain_H, domain_W)
+        bloc_tup        = (bloc_H, bloc_W)
+        domain_tup      = (domain_H, domain_W)
         
+        # split_type indicates which dimension the domain decomposition has been applied over.
+        # split_type = ('block', '', '')  # block or spread are the options
+        split_type  = tuple(map(lambda i, j: int(i < j) , bloc_tup, domain_tup))
+        split_type  = (0,1,0)
+        # print(split_type)
         
         ranges          = makeRanges( domain_tup, bloc_tup )
         # myblocks_sorted, total_blocs = makeSortedBlocks( ranges, bloc_tup )
@@ -259,15 +271,29 @@ def main(args) :
         dask_str = returnDaskBlockLayout(myblocks_sorted)
         if rank == 0:
             print(dask_str) 
+            
+        # exec(dask_str)
+        # x = da.block(data)
+        # y = x *2
+        # print(x.compute())
+        # print('')
+        # print(y.compute())
+        # print('')
+        # print(y.chunks)
+
         
         # Create split numpy arrays distributed over ranks
     finally:
         # finalize Catalyst
-        bridge.finalize()    
+        # bridge.finalize()    
         pass
   
-  
-def output_via_ascent(np_data, iteration)
+
+
+
+
+# This will be for visualization. Currently not used
+def output_via_ascent(np_data, iteration):
     import conduit
     import conduit.blueprint
     import ascent
@@ -278,17 +304,26 @@ def output_via_ascent(np_data, iteration)
 
 
     # open ascent
-    a = ascent.Ascent()
-    a.open()
+    # a = ascent.Ascent()
+    # a.open()
+    # open ascent
+    a = ascent.mpi.Ascent()
+    ascent_opts = conduit.Node()
+    ascent_opts["mpi_comm"].set(MPI.COMM_WORLD.py2f())
+    a.open(ascent_opts)
 
 
     # create example mesh using conduit blueprint
     n_mesh = conduit.Node()
-    conduit.blueprint.mesh.examples.braid("hexs",
-                                        11,
-                                        11,
-                                        11,
-                                        n_mesh)
+    # Explicit examples are available here: https://llnl-conduit.readthedocs.io/en/latest/blueprint_mesh.html#hexs
+    # conduit.blueprint.mesh.examples.braid("hexs",  11, 11, 11,  n_mesh)
+    conduit.blueprint.mesh.examples.basic("hexs",  11, 11, 11,  n_mesh)
+    
+    n_mesh["state/domain_id"] = MPI.COMM_WORLD.rank
+    # overwrite example field with domain id
+    n_mesh["fields/braid/values"][:] = MPI.COMM_WORLD.rank
+    
+    
     # publish mesh to ascent
     a.publish(n_mesh)
 

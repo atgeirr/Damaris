@@ -39,6 +39,7 @@ option(ENABLE_VISIT    "Build VisIt support. May requires VisIt_ROOT to be set."
 option(ENABLE_CATALYST "Build Catalyst support. May requires ParaView_DIR to be set." OFF)
 option(ENABLE_HDF5     "Build with HDF5 support. May requires HDF5_ROOT to be set." OFF)
 option(ENABLE_PYTHON   "Build with Python+ NumPy scripting capabilties." OFF)
+option(ENABLE_PYTHONMOD"Build external Python module to import Damaris communicator into mpi4py." OFF)
 option(ENABLE_DOCS     "Configure DOxygen documentation build feature." OFF)
 option(GENERATE_MODEL  "Regenerates the XSD model instead of using existing ones." OFF)
 
@@ -87,7 +88,7 @@ include_directories(${DAMARIS_SOURCE_DIR}/include/damaris)
 include_directories(${CMAKE_BINARY_DIR}/include)
 
 #----------------------------------------------------------------------------#
-# Set everything related to the Boost libraries
+# Set everything related to the Boost libraries (except boost::python and boost::numpy)
 #----------------------------------------------------------------------------#
 ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
 set(Boost_USE_STATIC_LIBS OFF)
@@ -146,25 +147,37 @@ endif(ENABLE_HDF5)
 #----------------------------------------------------------------------------#
 # Set everything related to Python
 #----------------------------------------------------------------------------#
+
 if(ENABLE_PYTHON)
-  execute_process(
-  COMMAND python -c "import numpy; print numpy.get_include()"
-  OUTPUT_VARIABLE NUMPY_INCLUDE_PATH
-  ERROR_QUIET
-  )
   find_package(Boost COMPONENTS python REQUIRED)
   find_package(Boost COMPONENTS numpy REQUIRED)
+  # find_package(Python 3 COMPONENTS Interpreter Development REQUIRED)  # fails at build time with fatal error: pyconfig.h: No such file or directory
   find_package(PythonInterp 3 )
-  find_package( PythonLibs 3 REQUIRED )
-  set(HAVE_PYTHON_ENABLED 1) 
-  list(APPEND DEP_LIBRARIES  ${PYTHON_LIBRARIES} ${Boost_LIBRARIES} )
-#   include_directories(
-#  ${PYTHON_INCLUDE_DIRS}
-#  ${Boost_INCLUDE_DIRS}
-#  ${NUMPY_INCLUDE_PATH}
-#  )
+  find_package(PythonLibs 3 REQUIRED )
+  if(PythonInterp_FOUND)
+    # message("PythonInterp_FOUND:${PythonInterp_FOUND}")
+    execute_process(
+      COMMAND Python3::Interpreter -c "import numpy; print numpy.get_include()"
+      OUTPUT_VARIABLE NUMPY_INCLUDE_PATH
+      ERROR_QUIET
+    )
+    list(APPEND DEP_LIBRARIES  ${PYTHON_LIBRARIES} ${Boost_LIBRARIES} )
+    
+    set(HAVE_PYTHON_ENABLED 1)
+  endif(PythonInterp_FOUND)
 endif(ENABLE_PYTHON)
 
+#----------------------------------------------------------------------------#
+# Test that the pydamaris Python module has an install path
+#----------------------------------------------------------------------------#
+if(ENABLE_PYTHONMOD)
+  if (NOT PYTHON_INSTALL_PATH )
+     message(
+                ERROR
+                "ENABLE_PYTHONMOD is TRUE, so please set -DPYTHON_INSTALL_PATH=<path> to the path to install the pydamaris Python module"
+            )
+  endif()
+endif(ENABLE_PYTHONMOD)
 
 #----------------------------------------------------------------------------#
 # Set everything related to ParaView
@@ -226,6 +239,10 @@ CONFIGURE_FILE(${DAMARIS_SOURCE_DIR}/include/Damaris.h.in
 #----------------------------------------------------------------------------#
 add_subdirectory (lib)
 
+if(ENABLE_PYTHONMOD)
+add_subdirectory (python)
+endif(ENABLE_PYTHONMOD)
+
 if(ENABLE_EXAMPLES)
   add_subdirectory (examples)
 endif(ENABLE_EXAMPLES)
@@ -237,3 +254,4 @@ endif(ENABLE_TESTS)
 if(ENABLE_DOCS)
   add_subdirectory (docs)
 endif(ENABLE_DOCS)
+

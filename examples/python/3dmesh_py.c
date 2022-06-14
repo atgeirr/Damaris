@@ -75,113 +75,78 @@ int main(int argc, char** argv)
    // if((err == DAMARIS_OK || err == DAMARIS_NO_SERVER) && is_client) {
    if(err == DAMARIS_OK && is_client) {
 
-      MPI_Comm comm;
-      damaris_client_comm_get(&comm);
+        MPI_Comm comm;
+        damaris_client_comm_get(&comm);
 
-      damaris_parameter_get("WIDTH" , &WIDTH , sizeof(int));
-      damaris_parameter_get("HEIGHT", &HEIGHT, sizeof(int));
-      damaris_parameter_get("DEPTH" , &DEPTH , sizeof(int));
-      damaris_parameter_get("whd_layout" , &whd_layout , sizeof(int));
+        damaris_parameter_get("WIDTH" , &WIDTH , sizeof(int));
+        damaris_parameter_get("HEIGHT", &HEIGHT, sizeof(int));
+        damaris_parameter_get("DEPTH" , &DEPTH , sizeof(int));
+        damaris_parameter_get("whd_layout" , &whd_layout , sizeof(int));
 
-      MPI_Comm_rank(comm , &rank_client);
-      MPI_Comm_size(comm , &size_client);
-      
-      fprintf(stdout,"Input paramaters found: v=%d r=%d (0 is not found)\n",verbose, rank_only);
+        MPI_Comm_rank(comm , &rank_client);
+        MPI_Comm_size(comm , &size_client);
 
-      // Dynamically update the size used in the Damaris layout configuration
-      damaris_parameter_set("size" , &size_client , sizeof(int));
-      
-      int64_t position_cube[3];
-      int local_width, local_height, local_depth  ;
-      int rank_start = 0 ;
+        fprintf(stdout,"Input paramaters found: v=%d r=%d (0 is not found)\n",verbose, rank_only);
 
-      if (whd_layout == 0) {
-         if (size_client > DEPTH) {
-             printf("ERROR: MPI process count (size=%2d) is greater than the blocked index (DEPTH=%2d)\t", size_client, DEPTH  );
-             exit(-1);
-         }
-         // used with: <layout name="cells_whd_dl" type="int" dimensions="WIDTH,HEIGHT,DEPTH/size" global="WIDTH,HEIGHT,DEPTH" />
-         local_width      = WIDTH;
-         local_height     = HEIGHT;
-         local_depth      = DEPTH/size_client;
+        // Dynamically update the size used in the Damaris layout configuration
+        damaris_parameter_set("size" , &size_client , sizeof(int));
 
-         position_cube[0] = 0;
-         position_cube[1] = 0;
-         position_cube[2] = rank_client*local_depth;
-         
-         rank_start = rank_client * local_width * local_height ;
+        int64_t position_cube[3];
+        int local_width, local_height, local_depth  ;
+        int rank_start = 0 ;
 
-      } else  if (whd_layout == 1) {
-         if (size_client > HEIGHT) {
-             printf("ERROR: MPI process count (size=%2d) is greater than the blocked index (HEIGHT=%2d)\t", size_client, HEIGHT  );
-             exit(-1);
-         }
-          // used with: <layout name="cells_whd_hm" type="int" dimensions="WIDTH,HEIGHT/size,DEPTH" global="WIDTH,HEIGHT,DEPTH" />
-         local_width      = WIDTH;
-         local_height     = HEIGHT/size_client;
-         local_depth      = DEPTH;
-         
-         position_cube[0] = 0;
-         position_cube[1] = rank_client*local_height;
-         position_cube[2] = 0;
-         
-         rank_start = rank_client * local_width * local_depth ;
-         
-      } else  if (whd_layout == 2) {
-         if (size_client > WIDTH) {
-             printf("ERROR: MPI process count (size=%2d) is greater than the blocked index (WIDTH=%2d)\t", size_client, WIDTH  );
-             exit(-1);
-         }
-          // used with: <layout name="cells_whd_wf" type="int" dimensions="WIDTH/size,HEIGHT,DEPTH" global="WIDTH,HEIGHT,DEPTH" />
-         local_width      = WIDTH ; // WIDTH/size;
-         local_height     = HEIGHT;
-         local_depth      = DEPTH/size_client;
-         
+     
+        if (size_client > WIDTH) {
+         printf("ERROR: MPI process count (size=%2d) is greater than the blocked index (WIDTH=%2d)\t", size_client, WIDTH  );
+         exit(-1);
+        }
+        // used with: <layout name="cells_whd_wf" type="int" dimensions="WIDTH/size,HEIGHT,DEPTH" global="WIDTH,HEIGHT,DEPTH" />
+        local_width      = WIDTH ; // WIDTH/size;
+        local_height     = HEIGHT;
+        local_depth      = DEPTH/size_client;
 
-         position_cube[0] = rank_client*local_depth;
-         position_cube[1] = 0;
-         position_cube[2] = 0;
-         
-         rank_start = rank_client * local_width * local_height ;
-         
-      }
-      
-      // allocate the local data array
-      int cube[local_depth][local_height][local_width];
-      float cube_f[local_depth][local_height][local_width];
-      
-      // set the appropriate position for the current rank
-      damaris_set_position("cube_i",position_cube);
-      damaris_set_position("cube_f",position_cube);
-      
-      // do not do this here as we will not get an updated value (if time-varying="true" )
-      // damaris_write("last_iter" , &MAX_CYCLES);
+        position_cube[0] = rank_client*local_depth;
+        position_cube[1] = 0;
+        position_cube[2] = 0;
 
-      int i, d, h, w ;
-      for( i=0; i < MAX_CYCLES; i++) {
-         double t1 = MPI_Wtime();         
-         int sequence ;
-         sequence =  i ;  // this is the start of the sequence for this iteration
-         if (verbose == 0) { // default - do not print values to screen
+        rank_start = rank_client * local_width * local_height ;
 
-             for ( d = 0; d < local_depth; d++){
-               for ( h = 0; h < local_height; h++){
-                 for ( w = 0; w < local_width; w++) {
+        // allocate the local data array
+        int cube[local_depth][local_height][local_width];
+        float cube_f[local_depth][local_height][local_width];
 
-                    cube[d][h][w] = (int) sequence + rank_start;
-                    cube_f[d][h][w] = (float) sequence + rank_start +0.5f;
-                    if (rank_only==0) sequence++;
-                 }  
-               }
-            }            
-         } else  if (verbose == 1) { // print values to screen
+        // set the appropriate position for the current rank
+        damaris_set_position("cube_i",position_cube);
+        damaris_set_position("cube_f",position_cube);
+
+        // do not do this here as we will not get an updated value (if time-varying="true" )
+        // damaris_write("last_iter" , &MAX_CYCLES);
+
+        int i, d, h, w ;
+        for( i=0; i < MAX_CYCLES; i++) {
+            double t1 = MPI_Wtime();         
+            int sequence ;
+            sequence =  i ;  // this is the start of the sequence for this iteration
+            if (verbose == 0) { // default - do not print values to screen
+
+                for ( d = 0; d < local_depth; d++){
+                    for ( h = 0; h < local_height; h++){
+                         for ( w = 0; w < local_width; w++) {
+
+                            cube[d][h][w] = (int) sequence + rank_start;
+                            cube_f[d][h][w] = (float) sequence + rank_start +0.5f;
+                            if (rank_only==0) sequence++;
+                         }  
+                    }
+                }            
+            } else  if (verbose == 1) { // print values to screen
             int current_rank = 0 ;
             int sending_rank = 0 ;
              // serialize the print statements
              while ( current_rank < size_client)
              {
-               printf("\n"); 
-               if (rank_client == current_rank) { // start of serialized section
+                printf("\n"); 
+                if (rank_client == current_rank) { // start of serialized section
 
                   for ( d = 0; d < local_depth; d++){
                     for ( h = 0; h < local_height; h++){
@@ -198,61 +163,61 @@ int main(int argc, char** argv)
                   fflush(stdin); 
                   sending_rank = current_rank ;
                   current_rank++ ;
-               } // end of serialized section
-               MPI_Bcast(&current_rank,1, MPI_INT,sending_rank, comm);
-               sending_rank = current_rank ;
+                } // end of serialized section
+                MPI_Bcast(&current_rank,1, MPI_INT,sending_rank, comm);
+                sending_rank = current_rank ;
             } // end of in-order loop over ranks
-         } else  if (verbose == 2) { // print sumation values to screen
-            int current_rank = 0 ;
-            int sending_rank = 0 ;
-            int sumdata = 0 ;
-             // serialize the print statements
-             while ( current_rank < size_client)
-             {
-               // printf("\n"); 
-               if (rank_client == current_rank) { // start of serialized section                
+            } else  if (verbose == 2) { // print sumation values to screen
+                int current_rank = 0 ;
+                int sending_rank = 0 ;
+                int sumdata = 0 ;
+                 // serialize the print statements
+                 while ( current_rank < size_client)
+                 {
+                   // printf("\n"); 
+                   if (rank_client == current_rank) { // start of serialized section                
 
-                  for ( d = 0; d < local_depth; d++){
-                    for ( h = 0; h < local_height; h++){
-                     for ( w = 0; w < local_width; w++) {
-                        cube[d][h][w] = (int) sequence + rank_start ;
-                        cube_f[d][h][w] = (float) sequence + rank_start +0.5f;
-                        sumdata += cube[d][h][w] ;
-                        if (rank_only==0) sequence++;
-                     }
-                    }
-                  }
-                  printf("Iteration %d Rank %d Sum = %8d\n", i, current_rank, sumdata );
-                  fflush(stdin); 
-                  sending_rank = current_rank ;
-                  current_rank++ ;
-               } // end of serialized section
-               MPI_Bcast(&current_rank,1, MPI_INT,sending_rank, comm);
-               sending_rank = current_rank ;
-            } // end of in-order loop over ranks
-         }
+                      for ( d = 0; d < local_depth; d++){
+                        for ( h = 0; h < local_height; h++){
+                         for ( w = 0; w < local_width; w++) {
+                            cube[d][h][w] = (int) sequence + rank_start ;
+                            cube_f[d][h][w] = (float) sequence + rank_start +0.5f;
+                            sumdata += cube[d][h][w] ;
+                            if (rank_only==0) sequence++;
+                         }
+                        }
+                      }
+                      printf("Iteration %d Rank %d Sum = %8d\n", i, current_rank, sumdata );
+                      fflush(stdin); 
+                      sending_rank = current_rank ;
+                      current_rank++ ;
+                   } // end of serialized section
+                   MPI_Bcast(&current_rank,1, MPI_INT,sending_rank, comm);
+                   sending_rank = current_rank ;
+                } // end of in-order loop over ranks
+            }
          
          
 
-         damaris_write("cube_i" , cube);
-         damaris_write("cube_f" , cube_f);
-         damaris_write("last_iter" , &MAX_CYCLES);
-         sleep(time);
-         
-         damaris_end_iteration();
-         MPI_Barrier(comm);
-         
-         // sleep(time);
+            damaris_write("cube_i" , cube);
+            damaris_write("cube_f" , cube_f);
+            damaris_write("last_iter" , &MAX_CYCLES);
+            sleep(time);
 
-         double t2 = MPI_Wtime();
+            damaris_end_iteration();
+            MPI_Barrier(comm);
 
-         if(rank_client == 0) {
+            // sleep(time);
+
+            double t2 = MPI_Wtime();
+
+            if(rank_client == 0) {
             printf("Iteration %d done in %f seconds\n",i,(t2-t1));
             fflush(stdin); 
-         }
-      }
+            }
+        }  // end of for loop over MAX_CYCLES
 
-      damaris_stop();
+        damaris_stop();
    }
 
    damaris_finalize();
