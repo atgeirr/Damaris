@@ -10,7 +10,7 @@
     <data>
         <parameter name="WIDTH"  type="int" value="16" />
         <parameter name="HEIGHT" type="int" value="8" />
-        <parameter name="DEPTH"  type="int" value="4" />
+        <parameter name="DEPTH"  type="int" value="16" />
         <parameter name="size"   type="int" value="4"      comment="this will be dynamically updated with the number of mpi client ranks"/>
       <parameter name="whd_layout" type="int" value="2"  comment="Set this to 0 for layout=cells_whd_dl, 1 for layout=cells_whd_hm and 2 for layout=cells_whd_wf "/>
 

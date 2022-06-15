@@ -530,6 +530,7 @@ class PyAction : public Action, public Configurable<model::Script> {
     }
 
     
+    // N.B. In Python you can create a tuple directly from a list using: mytuple = tuple( listname )
    template <typename T>
      np::ndarray   ReturnNpNdarrayTyped(int blockDimension, int * localDims, void *np_ptr, model::Type mdlType,   T mytype) {
         bp::object own_local = bp::object() ;

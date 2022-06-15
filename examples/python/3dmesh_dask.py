@@ -77,16 +77,24 @@ np.set_printoptions(threshold=np.inf)
 # A Damaris variable dictionary has the following structure
 # DD['iteration_data']['cube_i'].keys()
 #       (['numpy_data', 
-#         'block_source', 
-#         'block_domains', 
+#         'sort_data',
+#         # 'block_source', 
+#         # 'block_domains', 
 #         'type_string'
 #        ])
+# 
+# DD['iteration_data']['cube_i']['sort_data']
+# sort_data is a list, that can be sorted on (possibly required to be transformed to tuple) data:
+#    ['string', 'string', [ <block_offset values> ]]
+#   A specific example:
+#     ['S0_I1', 'P0_B0', [ 0, 9, 12 ]]
 #
 # And, finally, the NumPy data is present in blocks, given by keys constructed as described below
 # DD['iteration_data']['cube_i']['numpy_data'].keys()
 #        (['P0_B0',  
 #          'P1_B0'
 #        ])
+
 #  Damaris NumPy data keys "P" + damaris block number + "_B" + domain number
 #  The block number is the source of the data (i.e. the Damaris client number)
 #  The domain number is the result of multiple calls to damaris_write_block()
@@ -98,18 +106,90 @@ np.set_printoptions(threshold=np.inf)
 #      the distributed workers.
 
 
- 
+
+
 def main(DD):
     from mpi4py import MPI
     import dask.array as da
     import time
     from os import path
     from dask.distributed import Client, TimeoutError, Lock, Variable
+    from pydamaris import damaris_comm
+    
+     
+    def getSeparator2(p0, p1, dim, instr, first_elem):         
+        resstr = ''
+        if p1[dim] > p0[dim]:
+            if first_elem == False:
+                resstr = instr + ","
+            else:
+                first_elem = False
+                resstr = instr + ","
+        elif p1[dim] <= p0[dim]:
+            if dim > 0:
+                instr += "]\n"
+                first_elem = False
+                resstr2, first_elem = getSeparator2(p0, p1, dim-1, instr, first_elem)
+                first_elem = True
+                resstr += resstr2 + "["           
+        return resstr, first_elem
+      
+
+    def returnDaskBlockLayout(myblocks_sorted):
+        tup_len = len(myblocks_sorted[0].offset_tpl)
         
+        dask_str='data = '
+        for dim in reversed(range(0, tup_len)):
+            dask_str+= '[' 
+        
+        # initialize inputs
+        first_elem = False 
+        p0 = myblocks_sorted[0].offset_tpl
+        p0_pub_name = myblocks_sorted[0].pub_name
+        p0_key = myblocks_sorted[0].P_B_key
+        # add first tuple to list
+        p0_full_str = 'client.datasets[\'' + p0_pub_name + '\'][\'' + p0_key + '\']'
+        dask_str+=str(p0_full_str)
+        t1 = 1
+        while t1 < len(myblocks_sorted):
+            p1 = myblocks_sorted[t1].offset_tpl
+            p1_pub_name = myblocks_sorted[t1].pub_name
+            p1_key = myblocks_sorted[t1].P_B_key
+            # add first tuple to list
+            p1_full_str = 'client.datasets[\'' + p1_pub_name + '\'][\'' + p1_key + '\']'
+            dim = tup_len-1
+            sepStr , first_elem =  getSeparator2(p0, p1, dim, '',first_elem) 
+
+            dask_str += sepStr + str(p1_full_str)
+            t1 = t1 + 1
+            p0 = p1
+          
+        for dim in reversed(range(0, tup_len)):
+            dask_str+= ']'
+          
+        return dask_str
+     
+     
+    class SubBlock:
+        def __init__(self,  offset_tpl, pub_name, P_B_key_str):
+            self.offset_tpl = offset_tpl
+            self.pub_name   = pub_name
+            self.P_B_key    = P_B_key_str
+            # self.myblock_np = myblock_np
+            # print(self.offset_tpl)
+        def __repr__(self):
+            return repr((self.offset_tpl))
+
+
     try:
-        # pass                   # use this to skip whole block
-        comm = MPI.COMM_WORLD
-        rank = comm.Get_rank()
+        # pass
+        # comm = MPI.COMM_WORLD
+        # rank = comm.Get_rank()
+        damaris_comm = damaris_comm()
+        rank = damaris_comm.Get_rank()
+        size = damaris_comm.Get_size()
+        print('rank: ', rank, ' of : ', size)    
+        
         
         # keys = list(DD.keys())
         # print(keys)
@@ -122,6 +202,7 @@ def main(DD):
         iter_dict    = DD['iteration_data']   
         # This is the iteration value the from Damaris perspective
         # i.e. It is the number of times damaris_end_iteration() has been called
+        iteration    = iter_dict['iteration']
         it_str       = str(iter_dict['iteration'])
         
         keys = list(iter_dict.keys())
@@ -137,22 +218,9 @@ def main(DD):
             cube_i_numpy = cube_i['numpy_data'][key]
             print('Info from Python: Iteration ', it_str, ' Data found: cube_i[',key,'].sum() = ', cube_i_numpy.sum() )
         
-        # The number of block domains depends on use of 'domains' in 
-        # the Damaris XML file and use of the damaris_write_block() API
-        # There is always at least one per client for which a server looks after.
-        block_domains = len( cube_i['block_domains']) 
-        # print('for variable cube_i the number of domains (== clients x blocks_per_client) for variable last_iter: ', str(block_domains))
-        # print('cube_i[block_domains]: ', cube_i['block_domains'])
-        # block_source should always exist - it is a list() of Damaris clients 
-        # who sent data to a Damaris server on the current server that is running 
-        # this Python code.
-        block_source_list = cube_i['block_source']
-        print('for variable cube_i block sources list: ', block_source_list)
-        
-        
+
         # Do some Dask stuff
-        
-        # If this file exists (is not a n empty string) then a Dask scheduler was 
+        # If this scheduler_file exists (is not an empty string) then a Dask scheduler was 
         # found (Access has been tested on the Damaris server C++ Python).
         scheduler_file  = dask_dict['dask_scheduler_file']  
         if int(it_str) == 0:
@@ -161,35 +229,83 @@ def main(DD):
             print("-------------------------------------------------------------------")
             try:      
                 client =  Client(scheduler_file=scheduler_file, timeout='2s')
+                # time.sleep(1.0)
+                
+                mylist = iter_dict['cube_i']['sort_list']            
+                mylist = damaris_comm.gather(mylist, root=0) # this collects together a list of lists on rank 0
+                mydatadict = iter_dict['cube_i']['numpy_data']
+                if rank == 0:
+                    print(mylist)
                
+                for pub_name_key in client.datasets.keys():
+                     client.unpublish_dataset(pub_name_key)   
+                global pub_name 
+                pub_name = 'S'+str(rank) + '_I'+str(iteration)
+                client.datasets[pub_name] = mydatadict
+                print("rank " , rank, "  client.datasets[ " , pub_name, "] was published")
+                time.sleep(0.5)
                 
+                # time.sleep(2)
+                damaris_comm.Barrier()
                 
-                future  = client.submit( inc, shared_counter, lock )
-                res_inc = client.gather(future)  # This blocks until result of all .submit() functions are completed
+                list_merged = []  
+                myblocks_sorted = []
+                print('')
+                if rank == 0:
+                    # merge into a single list
+                    for list_itm in mylist:
+                        for p_k_bo in list_itm:
+                            tlist = [ p_k_bo[0],p_k_bo[1],tuple(p_k_bo[2]) ]
+                            ttup = (tuple(tlist))
+                            list_merged.append( ttup )
+                    print('list_merged:')        
+                    print(list_merged)
+                    print('')
+                    mylist_sorted = sorted(list_merged, key=lambda tup: tup[2])
+                    print(mylist_sorted)
+                    print('')
+                    
+                    for list_itm in mylist_sorted:
+                       print('list_itm ' + str(list_itm) )
+                       pub_name_tmp = list_itm[0]
+                       P_B_key = list_itm[1]
+                       offset_tpl = list_itm[2]
+                       myblocks_sorted.append(SubBlock(offset_tpl,pub_name_tmp,P_B_key))
+
+                    dask_str = returnDaskBlockLayout(myblocks_sorted)
+                    print(dask_str) 
+                    global data 
+                    exec("global data; " + dask_str)
+                    
+                    x = da.block(data)
+                    y = x * 2
+
+                    print(x.compute())
+                    print('')
+                    print(y.compute())
+
+                damaris_comm.Barrier()
                 
-                print('Python INFO: rank: ', str(rank), ' Current value of res_inc: '+str(res_inc)) 
-                
-                # reset the variable on last iteration
-                if int(it_str) == last_iter:
-                    shared_counter.set(0)
-                           
+                # pub_name ='S'+str(rank)  + '_I'+str(iteration)
+                client.unpublish_dataset(pub_name) 
+                print("rank " , rank, "  client.datasets[ " , pub_name, "] was unpublished")
                 client.close()
+                
             except TimeoutError:
                 have_dask = False  
             except OSError:
                 have_dask = False  
 
-        
-        
-   
     except KeyError as err: 
-        print('KeyError: No damaris data of name: ', err)
+        print('Python Script KeyError: No damaris data of name: ', err)
     except PermissionError as err:
-        print('PermissionError!: ', err)
+        print('Python Script PermissionError!: ', err)
     except ValueError as err:
-        print('Damaris Data is read only!: ', err)
+        print('Python Script Damaris Data is read only!: ', err)
     except UnboundLocalError as err:
-        print('Damaris data not assigned!: ', err)
+        print('Python Script Damaris data not assigned!: ', err)
+    except NameError as err:
+        print('Python Script NameError: ', err)
     # finally: is always called.    
     finally:
         pass

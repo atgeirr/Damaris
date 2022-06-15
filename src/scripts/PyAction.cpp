@@ -253,10 +253,13 @@ namespace damaris {
     
     bool PyAction::PassDataToPython(int iteration )
     {
-        std::stringstream varName ;
+        std::stringstream P_B_key ;       ///< The specific P<source>_B<block number> of the data
+        std::stringstream S_I_dask_pub ;  ///< the name used to publish a list of all datasets available on the current Damaris server for the current iteration
         BlocksByIteration::iterator begin;
         BlocksByIteration::iterator end;
-        
+       
+        S_I_dask_pub << "S" << Environment::GetEntityProcessID() << "_I" << iteration ;
+        std::cout << "PyAction: OUTPUT:::::::::::: " << S_I_dask_pub.str()  << std::endl ;
         // Each variable will be added to this dictionary (by variable name)
         // and will contain meta-data about multiple blocks
         bp::dict iteration_dict ;
@@ -306,64 +309,59 @@ namespace damaris {
  
             v->GetBlocksByIteration(iteration, begin, end);
 
-            // Define Python lists for some usefull metadata to be pushed to Python
-            bp::list block_list ;   // each client produces a seperate 'block' of a variable
-            bp::list blockid_list ; // Variables can also have multiple 'domains', which translates to multiple blocks and 
-                                    // is data written in multiple chunks on a single damaris interation
+            // Define Python lists for some usefull metadata to be pushed to Python so we can reconstruct the arrays
+                          
+            bp::list sort_list ;      // list of  data_list lists [ [ S_I_dask_pub, P_B_key, block_offset ],... ], where block_offset is a list of the indicies into the array            
             bp::dict variable_data ;  // the numpy arrays - one for each block + domain
             for (BlocksByIteration::iterator bid = begin; bid != end; bid++) {
                 std::shared_ptr<Block> b = *bid;
+                
 
                 // Obtain block array number of dimension
                 int blockDimension = b->GetDimensions();
-                varName << "P" << b->GetSource() << "_B" << b->GetID();
-            
+                P_B_key << "P" << b->GetSource() << "_B" << b->GetID() ;
+                           
                 // Obtain the block size
                 // Numpy uses C storage conventions, assuming that the last listed
                 // dimension is the fastest-changing dimension and the first-listed
                 // dimension is the slowest changing.
+                bp::list block_offset_lst ;
+                bp::list data_list ;      // [ S_I_dask_pub, P_B_key, block_offset ]      
                 std::string logString_localDims   ("PyAction::PassDataToPython() numpy array dims    ['iteration_data']['") ;
                 std::string logString_localOffsets("PyAction::PassDataToPython() numpy array offsets ['iteration_data']['") ; 
-                logString_localDims    += v->GetName() + "']['numpy_data']" + "[ " + varName.str() + "]" ;
-                logString_localOffsets += v->GetName() + "']['numpy_data']" + "[ " + varName.str() + "]" ;
+                logString_localDims    += v->GetName() + "']['numpy_data']" + "[ " + P_B_key.str() + "]" ;
+                logString_localOffsets += v->GetName() + "']['numpy_data']" + "[ " + P_B_key.str() + "]" ;
                 for (int i = 0 ; i < blockDimension ; i++) {
                     localOffset[i] = b->GetStartIndex(i);
+                    block_offset_lst.append(b->GetStartIndex(i)) ;
                     localDims[i]   = b->GetEndIndex(i) - b->GetStartIndex(i) + 1;
                     logString_localDims    += "[" + std::to_string(localDims[i]) + "]" ;
                     logString_localOffsets += "[" + std::to_string(localOffset[i]) + "]" ;
                 }
-                
-                block_list.append(b->GetSource() ) ;
-                //if (Environment::NumDomainsPerClient() > 1 ) {
-                blockid_list.append(b->GetID());  // always add the blockid
-                // }
-                //// globalDims are not currently used
-                //for (int i = 0; i < varDimention; i++) {
-                //    globalDims[i] = b->GetGlobalExtent(i) ;
-                //}
 
                 // Get pointer to the block data
                 void *np_ptr = b->GetDataSpace().GetData();
-                
                 try {
                    // Wrapping data as NumPy array
-                   // ************** Push the NumPy data through to Python 
                    np::ndarray mul_data_ex = ReturnNpNdarray(blockDimension, localDims, np_ptr, v->GetLayout()->GetType()) ;
                 
                    // Store reference to NumPy array in Python dictionary
-                   variable_data[varName.str()]  = mul_data_ex ;
+                   variable_data[P_B_key.str()]  = mul_data_ex ;
+                   data_list.append(S_I_dask_pub.str()) ;
+                   data_list.append(P_B_key.str()) ;
+                   data_list.append(block_offset_lst) ;
+                   
+                   sort_list.append(data_list);
                 }
                 catch( bp::error_already_set &e) {
                    CatchPrintAndLogPyException("ERROR: PyAction::PassDataToPython() np::from_data() Error wrapping Damaris data as NumPy array /n ") ;                      
                 }
-                varName.str("") ; // reset the name string
+                P_B_key.str("") ; // reset the name string
                 Environment::Log(logString_localDims , EventLogger::Debug);
                 Environment::Log(logString_localOffsets , EventLogger::Debug);
             } // for each block of the variable
-            damaris_variable_dict["numpy_data"]    =  variable_data ; 
-            damaris_variable_dict["block_source"]  =  block_list    ;
-            damaris_variable_dict["block_domains"] =  blockid_list  ;
-            // std::sring typestr = 
+            damaris_variable_dict["numpy_data"]   =  variable_data ; 
+            damaris_variable_dict["sort_list"]    =  sort_list ;
             damaris_variable_dict["type_string"]   =  GetTypeString(v->GetLayout()->GetType()) ; // return type string is prefixed by "_"
             
             // For this variable, add all the meta-data and numpy array blocks to the iteration dictionary
@@ -393,187 +391,11 @@ namespace damaris {
         }
         
         
-        // ************** Now remove the data, as the block data will be deleted from shared memory (well, maybe only the references to it)
-        /*
-         * e_ = "\\b(REPLACE)([^ ]*)" ;  // Set the regex as we use it in the constructor for various substitutions
-        w = GetVariables().begin();
-        // for selected variables ... (like HDF5 storage, we can can have a <variable ... script="MyScript" /> attribute 
-        for (; w != GetVariables().end(); w++) {
-            std::shared_ptr<Variable> v = w->lock();
-            v->GetBlocksByIteration(iteration, begin, end);
-            std::string varName;
-            
-            for (BlocksByIteration::iterator bid = begin; bid != end; bid++) {
-                std::shared_ptr<Block> b = *bid;
-                varName = GetVariableFullName(v , &b);
-                std::string numpy_name =  varName + "_" + std::to_string(iteration) ;
-                
-                // std::cout <<"INFO: " << iteration << " PyAction::PassDataToPython() deleting: " << numpy_name << std::endl << std::flush ;
-                numpy_name +=  "$2" ;
-               
-                std::string string_with_python_code = std::regex_replace (regex_string_with_python_code_,this->e_,numpy_name.c_str());
-                
-                try {
-                    bp::object result = bp::exec(string_with_python_code.c_str(), this->globals_, this->locals_);  
-                }  catch( bp::error_already_set &e) {
-                    CatchPrintAndLogPyException("ERROR: PyAction::PassDataToPython() bp::exec() " ) ;
-                }
-            }                        
-        }
-        */
-            
-          
-        
         
         // if all good then return true
         return true;
     }
 
-
-    /*
-     void HDF5Store::OutputPerCore(int32_t iteration) {
-        hid_t       fileId, dsetId;           // file and dataset identifiers
-        hid_t       fileSpace , memSpace;     // file and memory dataspace identifiers
-        hid_t       dtypeId = -1;
-        hid_t       lcplId;
-        std::string      fileName;
-        std::vector<std::weak_ptr<Variable> >::const_iterator w;
-
-        // Initialise variables
-        fileName = GetOutputFileName(iteration);
-        w = GetVariables().begin();
-
-        // Create the HDF5 file
-        if ((fileId = H5Fcreate(fileName.c_str() , H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)) < 0)
-            ERROR("HDF5: H5Fcreate Failed ");
-
-        // Enable group creation with fully qualified dataset names
-        lcplId = H5Pcreate (H5P_LINK_CREATE);
-        H5Pset_create_intermediate_group(lcplId, 1);
-
-        // for each variable ...
-        for (; w != GetVariables().end(); w++) {
-            std::shared_ptr<Variable> v = w->lock();
-
-            // non TimeVarying variables only are written in the first iteration.
-            if ((not v->IsTimeVarying()) && (iteration > 0))
-                continue;
-
-            // Getting the dimention of the variable
-            int varDimention;
-            varDimention = v->GetLayout()->GetDimensions();
-
-            // Create a array for dimentions
-            hsize_t *globalDims;
-            hsize_t *localDims;
-            globalDims = new (std::nothrow) hsize_t[varDimention];
-            localDims = new (std::nothrow) hsize_t[varDimention];
-
-            if ((globalDims == NULL) || (localDims == NULL)) {
-                ERROR("Failed to allocate memory for dim arrays!");
-            }
-
-
-           
-            // fileSpace creation is being moved to the inner block loop due
-            // to issue with updating layout sizes when parameters change on the
-            // server side. See:
-            // https://gitlab.inria.fr/Damaris/damaris-development/-/issues/20
-            
-
-            // Getting the equivalent hDF5 Variable Type
-            if (not GetHDF5Type(v->GetLayout()->GetType(), dtypeId))
-                ERROR("HDF5:Unknown variable type " << v->GetLayout()->GetType());
-
-            BlocksByIteration::iterator begin;
-            BlocksByIteration::iterator end;
-            v->GetBlocksByIteration(iteration, begin, end);
-            int numBlocks = 0;
-            std::string varName;
-
-            for (BlocksByIteration::iterator bid = begin; bid != end; bid++) {
-                std::shared_ptr<Block> b = *bid;
-                numBlocks++;
-
-                // Create block dimentions
-                int blockDimention = b->GetDimensions();
-                //for (int i = 0; i < blockDimention; i++)
-                //    b->GetGlobalExtent(i);              // TODO: What does this do? Nothing!
-
-                hsize_t *blockDim = new (std::nothrow) hsize_t[blockDimention];
-                if (blockDim == NULL)
-                    ERROR("HDF5:Failed to allocate memory ");
-
-                // Obtain the block size
-                // HDF5 uses C storage conventions, assuming that the last listed
-                // dimension is the fastest-changing dimension and the first-listed
-                // dimension is the slowest changing.
-                // So here we are assuming that Damaris has stored the fastest moving dimension
-                // in the 1st ([0]) position of the lower_bounds_ and upper_bounds_ arrays
-                int i_backwards = blockDimention - 1 ;
-                for (int i = 0 ; i < blockDimention ; i++)
-                {
-                     blockDim[i_backwards] = b->GetEndIndex(i) - b->GetStartIndex(i) + 1;
-                     i_backwards-- ;
-                }
-
-                // Obtain the FilesSpace size (has to match the memory space dimensions)
-                i_backwards =  blockDimention - 1;
-                for (int i = 0 ; i < blockDimention ; i++) {
-                    localDims[i_backwards] = b->GetEndIndex(i) - b->GetStartIndex(i) + 1;
-                    i_backwards-- ;
-                }
-
-                // globalDims are not currently used (may be needed for VDS support?)
-                for (int i = 0; i < varDimention; i++) {
-                    globalDims[i] = b->GetGlobalExtent(i) ;
-                }
-
-                // create the file space
-                if ((fileSpace = H5Screate_simple(varDimention, localDims , NULL)) < 0)
-                    ERROR("HDF5: file space creation failed !");
-
-                // Create Dataset for each block
-                varName = GetVariableFullName(v , &b);
-                if ((dsetId = H5Dcreate(fileId, varName.c_str() , dtypeId , fileSpace,
-                                         lcplId, H5P_DEFAULT, H5P_DEFAULT)) < 0)
-                    ERROR("HDF5: Failed to create dataset ... ");
-               
-                // Create memory data space
-                memSpace = H5Screate_simple(blockDimention, blockDim , NULL);
-
-                // Update ghost zones
-                UpdateGhostZones(v , memSpace , blockDim);
-
-                // Select hyperslab in the file.
-                fileSpace = H5Dget_space(dsetId);
-                H5Sselect_all(fileSpace);
-                //H5Sselect_hyperslab(fileSpace, H5S_SELECT_SET, memOffset, NULL, blockDim , NULL);
-
-                // Getting the data
-                void *ptr = b->GetDataSpace().GetData();
-
-                // Writing data
-                if (H5Dwrite(dsetId, dtypeId, memSpace, fileSpace, H5P_DEFAULT, ptr) < 0)
-                    ERROR("HDF5: Writing Data Failed !");
-
-                // 8 Free evertything
-                delete [] blockDim;
-                H5Sclose(memSpace);
-                H5Sclose(fileSpace);
-                H5Dclose(dsetId);
-            } // for of block iteration
-            // H5Sclose(fileSpace);
-            delete [] globalDims;
-            delete [] localDims;
-        } // for of variable iteration
-
-        H5Fclose(fileId);
-        H5Pclose(lcplId);
-    }
-    
-    
-    */
 }
 
 // #endif // HAVE_PYTHON_ENABLED
