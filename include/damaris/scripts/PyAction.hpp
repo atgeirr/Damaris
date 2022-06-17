@@ -217,15 +217,15 @@ class PyAction : public Action, public Configurable<model::Script> {
             try {
               std::string::size_type sz; 
               dask_nthreads_ = std::stoi (dask_nthreads_str,&sz);
-            }
-            catch (const std::invalid_argument& ia) {
-	           std::cerr << "PyAction:PyAction() Invalid argument: " << ia.what() << '\n';
+            }
+            catch (const std::invalid_argument& ia) {
+	           std::cerr << "PyAction:PyAction() Invalid argument: " << ia.what() << '\n';
 	           dask_nthreads_ = 1 ;
             }       
        }
        
        // set string to lower case
-       std::transform(dask_keep_workers_str.begin(),dask_keep_workers_str.end(), dask_keep_workers_str.begin(), 
+       std::transform(dask_keep_workers_str.begin(),dask_keep_workers_str.end(), dask_keep_workers_str.begin(), 
                        [](unsigned char c){ return std::tolower(c); } );
        
        /** dask_keep_workers_ is tested for in ~PyAction destructor. If true then workers are not destroyed

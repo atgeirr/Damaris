@@ -169,7 +169,40 @@ def main(DD):
           
         return dask_str
      
-     
+ 
+    def returnDaskBlockLayoutList(mylist_sorted, dask_client_name_str):
+        tup_len = len(myblocks_sorted[2])
+        
+        dask_str='data = '
+        for dim in reversed(range(0, tup_len)):
+            dask_str+= '[' 
+        
+        # initialize inputs
+        first_elem = False         
+        p0_pub_name = myblocks_sorted[0]
+        p0_key = myblocks_sorted[1]
+        p0_tpl = myblocks_sorted[2]
+        # add first tuple to list
+        p0_full_str = dask_client_name_str + '.datasets[\'' + p0_pub_name + '\'][\'' + p0_key + '\']'
+        dask_str+=str(p0_full_str)
+        t1 = 1
+        while t1 < len(myblocks_sorted):            
+            p1_pub_name = myblocks_sorted[0].pub_name
+            p1_key = myblocks_sorted[1].P_B_key
+            p1_tpl = myblocks_sorted[2].offset_tpl
+            # add first tuple to list
+            p1_full_str = dask_client_name_str + '.datasets[\'' + p1_pub_name + '\'][\'' + p1_key + '\']'
+            dim = tup_len-1
+            sepStr , first_elem =  getSeparator2(p0_tpl, p1_tpl, dim, '',first_elem) 
+
+            dask_str += sepStr + str(p1_full_str)
+            t1 = t1 + 1
+            p0_tpl = p1_tpl
+          
+        for dim in reversed(range(0, tup_len)):
+            dask_str+= ']'
+          
+        return dask_str    
     class SubBlock:
         def __init__(self,  offset_tpl, pub_name, P_B_key_str):
             self.offset_tpl = offset_tpl
@@ -272,7 +305,7 @@ def main(DD):
                        offset_tpl = list_itm[2]
                        myblocks_sorted.append(SubBlock(offset_tpl,pub_name_tmp,P_B_key))
 
-                    dask_str = returnDaskBlockLayout(myblocks_sorted)
+                    dask_str = returnDaskBlockLayoutList(mylist_sorted, 'client')
                     print(dask_str) 
                     global data 
                     exec("global data; " + dask_str)

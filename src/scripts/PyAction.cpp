@@ -258,8 +258,8 @@ namespace damaris {
         BlocksByIteration::iterator begin;
         BlocksByIteration::iterator end;
        
-        S_I_dask_pub << "S" << Environment::GetEntityProcessID() << "_I" << iteration ;
-        std::cout << "PyAction: OUTPUT:::::::::::: " << S_I_dask_pub.str()  << std::endl ;
+        S_I_dask_pub << "S" << Environment::GetEntityProcessID() << "_I" << iteration << "_" << Environment::GetMagicNumber();
+ 
         // Each variable will be added to this dictionary (by variable name)
         // and will contain meta-data about multiple blocks
         bp::dict iteration_dict ;
