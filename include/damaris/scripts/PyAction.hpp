@@ -197,7 +197,7 @@ class PyAction : public Action, public Configurable<model::Script> {
         * not that the Scheduler is accessible via Python.
         */
         dask_scheduler_exists_ = DaskSchedulerFileExists(Environment::GetEntityComm(), scheduler_file_) ;
-        dask_worker_name_      =  Environment::GetSimulationName() + "_" + Environment::GetMagicNumber() + "_" + std::to_string(Environment::GetEntityProcessID()) ;
+        dask_worker_name_      = Environment::GetSimulationName() + "_" + Environment::GetMagicNumber() + "_" + std::to_string(Environment::GetEntityProcessID()) ;
         
         
         // Mess around trying to convert a string to a nthread integer

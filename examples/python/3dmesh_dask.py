@@ -1,6 +1,7 @@
-# Python code: 3dmesh_dask.py
+# Python code: 3dmesh_dask.py.template
 # Author: Josh Bowden, Inria
-# Description: Part of the Damaris examples of using Python integration with Dask distributed
+# Description: Template file for running tests on Grid5000
+# Part of the Damaris examples of using Python integration with Dask distributed
 # To run this example, a Dask scheduler needs to be spun up:
 # 
 #   dask-scheduler --scheduler-file "/home/user/dask_file.json" &
@@ -87,7 +88,8 @@ np.set_printoptions(threshold=np.inf)
 # sort_data is a list, that can be sorted on (possibly required to be transformed to tuple) data:
 #    ['string', 'string', [ <block_offset values> ]]
 #   A specific example:
-#     ['S0_I1', 'P0_B0', [ 0, 9, 12 ]]
+#     ['S0_I1_<majic_num>', 'P0_B0', [ 0, 9, 12 ]]
+#   The strings 
 #
 # And, finally, the NumPy data is present in blocks, given by keys constructed as described below
 # DD['iteration_data']['cube_i']['numpy_data'].keys()
@@ -95,8 +97,8 @@ np.set_printoptions(threshold=np.inf)
 #          'P1_B0'
 #        ])
 
-#  Damaris NumPy data keys "P" + damaris block number + "_B" + domain number
-#  The block number is the source of the data (i.e. the Damaris client number)
+#  Damaris NumPy data keys: "P" + damaris block number + "_B" + domain number
+#  The block number is the source of the data (i.e. it is the Damaris client number that wrote the data)
 #  The domain number is the result of multiple calls to damaris_write_block()
 #  or 0 if only damaris_write() API is used.
 # 
@@ -111,6 +113,7 @@ np.set_printoptions(threshold=np.inf)
 def main(DD):
     from mpi4py import MPI
     import dask.array as da
+    import numpy as np
     import time
     from os import path
     from dask.distributed import Client, TimeoutError, Lock, Variable
@@ -168,10 +171,10 @@ def main(DD):
             dask_str+= ']'
           
         return dask_str
-     
- 
+    
+    
     def returnDaskBlockLayoutList(mylist_sorted, dask_client_name_str):
-        tup_len = len(myblocks_sorted[2])
+        tup_len = len(mylist_sorted[2])
         
         dask_str='data = '
         for dim in reversed(range(0, tup_len)):
@@ -179,17 +182,17 @@ def main(DD):
         
         # initialize inputs
         first_elem = False         
-        p0_pub_name = myblocks_sorted[0]
-        p0_key = myblocks_sorted[1]
-        p0_tpl = myblocks_sorted[2]
+        p0_pub_name = mylist_sorted[0][0]
+        p0_key = mylist_sorted[0][1]
+        p0_tpl = mylist_sorted[0][2]
         # add first tuple to list
         p0_full_str = dask_client_name_str + '.datasets[\'' + p0_pub_name + '\'][\'' + p0_key + '\']'
         dask_str+=str(p0_full_str)
         t1 = 1
-        while t1 < len(myblocks_sorted):            
-            p1_pub_name = myblocks_sorted[0].pub_name
-            p1_key = myblocks_sorted[1].P_B_key
-            p1_tpl = myblocks_sorted[2].offset_tpl
+        while t1 < len(mylist_sorted):            
+            p1_pub_name = mylist_sorted[t1][0]
+            p1_key = mylist_sorted[t1][1]
+            p1_tpl = mylist_sorted[t1][2]
             # add first tuple to list
             p1_full_str = dask_client_name_str + '.datasets[\'' + p1_pub_name + '\'][\'' + p1_key + '\']'
             dim = tup_len-1
@@ -203,6 +206,10 @@ def main(DD):
             dask_str+= ']'
           
         return dask_str    
+    
+    
+ 
+ 
     class SubBlock:
         def __init__(self,  offset_tpl, pub_name, P_B_key_str):
             self.offset_tpl = offset_tpl
@@ -212,23 +219,26 @@ def main(DD):
             # print(self.offset_tpl)
         def __repr__(self):
             return repr((self.offset_tpl))
-
+    
+    # Using to sum up elements in each block
+    # see: https://stackoverflow.com/questions/40092808/compute-sum-of-the-elements-in-a-chunk-of-a-dask-array
+    def compute_block_sum(block):
+        return np.array([np.sum(block)])[:, None, None]
 
     try:
         # pass
-        # comm = MPI.COMM_WORLD
-        # rank = comm.Get_rank()
         damaris_comm = damaris_comm()
         rank = damaris_comm.Get_rank()
-        size = damaris_comm.Get_size()
-        print('rank: ', rank, ' of : ', size)    
-        
+        size = damaris_comm.Get_size() 
         
         # keys = list(DD.keys())
         # print(keys)
-        # These two dictionaries are set up in the PyAction constructor 
-        # and are static.
+        # There are two dictionaries that are set up in the PyAction constructor 
+        # and are static i.e. they do not change throughout iterations
         damaris_dict = DD['damaris_env']
+        magic_num    = damaris_dict['simulation_magic_number']
+        
+        
         dask_dict    = DD['dask_env']
         # This third dictionary is set up in PyAction::PassDataToPython() and is 
         # typically different each iteration.
@@ -238,111 +248,127 @@ def main(DD):
         iteration    = iter_dict['iteration']
         it_str       = str(iter_dict['iteration'])
         
-        keys = list(iter_dict.keys())
-
-        for data_key in keys :
-            if (data_key != 'iteration'):
-                print(data_key)
-                   
-        # We know the dictionary key as it is the variable name that are in the Damaris XML file
-        cube_i =  iter_dict['cube_i']
-        # There will be one key and corresponding NumPy array for each block of the variable
-        for key in cube_i['numpy_data'].keys() :
-            cube_i_numpy = cube_i['numpy_data'][key]
-            print('Info from Python: Iteration ', it_str, ' Data found: cube_i[',key,'].sum() = ', cube_i_numpy.sum() )
+        damaris_comm.Barrier()
+        if iteration == 0 :
+            print('rank: ', rank, ' of : ', size) 
         
-
+        
+        # The value passed through by Damaris clients is to be compared with the value computed by Dask.
+        # It is an array of a single value, which changes each iteration and is
+        # the sum of all values in the whole cube_i dataset in distributed memory.
+        # The sum is only available on client rank 0
+        if 'array_sum' in iter_dict.keys():
+            array_sum =  iter_dict['array_sum']         
+            # Only Process/rank 0 of the Damaris clients (P0) will hold the value
+            if 'P0_B0' in array_sum['numpy_data'].keys():
+                array_sum_numpy = array_sum['numpy_data']['P0_B0']
+                print('Info from Python: Iteration ', it_str, ' Data found: iter_dict[array_sum][numpy_data][P0_B0] = ', array_sum_numpy[0] )
+        
+        if 'last_iter' in iter_dict.keys():
+            last_iter =  iter_dict['last_iter'] 
+            for key in last_iter['numpy_data'].keys() :
+                last_iter_numpy = last_iter['numpy_data'][key]
+                # print('Info from Python: Iteration ', it_str, ' Data found: last_iter_numpy[',key,'][0] = ', last_iter_numpy[0] )
+        
+ 
         # Do some Dask stuff
         # If this scheduler_file exists (is not an empty string) then a Dask scheduler was 
         # found (Access has been tested on the Damaris server C++ Python).
         scheduler_file  = dask_dict['dask_scheduler_file']  
-        if int(it_str) == 0:
+        if iteration == 0:
             print('Python INFO: Scheduler file '+ scheduler_file) 
         if (scheduler_file != ""):            
-            print("-------------------------------------------------------------------")
+            
             try:      
                 client =  Client(scheduler_file=scheduler_file, timeout='2s')
-                # time.sleep(1.0)
                 
                 mylist = iter_dict['cube_i']['sort_list']            
                 mylist = damaris_comm.gather(mylist, root=0) # this collects together a list of lists on rank 0
                 mydatadict = iter_dict['cube_i']['numpy_data']
-                if rank == 0:
-                    print(mylist)
-               
-                for pub_name_key in client.datasets.keys():
-                     client.unpublish_dataset(pub_name_key)   
-                global pub_name 
-                pub_name = 'S'+str(rank) + '_I'+str(iteration)
-                client.datasets[pub_name] = mydatadict
-                print("rank " , rank, "  client.datasets[ " , pub_name, "] was published")
-                time.sleep(0.5)
                 
-                # time.sleep(2)
+                 
                 damaris_comm.Barrier()
+                # for pub_name_key in client.datasets.keys():
+                #     client.unpublish_dataset(pub_name_key)   
+                global pub_name 
+                pub_name = 'S'+str(rank) + '_I'+str(iteration) + '_' + magic_num
+                client.datasets[pub_name] = mydatadict
+                # print("rank " , rank, "  client.datasets[ " , pub_name, "] was published")
                 
+                damaris_comm.Barrier()
                 list_merged = []  
-                myblocks_sorted = []
-                print('')
+
                 if rank == 0:
                     # merge into a single list
                     for list_itm in mylist:
                         for p_k_bo in list_itm:
-                            tlist = [ p_k_bo[0],p_k_bo[1],tuple(p_k_bo[2]) ]
+                            # p_k_bo is a list of: p_k_bo[0]='string' p_k_bo[1]='string'  p_k_bo[3]=list[integers]
+                            # and the list[integers] are the offsets into a Daamris array, set using damaris_set_position() API call
+                            tlist = [ p_k_bo[0], p_k_bo[1], tuple( p_k_bo[2]) ]
                             ttup = (tuple(tlist))
                             list_merged.append( ttup )
-                    print('list_merged:')        
-                    print(list_merged)
+
                     print('')
                     mylist_sorted = sorted(list_merged, key=lambda tup: tup[2])
-                    print(mylist_sorted)
-                    print('')
+                    if iteration == 0:
+                        print(mylist_sorted)
                     
-                    for list_itm in mylist_sorted:
-                       print('list_itm ' + str(list_itm) )
-                       pub_name_tmp = list_itm[0]
-                       P_B_key = list_itm[1]
-                       offset_tpl = list_itm[2]
-                       myblocks_sorted.append(SubBlock(offset_tpl,pub_name_tmp,P_B_key))
-
                     dask_str = returnDaskBlockLayoutList(mylist_sorted, 'client')
-                    print(dask_str) 
                     global data 
                     exec("global data; " + dask_str)
                     
+                    
+                    # We now create the Dask dask.array
                     x = da.block(data)
-                    y = x * 2
+                    array_sum_dask = x.sum().compute()
+                    print('Iteration ', it_str,' dask x.sum() := ', array_sum_dask)
+                    
+                    if iteration == 0 :
+                        y = x.map_blocks(compute_block_sum, chunks=(1, 1, 1)).compute()
+                        print("The sum of values within the dask.array blocks is:")
+                        print(y)
+                    
+                    if array_sum_numpy[0] == array_sum_dask:
+                        print('PASS')  # I should push this to the Dask memory to compare at end of iterations?
+                    else:
+                        print('FAIL')
 
-                    print(x.compute())
-                    print('')
-                    print(y.compute())
+                    # Use .persist() to not bring datasets back to the curent client
+                    # Use .compute() with small datasets (summaries / reductions) to use in displaying results
 
                 damaris_comm.Barrier()
                 
-                # pub_name ='S'+str(rank)  + '_I'+str(iteration)
-                client.unpublish_dataset(pub_name) 
-                print("rank " , rank, "  client.datasets[ " , pub_name, "] was unpublished")
+                # Shutting down the scheduler.
+                # The following would shut down the scheduler and all workers.
+                # The Damaris simulation may also try to shut down just the workers.     
+                # The runscript that launched the simulation may also try to shut down the scheduler.               
+                # if iteration == (last_iter-1):
+                #    client.shutdown() 
+                # else:
                 client.close()
+                    
+                # client.unpublish_dataset(pub_name) 
+                # print("rank " , rank, "  client.datasets[ " , pub_name, "] was unpublished")
                 
             except TimeoutError:
                 have_dask = False  
             except OSError:
                 have_dask = False  
-
+        else:
+             print('Python INFO: Scheduler file not found:', scheduler_file)
     except KeyError as err: 
-        print('Python Script KeyError: No damaris data of name: ', err)
+        print('Python INFO: KeyError: No damaris data of name: ', err)
     except PermissionError as err:
-        print('Python Script PermissionError!: ', err)
+        print('Python INFO: PermissionError!: ', err)
     except ValueError as err:
-        print('Python Script Damaris Data is read only!: ', err)
+        print('Python INFO: Damaris Data problem!: ', err)
     except UnboundLocalError as err:
-        print('Python Script Damaris data not assigned!: ', err)
+        print('Python INFO: Damaris data not assigned!: ', err)
     except NameError as err:
-        print('Python Script NameError: ', err)
+        print('Python INFO: NameError: ', err)
     # finally: is always called.    
     finally:
         pass
-        # print('Finally called for iteration: ', DD['iteration'])
 
 
 

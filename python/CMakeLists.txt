@@ -14,7 +14,7 @@ cmake_minimum_required(VERSION 3.12)
       find_package(PythonLibs 3 REQUIRED)
     endif()
     
-    # if(PythonInterp_FOUND)
+
         execute_process(
             COMMAND python -c "import mpi4py"
             RESULT_VARIABLE EXIT_CODE
@@ -23,7 +23,7 @@ cmake_minimum_required(VERSION 3.12)
         if (NOT ${EXIT_CODE} EQUAL 0)
             message(
                 WARNING
-                "The \"mpi4py\" Python3 package is not installed. Cannot build Damaris Python module. Please install mpi4py using the following command: \"MPICC=$(which mpicc) python -m pip install --no-cache-dir mpi4py\"."
+                ": The \"mpi4py\" Python3 package is not installed. Cannot build Damaris Python module. Please install mpi4py using the following command: \"MPICC=$(which mpicc) python -m pip install --no-cache-dir mpi4py\"."
             )
         endif()
 
@@ -34,11 +34,14 @@ cmake_minimum_required(VERSION 3.12)
         ) 
 
         string(REPLACE "\n" "" MPI4PY_INCLUDE_PATH ${MPI4PY_INCLUDE_PATH})
-    # endif(PythonInterp_FOUND)
+
         message(
                 STATUS
                 "Found mpi4py: INCLUDE_PATH: ${MPI4PY_INCLUDE_PATH}" 
             )  
+
+            
+    # "${PYTHON_MODULE_INSTALL_PATH}" is tested for in root CMakeList.txt
 
 
     add_library(pydamaris MODULE damaris_comm.cpp)
@@ -51,8 +54,7 @@ cmake_minimum_required(VERSION 3.12)
     
 
 
-
     # configure_file(__init__.py ${CMAKE_CURRENT_BINARY_DIR}/python/__init__.py COPYONLY)
-    # install(TARGETS pydamaris __init__.py DESTINATION "${PYTHON_INSTALL_PATH}")
-     install(TARGETS pydamaris DESTINATION "${PYTHON_INSTALL_PATH}")
+    # install(TARGETS pydamaris __init__.py DESTINATION "${PYTHON_MODULE_INSTALL_PATH}")
+     install(TARGETS pydamaris DESTINATION "${PYTHON_MODULE_INSTALL_PATH}")
 endif(ENABLE_PYTHONMOD)

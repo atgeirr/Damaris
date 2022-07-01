@@ -171,10 +171,10 @@ endif(ENABLE_PYTHON)
 # Test that the pydamaris Python module has an install path
 #----------------------------------------------------------------------------#
 if(ENABLE_PYTHONMOD)
-  if (NOT PYTHON_INSTALL_PATH )
+  if ( "${PYTHON_MODULE_INSTALL_PATH}" STREQUAL "" )
      message(
-                ERROR
-                "ENABLE_PYTHONMOD is TRUE, so please set -DPYTHON_INSTALL_PATH=<path> to the path to install the pydamaris Python module"
+                FATAL_ERROR 
+                "ENABLE_PYTHONMOD is TRUE. Please set -DPYTHON_MODULE_INSTALL_PATH=<path> to the path to install the pydamaris Python module"
             )
   endif()
 endif(ENABLE_PYTHONMOD)

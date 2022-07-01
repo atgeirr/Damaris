@@ -224,8 +224,7 @@ namespace damaris {
                    bp::object result = bp::exec(regex_check_scheduler_exists_.c_str(), this->globals_, this->locals_);  
                 }  
                 catch( bp::error_already_set &e) 
-                {
-                    
+                {
                     CatchPrintAndLogPyException("ERROR: PyAction::DaskSchedulerFileExists() bp::exec() Test attaching to Dask Scheduler. " ) ;                    
                     retint = 0 ;
                 }
@@ -241,7 +240,7 @@ namespace damaris {
         if (retint == 1) {
             dask_file_exists += " Exists and is a valid scheduler file. Damaris server cores will launch dask-workers." ;
         } else {
-            dask_file_exists += " Does not exist or is not a valid scheduler file. Check Damaris XML file <pyscript> tag for scheduler-file value, or when you launch a dask-scheduler use: --schedule-file " + filename ; 
+            dask_file_exists += " Does not exist or is not a valid scheduler file. Check Damaris XML file <pyscript> tag for scheduler-file value, or when you launch a dask-scheduler use: --scheduler-file " + filename ; 
         }
         
         Environment::Log(dask_file_exists , EventLogger::Debug);

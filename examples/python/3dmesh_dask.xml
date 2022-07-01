@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <simulation name="3dmesh_wf" language="c" xmlns="http://damaris.gforge.inria.fr/damaris/model">
     <architecture comment="mpirun -np 6 ./3dmesh_py 3dmesh_dask.xml -v 2 -r -i 2" >
-        <domains count="1" />
+        <domains count="8" />
         <dedicated cores="2" nodes="0" />
         <placement />
         <buffer name="damaris-buffer" size="536870912" />
@@ -30,12 +30,14 @@
         <layout name="cells_whd_wf_float"  type="float" dimensions="DEPTH/size,HEIGHT,WIDTH"
             global="DEPTH,HEIGHT,WIDTH" ghosts="0:0,0:0,0:0" />
         
-        <layout name="one_int"  type="int" dimensions="1"  global="1" />
+        <layout name="one_int"  type="int"    dimensions="1"  global="1" />
+        <layout name="one_double"  type="double" dimensions="1"  global="1" />
         
         <variable name="cube_i" type="scalar" layout="cells_whd_wf" mesh="mesh" centering="nodal" script="MyPyAction" />
         <variable name="cube_f" type="scalar" layout="cells_whd_wf_float" mesh="mesh" centering="nodal" script="MyPyAction" />
           
         <variable name="last_iter" type="scalar"  script="MyPyAction" layout="one_int" time-varying="true" /> 
+        <variable name="array_sum" type="scalar"  script="MyPyAction" layout="one_double" time-varying="true" comment="used to pass summation computed on C side to the Python side"/> 
     </data>
     <actions>
     </actions>

@@ -96,8 +96,8 @@ int main(int argc, char** argv)
         int rank_start = 0 ;
 
      
-        if (size_client > WIDTH) {
-         printf("ERROR: MPI process count (size=%2d) is greater than the blocked index (WIDTH=%2d)\t", size_client, WIDTH  );
+        if (size_client > DEPTH) {
+         printf("ERROR: MPI process count (size=%2d) is greater than the blocked index (DEPTH=%2d)\t", size_client, DEPTH  );
          exit(-1);
         }
         // used with: <layout name="cells_whd_wf" type="int" dimensions="WIDTH/size,HEIGHT,DEPTH" global="WIDTH,HEIGHT,DEPTH" />
@@ -168,40 +168,34 @@ int main(int argc, char** argv)
                 sending_rank = current_rank ;
             } // end of in-order loop over ranks
             } else  if (verbose == 2) { // print sumation values to screen
-                int current_rank = 0 ;
-                int sending_rank = 0 ;
-                int sumdata = 0 ;
-                 // serialize the print statements
-                 while ( current_rank < size_client)
-                 {
-                   // printf("\n"); 
-                   if (rank_client == current_rank) { // start of serialized section                
-
-                      for ( d = 0; d < local_depth; d++){
-                        for ( h = 0; h < local_height; h++){
-                         for ( w = 0; w < local_width; w++) {
-                            cube[d][h][w] = (int) sequence + rank_start ;
-                            cube_f[d][h][w] = (float) sequence + rank_start +0.5f;
-                            sumdata += cube[d][h][w] ;
-                            if (rank_only==0) sequence++;
-                         }
+            
+                long int sumdata = 0 ;
+                for ( d = 0; d < local_depth; d++){
+                    for ( h = 0; h < local_height; h++){
+                        for ( w = 0; w < local_width; w++) {
+                           cube[d][h][w] = (int) sequence + rank_start ;
+                           cube_f[d][h][w] = (float) sequence + rank_start +0.5f;
+                           sumdata += cube[d][h][w] ;
+                           if (rank_only==0) sequence++;
                         }
-                      }
-                      printf("Iteration %d Rank %d Sum = %8d\n", i, current_rank, sumdata );
-                      fflush(stdin); 
-                      sending_rank = current_rank ;
-                      current_rank++ ;
-                   } // end of serialized section
-                   MPI_Bcast(&current_rank,1, MPI_INT,sending_rank, comm);
-                   sending_rank = current_rank ;
-                } // end of in-order loop over ranks
+                    }
+                } 
+                  
+                // Each MPI process sends its rank to reduction, root MPI process collects the result
+                long int reduction_result = 0;
+                MPI_Reduce(&sumdata, &reduction_result, 1, MPI_LONG, MPI_SUM, 0, comm);
+                
+                if (rank_client == 0) 
+                    printf("Iteration %d Rank %d Sum = %ld\n", i, rank_client, reduction_result );
+              
+                double array_sum = (double) reduction_result ;
+                damaris_write("array_sum" , &array_sum);  // Used to confirm the summation value found in Dask
             }
-         
-         
-
+            
             damaris_write("cube_i" , cube);
             damaris_write("cube_f" , cube_f);
-            damaris_write("last_iter" , &MAX_CYCLES);
+            
+            damaris_write("last_iter" , &MAX_CYCLES); // The Damaris XML variable has time-varing=true so we must give an updated value at each iteration
             sleep(time);
 
             damaris_end_iteration();
