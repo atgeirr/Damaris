@@ -174,7 +174,7 @@ if(ENABLE_PYTHONMOD)
   if ( "${PYTHON_MODULE_INSTALL_PATH}" STREQUAL "" )
      message(
                 FATAL_ERROR 
-                "ENABLE_PYTHONMOD is TRUE. Please set -DPYTHON_MODULE_INSTALL_PATH=<path> to the path to install the pydamaris Python module"
+                "ENABLE_PYTHONMOD is TRUE. Please set -DPYTHON_MODULE_INSTALL_PATH=<path> to the path to install the damaris4py Python module"
             )
   endif()
 endif(ENABLE_PYTHONMOD)
@@ -240,7 +240,7 @@ CONFIGURE_FILE(${DAMARIS_SOURCE_DIR}/include/Damaris.h.in
 add_subdirectory (lib)
 
 if(ENABLE_PYTHONMOD)
-add_subdirectory (python)
+add_subdirectory (python/damaris4py/damaris4py)
 endif(ENABLE_PYTHONMOD)
 
 if(ENABLE_EXAMPLES)

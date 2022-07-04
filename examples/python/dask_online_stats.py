@@ -41,57 +41,94 @@ def finalize(existingAggregate):
     if count < 2:
         return float("nan")
     else:
-        (mean, variance, sampleVariance) = (mean, M2 / count, M2 / (count - 1))
-        return (mean, variance, sampleVariance)
+        (mean, sampleVariance) = (mean, M2 / (count - 1))
+        return (mean, sampleVariance)
+     
      
      
 # Using to sum up elements in each block, see: 
 #https://stackoverflow.com/questions/40092808/compute-sum-of-the-elements-in-a-chunk-of-a-dask-array
-#def compute_block_sum(block):
-#    return np.array([np.sum(block)])[:, None, None]
-
 def compute_block_add_rand(block):
-    np_data = block - np.random.rand(block.shape) 
+    np_data = block + np.random.normal(0.0, 0.1, block.shape) 
     return np_data
+    
+def compute_block_average(block):  
+    return np.array([np.average(block)])[:, None, None]
 
-client.shutdown()
+def compute_block_sqrt_average(block):  
+    return np.array([np.average(np.sqrt(block))])[:, None, None]
+    
+block_shape = (1, 3, 4)
 
-P0_B0 = np.zeros((3, 4)) )
-P1_B0 = np.ones((3, 4))  )
-P2_B0 = np.ones((3, 4))*2)
-P3_B0 = np.ones((3, 4))*3)
-P4_B0 = np.ones((3, 4))*4)
-P5_B0 = np.ones((3, 4))*5)
-P6_B0 = np.ones((3, 4))*6)
-P7_B0 = np.ones((3, 4))*7)
-P8_B0 = np.ones((3, 4))*8)
-P9_B0 = np.ones((3, 4))*9)
-P10_B0 = np.ones((3, 4))*10)
-P11_B0 = np.ones((3, 4))*11)
-P12_B0 = np.ones((3, 4))*12)
-P13_B0 = np.ones((3, 4))*13)
-P14_B0 = np.ones((3, 4))*14)
-P15_B0 = np.ones((3, 4))*15)
- 
-data = [
-    [
-    [P0_B0,  P1_B0,  P2_B0,  P3_B0],
-    [P4_B0,  P5_B0,  P6_B0,  P7_B0],
-    [P8_B0,  P9_B0,  P10_B0, P11_B0],
-    [P12_B0, P13_B0, P14_B0, P15_B0]
+if True:
+    P0_B0 = np.zeros(block_shape )
+    P1_B0 = np.ones(block_shape  )
+    P2_B0 = np.ones(block_shape)*2
+    P3_B0 = np.ones(block_shape)*3
+    P4_B0 = np.ones(block_shape)*4
+    P5_B0 = np.ones(block_shape)*5
+    P6_B0 = np.ones(block_shape)*6
+    P7_B0 = np.ones(block_shape)*7
+    P8_B0 = np.ones(block_shape)*8
+    P9_B0 = np.ones(block_shape)*9
+    P10_B0 = np.ones(block_shape)*10
+    P11_B0 = np.ones(block_shape)*11
+    P12_B0 = np.ones(block_shape)*12
+    P13_B0 = np.ones(block_shape)*13
+    P14_B0 = np.ones(block_shape)*14
+    P15_B0 = np.ones(block_shape)*15
+
+    data = [
+        [
+            [P0_B0,  P1_B0,  P2_B0,  P3_B0],
+            [P4_B0,  P5_B0,  P6_B0,  P7_B0],
+            [P8_B0,  P9_B0,  P10_B0, P11_B0],
+            [P12_B0, P13_B0, P14_B0, P15_B0]
+        ]
     ]
-]
+    data2 = [
+        [
+            [P1_B0,  P1_B0,  P1_B0,  P1_B0],
+            [P1_B0,  P1_B0,  P1_B0,  P1_B0],
+            [P1_B0,  P1_B0,  P1_B0,  P1_B0],
+            [P1_B0,  P1_B0,  P1_B0,  P1_B0]
+        ]
+    ]
 
+    x = da.block(data)
 
-x = da.block(data)
-# y = da.full_like(x, 12.3)
-# y = x.map_blocks(compute_block_add_rand, chunks=(3, 4)).persist()
-y = x.map_blocks(compute_block_add_rand, chunks=(3, 4)).compute()
+    print(x.compute())
+    print(da.average(x).compute())
+    existingAggregate = create(x)
+ 
+    for i in range(100):
+        y = x + da.random.normal(0.0, 0.1, x.shape)
+        existingAggregate = update(existingAggregate, y)
 
-print(y)
+    (mean, sampleVariance) = finalize(existingAggregate)
 
+    print(mean.map_blocks(compute_block_average, chunks=(1, 1, 1)).compute())
+    print(sampleVariance.map_blocks(compute_block_sqrt_average, chunks=(1, 1, 1)).compute())
+    print(da.average(da.sqrt(sampleVariance)).compute()))
+    
+    # client.shutdown()
+else:
+    x = np.ones(block_shape  )
+    # y = da.full_like(x, 12.3)
+    # y = x.map_blocks(compute_block_add_rand, chunks=block_shape.persist()
+    y = x + np.random.normal(0.0, 0.1, x.shape) 
+    print(y)
 
+    existingAggregate = create_np(y)
 
+    for i in range(10000):
+        y = x + np.random.normal(0.0, 0.1, x.shape) 
+        existingAggregate = update_np(existingAggregate, y)
+
+    (mean, sampleVariance) = finalize_np(existingAggregate)
+     
+    print(mean)
+    print(np.sqrt(sampleVariance))
 
 
 

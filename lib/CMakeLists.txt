@@ -308,16 +308,13 @@ configure_file(damaris.pc.in damaris.pc @ONLY)
 install(TARGETS damaris EXPORT DamarisTargets
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib)
-install(EXPORT DamarisTargets
-        DESTINATION ${DAMARIS_PKG}
-        FILE "DamarisTargets.cmake")
-install(FILES   "${CMAKE_CURRENT_BINARY_DIR}/DamarisConfigVersion.cmake"
+install(EXPORT DamarisTargets DESTINATION ${DAMARIS_PKG}  FILE "DamarisTargets.cmake")
+install(FILES  "${CMAKE_CURRENT_BINARY_DIR}/DamarisConfigVersion.cmake"
         "${CMAKE_CURRENT_BINARY_DIR}/DamarisConfig.cmake"
         "${DAMARIS_SOURCE_DIR}/cmake/Modules/FindVisIt.cmake"
         "${DAMARIS_SOURCE_DIR}/cmake/Modules/FindXSD.cmake"
         DESTINATION ${DAMARIS_PKG} )
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/damaris.pc"
-    DESTINATION lib/pkgconfig)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/damaris.pc" DESTINATION lib/pkgconfig)
 install(FILES "${CMAKE_BINARY_DIR}/include/Damaris.h" DESTINATION include)
 install(FILES "${CMAKE_BINARY_DIR}/include/damaris/model/Model.hpp" DESTINATION include/damaris/model)
 install(DIRECTORY "${DAMARIS_SOURCE_DIR}/include/damaris" DESTINATION include)
@@ -356,20 +353,21 @@ if(ENABLE_EXAMPLES)
     if(ENABLE_VISIT)
       install(DIRECTORY "${DAMARIS_SOURCE_DIR}/examples/visit" DESTINATION  examples/damaris )
       install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/blocks" DESTINATION examples/damaris/visit)
-      install(PROGRAMS "${DAMARIS_SOURCE_DIR}/examples/visit/cmd.py" DESTINATION examples/damaris/visit)
+      install(FILES "${DAMARIS_SOURCE_DIR}/examples/visit/cmd.py" DESTINATION examples/damaris/visit)
       install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/curve" DESTINATION examples/damaris/visit)
       install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/mandelbulb" DESTINATION examples/damaris/visit)
       install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/mesh" DESTINATION examples/damaris/visit)
       install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/point" DESTINATION examples/damaris/visit)
       install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/var" DESTINATION examples/damaris/visit)
       install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/life" DESTINATION examples/damaris/visit)
-      install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/curve.xml" DESTINATION examples/damaris/visit)
-      install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/mandelbulb.xml" DESTINATION examples/damaris/visit)      
-      install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/life.xml" DESTINATION examples/damaris/visit)
-      install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/blocks.xml" DESTINATION examples/damaris/visit)
-      install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/mesh.xml" DESTINATION examples/damaris/visit)
-      install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/point.xml" DESTINATION examples/damaris/visit)
-      install(PROGRAMS "${CMAKE_BINARY_DIR}/examples/visit/var.xml" DESTINATION examples/damaris/visit)
+      # These XML are from a template and created by cmake, so need to be copied from the bin dir
+      install(FILES "${CMAKE_BINARY_DIR}/examples/visit/curve.xml" DESTINATION examples/damaris/visit)
+      install(FILES "${CMAKE_BINARY_DIR}/examples/visit/mandelbulb.xml" DESTINATION examples/damaris/visit)      
+      install(FILES "${CMAKE_BINARY_DIR}/examples/visit/life.xml" DESTINATION examples/damaris/visit)
+      install(FILES "${CMAKE_BINARY_DIR}/examples/visit/blocks.xml" DESTINATION examples/damaris/visit)
+      install(FILES "${CMAKE_BINARY_DIR}/examples/visit/mesh.xml" DESTINATION examples/damaris/visit)
+      install(FILES "${CMAKE_BINARY_DIR}/examples/visit/point.xml" DESTINATION examples/damaris/visit)
+      install(FILES "${CMAKE_BINARY_DIR}/examples/visit/var.xml" DESTINATION examples/damaris/visit)
     endif(ENABLE_VISIT)
     if(ENABLE_FORTRAN)
       install(DIRECTORY "${DAMARIS_SOURCE_DIR}/examples/fortran" DESTINATION  examples/damaris )

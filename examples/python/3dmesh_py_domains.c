@@ -118,6 +118,7 @@ int main(int argc, char** argv)
         for( i=0; i < MAX_CYCLES; i++) 
         {   
             double array_sum = 0.0 ;
+            long int reduction_result = 0;
             double t1 = MPI_Wtime(); 
             for (int block = 0 ; block < domains ; block++)
             {
@@ -205,7 +206,7 @@ int main(int argc, char** argv)
                     } 
                       
                     // Each MPI process sends its rank to reduction, root MPI process collects the result
-                    long int reduction_result = 0;
+                    
                     MPI_Reduce(&sumdata, &reduction_result, 1, MPI_LONG, MPI_SUM, 0, comm);                                    
                   
                     array_sum += reduction_result ;

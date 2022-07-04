@@ -43,18 +43,20 @@ cmake_minimum_required(VERSION 3.12)
             
     # "${PYTHON_MODULE_INSTALL_PATH}" is tested for in root CMakeList.txt
 
-
-    add_library(pydamaris MODULE damaris_comm.cpp)
-    set_target_properties(pydamaris PROPERTIES PREFIX "")
+    add_library(damaris4py MODULE damaris_comm.cpp)
+    set_target_properties(damaris4py PROPERTIES PREFIX "")
 
 
     # Set up the libraries and header search paths for this target
-    target_include_directories(pydamaris PRIVATE damaris ${MPI4PY_INCLUDE_PATH} ${PYTHON_INCLUDE_DIRS})
-    target_link_libraries(pydamaris damaris ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
+    target_include_directories(damaris4py PRIVATE damaris ${MPI4PY_INCLUDE_PATH} ${PYTHON_INCLUDE_DIRS})
+    target_link_libraries(damaris4py damaris ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
     
 
 
     # configure_file(__init__.py ${CMAKE_CURRENT_BINARY_DIR}/python/__init__.py COPYONLY)
     # install(TARGETS pydamaris __init__.py DESTINATION "${PYTHON_MODULE_INSTALL_PATH}")
-     install(TARGETS pydamaris DESTINATION "${PYTHON_MODULE_INSTALL_PATH}")
+     install(TARGETS damaris4py DESTINATION "${PYTHON_MODULE_INSTALL_PATH}/damaris4py")
+     install(FILES "${DAMARIS_SOURCE_DIR}/python/damaris4py/damaris4py/__init__.py" DESTINATION "${PYTHON_MODULE_INSTALL_PATH}/damaris4py")
+     install(FILES "${DAMARIS_SOURCE_DIR}/python/damaris4py/damaris4py/dask/__init__.py" DESTINATION "${PYTHON_MODULE_INSTALL_PATH}/damaris4py/dask")
+     install(FILES "${DAMARIS_SOURCE_DIR}/python/damaris4py/damaris4py/dask/damaris_dask.py" DESTINATION "${PYTHON_MODULE_INSTALL_PATH}/damaris4py/dask")
 endif(ENABLE_PYTHONMOD)
