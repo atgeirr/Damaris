@@ -7,18 +7,34 @@
 #include <mpi.h>
 #include "Damaris.h"
 
-//#define MAX_CYCLES 3
+/**
+    A Damaris example of using Python integration with Dask distributed. This version sets up a dataset
+    which has multiple domains (or blocks) written ber iteration, and the sum of the data in the blocks is 
+    compared between this simulation code and the Python code that is passed the data via Damaris.
+    
+    To run this example, a Dask scheduler needs to be spun up:
+
+      dask-scheduler --scheduler-file "/home/user/dask_file.json" &
+
+    The --scheduler-file argument must match what is in the Damaris XML file <pyscript> tag.
+
+    Then run the simulation: (assumes 4 Damaris clients and 2 Damaris server cores as per the xml file)
+
+      mpirun --oversubscribe --host ubu20-hvvm-c -np 6 ./3dmesh_py_domains 3dmesh_dask.xml -i 10 -r -d 4
+      
+    N.B. Set the global mesh size values WIDTH, HEIGHT and DEPTH using the XML input file.
+
+    The simulation code (via Damaris pyscript class) will create the Dask workers (one per Damaris server core) 
+    and have them connect to the Dask scheduler. The simulation code will remove the workers at the end of the execution, 
+    unless  keep-workers="yes" is specified in 3dmesh_dask.xml <pyscript> tag
+*/
 
 void print_usage(char* exename) {
-   
-      fprintf(stderr,"Usage: %s <3dmesh_py.xml> [-v] [-r] [-s X]\n",exename);
-      fprintf(stderr,"-v  <X>    X = 0 default, do not print arrays\n");
-      fprintf(stderr,"           X = 1 Verbose mode, prints arrays\n");
-      fprintf(stderr,"           X = 2 Verbose mode, prints summation of arrays\n");
-      fprintf(stderr,"-r         Array values set as rank of process\n");
-      fprintf(stderr,"-d  <D>    D is the number of domains to split data into (must divide into Width perfectly)\n");
-      fprintf(stderr,"-s  <Y>    Y is integer time to sleep in seconds between iterations\n");
-      fprintf(stderr,"-i  <I>    I is the number of iterations of simulation to run\n");
+    fprintf(stderr,"Usage: %s <3dmesh_dask.xml> [-i I] [-d D] [-r] [-s S]\n",exename);
+    fprintf(stderr,"-i  I    I is the number of iterations of simulation to run\n");
+    fprintf(stderr,"-r         Array values set as rank of process\n");
+    fprintf(stderr,"-d  D    D is the number of domains to split data into (must divide into Width perfectly)\n");
+    fprintf(stderr,"-s  S    S is integer time to sleep in seconds between iterations\n");
 }
 
 int WIDTH;
@@ -53,10 +69,7 @@ int main(int argc, char** argv)
     }
     else if (strcmp(argv[current_arg],"-r") == 0)
       rank_only = 1 ;
-    else if (strcmp(argv[current_arg],"-s") == 0) {
-        current_arg++;
-        time = atoi(argv[current_arg]);
-    } else if (strcmp(argv[current_arg],"-i") == 0) {
+    else if (strcmp(argv[current_arg],"-i") == 0) {
         current_arg++;
         MAX_CYCLES = atoi(argv[current_arg]);
     } else if (strcmp(argv[current_arg],"-d") == 0) {
@@ -70,10 +83,7 @@ int main(int argc, char** argv)
       current_arg++;
   }
 
-  
-
    int size_client, rank_client, whd_layout;
-
    int is_client;
    int err = damaris_start(&is_client);
 
@@ -86,24 +96,27 @@ int main(int argc, char** argv)
         damaris_parameter_get("WIDTH" , &WIDTH , sizeof(int));
         damaris_parameter_get("HEIGHT", &HEIGHT, sizeof(int));
         damaris_parameter_get("DEPTH" , &DEPTH , sizeof(int));
-        damaris_parameter_get("whd_layout" , &whd_layout , sizeof(int));
-
+        
+        // This is only be available on the first iteration if time-varing=false
+        // damaris_write("last_iter" , &MAX_CYCLES); // we could set it now and publish it in dask to keep it around as needed.
+        
         MPI_Comm_rank(comm , &rank_client);
         MPI_Comm_size(comm , &size_client);
 
-        fprintf(stdout,"Input paramaters found: v=%d r=%d (0 is not found)\n",verbose, rank_only);
+        fprintf(stdout,"Input paramaters found: v=%d r=%d (0 is not found)\n",verbose, rank_only) ;
 
         // Dynamically update the size used in the Damaris layout configuration
-        damaris_parameter_set("size" , &size_client , sizeof(int));
+        damaris_parameter_set("size" , &size_client , sizeof(int)) ;
         
         // Dynamically update the number of domains being used in the Damaris layout configuration
-        damaris_parameter_set("blocks" , &domains , sizeof(int));
+        damaris_parameter_set("blocks" , &domains , sizeof(int)) ;
         
 
         int64_t position_cube[3];
-        int local_width, local_height, local_depth  ;
-        int start_width, end_width  ;
-        int rank_start = 0 ;
+        int local_width, local_height, local_depth ;
+        // rank_start is the value a ranks data will start at and then be incremented 
+        // at each position onward (if -r not present)
+        int rank_start = 0 ; 
 
      
         if (size_client > DEPTH) {
@@ -111,131 +124,83 @@ int main(int argc, char** argv)
          exit(-1);
         }
         if (WIDTH % domains != 0) {
-         printf("ERROR: WIDTH % domains must divide perfectly %d % %d = %d\t", WIDTH, domains, WIDTH % domains  );
+         int temp_int  =WIDTH % domains ;
+         printf("ERROR: WIDTH mod domains must divide perfectly %d mod %d = %d\t", WIDTH, domains, temp_int  );
          exit(-1);
         }
+        
+        // used with: <layout name="cells_whd_wf" type="int" dimensions="DEPTH/size,HEIGHT,WIDTH/domains" 
+        // global="DEPTH,HEIGHT,WIDTH" />
+        // These sizes do not change 
+        local_width      = WIDTH / domains ;         
+        local_height     = HEIGHT ;
+        local_depth      = DEPTH / size_client ;
         int i, d, h, w ;
         for( i=0; i < MAX_CYCLES; i++) 
         {   
             double array_sum = 0.0 ;
-            long int reduction_result = 0;
-            double t1 = MPI_Wtime(); 
+            long int reduction_result = 0 ;
+            double t1 = MPI_Wtime() ; 
+            
+            damaris_write("last_iter" , &MAX_CYCLES) ; // The Damaris XML variable has time-varing=true 
+            
+            // We are writing multiple blocks of data per Damaris client rank.
+            // This requires that we use damaris_set_block_position() and damaris_write_block() API calls
+            // instead of damaris_set_position() and damaris_write()
             for (int block = 0 ; block < domains ; block++)
             {
-                // used with: <layout name="cells_whd_wf" type="int" dimensions="WIDTH/size,HEIGHT,DEPTH" global="WIDTH,HEIGHT,DEPTH" />
-                local_width      = WIDTH / domains ; // WIDTH/size;
-                local_height     = HEIGHT;
-                local_depth      = DEPTH/size_client;
-                
-                start_width      = block * local_width ;
-                end_width        = start_width + local_width ;
-                
-                position_cube[0] = rank_client*local_depth;
-                position_cube[1] = 0;
-                position_cube[2] = start_width;
+                position_cube[0] = rank_client*local_depth ;
+                position_cube[1] = 0 ;
+                position_cube[2] = block * local_width ;
 
                 rank_start = rank_client * local_width * local_height ;
 
                 // allocate the local data array
-                int cube[local_depth][local_height][local_width];
-                float cube_f[local_depth][local_height][local_width];
+                int cube[local_depth][local_height][local_width] ;
 
                 // set the appropriate position for the current rank
-                damaris_set_block_position("cube_i", block, position_cube);
-                damaris_set_block_position("cube_f", block, position_cube);
-
-                // do not do this here as we will not get an updated value (if time-varying="true" )
-                // damaris_write("last_iter" , &MAX_CYCLES);
-
-            
-                        
+                damaris_set_block_position("cube_i", block, position_cube) ;
+ 
                 int sequence ;
                 sequence =  i ;  // this is the start of the sequence for this iteration
-                if (verbose == 0) { // default - do not print values to screen
-
-                    for ( d = 0; d < local_depth; d++){
-                        for ( h = 0; h < local_height; h++){
-                             for ( w = 0 ; w < local_width; w++) {
-
-                                cube[d][h][w] = (int) sequence + rank_start;
-                                cube_f[d][h][w] = (float) sequence + rank_start +0.5f;
-                                if (rank_only==0) sequence++;
-                             }  
-                        }
-                    }            
-                } else  if (verbose == 1) { // print values to screen
-                int current_rank = 0 ;
-                int sending_rank = 0 ;
-                 // serialize the print statements
-                 while ( current_rank < size_client)
-                 {
-                    printf("\n"); 
-                    if (rank_client == current_rank) { // start of serialized section
-
-                      for ( d = 0; d < local_depth; d++){
-                        for ( h = 0; h < local_height; h++){
-                         for ( w = 0 ; w < local_width; w++) {
-                            cube[d][h][w] = (int) sequence + rank_start;
-                            cube_f[d][h][w] = (float) sequence + rank_start +0.5f;
-                            printf("%2d\t", cube[d][h][w] );
-                            if (rank_only==0) sequence++;
-                         }
-                         printf("\n");
-                        }
-                        printf("\n");
-                      }
-                      fflush(stdin); 
-                      sending_rank = current_rank ;
-                      current_rank++ ;
-                    } // end of serialized section
-                    MPI_Bcast(&current_rank,1, MPI_INT,sending_rank, comm);
-                    sending_rank = current_rank ;
-                } // end of in-order loop over ranks
-                } else  if (verbose == 2) { // print sumation values to screen
                 
-                    long int sumdata = 0 ;
-                    for ( d = 0; d < local_depth; d++){
-                        for ( h = 0; h < local_height; h++){
-                            for ( w = 0 ; w < local_width; w++) {
-                               cube[d][h][w] = (int) sequence + rank_start ;
-                               cube_f[d][h][w] = (float) sequence + rank_start +0.5f;
-                               sumdata += cube[d][h][w] ;
-                               if (rank_only==0) sequence++;
-                            }
+                // print sumation values to screen
+                long int sumdata = 0 ;
+                for ( d = 0; d < local_depth; d++){
+                    for ( h = 0; h < local_height; h++){
+                        for ( w = 0 ; w < local_width; w++) {
+                           cube[d][h][w] = (int) sequence + rank_start ;
+                           sumdata += cube[d][h][w] ;
+                           if (rank_only==0) sequence++;
                         }
-                    } 
-                      
-                    // Each MPI process sends its rank to reduction, root MPI process collects the result
-                    
-                    MPI_Reduce(&sumdata, &reduction_result, 1, MPI_LONG, MPI_SUM, 0, comm);                                    
+                    }
+                } 
                   
-                    array_sum += reduction_result ;
-                    
-                }
-                
-                damaris_write_block("cube_i" , block, cube);
-                damaris_write_block("cube_f" , block, cube_f);
+                // Each MPI process sends its rank to reduction, root MPI process collects the result
+                MPI_Reduce(&sumdata, &reduction_result, 1, MPI_LONG, MPI_SUM, 0, comm) ;                                    
+                array_sum += reduction_result ;
 
+                damaris_write_block("cube_i" , block, cube) ;
 
             }  // end of loop over blocks
-            sleep(time);
-            MPI_Barrier(comm);
-            double t2 = MPI_Wtime();
+            sleep(time) ;
+            MPI_Barrier(comm) ;
+            double t2 = MPI_Wtime() ;
             if(rank_client == 0) {
-                printf("Iteration %d done in %f seconds\n",i,(t2-t1));
+                printf("Iteration %d done in %f seconds\n",i,(t2-t1)) ;
                 fflush(stdin); 
             }
             if (rank_client == 0)
-                printf("Iteration %d Rank %d Sum = %ld\n", i, rank_client, reduction_result );
-            damaris_write("array_sum" , &array_sum);  // Used to confirm the summation value found in Dask        
-            damaris_write("last_iter" , &MAX_CYCLES); // The Damaris XML variable has time-varing=true so we must give an updated value at each iteration
-            damaris_end_iteration();
+                printf("Iteration %d Rank %d Sum = %f\n", i, rank_client, array_sum ) ;
+            damaris_write("array_sum" , &array_sum) ;  // Used to confirm the summation value found in Dask        
+           
+            damaris_end_iteration() ;
         }  // end of for loop over MAX_CYCLES
 
-        damaris_stop();
+        damaris_stop() ;
    }
 
-   damaris_finalize();
-   MPI_Finalize();
+   damaris_finalize() ;
+   MPI_Finalize() ;
    return 0;
 }

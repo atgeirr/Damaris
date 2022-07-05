@@ -41,12 +41,14 @@ static PyObject* hw_damaris_comm()
 */
 static PyObject* hw_damaris_comm_check_client()
 {
-  if (damaris::Environment::isClient())
+  if (damaris::Environment::IsClient())
     return hw_damaris_comm() ;
   else {
-    cout << "Error: GetClientComm() was not called from a client process!\n";
+    std::cout << "Error: GetClientComm() was not called from a client process!\n";
     bp::throw_error_already_set();
    }
+   
+   return NULL ;
 }
 
 /**
@@ -58,9 +60,10 @@ static PyObject* hw_damaris_comm_check_server()
   if (damaris::Environment::IsServer())
     return hw_damaris_comm() ;
   else {
-    cout << "Error: GetServerComm() was not called from a server process!\n";
+    std::cout << "Error: GetServerComm() was not called from a server process!\n";
     bp::throw_error_already_set();
    }
+   return NULL ;
 }
 
 /**
@@ -83,16 +86,16 @@ static PyObject* hw_global_comm()
 * Damaris Environment class wrapper 
 * Tells if the process is a client or not. If true then implies hw_is_server() is false.
 */
-static PyObject* hw_is_client()
+static bp::object hw_is_client()
 {
-  return bp::object(damaris::Environment::isClient());
+  return bp::object(damaris::Environment::IsClient());
 }
 
 /**
 * Damaris Environment class wrapper
 * Tells if the process is a server or not. If true then implies hw_is_client() is false.
 */
-static PyObject* hw_is_server()
+static bp::object hw_is_server()
 {
   return bp::object(damaris::Environment::IsServer());
 }
@@ -101,7 +104,7 @@ static PyObject* hw_is_server()
 * Damaris Environment class wrapper
 * Tells if the process is a dedicated core or not. If true then implies hw_is_server() is true.
 */
-static PyObject* hw_is_dedicated_core()
+static bp::object hw_is_dedicated_core()
 {
   return bp::object(damaris::Environment::IsDedicatedCore());
 }
@@ -110,7 +113,7 @@ static PyObject* hw_is_dedicated_core()
 * Damaris Environment class wrapper
 * Tells if the process is a dedicated node or not. If true then implies hw_is_server() is true.
 */
-static PyObject* hw_is_dedicated_node()
+static bp::object hw_is_dedicated_node()
 {
   return bp::object(damaris::Environment::IsDedicatedNode());
 }
@@ -119,7 +122,7 @@ static PyObject* hw_is_dedicated_node()
 * Damaris Environment class wrapper
 * Returns the number of Damaris clients (mpi processes) per node. i.e. The number of simulation ranks per node.
 */
-static PyObject* hw_clients_per_node()
+static bp::object hw_clients_per_node()
 {
   return bp::object(damaris::Environment::ClientsPerNode());
 }
@@ -128,7 +131,7 @@ static PyObject* hw_clients_per_node()
 * Damaris Environment class wrapper
 * Returns the number of Damaris cores (mpi processes) per node.
 */
-static PyObject* hw_cores_per_node()
+static bp::object hw_cores_per_node()
 {
   return bp::object(damaris::Environment::CoresPerNode());
 }
@@ -137,7 +140,7 @@ static PyObject* hw_cores_per_node()
 * Damaris Environment class wrapper
 * Returns the number of Damaris server cores (ranks) being used per node
 */
-static PyObject* hw_servers_per_node()
+static bp::object hw_servers_per_node()
 {
   return bp::object(damaris::Environment::ServersPerNode());
 }
@@ -146,29 +149,50 @@ static PyObject* hw_servers_per_node()
 * Damaris Environment class wrapper
 * Returns the number of nodes being used in the simulation
 */
-static PyObject* hw_number_of_nodes()
+static bp::object hw_number_of_nodes()
 {
   return bp::object(damaris::Environment::NumberOfNodes());
 }
+
+
+/**
+ * Returns the list of id of clients connected to the
+ * dedicated core. In standalone mode, will return a list
+ * with only the id of the calling client.
+ */
+static bp::object hw_list_known_clients()
+{
+  static const std::list<int> my_cpp_list = damaris::Environment::GetKnownLocalClients();
+  static bp::list retlist ;
+  for (auto c : my_cpp_list){
+    retlist.append(c);
+  }
+  return bp::object(retlist);
+}
+    
+
+
+
 /* 
 * Expose the functions as a Python module
 */
-BOOST_PYTHON_MODULE(pydamaris)
+BOOST_PYTHON_MODULE(damaris4py)
 {
   Py_Initialize();
   if (import_mpi4py() < 0) return;
 
-  bp::def("GetClientComm", hw_damaris_comm_check_client);
-  bp::def("GetServerComm", hw_damaris_comm_check_server);
-  bp::def("GetDamarisComm", hw_damaris_comm);
-  bp::def("GetGlobalComm", hw_global_comm);
-  bp::def("IsClient", hw_is_client);
-  bp::def("IsServer", hw_is_server);
-  bp::def("IsDedicatedCore", hw_is_dedicated_core);
-  bp::def("IsDedicatedNode", hw_is_dedicated_node);
-  bp::def("ClientsPerNode", hw_clients_per_node);
-  bp::def("CoresPerNode", hw_cores_per_node);
-  bp::def("ServersPerNode", hw_servers_per_node);
-  bp::def("NumberOfNodes", hw_number_of_nodes);
+  bp::def("getclientcomm", hw_damaris_comm_check_client);
+  bp::def("getservercomm", hw_damaris_comm_check_server);
+  bp::def("getdamariscomm", hw_damaris_comm);
+  bp::def("getglobalcomm", hw_global_comm);
+  bp::def("isclient", hw_is_client);
+  bp::def("isserver", hw_is_server);
+  bp::def("isdedicatedcore", hw_is_dedicated_core);
+  bp::def("isdedicatednode", hw_is_dedicated_node);
+  bp::def("clientspernode", hw_clients_per_node);
+  bp::def("corespernode", hw_cores_per_node);
+  bp::def("serverspernode", hw_servers_per_node);
+  bp::def("numberofnodes", hw_number_of_nodes);
+  bp::def("listknownclients", hw_list_known_clients);
 }
 

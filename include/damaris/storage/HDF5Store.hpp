@@ -79,15 +79,15 @@ private:
 
    /**
     * This function writes the data of an iteration into a single HDF5 file using collective I/O.
+    * Each iteration writes to a new file.
     * Parallel HDF5 has been used as an I/O middleware here.
-    * Collective I/O be used by specifying "Collective" in the Damaris
-    * XML config file <store> section:
+    * Collective I/O is used by specifying "Collective" in the Damaris XML config file <store> section:
     *  <option key="FileMode">Collective</option>
     */
     void OutputCollective(int32_t iteration);
 
    /**
-    * This function writes the data of an iteration into a single HDF5 file using collective I/O (i.e. as a single dataset). Each iteration writes to a new file.
+    * This function writes the data of an iteration into a single HDF5 file using collective I/O (i.e. as a single dataset). 
     * Parallel HDF5 has been used as an I/O middleware here.
     * It is a to-be-tested version that can be used by specifying "CollectiveTest" in the Damaris
     * XML config file <store> section:
@@ -96,11 +96,12 @@ private:
     //void OutputCollectiveTest(int32_t iteration);
 
     /**
-    * This function writes the data of an iteration into multiple HDF5 datasets within a single HDF5 file. Each iteration writes to a new file.
+    * This function writes the data of an iteration into multiple HDF5 datasets within a single HDF5 file. 
+    * Each iteration writes to a new file.
     * No collective I/O is used in this case.
-    * Is enabled by specifying "FilePerCore" in the Damaris
-    * XML config file <store> section:
+    * Is enabled by specifying "FilePerCore" in the Damaris XML config file <store> section:
     *  <option key="FileMode">FilePerCore</option>
+    * This name is somewhat decieving, as it is actually a dataset written per core.
     */
     void OutputPerCore(int32_t iteration);
 
