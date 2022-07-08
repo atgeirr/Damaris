@@ -171,6 +171,16 @@ static bp::object hw_list_known_clients()
 }
     
 
+static bp::object hw_damaris_initialize(boost::python::object xml_path, boost::python::object mpi4py_comm  )
+{
+  PyObject * mp_py_mpicomm = bp::extract<PyObject *>(mpi4py_comm) ;
+  MPI_Comm passed_in_comm =   *PyMPIComm_Get(mp_py_mpicomm) ;
+  std::string xml_std_str = bp::extract<std::string>(xml_path) ;
+  int res ;
+  res = damaris_initialize(xml_std_str.c_str(), passed_in_comm) ;
+  bp::object res_bp(res) ;
+  return ( res_bp );
+}
 
 
 /* 
@@ -180,7 +190,8 @@ BOOST_PYTHON_MODULE(damaris4py)
 {
   Py_Initialize();
   if (import_mpi4py() < 0) return;
-
+  
+  bp::def("damaris_initialize", hw_damaris_initialize);
   bp::def("getclientcomm", hw_damaris_comm_check_client);
   bp::def("getservercomm", hw_damaris_comm_check_server);
   bp::def("getdamariscomm", hw_damaris_comm);

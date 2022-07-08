@@ -106,7 +106,11 @@ int damaris_stop()
 int damaris_write(const char* varname, const void* data)
 {
 	Environment::Log("damaris_write method started.", EventLogger::Info);
-
+    
+    if(not Environment::Initialized()) {
+		return DAMARIS_NOT_INITIALIZED;
+	}
+    
 	damaris_write_block(varname,0,data);
 	return DAMARIS_OK;
 }
@@ -129,7 +133,11 @@ int damaris_write_block(const char* varname, int32_t block, const void* data)
 int damaris_alloc(const char* varname, void** ptr)
 {
 	Environment::Log("damaris_alloc method started.", EventLogger::Info);
-
+    
+    if(not Environment::Initialized()) {
+		return DAMARIS_NOT_INITIALIZED;
+	}
+    
 	return damaris_alloc_block(varname,0,ptr);
 }
 
@@ -146,7 +154,11 @@ int damaris_alloc_block(const char* varname, int32_t block, void** ptr)
 int damaris_commit(const char* varname)
 {
 	Environment::Log("damaris_commit method started.", EventLogger::Info);
-
+    
+    if(not Environment::Initialized()) {
+		return DAMARIS_NOT_INITIALIZED;
+	}
+    
 	int iteration = Environment::GetLastIteration();
 	return damaris_commit_block_iteration(varname,0,iteration);
 }
@@ -154,7 +166,11 @@ int damaris_commit(const char* varname)
 int damaris_commit_block(const char* varname, int32_t block)
 {
 	Environment::Log("damaris_commit_block method started.", EventLogger::Info);
-
+    
+    if(not Environment::Initialized()) {
+		return DAMARIS_NOT_INITIALIZED;
+	}
+    
 	int iteration = Environment::GetLastIteration();
 	return damaris_commit_block_iteration(varname,block,iteration);
 }
@@ -162,7 +178,11 @@ int damaris_commit_block(const char* varname, int32_t block)
 int damaris_commit_iteration(const char* varname, int32_t iteration)
 {
 	Environment::Log("damaris_commit_iteration method started.", EventLogger::Info);
-
+    
+    if(not Environment::Initialized()) {
+		return DAMARIS_NOT_INITIALIZED;
+	}
+    
 	return damaris_commit_block_iteration(varname,0,iteration);
 }
 
@@ -180,7 +200,11 @@ int damaris_commit_block_iteration(const char* varname,
 int damaris_clear(const char* varname)
 {
 	Environment::Log("damaris_clear method started.", EventLogger::Info);
-
+    
+    if(not Environment::Initialized()) {
+		return DAMARIS_NOT_INITIALIZED;
+	}
+    
 	int iteration = Environment::GetLastIteration();
 	return damaris_clear_block_iteration(varname,0,iteration);
 }
@@ -188,7 +212,11 @@ int damaris_clear(const char* varname)
 int damaris_clear_block(const char* varname, int32_t block)
 {
 	Environment::Log("damaris_clear_block method started.", EventLogger::Info);
-
+    
+    if(not Environment::Initialized()) {
+		return DAMARIS_NOT_INITIALIZED;
+	}
+    
 	int iteration = Environment::GetLastIteration();
 	return damaris_clear_block_iteration(varname,block,iteration);
 }
@@ -196,7 +224,11 @@ int damaris_clear_block(const char* varname, int32_t block)
 int damaris_clear_iteration(const char* varname, int32_t iteration)
 {
 	Environment::Log("damaris_clear_iteartion method II started.", EventLogger::Info);
-
+    
+    if(not Environment::Initialized()) {
+		return DAMARIS_NOT_INITIALIZED;
+	}
+    
 	return damaris_clear_block_iteration(varname,0,iteration);
 }
 
@@ -271,7 +303,11 @@ int damaris_parameter_set(const char* name,
 int damaris_set_position(const char* var_name, const int64_t* position)
 {
 	Environment::Log("damaris_set_position method started.", EventLogger::Info);
-
+    
+    if(not Environment::Initialized()) {
+		return DAMARIS_NOT_INITIALIZED;
+	}
+    
 	return damaris_set_block_position(var_name,0,position);
 }
 

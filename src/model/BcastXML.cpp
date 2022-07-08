@@ -40,8 +40,9 @@ std::shared_ptr<Simulation> BcastXML(const MPI_Comm& comm, const std::string& ur
         
         if(xmlfile.fail()) {
             ERROR("Fail to open configuration file " << uri);
-            MPI_Abort(comm,-1);
-            exit(-1);
+            return (nullptr) ;
+            // MPI_Abort(comm,-1);
+            // exit(-1);
         }
 
         // get length of file

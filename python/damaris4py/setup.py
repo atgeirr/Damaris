@@ -17,7 +17,6 @@ from setuptools import setup
    description='A package to wrap functionality of the Damaris library for asynchronous I/O and visualisation of MPI based simulations',
    long_description=open('README.md').read(),
    install_requires=[
-       "mpi4py",
-       "pytest",
+       "mpi4py"
    ],
 )

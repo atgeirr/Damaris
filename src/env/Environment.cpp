@@ -83,6 +83,9 @@ bool Environment::Init(const std::string& configFile,
     MPI_Comm_rank(world,&rank);
 
     _baseModel_ = model::BcastXML(world,configFile);
+    if (_baseModel_ == nullptr) {
+        return false ;
+    }
     _globalComm_ = world;
     _lastIteration_ = 0;
     _initialized_ = true;

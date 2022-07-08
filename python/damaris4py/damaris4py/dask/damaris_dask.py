@@ -79,10 +79,6 @@ def return_scalar_from_position(DamarisData, varname, pos=(0), client_rank=0, bl
     # This third dictionary is set up in PyAction::PassDataToPython() and is 
     # typically different each iteration.
     iter_dict    = DamarisData['iteration_data']   
-    # The value passed through by Damaris clients is to be compared with the value computed by Dask.
-    # It is an array of a single value, which changes each iteration and is
-    # the sum of all values in the whole cube_i dataset in distributed memory.
-    # The sum is only available on client rank 0
     try:
         if varname in iter_dict.keys():
             array_of_interest =  iter_dict[varname]         
@@ -101,10 +97,6 @@ def return_numpy_array(DamarisData, varname, client_rank=0, block_number=0 ):
     # This third dictionary is set up in PyAction::PassDataToPython() and is 
     # typically different each iteration.
     iter_dict    = DamarisData['iteration_data']   
-    # The value passed through by Damaris clients is to be compared with the value computed by Dask.
-    # It is an array of a single value, which changes each iteration and is
-    # the sum of all values in the whole cube_i dataset in distributed memory.
-    # The sum is only available on client rank 0
     try:
         if varname in iter_dict.keys():
             array_of_interest =  iter_dict[varname]         
