@@ -139,6 +139,7 @@ endif(ENABLE_HDF5)
 if(ENABLE_CATALYST)
     target_include_directories(damaris PUBLIC ${PARAVIEW_INCLUDE_DIRS})
     target_include_directories(damaris PUBLIC ${ParaView_INCLUDE_DIRS})
+    target_include_directories(damaris PUBLIC ${VTK_INCLUDE_DIRS})
 endif(ENABLE_CATALYST)
 
 

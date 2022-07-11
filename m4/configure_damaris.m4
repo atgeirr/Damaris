@@ -1,15 +1,31 @@
 
-# CS_AC_TEST_DAMARIS
+# CONF_AC_TEST_DAMARIS
 #--------------------
-# modifies or sets cs_have_damaris, DAMARIS_CPPFLAGS, DAMARIS_LDFLAGS,
+# modifies or sets conf_have_damaris, DAMARIS_CPPFLAGS, DAMARIS_LDFLAGS,
 # and DAMARIS_LIBS depending on libraries found
+# Sets the following for infomation about Damaris plugins:
+# conf_have_damaris_catalyst, conf_have_damaris_catalyst, conf_have_damaris_hdf5,
+# conf_have_damaris_python
+# 
+# In configure.ac use something like the following:
+# ...
+# CONF_AC_TEST_DAMARIS
+# ...
+# echo " Damaris (asynchronous I/O) support: "$conf_have_damaris""
+# echo " Damaris has support for :"
+# echo "                Catalyst : "$conf_have_damaris_catalyst""
+# echo "                   VisIt : "$conf_have_damaris_visit""
+# echo "                    HDF5 : "$conf_have_damaris_hdf5""
+# echo "                  Python : "$conf_have_damaris_python""
 
-AC_DEFUN([CS_AC_TEST_DAMARIS], [
 
-cs_have_damaris=no
-# cs_have_damaris_catalyst is not used as it is currently assumed
-cs_have_damaris_catalyst=no
+AC_DEFUN([CONF_AC_TEST_DAMARIS], [
 
+conf_have_damaris=no
+conf_have_damaris_catalyst=no
+conf_have_damaris_visit=no
+conf_have_damaris_hdf5=no
+conf_have_damaris_python=no
              
              
 # Configure options for Damaris paths
@@ -53,6 +69,45 @@ AC_ARG_WITH(damaris-lib,
 
 
 
+if test "x$with_damaris" != "xno"; then
+    if test -f "$with_damaris/share/cmake/damaris/DamarisConfig.cmake"  ; then
+    
+      # Check if Damaris was compiled with Paraview/Catalyst support
+      #------------------------
+      ON_OR_OFF=`grep Damaris_HAS_CATALYST  ${with_damaris}/share/cmake/damaris/DamarisConfig.cmake | grep ON`
+      if test "x$ON_OR_OFF" != "x"  ; then
+        conf_have_damaris_catalyst=yes
+      fi 
+    
+      # Check if Damaris was compiled with Visit support
+      #------------------------
+      ON_OR_OFF=`grep Damaris_HAS_VISIT  ${with_damaris}/share/cmake/damaris/DamarisConfig.cmake | grep ON`
+      if test "x$ON_OR_OFF" != "x"  ; then
+        conf_have_damaris_visit=yes
+      fi
+
+       
+      # Check if Damaris was compiled with HDF5 support
+      #------------------------   
+      ON_OR_OFF=`grep Damaris_HAS_HDF5  ${with_damaris}/share/cmake/damaris/DamarisConfig.cmake | grep ON`
+      if test "x$ON_OR_OFF" != "x"  ; then
+        conf_have_damaris_hdf5=yes
+      fi
+     
+      # Check if Damaris was compiled with Python support
+      #------------------------
+      ON_OR_OFF=`grep Damaris_HAS_PYTHON  ${with_damaris}/share/cmake/damaris/DamarisConfig.cmake | grep ON`
+      if test "x$ON_OR_OFF" != "x"  ; then
+        conf_have_damaris_python=yes
+      fi
+     
+    else
+      echo "Damaris asynchronous I/O test for file  ${with_damaris}/share/cmake/damaris/DamarisConfig.cmake failed. Therefore cannot test for Damaris plugins support."
+    fi   
+fi
+  
+
+  
 # Now check for libraries
 #------------------------
 
@@ -66,7 +121,8 @@ if test "x$with_damaris" != "xno"; then
   DAMARIS_LIBS="-rdynamic -Wl,--whole-archive -ldamaris -Wl,--no-whole-archive"
   DAMARIS_LDFLAGS="${DAMARIS_LDFLAGS}"
 
-  if test "x$cs_have_mpi" != "xno"; then
+  
+  if test "x$conf_have_mpi" != "xno"; then
 
     AC_MSG_CHECKING([for Damaris library])
 
@@ -78,8 +134,8 @@ if test "x$with_damaris" != "xno"; then
 [[#include <stdint.h>
 #include <Damaris.h>]],
 (void)damaris_initialize("name", MPI_COMM_SELF);)],
-                   [cs_have_damaris=yes],
-                   [cs_have_damaris=no])
+                   [conf_have_damaris=yes],
+                   [conf_have_damaris=no])
 
   fi
 
@@ -88,9 +144,9 @@ if test "x$with_damaris" != "xno"; then
   # Report Damaris support
   #------------------------
 
-  if test "x$cs_have_damaris" = "xyes" ; then
+  if test "x$conf_have_damaris" = "xyes" ; then
     AC_DEFINE([HAVE_DAMARIS], 1, [Damaris asynchronous I/O support])
-  elif test "x$cs_have_damaris" = "xno" ; then
+  elif test "x$conf_have_damaris" = "xno" ; then
     if test "x$with_damaris" != "xcheck" ; then
       AC_MSG_FAILURE([Damaris asynchronous I/O support requested, but test for Damaris failed!])
     else
@@ -98,9 +154,9 @@ if test "x$with_damaris" != "xno"; then
     fi
   fi
 
-  AC_MSG_RESULT($cs_have_damaris)
+  AC_MSG_RESULT($conf_have_damaris)
 
-  if test "x$cs_have_damaris" != "xyes"; then
+  if test "x$conf_have_damaris" != "xyes"; then
     DAMARIS_LIBS=""
   fi
 
@@ -114,15 +170,15 @@ if test "x$with_damaris" != "xno"; then
 
 fi
 
-AM_CONDITIONAL(HAVE_DAMARIS, test x$cs_have_damaris = xyes)
+AM_CONDITIONAL(HAVE_DAMARIS, test x$conf_have_damaris = xyes)
 
 
-cs_py_have_plugin_damaris=False
-if test x$cs_have_plugin_damaris = xyes ; then
-  cs_py_have_plugin_damaris=True
+conf_py_have_plugin_damaris=False
+if test x$conf_have_plugin_damaris = xyes ; then
+  conf_py_have_plugin_damaris=True
 fi
 
-AC_SUBST(cs_have_damaris)
+AC_SUBST(conf_have_damaris)
 AC_SUBST(DAMARIS_CPPFLAGS)
 AC_SUBST(DAMARIS_LDFLAGS)
 AC_SUBST(DAMARIS_LIBS)

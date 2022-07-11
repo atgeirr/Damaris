@@ -121,7 +121,7 @@ int damaris_start(int* is_client);
  * before. When all client processes have called damaris_stop, server processes
  * blocked on damaris_start will return (with is_client set to 0).
  */
-int damaris_stop();
+int damaris_stop( void );
 
 /** 
  * Writes a variable (similar to damaris_write_block(varnale,0,data)).

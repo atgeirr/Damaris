@@ -6,6 +6,7 @@ set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}")
 set(Damaris_HAS_HDF5 @ENABLE_HDF5@)
 set(Damaris_HAS_VISIT @ENABLE_VISIT@)
 set(Damaris_HAS_CATALYST @ENABLE_CATALYST@)
+set(Damaris_HAS_PYTHON @ENABLE_PYTHON@)
 set(Damaris_INCLUDE_DIRS @CMAKE_INSTALL_PREFIX@/include)
 set(Damaris_LIBRARIES "damaris" @DEP_LIBRARIES@)
 
@@ -36,9 +37,15 @@ endif(Damaris_HAS_VISIT)
 
 if(Damaris_HAS_CATALYST)
   set(ParaView_DIR @ParaView_DIR@)
-  find_dependency (ParaView)
+  find_dependency (ParaView REQUIRED PythonCatalyst VTK::mpi)
   include("${PARAVIEW_USE_FILE}")
 endif(Damaris_HAS_CATALYST)
+
+if(Damaris_HAS_PYTHON)
+  set(Python_DIR @Python_DIR@)
+  find_dependency(PythonLibs)
+  list(APPEND Damaris_INCLUDE_DIRS ${PYTHON_INCLUDE_DIRS} ${NUMPY_INCLUDE_PATH})
+endif(Damaris_HAS_PYTHON)
 
 include ("${CMAKE_CURRENT_LIST_DIR}/DamarisTargets.cmake")
 

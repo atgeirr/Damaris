@@ -51,6 +51,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 #----------------------------------------------------------------------------#
+# MPI is currently mandatory
+#----------------------------------------------------------------------------#
+find_package(MPI)
+
+#----------------------------------------------------------------------------#
 # Enabling Fortran
 #----------------------------------------------------------------------------#
 if(ENABLE_FORTRAN)
@@ -198,10 +203,18 @@ if(ENABLE_CATALYST)
     message(STATUS "ParaView >= 5.7 found")
     set(HAVE_PARAVIEW_ENABLED 1)
     set(PARAVIEW_VERSION ${ParaView_VERSION})
-    find_package(ParaView 4.2 REQUIRED COMPONENTS PythonCatalyst ) 
-    set(PARAVIEW_LIBRARIES ParaView::PythonCatalyst VTK::mpi)
+    find_package(ParaView 4.2  COMPONENTS Catalyst PythonCatalyst ) 
+    set(PARAVIEW_LIBRARIES ParaView::Catalyst ParaView::PythonCatalyst VTK::mpi)
     message(STATUS "ParaView_LIBRARIES: ${ParaView_LIBRARIES}")
-    message(STATUS "VTK_LIBRARIES: ${VTK_LIBRARIES}")
+    # -DParaView_DIR=${INSTALL_PREFIX}/lib/cmake/paraview-5.8
+    get_filename_component(PARENT_DIR ${ParaView_DIR} DIRECTORY)
+    get_filename_component(PV_VERSION_DIR ${ParaView_DIR} NAME)
+    set(PARAVIEW_INCLUDE_DIRS "${PARENT_DIR}/../../include/${PV_VERSION_DIR}")
+    # include_directories(${ParaView_INCLUDE_DIRS})
+    # include_directories(${VTK_INCLUDE_DIRS})
+    message(STATUS "PARAVIEW_INCLUDE_DIRS: ${PARAVIEW_INCLUDE_DIRS}")
+    message(STATUS "ParaView_INCLUDE_DIRS: ${ParaView_INCLUDE_DIRS}")
+    message(STATUS "VTK_INCLUDE_DIRS: ${VTK_INCLUDE_DIRS}")
   endif()
   list(APPEND DEP_LIBRARIES ${PARAVIEW_LIBRARIES})
   add_definitions("-DUSE_CATALYST")
