@@ -91,7 +91,7 @@ do
 done
 
 
-echo "GRAPH: Docker image base : $DOCKER_IMAGE_BASENAME<O.S.><ParaView>$DAMARIS_VER  "
+echo "GRAPH: Docker image base : $DOCKER_IMAGE_BASENAME:<O.S.>-p<ParaView>-damaris-$DAMARIS_VER  "
 echo "GRAPH: Command Tested    : $EXECMD  "
 TABLE_HEAD="GRAPH: |   "
 TABLE_BASE="GRAPH: |---"
@@ -133,7 +133,7 @@ do
           # echo ""
           PVSHORT=${PV_VERSION//./}
           PV_SHORT_DOT=${PV_VERSION:1:-2}
-          BASEIMAGETAG=$(echo $BASE_IMAGE_SHORT-p${PVSHORT}${DAMARIS_VER})
+          BASEIMAGETAG=$(echo $BASE_IMAGE_SHORT-p${PVSHORT}-damaris-${DAMARIS_VER})
           # echo "BASEIMAGETAG= $DOCKER_IMAGE_BASENAME:$BASEIMAGETAG  ${EXECMD}"
           # Check if the image exists in the repository
           TMPVAR=$(docker manifest inspect $DOCKER_IMAGE_BASENAME:${BASEIMAGETAG} 2> /dev/null) 
@@ -158,8 +158,8 @@ do
             # rm ./Dockerfile.out
          else
            # echo "INFO: The base image ${DOCKER_IMAGE_BASENAME}:${BASEIMAGETAG} does not exist "
-           TABLE_ROW+="|  nbc  "
-        fi
+           TABLE_ROW+="|  nbc   "
+         fi
         done
     else
       echo "ERROR: Dockerfile.${DOCKERFILE}.paraview does not exist - check the names given in DOCKERFILE_ARRAY"

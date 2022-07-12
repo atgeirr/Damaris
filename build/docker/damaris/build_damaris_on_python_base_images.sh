@@ -99,7 +99,10 @@ do
     LEN_ARRAY+=($CURRENT_NUM)
 done
 
-echo "GRAPH: Repository: $DAMARIS_REPO  branch:$DAMARIS_VER"
+echo "GRAPH: for python:"
+echo "GRAPH: Docker image base:tag : $DOCKER_IMAGE_BASENAME:<O.S.>-python-py-on-damaris-$DAMARIS_VER  "
+echo "GRAPH: or, for nodeps:"
+echo "GRAPH: Docker image base:tag : $DOCKER_IMAGE_BASENAME:<O.S.>-python-py-off-damaris-$DAMARIS_VER  "
 TABLE_HEAD="GRAPH: |   "
 TABLE_BASE="GRAPH: |---"
 # Make the lines all matching length
@@ -178,6 +181,7 @@ do
                    --build-arg INPUT_damaris_ver=${DAMARIS_VER} \
                    --build-arg INPUT_repo=${DAMARIS_REPO} \
                   -f ./Dockerfile.out . 
+                  RES=$?
                 else
                   DOCKER_BUILDKIT=1 docker build --no-cache -t \
                   ${DOCKER_IMAGE_OUTPUTNAME}:${BASEIMAGETAG}-damaris-${DAMARIS_VER} \
@@ -185,19 +189,19 @@ do
                    --build-arg INPUT_damaris_ver=${DAMARIS_VER} \
                    --build-arg INPUT_repo=${DAMARIS_REPO} \
                   -f ./Dockerfile.out . 
-                  
+                  RES=$?
                 fi
-            if [[ $? -eq 0 ]] ; then
-               docker push "$DOCKER_IMAGE_OUTPUTNAME:${BASEIMAGETAG}-damaris-${DAMARIS_VER}"
-               echo "INFO: ${DOCKER_IMAGE_OUTPUTNAME}:${BASEIMAGETAG}-damaris-${DAMARIS_VER}  built"
-               TABLE_ROW+="|   d    "
-               # echo ""
-            else 
-               echo "ERROR: ${DOCKER_IMAGE_OUTPUTNAME}:${BASEIMAGETAG}-damaris-${DAMARIS_VER} could not be built"
-               TABLE_ROW+="|   x    "
-              # echo ""
-            fi
-            rm ./Dockerfile.out
+                if [[ "RES" -eq "0" ]] ; then
+                   docker push "$DOCKER_IMAGE_OUTPUTNAME:${BASEIMAGETAG}-damaris-${DAMARIS_VER}"
+                   echo "INFO: ${DOCKER_IMAGE_OUTPUTNAME}:${BASEIMAGETAG}-damaris-${DAMARIS_VER}  built"
+                   TABLE_ROW+="|   d    "
+                   # echo ""
+                else 
+                   echo "ERROR: ${DOCKER_IMAGE_OUTPUTNAME}:${BASEIMAGETAG}-damaris-${DAMARIS_VER} could not be built"
+                   TABLE_ROW+="|   x    "
+                  # echo ""
+                fi
+                rm ./Dockerfile.out
           else
             echo "INFO: The base image ${DOCKER_IMAGE_BASENAME}:${BASEIMAGETAG} does not exist "
             TABLE_ROW+="|   pf   "

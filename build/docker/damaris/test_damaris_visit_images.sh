@@ -91,7 +91,8 @@ do
 done
 
 
-echo "GRAPH: Docker image base : $DOCKER_IMAGE_BASENAME<O.S.>-<visit>$DAMARIS_VER  "
+echo "GRAPH: Docker image base : $DOCKER_IMAGE_BASENAME:<O.S.>-visit<SHORTVERNUM>-damaris-$DAMARIS_VER  "
+echo "GRAPH: <SHORTVERNUM> is the VisIt version without the . "
 echo "GRAPH: Command Tested    : $EXECMD  "
 TABLE_HEAD="GRAPH: |   "
 TABLE_BASE="GRAPH: |---"

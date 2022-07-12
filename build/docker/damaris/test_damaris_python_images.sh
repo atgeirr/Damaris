@@ -90,8 +90,10 @@ do
     LEN_ARRAY+=($CURRENT_NUM)
 done
 
-
-echo "GRAPH: Docker image base : $DOCKER_IMAGE_BASENAME<O.S.><ParaView>$DAMARIS_VER  "
+echo "GRAPH: for python:"
+echo "GRAPH: Docker image base:tag : $DOCKER_IMAGE_BASENAME:<O.S.>-python-py-on-damaris-$DAMARIS_VER  "
+echo "GRAPH: or, for nodeps:"
+echo "GRAPH: Docker image base:tag : $DOCKER_IMAGE_BASENAME:<O.S.>-python-py-off-damaris-$DAMARIS_VER  "
 echo "GRAPH: Command Tested    : $EXECMD  "
 TABLE_HEAD="GRAPH: |   "
 TABLE_BASE="GRAPH: |---"
@@ -103,7 +105,7 @@ done
 # Add the columns for each Python install
 for PY_VERSION in ${PYTHON_VER_ARRAY[@]};
 do
-  TABLE_HEAD+="| $PV_VERSION "
+  TABLE_HEAD+="| $PY_VERSION "
   TABLE_BASE+="|--------"
 done
 echo "$TABLE_HEAD|"

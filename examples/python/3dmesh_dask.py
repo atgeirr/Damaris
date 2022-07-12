@@ -133,23 +133,12 @@ def main(DD):
         damaris_comm = getservercomm()
         rank = damaris_comm.Get_rank()
         size = damaris_comm.Get_size() 
-        
-        # keys = list(DD.keys())
-        # print(keys)
-        # There are two dictionaries that are set up in the PyAction constructor 
-        # and are static i.e. they do not change throughout iterations
-        damaris_dict = DD['damaris_env']
-        magic_num    = damaris_dict['simulation_magic_number']
-        
-        
-        dask_dict    = DD['dask_env']
-        # This third dictionary is set up in PyAction::PassDataToPython() and is 
-        # typically different each iteration.
-        iter_dict    = DD['iteration_data']   
+          
         # This is the iteration value the from Damaris perspective
         # i.e. It is the number of times damaris_end_iteration() has been called
-        iteration    = iter_dict['iteration']
-        it_str       = str(iter_dict['iteration'])
+        iteration        = iter_dict['iteration']
+        iteration_dam    = damaris_dask.return_iteration()         
+        assert iteration == iteration_dam
         
         damaris_comm.Barrier()
 
