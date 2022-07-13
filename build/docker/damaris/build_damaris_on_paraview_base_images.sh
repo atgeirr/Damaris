@@ -189,17 +189,17 @@ do
                   -f ./Dockerfile.out . 
                   
                 fi
-            if [[ $? -eq 0 ]] ; then
-               docker push "$DOCKER_IMAGE_OUTPUTNAME:${BASEIMAGETAG}-damaris-${DAMARIS_VER}"
-               echo "INFO: ${DOCKER_IMAGE_OUTPUTNAME}:${BASEIMAGETAG}-damaris-${DAMARIS_VER}  built"
-               TABLE_ROW+="|   d    "
-               # echo ""
-            else 
-               echo "ERROR: ${DOCKER_IMAGE_OUTPUTNAME}:${BASEIMAGETAG}-damaris-${DAMARIS_VER} could not be built"
-               TABLE_ROW+="|   x    "
-              # echo ""
-            fi
-            rm ./Dockerfile.out
+                if [[ $? -eq 0 ]] ; then
+                   docker push "$DOCKER_IMAGE_OUTPUTNAME:${BASEIMAGETAG}-damaris-${DAMARIS_VER}"
+                   echo "INFO: ${DOCKER_IMAGE_OUTPUTNAME}:${BASEIMAGETAG}-damaris-${DAMARIS_VER}  built"
+                   TABLE_ROW+="|   d    "
+                   # echo ""
+                else 
+                   echo "ERROR: ${DOCKER_IMAGE_OUTPUTNAME}:${BASEIMAGETAG}-damaris-${DAMARIS_VER} could not be built"
+                   TABLE_ROW+="|   x    "
+                  # echo ""
+                fi
+                rm ./Dockerfile.out
          else
            echo "INFO: The base image ${DOCKER_IMAGE_BASENAME}:${BASEIMAGETAG} does not exist "
            TABLE_ROW+="|   pf   "

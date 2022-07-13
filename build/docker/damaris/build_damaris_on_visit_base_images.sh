@@ -83,6 +83,9 @@ get_tag_name () {
 }
 
 
+# docker login registry.gitlab.inria.fr
+DOCKER_IMAGE_BASENAME=registry.gitlab.inria.fr/damaris/damaris-development
+DOCKER_IMAGE_OUTPUTNAME=registry.gitlab.inria.fr/damaris/$DAMARIS_REPO
 
 #######################################################
 ## Setting up the markdown table
@@ -124,9 +127,6 @@ echo "$TABLE_BASE|"
 ##  Loop through docker images and build damaris
 #######################################################
 
-# docker login registry.gitlab.inria.fr
-DOCKER_IMAGE_BASENAME=registry.gitlab.inria.fr/damaris/damaris-development
-DOCKER_IMAGE_OUTPUTNAME=registry.gitlab.inria.fr/damaris/$DAMARIS_REPO
 i=0
 for DOCKERFILE in ${DOCKERFILE_ARRAY[@]};
 do
@@ -150,17 +150,17 @@ do
     if [[ "$BASE_IMAGE_SHORT" != "" ]] ; then
         for VISIT_VERSION in ${VISIT_VER_ARRAY[@]};
         do
-          echo ""
-          VISITSHORT=${VISIT_VERSION//./}
-          # PV_SHORT_DOT=${VISIT_VERSION:1:-2}
-          BASEIMAGETAG=$(echo $BASE_IMAGE_SHORT-visit${VISITSHORT})
+            echo ""
+            VISITSHORT=${VISIT_VERSION//./}
+            # PV_SHORT_DOT=${VISIT_VERSION:1:-2}
+            BASEIMAGETAG=$(echo $BASE_IMAGE_SHORT-visit${VISITSHORT})
 
-          # Check if the image exists in the repository
-          TMPVAR=$(docker manifest inspect $DOCKER_IMAGE_BASENAME:${BASEIMAGETAG} 2> /dev/null) 
-          BUILD_IMAGE=$(echo $?)
-          #  echo "BUILD_IMAGE= $BUILD_IMAGE"
-          if [[ "$BUILD_IMAGE" == "0" ]] ; then
-              # The base container exists in the repository   
+            # Check if the base image (has VisIt build) exists in the repository
+            TMPVAR=$(docker manifest inspect $DOCKER_IMAGE_BASENAME:${BASEIMAGETAG} 2> /dev/null) 
+            BUILD_IMAGE=$(echo $?)
+            #  echo "BUILD_IMAGE= $BUILD_IMAGE"
+            if [[ "$BUILD_IMAGE" == "0" ]] ; then
+                # The base container exists in the repository   
                 cp Dockerfile._BASEWITHPARAVIEW_.visit  Dockerfile.out
                 sed -i "s|_BASEWITHPARAVIEW_|${DOCKER_IMAGE_BASENAME}:${BASEIMAGETAG}|g" Dockerfile.out
                 # sed -i "s|_DISTLIB_|${LIB64}|g" Dockerfile.out
@@ -170,39 +170,39 @@ do
                 # echo "Building: $DOCKER_IMAGE_OUTPUTNAME:${BASEIMAGETAG}"
                 RES=-1
                 if [[ "$DAMARIS_REPO" == "damaris" ]] ; then
-                  DOCKER_BUILDKIT=1 docker build --no-cache -t \
-                  ${DOCKER_IMAGE_OUTPUTNAME}:${BASEIMAGETAG}-damaris-${DAMARIS_VER} \
-                   --build-arg INPUT_damaris_ver=${DAMARIS_VER} \
-                   --build-arg INPUT_repo=${DAMARIS_REPO} \
-                  -f ./Dockerfile.out . 
-                  RES=$?
+                    DOCKER_BUILDKIT=1 docker build --no-cache -t \
+                    ${DOCKER_IMAGE_OUTPUTNAME}:${BASEIMAGETAG}-damaris-${DAMARIS_VER} \
+                    --build-arg INPUT_damaris_ver=${DAMARIS_VER} \
+                    --build-arg INPUT_repo=${DAMARIS_REPO} \
+                    -f ./Dockerfile.out . 
+                    RES=$?
                 else
-                  DOCKER_BUILDKIT=1 docker build --no-cache -t \
-                  ${DOCKER_IMAGE_OUTPUTNAME}:${BASEIMAGETAG}-damaris-${DAMARIS_VER} \
-                  --secret id=thepassword,src=$MY_CI_READ_REPO_PWD \
-                   --build-arg INPUT_damaris_ver=${DAMARIS_VER} \
-                   --build-arg INPUT_repo=${DAMARIS_REPO} \
-                  -f ./Dockerfile.out . 
-                  RES=$?
+                    DOCKER_BUILDKIT=1 docker build --no-cache -t \
+                    ${DOCKER_IMAGE_OUTPUTNAME}:${BASEIMAGETAG}-damaris-${DAMARIS_VER} \
+                    --secret id=thepassword,src=$MY_CI_READ_REPO_PWD \
+                    --build-arg INPUT_damaris_ver=${DAMARIS_VER} \
+                    --build-arg INPUT_repo=${DAMARIS_REPO} \
+                    -f ./Dockerfile.out . 
+                    RES=$?
                 fi
                 if [[ "$RES" -eq "0" ]] ; then
-                   docker push "$DOCKER_IMAGE_OUTPUTNAME:${BASEIMAGETAG}-damaris-${DAMARIS_VER}"
-                   echo "INFO: ${DOCKER_IMAGE_OUTPUTNAME}:${BASEIMAGETAG}-damaris-${DAMARIS_VER}  built"
-                   TABLE_ROW+="|   d    "
-                   # echo ""
+                    docker push "$DOCKER_IMAGE_OUTPUTNAME:${BASEIMAGETAG}-damaris-${DAMARIS_VER}"
+                    echo "INFO: ${DOCKER_IMAGE_OUTPUTNAME}:${BASEIMAGETAG}-damaris-${DAMARIS_VER}  built"
+                    TABLE_ROW+="|   d    "
+                # echo ""
                 else 
-                   echo "ERROR: ${DOCKER_IMAGE_OUTPUTNAME}:${BASEIMAGETAG}-damaris-${DAMARIS_VER} could not be built"
-                   TABLE_ROW+="|   x    "
-                  # echo ""
+                    echo "ERROR: ${DOCKER_IMAGE_OUTPUTNAME}:${BASEIMAGETAG}-damaris-${DAMARIS_VER} could not be built"
+                    TABLE_ROW+="|   x    "
+                    # echo ""
                 fi
                 rm ./Dockerfile.out
-         else
-           echo "INFO: The base image ${DOCKER_IMAGE_BASENAME}:${BASEIMAGETAG} does not exist "
-           TABLE_ROW+="|   pf   "
-        fi
+            else
+                echo "INFO: The base image ${DOCKER_IMAGE_BASENAME}:${BASEIMAGETAG} does not exist "
+                TABLE_ROW+="|   pf   "
+            fi
         done
     else
-      echo "ERROR: Dockerfile.${DOCKERFILE}.visit does not exist - check the names given in DOCKERFILE_ARRAY"
+        echo "ERROR: Dockerfile.${DOCKERFILE}.visit does not exist - check the names given in DOCKERFILE_ARRAY"
     fi
     echo "$TABLE_ROW|"
     i=$((i+1))
