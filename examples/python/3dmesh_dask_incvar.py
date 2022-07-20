@@ -19,8 +19,8 @@
 import numpy as np
 np.set_printoptions(threshold=np.inf)
 
-# N.B. This file (3dmesh_dask_incvar.py) is read by each Damaris server process on each 
-#      iteration that is specified by the frequency="" in the <pyscript> XML sttribute.
+# N.B. This file is read by each Damaris server process on each iteration that is 
+#      specified by the frequency="" in the <pyscript> XML sttribute.
 # 
 # DD (AKA Damaris Data) is a dictionary that has been filled by the 
 # Damaris server process with NumPy arrays that point to the Damaris data variables 
@@ -40,9 +40,9 @@ np.set_printoptions(threshold=np.inf)
 #    N.B. Setting nthreads="openmp" will set the dask worker threads
 #         to the value obtained from opm_get_num_threads()
 # 
- 
-# The Damaris server processes also present three dictionaries containing metadata 
-# so that we can access the data
+#
+# The Damaris server processes also present three dictionaries, damaris_env, dask_env and iteration_data 
+# containing various data about the simulation as well as the variable data itself, packaged as Numpy arrays.
 # DD['damaris_env'].keys()     - The global Damaris environment data
 #       (['is_dedicated_node',    # 
 #         'is_dedicated_core',    # 
@@ -63,32 +63,45 @@ np.set_printoptions(threshold=np.inf)
 #       ]) 
 #
 # DD['iteration_data'].keys() - A single simulation iteration. 
-#                        Contains the iteration number and a lsit of sub-dictionaries, 
-#                        one for each Damaris variable that has been exposed to the Python 
-#                        interface. i.e. specified with the script="MyAction" in this example
+#                        Contains the iteration number and a list of sub-dictionaries, 
+#                        one for each *Damaris variable* that has been exposed to the Python 
+#                        interface. i.e. specified with the script="MyAction" as in the example above
 #       (['iteration',              # The iteration number as an integer.
-#          'cube_i',                # A Damaris variable dictionary
-#          'cube_f',                # A Damaris variable dictionary
-#          #'last_iter'             # This is not present in dictionary
+#          'cube_i',                # A Damaris variable dictionary - the name relates to the variable name used in the Damaris XML file
+#          '...',                   # A Damaris variable dictionary
+#          '...'                    # A Damaris variable dictionary
 #       ])
 #
 # A Damaris variable dictionary has the following structure
 # DD['iteration_data']['cube_i'].keys()
 #       (['numpy_data', 
-#         'block_source', 
-#         'block_domains', 
-#         'type_string'
+#         'sort_data',             
+#         'type_string'           # possibly to be removed as this information can be obtained from the NumPy array itself
 #        ])
+# 
+# DD['iteration_data']['cube_i']['sort_data']
+# sort_data is a list, that can be sorted on (possibly required to be transformed to tuple) which
+# when sorted, the list values can be used to reconstruct the whole array using Dask:
+#    ['string', 'string', [ <block_offset values> ]]
+#   A specific example:
+#     ['S0_I1_<simulation_magic_number>', 'P0_B0', [ 0, 9, 12 ]]
+#   The string 'S0_I1_<simulation_magic_number>' indicates 'S' for server and 'I' for iteration. 
+#                                                The magic number is needed as the data is published to a Dask server
+#   The string 'P0_B0' indciates the dictionary key of Numpy data (see next description for explanation of 'P' and 'B')
+#   The list [ 0, 9, 12 ] indicates the offestes into the global array from where the NumPy data is mapped 
+#                         (The size of the NumPy array inicates the block size of the data)
+#                         
 #
 # And, finally, the NumPy data is present in blocks, given by keys constructed as described below
 # DD['iteration_data']['cube_i']['numpy_data'].keys()
 #        (['P0_B0',  
 #          'P1_B0'
 #        ])
-#  Damaris NumPy data keys "P" + damaris block number + "_B" + domain number
-#  The block number is the source of the data (i.e. the Damaris client number)
+
+#  Damaris NumPy data keys: 'P' + damaris client number + '_B' + domain number
+#  The client number is the source of the data (i.e. it is the Damaris client number that wrote the data)
 #  The domain number is the result of multiple calls to damaris_write_block()
-#  or 0 if only damaris_write() API is used.
+#  or 0 if only damaris_write() API is used or a single block only was written.
 # 
 # N.B. Only the data for the current iteration is available - and it is Read Only. 
 #      If it is needed later it needs to be saved somehow and re-read on the 

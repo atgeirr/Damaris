@@ -9,8 +9,9 @@
 
 /**
     A Damaris example of using Python integration with Dask distributed. This version sets up a dataset
-    which has multiple domains (or blocks) written per iteration, and the sum of the data in the blocks is 
-    compared between this simulation code and the Python code (3dmesh_dask.py) that is passed data via Damaris.
+    which has multiple domains (or blocks) written per iteration, and is to be run multiple times and the
+    values written are summarised i.e. a running average and standard deviation is computed through use of
+    the damaris4py DaskStats Python class.
     
     To run this example, a Dask scheduler needs to be spun up:
 
@@ -18,22 +19,32 @@
 
     The --scheduler-file argument must match what is in the Damaris XML file <pyscript> tag.
 
-    Then run the simulation: (assumes 4 Damaris clients and 2 Damaris server cores as per the xml file)
+    Then run the simulation multiple times:
 
-      mpirun --oversubscribe --host ubu20-hvvm-c -np 6 ./3dmesh_py_domains 3dmesh_dask.xml -i 10 -r -d 4
-      
+    for i in `seq 1 10` do
+        sbatch slurm_launcher.sh $i  # Use the correct submission command for your cluster's resource manager
+    done
+    
+    Inside the launch script slurm_launcher.sh will be something like the following:
+    
+      #SBATCH etc.... 
+      MY_VAL=$1
+      # Assumes 4 Damaris clients and 2 Damaris server cores as per the xml file
+      mpirun --oversubscribe  -np 6 ./3dmesh_py_domains_stats 3dmesh_dask.xml -i 10 -v $MY_VAL -d 4 -s 5
+    
+    
     N.B. Set the global mesh size values WIDTH, HEIGHT and DEPTH using the XML input file.
-         Set the name of the Python script to run in the <pyscript ... file="3dmesh_dask.py" ...> tag
+         Set the name of the Python script to run via the <pyscript ... file="3dmesh_dask_stats.py" ...> tag
 
-    The simulation code (via Damaris pyscript class) will create the Dask workers (one per Damaris server core) 
-    and have them connect to the Dask scheduler. The simulation code will remove the workers at the end of the execution, 
-    unless  keep-workers="yes" is specified in 3dmesh_dask.xml <pyscript> tag
+    The simulation code (via Damaris C++ pyscript class) will create the Dask workers (one per Damaris server core) 
+    and have them connect to the Dask scheduler. The simulation code will remove the workers at the end of program
+    execution, unless  keep-workers="yes" is specified in 3dmesh_dask.xml <pyscript> tag
 */
 
 void print_usage(char* exename) {
     fprintf(stderr,"Usage: %s <3dmesh_dask.xml> [-i I] [-d D] [-r] [-s S]\n",exename);
     fprintf(stderr,"-i  I    I is the number of iterations of simulation to run\n");
-    fprintf(stderr,"-r         Array values set as rank of process\n");
+    fprintf(stderr,"-v  V    V is the value to add to each array element (default = 5)\n");
     fprintf(stderr,"-d  D    D is the number of domains to split data into (must divide into Width perfectly)\n");
     fprintf(stderr,"-s  S    S is integer time to sleep in seconds between iterations\n");
 }
@@ -54,35 +65,34 @@ int main(int argc, char** argv)
 
    MPI_Init(&argc , &argv);
 
+   // argument 1 is the Damaris XML file name
    damaris_initialize(argv[1],MPI_COMM_WORLD);
    
-  int verbose = 0;
-  int rank_only = 0;
-  int current_arg = 2 ;  
-  int time = 1 ;
-  int domains = 1 ;
-  MAX_CYCLES = 5;  // default number of iterations to run
-  while (current_arg < argc ) 
-  {
-    if (strcmp(argv[current_arg],"-v") == 0) {
-        current_arg++;
-        verbose = atoi(argv[current_arg]);
-    }
-    else if (strcmp(argv[current_arg],"-r") == 0)
-      rank_only = 1 ;
-    else if (strcmp(argv[current_arg],"-i") == 0) {
-        current_arg++;
-        MAX_CYCLES = atoi(argv[current_arg]);
-    } else if (strcmp(argv[current_arg],"-d") == 0) {
-        current_arg++;
-        domains = atoi(argv[current_arg]);
-    } else if (strcmp(argv[current_arg],"-h") == 0) {
-        print_usage(argv[0]) ;
-        exit(0);
-    }
-    
-      current_arg++;
-  }
+   int verbose = 0;
+   int rank_only = 1;
+   int current_arg = 2 ; 
+   int myval = 5 ;  
+   int time = 1 ;
+   int domains = 1 ;
+   MAX_CYCLES = 5;  // default number of iterations to run
+   while (current_arg < argc ) 
+   {
+     if (strcmp(argv[current_arg],"-v") == 0) {
+         rank_only = 1 ;
+         current_arg++;
+         myval = atoi(argv[current_arg]);
+     } else if (strcmp(argv[current_arg],"-i") == 0) {
+         current_arg++;
+         MAX_CYCLES = atoi(argv[current_arg]);
+     } else if (strcmp(argv[current_arg],"-d") == 0) {
+         current_arg++;
+         domains = atoi(argv[current_arg]);
+     } else if (strcmp(argv[current_arg],"-h") == 0) {
+         print_usage(argv[0]) ;
+         exit(0);
+     }
+       current_arg++;
+   }
 
    int size_client, rank_client, whd_layout;
    int is_client;
@@ -94,9 +104,9 @@ int main(int argc, char** argv)
         MPI_Comm comm;
         damaris_client_comm_get(&comm);
 
-        // We get the dimensions from the XML input file.
-        // We could have, conversely, got the values from the command line (or somewhere else)
-        // And then used damaris_paramater_set() to tell Damaris how big the arrays will be.
+        // These are the desired sizes of the array. We get the dimensions from the XML input file.
+        // We could have, conversely, got the values from the command line (or somewhere else) and
+        // then used damaris_paramater_set() to tell Damaris how big the arrays will be.
         damaris_parameter_get("WIDTH" , &WIDTH , sizeof(int));
         damaris_parameter_get("HEIGHT", &HEIGHT, sizeof(int));
         damaris_parameter_get("DEPTH" , &DEPTH , sizeof(int));
@@ -173,7 +183,7 @@ int main(int argc, char** argv)
                 for ( d = 0; d < local_depth; d++){
                     for ( h = 0; h < local_height; h++){
                         for ( w = 0 ; w < local_width; w++) {
-                           cube[d][h][w] = (int) sequence + rank_start ;
+                           cube[d][h][w] = (int) rank_start +  myval ;
                            sumdata += cube[d][h][w] ;
                            if (rank_only==0) sequence++;
                         }

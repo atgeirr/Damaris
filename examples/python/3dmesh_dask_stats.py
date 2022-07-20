@@ -113,6 +113,7 @@ np.set_printoptions(threshold=np.inf)
 
 
 
+
 def main(DD):
     from mpi4py import MPI
     import dask.array as da
@@ -120,9 +121,10 @@ def main(DD):
     import time
     from os import path
     from dask.distributed import Client, TimeoutError, Lock, Variable
-    from damaris4py.damaris4py import getservercomm
-    from damaris4py.damaris4py import listknownclients
-    from damaris4py.dask import damaris_dask
+    import damaris4py as d4py
+    from   d4py.damaris4py import getservercomm
+    from   d4py.damaris4py import listknownclients
+    from   d4py.dask import damaris_dask
     
    
 

@@ -1,25 +1,6 @@
-#!/usr/bin/python3
-# Author: Josh Bowden, Inria
-# Usage:
-# > ./dask_online_stats <float> | -u | -s | -r |
-# <float> a value to add to the data
-#  -u     Unpublish datasets 
-#  -s     Shutdown dask scheduler 
-#  -r    [num] Start Dask Scheduler with num workers (default 2)  
-#
-# Description: 
-#  Test code for streaming statistics using Dask, based on Welford's online algorithm.
-#  (https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#:~:text=to%20a%20degree.-,Welford%27s%20online%20algorithm,-%5Bedit%5D)
-#
-#  Part of the Damaris examples of using Python integration with Dask distributed
-#  To run this example, a Dask scheduler needs to be spun up:
-# 
-#
-
 import dask.array as da
 import numpy as np
 from dask.distributed import Client
-import sys
 
 
 class DaskStats:
@@ -27,6 +8,16 @@ class DaskStats:
     import numpy as np
     """
      A class used to hold a Dask array version of streaming statistics.
+     
+     This class can return the average and standard deviation of data that
+     has been pushed to it via the update() method. The pushed data must be
+     the same shape as the all prior data that has been pushed. The intermediate results 
+     are saved to the Dask scheduler and can be updated by multiple Dask clients. This requires
+     a unique and known name to be used
+     
+    The method is based on Welford's online algorithm. See:
+    (https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#:~:text=to%20a%20degree.-,Welford%27s%20online%20algorithm,-%5Bedit%5D)
+
      
      Methods
      -------
@@ -241,144 +232,3 @@ class DaskStats:
         return chunks_tup
     
     
-
-      
-block_shape = (1, 3, 4)
-
-
-P0_B0 = np.zeros(block_shape )
-P1_B0 = np.ones(block_shape  )
-P2_B0 = np.ones(block_shape)*2
-P3_B0 = np.ones(block_shape)*3
-P4_B0 = np.ones(block_shape)*4
-P5_B0 = np.ones(block_shape)*5
-P6_B0 = np.ones(block_shape)*6
-P7_B0 = np.ones(block_shape)*7
-P8_B0 = np.ones(block_shape)*8
-P9_B0 = np.ones(block_shape)*9
-P10_B0 = np.ones(block_shape)*10
-P11_B0 = np.ones(block_shape)*11
-P12_B0 = np.ones(block_shape)*12
-P13_B0 = np.ones(block_shape)*13
-P14_B0 = np.ones(block_shape)*14
-P15_B0 = np.ones(block_shape)*15
-
-data = [
-    [
-        [P0_B0,  P1_B0,  P2_B0,  P3_B0],
-        [P4_B0,  P5_B0,  P6_B0,  P7_B0],
-        [P8_B0,  P9_B0,  P10_B0, P11_B0],
-        [P12_B0, P13_B0, P14_B0, P15_B0]
-    ]
-]
-
-x = da.block(data)
-
-def compute_block_average(block):  
-    return np.array([np.average(block)])[:, None, None]
-
-def compute_block_average_of_sqrt(block):  
-    return np.array([np.average(np.sqrt(block))])[:, None, None]
-
-# from dask.distributed import Client
-def print_help()
-    print(sys.argv[1], '  <float> ')
-    print(sys.argv[1], '  -u  Unpublish datasets ')
-    print(sys.argv[1], '  -s  Shutdown dask scheduler ')
-    print(sys.argv[1], '  -r  [num] Restart Dask Scheduler with num workers (default 2)  ')
-
-unpublish = False
-shutdown = False
-restart = False
-how_many_workers = 2
-if len(sys. argv) > 1: 
-    if (sys.argv[1] == '-u'):
-        print('unpublish = True')
-        unpublish = True
-    elif (sys.argv[1] == '-s'):
-        print('shutdown = True')
-        shutdown = True
-    elif (sys.argv[1] == '-r'):
-        print('restart = True')
-        restart = True
-        if len(sys. argv) > 2:
-            how_many_workers = int(sys.argv[2])
-    elif (sys.argv[1] == '-h'):
-        print_help()
-        sys.exit()
-    else:
-        myval = float(sys.argv[1])
-else:
-    print_help() 
-Retirves
-
-    
-if restart == True :
-    import subprocess, time
-    print('Restarting down the Dask Scheduler and workers!')
-    #client.shutdown()
-    subprocess.Popen(['dask-scheduler', '--scheduler-file', '/home/jbowden/dask_file.json'])
-    time.sleep(1.0)
-    # dask-scheduler --scheduler-file "/home/$USER/dask_file.json" &
-    for i in range(how_many_workers):
-        subprocess.Popen(['dask-worker', '--scheduler-file', '/home/jbowden/dask_file.json',  '--nthreads', '1'])
-
-client =  Client(scheduler_file='/home/jbowden/dask_file.json', timeout='2s')
-print(client.list_datasets())
-
-if unpublish == True :
-    for ds  in client.list_datasets():
-        print('Unpublishing Daskstats:', ds)
-        client.unpublish_dataset(ds)
-    client.close()
-    sys.exit()
-    
-if shutdown == True :
-    print('Shuting down the Dask Scheduler and workers!')
-    client.shutdown()
-    sys.exit()
-    
-    
-if 'unique_name1' not in client.list_datasets():
-    print('Creating Daskstats:')
-    daskstats = DaskStats(x)
-    client.datasets['unique_name1'] = 'unique_name1'
-else:
-    print('Retrieving Daskstats:')
-    daskstats = DaskStats(x)
-    daskstats.retrieve_from_dask(client, 'unique_name1' )
-         
-
-# Update the dataset
-for i in range(10):
-    y = x + myval# da.random.normal(0.0, 0.1, x.shape)
-    daskstats.update(y)
-
-
-print('The current mean and stddev values are:')
-(mean, sampleVariance) = daskstats.return_mean_var_tuple()
-
-my_tuple = daskstats.get_chunks(x)  # tuple of 1's e.g. (1, 1, 1)
-print(mean.map_blocks(daskstats.compute_block_average, chunks=(1, 1, 1)).compute())
-print(sampleVariance.map_blocks(daskstats.compute_block_average_of_sqrt, chunks=my_tuple).compute())
-
-# Compare with global derived value
-print(da.average(da.sqrt(sampleVariance)).compute())
-
-sys.stdout.flush()
-daskstats.save_on_dask(client, 'unique_name1' )
-
-client.close()
-
-
-
-
-
-
-
-
-
-
-
-
-

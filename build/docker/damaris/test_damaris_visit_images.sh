@@ -143,7 +143,7 @@ do
               # The base container exists in the repository                  
               # echo "Building: $DOCKER_IMAGE_OUTPUTNAME:${BASEIMAGETAG}"
               # Run the command within the Docker image:
-              docker run  --rm -v /dev/shm:/dev/shm -p 22222:22222 \
+              docker run  --rm -v /dev/shm:/dev/shm  \
                   ${DOCKER_IMAGE_BASENAME}:${BASEIMAGETAG} ${EXECMD}
             if [[ $? -eq 0 ]] ; then
                # docker push "$DOCKER_IMAGE_OUTPUTNAME:${BASEIMAGETAG}-damaris-${DAMARIS_VER}"
