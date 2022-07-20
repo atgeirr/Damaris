@@ -27,10 +27,11 @@
     
     Inside the launch script slurm_launcher.sh will be something like the following:
     
-      #SBATCH etc.... 
-      MY_VAL=$1
+      #SBATCH #OAR #PBS etc.... 
+      # MY_VAL is the value to be added to the 3D array on each iteration
+      MY_VAL=$1  
       # Assumes 4 Damaris clients and 2 Damaris server cores as per the xml file
-      mpirun --oversubscribe  -np 6 ./3dmesh_py_domains_stats 3dmesh_dask.xml -i 10 -v $MY_VAL -d 4 -s 5
+      mpirun --oversubscribe  -np 6 ./3dmesh_dask_stats 3dmesh_dask_stats.xml -i 10 -v $MY_VAL -d 4 -s 5
     
     
     N.B. Set the global mesh size values WIDTH, HEIGHT and DEPTH using the XML input file.

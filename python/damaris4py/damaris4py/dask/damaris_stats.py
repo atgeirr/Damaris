@@ -28,21 +28,27 @@ class DaskStats:
         """
         Constructor
         
-        array_of_shape: is a dask.array, from which we will create the mean and M2 arrays
-        of the same shape - including the block layout of a distributed array. All array 
-        values are initialised to 0.0 double precision floating point
+        unique_name_str : Is the name given to the average, M2 and count datasets when saved to 
+                          the Client.datasets[] dictionary. 
+                          Client.datasets[unique_name_str+'_count']
+                          Client.datasets[unique_name_str+'_mean']
+                          Client.datasets[unique_name_str+'_M2']
+                          The dictionary values are read only, so 
+                          we have to remove them before updating them with new values
+                          
+        lock_name_str: Is a name to use for the lock, so other Dask clients can ask for it by name.
         
+        dasklock : is a Dask lock, used so that only one client can update data at a time.
         """
 
         self.lock_name_str   = lock_name_str
         self.dasklock        = Lock(name=lock_name_str)
-
         self.unique_name_str = unique_name_str
         
             
         
         
-    def update(self, client, newValue, lock_timeout=60):
+    def update(self, newValue, client, lock_timeout=60):
         """
         update(newValue)
         
@@ -59,29 +65,27 @@ class DaskStats:
         """
         if dasklock.aquire(timeout=lock_timeout):
             if self.unique_name_str+'_count' in client.list_datasets():
-                self.count = client.datasets[self.unique_name_str+'_count']
-                self.mean  = client.datasets[self.unique_name_str+'_mean']
-                self.M2    = client.datasets[self.unique_name_str+'_M2']
+                count = client.datasets[self.unique_name_str+'_count']
+                mean  = client.datasets[self.unique_name_str+'_mean']
+                M2    = client.datasets[self.unique_name_str+'_M2']
             else: # initialise
-                self.count     = 0    
-                self.mean      = da.zeros_like(newValue, dtype=np.float64)
-                self.M2        = da.zeros_like(newValue, dtype=np.float64)
+                count     = 0    
+                mean      = da.zeros_like(newValue, dtype=np.float64)
+                M2        = da.zeros_like(newValue, dtype=np.float64)
             
-            assert newValue.shape == self.mean.shape    
+            assert newValue.shape == mean.shape    
             
-            self.count += 1
-            delta = newValue - self.mean
+            count += 1
+            delta = newValue - mean
             delta.persist()
-            self.mean += delta / self.count
-            self.mean.persist()
-            delta2 = newValue - self.mean
-            self.M2 += delta * delta2
-            
-            # self.mean.persist()
-            self.M2.persist()
+            mean += delta / count
+            # mean.persist()
+            delta2 = newValue - mean
+            M2 += delta * delta2
+            # M2.persist()
             
             # this will unpublish_dataset() first
-            save_on_dask(client )
+            save_on_dask(client, count, mean,  M2 )
             
             dasklock.release()
         
@@ -91,7 +95,7 @@ class DaskStats:
 
         
         
-    def save_on_dask(self, client ):
+    def save_on_dask(self, client, count, mean,  M2 ):
         """
         save_on_dask
         
@@ -106,34 +110,35 @@ class DaskStats:
             client.unpublish_dataset(self.unique_name_str+'_mean')  
             client.unpublish_dataset(self.unique_name_str+'_M2')   
             
-        client.datasets[self.unique_name_str+'_count'] = self.count    
-        client.datasets[self.unique_name_str+'_mean']  = self.mean  
-        client.datasets[self.unique_name_str+'_M2']    = self.M2  
+        client.datasets[self.unique_name_str+'_count'] = count    
+        client.datasets[self.unique_name_str+'_mean']  = mean  
+        client.datasets[self.unique_name_str+'_M2']    = M2  
     
     
-    def retrieve_from_dask(self, client, lock_timeout=60 ):
-        """
-        retrieve_from_dask
+    # def retrieve_from_dask(self, client, lock_timeout=60 ):
+        # """
+        # retrieve_from_dask
         
-        client:  A Dask distributed client
-        unique_name_str: Key to set so we can find correct dataset
+        # client:  A Dask distributed client
+        # unique_name_str: Key to set so we can find correct dataset
         
-        Retrieve the saved data (saved by save_on_dask())
+        # Retrieve the saved data (saved by save_on_dask())
         
-        """
+        # """
         
-        # Do not use this assert as we may not know the shape
-        # assert self.mean.shape == client.datasets[unique_name_str+'_mean'].shape
-        if dasklock.aquire(timeout=lock_timeout):
-            self.count = client.datasets[unique_name_str+'_count']
-            self.mean  = client.datasets[unique_name_str+'_mean']
-            self.M2    = client.datasets[unique_name_str+'_M2'] 
-            self.mean.persist()
-            self.M2.persist()
+        # # Do not use this assert as we may not know the shape
+        # # assert self.mean.shape == client.datasets[unique_name_str+'_mean'].shape
+        # if dasklock.aquire(timeout=lock_timeout):
+            # self.count = client.datasets[unique_name_str+'_count']
+            # self.mean  = client.datasets[unique_name_str+'_mean']
+            # self.M2    = client.datasets[unique_name_str+'_M2'] 
+            # self.mean.persist()
+            # self.M2.persist()
             
-            dasklock.release()
-        else:
-            raise TimeoutError('Dask lock: ' + self.lock_name_str + ' timesd out') 
+            # dasklock.release()
+            
+        # else:
+            # raise TimeoutError('Dask lock: ' + self.lock_name_str + ' timesd out') 
             
             
     def return_mean(self, client, lock_timeout=60):
@@ -144,20 +149,18 @@ class DaskStats:
         """
         if dasklock.aquire(timeout=lock_timeout):
             if self.unique_name_str+'_count' in client.list_datasets():
-                self.count = client.datasets[self.unique_name_str+'_count']
-                self.mean  = client.datasets[self.unique_name_str+'_mean']
-                self.M2    = client.datasets[self.unique_name_str+'_M2']
+                count = client.datasets[self.unique_name_str+'_count']
+                mean  = client.datasets[self.unique_name_str+'_mean']
             else: # initialise
-                self.count     = 0    
-                self.mean      = da.zeros_like(newValue, dtype=np.float64)
-                self.M2        = da.zeros_like(newValue, dtype=np.float64)
+                count     = 0    
+                mean      = da.zeros_like(newValue, dtype=np.float64)
                 
             dasklock.release()    
                 
-            if self.count < 2:
-                return da.full_like(self.mean, float("nan")) 
+            if count < 2:
+                return da.full_like(mean, float("nan")) 
             else:
-                return self.mean.persist()
+                return mean.persist()
         else:
             raise TimeoutError('Dask lock: ' + self.lock_name_str + ' timesd out')    
             
@@ -174,23 +177,22 @@ class DaskStats:
         """
         if dasklock.aquire(timeout=lock_timeout):
             if self.unique_name_str+'_count' in client.list_datasets():
-                self.count = client.datasets[self.unique_name_str+'_count']
-                self.mean  = client.datasets[self.unique_name_str+'_mean']
-                self.M2    = client.datasets[self.unique_name_str+'_M2']
+                count = client.datasets[self.unique_name_str+'_count']
+                M2    = client.datasets[self.unique_name_str+'_M2']
             else: # initialise
-                self.count     = 0    
-                self.mean      = da.zeros_like(newValue, dtype=np.float64)
-                self.M2        = da.zeros_like(newValue, dtype=np.float64)
-                
-                
-              
+                count     = 0    
+                mean      = da.zeros_like(newValue, dtype=np.float64)
+                M2        = da.zeros_like(newValue, dtype=np.float64)
+
         else:
             raise TimeoutError('Dask lock: ' + self.lock_name_str + ' timesd out')    
-            
-        if self.count < 2:
-            return da.full_like(self.mean, float("nan")) 
+        
+        dasklock.release()  
+        
+        if count < 2:
+            return da.full_like(mean, float("nan")) 
         else:
-            sampleVariance = ( self.M2 / (self.count - 1))
+            sampleVariance = ( M2 / (count - 1))
         return sampleVariance.persist()  
           
          
