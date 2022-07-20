@@ -18,7 +18,7 @@
 # unless  keep-workers="yes" is specified in 3dmesh_dask.xml <pyscript> tag
 # 
 
-import numpy as np
+import numpy as np 
 np.set_printoptions(threshold=np.inf)
 
 

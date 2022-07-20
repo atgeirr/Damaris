@@ -13,7 +13,7 @@
         <parameter name="DEPTH"    type="int" value="16" comment="this will be divided by the number of MPI ranks used (Damaris clients) - see the layout cells_whd_wf" />
         <parameter name="size"     type="int" value="4"  comment="this will be dynamically updated with the number of MPI client ranks" />
         <parameter name="blocks"   type="int" value="4"  comment="this will be dynamically updated with the number of blocks specified on the command line of the executable"/>
-
+ 
         <layout name="cells_whd_wf"    type="int"    dimensions="DEPTH/size,HEIGHT,WIDTH/blocks"  global="DEPTH,HEIGHT,WIDTH"  />
         <layout name="one_int"         type="int"    dimensions="1"  global="1" 
                 comment="This will provide storage for one integer per Damaris client rank" />

@@ -63,7 +63,7 @@ int main(int argc, char** argv)
       exit(0);
    }
 
-   MPI_Init(&argc , &argv);
+   MPI_Init(&argc , &argv); 
 
    // argument 1 is the Damaris XML file name
    damaris_initialize(argv[1],MPI_COMM_WORLD);
