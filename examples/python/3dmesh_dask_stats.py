@@ -15,23 +15,23 @@ np.set_printoptions(threshold=np.inf)
 
 
 def main(DD):
-    import dask.array as da
-    import numpy as np
-    from dask.distributed import Client, TimeoutError
-    import damaris4py as d4py
-    from   d4py.damaris4py import getservercomm
-    from   d4py.dask import damaris_dask
-    from   d4py.dask import damaris_stats
+    # import dask.array as da
+    # import numpy as np
+    from   dask.distributed import Client, TimeoutError
+    from   damaris4py.damaris4py import getservercomm
+    from   damaris4py.damaris4py import magicnumber_string
+    from   damaris4py.dask import damaris_dask
+    from   damaris4py.dask import damaris_stats
    
     try:
 
         damaris_comm = getservercomm()   
         # This is the iteration value the from Damaris perspective
         # i.e. It is the number of times damaris_end_iteration() has been called
-        iteration        = iter_dict['iteration']
-        iteration_dam    = damaris_dask.return_iteration()         
-        assert iteration == iteration_dam
-        
+        # iteration        = iter_dict['iteration']
+        iteration    = damaris_dask.return_iteration(DD)         
+        # assert iteration == iteration_dam
+        print('Py  Iteration ' + str(iteration) + '  magicnumber_string ' + magicnumber_string())
         damaris_comm.Barrier()
 
         # Do some Dask stuff - running statistics
@@ -40,19 +40,23 @@ def main(DD):
         scheduler_file  = damaris_dask.return_scheduler_filename(DD)        
         if iteration == 0:
             print('Python INFO: Scheduler file '+ scheduler_file) 
-        if (scheduler_file != ""):            
-            
+        if (scheduler_file != ""):                        
             try:      
                 client =  Client(scheduler_file=scheduler_file, timeout='2s')
                 unique_name_str = 'dask_client_published_str' # Any simulation that uses this can contribute to the running stats
                 lock_name_str   = 'dask_lock_str'
                 # Creating the DaskStats object on each iteration, as I do not keep them on the Dask scheduler, however I possibly could.
                 daskstats = damaris_stats.DaskStats( unique_name_str, lock_name_str) 
+                print('Py  Iteration ' + str(iteration) + ':We have the daskstats object')
                 # We now create the Dask dask.array
-                x =  damaris_dask.return_dask_array(DD, client, 'cube_i', damaris_comm, print_array_component=False )
+                x =  damaris_dask.return_dask_array(DD, client, 'cube_d', damaris_comm, print_array_component=False )
+                print('Py  Iteration ' + str(iteration) + ':We have the dask array returned from return_dask_array()')
                 # Only rank 0 returns a dask.array, the others return None
                 if (x is not None):
-                    daskstats.update(x, client, lock_timeout=60):
+                    print('Py  Iteration ' + str(iteration) + '  calling update()')
+                    daskstats.update(x, client, lock_timeout=60)
+                    print('Py  Iteration ' + str(iteration) + ':  We have called daskstats.update() using the new data')
+                    
                     
                 # damaris_comm.Barrier()
                 # close the client only:

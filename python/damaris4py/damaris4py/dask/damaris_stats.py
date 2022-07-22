@@ -42,8 +42,9 @@ class DaskStats:
         """
 
         self.lock_name_str   = lock_name_str
-        self.dasklock        = Lock(name=lock_name_str)
+        # self.dasklock        = Lock(name=lock_name_str)
         self.unique_name_str = unique_name_str
+        # self.chunks_tup      = None  # set on the first call to update()
         
             
         
@@ -63,21 +64,27 @@ class DaskStats:
         and leave them in distributed memory.
         
         """
-        if dasklock.aquire(timeout=lock_timeout):
+        dasklock        = Lock(name=self.lock_name_str)
+        if dasklock.acquire(timeout=lock_timeout):
             if self.unique_name_str+'_count' in client.list_datasets():
-                count = client.datasets[self.unique_name_str+'_count']
-                mean  = client.datasets[self.unique_name_str+'_mean']
-                M2    = client.datasets[self.unique_name_str+'_M2']
+                count      = client.datasets[self.unique_name_str+'_count']
+                chunks_tup = client.datasets[self.unique_name_str+'_chunks_tup']
+                mean       = client.datasets[self.unique_name_str+'_mean']
+                M2         = client.datasets[self.unique_name_str+'_M2']
             else: # initialise
-                count     = 0    
-                mean      = da.zeros_like(newValue, dtype=np.float64)
-                M2        = da.zeros_like(newValue, dtype=np.float64)
+                count      = 0    
+                chunks_tup = None 
+                mean       = da.zeros_like(newValue, dtype=np.float64)
+                M2         = da.zeros_like(newValue, dtype=np.float64)
             
             assert newValue.shape == mean.shape    
             
+            if chunks_tup == None:
+                chunks_tup = self.set_chunks(newValue.shape)
+            
             count += 1
             delta = newValue - mean
-            delta.persist()
+            # delta.persist()
             mean += delta / count
             # mean.persist()
             delta2 = newValue - mean
@@ -85,61 +92,59 @@ class DaskStats:
             # M2.persist()
             
             # this will unpublish_dataset() first
-            save_on_dask(client, count, mean,  M2 )
+            self.save_on_dask(client, count, chunks_tup, mean,  M2 )
             
             dasklock.release()
         
         else:
-            raise TimeoutError('Dask lock: ' + self.lock_name_str + ' timesd out')
+            dasklock.release()
+            raise TimeoutError('damaris_stats: Dask lock named: ' + self.lock_name_str + ' timed out')
             
 
         
         
-    def save_on_dask(self, client, count, mean,  M2 ):
+    def save_on_dask(self, client, count, chunks_tup, mean,  M2 ):
         """
         save_on_dask
         
         client:  A Dask distributed client
-        unique_name_str: Key to set so we can find correct dataset
+        count:   Integer, the number of times data have been updated
+        mean:    A NumPy array containing the current mean of data at each element of the array
+        M2:      A Numpy array containing the M squared values for computing streaming standard deviations
         
         Saves our data to the Dask server so we can retirve it from another client
         
         """
         if self.unique_name_str+'_count' in client.list_datasets():
-            client.unpublish_dataset(self.unique_name_str+'_count')    
+            client.unpublish_dataset(self.unique_name_str+'_count') 
+            client.unpublish_dataset(self.unique_name_str+'_chunks_tup')             
             client.unpublish_dataset(self.unique_name_str+'_mean')  
             client.unpublish_dataset(self.unique_name_str+'_M2')   
             
-        client.datasets[self.unique_name_str+'_count'] = count    
+        client.datasets[self.unique_name_str+'_count'] = count   
+        client.datasets[self.unique_name_str+'_chunks_tup'] = chunks_tup        
         client.datasets[self.unique_name_str+'_mean']  = mean  
         client.datasets[self.unique_name_str+'_M2']    = M2  
     
-    
-    # def retrieve_from_dask(self, client, lock_timeout=60 ):
-        # """
-        # retrieve_from_dask
+    def return_count(self, client, lock_timeout=60):
+        """
+        return_count
         
-        # client:  A Dask distributed client
-        # unique_name_str: Key to set so we can find correct dataset
-        
-        # Retrieve the saved data (saved by save_on_dask())
-        
-        # """
-        
-        # # Do not use this assert as we may not know the shape
-        # # assert self.mean.shape == client.datasets[unique_name_str+'_mean'].shape
-        # if dasklock.aquire(timeout=lock_timeout):
-            # self.count = client.datasets[unique_name_str+'_count']
-            # self.mean  = client.datasets[unique_name_str+'_mean']
-            # self.M2    = client.datasets[unique_name_str+'_M2'] 
-            # self.mean.persist()
-            # self.M2.persist()
-            
-            # dasklock.release()
-            
-        # else:
-            # raise TimeoutError('Dask lock: ' + self.lock_name_str + ' timesd out') 
-            
+        Retrieve the Dask 'count' 
+        """
+        dasklock        = Lock(name=self.lock_name_str)
+        if dasklock.acquire(timeout=lock_timeout):
+            if self.unique_name_str+'_count' in client.list_datasets():
+                count = client.datasets[self.unique_name_str+'_count']
+            else: # initialise
+                count     = 0    
+                
+            dasklock.release()    
+                
+            return count
+        else:
+            dasklock.release()
+            raise TimeoutError('Dask lock: ' + self.lock_name_str + ' timed out') 
             
     def return_mean(self, client, lock_timeout=60):
         """
@@ -147,7 +152,8 @@ class DaskStats:
         
         Retrieve the Dask array 'future' self.mean
         """
-        if dasklock.aquire(timeout=lock_timeout):
+        dasklock        = Lock(name=self.lock_name_str)
+        if dasklock.acquire(timeout=lock_timeout):
             if self.unique_name_str+'_count' in client.list_datasets():
                 count = client.datasets[self.unique_name_str+'_count']
                 mean  = client.datasets[self.unique_name_str+'_mean']
@@ -162,6 +168,7 @@ class DaskStats:
             else:
                 return mean.persist()
         else:
+            dasklock.release()
             raise TimeoutError('Dask lock: ' + self.lock_name_str + ' timesd out')    
             
             
@@ -175,7 +182,8 @@ class DaskStats:
         
         Returns a 'future', so to get the values we must .compute() or .persist()
         """
-        if dasklock.aquire(timeout=lock_timeout):
+        dasklock        = Lock(name=self.lock_name_str)
+        if dasklock.acquire(timeout=lock_timeout):
             if self.unique_name_str+'_count' in client.list_datasets():
                 count = client.datasets[self.unique_name_str+'_count']
                 M2    = client.datasets[self.unique_name_str+'_M2']
@@ -185,7 +193,8 @@ class DaskStats:
                 M2        = da.zeros_like(newValue, dtype=np.float64)
 
         else:
-            raise TimeoutError('Dask lock: ' + self.lock_name_str + ' timesd out')    
+            dasklock.release()
+            raise TimeoutError('Dask lock: ' + self.lock_name_str + ' timed out')    
         
         dasklock.release()  
         
@@ -197,8 +206,8 @@ class DaskStats:
           
          
          
-    def return_mean_var_tuple(self, client):
-        return (self.return_mean(), self.return_variance())    
+    def return_mean_var_tuple(self, client, lock_timeout=60):
+        return (self.return_mean(client, lock_timeout=lock_timeout), self.return_variance(client, lock_timeout=lock_timeout))    
 
 
     @staticmethod
@@ -280,10 +289,12 @@ class DaskStats:
         return res_str
 
 
-    @staticmethod    
-    def get_chunks( dask_array ):
+        
+    def set_chunks(self,   shape  ):
         """
-        get_chunks
+        set_chunks
+        
+        shape : is a tuple of dimensions of the array  (i.e. from np.shape(num_array)) 
         
         Returns a tuple of 1's the length of the number of dimensions of the input array.
         
@@ -291,11 +302,24 @@ class DaskStats:
         
         This is useful for the chunks= attribute of map_blocks()
         
-        """
+        """   
         tuplist = list()
-        for i in range(len(dask_array.shape)):
+        for i in range(len(shape)):
             tuplist.append(1)
         chunks_tup=tuple(tuplist)
-        return chunks_tup
+        return chunks_tup 
     
-    
+    def get_chunks( self, client  ):
+        """
+        get_chunks
+        
+        client : A Dask Client object that has access to the scheduler that we saved the tuple to in the update() method
+        
+        Returns a tuple of 1's the length of the number of dimensions of the input array.
+        
+        e.g. if array has 3 dims then returns (1, 1, 1). 
+        
+        This is useful for the chunks= attribute of map_blocks()
+        
+        """   
+        return client.datasets[self.unique_name_str+'_chunks_tup']

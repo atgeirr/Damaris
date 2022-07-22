@@ -183,6 +183,11 @@ static bp::object hw_damaris_initialize(boost::python::object xml_path, boost::p
 }
 
 
+static bp::object hw_damaris_magic_number( )
+{
+  return bp::object(damaris::Environment::GetMagicNumber()) ;
+}
+
 /* 
 * Expose the functions as a Python module
 */
@@ -205,5 +210,6 @@ BOOST_PYTHON_MODULE(damaris4py)
   bp::def("serverspernode", hw_servers_per_node);
   bp::def("numberofnodes", hw_number_of_nodes);
   bp::def("listknownclients", hw_list_known_clients);
+  bp::def("magicnumber_string", hw_damaris_magic_number);
 }
 

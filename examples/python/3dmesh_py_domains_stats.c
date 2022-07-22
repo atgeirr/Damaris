@@ -72,19 +72,23 @@ int main(int argc, char** argv)
    int verbose = 0;
    int rank_only = 1;
    int current_arg = 2 ; 
-   int myval = 5 ;  
+   int myval = 5 ; 
+   int myval_d = 5.0 ;   
    int time = 1 ;
    int domains = 1 ;
    MAX_CYCLES = 5;  // default number of iterations to run
    while (current_arg < argc ) 
    {
      if (strcmp(argv[current_arg],"-v") == 0) {
-         rank_only = 1 ;
          current_arg++;
          myval = atoi(argv[current_arg]);
+         myval_d = (double) myval ;
      } else if (strcmp(argv[current_arg],"-i") == 0) {
          current_arg++;
          MAX_CYCLES = atoi(argv[current_arg]);
+     } else if (strcmp(argv[current_arg],"-s") == 0) {
+         current_arg++;
+         time = atoi(argv[current_arg]);
      } else if (strcmp(argv[current_arg],"-d") == 0) {
          current_arg++;
          domains = atoi(argv[current_arg]);
@@ -171,51 +175,56 @@ int main(int argc, char** argv)
                 rank_start = rank_client * local_width * local_height ;
 
                 // allocate the local data array
-                int cube[local_depth][local_height][local_width] ;
+                double cube[local_depth][local_height][local_width] ;
 
                 // set the appropriate position for the current rank
-                damaris_set_block_position("cube_i", block, position_cube) ;
+                damaris_set_block_position("cube_d", block, position_cube) ;
  
                 int sequence ;
                 sequence =  i ;  // this is the start of the sequence for this iteration
                 
                 // print sumation values to screen
-                long int sumdata = 0 ;
+                double sumdata = 0.0 ;
                 for ( d = 0; d < local_depth; d++){
                     for ( h = 0; h < local_height; h++){
                         for ( w = 0 ; w < local_width; w++) {
-                           cube[d][h][w] = (int) rank_start +  myval ;
+                           cube[d][h][w] = (double) rank_start +  myval_d ;
                            sumdata += cube[d][h][w] ;
-                           if (rank_only==0) sequence++;
+                           // if (rank_only==0) sequence++;
                         }
                     }
                 } 
                   
                 // Each MPI process sends its rank to reduction, root MPI process collects the result
-                MPI_Reduce(&sumdata, &reduction_result, 1, MPI_LONG, MPI_SUM, 0, comm) ;                                    
+                MPI_Reduce(&sumdata, &reduction_result, 1, MPI_DOUBLE, MPI_SUM, 0, comm) ;                                    
                 array_sum += reduction_result ;
 
-                damaris_write_block("cube_i" , block, cube) ;
+                damaris_write_block("cube_d" , block, cube) ;
 
             }  // end of loop over blocks
-            sleep(time) ;
+            
             MPI_Barrier(comm) ;
             double t2 = MPI_Wtime() ;
             if(rank_client == 0) {
-                printf("Iteration %d done in %f seconds\n",i,(t2-t1)) ;
+                printf("Sim Iteration %d done in %f seconds\n",i,(t2-t1)) ;
                 fflush(stdin); 
             }
             if (rank_client == 0)
-                printf("Iteration %d Rank %d Sum = %f\n", i, rank_client, array_sum ) ;
+                printf("Sim Iteration %d Rank %d Sum = %f\n", i, rank_client, array_sum ) ;
             damaris_write("array_sum" , &array_sum) ;  // Used to confirm the summation value found in Dask        
-           
+            
             damaris_end_iteration() ;
+            sleep(time) ;
         }  // end of for loop over MAX_CYCLES
 
         damaris_stop() ;
+        sleep(time) ;
    }
 
    damaris_finalize() ;
+   
+   MPI_Barrier(MPI_COMM_WORLD) ;
+   
    MPI_Finalize() ;
    return 0;
 }

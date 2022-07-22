@@ -291,7 +291,7 @@ unpublish = False
 shutdown = False
 restart = False
 how_many_workers = 2
-if len(sys. argv) > 1: 
+if len(sys.argv) > 1: 
     if (sys.argv[1] == '-u'):
         print('unpublish = True')
         unpublish = True
@@ -310,7 +310,7 @@ if len(sys. argv) > 1:
         myval = float(sys.argv[1])
 else:
     print_help() 
-Retirves
+
 
     
 if restart == True :
