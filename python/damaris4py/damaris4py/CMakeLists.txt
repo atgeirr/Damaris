@@ -23,7 +23,7 @@ cmake_minimum_required(VERSION 3.12)
         if (NOT ${EXIT_CODE} EQUAL 0)
             message(
                 WARNING
-                ": The \"mpi4py\" Python3 package is not installed. Cannot build Damaris Python module. Please install mpi4py using the following command: \"MPICC=$(which mpicc) python -m pip install --no-cache-dir mpi4py\"."
+                "WARNING: The \"mpi4py\" Python3 package is not installed. Cannot build Damaris with its Python module. Please install mpi4py using the following command: \"MPICC=$(which mpicc) python -m pip install --no-cache-dir mpi4py\", or one relveant to your O.S. Or, disable the Python module installation using -DENABLE_PYTHONMOD=OFF "
             )
         endif()
 

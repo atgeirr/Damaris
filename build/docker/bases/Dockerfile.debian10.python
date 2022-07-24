@@ -29,6 +29,8 @@ RUN useradd docker \
 # RUN yes docker | passwd --stdin root
 RUN echo 'root:docker' | chpasswd
 
+
+# libboost-all-dev  is not installed as it links to Python2
 RUN apt-get update -y \
   && echo "debconf debconf/frontend select Noninteractive" | debconf-set-selections \
   && apt-get install -y --no-install-recommends \
@@ -38,7 +40,6 @@ RUN apt-get update -y \
     cmake \
     wget unzip nano \
 	libopenmpi-dev \
-    libboost-all-dev \
 	libxerces-c-dev  \
 	xsdcxx \
     libcppunit-dev \
@@ -47,7 +48,8 @@ RUN apt-get update -y \
 
 
 
-RUN apt-get install -y --no-install-recommends \
+RUN apt-get install -y \
+  python3-pip \
   libpython3-dev  
   
 # RUN apt-get install -y --no-install-recommends \
@@ -61,11 +63,7 @@ RUN apt-get install -y --no-install-recommends \
   && apt-get clean
 
 
-
-
 RUN ln -s /usr/bin/python3 /usr/bin/python  || echo "python already linked to python3"
-
-
 
 ENV INSTALL_PREFIX=/home/docker/local
 ENV PATH=${INSTALL_PREFIX}/bin:${PATH}
@@ -85,6 +83,18 @@ ENV MPIFORT=$MPI_ROOT/bin/mpifort
 
 ENV GCC=/usr/bin/gcc
 ENV GPP=/usr/bin/g++
+
+RUN mkdir buildboost \
+    && cd buildboost \
+    && apt-get install python3-mpi4py \
+    && pip3 install numpy \
+    && wget https://boostorg.jfrog.io/artifactory/main/release/1.79.0/source/boost_1_79_0.tar.gz \
+    && tar -xf boost_1_79_0.tar.gz \
+    && cd boost_1_79_0 \
+    && ./boostrap --with-python=$(which python3) --prefix=${INSTALL_PREFIX} \
+    && ./b2 install \
+    && cd ../.. \
+    && rm -fr ./buildboost
 
 USER docker
 

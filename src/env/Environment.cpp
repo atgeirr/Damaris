@@ -91,9 +91,11 @@ bool Environment::Init(const std::string& configFile,
     _initialized_ = true;
 
     /* Compute the magic number of the simulation */
-    time_t mgnbr;
-    time(&mgnbr);
-    MPI_Bcast(&mgnbr,sizeof(time_t),MPI_BYTE,0,_globalComm_);
+    //time_t mgnbr;
+    //time(&mgnbr);
+    //MPI_Bcast(&mgnbr,sizeof(time_t),MPI_BYTE,0,_globalComm_);
+    double mgnbr = MPI_Wtime();
+    MPI_Bcast(&mgnbr,1,MPI_DOUBLE,0,_globalComm_);
     std::ostringstream oss;
     oss << mgnbr;
     _magicNumber_ = oss.str();

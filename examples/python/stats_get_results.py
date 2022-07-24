@@ -1,3 +1,17 @@
+# Python code: stats_3dmesh_dask.py
+# Author: Josh Bowden, Inria
+# Description: 
+# Returns the resulting Average and Variabnce of the simulation data that was computed by Dask.
+# 
+# Part of the Damaris examples of using Python integration with Dask distributed
+# To run this example on Grid5000 (OAR job scheduler), use the script: stats_launcher.sh
+# The script is designed to test the damaris4py.damaris_stats class named DaskStats
+# 
+# N.B. If 4 simulations are launched which each runs 4 iterations, 
+#      and each adding a integer 1, 2, 3, or 4 distributed over the 4 simulations 
+#      on each iteration, then: 
+#      The mean of the first blocks will be 2.5 
+#      and the variance for 4 iterations will be 1.333...
 from   dask.distributed import Client
 from   damaris4py.damaris4py import getservercomm
 from   damaris4py.dask import damaris_dask
@@ -36,6 +50,10 @@ try:
             # Creating the DaskStats object on each iteration, as I do not keep them on the Dask scheduler, however I possibly could.
             daskstats = damaris_stats.DaskStats( unique_name_str, lock_name_str) 
             
+            # N.B. If 4 simulations are launched which each runs the same number of iterations, 
+            #      and each adding a integer 1, 2, 3, or 4 on each iteration, then:
+            #      the mean of the first blocks will be 2.5 
+            #      and the variance for 4 iterations will be 1.333...
             (mean, sampleVariance) =  daskstats.return_mean_var_tuple(client, lock_timeout=60)
             count = daskstats.return_count(client, lock_timeout=60)
             print('Py results: The damaris_stats count value is: ', count)

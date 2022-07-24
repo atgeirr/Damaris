@@ -1,4 +1,4 @@
-# Python code: 3dmesh_dask.py.template
+# Python code: stats_3dmesh_dask.py
 # Author: Josh Bowden, Inria
 # Description: 
 # Part of the Damaris examples of using Python integration with Dask distributed
