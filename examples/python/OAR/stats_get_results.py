@@ -47,13 +47,9 @@ try:
             client =  Client(scheduler_file=scheduler_file, timeout='2s')
             unique_name_str = 'dask_client_published_str' # Any simulation that uses this can contribute to the running stats
             lock_name_str   = 'dask_lock_str'
-            # Creating the DaskStats object on each iteration, as I do not keep them on the Dask scheduler, however I possibly could.
+            # Creating the DaskStats object on each iteration, it only sets the name for the lock.
             daskstats = damaris_stats.DaskStats( unique_name_str, lock_name_str) 
-            
-            # N.B. If 4 simulations are launched which each runs the same number of iterations, 
-            #      and each adding a integer 1, 2, 3, or 4 on each iteration, then:
-            #      the mean of the first blocks will be 2.5 
-            #      and the variance for 4 iterations will be 1.333...
+
             (mean, sampleVariance) =  daskstats.return_mean_var_tuple(client, lock_timeout=60)
             count = daskstats.return_count(client, lock_timeout=60)
             print('Py results: The damaris_stats count value is: ', count)

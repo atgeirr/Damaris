@@ -16,7 +16,7 @@
 PV_VER_ARRAY=(v5.8.0 v5.8.1 v5.9.0 v5.9.1 v5.10.0)
 VISIT_VER_ARRAY=( 3.2.1 )
 DOCKERFILE_ARRAY=(ubuntu20 ubuntu21 debian10 debian11 centos8 archlinux opensuse)
-# DOCKERFILE_ARRAY=(  archlinux  )
+DOCKERFILE_ARRAY=(  debian10  )
 # 
 DOCKER_IMAGE_BASENAME=registry.gitlab.inria.fr/damaris/damaris-development
 

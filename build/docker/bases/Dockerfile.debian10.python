@@ -86,12 +86,11 @@ ENV GPP=/usr/bin/g++
 
 RUN mkdir buildboost \
     && cd buildboost \
-    && apt-get install python3-mpi4py \
-    && pip3 install numpy \
+    && apt-get install -y python3-mpi4py python3-numpy \
     && wget https://boostorg.jfrog.io/artifactory/main/release/1.79.0/source/boost_1_79_0.tar.gz \
     && tar -xf boost_1_79_0.tar.gz \
     && cd boost_1_79_0 \
-    && ./boostrap --with-python=$(which python3) --prefix=${INSTALL_PREFIX} \
+    && ./bootstrap.sh --with-python=$(which python3) --prefix=${INSTALL_PREFIX} \
     && ./b2 install \
     && cd ../.. \
     && rm -fr ./buildboost
