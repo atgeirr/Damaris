@@ -42,7 +42,7 @@ else:
     
 try:
 
-    if (scheduler_file != ''):            
+    if (scheduler_file != ''):             
         try:      
             client =  Client(scheduler_file=scheduler_file, timeout='2s')
             unique_name_str = 'dask_client_published_str' # Any simulation that uses this can contribute to the running stats
