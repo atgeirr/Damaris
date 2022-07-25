@@ -13,7 +13,7 @@
 #      The mean of the first blocks will be 2.5 
 #      and the variance for 4 iterations will be 1.333...
 from   dask.distributed import Client
-from   damaris4py.damaris4py import getservercomm
+from   damaris4py.server import getservercomm
 from   damaris4py.dask import damaris_dask
 from   damaris4py.dask import damaris_stats
 import sys
@@ -52,10 +52,14 @@ try:
 
             (mean, sampleVariance) =  daskstats.return_mean_var_tuple(client, lock_timeout=60)
             count = daskstats.return_count(client, lock_timeout=60)
+            print('')
             print('Py results: The damaris_stats count value is: ', count)
             my_tuple = daskstats.get_chunks(client)  # tuple of 1's e.g. (1, 1, 1)
+            # These are the averages over the dask blocks, reduces size of outputs
             print(mean.map_blocks(daskstats.compute_block_average, chunks=my_tuple).compute())
             print(sampleVariance.map_blocks(daskstats.compute_block_average, chunks=my_tuple).compute())
+            print('')
+            # These are the full arrays - they could be big
             # print(mean.compute())
             # print(sampleVariance.compute())
             

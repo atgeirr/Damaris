@@ -8,7 +8,7 @@
 # ./stats_launcher.sh [ NUMSIMS ] 
 # NUMSIMS is optional and defaults to 4
 
-cd ..
+
 
 # Get value for number of simulations to run from the command line (if present)
 NUMSIMS=4
@@ -81,7 +81,7 @@ sleep 60
 # N.B. these jobs implicitly use a Dask scheduler, which is specified in the Damaris
 # XML file <pyscript> tag - it must match the path to DASK_SCHEDULER_FILE
 JOBS_ARRAY=()
-echo "We will be launching $NUMSIMS simulaitons"
+echo "We will be launching $NUMSIMS simulations"
 for i in `seq 1 $NUMSIMS` ; do
     # sbatch slurm_launch_one_job.sh $i  # Use the correct submission command for your cluster's resource manager
     

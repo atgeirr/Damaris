@@ -91,17 +91,34 @@ bool Environment::Init(const std::string& configFile,
     _initialized_ = true;
 
     /* Compute the magic number of the simulation */
-    //time_t mgnbr;
-    //time(&mgnbr);
-    //MPI_Bcast(&mgnbr,sizeof(time_t),MPI_BYTE,0,_globalComm_);
-    double mgnbr = MPI_Wtime();
-    MPI_Bcast(&mgnbr,1,MPI_DOUBLE,0,_globalComm_);
-    std::ostringstream oss;
-    oss << mgnbr;
-    _magicNumber_ = oss.str();
-
-    /* Create a new communicator gathering processes of the same node */
+    time_t mgnbr;
+    double mgnbr_d = MPI_Wtime();
+    uint64_t mgnbr_magic ;
+    time(&mgnbr);
     int node_id = Hardware::GetNodeID();
+    mgnbr_d = MPI_Wtime();
+    uint32_t mgnbr_uint32 ;
+    
+    // to convert double bits to uint32_t bits
+    union {
+        double d;
+        uint32_t i[2];
+    } u;
+
+    u.d = mgnbr_d ;
+    mgnbr_uint32 = u.i[0];  // take the LSBs, they will have more variance
+
+
+    mgnbr_magic = (uint64_t) mgnbr + (uint64_t) mgnbr_uint32 +  (uint64_t) node_id  ;
+    MPI_Bcast(&mgnbr_magic,sizeof(uint64_t),MPI_BYTE,0,_globalComm_);
+    
+    std::ostringstream oss;
+    oss << mgnbr_magic;
+    _magicNumber_ = oss.str();
+    
+   
+    /* Create a new communicator gathering processes of the same node */
+    // int node_id = Hardware::GetNodeID();
     MPI_Comm_split(_globalComm_,node_id,rank,&_nodeComm_);
 
     /* Create a global communicator with ordered ranks */

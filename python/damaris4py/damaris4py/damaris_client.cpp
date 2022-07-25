@@ -1,3 +1,7 @@
+/**
+File: damaris_client.cpp
+Part of the Damaris Python module, implementing Damaris client side functionality (i.e., data passing from simulation to the Damaris servers)
+*/
 
 #include <mpi.h>
 #include <iostream>
@@ -188,30 +192,6 @@ static bp::object hw_damaris_magic_number( )
   return bp::object(damaris::Environment::GetMagicNumber()) ;
 }
 
-/* 
-* Expose the functions as a Python module
-*/
-BOOST_PYTHON_MODULE(server)
-{
-  Py_Initialize();
-  if (import_mpi4py() < 0) return;
-  
-  // bp::def("damaris_initialize", hw_damaris_initialize);
-  bp::def("getclientcomm", hw_damaris_comm_check_client);
-  bp::def("getservercomm", hw_damaris_comm_check_server);
-  bp::def("getdamariscomm", hw_damaris_comm);
-  bp::def("getglobalcomm", hw_global_comm);
-  bp::def("isclient", hw_is_client);
-  bp::def("isserver", hw_is_server);
-  bp::def("isdedicatedcore", hw_is_dedicated_core);
-  bp::def("isdedicatednode", hw_is_dedicated_node);
-  bp::def("clientspernode", hw_clients_per_node);
-  bp::def("corespernode", hw_cores_per_node);
-  bp::def("serverspernode", hw_servers_per_node);
-  bp::def("numberofnodes", hw_number_of_nodes);
-  bp::def("listknownclients", hw_list_known_clients);
-  bp::def("magicnumber_string", hw_damaris_magic_number);
-}
 
 /* 
 * Expose the functions as a Python module

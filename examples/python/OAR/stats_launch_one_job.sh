@@ -22,6 +22,10 @@ export PYTHONPATH=/home/jbowden/mypylib:$PYTHONPATH
 # sleep $(( RANDOM % 30 ))  # this was needed so multiple simulations did not launch at the same time
 MY_VAL=$1
 
+# We are assuming we are in the sub directory <INSTALL_PATH>/examples/damaris/python/OAR 
+# and the executables are one directory up, so move there:
+cd ..
+
 #  Usage: stats_3dmesh_dask <stats_3dmesh_dask.xml> [-i I] [-d D] [-r] [-s S]
 #  -i  I    I is the number of iterations of simulation to run
 #  -v  V    V is the value to add to each array element (default = 5)

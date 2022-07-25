@@ -120,8 +120,8 @@ def main(DD):
     import time
     from os import path
     from dask.distributed import Client, TimeoutError, Lock, Variable
-    from damaris4py.damaris4py import getservercomm
-    from damaris4py.damaris4py import listknownclients
+    from damaris4py.server import getservercomm
+    from damaris4py.server import listknownclients
     from damaris4py.dask import damaris_dask
     
    

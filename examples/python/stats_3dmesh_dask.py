@@ -18,8 +18,8 @@ def main(DD):
     # import dask.array as da
     # import numpy as np
     from   dask.distributed import Client, TimeoutError
-    from   damaris4py.damaris4py import getservercomm
-    from   damaris4py.damaris4py import magicnumber_string
+    from   damaris4py.server import getservercomm
+    from   damaris4py.server import magicnumber_string
     from   damaris4py.dask import damaris_dask
     from   damaris4py.dask import damaris_stats
    
