@@ -14,7 +14,7 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ***************************************************************************/
-// #ifdef HAVE_PYTHON_ENABLED
+
 
 
 #include <sstream>
@@ -23,7 +23,7 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <fstream> 
 #include "util/Debug.hpp"
 #include "scripts/PyAction.hpp"
-
+#ifdef HAVE_PYTHON_ENABLED
 
 // namespace damaris {
 //     template <typename T>
@@ -397,5 +397,5 @@ namespace damaris {
 
 }
 
-// #endif // HAVE_PYTHON_ENABLED
+#endif // HAVE_PYTHON_ENABLED
 
