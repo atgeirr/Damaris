@@ -208,7 +208,7 @@ endforeach(p)
 # ---
 # processing library dirs and names
 set(LIBS_LIST_FOR_PKGCONFIG "")
-set(LIBS_DIR_LIST_FOR_PKG_CONFIG "")
+set(LIBS_DIR_LIST_FOR_PKGCONFIG "")
 # get Boost libraries
 foreach(p ${Boost_LIBRARIES})
   get_filename_component(libname ${p} NAME_WE)
