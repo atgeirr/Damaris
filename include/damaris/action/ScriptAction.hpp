@@ -88,37 +88,6 @@ class ScriptAction : public Action, public Configurable<model::Script> {
     template<typename SUPER>
     static std::shared_ptr<SUPER> New(const model::Script& mdl, 
                     const std::string& name) {
-  /*      switch(mdl.scope()) {
-        case model::Scope::core :
-        case model::Scope::bcast :
-
-            if(mdl.language() == model::Language::python) {
-#ifdef HAVE_PYTHON_ENABLED
-                return std::shared_ptr<PyAction>(PyAction::New(mdl,name));
-#else
-                CFGERROR("ScriptAction 1: Damaris has not been compiled"
-                    << " with Python support.");
-#endif
-            } else {
-                CFGERROR("ScriptAction \"" << mdl.language() 
-                << "\" is not a valid scripting language.");
-            }
-            break;
-
-        case model::Scope::group :
-            if(mdl.language() == model::Language::python) {
-#ifdef HAVE_PYTHON_ENABLED
-             //   return NodeAction<Python::PyAction, model::Script>::New(mdl,name);
-// #else
-                CFGERROR("ScriptAction 2: case model::Scope::group is not defined");
-#endif
-            } else {
-                CFGERROR("\"" << mdl.language() 
-                << "\" is not a supported scripting language.");
-            }
-            break;
-        }
-*/
         return std::shared_ptr<SUPER>();
     }
 

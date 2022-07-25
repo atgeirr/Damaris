@@ -235,6 +235,16 @@ if(ENABLE_VISIT)
   endforeach(p)
 endif(ENABLE_VISIT)
 
+# optional: Python
+if(ENABLE_PYTHON)
+  foreach(p ${PYTHON_LIBRARIES})
+    get_filename_component(libname ${p} NAME_WE)
+    get_filename_component(libpath ${p} DIRECTORY)
+    list(APPEND LIBS_LIST_FOR_PKGCONFIG ${libname})
+    list(APPEND LIBS_DIR_LIST_FOR_PKGCONFIG ${libpath})
+  endforeach(p)
+endif(ENABLE_PYTHON)
+
 # optional: Catalyst
 if(ENABLE_CATALYST)
   # target_link_libraries(damaris ParaView::PythonCatalyst VTK::mpi)  

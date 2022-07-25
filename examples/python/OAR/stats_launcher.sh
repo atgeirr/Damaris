@@ -8,6 +8,7 @@
 # ./stats_launcher.sh [ NUMSIMS ] 
 # NUMSIMS is optional and defaults to 4
 
+cd ..
 
 # Get value for number of simulations to run from the command line (if present)
 NUMSIMS=4
@@ -22,14 +23,14 @@ export PYTHONPATH=/home/jbowden/mypylib:$PYTHONPATH
 DASK_SCHEDULER_FILE=/home/jbowden/dask_file.json
 DASK_SCHED_STR=\'$DASK_SCHEDULER_FILE\'
 
-
+#####
+# Shutdown and remove any previous Dask scheduler 
 if [[ -f $DASK_SCHEDULER_FILE ]] ; then
     python3 -c "from dask.distributed import Client; client= Client(scheduler_file=$DASK_SCHED_STR, timeout='2s'); client.shutdown()"  &> /dev/null
     if [[ -f $DASK_SCHEDULER_FILE  ]] ; then
       rm $DASK_SCHEDULER_FILE
     fi
 fi
-# python3 -c "from dask.distributed import Client; client= Client(scheduler_file='/home/jbowden/dask_file.json', timeout='2s'); client.shutdown()"
 
 echo "PWD = $PWD"
 sleep 5
@@ -76,6 +77,9 @@ sleep 60
 
 #####
 # Launch the simulations, passing in a different value to add to the dataset ($i)
+# Add the JOB ID to the JOBS_ARRAY so we can poll them to see if they have completed
+# N.B. these jobs implicitly use a Dask scheduler, which is specified in the Damaris
+# XML file <pyscript> tag - it must match the path to DASK_SCHEDULER_FILE
 JOBS_ARRAY=()
 echo "We will be launching $NUMSIMS simulaitons"
 for i in `seq 1 $NUMSIMS` ; do
