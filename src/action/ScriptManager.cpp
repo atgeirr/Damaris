@@ -41,7 +41,6 @@ void ScriptManager::Init(const model::Scripts& mdl_script)
             Create<PyAction>(*s,"#error");
         }
     }
-    
 #endif  // HAVE_PYTHON_ENABLED
 
     VariableManager::iterator v = VariableManager::Begin();
@@ -84,10 +83,12 @@ bool ScriptManager::RunScripts(const int iteration)
     for(; actnItr != End(); actnItr++) {
         
        // if ( dynamic_cast<PyAction*>(*actnItr) != nullptr ) {
+#ifdef HAVE_PYTHON_ENABLED     
         if ( std::dynamic_pointer_cast<PyAction>(*actnItr) != nullptr ) {
             std::shared_ptr<Action> action = *actnItr;
             action->Call(iteration, iteration) ;            
         }
+#endif  // HAVE_PYTHON_ENABLED
         
        // action->CoProcess(iteration) ;
        /* const model::Actions& actn_mdl = GetModel(); 

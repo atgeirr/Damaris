@@ -84,10 +84,12 @@ bool ActionManager::RunActions(const int iteration)
         
         // Need to do the opposite here as done in ScriptManager::RunScript()
         // i.e. call action->Call() only if it is *not* a script
+#ifdef HAVE_PYTHON_ENABLED        
         if ( std::dynamic_pointer_cast<PyAction>(*actnItr) == nullptr ) {
             std::shared_ptr<Action> action = *actnItr;
             action->Call(iteration, iteration) ;            
         }
+#endif
     }
     
     return true ;
