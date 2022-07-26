@@ -41,7 +41,7 @@ static PyObject* hw_damaris_comm()
 
 /**
 * Damaris Environment class wrapper 
-* Returns the communicator among the clients (if called on a client processs) otherwise calls exception.
+* Returns the communicator among the Damaris clients (if called on a client processs) otherwise calls exception.
 */
 static PyObject* hw_damaris_comm_check_client()
 {
@@ -57,7 +57,7 @@ static PyObject* hw_damaris_comm_check_client()
 
 /**
 * Damaris Environment class wrapper 
-* Returns the communicator among the clients (if called on a client processs) otherwise calls exception.
+* Returns the communicator among the Damaris servers (if called on a server processs) otherwise calls exception.
 */
 static PyObject* hw_damaris_comm_check_server()
 {
@@ -187,6 +187,9 @@ static bp::object hw_list_known_clients()
 }
  */
 
+/**
+* Returns the string used to identify a simulation uniquely 
+*/
 static bp::object hw_damaris_magic_number( )
 {
   return bp::object(damaris::Environment::GetMagicNumber()) ;
@@ -200,20 +203,35 @@ BOOST_PYTHON_MODULE(server)
   Py_Initialize();
   if (import_mpi4py() < 0) return;
   
-  // bp::def("damaris_initialize", hw_damaris_initialize);
-  bp::def("getclientcomm", hw_damaris_comm_check_client);
-  bp::def("getservercomm", hw_damaris_comm_check_server);
-  bp::def("getdamariscomm", hw_damaris_comm);
-  bp::def("getglobalcomm", hw_global_comm);
-  bp::def("isclient", hw_is_client);
-  bp::def("isserver", hw_is_server);
-  bp::def("isdedicatedcore", hw_is_dedicated_core);
-  bp::def("isdedicatednode", hw_is_dedicated_node);
-  bp::def("clientspernode", hw_clients_per_node);
-  bp::def("corespernode", hw_cores_per_node);
-  bp::def("serverspernode", hw_servers_per_node);
-  bp::def("numberofnodes", hw_number_of_nodes);
-  bp::def("listknownclients", hw_list_known_clients);
-  bp::def("magicnumber_string", hw_damaris_magic_number);
+
+  bp::def("getclientcomm", hw_damaris_comm_check_client,  
+  "Returns the communicator among the Damaris clients (if called on a client processs) otherwise calls exception." );
+  bp::def("getservercomm", hw_damaris_comm_check_server, 
+  "Returns the communicator among the Damaris servers (if called on a server processs) otherwise calls exception.");
+  bp::def("getdamariscomm", hw_damaris_comm, 
+  "Returns the Damaris MPI_Comm object that is specific to the current process \n"
+  "i.e. If this function is called from a client process, it returns the communicator \n"
+  "     among the clients, or, if it is is called from a Damaris server process,\n"
+  "     it returns the communicator of the server processes.\n"
+  "     So, either communicator is returned by Environment::GetEntityComm()\n" );
+  bp::def("getglobalcomm", hw_global_comm,  
+  "Damaris possibly re-orders the MPI_COMM_WORLD communicator and names it  _globalComm_ \n"
+  "which is returned by Environment::GetGlobalComm() \n"
+  "N.B. Using the global communicator is not recommended from a simulation as only Damaris  \n"
+  "   server processes are used to run Python scripts, so the damaris_comm() communicator \n"
+  "   should be used.");
+  bp::def("isclient", hw_is_client,  "Tells if the process is a Damaris client or not. If true then implies hw_is_server() is false." );
+  bp::def("isserver", hw_is_server,  "Tells if the process is a Damaris server or not. If true then implies hw_is_client() is false." );
+  bp::def("isdedicatedcore", hw_is_dedicated_core,  "Tells if the process is a dedicated core or not. If true then implies hw_is_server() is true." );
+  bp::def("isdedicatednode", hw_is_dedicated_node,  "Tells if the process is a dedicated node or not. If true then implies hw_is_server() is true.");
+  bp::def("clientspernode", hw_clients_per_node,  "Returns the number of Damaris clients (mpi processes) per node. i.e. The number of simulation ranks per node." );
+  bp::def("corespernode", hw_cores_per_node, "Returns the number of Damaris cores (mpi processes) per node.");
+  bp::def("serverspernode", hw_servers_per_node, "Returns the number of Damaris server cores (ranks) being used per node");
+  bp::def("numberofnodes", hw_number_of_nodes, "Returns the number of nodes being used in the simulation");
+  bp::def("listknownclients", hw_list_known_clients,  
+  "Returns the list of id of clients connected to the "
+  "dedicated core. In standalone mode, will return a list "
+  "with only the id of the calling client.");
+  bp::def("magicnumber_string", hw_damaris_magic_number, "Returns the string used to identify a simulation uniquely");
 }
 
