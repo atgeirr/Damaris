@@ -269,7 +269,11 @@ endif(ENABLE_CATALYST)
 
 # remove dublicates
 list(REMOVE_DUPLICATES LIBS_LIST_FOR_PKGCONFIG)
+
+if(LIBS_DIR_LIST_FOR_PKGCONFIG)
 list(REMOVE_DUPLICATES LIBS_DIR_LIST_FOR_PKGCONFIG)
+endif()
+
 # build a string for the list of directories (-L)
 set(PKG_CONFIG_LIBS_FLAGS "")
 foreach(p ${LIBS_DIR_LIST_FOR_PKGCONFIG})
