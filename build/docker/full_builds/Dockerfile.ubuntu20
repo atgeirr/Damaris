@@ -220,7 +220,7 @@ RUN --mount=type=secret,id=thepassword if [ "$repo" == "damaris-development" ] ;
   
  # && echo "localhost" > ${INSTALLTMDIR}/build/$repo/test/my-hostfile 
   
-RUN find ${INSTALL_PREFIX}/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples|"
+RUN find ${INSTALL_PREFIX}/examples/damaris/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples/damaris|"
 # RUN chown -R docker:docker /home/docker 
 
 
@@ -266,14 +266,14 @@ RUN apt-get update -y \
 #   libpython3-dev libboost-python-dev libboost-numpy-dev \
 
 COPY --from=builder /home/docker/local/ /home/docker/local/
-COPY --from=builder ${INSTALLTMDIR}/build/$repo/test/ /home/docker/local/examples/test/
-COPY --from=builder ${INSTALLTMDIR}/build/$repo/CTestTestfile.cmake /home/docker/local/examples/
+COPY --from=builder ${INSTALLTMDIR}/build/$repo/test/ /home/docker/local/examples/damaris/test/
+COPY --from=builder ${INSTALLTMDIR}/build/$repo/CTestTestfile.cmake /home/docker/local/examples/damaris/
 
-RUN sed -i "s|${INSTALLTMDIR}/build/$repo/|/home/docker/local/examples/|g" /home/docker/local/examples/test/CTestTestfile.cmake
+RUN sed -i "s|${INSTALLTMDIR}/build/$repo/|/home/docker/local/examples/damaris/|g" /home/docker/local/examples/damaris/test/CTestTestfile.cmake
 
 RUN chown -R docker:docker /home/docker
 USER docker
 
-WORKDIR /home/docker/local/examples
+WORKDIR /home/docker/local/examples/damaris
  
 CMD ["/bin/bash"]

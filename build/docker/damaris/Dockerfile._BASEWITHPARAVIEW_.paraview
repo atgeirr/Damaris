@@ -59,10 +59,10 @@ RUN --mount=type=secret,id=thepassword if [ "$repo" == "damaris-development" ] ;
       -DENABLE_CATALYST=ON -DParaView_DIR=${INSTALL_PREFIX}/_DISTLIB_/cmake/paraview-_PV_SHORT_DOT_ \
   && make -j${NUMCORES} \
   && make install \
-  && find ${INSTALL_PREFIX}/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples|" \
-  && cp -r ${INSTALLTMDIR}/build/$repo/test/ ${INSTALL_PREFIX}/examples/test/ \
-  && cp  ${INSTALLTMDIR}/build/$repo/CTestTestfile.cmake ${INSTALL_PREFIX}/examples/ \
-  && sed -i "s|${INSTALLTMDIR}/build/$repo/|${INSTALL_PREFIX}/examples/|g" ${INSTALL_PREFIX}/examples/test/CTestTestfile.cmake \
+  && find ${INSTALL_PREFIX}/examples/damaris/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples/damaris|" \
+  && cp -r ${INSTALLTMDIR}/build/$repo/test/ ${INSTALL_PREFIX}/examples/damaris/test/ \
+  && cp  ${INSTALLTMDIR}/build/$repo/CTestTestfile.cmake ${INSTALL_PREFIX}/examples/damaris/ \
+  && sed -i "s|${INSTALLTMDIR}/build/$repo/|${INSTALL_PREFIX}/examples/damaris/|g" ${INSTALL_PREFIX}/examples/damaris/test/CTestTestfile.cmake \
   && rm -fr ${INSTALLTMDIR}/  \
   && chown -R docker:docker /home/docker
 
@@ -70,6 +70,6 @@ USER docker
 # ENV PYTHONPATH=/usr/local/lib/python3.8/site-packages/_paraview.zip:/usr/local/lib/python3.8/site-packages/_vtk.zip:/usr/local/lib/python3.8/site-packages:/usr/lib/python38.zip:/usr/lib/python3.8:/usr/lib/python3.8/lib-dynload:/usr/local/lib/python3.8/dist-packages:/usr/lib/python3/dist-packages
 # ENV LD_LIBRARY_PATH=_MPI_BIN_PATH_../_DISTLIB_:${LD_LIBRARY_PATH}
 
-WORKDIR ${INSTALL_PREFIX}/examples
+WORKDIR ${INSTALL_PREFIX}/examples/damaris
  
 CMD ["/bin/bash"]

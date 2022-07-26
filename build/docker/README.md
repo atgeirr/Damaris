@@ -34,12 +34,12 @@ docker pull registry.gitlab.inria.fr/damaris/damaris:latest
 sudo docker run --rm -it registry.gitlab.inria.fr/damaris/damaris:<branch> /bin/bash
  
 # Run unit tests:
-<container prompt> cd /home/docker/local/examples
+<container prompt> cd /home/docker/local/examples/damaris
 <container prompt> ctest
  
 # run and example:
-<container prompt> cd /home/docker/local/examples
-<container prompt> mpirun -np 4  /home/docker/local/examples/storage/3dmesh /home/docker/local/examples/storage/3dmesh.xml [-v] [-r]
+<container prompt> cd /home/docker/local/examples/damaris
+<container prompt> mpirun -np 4  /home/docker/local/examples/damaris/storage/3dmesh /home/docker/local/examples/damaris/storage/3dmesh.xml [-v] [-r]
  
 ## After running, we should find HDF5 output
 <container prompt> ls *.h5

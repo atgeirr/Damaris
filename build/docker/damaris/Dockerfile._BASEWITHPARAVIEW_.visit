@@ -81,10 +81,10 @@ RUN --mount=type=secret,id=thepassword if [ "$repo" == "damaris-development" ] ;
       -DENABLE_CATALYST=OFF \
   && make -j${NUMCORES} \
   && make install \
-  && find ${INSTALL_PREFIX}/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples|" \
-  && cp -r ${INSTALLTMDIR}/build/$repo/test/ ${INSTALL_PREFIX}/examples/test/ \
-  && cp  ${INSTALLTMDIR}/build/$repo/CTestTestfile.cmake ${INSTALL_PREFIX}/examples/ \
-  && sed -i "s|${INSTALLTMDIR}/build/$repo/|${INSTALL_PREFIX}/examples/|g" ${INSTALL_PREFIX}/examples/test/CTestTestfile.cmake \
+  && find ${INSTALL_PREFIX}/examples/damaris/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples/damaris|" \
+  && cp -r ${INSTALLTMDIR}/build/$repo/test/ ${INSTALL_PREFIX}/examples/damaris/test/ \
+  && cp  ${INSTALLTMDIR}/build/$repo/CTestTestfile.cmake ${INSTALL_PREFIX}/examples/damaris/ \
+  && sed -i "s|${INSTALLTMDIR}/build/$repo/|${INSTALL_PREFIX}/examples/damaris/|g" ${INSTALL_PREFIX}/examples/damaris/test/CTestTestfile.cmake \
   && rm -fr ${INSTALLTMDIR}/  \
   && chown -R docker:docker /home/docker
 
@@ -92,6 +92,6 @@ USER docker
 ENV PYTHONPATH=$VISIT_PYTHON3/lib/python$VISIT_PYTHON_VERSION/:VISIT_PYTHON3/lib/python$VISIT_PYTHON_VERSION/site-packages:$VISIT_PYTHON3/lib/python$VISIT_PYTHON_VERSION/lib-dynload:$PYTHONPATH
 # ENV LD_LIBRARY_PATH=_MPI_BIN_PATH_../_DISTLIB_:${LD_LIBRARY_PATH}
 
-WORKDIR ${INSTALL_PREFIX}/examples
+WORKDIR ${INSTALL_PREFIX}/examples/damaris
  
 CMD ["/bin/bash"]

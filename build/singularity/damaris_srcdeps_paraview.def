@@ -168,7 +168,7 @@ Stage: build
    make -j${NUMCORES}
    make install
    
-  find ${INSTALL_PREFIX}/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples|"
+  find ${INSTALL_PREFIX}/examples/damaris/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples/damaris|"
    
    
   cd ${INSTALLTMDIR} 

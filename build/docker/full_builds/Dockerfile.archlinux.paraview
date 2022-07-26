@@ -44,7 +44,7 @@
 # <container prompt> ctest
 #
 # > sudo docker run --rm -v /dev/shm:/dev/shm -p 22222:22222 -it registry.gitlab.inria.fr/damaris/damaris:v1.5.0-archlinux-pvv5100 /bin/bash
-# > cd /home/docker/local/examples/storage/
+# > cd /home/docker/local/examples/damaris/storage/
 # > mpirun -np 4 ./3dmesh 3dmesh.xml
 ######################################################################################
 
@@ -210,17 +210,17 @@ RUN export PV_VERSION_SHORT=${PV_VERSION:1:-2} \
   && make -j${NUMCORES} \
   && make install 
   
-RUN find ${INSTALL_PREFIX}/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples|"
+RUN find ${INSTALL_PREFIX}/examples/damaris/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples/damaris|"
 
 # COPY --from=builder ${INSTALL_PREFIX}/ ${INSTALL_PREFIX}/
-RUN  cp -r ${INSTALLTMDIR}/build/$repo/test/ ${INSTALL_PREFIX}/examples/test/ \
- && cp  ${INSTALLTMDIR}/build/$repo/CTestTestfile.cmake ${INSTALL_PREFIX}/examples/ \
- && sed -i "s|${INSTALLTMDIR}/build/$repo/|${INSTALL_PREFIX}/examples/|g" ${INSTALL_PREFIX}/examples/test/CTestTestfile.cmake
+RUN  cp -r ${INSTALLTMDIR}/build/$repo/test/ ${INSTALL_PREFIX}/examples/damaris/test/ \
+ && cp  ${INSTALLTMDIR}/build/$repo/CTestTestfile.cmake ${INSTALL_PREFIX}/examples/damaris/ \
+ && sed -i "s|${INSTALLTMDIR}/build/$repo/|${INSTALL_PREFIX}/examples/damaris/|g" ${INSTALL_PREFIX}/examples/damaris/test/CTestTestfile.cmake
  
 RUN rm -fr ${INSTALLTMDIR}
 
 RUN chown -R docker:docker /home/docker
-WORKDIR ${INSTALL_PREFIX}/examples
+WORKDIR ${INSTALL_PREFIX}/examples/damaris
 
 # ENV PATH=/usr/local/bin:${PATH}
 # ENV LD_LIBRARY_PATH=/usr/local/bin:${LD_LIBRARY_PATH}
@@ -284,15 +284,15 @@ WORKDIR ${INSTALL_PREFIX}/examples
 
 
 # COPY --from=builder /home/docker/local/ /home/docker/local/
-# COPY --from=builder ${INSTALLTMDIR}/build/$repo/test/ /home/docker/local/examples/test/
-# COPY --from=builder ${INSTALLTMDIR}/build/$repo/CTestTestfile.cmake /home/docker/local/examples/
+# COPY --from=builder ${INSTALLTMDIR}/build/$repo/test/ /home/docker/local/examples/damaris/test/
+# COPY --from=builder ${INSTALLTMDIR}/build/$repo/CTestTestfile.cmake /home/docker/local/examples/damaris/
 
 # # Change the paths in the ctest unit test runner (CTestTestfile.cmake)
-# RUN sed -i "s|${INSTALLTMDIR}/build/$repo/|/home/docker/local/examples/|g" /home/docker/local/examples/test/CTestTestfile.cmake
+# RUN sed -i "s|${INSTALLTMDIR}/build/$repo/|/home/docker/local/examples/damaris/|g" /home/docker/local/examples/damaris/test/CTestTestfile.cmake
 
 # RUN chown -R docker:docker /home/docker
 # USER docker
 
-# WORKDIR /home/docker/local/examples
+# WORKDIR /home/docker/local/examples/damaris
  
 CMD ["/bin/bash"]

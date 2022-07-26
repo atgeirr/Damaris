@@ -36,7 +36,7 @@
 #    Map the shared memory filesystem and the Paraview Catalyst port
 #
 # > sudo docker run --rm -v /dev/shm:/dev/shm -p 22222:22222 -it registry.gitlab.inria.fr/damaris/damaris:v1.5.0-opensuse-pv5100 /bin/bash
-# > cd /home/docker/local/examples/storage/
+# > cd /home/docker/local/examples/damaris/storage/
 # > mpirun -np 4 ./3dmesh 3dmesh.xml
 ######################################################################################
 

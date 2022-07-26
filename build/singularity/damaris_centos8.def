@@ -20,15 +20,15 @@ Stage: build
         sudo singularity build --sandbox damaris_centos8 damaris_centos8.def
 
         # run the example:
-        mpirun -np 4 singularity exec ./damaris_centos8   /usr/local/examples/storage/3dmesh /usr/local/examples/storage/3dmesh.xml [-v] [-r]
+        mpirun -np 4 singularity exec ./damaris_centos8   /usr/local/examples/damaris/storage/3dmesh /usr/local/examples/damaris/storage/3dmesh.xml [-v] [-r]
        
         # -v is for verbose output (prints arrays)
         # -r prints the mpi rank that will write the array data
         
-        # edit the file: /usr/local/examples/storage/3dmesh.xml to change the <parameter name="whd_layout" ...> value to change the layout used to write the data in memory        
+        # edit the file: /usr/local/examples/damaris/storage/3dmesh.xml to change the <parameter name="whd_layout" ...> value to change the layout used to write the data in memory        
     To get a shell into the container:
         sudo singularity shell --writable damaris_centos8
-        nano /usr/local/examples/storage/3dmesh.xml
+        nano /usr/local/examples/damaris/storage/3dmesh.xml
         exit
         
     N.B. The install directory for all code built from source is: /usr/local        
@@ -43,7 +43,7 @@ Stage: build
     export LC_ALL=C
     export INSTALL_PREFIX=/usr/local
     export MPI_BINDIR=/usr/lib64/openmpi/bin
-    export PATH=$INSTALL_PREFIX/bin:$INSTALL_PREFIX/examples/storage:$PATH
+    export PATH=$INSTALL_PREFIX/bin:$INSTALL_PREFIX/examples/damaris/storage:$PATH
     export PATH=${MPI_BINDIR}:$PATH
     export LD_LIBRARY_PATH=$INSTALL_PREFIX/lib:$LD_LIBRARY_PATH
     export LD_LIBRARY_PATH=$INSTALL_PREFIX/lib64:$LD_LIBRARY_PATH
@@ -141,7 +141,7 @@ Stage: build
     make -j${NUMCORES}
     make install
     
-    find ${INSTALL_PREFIX}/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples|"
+    find ${INSTALL_PREFIX}/examples/damaris/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples/damaris|"
    
 
    

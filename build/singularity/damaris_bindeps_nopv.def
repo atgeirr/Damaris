@@ -30,7 +30,7 @@ Stage: build
         sudo singularity shell [--writable] damaris_container
         # you can run a Damris example
         export INSTALL_PREFIX=/opt/damaris
-        mpirun -np 4 $INSTALL_PREFIX/examples/storage/3dmesh $INSTALL_PREFIX/examples/storage/3dmesh.xml -v
+        mpirun -np 4 $INSTALL_PREFIX/examples/damaris/storage/3dmesh $INSTALL_PREFIX/examples/damaris/storage/3dmesh.xml -v
         
         # view contents of output 
         h5dump -w 100 3dmesh_wf_It4.h5
@@ -127,7 +127,7 @@ Stage: build
     make install
     make clean
    
-    find ${INSTALL_PREFIX}/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples|"
+    find ${INSTALL_PREFIX}/examples/damaris/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples/damaris|"
    
    chmod -R a+rw $BUILDDIR
    chmod -R a+rw $INSTALL_PREFIX

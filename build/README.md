@@ -167,11 +167,11 @@ And if you have access rights:
 sudo docker run --rm -it registry.gitlab.inria.fr/damaris/damaris:<branch> /bin/bash
  
 # Run unit tests:
-<container prompt> cd /home/docker/local/examples
+<container prompt> cd /home/docker/local/examples/damaris
 <container prompt> ctest
  
 # run and example:
-<container prompt> mpirun -np 4  /home/docker/local/examples/storage/3dmesh /home/docker/local/examples/storage/3dmesh.xml [-v] [-r]
+<container prompt> mpirun -np 4  /home/docker/local/examples/damaris/storage/3dmesh /home/docker/local/examples/damaris/storage/3dmesh.xml [-v] [-r]
  
 # Should find HDF5 output
 <container prompt> ls *.h5
@@ -214,7 +214,7 @@ qsub -I <arguments for qsub interactive job>
 module load singularity openmpi
 cd ~
 # run the example code that is inside the container
-mpirun -np 4 singularity exec ./damaris_centos8  /usr/local/examples/storage/3dmesh /usr/local/examples/storage/3dmesh.xml [-v] [-r]
+mpirun -np 4 singularity exec ./damaris_centos8  /usr/local/examples/damaris/storage/3dmesh /usr/local/examples/damaris/storage/3dmesh.xml [-v] [-r]
 
 ```
 

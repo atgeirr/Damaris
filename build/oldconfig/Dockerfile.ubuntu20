@@ -97,7 +97,7 @@ RUN  mkdir -p ${INSTALLTMDIR} \
   && make -j${NUMCORES} \ 
   && make install 
   
-  RUN find ${INSTALL_PREFIX}/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples|"
+  RUN find ${INSTALL_PREFIX}/examples/damaris/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples/damaris|"
 
 ########################################
 ## Stage 2 of build
@@ -139,6 +139,6 @@ RUN apt-get update -y \
  USER docker
  COPY --from=builder /home/docker/local/ /home/docker/local/
  
- WORKDIR /home/docker/local/examples
+ WORKDIR /home/docker/local/examples/damaris
  
  CMD ["/bin/bash"]

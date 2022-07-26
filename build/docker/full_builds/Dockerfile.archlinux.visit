@@ -40,7 +40,7 @@
 #
 # > sudo docker run --rm -u "docker:staff" -v /dev/shm:/dev/shm -it registry.gitlab.inria.fr/damaris/damaris:${TAG}-archlinux-visit${VISIT_VER} /bin/bash
 # <container prompt> ctest
-# <container prompt> cd /home/docker/local/examples/storage/
+# <container prompt> cd /home/docker/local/examples/damaris/storage/
 # <container prompt> mpirun -np 4 ./3dmesh 3dmesh.xml
 ######################################################################################
 
@@ -242,12 +242,12 @@ RUN --mount=type=secret,id=thepassword if [ "$repo" == "damaris-development" ] ;
   && make -j${NUMCORES} \
   && make install
 
-RUN find ${INSTALL_PREFIX}/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples|"
+RUN find ${INSTALL_PREFIX}/examples/damaris/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples/damaris|"
 
 # COPY --from=builder ${INSTALL_PREFIX}/ ${INSTALL_PREFIX}/
-RUN  cp -r ${INSTALLTMDIR}/build/$repo/test/ ${INSTALL_PREFIX}/examples/test/ \
- && cp  ${INSTALLTMDIR}/build/$repo/CTestTestfile.cmake ${INSTALL_PREFIX}/examples/ \
- && sed -i "s|${INSTALLTMDIR}/build/$repo/|${INSTALL_PREFIX}/examples/|g" ${INSTALL_PREFIX}/examples/test/CTestTestfile.cmake
+RUN  cp -r ${INSTALLTMDIR}/build/$repo/test/ ${INSTALL_PREFIX}/examples/damaris/test/ \
+ && cp  ${INSTALLTMDIR}/build/$repo/CTestTestfile.cmake ${INSTALL_PREFIX}/examples/damaris/ \
+ && sed -i "s|${INSTALLTMDIR}/build/$repo/|${INSTALL_PREFIX}/examples/damaris/|g" ${INSTALL_PREFIX}/examples/damaris/test/CTestTestfile.cmake
 
 
 
@@ -338,7 +338,7 @@ ENV MPICC=$MPI_BINDIR/mpicc
 ENV MPIFORT=$MPI_BINDIR/mpifort
 COPY --from=builder ${INSTALL_PREFIX}/ ${INSTALL_PREFIX}/
 USER docker
-WORKDIR ${INSTALL_PREFIX}/examples
+WORKDIR ${INSTALL_PREFIX}/examples/damaris
 
 RUN visit -env -engine > ~/tmp.txt \
    && sed -i 's|^|export |g' ~/tmp.txt \

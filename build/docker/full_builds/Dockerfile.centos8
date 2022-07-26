@@ -249,7 +249,7 @@ RUN --mount=type=secret,id=thepassword if [ "$repo" == "damaris-development" ] ;
   && make -j${NUMCORES} \
   && make install 
   
-RUN find ${INSTALL_PREFIX}/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples|"
+RUN find ${INSTALL_PREFIX}/examples/damaris/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples/damaris|"
 
 
 
@@ -305,15 +305,15 @@ ENV LD_LIBRARY_PATH=$INSTALL_PREFIX/lib:$INSTALL_PREFIX/lib64:$MPI_LIBDIR:$LD_LI
 
 
 COPY --from=builder /home/docker/local/ /home/docker/local/
-COPY --from=builder ${INSTALLTMDIR}/build/$repo/test/ /home/docker/local/examples/test/
-COPY --from=builder ${INSTALLTMDIR}/build/$repo/CTestTestfile.cmake /home/docker/local/examples/
+COPY --from=builder ${INSTALLTMDIR}/build/$repo/test/ /home/docker/local/examples/damaris/test/
+COPY --from=builder ${INSTALLTMDIR}/build/$repo/CTestTestfile.cmake /home/docker/local/examples/damaris/
 
 # Change the paths in the ctest unit test runner (CTestTestfile.cmake)
-RUN sed -i "s|${INSTALLTMDIR}/build/$repo/|/home/docker/local/examples/|g" /home/docker/local/examples/test/CTestTestfile.cmake
+RUN sed -i "s|${INSTALLTMDIR}/build/$repo/|/home/docker/local/examples/damaris/|g" /home/docker/local/examples/damaris/test/CTestTestfile.cmake
 
 RUN chown -R docker:docker /home/docker
 USER docker
 
-WORKDIR /home/docker/local/examples
+WORKDIR /home/docker/local/examples/damaris
  
 CMD ["/bin/bash"]
