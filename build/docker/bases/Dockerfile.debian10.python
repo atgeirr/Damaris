@@ -1,0 +1,101 @@
+# syntax=docker/dockerfile:1
+## Usage of this file (standalone or automated via gitlab CI): 
+# The gitlab.inria.fr/Damaris/damaris repo should build without the secret setup.
+# 
+# To build the damaris repo (no password needed):
+# export TAG=v1.5.0
+# export PV_VER=v5.9.0
+# export PVSHORT=${PV_VERSION//./}
+# sudo  DOCKER_BUILDKIT=1 docker build -t \
+#            registry.gitlab.inria.fr/damaris/damaris:${TAG}-deb11-p${PVSHORT) \
+#            --build-arg INPUT_pv_ver=${PV_VER} \
+#                -f ./Dockerfile.debian.paraview58 .
+# 
+# mpirun -np 4 singularity exec ubuntu20_paraview58  /usr/local/damaris/examples/paraview/image /usr/local/damaris/examples/paraview/image.xml
+
+########################################
+## Stage 1 of build
+########################################
+FROM debian:10 AS builder
+SHELL ["/bin/bash", "-c"]
+
+USER root
+
+RUN useradd docker \
+	&& mkdir /home/docker \
+	&& chown docker:docker /home/docker \
+	&& addgroup docker staff
+
+# RUN yes docker | passwd --stdin root
+RUN echo 'root:docker' | chpasswd
+
+
+# libboost-all-dev  is not installed as it links to Python2
+RUN apt-get update -y \
+  && echo "debconf debconf/frontend select Noninteractive" | debconf-set-selections \
+  && apt-get install -y --no-install-recommends \
+    apt-utils \
+    pkg-config \
+    git-core \
+    cmake \
+    wget unzip nano \
+	libopenmpi-dev \
+	libxerces-c-dev  \
+	xsdcxx \
+    libcppunit-dev \
+  && apt-get clean \
+  && ln -s /usr/bin/xsdcxx /usr/bin/xsd
+
+
+
+RUN apt-get install -y \
+  python3-pip \
+  libpython3-dev  
+  
+# RUN apt-get install -y --no-install-recommends \
+#  libhdf5-openmpi-dev \
+#  hfdtools
+
+RUN apt-get install -y --no-install-recommends \
+	software-properties-common \
+    build-essential \
+    gfortran \
+  && apt-get clean
+
+
+RUN ln -s /usr/bin/python3 /usr/bin/python  || echo "python already linked to python3"
+
+ENV INSTALL_PREFIX=/home/docker/local
+ENV PATH=${INSTALL_PREFIX}/bin:${PATH}
+ENV LD_LIBRARY_PATH=${INSTALL_PREFIX}/lib:${INSTALL_PREFIX}/lib64:${LD_LIBRARY_PATH}
+
+ENV INSTALLTMDIR=/home/docker/installdir
+ENV CMAKE_BUILD_TYPE=Release
+ENV NUMCORES=4
+
+ENV GL_INSTALL_PATH=/usr/lib/x86_64-linux-gnu
+ENV GL_HEADER_PATH=/usr
+
+ENV MPI_ROOT=/usr
+ENV MPICXX=$MPI_ROOT/bin/mpicxx
+ENV MPICC=$MPI_ROOT/bin/mpicc
+ENV MPIFORT=$MPI_ROOT/bin/mpifort
+
+ENV GCC=/usr/bin/gcc
+ENV GPP=/usr/bin/g++
+
+RUN mkdir buildboost \
+    && cd buildboost \
+    && apt-get install -y python3-mpi4py python3-numpy \
+    && wget https://boostorg.jfrog.io/artifactory/main/release/1.79.0/source/boost_1_79_0.tar.gz \
+    && tar -xf boost_1_79_0.tar.gz \
+    && cd boost_1_79_0 \
+    && ./bootstrap.sh --with-python=$(which python3) --prefix=${INSTALL_PREFIX} \
+    && ./b2 install \
+    && cd ../.. \
+    && rm -fr ./buildboost
+
+USER docker
+
+ 
+CMD ["/bin/bash"]

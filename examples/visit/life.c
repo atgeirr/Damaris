@@ -389,7 +389,7 @@ void mainloop(simulation_data *sim)
 		if(r == 0) printf(" -- Simulating time step %d\n",i);
 		simulate_one_timestep(sim);
 		exposeDataToDamaris(sim);
-		sleep(5);
+		sleep(10);
 		i++;
 	} while(!sim->done);
 }

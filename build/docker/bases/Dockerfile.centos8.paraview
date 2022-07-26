@@ -56,29 +56,8 @@ RUN useradd docker \
 	&& groupadd staff \
     && usermod -a -G staff docker
 
-ENV INSTALL_PREFIX=/home/docker/local
-ENV MPI_BINDIR=/usr/lib64/openmpi/bin 
-ENV PATH=$INSTALL_PREFIX/bin:${MPI_BINDIR}:$PATH  
-ENV LD_LIBRARY_PATH=$INSTALL_PREFIX/lib:$INSTALL_PREFIX/lib64:$MPI_LIBDIR:$LD_LIBRARY_PATH
-ENV PATH=${INSTALL_PREFIX}/bin:${PATH}
-ENV LD_LIBRARY_PATH=${INSTALL_PREFIX}/lib:${INSTALL_PREFIX}/lib64:${LD_LIBRARY_PATH}
-
-
-# N.B. MPI_BINDIR=/usr/lib64/openmpi/bin has to be on the PATH
-ENV MPICXX_PATH=$MPI_BINDIR/mpicxx
-ENV MPICC_PATH=$MPI_BINDIR/mpicc
-ENV MPIFORT_PATH=$MPI_BINDIR/mpifort
-
-ENV INSTALLTMDIR=/home/docker/installdir
-ENV CMAKE_BUILD_TYPE=Release
-ENV NUMCORES=4
-
-ENV GL_INSTALL_PATH=/usr/lib64
-ENV GL_HEADER_PATH=/usr/include
-
-
-
 ## Good to look at: https://centos.pkgs.org/
+RUN echo 'docker' | passwd --stdin root
 
 ## Install build tools and dependencies for Damaris
 RUN dnf -y install dnf-plugins-core \
@@ -94,8 +73,6 @@ RUN dnf -y install dnf-plugins-core \
    hdf5-openmpi-static \
    boost-devel \
    git \
-   gcc-gfortran \
-   gcc-c++ \
    openssl-devel \
    libcurl-devel \
    xz-devel \
@@ -104,13 +81,19 @@ RUN dnf -y install dnf-plugins-core \
    cmake \
    && cp /usr/bin/xsdcxx /usr/bin/xsd
 
+
+RUN  dnf -y install  gcc-gfortran gcc-c++
+RUN  dnf -y --enablerepo=powertools install python3 python3-devel platform-python-devel boost-python3-devel
+
+RUN ln -s /usr/bin/python3 /usr/bin/python
+
+
 ## For Paraview
-RUN dnf install -y --enablerepo=powertools mesa-libOSMesa-devel \
+RUN dnf install -y --enablerepo=PowerTools mesa-libOSMesa-devel \
     freeglut-devel \
     ninja-build \
     tbb-devel 
 
-RUN  dnf -y --enablerepo=powertools install python3 platform-python-devel boost-python3-devel  
 
 USER docker
 

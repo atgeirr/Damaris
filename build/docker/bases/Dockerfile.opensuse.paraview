@@ -34,9 +34,6 @@
 # 
 # 2/ Use docker run as it does not leave the container running on exit and run Damaris tests:
 #    Map the shared memory filesystem and the Paraview Catalyst port
-# 
-# > docker run --rm -v /dev/shm:/dev/shm -p 22222:22222 -it registry.gitlab.inria.fr/damaris/damaris:<branch>-<OS>-<Paraview_version> /bin/bash
-# <container prompt> ctest
 #
 # > sudo docker run --rm -v /dev/shm:/dev/shm -p 22222:22222 -it registry.gitlab.inria.fr/damaris/damaris:v1.5.0-opensuse-pv5100 /bin/bash
 # > cd /home/docker/local/examples/storage/
@@ -51,59 +48,22 @@ SHELL ["/bin/bash", "-c"]
 
 
 RUN useradd -m --create-home -s /bin/bash docker \
-	&& groupadd staff \
+    && groupadd staff \
     && groupadd docker \
     && usermod -a -G staff docker \
     && mkdir -p  /home/docker \
     && chown docker:docker /home/docker
 
-
-# opensuse:hdf5-openmpi4-devel
-# /usr/lib64/mpi/gcc/openmpi4/lib64/libhdf5.so
-# /usr/lib64/mpi/gcc/openmpi4/bin/h5c++
-# 
+RUN echo 'root:docker' | chpasswd
+#RUN yes docker | passwd --stdin root
 
 
-ENV INSTALL_PREFIX=/home/docker/local
-ENV MPI_BINDIR=/usr/lib64/mpi/gcc/openmpi4/bin
-ENV PATH=$INSTALL_PREFIX/bin:${MPI_BINDIR}:$PATH  
-ENV LD_LIBRARY_PATH=$INSTALL_PREFIX/lib:$INSTALL_PREFIX/lib64:$MPI_LIBDIR:$LD_LIBRARY_PATH
-ENV PATH=${INSTALL_PREFIX}/bin:${PATH}
-ENV LD_LIBRARY_PATH=${INSTALL_PREFIX}/lib:${INSTALL_PREFIX}/lib64:${LD_LIBRARY_PATH}
-
-
-# N.B. MPI_BINDIR=/usr/lib64/openmpi/bin has to be on the PATH
-ENV MPICXX_PATH=$MPI_BINDIR/mpicxx
-ENV MPICC_PATH=$MPI_BINDIR/mpicc
-ENV MPIFORT_PATH=$MPI_BINDIR/mpifort
-
-ENV INSTALLTMDIR=/home/docker/installdir
-ENV CMAKE_BUILD_TYPE=Release
-ENV NUMCORES=4
-
-# ARG INPUT_pv_ver=5.8.0
-# ENV PV_VERSION=$INPUT_pv_ver
-# ENV PYTHON_INCLUDE_DIR=/usr/include/python3.8
-ENV GL_INSTALL_PATH=/usr/lib
-ENV GL_HEADER_PATH=/usr/include
-# ENV PYTHON_INCLUDE_DIR=/usr/include/python3.8
-# ENV GL_INSTALL_PATH=/usr/lib/x86_64-linux-gnu
-# ENV GL_HEADER_PATH=/usr
-
-
-# /usr/lib64/mpi/gcc/openmpi4/lib64/
-# /usr/lib64/mpi/gcc/openmpi4/bin
-# /usr/lib64/mpi/gcc/openmpi4/bin/mpicxx
-# /usr/lib64/mpi/gcc/openmpi4/lib64/libmpi.so
-
-## Good to look at: https://centos.pkgs.org/
 
 ## Install build tools and dependencies for Damaris
 RUN zypper --non-interactive install libxerces-c-devel \
-   &&  zypper -n install libxerces-c-devel \
    &&  zypper -n install -y xsd \
    &&  zypper -n install cppunit-devel \
-   &&  zypper -n install gcc-fortran libboost*_75_0-devel \
+   &&  zypper -n install libboost*_75_0-devel \
    &&  zypper -n install openmpi4-devel \
    &&  zypper -n install hdf5-openmpi4-devel \
    &&  zypper -n install boost-gnu-openmpi4-hpc-python3 boost-gnu-openmpi4-hpc-devel \
@@ -115,18 +75,56 @@ RUN zypper --non-interactive install libxerces-c-devel \
    nano \
    wget \
    cmake \
-   && cp /usr/bin/xsdcxx /usr/bin/xsd
+   && cp /usr/bin/xsdcxx /usr/bin/xsd \
+   && zypper clean --all
+
+RUN zypper --non-interactive install python3-devel   \
+   && zypper clean --all
+
+# Compile-time dependencies
+# freeglut-devel is just for OpenGL headers,
+# that should be found in the mesa install of Visit,
+# but are not.
+RUN zypper --non-interactive install  gcc-c++ gcc-fortran  \
+       libtool m4 automake   \
+       freeglut-devel \
+   && zypper clean --all
 
 ## For Paraview
 RUN zypper --non-interactive install libOSMesa-devel \
     freeglut-devel \
     ninja \
-    tbb-devel 
+    tbb-devel
+
+ENV INSTALL_PREFIX=/home/docker/local
+ENV MPI_ROOT=/usr/lib64/mpi/gcc/openmpi4
+ENV HDF5_ROOT=${MPI_ROOT}
+# ENV MPI_BINDIR=/usr/lib64/openmpi/bin
+ENV PATH=$INSTALL_PREFIX/bin:${MPI_ROOT}/bin:$INSTALL_PREFIX/visit/bin:$PATH
+ENV LD_LIBRARY_PATH=$INSTALL_PREFIX/lib:$INSTALL_PREFIX/lib64:$MPI_ROOT/lib:$MPI_ROOT/lib64:$LD_LIBRARY_PATH
+ENV PATH=${INSTALL_PREFIX}/bin:${PATH}
+ENV LD_LIBRARY_PATH=${INSTALL_PREFIX}/lib:${INSTALL_PREFIX}/lib64:${LD_LIBRARY_PATH}
+
+
+# N.B. MPI_ROOT=/usr/lib64/openmpi/bin has to be on the PATH
+ENV MPICXX=$MPI_ROOT/bin/mpicxx
+ENV MPICC=$MPI_ROOT/bin/mpicc
+ENV MPIFORT=$MPI_ROOT/bin/mpifort
+
+ENV GCC=/usr/bin/gcc
+ENV GPP=/usr/bin/g++
+
+ENV INSTALLTMDIR=/home/docker/installdir
+ENV CMAKE_BUILD_TYPE=Release
+ENV NUMCORES=4
+
+
+ENV GL_INSTALL_PATH=/usr/lib
+ENV GL_HEADER_PATH=/usr/include
 
 RUN zypper --non-interactive install python3-devel  
 
 USER docker
-
  
 RUN   mkdir -p ${INSTALLTMDIR} \
   &&   cd ${INSTALLTMDIR} \

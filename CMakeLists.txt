@@ -21,7 +21,7 @@ project(DAMARIS VERSION 1.6.0)
 # Set the location of CMake Modules
 #----------------------------------------------------------------------------#
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} 
-		"${DAMARIS_SOURCE_DIR}/cmake/Modules/")
+        "${DAMARIS_SOURCE_DIR}/cmake/Modules/")
 
 
 #----------------------------------------------------------------------------#
@@ -40,6 +40,7 @@ option(ENABLE_VISIT    "Build VisIt support. May requires VisIt_ROOT to be set."
 option(ENABLE_CATALYST "Build Catalyst support. May requires ParaView_DIR to be set." OFF)
 option(ENABLE_HDF5     "Build with HDF5 support. May requires HDF5_ROOT to be set." OFF)
 option(ENABLE_PYTHON   "Build with Python+ NumPy scripting capabilties." OFF)
+option(ENABLE_PYTHONMOD"Build external Python module to import Damaris communicator into mpi4py." OFF)
 option(ENABLE_DOCS     "Configure DOxygen documentation build feature." OFF)
 option(GENERATE_MODEL  "Regenerates the XSD model instead of using existing ones." OFF)
 
@@ -51,6 +52,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 #----------------------------------------------------------------------------#
+# MPI is currently mandatory
+#----------------------------------------------------------------------------#
+find_package(MPI)
+
+#----------------------------------------------------------------------------#
 # Enabling Fortran
 #----------------------------------------------------------------------------#
 if(ENABLE_FORTRAN)
@@ -60,8 +66,8 @@ if(ENABLE_FORTRAN)
     enable_language(Fortran)
     include(FortranCInterface)
     FortranCInterface_HEADER(${DAMARIS_SOURCE_DIR}/include/DamarisFCMangle.h
-		    MACRO_NAMESPACE "FC_FUNC_"
-		    SYMBOL_NAMESPACE "FC_SYM_")
+            MACRO_NAMESPACE "FC_FUNC_"
+            SYMBOL_NAMESPACE "FC_SYM_")
     add_definitions(-D__ENABLE_FORTRAN)
   else(CMAKE_Fortran_COMPILER)
     message(FATAL "Fortran support requested but no Fortran compiler was found.")
@@ -88,7 +94,7 @@ include_directories(${DAMARIS_SOURCE_DIR}/include/damaris)
 include_directories(${CMAKE_BINARY_DIR}/include)
 
 #----------------------------------------------------------------------------#
-# Set everything related to the Boost libraries
+# Set everything related to the Boost libraries (except boost::python and boost::numpy)
 #----------------------------------------------------------------------------#
 ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
 set(Boost_USE_STATIC_LIBS OFF)
@@ -147,25 +153,37 @@ endif(ENABLE_HDF5)
 #----------------------------------------------------------------------------#
 # Set everything related to Python
 #----------------------------------------------------------------------------#
+
 if(ENABLE_PYTHON)
-  execute_process(
-  COMMAND python -c "import numpy; print numpy.get_include()"
-  OUTPUT_VARIABLE NUMPY_INCLUDE_PATH
-  ERROR_QUIET
-  )
   find_package(Boost COMPONENTS python REQUIRED)
   find_package(Boost COMPONENTS numpy REQUIRED)
+  # find_package(Python 3 COMPONENTS Interpreter Development REQUIRED)  # fails at build time with fatal error: pyconfig.h: No such file or directory
   find_package(PythonInterp 3 )
-  find_package( PythonLibs 3 REQUIRED )
-  set(HAVE_PYTHON_ENABLED 1)
-  list(APPEND DEP_LIBRARIES  ${PYTHON_LIBRARIES} ${Boost_LIBRARIES} )
-#   include_directories(
-#  ${PYTHON_INCLUDE_DIRS}
-#  ${Boost_INCLUDE_DIRS}
-#  ${NUMPY_INCLUDE_PATH}
-#  )
+  find_package(PythonLibs 3 REQUIRED )
+  if(PythonInterp_FOUND)
+    # message("PythonInterp_FOUND:${PythonInterp_FOUND}")
+    execute_process(
+      COMMAND Python3::Interpreter -c "import numpy; print numpy.get_include()"
+      OUTPUT_VARIABLE NUMPY_INCLUDE_PATH
+      ERROR_QUIET
+    )
+    list(APPEND DEP_LIBRARIES  ${PYTHON_LIBRARIES} ${Boost_LIBRARIES} )
+    
+    set(HAVE_PYTHON_ENABLED 1)
+  endif(PythonInterp_FOUND)
 endif(ENABLE_PYTHON)
 
+#----------------------------------------------------------------------------#
+# Test that the pydamaris Python module has an install path
+#----------------------------------------------------------------------------#
+if(ENABLE_PYTHONMOD)
+  if ( "${PYTHON_MODULE_INSTALL_PATH}" STREQUAL "" )
+     message(
+                FATAL_ERROR 
+                "ENABLE_PYTHONMOD is TRUE. Please set -DPYTHON_MODULE_INSTALL_PATH=<path> to the path to install the damaris4py Python module"
+            )
+  endif()
+endif(ENABLE_PYTHONMOD)
 
 #----------------------------------------------------------------------------#
 # Set everything related to ParaView
@@ -186,10 +204,18 @@ if(ENABLE_CATALYST)
     message(STATUS "ParaView >= 5.7 found")
     set(HAVE_PARAVIEW_ENABLED 1)
     set(PARAVIEW_VERSION ${ParaView_VERSION})
-    find_package(ParaView 4.2 REQUIRED COMPONENTS PythonCatalyst ) 
-    set(PARAVIEW_LIBRARIES ParaView::PythonCatalyst VTK::mpi)
+    find_package(ParaView 4.2  COMPONENTS Catalyst PythonCatalyst ) 
+    set(PARAVIEW_LIBRARIES ParaView::Catalyst ParaView::PythonCatalyst VTK::mpi)
     message(STATUS "ParaView_LIBRARIES: ${ParaView_LIBRARIES}")
-    message(STATUS "VTK_LIBRARIES: ${VTK_LIBRARIES}")
+    # -DParaView_DIR=${INSTALL_PREFIX}/lib/cmake/paraview-5.8
+    get_filename_component(PARENT_DIR ${ParaView_DIR} DIRECTORY)
+    get_filename_component(PV_VERSION_DIR ${ParaView_DIR} NAME)
+    set(PARAVIEW_INCLUDE_DIRS "${PARENT_DIR}/../../include/${PV_VERSION_DIR}")
+    # include_directories(${ParaView_INCLUDE_DIRS})
+    # include_directories(${VTK_INCLUDE_DIRS})
+    message(STATUS "PARAVIEW_INCLUDE_DIRS: ${PARAVIEW_INCLUDE_DIRS}")
+    message(STATUS "ParaView_INCLUDE_DIRS: ${ParaView_INCLUDE_DIRS}")
+    message(STATUS "VTK_INCLUDE_DIRS: ${VTK_INCLUDE_DIRS}")
   endif()
   list(APPEND DEP_LIBRARIES ${PARAVIEW_LIBRARIES})
   add_definitions("-DUSE_CATALYST")
@@ -219,13 +245,17 @@ endfunction()
 # Configure Damaris
 #----------------------------------------------------------------------------#
 CONFIGURE_FILE(${DAMARIS_SOURCE_DIR}/include/Damaris.h.in 
-	       ${CMAKE_BINARY_DIR}/include/Damaris.h)
-	       
+           ${CMAKE_BINARY_DIR}/include/Damaris.h)
+           
 
 #----------------------------------------------------------------------------#
 # Add the proper subdirectories
 #----------------------------------------------------------------------------#
 add_subdirectory (lib)
+
+if(ENABLE_PYTHONMOD)
+add_subdirectory (python/damaris4py/damaris4py)
+endif(ENABLE_PYTHONMOD)
 
 if(ENABLE_EXAMPLES)
   add_subdirectory (examples)
@@ -238,3 +268,4 @@ endif(ENABLE_TESTS)
 if(ENABLE_DOCS)
   add_subdirectory (docs)
 endif(ENABLE_DOCS)
+

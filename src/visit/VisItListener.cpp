@@ -42,7 +42,7 @@ namespace damaris {
 VisItListener::SimData VisItListener::sim_ = {0};
 MPI_Comm VisItListener::comm_ = MPI_COMM_NULL;
 int VisItListener::visitstate_ = -1;
-unsigned int VisItListener::updatefreq_ = 0;
+unsigned int VisItListener::updatefreq_ = 1;
 
 void VisItListener::Init(MPI_Comm c, 
 	const model::Simulation::visit_optional& mdl, 
@@ -59,18 +59,23 @@ void VisItListener::Init(MPI_Comm c,
 			s = (char*)malloc(mdl.get().path().get().length()+1);
 			strcpy(s,mdl.get().path().get().c_str());
 			VisItSetDirectory(s);
+            std::cout << "VisItListener::Init: VisItSetDirectory" << s << std::endl ;
 			free(s);
+            
 		}
 		if(mdl.get().options().present()) {
 			s = (char*)malloc(mdl.get().options().get().length()+1);
 			strcpy(s,mdl.get().options().get().c_str());
 			VisItSetOptions(s);
+            std::cout << "VisItListener::Init: VisItSetOptions" << s << std::endl ;
 			free(s);
 		}
 	}
 	
-	if(mdl.present()) {
+    std::cout << "VisItListener::Init: updatefreq_ = " << updatefreq_ << std::endl ;
+    if(mdl.present()) {
 		updatefreq_ = mdl.get().update_frequency();
+        std::cout << "VisItListener::Init: updatefreq_ = " << updatefreq_ << std::endl ;
 	}
 	
 	VisItSetBroadcastIntFunction(&BroadcastIntCallback);
@@ -90,8 +95,9 @@ void VisItListener::Init(MPI_Comm c,
 	free(env);
 
 	if(rank == 0) {
+        std::cout << "VisItListener::Init: Saving Sim2 File" << std::endl ;
 		VisItInitializeSocketAndDumpSimFile(simname.c_str(),
-				"", "", NULL, NULL, NULL);
+				"This simulation has been instrumentd via Damaris", "/home/jbowden/local/examples/visit", NULL, NULL, NULL);
 	}
 }
 
@@ -118,6 +124,8 @@ void VisItListener::EnterSyncSection(
 	MPI_Bcast(&visitstate_,1,MPI_INT,0,comm_);
 	
 	sim_.iteration_ = Environment::GetLastIteration()-1;
+    std::cout << "VisItListener::EnterSyncSection: Iteration = " << sim_.iteration_ << std::endl ;
+    
 	switch(visitstate_) {
 	case 1:
 		if(VisItAttemptToCompleteConnection() == VISIT_OKAY) {

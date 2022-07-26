@@ -1043,23 +1043,6 @@ namespace damaris
       void
       dedicated (::std::unique_ptr< dedicated_type > p);
 
-      // placement
-      //
-      typedef ::damaris::model::Placement placement_type;
-      typedef ::xsd::cxx::tree::traits< placement_type, char > placement_traits;
-
-      const placement_type&
-      placement () const;
-
-      placement_type&
-      placement ();
-
-      void
-      placement (const placement_type& x);
-
-      void
-      placement (::std::unique_ptr< placement_type > p);
-
       // buffer
       //
       typedef ::damaris::model::Buffer buffer_type;
@@ -1076,6 +1059,23 @@ namespace damaris
 
       void
       buffer (::std::unique_ptr< buffer_type > p);
+
+      // placement
+      //
+      typedef ::damaris::model::Placement placement_type;
+      typedef ::xsd::cxx::tree::traits< placement_type, char > placement_traits;
+
+      const placement_type&
+      placement () const;
+
+      placement_type&
+      placement ();
+
+      void
+      placement (const placement_type& x);
+
+      void
+      placement (::std::unique_ptr< placement_type > p);
 
       // queue
       //
@@ -1115,18 +1115,39 @@ namespace damaris
       void
       name (::std::unique_ptr< name_type > p);
 
+      // comment
+      //
+      typedef ::xml_schema::string comment_type;
+      typedef ::xsd::cxx::tree::optional< comment_type > comment_optional;
+      typedef ::xsd::cxx::tree::traits< comment_type, char > comment_traits;
+
+      const comment_optional&
+      comment () const;
+
+      comment_optional&
+      comment ();
+
+      void
+      comment (const comment_type& x);
+
+      void
+      comment (const comment_optional& x);
+
+      void
+      comment (::std::unique_ptr< comment_type > p);
+
       // Constructors.
       //
       Architecture (const domains_type&,
                     const dedicated_type&,
-                    const placement_type&,
                     const buffer_type&,
+                    const placement_type&,
                     const queue_type&);
 
       Architecture (::std::unique_ptr< domains_type >,
                     ::std::unique_ptr< dedicated_type >,
-                    ::std::unique_ptr< placement_type >,
                     ::std::unique_ptr< buffer_type >,
+                    ::std::unique_ptr< placement_type >,
                     ::std::unique_ptr< queue_type >);
 
       Architecture (const ::xercesc::DOMElement& e,
@@ -1157,10 +1178,11 @@ namespace damaris
       protected:
       ::xsd::cxx::tree::one< domains_type > domains_;
       ::xsd::cxx::tree::one< dedicated_type > dedicated_;
-      ::xsd::cxx::tree::one< placement_type > placement_;
       ::xsd::cxx::tree::one< buffer_type > buffer_;
+      ::xsd::cxx::tree::one< placement_type > placement_;
       ::xsd::cxx::tree::one< queue_type > queue_;
       name_optional name_;
+      comment_optional comment_;
     };
 
     class Language: public ::xml_schema::string
@@ -3418,6 +3440,27 @@ namespace damaris
       static external_type
       external_default_value ();
 
+      // comment
+      //
+      typedef ::xml_schema::string comment_type;
+      typedef ::xsd::cxx::tree::optional< comment_type > comment_optional;
+      typedef ::xsd::cxx::tree::traits< comment_type, char > comment_traits;
+
+      const comment_optional&
+      comment () const;
+
+      comment_optional&
+      comment ();
+
+      void
+      comment (const comment_type& x);
+
+      void
+      comment (const comment_optional& x);
+
+      void
+      comment (::std::unique_ptr< comment_type > p);
+
       // Constructors.
       //
       Event (const name_type&,
@@ -3458,6 +3501,7 @@ namespace damaris
       ::xsd::cxx::tree::one< scope_type > scope_;
       static const scope_type scope_default_value_;
       ::xsd::cxx::tree::one< external_type > external_;
+      comment_optional comment_;
     };
 
     class Script: public ::xml_schema::type
@@ -3588,6 +3632,107 @@ namespace damaris
       static frequency_type
       frequency_default_value ();
 
+      // scheduler-file
+      //
+      typedef ::xml_schema::string scheduler_file_type;
+      typedef ::xsd::cxx::tree::traits< scheduler_file_type, char > scheduler_file_traits;
+
+      const scheduler_file_type&
+      scheduler_file () const;
+
+      scheduler_file_type&
+      scheduler_file ();
+
+      void
+      scheduler_file (const scheduler_file_type& x);
+
+      void
+      scheduler_file (::std::unique_ptr< scheduler_file_type > p);
+
+      static const scheduler_file_type&
+      scheduler_file_default_value ();
+
+      // nthreads
+      //
+      typedef ::xml_schema::string nthreads_type;
+      typedef ::xsd::cxx::tree::traits< nthreads_type, char > nthreads_traits;
+
+      const nthreads_type&
+      nthreads () const;
+
+      nthreads_type&
+      nthreads ();
+
+      void
+      nthreads (const nthreads_type& x);
+
+      void
+      nthreads (::std::unique_ptr< nthreads_type > p);
+
+      static const nthreads_type&
+      nthreads_default_value ();
+
+      // timeout
+      //
+      typedef ::xml_schema::string timeout_type;
+      typedef ::xsd::cxx::tree::traits< timeout_type, char > timeout_traits;
+
+      const timeout_type&
+      timeout () const;
+
+      timeout_type&
+      timeout ();
+
+      void
+      timeout (const timeout_type& x);
+
+      void
+      timeout (::std::unique_ptr< timeout_type > p);
+
+      static const timeout_type&
+      timeout_default_value ();
+
+      // keep-workers
+      //
+      typedef ::xml_schema::string keep_workers_type;
+      typedef ::xsd::cxx::tree::traits< keep_workers_type, char > keep_workers_traits;
+
+      const keep_workers_type&
+      keep_workers () const;
+
+      keep_workers_type&
+      keep_workers ();
+
+      void
+      keep_workers (const keep_workers_type& x);
+
+      void
+      keep_workers (::std::unique_ptr< keep_workers_type > p);
+
+      static const keep_workers_type&
+      keep_workers_default_value ();
+
+      // comment
+      //
+      typedef ::xml_schema::string comment_type;
+      typedef ::xsd::cxx::tree::optional< comment_type > comment_optional;
+      typedef ::xsd::cxx::tree::traits< comment_type, char > comment_traits;
+
+      const comment_optional&
+      comment () const;
+
+      comment_optional&
+      comment ();
+
+      void
+      comment (const comment_type& x);
+
+      void
+      comment (const comment_optional& x);
+
+      void
+      comment (::std::unique_ptr< comment_type > p);
+
       // Constructors.
       //
       Script (const name_type&,
@@ -3629,6 +3774,15 @@ namespace damaris
       static const scope_type scope_default_value_;
       ::xsd::cxx::tree::one< external_type > external_;
       ::xsd::cxx::tree::one< frequency_type > frequency_;
+      ::xsd::cxx::tree::one< scheduler_file_type > scheduler_file_;
+      static const scheduler_file_type scheduler_file_default_value_;
+      ::xsd::cxx::tree::one< nthreads_type > nthreads_;
+      static const nthreads_type nthreads_default_value_;
+      ::xsd::cxx::tree::one< timeout_type > timeout_;
+      static const timeout_type timeout_default_value_;
+      ::xsd::cxx::tree::one< keep_workers_type > keep_workers_;
+      static const keep_workers_type keep_workers_default_value_;
+      comment_optional comment_;
     };
 
     class Exception: public ::xml_schema::type
@@ -3878,6 +4032,27 @@ namespace damaris
       static end_iteration_type
       end_iteration_default_value ();
 
+      // comment
+      //
+      typedef ::xml_schema::string comment_type;
+      typedef ::xsd::cxx::tree::optional< comment_type > comment_optional;
+      typedef ::xsd::cxx::tree::traits< comment_type, char > comment_traits;
+
+      const comment_optional&
+      comment () const;
+
+      comment_optional&
+      comment ();
+
+      void
+      comment (const comment_type& x);
+
+      void
+      comment (const comment_optional& x);
+
+      void
+      comment (::std::unique_ptr< comment_type > p);
+
       // Constructors.
       //
       ParaViewParam ();
@@ -3912,6 +4087,7 @@ namespace damaris
       ::xsd::cxx::tree::one< update_frequency_type > update_frequency_;
       ::xsd::cxx::tree::one< realtime_timestep_type > realtime_timestep_;
       ::xsd::cxx::tree::one< end_iteration_type > end_iteration_;
+      comment_optional comment_;
     };
 
     class Actions: public ::xml_schema::type

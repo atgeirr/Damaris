@@ -21,7 +21,7 @@ docker-build:
     - docker:dind
   before_script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-    
+    - docker system prune -f
     # This code section is needed to get access to a specific machine (MY_CI_REMOTETEST_HOST) which 
     # is on Grid5000. The gitlab-runner needs to be running on a machine in grid5000.fr or connected 
     # to it via VPN.
@@ -45,34 +45,58 @@ docker-build:
         tag=":$CI_COMMIT_REF_SLUG"
         echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
       fi
-    - pwd
-    - cd build/docker/damaris
-    - ls -l
-    # - docker image prune -f
-    # - docker container prune -f
-    # - docker builder prune -f
-    # - ssh jbowden@"$MY_CI_REMOTETEST_HOST"  'bash -s' < ../../test/run_on_remote.sh
-    # Build Ubuntu 20.04 version
-    # - export PV_VERSION=v5.8.0
-    # - export PVSHORT=${PV_VERSION//./}
-    # - DOCKER_BUILDKIT=1 docker build --no-cache --pull -t "${CI_REGISTRY_IMAGE}${tag}-ubu20-p${PVSHORT}" --secret id=thepassword,src=$MY_CI_READ_REPO_PWD --build-arg INPUT_damaris_ver=$CI_COMMIT_BRANCH --build-arg INPUT_repo=$CI_PROJECT_NAME --build-arg INPUT_pv_ver=${PV_VERSION} -f ./Dockerfile.ubuntu20.paraview .
-    # - docker push "$CI_REGISTRY_IMAGE${tag}-ubu20-p${PVSHORT}"
-    # Build CentOS8  version
-    # - DOCKER_BUILDKIT=1 docker build --no-cache --pull -t "${CI_REGISTRY_IMAGE}${tag}-centos8-p${PVSHORT}" --secret id=thepassword,src=$MY_CI_READ_REPO_PWD --build-arg INPUT_damaris_ver=$CI_COMMIT_BRANCH --build-arg INPUT_repo=$CI_PROJECT_NAME  --build-arg INPUT_pv_ver=${PV_VERSION} -f ./Dockerfile.centos8.paraview .
-    # - docker push "$CI_REGISTRY_IMAGE${tag}-centos8-p${PVSHORT}"
-    # - sudo chmod +x ./build_damaris_on_paraview_base_images.sh
-    # - apt -y install bash 
-    - apk add --no-cache bash 
-    - ./build_damaris_on_paraview_base_images.sh  $CI_PROJECT_NAME  $CI_COMMIT_BRANCH  $MY_CI_READ_REPO_PWD | tee build_damaris_on_paraview_base_images.graph
-    - ./test_damaris_images.sh   $CI_PROJECT_NAME  -damaris-$CI_COMMIT_BRANCH  "ctest -VV" | tee -a build_damaris_on_paraview_base_images.graph
-    - cat build_damaris_on_paraview_base_images.graph | grep "^GRAPH:" | sed "s|GRAPH:||g" > build_damaris_on_paraview_base_images.md
+    - |
+      if [[ -f CI_ON_OFF ]] ; then
+        DOCI=$(cat CI_ON_OFF)
+        echo "INFO The contents of CI_ON_OFF is $DOCI"
+      fi
+      if [[ "$DOCI" != "OFF" ]] ; then
+      
+        cd build/docker/damaris
+        apk add --no-cache bash 
+        ## build and test Paraview base image builds
+        ./build_damaris_on_paraview_base_images.sh  $CI_PROJECT_NAME  $CI_COMMIT_BRANCH  $MY_CI_READ_REPO_PWD | tee build_damaris_on_paraview_base_images.graph
+        ./test_damaris_paraview_images.sh   $CI_PROJECT_NAME  $CI_COMMIT_BRANCH  "ctest --output-on-failure" | tee -a build_damaris_on_paraview_base_images.graph
+        cat build_damaris_on_paraview_base_images.graph | grep "^GRAPH:" | sed "s|GRAPH:||g" > build_damaris_on_paraview_base_images.md
     
-    # - apk add --no-cache curl
-    # - DATA=$(cat build_damaris_on_paraview_base_images.md)
-    # - curl  -X GET  --header "PRIVATE-TOKEN:  $CI_JOB_TOKEN"  "https://gitlab.inria.fr/api/v4/projects/Damaris%2Fdamaris-development/wikis/Build-success-table"
-    # - curl  --request PUT --data "format=markdown&content=$DATA&title=Build-success-table"  --header "PRIVATE-TOKEN:  $CI_JOB_TOKEN"  "https://gitlab.inria.fr/api/v4/projects/Damaris%2Fdamaris-development/wikis/Build-success-table"
-    - rm build_damaris_on_paraview_base_images.graph    
-    - cat build_damaris_on_paraview_base_images.md
+        docker rmi $(docker images | grep pv5 | awk '{ print $3 }')
+        docker system prune -f
+    
+        ## build and test VisIt base image builds
+        ./build_damaris_on_visit_base_images.sh  $CI_PROJECT_NAME  $CI_COMMIT_BRANCH  $MY_CI_READ_REPO_PWD | tee build_damaris_on_visit_base_images.graph
+        ./test_damaris_visit_images.sh   $CI_PROJECT_NAME  $CI_COMMIT_BRANCH  "ctest --output-on-failure" | tee -a build_damaris_on_visit_base_images.graph
+        cat build_damaris_on_visit_base_images.graph | grep "^GRAPH:" | sed "s|GRAPH:||g" > build_damaris_on_visit_base_images.md
+    
+        docker rmi $(docker images | grep visit | awk '{ print $3 }')
+        docker system prune -f
+    
+        ## build and test Python and No dependencies version (no HDF5) base image builds
+        ./build_damaris_on_python_base_images.sh  $CI_PROJECT_NAME  $CI_COMMIT_BRANCH  $MY_CI_READ_REPO_PWD | tee build_damaris_on_python_base_images.graph
+        ./test_damaris_python_images.sh   $CI_PROJECT_NAME  $CI_COMMIT_BRANCH  "ctest --output-on-failure" | tee -a build_damaris_on_python_base_images.graph
+        cat build_damaris_on_python_base_images.graph | grep "^GRAPH:" | sed "s|GRAPH:||g" > build_damaris_on_python_base_images.md
+    
+        ## The following command could be used to run ReFrame tests (once developed)
+        # - ssh jbowden@"$MY_CI_REMOTETEST_HOST"  'bash -s' < ../../test/run_on_remote.sh
+    
+        ## Pushing data directly to Wiki (does not work)
+        # - apk add --no-cache curl
+        # - DATA=$(cat build_damaris_on_paraview_base_images.md)
+        # - curl  -X GET  --header "PRIVATE-TOKEN:  $CI_JOB_TOKEN"  "https://gitlab.inria.fr/api/v4/projects/Damaris%2Fdamaris-development/wikis/Build-success-table"
+        # - curl  --request PUT --data "format=markdown&content=$DATA&title=Build-success-table"  --header "PRIVATE-TOKEN:  $CI_JOB_TOKEN"  "https://gitlab.inria.fr/api/v4/projects/Damaris%2Fdamaris-development/wikis/Build-success-table"
+    
+        # - rm *.graph 
+        cat build_damaris_on_paraview_base_images.md
+        cat build_damaris_on_visit_base_images.md
+        cat build_damaris_on_python_base_images.md
+      else
+        echo ""
+        echo "WARNING file CI_ON_OFF has CI builds set to OFF. Set file contents to ON to run Gitlab-CI"
+        echo ""
+        cd build/docker/damaris
+        echo "file CI_ON_OFF has CI builds set to OFF." > build_damaris_on_paraview_base_images.md
+        echo "file CI_ON_OFF has CI builds set to OFF." > build_damaris_on_visit_base_images.md
+        echo "file CI_ON_OFF has CI builds set to OFF." > build_damaris_on_python_base_images.md
+      fi
   # Run this job in a branch where a Dockerfile exists
   timeout: 5h 00m
 #  rules:
@@ -92,7 +116,7 @@ docker-build:
     when: always
     name: table-of-successfull-builds-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG
     paths: 
-      - build/docker/damaris/build_damaris_on_paraview_base_images.md
+      - build/docker/damaris/*.md
   #  reports:
   #    junit: report.xml
 

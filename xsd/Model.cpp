@@ -652,30 +652,6 @@ namespace damaris
       this->dedicated_.set (std::move (x));
     }
 
-    const Architecture::placement_type& Architecture::
-    placement () const
-    {
-      return this->placement_.get ();
-    }
-
-    Architecture::placement_type& Architecture::
-    placement ()
-    {
-      return this->placement_.get ();
-    }
-
-    void Architecture::
-    placement (const placement_type& x)
-    {
-      this->placement_.set (x);
-    }
-
-    void Architecture::
-    placement (::std::unique_ptr< placement_type > x)
-    {
-      this->placement_.set (std::move (x));
-    }
-
     const Architecture::buffer_type& Architecture::
     buffer () const
     {
@@ -698,6 +674,30 @@ namespace damaris
     buffer (::std::unique_ptr< buffer_type > x)
     {
       this->buffer_.set (std::move (x));
+    }
+
+    const Architecture::placement_type& Architecture::
+    placement () const
+    {
+      return this->placement_.get ();
+    }
+
+    Architecture::placement_type& Architecture::
+    placement ()
+    {
+      return this->placement_.get ();
+    }
+
+    void Architecture::
+    placement (const placement_type& x)
+    {
+      this->placement_.set (x);
+    }
+
+    void Architecture::
+    placement (::std::unique_ptr< placement_type > x)
+    {
+      this->placement_.set (std::move (x));
     }
 
     const Architecture::queue_type& Architecture::
@@ -752,6 +752,36 @@ namespace damaris
     name (::std::unique_ptr< name_type > x)
     {
       this->name_.set (std::move (x));
+    }
+
+    const Architecture::comment_optional& Architecture::
+    comment () const
+    {
+      return this->comment_;
+    }
+
+    Architecture::comment_optional& Architecture::
+    comment ()
+    {
+      return this->comment_;
+    }
+
+    void Architecture::
+    comment (const comment_type& x)
+    {
+      this->comment_.set (x);
+    }
+
+    void Architecture::
+    comment (const comment_optional& x)
+    {
+      this->comment_ = x;
+    }
+
+    void Architecture::
+    comment (::std::unique_ptr< comment_type > x)
+    {
+      this->comment_.set (std::move (x));
     }
 
 
@@ -2891,6 +2921,36 @@ namespace damaris
       return external_type (false);
     }
 
+    const Event::comment_optional& Event::
+    comment () const
+    {
+      return this->comment_;
+    }
+
+    Event::comment_optional& Event::
+    comment ()
+    {
+      return this->comment_;
+    }
+
+    void Event::
+    comment (const comment_type& x)
+    {
+      this->comment_.set (x);
+    }
+
+    void Event::
+    comment (const comment_optional& x)
+    {
+      this->comment_ = x;
+    }
+
+    void Event::
+    comment (::std::unique_ptr< comment_type > x)
+    {
+      this->comment_.set (std::move (x));
+    }
+
 
     // Script
     // 
@@ -3073,6 +3133,156 @@ namespace damaris
     frequency_default_value ()
     {
       return frequency_type (1U);
+    }
+
+    const Script::scheduler_file_type& Script::
+    scheduler_file () const
+    {
+      return this->scheduler_file_.get ();
+    }
+
+    Script::scheduler_file_type& Script::
+    scheduler_file ()
+    {
+      return this->scheduler_file_.get ();
+    }
+
+    void Script::
+    scheduler_file (const scheduler_file_type& x)
+    {
+      this->scheduler_file_.set (x);
+    }
+
+    void Script::
+    scheduler_file (::std::unique_ptr< scheduler_file_type > x)
+    {
+      this->scheduler_file_.set (std::move (x));
+    }
+
+    const Script::scheduler_file_type& Script::
+    scheduler_file_default_value ()
+    {
+      return scheduler_file_default_value_;
+    }
+
+    const Script::nthreads_type& Script::
+    nthreads () const
+    {
+      return this->nthreads_.get ();
+    }
+
+    Script::nthreads_type& Script::
+    nthreads ()
+    {
+      return this->nthreads_.get ();
+    }
+
+    void Script::
+    nthreads (const nthreads_type& x)
+    {
+      this->nthreads_.set (x);
+    }
+
+    void Script::
+    nthreads (::std::unique_ptr< nthreads_type > x)
+    {
+      this->nthreads_.set (std::move (x));
+    }
+
+    const Script::nthreads_type& Script::
+    nthreads_default_value ()
+    {
+      return nthreads_default_value_;
+    }
+
+    const Script::timeout_type& Script::
+    timeout () const
+    {
+      return this->timeout_.get ();
+    }
+
+    Script::timeout_type& Script::
+    timeout ()
+    {
+      return this->timeout_.get ();
+    }
+
+    void Script::
+    timeout (const timeout_type& x)
+    {
+      this->timeout_.set (x);
+    }
+
+    void Script::
+    timeout (::std::unique_ptr< timeout_type > x)
+    {
+      this->timeout_.set (std::move (x));
+    }
+
+    const Script::timeout_type& Script::
+    timeout_default_value ()
+    {
+      return timeout_default_value_;
+    }
+
+    const Script::keep_workers_type& Script::
+    keep_workers () const
+    {
+      return this->keep_workers_.get ();
+    }
+
+    Script::keep_workers_type& Script::
+    keep_workers ()
+    {
+      return this->keep_workers_.get ();
+    }
+
+    void Script::
+    keep_workers (const keep_workers_type& x)
+    {
+      this->keep_workers_.set (x);
+    }
+
+    void Script::
+    keep_workers (::std::unique_ptr< keep_workers_type > x)
+    {
+      this->keep_workers_.set (std::move (x));
+    }
+
+    const Script::keep_workers_type& Script::
+    keep_workers_default_value ()
+    {
+      return keep_workers_default_value_;
+    }
+
+    const Script::comment_optional& Script::
+    comment () const
+    {
+      return this->comment_;
+    }
+
+    Script::comment_optional& Script::
+    comment ()
+    {
+      return this->comment_;
+    }
+
+    void Script::
+    comment (const comment_type& x)
+    {
+      this->comment_.set (x);
+    }
+
+    void Script::
+    comment (const comment_optional& x)
+    {
+      this->comment_ = x;
+    }
+
+    void Script::
+    comment (::std::unique_ptr< comment_type > x)
+    {
+      this->comment_.set (std::move (x));
     }
 
 
@@ -3319,6 +3529,36 @@ namespace damaris
     end_iteration_default_value ()
     {
       return end_iteration_type (0U);
+    }
+
+    const ParaViewParam::comment_optional& ParaViewParam::
+    comment () const
+    {
+      return this->comment_;
+    }
+
+    ParaViewParam::comment_optional& ParaViewParam::
+    comment ()
+    {
+      return this->comment_;
+    }
+
+    void ParaViewParam::
+    comment (const comment_type& x)
+    {
+      this->comment_.set (x);
+    }
+
+    void ParaViewParam::
+    comment (const comment_optional& x)
+    {
+      this->comment_ = x;
+    }
+
+    void ParaViewParam::
+    comment (::std::unique_ptr< comment_type > x)
+    {
+      this->comment_.set (std::move (x));
     }
 
 
@@ -4963,32 +5203,34 @@ namespace damaris
     Architecture::
     Architecture (const domains_type& domains,
                   const dedicated_type& dedicated,
-                  const placement_type& placement,
                   const buffer_type& buffer,
+                  const placement_type& placement,
                   const queue_type& queue)
     : ::xml_schema::type (),
       domains_ (domains, this),
       dedicated_ (dedicated, this),
-      placement_ (placement, this),
       buffer_ (buffer, this),
+      placement_ (placement, this),
       queue_ (queue, this),
-      name_ (this)
+      name_ (this),
+      comment_ (this)
     {
     }
 
     Architecture::
     Architecture (::std::unique_ptr< domains_type > domains,
                   ::std::unique_ptr< dedicated_type > dedicated,
-                  ::std::unique_ptr< placement_type > placement,
                   ::std::unique_ptr< buffer_type > buffer,
+                  ::std::unique_ptr< placement_type > placement,
                   ::std::unique_ptr< queue_type > queue)
     : ::xml_schema::type (),
       domains_ (std::move (domains), this),
       dedicated_ (std::move (dedicated), this),
-      placement_ (std::move (placement), this),
       buffer_ (std::move (buffer), this),
+      placement_ (std::move (placement), this),
       queue_ (std::move (queue), this),
-      name_ (this)
+      name_ (this),
+      comment_ (this)
     {
     }
 
@@ -4999,10 +5241,11 @@ namespace damaris
     : ::xml_schema::type (x, f, c),
       domains_ (x.domains_, f, this),
       dedicated_ (x.dedicated_, f, this),
-      placement_ (x.placement_, f, this),
       buffer_ (x.buffer_, f, this),
+      placement_ (x.placement_, f, this),
       queue_ (x.queue_, f, this),
-      name_ (x.name_, f, this)
+      name_ (x.name_, f, this),
+      comment_ (x.comment_, f, this)
     {
     }
 
@@ -5013,10 +5256,11 @@ namespace damaris
     : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
       domains_ (this),
       dedicated_ (this),
-      placement_ (this),
       buffer_ (this),
+      placement_ (this),
       queue_ (this),
-      name_ (this)
+      name_ (this),
+      comment_ (this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
       {
@@ -5063,20 +5307,6 @@ namespace damaris
           }
         }
 
-        // placement
-        //
-        if (n.name () == "placement" && n.namespace_ () == "http://damaris.gforge.inria.fr/damaris/model")
-        {
-          ::std::unique_ptr< placement_type > r (
-            placement_traits::create (i, f, this));
-
-          if (!placement_.present ())
-          {
-            this->placement_.set (::std::move (r));
-            continue;
-          }
-        }
-
         // buffer
         //
         if (n.name () == "buffer" && n.namespace_ () == "http://damaris.gforge.inria.fr/damaris/model")
@@ -5087,6 +5317,20 @@ namespace damaris
           if (!buffer_.present ())
           {
             this->buffer_.set (::std::move (r));
+            continue;
+          }
+        }
+
+        // placement
+        //
+        if (n.name () == "placement" && n.namespace_ () == "http://damaris.gforge.inria.fr/damaris/model")
+        {
+          ::std::unique_ptr< placement_type > r (
+            placement_traits::create (i, f, this));
+
+          if (!placement_.present ())
+          {
+            this->placement_.set (::std::move (r));
             continue;
           }
         }
@@ -5122,17 +5366,17 @@ namespace damaris
           "http://damaris.gforge.inria.fr/damaris/model");
       }
 
-      if (!placement_.present ())
-      {
-        throw ::xsd::cxx::tree::expected_element< char > (
-          "placement",
-          "http://damaris.gforge.inria.fr/damaris/model");
-      }
-
       if (!buffer_.present ())
       {
         throw ::xsd::cxx::tree::expected_element< char > (
           "buffer",
+          "http://damaris.gforge.inria.fr/damaris/model");
+      }
+
+      if (!placement_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_element< char > (
+          "placement",
           "http://damaris.gforge.inria.fr/damaris/model");
       }
 
@@ -5154,6 +5398,12 @@ namespace damaris
           this->name_.set (name_traits::create (i, f, this));
           continue;
         }
+
+        if (n.name () == "comment" && n.namespace_ ().empty ())
+        {
+          this->comment_.set (comment_traits::create (i, f, this));
+          continue;
+        }
       }
     }
 
@@ -5172,10 +5422,11 @@ namespace damaris
         static_cast< ::xml_schema::type& > (*this) = x;
         this->domains_ = x.domains_;
         this->dedicated_ = x.dedicated_;
-        this->placement_ = x.placement_;
         this->buffer_ = x.buffer_;
+        this->placement_ = x.placement_;
         this->queue_ = x.queue_;
         this->name_ = x.name_;
+        this->comment_ = x.comment_;
       }
 
       return *this;
@@ -7720,7 +7971,8 @@ namespace damaris
       execution_ (execution_default_value (), this),
       library_ (library_default_value (), this),
       scope_ (scope_default_value (), this),
-      external_ (external_default_value (), this)
+      external_ (external_default_value (), this),
+      comment_ (this)
     {
     }
 
@@ -7734,7 +7986,8 @@ namespace damaris
       execution_ (x.execution_, f, this),
       library_ (x.library_, f, this),
       scope_ (x.scope_, f, this),
-      external_ (x.external_, f, this)
+      external_ (x.external_, f, this),
+      comment_ (x.comment_, f, this)
     {
     }
 
@@ -7748,7 +8001,8 @@ namespace damaris
       execution_ (this),
       library_ (this),
       scope_ (this),
-      external_ (this)
+      external_ (this),
+      comment_ (this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
       {
@@ -7800,6 +8054,12 @@ namespace damaris
         if (n.name () == "external" && n.namespace_ ().empty ())
         {
           this->external_.set (external_traits::create (i, f, this));
+          continue;
+        }
+
+        if (n.name () == "comment" && n.namespace_ ().empty ())
+        {
+          this->comment_.set (comment_traits::create (i, f, this));
           continue;
         }
       }
@@ -7858,6 +8118,7 @@ namespace damaris
         this->library_ = x.library_;
         this->scope_ = x.scope_;
         this->external_ = x.external_;
+        this->comment_ = x.comment_;
       }
 
       return *this;
@@ -7877,6 +8138,18 @@ namespace damaris
     const Script::scope_type Script::scope_default_value_ (
       "core");
 
+    const Script::scheduler_file_type Script::scheduler_file_default_value_ (
+      "");
+
+    const Script::nthreads_type Script::nthreads_default_value_ (
+      "");
+
+    const Script::timeout_type Script::timeout_default_value_ (
+      "2");
+
+    const Script::keep_workers_type Script::keep_workers_default_value_ (
+      "no");
+
     Script::
     Script (const name_type& name,
             const file_type& file,
@@ -7888,7 +8161,12 @@ namespace damaris
       language_ (language, this),
       scope_ (scope_default_value (), this),
       external_ (external_default_value (), this),
-      frequency_ (frequency_default_value (), this)
+      frequency_ (frequency_default_value (), this),
+      scheduler_file_ (scheduler_file_default_value (), this),
+      nthreads_ (nthreads_default_value (), this),
+      timeout_ (timeout_default_value (), this),
+      keep_workers_ (keep_workers_default_value (), this),
+      comment_ (this)
     {
     }
 
@@ -7903,7 +8181,12 @@ namespace damaris
       language_ (x.language_, f, this),
       scope_ (x.scope_, f, this),
       external_ (x.external_, f, this),
-      frequency_ (x.frequency_, f, this)
+      frequency_ (x.frequency_, f, this),
+      scheduler_file_ (x.scheduler_file_, f, this),
+      nthreads_ (x.nthreads_, f, this),
+      timeout_ (x.timeout_, f, this),
+      keep_workers_ (x.keep_workers_, f, this),
+      comment_ (x.comment_, f, this)
     {
     }
 
@@ -7918,7 +8201,12 @@ namespace damaris
       language_ (this),
       scope_ (this),
       external_ (this),
-      frequency_ (this)
+      frequency_ (this),
+      scheduler_file_ (this),
+      nthreads_ (this),
+      timeout_ (this),
+      keep_workers_ (this),
+      comment_ (this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
       {
@@ -7978,6 +8266,36 @@ namespace damaris
           this->frequency_.set (frequency_traits::create (i, f, this));
           continue;
         }
+
+        if (n.name () == "scheduler-file" && n.namespace_ ().empty ())
+        {
+          this->scheduler_file_.set (scheduler_file_traits::create (i, f, this));
+          continue;
+        }
+
+        if (n.name () == "nthreads" && n.namespace_ ().empty ())
+        {
+          this->nthreads_.set (nthreads_traits::create (i, f, this));
+          continue;
+        }
+
+        if (n.name () == "timeout" && n.namespace_ ().empty ())
+        {
+          this->timeout_.set (timeout_traits::create (i, f, this));
+          continue;
+        }
+
+        if (n.name () == "keep-workers" && n.namespace_ ().empty ())
+        {
+          this->keep_workers_.set (keep_workers_traits::create (i, f, this));
+          continue;
+        }
+
+        if (n.name () == "comment" && n.namespace_ ().empty ())
+        {
+          this->comment_.set (comment_traits::create (i, f, this));
+          continue;
+        }
       }
 
       if (!name_.present ())
@@ -8020,6 +8338,26 @@ namespace damaris
       {
         this->frequency_.set (frequency_default_value ());
       }
+
+      if (!scheduler_file_.present ())
+      {
+        this->scheduler_file_.set (scheduler_file_default_value ());
+      }
+
+      if (!nthreads_.present ())
+      {
+        this->nthreads_.set (nthreads_default_value ());
+      }
+
+      if (!timeout_.present ())
+      {
+        this->timeout_.set (timeout_default_value ());
+      }
+
+      if (!keep_workers_.present ())
+      {
+        this->keep_workers_.set (keep_workers_default_value ());
+      }
     }
 
     Script* Script::
@@ -8042,6 +8380,11 @@ namespace damaris
         this->scope_ = x.scope_;
         this->external_ = x.external_;
         this->frequency_ = x.frequency_;
+        this->scheduler_file_ = x.scheduler_file_;
+        this->nthreads_ = x.nthreads_;
+        this->timeout_ = x.timeout_;
+        this->keep_workers_ = x.keep_workers_;
+        this->comment_ = x.comment_;
       }
 
       return *this;
@@ -8271,7 +8614,8 @@ namespace damaris
       script_ (this),
       update_frequency_ (update_frequency_default_value (), this),
       realtime_timestep_ (realtime_timestep_default_value (), this),
-      end_iteration_ (end_iteration_default_value (), this)
+      end_iteration_ (end_iteration_default_value (), this),
+      comment_ (this)
     {
     }
 
@@ -8283,7 +8627,8 @@ namespace damaris
       script_ (x.script_, f, this),
       update_frequency_ (x.update_frequency_, f, this),
       realtime_timestep_ (x.realtime_timestep_, f, this),
-      end_iteration_ (x.end_iteration_, f, this)
+      end_iteration_ (x.end_iteration_, f, this),
+      comment_ (x.comment_, f, this)
     {
     }
 
@@ -8295,7 +8640,8 @@ namespace damaris
       script_ (this),
       update_frequency_ (this),
       realtime_timestep_ (this),
-      end_iteration_ (this)
+      end_iteration_ (this),
+      comment_ (this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
       {
@@ -8351,6 +8697,12 @@ namespace damaris
           this->end_iteration_.set (end_iteration_traits::create (i, f, this));
           continue;
         }
+
+        if (n.name () == "comment" && n.namespace_ ().empty ())
+        {
+          this->comment_.set (comment_traits::create (i, f, this));
+          continue;
+        }
       }
 
       if (!update_frequency_.present ())
@@ -8386,6 +8738,7 @@ namespace damaris
         this->update_frequency_ = x.update_frequency_;
         this->realtime_timestep_ = x.realtime_timestep_;
         this->end_iteration_ = x.end_iteration_;
+        this->comment_ = x.comment_;
       }
 
       return *this;

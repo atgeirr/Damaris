@@ -65,7 +65,6 @@ void ActionManager::Init(const model::Actions& mdl)
     }
 
     // build scripts - done in ScriptManager
-    
     if(not Search("#error")) {
         WARN("Error handler not found, switching back to default"
         << " garbage collector.");
@@ -78,25 +77,21 @@ void ActionManager::Init(const model::Actions& mdl)
 bool ActionManager::RunActions(const int iteration)
 {
     
-    iterator s = Begin();
-    for(; s != End(); s++) {
-        (*s)->Call(iteration, iteration);
-    }
-    
-    /*
     // loop through actions looking for the script() actions
     auto actnItr = Begin();
     for(; actnItr != End(); actnItr++) {
         std::shared_ptr<Action> action = *actnItr;
-       // action->CoProcess(iteration) ;
-        const model::Actions& actn_mdl = GetModel(); 
-       if (Actions::pyscript.get().language().present() ) {
-           
-           std::string file_ = Actions.get().file() ;
-           std::cout << "RunActions has found a script which has a file field named: " << file_ << std::endl ;
-       }
+        
+        // Need to do the opposite here as done in ScriptManager::RunScript()
+        // i.e. call action->Call() only if it is *not* a script
+#ifdef HAVE_PYTHON_ENABLED        
+        if ( std::dynamic_pointer_cast<PyAction>(*actnItr) == nullptr ) {
+            std::shared_ptr<Action> action = *actnItr;
+            action->Call(iteration, iteration) ;            
+        }
+#endif
     }
-    */
+    
     return true ;
 } // end of RunActions
 

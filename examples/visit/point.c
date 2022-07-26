@@ -117,7 +117,7 @@ void mainloop(simulation_data *sim)
 	{
 		simulate_one_timestep(sim);
 		exposeDataToDamaris(sim);
-		sleep(1);
+		sleep(10);
 	}
 }
 

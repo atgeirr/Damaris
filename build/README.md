@@ -1,4 +1,4 @@
-The **offical documentation** for Damaris is available here: https://project.inria.fr/damaris/documentation/ 
+The **official documentation** for Damaris is available here: https://project.inria.fr/damaris/documentation/
 
 The following procedures may be out of date, however provides some extra information
 for installing Damaris using Spack and in a container via Docker.
@@ -15,13 +15,7 @@ for installing Damaris using Spack and in a container via Docker.
 # Installing Damaris
 ==================
 
-This file documents different ways from installing Damaris along
-with its dependencies. If you want to install Damaris in a docker
-please refer to the corresponding section. If you want to install
-Damaris in another environment, we highly recommand using Spack
-(see corresponding section), which can be used to install all the
-necessary dependencies. Other sections document alternate ways to
-build Damaris and its dependencies.
+This file documents different ways for installing Damaris along with its dependencies.
 
 
 ## Dependencies
@@ -366,7 +360,7 @@ libraries) installed on your platform.
 Change $HOME/local if you want it installed in another directory.
 
 Once the procedure completes, VisIt is installed and you can enable
-it using Damaris' cmake flags:
+it using the Damaris cmake flags:
 
     -DENABLE_VISIT=ON \
     -DVisIt_ROOT=$HOME/local/visit

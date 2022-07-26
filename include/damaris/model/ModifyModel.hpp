@@ -20,6 +20,8 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include <fstream>
 #include <map>
 
+#include <mpi.h>
+
 #include "damaris/model/Model.hpp"
 
 namespace damaris {
@@ -34,7 +36,7 @@ class ModifyModel {
           
     private:
         std::string config_xml_ ; /*!< A string of XML that (will) conform to the Damaris XSD model. */
-        std::unique_ptr<Simulation> simModel_ ; /*!< The Damaris XML model that will be created rom the config_xml_ string */
+        std::unique_ptr<Simulation> simModel_ ; /*!< The Damaris XML model that will be created from the config_xml_ string */
         bool converted_ ;          /*!< is true if the string XML value has been converted to the std::unique_ptr<Simulation> value */
                      
     public:
@@ -78,6 +80,26 @@ class ModifyModel {
          *  * \param[in] filename :  The filename to save the config_xml_XML string to 
          */
         void SaveXMLStringToFile(std::string filename ) ;
+        
+        
+        /**
+         * Loads an XML file in the rank 0 of the given MPI communicator, broadcast
+         * its content to other processes that will copy it to the config_xml_ string.
+         *
+         * \param[in] comm : MPI communicator gather all processess that need to 
+         *                   load the XML file.
+         * \param[in] uri  : Path and filename of the XML file.
+        */
+        bool ReadAndBroadcastXMLFromFile(const MPI_Comm& comm, const std::string& uri) ;
+        
+        /**
+        *  Uses ModifyModel::config_xml_ string to initialize the the Damaris XML *Simulation* model. 
+        *  which is a test if it is valid XML..
+        *
+        * \param[in] verbose : If verbose == true, then on failure to convert the string representation
+        *                      to the model then print the xml string 
+        */
+        bool TestSimulationModel( bool verbose ) ;
     
         
     protected:
@@ -87,7 +109,7 @@ class ModifyModel {
         *  Only call this method after any required preprocessing has been done to the XML string.
         *
         */
-        void SetSimulationModel( void ) ;
+        bool SetSimulationModel( void ) ;
         
         
         /**
@@ -109,7 +131,7 @@ class ModifyModel {
         
         
         /**
-        * Allows access to the  the Damaris XML *Simulation* model so it can be modified using the XSD geenrated API
+        * Allows access to the  the Damaris XML *Simulation* model so it can be modified using the XSD genrated API
         * N.B. Used for testing, not used in Damaris public API
         */
         Simulation * GetModel( void ) ;

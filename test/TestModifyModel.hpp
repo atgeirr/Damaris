@@ -30,41 +30,41 @@ class ModifyModelDerived : public ModifyModel {
 }
 
 class TestModifyModel : public CppUnit::TestFixture {
-	
+    
 private:
-	static bool initialized;
+    static bool initialized;
 public:
-	TestModifyModel() {
+    TestModifyModel() {
 
-	}
+    }
 
-	virtual ~TestModifyModel() {
-		//Environment::Finalize();
-		//initialized = false;
-	}
+    virtual ~TestModifyModel() {
+        //Environment::Finalize();
+        //initialized = false;
+    }
 
-	static CppUnit::Test* GetTestSuite() {
-		CppUnit::TestSuite *suiteOfTests = 
-			new CppUnit::TestSuite("ModifyModel");
-		
-		suiteOfTests->addTest(new CppUnit::TestCaller<TestModifyModel>(
-				"Creates a ModifyModel class and preprocess using REGEX simplified xml ",
-				&TestModifyModel::CallCreateModifyModelandRegex));
+    static CppUnit::Test* GetTestSuite() {
+        CppUnit::TestSuite *suiteOfTests = 
+            new CppUnit::TestSuite("ModifyModel");
         
         suiteOfTests->addTest(new CppUnit::TestCaller<TestModifyModel>(
-				"Creates a ModifyModel class and preprocess using REGEX, then returns the model::simulation and tests values of model (mdl->architecture().buffer().size()) ",
-				&TestModifyModel::CallCreateModifyModelandSimulation));
+                "Creates a ModifyModel class and preprocess using REGEX simplified xml ",
+                &TestModifyModel::CallCreateModifyModelandRegex));
         
         suiteOfTests->addTest(new CppUnit::TestCaller<TestModifyModel>(
-				"Creates a ModifyModel class and preprocess using REGEX, then returns the model::simulation via the void * release from the unique_ptr<Simulation> ",
-				&TestModifyModel::CallCreateModifyModelandSimulationViaVoid));
-		
-		return suiteOfTests;
-	}
+                "Creates a ModifyModel class and preprocess using REGEX, then returns the model::simulation and tests values of model (mdl->architecture().buffer().size()) ",
+                &TestModifyModel::CallCreateModifyModelandSimulation));
+        
+        suiteOfTests->addTest(new CppUnit::TestCaller<TestModifyModel>(
+                "Creates a ModifyModel class and preprocess using REGEX, then returns the model::simulation via the void * release from the unique_ptr<Simulation> ",
+                &TestModifyModel::CallCreateModifyModelandSimulationViaVoid));
+        
+        return suiteOfTests;
+    }
 
 protected:
-	
-	void CallCreateModifyModelandRegex() {
+    
+    void CallCreateModifyModelandRegex() {
         std::string input_xml = R"V0G0N( 
 _SHMEM_BUFFER_BYTES_REGEX_ _SHMEM_BUFFER_BYTES_REGEX_
 _DC_REGEX_ _SHMEM_BUFFER_BYTES_REGEX_
@@ -77,7 +77,7 @@ _MYSTORE_OR_EMPTY_REGEX_
 outputdir
 MyStore
 )V0G0N";
-		damaris::model::ModifyModelDerived myMod = damaris::model::ModifyModelDerived(input_xml);
+        damaris::model::ModifyModelDerived myMod = damaris::model::ModifyModelDerived(input_xml);
         // std::cout << "Input string: " << std::endl  << myMod.GetConfigString()  << std::endl ;
         std::map<std::string,std::string> find_replace_map = {
         {"_SHMEM_BUFFER_BYTES_REGEX_","67108864"},
@@ -91,16 +91,16 @@ MyStore
         CPPUNIT_ASSERT_EQUAL_MESSAGE("Comparing REGEXed string with expected",
               expected,
  myMod.GetConfigString() ) ;
-	}
-	
-	void CallCreateModifyModelandSimulation() {
-		damaris::model::ModifyModelDerived myMod = damaris::model::ModifyModelDerived(); // this creator is pre-defined with a Simulation XML string
+    }
+    
+    void CallCreateModifyModelandSimulation() {
+        damaris::model::ModifyModelDerived myMod = damaris::model::ModifyModelDerived(); // this creator is pre-defined with a Simulation XML string
         std::map<std::string,std::string> find_replace_map = {
         {"_SHMEM_BUFFER_BYTES_REGEX_","67108864"},
         {"_DC_REGEX_","1"},
         {"_DN_REGEX_","0"},
         {"_PATH_REGEX_","outputdir"},
-        {"_MYSTORE_OR_EMPTY_REGEX_","MyStore"},
+        {"_MYSTORE_OR_EMPTY_REGEX_",""},
         };
         myMod.RepalceWithRegEx(find_replace_map);
         myMod.SetSimulationModel() ;   
@@ -111,18 +111,18 @@ MyStore
         CPPUNIT_ASSERT_EQUAL_MESSAGE("Comparing REGEXed mdl->architecture().buffer().size()", 67108864ul, buffer_size
  ) ;
        
-		initialized = false; 
-	}
-	
-	void CallCreateModifyModelandSimulationViaVoid() {
-		damaris::model::ModifyModelDerived myMod = damaris::model::ModifyModelDerived();  // this creator is pre-defined with a Simulation XML string
+        initialized = false; 
+    }
+    
+    void CallCreateModifyModelandSimulationViaVoid() {
+        damaris::model::ModifyModelDerived myMod = damaris::model::ModifyModelDerived();  // this creator is pre-defined with a Simulation XML string
         std::cout << "Input string: " << std::endl  << myMod.GetConfigString()  << std::endl ;
         std::map<std::string,std::string> find_replace_map = {
         {"_SHMEM_BUFFER_BYTES_REGEX_","67108864"},
         {"_DC_REGEX_","1"},
         {"_DN_REGEX_","0"},
         {"_PATH_REGEX_","outputdir"},
-        {"_MYSTORE_OR_EMPTY_REGEX_","MyStore"},
+        {"_MYSTORE_OR_EMPTY_REGEX_",""},
         };
         myMod.RepalceWithRegEx(find_replace_map);
         myMod.SetSimulationModel() ;   
@@ -134,9 +134,9 @@ MyStore
         CPPUNIT_ASSERT_EQUAL_MESSAGE("Comparing REGEXed mdl->architecture().buffer().size()", 67108864ul, buffer_size
  ) ;
        
-		initialized = false;
-	}
-	
+        initialized = false;
+    }
+    
 };
 
 bool TestModifyModel::initialized = false;

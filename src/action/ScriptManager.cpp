@@ -33,15 +33,36 @@ void ScriptManager::Init(const model::Scripts& mdl_script)
 #ifdef HAVE_PYTHON_ENABLED
     model::Scripts::pyscript_const_iterator s(mdl_script.pyscript().begin());
     for(; s != mdl_script.pyscript().end(); s++) {
-        Create<PyAction>(*s);  // (std::string)s->name() this is actually a cal to PyAction::New(mdl)
         std::string file_ = s->file() ;
         std::cout << "ScriptManager has found a script which has a file field named: " << file_ << std::endl ;
+        Create<PyAction>(*s);  // (std::string)s->name() this is actually a call to PyAction::New(mdl)
         if(!handler_is_event && (std::string)s->name() == handler_name) 
         {
             Create<PyAction>(*s,"#error");
         }
     }
 #endif  // HAVE_PYTHON_ENABLED
+
+    VariableManager::iterator v = VariableManager::Begin();
+    for(; v != VariableManager::End(); v++) {
+        const model::Variable& mdl = (*v)->GetModel();
+        if(mdl.script() == "#") continue;
+        
+        std::vector<std::string> scripts;
+        boost::split(scripts, mdl.script(), boost::is_any_of(",; "));
+        
+        std::vector<std::string>::iterator s = scripts.begin();
+        for(; s != scripts.end(); s++) {
+            std::shared_ptr<Action> st = Search(*s); // Search is inherited from Manager
+            if(st) {
+                st->AddVariable(*v);
+            } else {
+                CFGERROR("Unknown script \""
+                << *s << "\" for variable \"" 
+                << (*v)->GetName() << "\"");
+            }
+        }
+    }
     
   // mdl_= mdl ;
 }
@@ -50,27 +71,36 @@ void ScriptManager::Init(const model::Scripts& mdl_script)
 // was RunActions(
 bool ScriptManager::RunScripts(const int iteration)
 {
-    
+    /*
     iterator s = Begin();
     for(; s != End(); s++) {
         (*s)->Call(iteration, iteration);
     }
+    */
     
-    /*
     // loop through actions looking for the script() actions
     auto actnItr = Begin();
     for(; actnItr != End(); actnItr++) {
-        std::shared_ptr<Action> action = *actnItr;
+        
+       // if ( dynamic_cast<PyAction*>(*actnItr) != nullptr ) {
+#ifdef HAVE_PYTHON_ENABLED     
+        if ( std::dynamic_pointer_cast<PyAction>(*actnItr) != nullptr ) {
+            std::shared_ptr<Action> action = *actnItr;
+            action->Call(iteration, iteration) ;            
+        }
+#endif  // HAVE_PYTHON_ENABLED
+        
        // action->CoProcess(iteration) ;
-        const model::Actions& actn_mdl = GetModel(); 
+       /* const model::Actions& actn_mdl = GetModel(); 
        if (actn_mdl.language().present() ) {
            
            std::string file_ = Actions.get().file() ;
            std::cout << "RunActions has found a script which has a file field named: " << file_ << std::endl ;
        }
+       */
     }
-    */
+    
     return true ;
-} // end of RunActions
+} // end of RunScripts
 
 }  // end damaris namespace

@@ -1,0 +1,144 @@
+# syntax=docker/dockerfile:1
+
+# Author: Josh Bowden
+# Company: Inria
+# Date: 13/01/2022
+#
+# Usage: 
+# sudo docker build -t registry.gitlab.inria.fr/damaris:v1.5.0 --build-arg INPUT_damaris_ver=v1.5.0 --build-arg INPUT_repo=damaris -f ./Dockerfile.ubuntu20 .
+#
+# USe docker run as it does not leave the container running on exit:
+# docker run -it registry.gitlab.inria.fr/damaris:v1.5.0 /bin/bash
+
+
+########################################
+## Stage 1 of build
+########################################
+FROM ubuntu:20.04 AS builder
+
+RUN useradd docker \
+	&& mkdir /home/docker \
+	&& chown docker:docker /home/docker \
+	&& addgroup docker staff
+
+
+ENV INSTALLTMDIR=/home/docker/installdir
+
+## Install build tools and dependencies for Damaris
+RUN apt-get update -y \
+  && echo "debconf debconf/frontend select Noninteractive" | debconf-set-selections \
+  && apt-get install -y --no-install-recommends \ 
+	software-properties-common \
+    apt-utils \
+    build-essential \
+    gfortran \
+    pkg-config \
+    git-core \
+    cmake \
+    wget unzip nano \
+	libpython3-dev libboost-python-dev libboost-numpy-dev \
+	libboost-dev \
+	libboost-regex-dev \
+	libboost-date-time-dev \
+	libboost-log-dev \
+	libboost-system-dev \
+	libboost-filesystem-dev \
+	libboost-thread-dev \
+	libhdf5-openmpi-dev \
+	libxerces-c-dev  \
+	xsdcxx \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/* \
+  && ln -s /usr/bin/xsdcxx /usr/bin/xsd 
+  
+   
+# RUN apt-get install -y --no-install-recommends \ 
+#  	libpython3-dev \
+#   libpython3-dev libboost-python-dev libboost-numpy-dev \
+  
+USER docker
+
+# N.B INPUT_damaris_ver to be provided on the docker build --build-arg INPUT_damaris_ver=v1.5.0 --build-arg INPUT_repo="damaris-development" .
+ARG INPUT_damaris_ver
+ARG INPUT_repo
+ENV DAMARIS_VERSION=$INPUT_damaris_ver
+ENV repo=$INPUT_repo
+
+# These should also be supplied on the command line as --build-arg 
+# ENV ENABLE_PYTHON=
+
+
+# Regenerate the xml model in C using XSD
+ENV REGEN_ON_OFF=ON
+ENV SHLIBS_ON_OFF=OFF
+# Build examples
+ENV EXAMPLES_ON_OFF=ON
+
+ENV INSTALL_PREFIX=/home/docker/local
+ENV NUMCORES=4
+
+  
+RUN  mkdir -p ${INSTALLTMDIR} \
+  && cd ${INSTALLTMDIR} \
+  && echo "Damaris Version: v1.5.0" \
+  && git clone --depth 1 --branch $DAMARIS_VERSION https://gitlab.inria.fr/Damaris/$repo.git \
+  && mkdir -p ${INSTALLTMDIR}/build/$repo \
+  && cd ${INSTALLTMDIR}/build/$repo \
+  && cmake ../../$repo -DCMAKE_INSTALL_PREFIX:PATH=$INSTALL_PREFIX \
+      -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
+      -DCMAKE_CXX_COMPILER=mpicxx \
+      -DCMAKE_C_COMPILER=mpicc \
+      -DENABLE_TESTS=OFF \
+      -DENABLE_EXAMPLES=$EXAMPLES_ON_OFF \
+      -DBUILD_SHARED_LIBS=$SHLIBS_ON_OFF \
+      -DENABLE_CATALYST=OFF \
+      -DGENERATE_MODEL=$REGEN_ON_OFF \
+      -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi \
+  && make -j${NUMCORES} \ 
+  && make install 
+  
+  RUN find ${INSTALL_PREFIX}/examples/ -type f -name *.xml  | xargs sed -i "s|<script>.*examples|<script>${INSTALL_PREFIX}/examples|"
+
+########################################
+## Stage 2 of build
+########################################
+FROM ubuntu:20.04 AS testing  
+
+RUN useradd docker \
+	&& mkdir /home/docker \
+	&& chown docker:docker /home/docker \
+	&& addgroup docker staff
+
+
+ENV INSTALLTMDIR=/home/docker/installdir
+
+RUN apt-get update -y \
+  && echo "debconf debconf/frontend select Noninteractive" | debconf-set-selections \
+  && apt-get install -y --no-install-recommends \ 
+	software-properties-common \
+    wget unzip nano \
+	libhdf5-openmpi-dev \
+	libboost-regex-dev \
+	libboost-date-time-dev \
+	libboost-log-dev \
+	libboost-system-dev \
+	libboost-filesystem-dev \
+	libboost-thread-dev \
+	libhdf5-openmpi-dev \
+	libxerces-c-dev  \
+	xsdcxx \
+	hdf5-tools \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
+  
+  
+# RUN apt-get install -y --no-install-recommends \ 
+#  	libpython3-dev \
+#   libpython3-dev libboost-python-dev libboost-numpy-dev \
+
+ USER docker
+ COPY --from=builder /home/docker/local/ /home/docker/local/
+ 
+ WORKDIR /home/docker/local/examples
+ 
+ CMD ["/bin/bash"]

@@ -63,25 +63,11 @@ RUN useradd -m --create-home -s /bin/bash docker \
 	&& groupadd staff \
     && usermod -a -G staff docker
 
-ENV INSTALL_PREFIX=/home/docker/local
-# ENV MPI_BINDIR=/usr/bin 
-# ENV PATH=$INSTALL_PREFIX/bin:${MPI_BINDIR}:$PATH  
-ENV PATH=${INSTALL_PREFIX}/bin:${PATH}
-ENV LD_LIBRARY_PATH=${INSTALL_PREFIX}/lib:${INSTALL_PREFIX}/lib64:${LD_LIBRARY_PATH}
+RUN echo 'root:docker' | chpasswd
+#RUN yes docker | passwd --stdin root
 
-ENV INSTALLTMDIR=/home/docker/installdir
-ENV CMAKE_BUILD_TYPE=Release
-ENV NUMCORES=4
-
-
-ENV GL_INSTALL_PATH=/usr/lib
-ENV GL_HEADER_PATH=/usr/include
-
-
-## Good to look at: https://centos.pkgs.org/
-## Install build tools and dependencies for Damaris
-RUN yes| pacman -Syu 
-
+# Archlinux: https://archlinux.org/packages/community/x86_64/
+# Dependencies for Damaris
 RUN  yes | pacman -Syu xerces-c \
     xsd \
     cppunit \
@@ -95,7 +81,22 @@ RUN  yes | pacman -Syu xerces-c \
     nano \
     wget \
     cmake \
-    && cp /usr/bin/xsdcxx /usr/bin/xsd
+    python \
+    python-mpi4py \
+    python-numpy \
+  && cp /usr/bin/xsdcxx /usr/bin/xsd \
+  && yes | pacman -Scc
+
+
+# Compile-time dependencies
+# freeglut-devel is just for OpenGL headers,
+# that should be found in the mesa install of Visit,
+# but are not.
+RUN yes | pacman -Syu   gcc gcc-fortran  \
+       libtool m4 automake   \
+       freeglut \
+  && yes | pacman -Scc
+
 
 # Archlinux: https://archlinux.org/packages/community/x86_64/paraview/
 ## For Paraview
@@ -113,29 +114,51 @@ RUN yes | pacman -Syu mesa \
     zlib \
     double-conversion \
     gcc-fortran
-    
+
 
 RUN yes | pacman -Syu python python-mpi4py python-numpy
 
+
+
+ENV INSTALL_PREFIX=/home/docker/local
+# ENV MPI_BINDIR=/usr/bin
+# ENV PATH=$INSTALL_PREFIX/bin:${MPI_BINDIR}:$PATH
+ENV PATH=${INSTALL_PREFIX}/bin:${PATH}
+ENV LD_LIBRARY_PATH=${INSTALL_PREFIX}/lib:${INSTALL_PREFIX}/lib64:${LD_LIBRARY_PATH}
+
+ENV INSTALLTMDIR=/home/docker/installdir
+ENV CMAKE_BUILD_TYPE=Release
+ENV NUMCORES=4
+
+
+ENV GL_INSTALL_PATH=/usr/lib
+ENV GL_HEADER_PATH=/usr/include
+
+ENV MPI_BINDIR=/usr/bin
+ENV PATH=$INSTALL_PREFIX/bin:${MPI_BINDIR}:$PATH
+# N.B. MPI_BINDIR=/usr/lib64/openmpi/bin has to be on the PATH
+ENV MPICXX=$MPI_BINDIR/mpicxx
+ENV MPICC=$MPI_BINDIR/mpicc
+ENV MPIFORT=$MPI_BINDIR/mpifort
+
+ENV GCC=/usr/bin/gcc
+ENV GPP=/usr/bin/g++
+
+
+
 USER docker
 
-ENV MPI_BINDIR=/usr/bin 
-ENV PATH=$INSTALL_PREFIX/bin:${MPI_BINDIR}:$PATH  
-# N.B. MPI_BINDIR=/usr/lib64/openmpi/bin has to be on the PATH
-ENV MPICXX_PATH=$MPI_BINDIR/mpicxx
-ENV MPICC_PATH=$MPI_BINDIR/mpicc
-ENV MPIFORT_PATH=$MPI_BINDIR/mpifort
 
 
 RUN   mkdir -p ${INSTALLTMDIR} \
   &&   cd ${INSTALLTMDIR} \
   &&   git clone  https://gitlab.kitware.com/paraview/paraview.git \
   &&   cd ${INSTALLTMDIR}/paraview   \
-  &&   git fetch --all 
+  &&   git fetch --all
 
 ARG INPUT_pv_ver=v5.8.0
 ENV PV_VERSION=$INPUT_pv_ver
-  
+
 RUN   cd ${INSTALLTMDIR}/paraview   \
   &&   git checkout ${PV_VERSION}  \
   &&   git submodule update --init --recursive \
@@ -157,7 +180,7 @@ RUN   cd ${INSTALLTMDIR}/paraview   \
        -DOSMESA_INCLUDE_DIR=$GL_HEADER_PATH/include \
        -DOSMESA_LIBRARY=$GL_INSTALL_PATH/libOSMesa.so \
        || cat /home/docker/installdir/build/pv/CMakeFiles/*.log
-       
+
 RUN   cd ${INSTALLTMDIR}/build/pv  \
   && ninja -j${NUMCORES} \
   && ninja install \

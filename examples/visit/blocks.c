@@ -32,7 +32,7 @@ void simulate_one_timestep(simulation_data *sim)
     ++sim->cycle;
     sim->time += 0.0134;
     printf("Simulating time step: cycle=%d, time=%lg\n", sim->cycle, sim->time);
-    sleep(1);
+    sleep(10);
 }
 
 void exposeDataToDamaris(simulation_data* s);

@@ -35,6 +35,10 @@ along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 #include "paraview/ParaViewAdaptor.hpp"
 #endif
 
+#ifdef HAVE_PYTHON_ENABLED
+// #include "scripts/.hpp"
+#endif
+
 enum {
     BCAST_EVENT,
     VISIT_CONNECTED,
@@ -186,11 +190,20 @@ void Server::EndOfIterationCallback(int tag, int source,
 
     StorageManager::Update(iteration);
     
+#ifdef HAVE_PYTHON_ENABLED
+    // N.B. ActionManager::RunActions(iteration); will run the same code as ScriptManager::RunScripts(iteration)
+    //std::cout <<"INFO: Server.cpp HAVE_PYTHON_ENABLED is defined" << std::endl ;
+    ScriptManager::RunScripts(iteration);
+#else
+   // std::cout <<"INFO: Server.cpp HAVE_PYTHON_ENABLED is NOT defined" << std::endl ;
+#endif
+    
+    // N.B. ActionManager::RunActions() *first* calls the garbage collector on block data of all variables
+    // And then it calls other actions (such as PyAction) which then have no block data.
+    // This is a 
     ActionManager::RunActions(iteration);
     
-#ifdef HAVE_PYTHON_ENABLED
-    ScriptManager::RunScripts(iteration);
-#endif
+
     
     t_fin = MPI_Wtime();
     t_server_run = t_fin - t_start;
