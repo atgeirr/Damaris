@@ -1,4 +1,6 @@
-  
+__all__ = ['return_scheduler_filename', 'return_iteration', 'return_magic_number', 'return_scalar_from_position', 'return_numpy_array', 'return_dask_array']
+
+
 def return_separator(p0, p1, dim, instr, first_elem):         
     resstr = ''
     if p1[dim] > p0[dim]:
@@ -53,31 +55,79 @@ def return_dask_block_layout(mylist_sorted, dask_client_name_str):
  
 
 def return_scheduler_filename(DamarisData):
+    """
+        return_scheduler_filename(DamarisData)
+        
+        DamarisData: Is the dictionary that describes the Damaris data that is created 
+                     by the Damaris server processes. It contains a dictionary 'dask_env'
+                     that contains the Dask scheduler name.
+                     
+        If this scheduler_file exists (is not an empty string) then a Dask 
+        scheduler was found (This access has been tested on the Damaris server C++ Python).
+    """
     dask_dict    = DamarisData['dask_env']
-    # If this scheduler_file exists (is not an empty string) then a Dask scheduler was 
-    # found (Access has been tested on the Damaris server C++ Python).
+    
     scheduler_file  = dask_dict['dask_scheduler_file']  
     return scheduler_file
     
         
 def return_iteration(DamarisData):
-    # This third dictionary is set up in PyAction::PassDataToPython() and is 
-    # typically different each iteration.
+    """
+        return_iteration(DamarisData)
+        
+        DamarisData: Is the dictionary that describes the Damaris data that is created 
+                     by the Damaris server processes. It contains a dictionary 'iteration_data'
+                     that contains meta-data about the current iteration of the simulation. 
+                     It is produced by Damaris C++ method PyAction::PassDataToPython()
+                     
+        Returns the iteration value the from Damaris perspective
+        i.e. It is the number of times damaris_end_iteration() has been called.
+    """
+
     iter_dict    = DamarisData['iteration_data']   
-    # This is the iteration value the from Damaris perspective
-    # i.e. It is the number of times damaris_end_iteration() has been called
     iteration    = iter_dict['iteration']
     return iteration
         
+        
+        
 def return_magic_number(DamarisData):
+    """
+        return_magic_number(DamarisData)
+        
+        DamarisData: Is the dictionary that describes the Damaris data that is created 
+                     by the Damaris server processes. It contains a dictionary 'damaris_env'
+                     that contains meta-data about the current simulation.
+                     
+        Returns a unique string that identifies the instance of the simulation.
+    """
     damaris_dict = DamarisData['damaris_env']
     magic_num    = damaris_dict['simulation_magic_number']
     return magic_num
 
 
 def return_scalar_from_position(DamarisData, varname, pos=(0), client_rank=0, block_number=0 ):
-    # This third dictionary is set up in PyAction::PassDataToPython() and is 
-    # typically different each iteration.
+    """
+        return_scalar_from_position(DamarisData, varname, pos=(0), client_rank=0, block_number=0)
+        
+        DamarisData:   Is the dictionary that describes the Damaris data that is created 
+                       by the Damaris server processes. It contains a dictionary 'iteration_data'
+                       that contains meta-data about the current simulation.
+                     
+        varname:      The Damaris variable name - matches names used in the Damaris XML file and used 
+                      for damaris_write()
+                    
+        pos     :     Is the specific index into the NumPy array from which to return the value.
+        
+        client_rank:  Specifies the Damaris client rank where the NumPy data was produced. 
+                      N.B. As data is distributed, only certain Damaris server processes will have 
+                      access to particular Damaris client data - they both need to reside on the
+                      same host. 
+        
+        block_number: Specifies the block (or the domain) written by damaris_write_block() or 0 if
+                      only damaris_write() has been used.
+                     
+        Returns single value from the specified NumPy array
+    """
     iter_dict    = DamarisData['iteration_data']   
     try:
         if varname in iter_dict.keys():
@@ -94,8 +144,26 @@ def return_scalar_from_position(DamarisData, varname, pos=(0), client_rank=0, bl
 
         
 def return_numpy_array(DamarisData, varname, client_rank=0, block_number=0 ):
-    # This third dictionary is set up in PyAction::PassDataToPython() and is 
-    # typically different each iteration.
+    """
+        return_numpy_array(DamarisData, varname, client_rank=0, block_number=0)
+        
+        DamarisData:   Is the dictionary that describes the Damaris data that is created 
+                       by the Damaris server processes. It contains a dictionary 'iteration_data'
+                       that contains meta-data about the current simulation.
+                     
+        varname:      The Damaris variable name - matches names used in the Damaris XML file and used 
+                      for damaris_write()
+                    
+        client_rank:  Specifies the Damaris client rank where the NumPy data was produced. 
+                      N.B. As data is distributed, only certain Damaris server processes will have 
+                      access to particular Damaris client data - they both need to reside on the
+                      same host. 
+        
+        block_number: Specifies the block (or the domain) written by damaris_write_block() or 0 if
+                      only damaris_write() has been used.
+                     
+        Returns the full NumPy array specified by the client rank and block number
+    """
     iter_dict    = DamarisData['iteration_data']   
     try:
         if varname in iter_dict.keys():
@@ -112,6 +180,22 @@ def return_numpy_array(DamarisData, varname, client_rank=0, block_number=0 ):
            
            
 def return_dask_array(DamarisData, client, varname, server_comm, print_array_component=False ):
+    """
+        return_dask_array(DamarisData, varname, server_comm block_number=0)
+        
+        DamarisData:   Is the dictionary that describes the Damaris data that is created 
+                       by the Damaris server processes. It contains a dictionary 'iteration_data'
+                       that contains meta-data about the current simulation.
+                     
+        varname:      The Damaris variable name - matches names used in the Damaris XML file and used 
+                      for damaris_write()
+                    
+        server_comm:  The simulation communicator collecting Damaris servers.
+        
+        print_array_component: Specifies whether to print to stdout the array structure or not.
+                     
+        Returns a created Dask dask.array of the distributed simulation data
+    """
     import dask.array as da
     try:
         rank = server_comm.Get_rank()

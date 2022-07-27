@@ -114,8 +114,6 @@ np.set_printoptions(threshold=np.inf)
 
 
 def main(DD):
-    from mpi4py import MPI
-    import dask.array as da
     import numpy as np
     import time
     from os import path
@@ -139,8 +137,9 @@ def main(DD):
           
         # This is the iteration value the from Damaris perspective
         # i.e. It is the number of times damaris_end_iteration() has been called
+        iter_dict        = DD['iteration_data']
         iteration        = iter_dict['iteration']
-        iteration_dam    = damaris_dask.return_iteration()         
+        iteration_dam    = damaris_dask.return_iteration(DD)         
         assert iteration == iteration_dam
         
         damaris_comm.Barrier()
@@ -153,13 +152,15 @@ def main(DD):
         sum_from_sim = damaris_dask.return_scalar_from_position(DD, 'array_sum', pos=(0))
         print('Info from Python: Iteration ', iteration, ' Data found: iter_dict[array_sum][numpy_data][P0_B0] = ', sum_from_sim )
 
+        
         # lists the known clients of the current Damaris server rank
         client_list = listknownclients()
         last_iter_numpy = damaris_dask.return_numpy_array(DD, 'last_iter', client_rank=client_list[0] )
-        if (last_iter_numpy is not None):
-            print('Info from Python: Iteration ', iteration, ' Data found: last_iter = ', last_iter_numpy[0] )
-        else:
-            print('Info from Python: Iteration ', iteration, ' Data not found: last_iter ')
+        if (iteration == 0):
+            if (last_iter_numpy is not None):
+                print('Python iteration ', iteration, ' Data found: last_iter = ', last_iter_numpy[0] )
+            else:
+                print('Python iteration ', iteration, ' Data not found: last_iter ')
 
         # Do some Dask stuff
         # If this scheduler_file exists (is not an empty string) then a Dask scheduler was 
@@ -177,12 +178,12 @@ def main(DD):
                 # Only rank 0 returns a dask.array, the others return None
                 if (x is not None):
                     array_sum_dask = x.sum().compute()
-                    print('Iteration ', iteration,' dask x.sum() := ', array_sum_dask)
+                    print('Python iteration ', iteration,' dask x.sum() := ', array_sum_dask)
                     
-                    if iteration == 2 :
-                        y = x.map_blocks(compute_block_sum, chunks=(1, 1, 1)).compute()
-                        print('Info from Python: Iteration ', iteration, 'The sum of values within the dask.array blocks is:')
-                        print(y)
+                    # if iteration == 2 :
+                    #    y = x.map_blocks(compute_block_sum, chunks=(1, 1, 1)).compute()
+                    #    print('Python iteration ', iteration, 'The sum of values within the dask.array blocks is:')
+                    #    print(y)
                     
                     if sum_from_sim == array_sum_dask:
                         print('PASS')  # I should push this to the Dask memory to compare at end of iterations?
@@ -193,18 +194,9 @@ def main(DD):
                     # Use .compute() with small datasets (summaries / reductions) to use in displaying results
 
                 damaris_comm.Barrier()
-                
-                # client.shutdown() would shut down the scheduler and all workers.
-                # The Damaris simulation may try to shut down just the workers.     
-                # The runscript that launched the simulation may also try to shut down the scheduler.               
-                # if iteration == (last_iter-1):
-                #    client.shutdown() 
-                
+  
                 # close the client only:
                 client.close()
-                    
-                # client.unpublish_dataset(pub_name) 
-                # print("rank " , rank, "  client.datasets[ " , pub_name, "] was unpublished")
                 
             except TimeoutError as err:
                 print('Python ERROR: TimeoutError!: ', err) 

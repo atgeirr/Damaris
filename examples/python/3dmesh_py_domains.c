@@ -191,11 +191,11 @@ int main(int argc, char** argv)
             MPI_Barrier(comm) ;
             double t2 = MPI_Wtime() ;
             if(rank_client == 0) {
-                printf("Iteration %d done in %f seconds\n",i,(t2-t1)) ;
+                printf("C++    iteration %d done in %f seconds\n",i,(t2-t1)) ;
                 fflush(stdin); 
             }
             if (rank_client == 0)
-                printf("Iteration %d Rank %d Sum = %f\n", i, rank_client, array_sum ) ;
+                printf("C++    iteration %d  Sum = %f\n", i, array_sum ) ;
             damaris_write("array_sum" , &array_sum) ;  // Used to confirm the summation value found in Dask        
            
             damaris_end_iteration() ;

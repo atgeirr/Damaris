@@ -43,9 +43,8 @@ np.set_printoptions(threshold=np.inf)
 #            timeout="4" />
 #    </scripts>
 #
-# 
-# The Damaris server processes also present three dictionaries containing metadata 
-# so that we can access the data
+# The Damaris server processes also present three dictionaries, damaris_env, dask_env and iteration_data 
+# containing various data about the simulation as well as the variable data itself, packaged as Numpy arrays.
 # DD['damaris_env'].keys()     - The global Damaris environment data
 #       (['is_dedicated_node',    # 
 #         'is_dedicated_core',    # 
@@ -66,32 +65,45 @@ np.set_printoptions(threshold=np.inf)
 #       ]) 
 #
 # DD['iteration_data'].keys() - A single simulation iteration. 
-#                        Contains the iteration number and a lsit of sub-dictionaries, 
-#                        one for each Damaris variable that has been exposed to the Python 
-#                        interface. i.e. specified with the script="MyAction" in this example
+#                        Contains the iteration number and a list of sub-dictionaries, 
+#                        one for each *Damaris variable* that has been exposed to the Python 
+#                        interface. i.e. specified with the script="MyAction" as in the example above
 #       (['iteration',              # The iteration number as an integer.
-#          'cube_i',                # A Damaris variable dictionary
-#          'cube_f',                # A Damaris variable dictionary
-#          #'last_iter'             # is not present in dictionary yet
+#          'cube_i',                # A Damaris variable dictionary - the name relates to the variable name used in the Damaris XML file
+#          '...',                   # A Damaris variable dictionary
+#          '...'                    # A Damaris variable dictionary
 #       ])
 #
 # A Damaris variable dictionary has the following structure
 # DD['iteration_data']['cube_i'].keys()
 #       (['numpy_data', 
-#         'block_source', 
-#         'block_domains', 
-#         'type_string'
+#         'sort_data',             
+#         'type_string'           # possibly to be removed as this information can be obtained from the NumPy array itself
 #        ])
+# 
+# DD['iteration_data']['cube_i']['sort_data']
+# sort_data is a list, that can be sorted on (possibly required to be transformed to tuple) which
+# when sorted, the list values can be used to reconstruct the whole array using Dask:
+#    ['string', 'string', [ <block_offset values> ]]
+#   A specific example:
+#     ['S0_I1_<simulation_magic_number>', 'P0_B0', [ 0, 9, 12 ]]
+#   The string 'S0_I1_<simulation_magic_number>' indicates 'S' for server and 'I' for iteration. 
+#                                                The magic number is needed as the data is published to a Dask server
+#   The string 'P0_B0' indciates the dictionary key of Numpy data (see next description for explanation of 'P' and 'B')
+#   The list [ 0, 9, 12 ] indicates the offestes into the global array from where the NumPy data is mapped 
+#                         (The size of the NumPy array inicates the block size of the data)
+#                         
 #
 # And, finally, the NumPy data is present in blocks, given by keys constructed as described below
 # DD['iteration_data']['cube_i']['numpy_data'].keys()
 #        (['P0_B0',  
 #          'P1_B0'
 #        ])
-#  Damaris NumPy data keys "P" + damaris block number + "_B" + domain number
-#  The block number is the source of the data (i.e. the Damaris client number)
+
+#  Damaris NumPy data keys: 'P' + damaris client number + '_B' + domain number
+#  The client number is the source of the data (i.e. it is the Damaris client number that wrote the data)
 #  The domain number is the result of multiple calls to damaris_write_block()
-#  or 0 if only damaris_write() API is used.
+#  or 0 if only damaris_write() API is used or a single block only was written.
 # 
 # N.B. Only the data for the current iteration is available - and it is Read Only. 
 #      If it is needed later it needs to be saved somehow and re-read on the 
@@ -99,15 +111,9 @@ np.set_printoptions(threshold=np.inf)
 #      the distributed workers.
 
 
+
 def main(DD):
-    # from mpi4py import MPI
     try:
-        # pass
-        # comm = MPI.COMM_WORLD
-        # rank = comm.Get_rank()
-        keys = list(DD.keys())
-        # print(keys)
-        
         # These two dictionaries are set up in the PyAction constructor 
         # and are static.
         damaris_dict = DD['damaris_env']
@@ -117,41 +123,32 @@ def main(DD):
         iter_dict    = DD['iteration_data']   
         # This is the iteration value the from Damaris perspective
         # i.e. It is the number of times damaris_end_iteration() has been called
-        it_str       = str(iter_dict['iteration'])
-        
-        keys = list(iter_dict.keys())
+        it       = iter_dict['iteration']
 
-        for data_key in keys :
-            if (data_key != 'iteration'):
-                print(data_key)
+        if it == 0:
+            print('The DamarisData dictionaries are:')
+            keys = list(DD.keys())
+            print(keys)
+            
+            # These are the variables that have been published to Python by the Damaris server process:
+            print('The DamarisData variables available are :')
+            keys = list(iter_dict.keys())
+            for data_key in keys :
+                if (data_key != 'iteration'):
+                    print(data_key)
                    
         # We know the variable names as they match what is in the Damaris XML file
         cube_i =  iter_dict['cube_i']
         # There will be one key and corresponding NumPy array for each block of the variable
+        total_sum = 0
         for key in cube_i['numpy_data'].keys() :
-            cube_i_numpy = cube_i['numpy_data'][key]
-            print('Info from Python: Iteration ', it_str, ' Data found: cube_i[',key,'].sum() = ', cube_i_numpy.sum() )
+            cube_i_numpy = cube_i['numpy_data'][key]  # This is our NumPy array
+            print('Python iteration ', it, ', Data found: cube_i[',key,'].sum() = ', cube_i_numpy.sum() )
+            total_sum += cube_i_numpy.sum()
         
-        
-        ###
-        # These lists can be used to create the NumPy data key
-        #  key = 'P' + str(cube_i['block_source'][0]) + '_B' + str(cube_i['block_domains'][0])
-        ###
-        # block_source should always exist - it is a list() of Damaris clients 
-        # who sent data to a Damaris server on the current server that is running 
-        # this Python code.
-        block_source_list = cube_i['block_source']
-        print('for variable cube_i block sources list: ', block_source_list)
-        # The number of block domains depends on use of 'domains' in 
-        # the Damaris XML file and use of the damaris_write_block() API
-        # There is always at least one per client for which a server looks after.
-        block_domains = len( cube_i['block_domains']) 
-        print('for variable cube_i the number of domains (== clients x blocks_per_client) for variable last_iter: ', str(block_domains))
-        print('cube_i[block_domains]: ', cube_i['block_domains'])
-        
-        
+        print('Python iteration ', it, ', Sum() = ', total_sum )
 
-        
+
         
     except KeyError as err: 
         print('KeyError: No damaris data of name: ', err)
@@ -160,12 +157,9 @@ def main(DD):
     except ValueError as err:
         print('Damaris Data is read only!: ', err)
     except UnboundLocalError as err:
-        print('Damaris data not assigned!: ', err)
-    # finally: is always called.    
+        print('Damaris data not assigned!: ', err)   
     finally:
         pass
-        #print('Finally called for iteration: ', DD['iteration'])
-        #print('')
 
 
 if __name__ == '__main__':

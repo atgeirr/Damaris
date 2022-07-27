@@ -7,8 +7,12 @@
 #include <mpi.h>
 #include "Damaris.h"
 
-//#define MAX_CYCLES 3
+/** C code: 3dmesh_py
+ Damaris example of obtaining data from a simulation via Python
 
+ mpirun --oversubscribe -np 5 ./3dmesh_py 3dmesh_py.xml -i 3 -v 2 -r
+ 
+*/
 void print_usage(char* exename) {
    
       fprintf(stderr,"Usage: %s <3dmesh_py.xml> [-v] [-r] [-s X]\n",exename);
@@ -86,7 +90,8 @@ int main(int argc, char** argv)
         MPI_Comm_rank(comm , &rank_client);
         MPI_Comm_size(comm , &size_client);
 
-        fprintf(stdout,"Input paramaters found: v=%d r=%d (0 is not found)\n",verbose, rank_only);
+        if (verbose > 0 )
+            fprintf(stdout,"C++ Input paramaters found: v=%d r=%d (0 is not found)\n",verbose, rank_only);
 
         // Dynamically update the size used in the Damaris layout configuration
         damaris_parameter_set("size" , &size_client , sizeof(int));
@@ -185,8 +190,9 @@ int main(int argc, char** argv)
                 long int reduction_result = 0;
                 MPI_Reduce(&sumdata, &reduction_result, 1, MPI_LONG, MPI_SUM, 0, comm);
                 
+                
                 if (rank_client == 0) 
-                    printf("Iteration %d Rank %d Sum = %ld\n", i, rank_client, reduction_result );
+                    printf("C++    iteration  %d , Sum () = %ld\n", i, reduction_result );
               
                 double array_sum = (double) reduction_result ;
                 damaris_write("array_sum" , &array_sum);  // Used to confirm the summation value found in Dask
@@ -206,8 +212,9 @@ int main(int argc, char** argv)
             double t2 = MPI_Wtime();
 
             if(rank_client == 0) {
-            printf("Iteration %d done in %f seconds\n",i,(t2-t1));
-            fflush(stdin); 
+                if (verbose > 0 )
+                    printf("C++    iteration %d done in %f seconds\n",i,(t2-t1));
+                fflush(stdin); 
             }
         }  // end of for loop over MAX_CYCLES
 
