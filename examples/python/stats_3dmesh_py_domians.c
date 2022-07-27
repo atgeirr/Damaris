@@ -13,33 +13,7 @@
     values written are summarised i.e. a running average and standard deviation is computed through use of
     the damaris4py DaskStats Python class.
     
-    To run this example, a Dask scheduler needs to be spun up:
-
-      dask-scheduler --scheduler-file "/home/user/dask_file.json" &
-
-    The --scheduler-file argument must match what is in the Damaris XML file <pyscript> tag.
-
-    Then run the simulation multiple times:
-
-    for i in `seq 1 10` do
-        sbatch slurm_launcher.sh $i  # Use the correct submission command for your cluster's resource manager
-    done
-    
-    Inside the launch script slurm_launcher.sh will be something like the following:
-    
-      #SBATCH #OAR #PBS etc.... 
-      # MY_VAL is the value to be added to the 3D array on each iteration
-      MY_VAL=$1  
-      # Assumes 4 Damaris clients and 2 Damaris server cores as per the xml file
-      mpirun --oversubscribe  -np 6 ./3dmesh_dask_stats 3dmesh_dask_stats.xml -i 10 -v $MY_VAL -d 4 -s 5
-    
-    
-    N.B. Set the global mesh size values WIDTH, HEIGHT and DEPTH using the XML input file.
-         Set the name of the Python script to run via the <pyscript ... file="3dmesh_dask_stats.py" ...> tag
-
-    The simulation code (via Damaris C++ pyscript class) will create the Dask workers (one per Damaris server core) 
-    and have them connect to the Dask scheduler. The simulation code will remove the workers at the end of program
-    execution, unless  keep-workers="yes" is specified in 3dmesh_dask.xml <pyscript> tag
+    Use a stats_launcher.sh script that matches your cluster system in the subdirectories.
 */
 
 void print_usage(char* exename) {
