@@ -34,7 +34,7 @@ void ScriptManager::Init(const model::Scripts& mdl_script)
     model::Scripts::pyscript_const_iterator s(mdl_script.pyscript().begin());
     for(; s != mdl_script.pyscript().end(); s++) {
         std::string file_ = s->file() ;
-        std::cout << "ScriptManager has found a script which has a file field named: " << file_ << std::endl ;
+        std::cout << "INFO: ScriptManager has found a script which has a file field named: " << file_ << std::endl ;
         Create<PyAction>(*s);  // (std::string)s->name() this is actually a call to PyAction::New(mdl)
         if(!handler_is_event && (std::string)s->name() == handler_name) 
         {
@@ -86,6 +86,7 @@ bool ScriptManager::RunScripts(const int iteration)
 #ifdef HAVE_PYTHON_ENABLED     
         if ( std::dynamic_pointer_cast<PyAction>(*actnItr) != nullptr ) {
             std::shared_ptr<Action> action = *actnItr;
+             std::cout << "INFO: ScriptManager is running: action->Call(iteration, iteration) "  << std::endl ;
             action->Call(iteration, iteration) ;            
         }
 #endif  // HAVE_PYTHON_ENABLED

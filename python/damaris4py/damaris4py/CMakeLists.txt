@@ -10,11 +10,12 @@ cmake_minimum_required(VERSION 3.12)
     if ( NOT ENABLE_PYTHON )
       find_package(Boost COMPONENTS python REQUIRED)
       find_package(Boost COMPONENTS numpy REQUIRED)
+      find_package(Python 3 COMPONENTS  Interpreter Development)
       find_package(PythonInterp 3)
       find_package(PythonLibs 3 REQUIRED)
     endif()
     
-
+    
         execute_process(
             COMMAND python -c "import mpi4py"
             RESULT_VARIABLE EXIT_CODE
@@ -42,18 +43,18 @@ cmake_minimum_required(VERSION 3.12)
 
             
     # "${PYTHON_MODULE_INSTALL_PATH}" is tested for in root CMakeList.txt
-
+    
     add_library(client MODULE damaris_client.cpp)
     set_target_properties(client PROPERTIES PREFIX "")
     # Set up the libraries and header search paths for this target
-    target_include_directories(client PRIVATE damaris ${MPI4PY_INCLUDE_PATH} ${PYTHON_INCLUDE_DIRS})
-    target_link_libraries(client damaris ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
+    target_include_directories(client PRIVATE damaris ${MPI4PY_INCLUDE_PATH} ${PYTHON_INCLUDE_DIRS} ${Python_INCLUDE_DIRS})
+    target_link_libraries(client damaris ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${Python_LIBRARIES} )
     
     add_library(server MODULE damaris_server.cpp)
     set_target_properties(server PROPERTIES PREFIX "")
     # Set up the libraries and header search paths for this target
-    target_include_directories(server PRIVATE damaris ${MPI4PY_INCLUDE_PATH} ${PYTHON_INCLUDE_DIRS})
-    target_link_libraries(server damaris ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
+    target_include_directories(server PRIVATE damaris ${MPI4PY_INCLUDE_PATH} ${PYTHON_INCLUDE_DIRS} ${Python_INCLUDE_DIRS})
+    target_link_libraries(server damaris ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${Python_LIBRARIES} )
 
 
     # configure_file(__init__.py ${CMAKE_CURRENT_BINARY_DIR}/python/__init__.py COPYONLY)

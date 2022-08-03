@@ -213,9 +213,9 @@ int main(int argc, char** argv)
 
             if(rank_client == 0) {
                 if (verbose > 0 )
-                    printf("C++    iteration %d done in %f seconds\n",i,(t2-t1));
-                fflush(stdin); 
+                    printf("C++    iteration %d done in %f seconds\n",i,(t2-t1)); 
             }
+            fflush(stdin);
         }  // end of for loop over MAX_CYCLES
 
         damaris_stop();

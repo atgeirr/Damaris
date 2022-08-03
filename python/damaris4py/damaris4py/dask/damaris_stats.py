@@ -159,7 +159,7 @@ class DaskStats:
                 mean  = client.datasets[self.unique_name_str+'_mean']
             else: # initialise
                 count     = 0    
-                mean      = da.zeros_like(newValue, dtype=np.float64)
+                mean      = 0 # da.zeros_like(newValue, dtype=np.float64)
                 
             dasklock.release()    
                 
@@ -189,8 +189,8 @@ class DaskStats:
                 M2    = client.datasets[self.unique_name_str+'_M2']
             else: # initialise
                 count     = 0    
-                mean      = da.zeros_like(newValue, dtype=np.float64)
-                M2        = da.zeros_like(newValue, dtype=np.float64)
+                mean      = 0 # da.zeros_like(newValue, dtype=np.float64)
+                M2        = 0 # da.zeros_like(newValue, dtype=np.float64)
 
         else:
             dasklock.release()
@@ -315,11 +315,15 @@ class DaskStats:
         
         client : A Dask Client object that has access to the scheduler that we saved the tuple to in the update() method
         
-        Returns a tuple of 1's the length of the number of dimensions of the input array.
+        Returns a tuple of 1's the length of the number of dimensions of the input array, or None if the name does not exist 
+        in client.datasets[] dictionary on the dask scheduler
         
         e.g. if array has 3 dims then returns (1, 1, 1). 
         
         This is useful for the chunks= attribute of map_blocks()
         
         """   
-        return client.datasets[self.unique_name_str+'_chunks_tup']
+        if self.unique_name_str+'_chunks_tup' in client.list_datasets():
+            return client.datasets[self.unique_name_str+'_chunks_tup']
+        else:
+            raise KeyError(f"Dataset not found: " + self.unique_name_str+'_chunks_tup')

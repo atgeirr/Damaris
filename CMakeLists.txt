@@ -100,7 +100,7 @@ ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 find_package(Threads REQUIRED)
-find_package(Boost 1.65.0 REQUIRED COMPONENTS thread log log_setup filesystem system date_time)
+find_package(Boost 1.65.0 REQUIRED COMPONENTS thread log log_setup filesystem system date_time )
 message(WARNING "WARNING Boost BOOST_BIND_GLOBAL_PLACEHOLDERS defined to remove warnings - perhaps check for issue?")
 add_definitions("-DBOOST_BIND_GLOBAL_PLACEHOLDERS")
 include_directories(${Boost_INCLUDE_DIRS})
@@ -155,22 +155,27 @@ endif(ENABLE_HDF5)
 #----------------------------------------------------------------------------#
 
 if(ENABLE_PYTHON)
+  # set(BOOST_ROOT /g100_scratch/userinternal/amemmol1/modules/easybuild/ebinstallation/software/Boost.Python/1.67.0-foss-2020a-Python-3.8.2)
   find_package(Boost COMPONENTS python REQUIRED)
   find_package(Boost COMPONENTS numpy REQUIRED)
   # find_package(Python 3 COMPONENTS Interpreter Development REQUIRED)  # fails at build time with fatal error: pyconfig.h: No such file or directory
-  find_package(PythonInterp 3 )
-  find_package(PythonLibs 3 REQUIRED )
-  if(PythonInterp_FOUND)
+  # find_package(PythonInterp 3 )
+  # find_package(PythonLibs 3 REQUIRED )
+  find_package(Python 3 COMPONENTS  Interpreter Development)
+  if(Python_FOUND)
     # message("PythonInterp_FOUND:${PythonInterp_FOUND}")
+    message("Python_FOUND:${Python_FOUND}")
     execute_process(
-      COMMAND Python3::Interpreter -c "import numpy; print numpy.get_include()"
+      COMMAND Python3::Interpreter -c "import numpy; print(numpy.get_include())"
       OUTPUT_VARIABLE NUMPY_INCLUDE_PATH
       ERROR_QUIET
     )
-    list(APPEND DEP_LIBRARIES  ${PYTHON_LIBRARIES} ${Boost_LIBRARIES} )
-    
-    set(HAVE_PYTHON_ENABLED 1)
-  endif(PythonInterp_FOUND)
+    list(APPEND DEP_LIBRARIES ${Boost_LIBRARIES}  ${PYTHON_LIBRARIES} ${Python_LIBRARIES} ${Boost_LIBRARIES} )
+    include_directories(${Python_INCLUDE_DIRS})
+     set(HAVE_PYTHON_ENABLED 1)
+  endif(Python_FOUND)
+  
+  
 endif(ENABLE_PYTHON)
 
 #----------------------------------------------------------------------------#

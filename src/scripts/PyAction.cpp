@@ -190,7 +190,7 @@ namespace damaris {
         std::cout << std::flush ;
         // launch_worker += scheduler_file_ + " --name " + dask_worker_name_ +  std::string(" &") ;
         launch_worker += scheduler_file_ + " --name " + dask_worker_name_ +    std::string(" --nthreads ") + std::to_string(dask_nthreads_) + std::string("  &") ;
-        std::cout <<"INFO: Starting Dask Worker, calling : " << launch_worker << std::endl ;
+        // std::cout <<"INFO: Starting Dask Worker, calling : " << launch_worker << std::endl ;
         Environment::Log(launch_worker , EventLogger::Debug);
         int ret = std::system(launch_worker.c_str()) ;
         return (ret) ;
@@ -210,7 +210,9 @@ namespace damaris {
             std::ifstream daskschedfile;
             daskschedfile.open(filename.c_str()); 
             if(! daskschedfile.fail()) {
-                std::cout  << "INFO: scheduler file found : " << filename << std::endl << std::flush ;
+                std::string test_scheduler_str("INFO: scheduler file found : ") ;
+                test_scheduler_str += filename ;
+                Environment::Log(test_scheduler_str , EventLogger::Debug);
                 daskschedfile.close();
                 retint = 1 ;
             }

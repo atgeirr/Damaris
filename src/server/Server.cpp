@@ -65,6 +65,7 @@ void Server::Run() {
 
     // if it's the first call to Run, install other callbacks
     if(firstRun_) {
+        Environment::Log("Server::Run(): Installing plugin callbacks ;", EventLogger::Debug);
         std::map<int,std::shared_ptr<Channel> >::iterator ch;
         for(ch = clients_.begin(); ch != clients_.end(); ch++) {
             std::shared_ptr<Channel> c = ch->second;
@@ -79,7 +80,7 @@ void Server::Run() {
 #ifdef HAVE_VISIT_ENABLED
         
         if(Environment::GetModel()->visit().present()) {
-
+            Environment::Log("Server::Run(): Visit is present in XML Initializing VisItListener;", EventLogger::Debug);
             void (*f)(int, int, const void*, int) 
                 = &VisItListener::EnterSyncSection;
             reactor_->Bind(VISIT_CONNECTED,f);
@@ -92,13 +93,15 @@ void Server::Run() {
 
 #ifdef HAVE_PARAVIEW_ENABLED
         if (Environment::GetModel()->paraview().present()) {
+            Environment::Log("Server::Run(): Paraview is present in XML Initializing ParaViewAdaptor;", EventLogger::Debug);
             std::shared_ptr<ParaViewAdaptor> paraview = ParaViewAdaptor::GetInstance();
             paraview->Initialize(Environment::GetEntityComm() ,
                                  Environment::GetModel()->paraview() ,
                                  Environment::GetSimulationName());
         }
         else
-            ERROR("Damaris is compiled with ParaView (vPARAVIEW_VERSION), but ParaView is not enabled in the XML configuration file. ");
+            Environment::Log("Damaris is compiled with ParaView (vPARAVIEW_VERSION), but ParaView is not enabled in the XML configuration file.", EventLogger::Debug);
+            // ERROR("Damaris is compiled with ParaView (vPARAVIEW_VERSION), but ParaView is not enabled in the XML configuration file. ");
 #endif
 
         reactor_->Bind(ITERATION_SYNC, 
@@ -108,7 +111,7 @@ void Server::Run() {
     
 #ifdef HAVE_VISIT_ENABLED
     if(Environment::GetModel()->visit().present()) {
-        
+        Environment::Log("Server::Run(): Visit calling PollSome();", EventLogger::Debug);
         while(not needStop_) {
             // try receiving from VisIt (only for rank 0)
             if(Environment::GetEntityProcessID() == 0) {
@@ -124,6 +127,8 @@ void Server::Run() {
         }
         
     } else {
+
+        Environment::Log("Server::Run(): calling reactor_->Run();", EventLogger::Debug);
         reactor_->Run();
     }
 #else
@@ -161,7 +166,7 @@ void Server::EndOfIterationCallback(int tag, int source,
     for(ch = clients_.begin(); ch != clients_.end(); ch++) {
         std::shared_ptr<Channel> c = ch->second;
         headerMsg_[ch->first] = HeaderMessage();
-
+        Environment::Log("Server::EndOfIterationCallback(): calling plugin callbacks ", EventLogger::Debug);
         c->AsyncRecv(DAMARIS_SIG_HEADER,
                 &(headerMsg_[ch->first]),
                 sizeof(HeaderMessage),
@@ -174,6 +179,7 @@ void Server::EndOfIterationCallback(int tag, int source,
     if(Environment::GetModel()->visit().present()) {
         int frequency = VisItListener::UpdateFrequency();
         if((frequency > 0) && (iteration % frequency == 0)) {
+            Environment::Log("Server::EndOfIterationCallback(): VisItListener::Update()", EventLogger::Debug);
             VisItListener::Update();
         }
     }
@@ -183,6 +189,7 @@ void Server::EndOfIterationCallback(int tag, int source,
     if (Environment::GetModel()->paraview().present()) {
         //if (iteration > 0) {
             std::shared_ptr<ParaViewAdaptor> paraview = ParaViewAdaptor::GetInstance();
+            Environment::Log("Server::EndOfIterationCallback(): paraview->CoProcess(iteration)", EventLogger::Debug);
             paraview->CoProcess(iteration);
         //}
     }
@@ -193,14 +200,18 @@ void Server::EndOfIterationCallback(int tag, int source,
 #ifdef HAVE_PYTHON_ENABLED
     // N.B. ActionManager::RunActions(iteration); will run the same code as ScriptManager::RunScripts(iteration)
     //std::cout <<"INFO: Server.cpp HAVE_PYTHON_ENABLED is defined" << std::endl ;
+    Environment::Log("Server::EndOfIterationCallback(): ScriptManager::RunScripts(iteration)", EventLogger::Debug);
     ScriptManager::RunScripts(iteration);
 #else
    // std::cout <<"INFO: Server.cpp HAVE_PYTHON_ENABLED is NOT defined" << std::endl ;
 #endif
     
+    
+    // std::cout << "INFO:  Server::EndOfIterationCallback(): calling ActionManager::RunActions(iteration); " << std::endl ;
     // N.B. ActionManager::RunActions() *first* calls the garbage collector on block data of all variables
     // And then it calls other actions (such as PyAction) which then have no block data.
     // This is a 
+    Environment::Log("Server::EndOfIterationCallback(): ActionManager::RunActions(iteration)", EventLogger::Debug);
     ActionManager::RunActions(iteration);
     
 
@@ -294,6 +305,7 @@ void Server::OnStop(int source)
 #ifdef HAVE_PARAVIEW_ENABLED
         if (Environment::GetModel()->paraview().present()) {
             std::shared_ptr<ParaViewAdaptor> paraview = ParaViewAdaptor::GetInstance();
+            Environment::Log("Server::OnStop(): paraview->Finalize();", EventLogger::Debug);
             paraview->Finalize();
         }
 

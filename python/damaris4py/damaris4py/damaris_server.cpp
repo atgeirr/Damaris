@@ -33,7 +33,7 @@ namespace bp = boost::python;
 */
 static PyObject* hw_damaris_comm()
 {
-
+  // if (import_mpi4py() < 0) return NULL;
   PyObject* py_obj = PyMPIComm_New( damaris::Environment::GetEntityComm() );
   if (py_obj == NULL) bp::throw_error_already_set();
   return(py_obj) ;
@@ -178,8 +178,8 @@ static bp::object hw_list_known_clients()
 /* static bp::object hw_damaris_initialize(boost::python::object xml_path, boost::python::object mpi4py_comm  )
 {
   PyObject * mp_py_mpicomm = bp::extract<PyObject *>(mpi4py_comm) ;
-  MPI_Comm passed_in_comm =   *PyMPIComm_Get(mp_py_mpicomm) ;
-  std::string xml_std_str = bp::extract<std::string>(xml_path) ;
+  MPI_Comm passed_in_comm  = *PyMPIComm_Get(mp_py_mpicomm) ;
+  std::string xml_std_str  = bp::extract<std::string>(xml_path) ;
   int res ;
   res = damaris_initialize(xml_std_str.c_str(), passed_in_comm) ;
   bp::object res_bp(res) ;
@@ -201,7 +201,11 @@ static bp::object hw_damaris_magic_number( )
 BOOST_PYTHON_MODULE(server)
 {
   Py_Initialize();
-  if (import_mpi4py() < 0) return;
+  if (import_mpi4py() < 0) {
+      std::cerr << "ERROR: Initialiazation via BOOST_PYTHON_MODULE(server) failed at import_mpi4py()" << std::endl ; 
+      std::cerr << " N.B. If the issue is with sizs being different then make sure the runtime mpi4py is the same mpi4py as what cmake found when configuring Damaris" << std::endl ;
+      throw boost::python::error_already_set();
+  }
   
 
   bp::def("getclientcomm", hw_damaris_comm_check_client,  
