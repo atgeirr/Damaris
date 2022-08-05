@@ -157,7 +157,7 @@ do
     
     COUNT_RUNNING=$(qstat -x  -Jt $ARRAY_JID |  grep " R " | wc -l)
     COUNT_FINISHED=$(qstat -x  -Jt $ARRAY_JID |  grep " X " | wc -l)
-    echo "INFO:  $COUNT_RUNNING are running and  $COUNT_FINISHED jobs of $NUMSIMS total"
+    echo "INFO:  $COUNT_RUNNING are running and  $COUNT_FINISHED jobs finished of $NUMSIMS total"
     sleep 10
     # echo "Waiting for $NUMSIMS jobs in job array to finish"
 done
