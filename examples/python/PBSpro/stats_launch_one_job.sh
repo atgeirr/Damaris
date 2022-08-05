@@ -35,18 +35,18 @@ sleep 20
 MY_VAL=$( expr ${PBS_ARRAY_INDEX}  % 4 + 1)
 
 
-# We are assuming we are currently in the sub directory <INSTALL_PATH>/examples/damaris/python/PBS 
+# We are assuming we are currently in the sub directory <INSTALL_PATH>/examples/damaris/python/PBSpro 
 # and the executables are one directory up, so move there:
 cd ..
 
 
-while [[ ! -f ./PBS/stats_3dmesh_dask_PBS.xml ]] ; do
+while [[ ! -f ./PBSpro/stats_3dmesh_dask_PBS.xml ]] ; do
     echo "INFO: $PWD "
-    echo "INFO: the Damaris input file does not seem to be available: ./PBS/stats_3dmesh_dask_PBS.xml"
+    echo "INFO: the Damaris input file does not seem to be available: ./PBSpro/stats_3dmesh_dask_PBS.xml"
     sleep 5
 done
 
-cat ./PBS/stats_3dmesh_dask_PBS.xml 
+cat ./PBSpro/stats_3dmesh_dask_PBS.xml 
 
 # To get rid of: "mpool.c:43   UCX  WARN  object 0x1d1dc40 was not returned to mpool ucp_requests"
 export UCX_LOG_LEVEL=error
@@ -58,6 +58,6 @@ export UCX_LOG_LEVEL=error
 #  -v  V    V is the value to add to each array element (default = 5)
 #  -d  D    D is the number of domains to split data into (must divide into WIDTH perfectly from XML file)
 #  -s  S    S is integer time to sleep in seconds between iterations
-mpirun -np $NCPUS -x PYTHONPATH=$PYTHONPATH  --mca mpi_warn_on_fork 0 --oversubscribe  ./stats_3dmesh_dask ./PBS/stats_3dmesh_dask_PBS.xml -i 4 -v $MY_VAL -d 4 -s 5
+mpirun -np $NCPUS -x PYTHONPATH=$PYTHONPATH  --mca mpi_warn_on_fork 0 --oversubscribe  ./stats_3dmesh_dask ./PBSpro/stats_3dmesh_dask_PBS.xml -i 4 -v $MY_VAL -d 4 -s 5
 
 sleep 5

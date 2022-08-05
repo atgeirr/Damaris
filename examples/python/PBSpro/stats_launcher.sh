@@ -152,8 +152,11 @@ do
       echo "Scheduler Job $SCHED_JOB_ID  in state = F finished - exiting $0"
       exit -1
     fi
-    # Check on load on scheduler node
-    check-pbs-jobs --jobid $SCHED_JOB_ID  --print-load | grep LOAD
+    # Check on load on scheduler node - may be IT4I specific
+    HAVE_CPJ=$(which check-pbs-jobs)
+    if [[!  -z "$HAVE_CPJ" ]] ; then
+      check-pbs-jobs --jobid $SCHED_JOB_ID  --print-load | grep LOAD
+    fi
     
     COUNT_RUNNING=$(qstat -x  -Jt $ARRAY_JID |  grep " R " | wc -l)
     COUNT_FINISHED=$(qstat -x  -Jt $ARRAY_JID |  grep " X " | wc -l)
