@@ -3,7 +3,7 @@
 #PBS -l select=1
 #PBS -j oe
 #PBS -m n
-#PBS -o results_from_dask.std
+#PBS -o results_from_dask.o
 #PBS -N results_from_dask
 
 

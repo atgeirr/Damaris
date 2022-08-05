@@ -1,12 +1,9 @@
 #!/bin/bash
-#PBS -l walltime=00:15:00
+#PBS -l walltime=00:30:00
 #PBS -l select=1
-#PBS -l ncpus=128
 #PBS -j oe
 #PBS -m n
-#PBS --ntasks-per-socket=1
-#PBS --cpus-per-task=24
-#PBS -o scheduler_job.std
+#PBS -o scheduler_job.o
 #PBS -N scheduler
 
 
@@ -17,12 +14,15 @@
 echo "We are now running the stats_launch_scheduler.sh script..."
 
 cd $PBS_O_WORKDIR
+. stats_modules.sh
 
+echo $(python -m site --user-site)
+ 
 # To be passed in on qsub command line using -v
-echo "PYTHONPATH=$PYTHONPATH "
+echo "PYTHONPATH         =$PYTHONPATH "
 echo "DASK_SCHEDULER_FILE=$DASK_SCHEDULER_FILE"
+echo "PATH               =$PATH"
 
-echo  "$0 : scheduler file: $DASK_SCHEDULER_FILE)"
 
 # number of OpenMP threads
 # export OMP_NUM_THREADS=$NCPUS 

@@ -8,20 +8,29 @@
 # ./stats_launcher.sh [ NUMSIMS ] 
 # NUMSIMS is optional and defaults to 4
 
-INSTALL_PREFIX=$HOME/local
-PROJECT_ID=DD-22-20
-PROJECT_QUEUE=qcpu_eurohpc
+
+module load Boost/1.77.0-GCC-10.2.0-Python-3.8.6
+
+export  INSTALL_PREFIX=$HOME/local
+export  PROJECT_ID=DD-22-20
+export  PROJECT_QUEUE=qcpu_eurohpc
 # N.B. There is a file named stat_modules.sh that loads modules and other paths for all submitted jobs
 # This needs to match what is in the Damaris XML file - we use a sed command to replace it bon line 22 below
-DASK_SCHEDULER_FILE=$HOME/dask_file.json
-DASK_SCHED_STR=\'$DASK_SCHEDULER_FILE\'
+export DASK_SCHEDULER_FILE=$HOME/dask_file.json
+export DASK_SCHED_STR=\'$DASK_SCHEDULER_FILE\'
 # Set path to Damaris Python module (for getting server MPI communicator)
 export PYTHONPATH=$HOME/mypylib:$(python -m site --user-site)
+export PATH=$HOME/.local/bin:$PATH
 # Make sure our Damaris XML file points to the correct Dask scheduler file
 #  N.B. We assume we are in the PBS directory (one directory up from the executables
 sed -i "s|scheduler-file=\".*\" |scheduler-file=\"${DASK_SCHEDULER_FILE}\" |g" stats_3dmesh_dask_PBS.xml
 
 
+HAVE_SCHEDULER=$(which dask-scheduler)
+if [[ -z "$HAVE_SCHEDULER" ]] ; then
+  echo "$0 : Will exit as the dask-scheduler executable is not installed or not on the PATH"
+  exit 0
+fi
 
 # Get value for number of simulations to run from the command line (if present)
 NUMSIMS=4
@@ -55,7 +64,7 @@ sleep 5
 # The name of the scheduler-file must match what is stored in the Damaris XML <pyscript> tag 
 # of the simulations (launched in stats_launch_one_job.sh)
 # -V means export the full environment use -v {list} to export specific variables i.e. DASK_SCHEDULER_FILE
-SCHED_JOB_ID=$(qsub -v DASK_SCHEDULER_FILE=$DASK_SCHEDULER_FILE -A $PROJECT_ID -q $PROJECT_QUEUE stats_launch_scheduler.sh)
+SCHED_JOB_ID=$(qsub -v DASK_SCHEDULER_FILE,PYTHONPATH -A $PROJECT_ID -q $PROJECT_QUEUE stats_launch_scheduler.sh)
 sleep 2
 echo "Scheduler Job is: $SCHED_JOB_ID "
 if [[ -z "$SCHED_JOB_ID" ]] ; then 
@@ -105,7 +114,7 @@ fi
 
 
 
-#####
+##### 
 # Launch the simulations, passing in a different value to add to the dataset using
 # the job array ${PBS_ARRAY_INDEX} within the script stats_launch_one_job.sh
 # N.B. these jobs implicitly use a Dask scheduler, which is specified in the Damaris
@@ -114,8 +123,8 @@ fi
 echo "We will be launching $NUMSIMS simulations as a PBS Job Array"
 # Could use -W depend=after:$SCHED_JOB_ID
 # N.B. $NUMSIMS should be less than or equal to 1500 
-ARRAY_JID=$(qsub -J 1-$NUMSIMS -v PYTHONPATH=$PYTHONPATH -A $PROJECT_ID -q $PROJECT_QUEUE stats_launch_one_job.sh   | sed -n 's/^.*job //p')
-
+ARRAY_JID=$(qsub -J 1-$NUMSIMS -v PYTHONPATH=$PYTHONPATH -A $PROJECT_ID -q $PROJECT_QUEUE stats_launch_one_job.sh)
+ARRAY_JID_SHORT=$(echo $ARRAY_JID | sed 's|\[.*||g' )
 
 
 #####
@@ -144,9 +153,13 @@ do
       exit -1
     fi
     # Check on load on scheduler node
-    check-pbs-jobs --jobid $SCHED_JOB_ID  --print-load --print-processes
+    check-pbs-jobs --jobid $SCHED_JOB_ID  --print-load | grep LOAD
+    
+    COUNT_RUNNING=$(qstat -x  -Jt $ARRAY_JID |  grep " R " | wc -l)
+    COUNT_FINISHED=$(qstat -x  -Jt $ARRAY_JID |  grep " X " | wc -l)
+    echo "INFO:  $COUNT_RUNNING are running and  $COUNT_FINISHED jobs of $NUMSIMS total"
     sleep 10
-    echo "Waiting for $NUMSIMS jobs in job array to finis"
+    # echo "Waiting for $NUMSIMS jobs in job array to finish"
 done
 
 
@@ -154,10 +167,10 @@ done
 #####
 # Collect the summary statistics - save to file or print to screen (if small enough)
 echo "Collect the summary statistics results"
-RESULTS_JOB_ID=$(qsub -v DASK_SCHEDULER_FILE=$DASK_SCHEDULER_FILE, PYTHONPATH=$PYTHONPATH  -A $PROJECT_ID -q $PROJECT_QUEUE  stats_get_results.sh )
+RESULTS_JOB_ID=$(qsub -v DASK_SCHEDULER_FILE,PYTHONPATH -A $PROJECT_ID -q $PROJECT_QUEUE  stats_get_results.sh )
 while true
 do
-   STATE=$(squeue -x $RESULTS_JOB_ID | grep $RESULTS_JOB_ID)
+   STATE=$(qstat -x $RESULTS_JOB_ID | grep $RESULTS_JOB_ID)
    RESULTS_JOB_FIN=$(echo $STATE | grep " F " )  
     # If not empty then F was found
     if [[ ! -z "$RESULTS_JOB_FIN" ]] ; then 
