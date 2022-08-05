@@ -46,7 +46,7 @@ pip3 install mpi4py --no-binary mpi4py --user --force --no-cache-dir
 
 # Make sure we have set PYTHONPATH correctly - $HOME/mpyylib was set in Damaris CMake configuration
 ```
-export PYTHONPATH=$HOME/mpyylib:$(python -m site --user-site)
+export PYTHONPATH=$HOME/mypylib:$(python -m site --user-site)
 ```
   
 # Interactive testing examples 
