@@ -1,0 +1,23 @@
+num_simulations: [1,2,3,4]
+python_path: /home/pviviani/opt/damarispy
+scheduler_file_name:
+  class: File
+  path: scheduler.json
+sim_exec:
+  class: File
+  path: data/stats_3dmesh_dask
+sim_xml:
+  class: File
+  path: data/stats_3dmesh_dask.xml
+sim_python_source:
+  class: File
+  path: data/stats_3dmesh_dask.py
+stats_get_results:
+  class: File
+  path: data/stats_get_results.py
+script_launch_sim:
+  class: File
+  path: data/launch_sim.sh
+gather_results_script:
+  class: File
+  path: data/gather_results.sh

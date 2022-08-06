@@ -1,3 +1,7 @@
-# TODO
+## StreamFlow example workflow
 
-Add a CWL/ACROSS specific workflow that is equivalent to the one in the OAR directory
+Use the environment.sh as example to setup and install Damaris
+
+```
+$streamflow run stramflow.yml
+```

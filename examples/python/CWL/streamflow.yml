@@ -1,0 +1,41 @@
+#!/usr/bin/env streamflow
+version: v1.0
+workflows:
+  master:
+    type: cwl
+    config:
+      file: cwl/main.cwl
+      settings: cwl/config.yml
+    bindings:
+      - step: /init_dask
+        target:
+          model: ssh_launch_dask
+      - step: /launch_simulation
+        target:
+          model: ssh_env
+      - step: /gather_results
+        target:
+          model: ssh_close_dask
+
+models:
+  ssh_launch_dask:
+    type: ssh
+    config:
+      file: launch.jinja2
+      nodes:
+        - hostname: localhost
+      username: pviviani
+  ssh_close_dask:
+    type: ssh
+    config:
+      file:  close.jinja2
+      nodes:
+        - hostname: localhost
+      username: pviviani
+  ssh_env:
+    type: ssh
+    config:
+      file:  env.jinja2
+      nodes:
+        - hostname: localhost
+      username: pviviani

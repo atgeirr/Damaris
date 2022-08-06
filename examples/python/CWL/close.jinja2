@@ -1,0 +1,7 @@
+#!/bin/bash
+
+source /home/pviviani/miniconda3/bin/activate across
+
+{{streamflow_command}}
+
+python -c "from dask.distributed import Client; client= Client(scheduler_file='{{streamflow_workdir}}/scheduler.json', timeout='2s'); client.shutdown()"

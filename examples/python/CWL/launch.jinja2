@@ -1,0 +1,10 @@
+#!/bin/bash
+
+source /home/pviviani/miniconda3/bin/activate across
+
+export SCHED_PORT=$(eval shuf -i 8000-9500 -n 1)
+
+dask-scheduler --scheduler-file {{streamflow_workdir}}/scheduler.json --port $SCHED_PORT > /dev/null 2>&1 & 
+dask-worker --scheduler-file {{streamflow_workdir}}/scheduler.json --nthreads 1 > /dev/null 2>&1 &
+
+{{streamflow_command}}
