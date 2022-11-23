@@ -52,6 +52,10 @@ private:
     FileMode fileMode_;
     XdmfMode xdmfMode_;
     std::string path_;
+    std::vector<hsize_t> cellMapping_;
+    std::vector<hsize_t*> blockPos_;
+    std::vector<hsize_t> blockSize_;
+
 
     /**
     * Updates the memory space and the dimentions according to ghost zones.

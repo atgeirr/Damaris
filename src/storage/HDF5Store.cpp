@@ -15,10 +15,12 @@ You should have received a copy of the GNU Lesser General Public License
 along with Damaris.  If not, see <http://www.gnu.org/licenses/>.
 ***************************************************************************/
 
+#include <iterator>
 #include <sstream>
 #include "util/Debug.hpp"
 #include "storage/HDF5Store.hpp"
 #include "env/Environment.hpp"
+#include "data/VariableManager.hpp"
 
 
 
@@ -356,6 +358,30 @@ namespace damaris {
         BlocksByIteration::iterator begin;
         BlocksByIteration::iterator end;
 
+        if (iteration == 0) {
+            const auto &gci_var = VariableManager::Search("GLOBAL_CELL_INDEX");
+            if (gci_var->GetLayout()->GetDimensions() != 1) {
+                // BOOM
+                assert(false);
+            }
+            gci_var->GetBlocksByIteration(iteration, begin, end);
+            const int num_blocks = std::distance(begin, end);
+            blockPos_.resize(num_blocks, nullptr);
+            blockSize_.resize(num_blocks, 0);
+            const int global_size = (*begin)->GetGlobalExtent(0);
+            cellMapping_.resize(global_size, -1);
+            hsize_t block_index = 0;
+            hsize_t offset = 0;
+            for (auto block_iter = begin; block_iter != end; ++block_iter, ++block_index) {
+                const auto& block = *block_iter;
+                const int* cur_block_pos = static_cast<int*>(block->GetDataSpace().GetData());
+                const size_t cur_block_size = block->GetEndIndex(0) - block->GetStartIndex(0) + 1;
+                blockPos_[block_index] = cellMapping_.data() + offset;
+                blockSize_[block_index] = cur_block_size;
+                std::copy(cur_block_pos, cur_block_pos + cur_block_size, blockPos_[block_index]);
+                offset += cur_block_size;
+            }
+        }
 
         // Initializing variables
         std::vector<std::weak_ptr<Variable> >::const_iterator w = GetVariables().begin();
@@ -453,7 +479,6 @@ namespace damaris {
                      logString_dim    += "[" + std::to_string(memDim[i]) + "]" ;                     
                  }
 
-                 
                  // Create memory data space
                  memSpace = H5Screate_simple(varDimention, memDim , NULL);
 
@@ -462,7 +487,8 @@ namespace damaris {
 
                  // Select hyperslab in the file.
                  fileSpace2 = H5Dget_space(dsetId);
-                 H5Sselect_hyperslab(fileSpace2, H5S_SELECT_SET, memOffset, NULL, memDim , NULL);
+                 //H5Sselect_hyperslab(fileSpace2, H5S_SELECT_SET, memOffset, NULL, memDim , NULL);
+                 H5Sselect_elements(fileSpace2, H5S_SELECT_SET, blockSize_[numBlocks], blockPos_[numBlocks]);
 
                  // Create property list for collective dataset write.
                  plistId = H5Pcreate(H5P_DATASET_XFER);
