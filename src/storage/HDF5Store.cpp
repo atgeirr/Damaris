@@ -367,13 +367,12 @@ namespace damaris {
             gci_var->GetBlocksByIteration(iteration, begin, end);
             const int global_size = (*begin)->GetGlobalExtent(0);
             cellMapping_.resize(global_size, -1);
-            hsize_t offset = 0;
             for (auto block_iter = begin; block_iter != end; ++block_iter) {
                 const auto& block = *block_iter;
-                const int* cur_block_pos = static_cast<int*>(block->GetDataSpace().GetData());
+                const int* cur_block_data = static_cast<int*>(block->GetDataSpace().GetData());
                 const size_t cur_block_size = block->GetEndIndex(0) - block->GetStartIndex(0) + 1;
-                std::copy(cur_block_pos, cur_block_pos + cur_block_size, cellMapping_.data() + offset);
-                offset += cur_block_size;
+                const size_t cur_block_pos = block->GetStartIndex(0);
+                std::copy(cur_block_data, cur_block_data + cur_block_size, cellMapping_.data() + cur_block_pos);
             }
         }
 
