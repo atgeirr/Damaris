@@ -365,20 +365,14 @@ namespace damaris {
                 assert(false);
             }
             gci_var->GetBlocksByIteration(iteration, begin, end);
-            const int num_blocks = std::distance(begin, end);
-            blockPos_.resize(num_blocks, nullptr);
-            blockSize_.resize(num_blocks, 0);
             const int global_size = (*begin)->GetGlobalExtent(0);
             cellMapping_.resize(global_size, -1);
-            hsize_t block_index = 0;
             hsize_t offset = 0;
-            for (auto block_iter = begin; block_iter != end; ++block_iter, ++block_index) {
+            for (auto block_iter = begin; block_iter != end; ++block_iter) {
                 const auto& block = *block_iter;
                 const int* cur_block_pos = static_cast<int*>(block->GetDataSpace().GetData());
                 const size_t cur_block_size = block->GetEndIndex(0) - block->GetStartIndex(0) + 1;
-                blockPos_[block_index] = cellMapping_.data() + offset;
-                blockSize_[block_index] = cur_block_size;
-                std::copy(cur_block_pos, cur_block_pos + cur_block_size, blockPos_[block_index]);
+                std::copy(cur_block_pos, cur_block_pos + cur_block_size, cellMapping_.data() + offset);
                 offset += cur_block_size;
             }
         }
@@ -488,7 +482,8 @@ namespace damaris {
                  // Select hyperslab in the file.
                  fileSpace2 = H5Dget_space(dsetId);
                  //H5Sselect_hyperslab(fileSpace2, H5S_SELECT_SET, memOffset, NULL, memDim , NULL);
-                 H5Sselect_elements(fileSpace2, H5S_SELECT_SET, blockSize_[numBlocks], blockPos_[numBlocks]);
+                 // H5Sselect_elements(fileSpace2, H5S_SELECT_SET, blockSize_[numBlocks], blockPos_[numBlocks]);
+                 H5Sselect_elements(fileSpace2, H5S_SELECT_SET, memDim[0], cellMapping_.data() + memOffset[0]);
 
                  // Create property list for collective dataset write.
                  plistId = H5Pcreate(H5P_DATASET_XFER);
